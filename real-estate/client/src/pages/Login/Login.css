@@ -36,42 +36,42 @@
     margin-left: 20%;
 }
 
-.login-container p{
-    font-size: 14px;
-    line-height: 20px;
-    letter-spacing: 0.3px;
-    margin: 20px 0;
-}
+/*.login-container p{*/
+/*    font-size: 14px;*/
+/*    line-height: 20px;*/
+/*    letter-spacing: 0.3px;*/
+/*    margin: 20px 0;*/
+/*}*/
 
-.login-container span{
-    font-size: 12px;
-}
+/*.login-container span{*/
+/*    font-size: 12px;*/
+/*}*/
 
-.login-container a{
-    color: #333;
-    font-size: 13px;
-    text-decoration: none;
-    margin: 15px 0 10px;
-}
+/*.login-container a{*/
+/*    color: #333;*/
+/*    font-size: 13px;*/
+/*    text-decoration: none;*/
+/*    margin: 15px 0 10px;*/
+/*}*/
 
-.login-container button{
-    background-color: #512da8;
-    color: #fff;
-    font-size: 12px;
-    padding: 10px 45px;
-    border: 1px solid transparent;
-    border-radius: 8px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    margin-top: 10px;
-    cursor: pointer;
-}
+/*.login-container .button{*/
+/*    background-color: #512da8;*/
+/*    color: #fff;*/
+/*    font-size: 12px;*/
+/*    padding: 10px 45px;*/
+/*    border: 1px solid transparent;*/
+/*    border-radius: 8px;*/
+/*    font-weight: 600;*/
+/*    letter-spacing: 0.5px;*/
+/*    text-transform: uppercase;*/
+/*    margin-top: 5px;*/
+/*    cursor: pointer;*/
+/*}*/
 
-.login-container button.hidden{
-    background-color: transparent;
-    border-color: #fff;
-}
+/*.login-container .button .hidden{*/
+/*    background-color: transparent;*/
+/*    border-color: #fff;*/
+/*}*/
 
 .login-container form{
     background-color: #fff;
@@ -83,7 +83,18 @@
     height: 100%;
 }
 
-.login-container input{
+/*.mantine-TextInput-input {*/
+/*    background-color: #eee;*/
+/*    border: none;*/
+/*    margin: 8px 0;*/
+/*    padding: 10px 15px;*/
+/*    font-size: 13px;*/
+/*    border-radius: 8px;*/
+/*    width: 100%;*/
+/*    outline: none;*/
+/*}*/
+
+.login-container .mantine-TextInput-input{
     background-color: #eee;
     border: none;
     margin: 8px 0;
@@ -93,6 +104,24 @@
     width: 100%;
     outline: none;
 }
+
+.login-container .mantine-PasswordInput-input {
+    background-color: #eee;
+    border-radius: 8px;
+    width: 100%;
+    margin: 8px 0;
+    padding: 0px 15px;
+}
+/*.login-container input{*/
+/*    background-color: #eee;*/
+/*    border: none;*/
+/*    margin: 8px 0;*/
+/*    padding: 10px 15px;*/
+/*    font-size: 13px;*/
+/*    border-radius: 8px;*/
+/*    width: 100%;*/
+/*    outline: none;*/
+/*}*/
 
 .form-container{
     position: absolute;
@@ -137,7 +166,7 @@
 }
 
 .social-icons{
-    margin: 20px 0;
+    margin: 5px 0;
 }
 
 .social-icons a{

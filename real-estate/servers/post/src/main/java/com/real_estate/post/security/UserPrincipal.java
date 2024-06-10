@@ -15,14 +15,16 @@ public class UserPrincipal implements OAuth2User, UserDetails {
     private Long id;
     private String email;
     private String password;
+    private boolean isActive;
     private Collection<? extends GrantedAuthority> authorities;
     private Map<String, Object> attributes;
 
-    public UserPrincipal(Long id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+    public UserPrincipal(Long id, String email, String password, Collection<? extends GrantedAuthority> authorities, boolean isActive) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
+        this.isActive = isActive;
     }
 
     public static UserPrincipal create(AccountEntity account) {
@@ -35,7 +37,8 @@ public class UserPrincipal implements OAuth2User, UserDetails {
                 account.getAccountId(),
                 account.getEmail(),
                 account.getPassword(),
-                authorities
+                authorities,
+                account.getIsActive()
         );
     }
 
@@ -80,7 +83,7 @@ public class UserPrincipal implements OAuth2User, UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isActive;
     }
 
     @Override

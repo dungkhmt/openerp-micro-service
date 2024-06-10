@@ -60,6 +60,6 @@ export default class BaseRequest {
 
   async _errorHandler(error) {
     // console.log(error);
-    return error.response.data;
+    return error.response?.data;
   }
 }

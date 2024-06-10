@@ -104,7 +104,7 @@ const CardSell = ({ item }) => {
         </div>
       </div>
       {item.avatarAuthor !== undefined && (
-        <div className="infoAuthor">
+        <div className="infoAuthor flexCenter">
           <Grid w={"100%"}>
             <Grid.Col span={"content"}>
               <Link to={"/manager-post/" + item.authorId}>
@@ -135,7 +135,6 @@ const CardSell = ({ item }) => {
                 <div
                   className="flexStart"
                   style={{
-                    // backgroundColor: "#007C80",
                     textAlign: "center",
                     alignItems: "center",
                   }}
