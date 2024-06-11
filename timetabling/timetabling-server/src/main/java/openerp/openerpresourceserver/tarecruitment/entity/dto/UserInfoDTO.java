@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.tarecruitment.dto;
+package openerp.openerpresourceserver.tarecruitment.entity.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

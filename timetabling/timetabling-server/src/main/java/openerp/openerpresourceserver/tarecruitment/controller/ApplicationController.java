@@ -1,10 +1,9 @@
 package openerp.openerpresourceserver.tarecruitment.controller;
 
 import lombok.AllArgsConstructor;
-import openerp.openerpresourceserver.tarecruitment.dto.ChartDTO;
-import openerp.openerpresourceserver.tarecruitment.dto.PaginationDTO;
+import openerp.openerpresourceserver.tarecruitment.entity.dto.ChartDTO;
+import openerp.openerpresourceserver.tarecruitment.entity.dto.PaginationDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.Application;
-import openerp.openerpresourceserver.tarecruitment.entity.ClassCall;
 import openerp.openerpresourceserver.tarecruitment.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
