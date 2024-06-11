@@ -4,6 +4,21 @@ const styles = {
     flexDirection: "row",
     paddingBottom: "1em",
   },
+  firstRow: {
+    marginTop: "1em",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: "1.2em",
+    height: "10em",
+  },
+  inlineRow: {
+    display: "flex",
+    flexDirection: "row",
+    paddingBottom: "1em",
+    marginTop: "1em",
+    marginLeft: "1em",
+  },
   chart: {
     width: "50%",
     padding: "1em",
@@ -11,6 +26,7 @@ const styles = {
   lastChart: {
     width: "100%",
     padding: "1em",
+    paddingBottom: "3em",
   },
   paper: {
     padding: "0.5em",
