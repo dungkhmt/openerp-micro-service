@@ -213,8 +213,6 @@ const RequestTableCreateByMe = () => {
     };
 
     const approveApi = () => {
-        // console.log("222");
-        // return;
         request("put", `/request/approve/${currentId}`, successHandlerApprove, errorHandlers, {});
         setOpenApprove(false);
     };
