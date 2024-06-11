@@ -17,8 +17,7 @@ public class AssetTypeServiceImpl implements AssetTypeService{
 
     @Override
     public List<AssetType> getAllAssetTypes() {
-        List<AssetType> assetTypes = assetTypeRepo.findAll();
-        return assetTypes;
+        return assetTypeRepo.getAllByLastUpdate();
     }
 
     @Override

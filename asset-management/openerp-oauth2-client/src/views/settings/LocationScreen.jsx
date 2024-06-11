@@ -7,7 +7,6 @@ import {StandardTable} from "erp-hust/lib/StandardTable";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
@@ -23,12 +22,6 @@ export const LocationScreen = () => {
         name: "",
         description: "",
         address: ""
-    };
-
-    const [age, setAge] = React.useState('');
-
-    const handleChange = (event) => {
-        setAge(event.target.value);
     };
 
     const [locations, setLocations] = useState([]);
@@ -48,15 +41,7 @@ export const LocationScreen = () => {
     const successHandler = (res) => {
         const msg = title === "CREATE NEW LOCATION" ? "CREATE SUCCESSFULLY" : "EDIT SUCCESSFULLY";
         successNoti(msg, 3000);
-        const locationIndex = locations.findIndex(location => location.id === res.data.id);
-
-        if (locationIndex !== -1) {
-            const updatedLocations = [...locations];
-            updatedLocations[locationIndex] = res.data;
-            setLocations(updatedLocations);
-        } else {
-            setLocations(prevLocations => [...prevLocations, res.data]);
-        }
+        window.location.reload();
     };
 
     const successHandlerDelete = () => {
@@ -157,13 +142,6 @@ export const LocationScreen = () => {
         {
             title: "Description",
             field: "description",
-        },
-        {
-            title: "Status",
-            sorting: true,
-            render: (rowData) => (
-                <Switch {...label} defaultChecked />
-            )
         },
         {
             title: "Edit",

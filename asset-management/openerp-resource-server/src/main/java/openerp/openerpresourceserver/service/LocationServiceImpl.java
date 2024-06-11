@@ -17,8 +17,7 @@ public class LocationServiceImpl implements LocationService{
 
     @Override
     public List<Location> getAllLocations() {
-        List<Location> locations = locationRepo.findAll();
-        return locations;
+        return locationRepo.getAllByLastUpdate();
     }
 
     @Override

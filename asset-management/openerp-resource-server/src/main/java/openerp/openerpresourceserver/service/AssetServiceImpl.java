@@ -171,6 +171,36 @@ public class AssetServiceImpl implements AssetService{
     }
 
     @Override
+    public Asset repairAsset(Integer Id, String admin_id, Boolean is_repair) {
+        Asset foundAsset = assetRepo.findById(Id).get();
+        if(!foundAsset.getAdmin_id().equals(admin_id)){
+            return null;
+        }
+        if(is_repair){
+            foundAsset.setStatus_id(REPAIR);
+        } else {
+            foundAsset.setStatus_id(AVAILABLE);
+        }
+
+        foundAsset.setLast_updated(new Date());
+        return assetRepo.save(foundAsset);
+    }
+
+    @Override
+    public Asset deprecatedAsset(Integer Id, String admin_id) {
+        Asset foundAsset = assetRepo.findById(Id).get();
+        if(foundAsset.getStatus_id().equals(DEPRECATED)){
+            return null;
+        }
+        if(!foundAsset.getAdmin_id().equals(admin_id)){
+            return null;
+        }
+        foundAsset.setStatus_id(DEPRECATED);
+        foundAsset.setLast_updated(new Date());
+        return assetRepo.save(foundAsset);
+    }
+
+    @Override
     public List<String> getTopAssignUsers() {
         return assetRepo.getTopAssignUsers();
     }

@@ -54,6 +54,8 @@ const AssetDetail = () => {
   const [assetDetail, setAssetDetail] = useState({});
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [openRepair, setOpenRepair] = useState(false);
+  const [openDeprecated, setOpenDeprecated] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
 
   const [locations, setLocations] = useState([]);
@@ -178,6 +180,14 @@ const AssetDetail = () => {
     setOpen(false);
   };
 
+  const handleCloseRepair = () => {
+    setOpenRepair(false);
+  };
+
+  const handleCloseDeprecated = () => {
+    setOpenDeprecated(false);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const foundLocation = locations.find(
@@ -211,6 +221,14 @@ const AssetDetail = () => {
     setOpen(true);
   };
 
+  const handleRepair = () => {
+    setOpenRepair(true);
+  };
+
+  const handleDeprecated = () => {
+    setOpenDeprecated(true);
+  };
+
   const handleDelete = () => {
     setOpenDelete(true);
   };
@@ -218,6 +236,24 @@ const AssetDetail = () => {
 	const handleCloseDelete = ()  => {
 		setOpenDelete(false);
 	};
+
+  const repairApi = async() => {
+    let is_repair = true;
+    if(assetDetail["status_id"] === 1 || assetDetail["status_id"] === 2){
+      await request("put", `/asset/repair/${params.id}/${is_repair}`, successHandler, errorHandlers, {});
+    }
+    else if(assetDetail["status_id"] === 3){
+      is_repair = false;
+      await request("put", `/asset/repair/${params.id}/${is_repair}`, successHandler, errorHandlers, {});
+    }
+    
+    setOpenRepair(false);
+  };
+
+  const deprecatedApi = async() => {
+    await request("put", `/asset/deprecated/${params.id}`, successHandler, errorHandlers, {});
+    setOpenDeprecated(false);
+  };
 
 	const deleteApi = () => {
 		request("delete", `/asset/delete/${params.id}`, successHandlerDelete, errorHandlers, {});
@@ -250,7 +286,10 @@ const AssetDetail = () => {
           title={<Typography variant="h5">Asset Detail</Typography>}
         />
         <div style={{ float: "right", paddingRight: "20px" }}>
+          {/* {assetDetail["status_id"] === 1 && <Button>Assign</Button>} */}
           <Button onClick={handleEdit}>Edit</Button>
+          <Button onClick={handleRepair}>Repair</Button>
+          {assetDetail["status_id"] !== 4 && <Button onClick={handleDeprecated}>Deprecated</Button>}
           <Button onClick={handleDelete}>Delete</Button>
         </div>
         <CardContent style={{ paddingTop: "20px" }}>
@@ -423,8 +462,60 @@ const AssetDetail = () => {
         </Box>
       </Modal>
       <Dialog
+        open={openRepair}
+        onClose={handleCloseRepair}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"REPAIR THIS ASSET"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {assetDetail["status_id"] !== 3 ? `Do you want to repair this asset. This asset will be repaired and cannot be used when finish repairing.` : `Finish repairing this asset? Now it will be available and can be use.`}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="outlined" onClick={handleCloseRepair}>
+            CANCEL
+          </Button>
+          <Button
+            variant="outlined"
+            color="success"
+            onClick={repairApi}
+            autoFocus
+          >
+            {assetDetail["status_id"] !== 3 ? `REPAIR` : `FINISH REPAIR`}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openDeprecated}
+        onClose={handleCloseDeprecated}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"DEPRECATE THIS ASSET"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Do you want to deprecate this asset. This asset will be deprecated and cannot be used anymore.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="outlined" onClick={handleCloseDeprecated}>
+            CANCEL
+          </Button>
+          <Button
+            variant="outlined"
+            color="success"
+            onClick={deprecatedApi}
+            autoFocus
+          >
+            DEPRECATE
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
         open={openDelete}
-        onClose={handleClose}
+        onClose={handleCloseDelete}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >

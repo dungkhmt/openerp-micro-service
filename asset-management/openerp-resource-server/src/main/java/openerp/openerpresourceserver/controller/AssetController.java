@@ -105,6 +105,26 @@ public class AssetController {
             .body(asset);
     }
 
+    @PutMapping("/repair/{Id}/{isRepair}")
+    public ResponseEntity<?> repairAsset(@PathVariable Integer Id, @PathVariable Boolean isRepair, Principal principal){
+        String admin_id = principal.getName();
+        Asset asset = assetService.repairAsset(Id, admin_id, isRepair);
+        assetLogService.createNewAssetLog(asset.getId(), admin_id, "repair");
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(asset);
+    }
+
+    @PutMapping("/deprecated/{Id}")
+    public ResponseEntity<?> deprecatedAsset(@PathVariable Integer Id, Principal principal){
+        String admin_id = principal.getName();
+        Asset asset = assetService.deprecatedAsset(Id, admin_id);
+        assetLogService.createNewAssetLog(asset.getId(), admin_id, "deprecated");
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(asset);
+    }
+
     @GetMapping("/top-admin-users")
     public ResponseEntity<?> getTopAdminUsers(){
         List<String> users = assetService.getTopAdminUsers();

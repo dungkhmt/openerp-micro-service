@@ -34,16 +34,7 @@ export const TypeScreen = () => {
     const successHandler = (res) => {
         const msg = title === "CREATE NEW ASSET TYPE" ? "CREATE SUCCESSFULLY" : "EDIT SUCCESSFULLY";
         successNoti(msg, 3000);
-        console.log("res", res);
-        const typeIndex = types.findIndex(type => type.id === res.data.id);
-
-        if (typeIndex !== -1) {
-            const updatedTypes = [...types];
-            updatedTypes[typeIndex] = res.data;
-            setTypes(updatedTypes);
-        } else {
-            setTypes(prevTypes => [...prevTypes, res.data]);
-        }
+        window.location.reload();
     };    
 
     const successHandlerDelete = () => {

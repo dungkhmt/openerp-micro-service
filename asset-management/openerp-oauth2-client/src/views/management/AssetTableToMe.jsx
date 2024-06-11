@@ -87,16 +87,7 @@ const AssetTableToMe = () => {
     const successHandler = (res) => {
         const msg = title === "CREATE NEW ASSET" ? "CREATE SUCCESSFULLY" : "EDIT SUCCESSFULLY";
         successNoti(msg, 3000);
-        const assetIndex = assets.findIndex(asset => asset.id === res.data.id);
-
-        if (assetIndex !== -1) {
-            const updatedAssets = [...assets];
-            updatedAssets[assetIndex] = res.data;
-            console.log("res data", res.data);
-            setAssets(updatedAssets);
-        } else {
-            setAssets(prevAsset => [...prevAsset, res.data]);
-        }
+        window.location.reload();
     };
 
     const successHandlerDelete = () => {

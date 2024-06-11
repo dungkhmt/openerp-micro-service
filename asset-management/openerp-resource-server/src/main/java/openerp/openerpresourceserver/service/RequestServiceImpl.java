@@ -51,6 +51,9 @@ public class RequestServiceImpl implements RequestService{
         newRequest.setType(request.getType());
         Integer asset_id = request.getAsset_id();
         Asset asset = assetRepo.findById(asset_id).get();
+        if(asset.getStatus_id().equals(3) || asset.getStatus_id().equals(4)) {
+            return null;
+        }
         newRequest.setAdmin_id(asset.getAdmin_id());
 
         if(request.getType() == 1){ // request borrow

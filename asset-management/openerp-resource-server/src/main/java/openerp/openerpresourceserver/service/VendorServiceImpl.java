@@ -17,8 +17,7 @@ public class VendorServiceImpl implements VendorService{
 
     @Override
     public List<Vendor> getAllVendors() {
-        List<Vendor> vendors = vendorRepo.findAll();
-        return vendors;
+        return vendorRepo.getAllByLastUpdate();
     }
 
     @Override
