@@ -22,10 +22,10 @@ public interface ApplicationRepo extends JpaRepository<Application, Integer> {
             "WHERE a.classCall.semester = :semester " +
             "AND a.applicationStatus = :status " +
             "AND (:search = '' " +
-            "     OR (a.classCall.subjectName LIKE CONCAT('%', :search, '%') " +
-            "     OR a.name LIKE CONCAT('%', :search, '%') " +
-            "     OR CAST(a.classCall.id AS string) LIKE CONCAT('%', :search, '%') " +
-            "     OR a.mssv LIKE CONCAT('%', :search, '%'))) " +
+            "     OR (LOWER(a.classCall.subjectName) LIKE CONCAT('%', LOWER(:search), '%') " +
+            "     OR LOWER(a.name) LIKE CONCAT('%', LOWER(:search), '%') " +
+            "     OR CAST(a.classCall.id AS string) LIKE CONCAT('%', LOWER(:search), '%') " +
+            "     OR LOWER(a.mssv) LIKE CONCAT('%', LOWER(:search), '%'))) " +
             "AND (:assignStatus = '' OR a.assignStatus = :assignStatus) " +
             "ORDER BY a.classCall.id ASC, a.user.id ASC")
     Page<Application> findByApplicationStatusAndSemester(String status, String semester, String search, String assignStatus, Pageable pageable);
@@ -34,12 +34,12 @@ public interface ApplicationRepo extends JpaRepository<Application, Integer> {
             "AND a.applicationStatus = :applicationStatus " +
             "AND a.assignStatus = :assignStatus " +
             "AND (:search = '' " +
-            "OR a.name LIKE CONCAT('%', :search, '%') " +
-            "OR a.email LIKE CONCAT('%', :search, '%') " +
-            "OR a.mssv LIKE CONCAT('%', :search, '%') " +
-            "OR a.classCall.subjectName LIKE CONCAT('%', :search, '%') " +
-            "OR CAST(a.classCall.id AS string) LIKE CONCAT('%', :search, '%') " +
-            "OR a.classCall.subjectId LIKE CONCAT('%', :search, '%')) " +
+            "OR LOWER(a.name) LIKE CONCAT('%', LOWER(:search), '%') " +
+            "OR LOWER(a.email) LIKE CONCAT('%', LOWER(:search), '%') " +
+            "OR LOWER(a.mssv) LIKE CONCAT('%', LOWER(:search), '%') " +
+            "OR LOWER(a.classCall.subjectName) LIKE CONCAT('%', LOWER(:search), '%') " +
+            "OR LOWER(CAST(a.classCall.id AS string)) LIKE CONCAT('%', LOWER(:search), '%') " +
+            "OR LOWER(a.classCall.subjectId) LIKE CONCAT('%', LOWER(:search), '%')) " +
             "ORDER BY a.classCall.id ASC, a.user.id ASC")
     Page<Application> getTABySemester(String applicationStatus, String assignStatus, String semester, String search, Pageable pageable);
 
@@ -51,10 +51,10 @@ public interface ApplicationRepo extends JpaRepository<Application, Integer> {
             "FROM Application a " +
             "WHERE a.classCall.semester = :semester " +
             "AND (:search = '' " +
-            "     OR (a.classCall.subjectName LIKE CONCAT('%', :search, '%') " +
-            "     OR a.name LIKE CONCAT('%', :search, '%') " +
-            "     OR a.mssv LIKE CONCAT('%', :search, '%')" +
-            "     OR CAST(a.classCall.id AS string) LIKE CONCAT('%', :search, '%'))) " +
+            "     OR (LOWER(a.classCall.subjectName) LIKE CONCAT('%', LOWER(:search), '%') " +
+            "     OR LOWER(a.name) LIKE CONCAT('%', LOWER(:search), '%') " +
+            "     OR LOWER(a.mssv) LIKE CONCAT('%', LOWER(:search), '%')" +
+            "     OR LOWER(CAST(a.classCall.id AS string)) LIKE CONCAT('%', LOWER(:search), '%'))) " +
             "AND (:applicationStatus = '' OR a.applicationStatus = :applicationStatus) " +
             "ORDER BY a.classCall.id ASC, a.user.id ASC")
     Page<Application> findApplicationsByClassSemester(String semester, String search, String applicationStatus, Pageable pageable);
