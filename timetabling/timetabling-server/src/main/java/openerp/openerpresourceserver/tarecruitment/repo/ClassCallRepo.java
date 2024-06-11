@@ -12,9 +12,9 @@ public interface ClassCallRepo extends JpaRepository<ClassCall, Integer> {
     @Query("SELECT cc FROM ClassCall cc " +
             "WHERE cc.semester = :semester " +
             "AND (:search = '' " +
-            "     OR cc.subjectName LIKE CONCAT('%', :search, '%') " +
-            "     OR cc.subjectId LIKE CONCAT('%', :search, '%') " +
-            "     OR CAST(cc.id AS string) LIKE CONCAT('%', :search, '%')) " +
+            "     OR LOWER(cc.subjectName) LIKE CONCAT('%', LOWER(:search), '%') " +
+            "     OR LOWER(cc.subjectId) LIKE CONCAT('%', LOWER(:search), '%') " +
+            "     OR LOWER(CAST(cc.id AS string)) LIKE CONCAT('%', LOWER(:search), '%')) " +
             "ORDER BY cc.id ASC")
     Page<ClassCall> findBySemester(String semester, String search, Pageable pageable);
 

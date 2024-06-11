@@ -1,6 +1,5 @@
-import { request } from "api";
-import { useEffect, useState, useCallback } from "react";
-import { SEMESTER } from "../config/localize";
+import { useEffect, useMemo, useState } from "react";
+import useDebounce from "../config/debounce";
 import {
   Chip,
   IconButton,
@@ -18,9 +17,11 @@ import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { DataGrid } from "@mui/x-data-grid";
-import styles from "./index.style";
+import { request } from "api";
+import { SEMESTER } from "../config/localize";
 import { applicationUrl, semesterUrl } from "../apiURL";
 import { successNoti } from "utils/notification";
+import styles from "./index.style";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -32,7 +33,6 @@ const RequestApprovalScreen = () => {
   const [originalApplications, setOriginalApplications] = useState([]);
 
   const [rowSelect, setRowSelect] = useState([]);
-
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
   const [semester, setSemester] = useState(SEMESTER);
@@ -42,10 +42,10 @@ const RequestApprovalScreen = () => {
   );
 
   const [isFilter, setIsFilter] = useState(false);
-
   const [statusFilter, setStatusFilter] = useState("ALL");
-
   const [search, setSearch] = useState("");
+
+  const debouncedSearch = useDebounce(search, 1000);
 
   useEffect(() => {
     request("get", semesterUrl.getCurrentSemester, (res) => {
@@ -53,34 +53,15 @@ const RequestApprovalScreen = () => {
     });
   }, []);
 
-  const debouncedSearch = useCallback(
-    (search, statusFilter) => {
-      const timer = setTimeout(() => {
-        setPaginationModel({
-          ...DEFAULT_PAGINATION_MODEL,
-          page: 0,
-        });
-        handleFetchData();
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [search, statusFilter]
-  );
-
-  useEffect(() => {
-    return debouncedSearch(search, statusFilter);
-  }, [search, statusFilter, debouncedSearch, semester]);
-
   useEffect(() => {
     handleFetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paginationModel, semester]);
+  }, [paginationModel, semester, debouncedSearch, statusFilter]);
 
   const handleFetchData = () => {
-    const searchParam =
-      search !== "" ? `&search=${encodeURIComponent(search)}` : "";
+    const searchParam = debouncedSearch
+      ? `&search=${encodeURIComponent(debouncedSearch)}`
+      : "";
     const applicationStatusParam =
       statusFilter !== "" ? `&appStatus=${statusFilter}` : "";
 
@@ -101,14 +82,13 @@ const RequestApprovalScreen = () => {
     setStatusFilter(e.target.value);
   };
 
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
-  };
+  const handleSearch = useMemo(
+    () => (e) => {
+      setSearch(e.target.value);
+    },
+    []
+  );
 
-  /**
-   * @description Handle change status of application
-   * @index Find the index of the application in the applications array
-   */
   const handleChangeStatus = (event, rowData) => {
     const { value } = event.target;
     const { id } = rowData;
@@ -128,17 +108,12 @@ const RequestApprovalScreen = () => {
     }
   };
 
-  /**
-   * @index Find the index of the application in the applications array
-   * @value Get the application status of the application
-   */
   const handleSaveData = (rowData) => {
     const { id } = rowData;
 
     const index = applications.findIndex(
       (application) => application.id === id
     );
-
     const value = applications[index].applicationStatus;
     const updatedApplication = { ...rowData, applicationStatus: value };
 
@@ -230,9 +205,7 @@ const RequestApprovalScreen = () => {
           id="application-status"
           name="application-status"
           sx={styles.selection}
-          onChange={(e) => {
-            handleChangeStatusFilter(e);
-          }}
+          onChange={handleChangeStatusFilter}
         >
           <MenuItem value="ALL">
             <Chip label="ALL" color="primary" variant="outlined" />

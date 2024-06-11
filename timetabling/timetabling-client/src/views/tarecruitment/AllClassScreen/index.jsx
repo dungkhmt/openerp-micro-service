@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
+import useDebounce from "../config/debounce";
 import { request } from "api";
 import { useHistory } from "react-router-dom";
 import {
@@ -39,6 +40,8 @@ const AllClassScreen = () => {
 
   const [search, setSearch] = useState("");
 
+  const debouncedSearch = useDebounce(search, 1000);
+
   const [paginationModel, setPaginationModel] = useState(
     DEFAULT_PAGINATION_MODEL
   );
@@ -56,34 +59,16 @@ const AllClassScreen = () => {
     });
   }, []);
 
-  const debouncedSearch = useCallback(
-    (search) => {
-      const timer = setTimeout(() => {
-        setPaginationModel({
-          ...DEFAULT_PAGINATION_MODEL,
-          page: 0,
-        });
-        handleFetchData();
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [search]
-  );
-
-  useEffect(() => {
-    return debouncedSearch(search);
-  }, [search, debouncedSearch]);
-
   useEffect(() => {
     handleFetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [semester, paginationModel]);
+  }, [paginationModel, semester, debouncedSearch]);
 
   const handleFetchData = () => {
     const searchParam =
-      search !== "" ? `&search=${encodeURIComponent(search)}` : "";
+      debouncedSearch !== ""
+        ? `&search=${encodeURIComponent(debouncedSearch)}`
+        : "";
     setIsLoading(true);
     request(
       "get",
@@ -156,9 +141,12 @@ const AllClassScreen = () => {
     setOpenApplicatorDialog(true);
   };
 
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
-  };
+  const handleSearch = useMemo(
+    () => (e) => {
+      setSearch(e.target.value);
+    },
+    []
+  );
 
   const handleCloseApplicatorDialog = () => {
     setOpenApplicatorDialog(false);

@@ -11,7 +11,8 @@ import {
 import { SEMESTER } from "../config/localize";
 import { styles } from "./index.style";
 import { DataGrid } from "@mui/x-data-grid";
-import { useCallback, useEffect, useState } from "react";
+import { useMemo, useEffect, useState } from "react";
+import useDebounce from "../config/debounce";
 import { request } from "api";
 import { applicationUrl, semesterUrl } from "../apiURL";
 
@@ -29,6 +30,8 @@ const TAAssistListScreen = () => {
 
   const [search, setSearch] = useState("");
 
+  const debouncedSearch = useDebounce(search, 1000);
+
   const [paginationModel, setPaginationModel] = useState(
     DEFAULT_PAGINATION_MODEL
   );
@@ -42,34 +45,16 @@ const TAAssistListScreen = () => {
     });
   }, []);
 
-  const debouncedSearch = useCallback(
-    (search) => {
-      const timer = setTimeout(() => {
-        setPaginationModel({
-          ...DEFAULT_PAGINATION_MODEL,
-          page: 0,
-        });
-        handleFetchData();
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [search]
-  );
-
-  useEffect(() => {
-    return debouncedSearch(search);
-  }, [search, debouncedSearch]);
-
   useEffect(() => {
     handleFetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [semester, paginationModel]);
+  }, [semester, paginationModel, debouncedSearch]);
 
   const handleFetchData = () => {
     const searchParam =
-      search !== "" ? `&search=${encodeURIComponent(search)}` : "";
+      debouncedSearch !== ""
+        ? `&search=${encodeURIComponent(debouncedSearch)}`
+        : "";
     setIsLoading(true);
     request(
       "get",
@@ -86,9 +71,12 @@ const TAAssistListScreen = () => {
     setSemester(event.target.value);
   };
 
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
-  };
+  const handleSearch = useMemo(
+    () => (e) => {
+      setSearch(e.target.value);
+    },
+    []
+  );
 
   const handleDownloadFile = () => {
     request(
@@ -115,6 +103,7 @@ const TAAssistListScreen = () => {
     {
       field: "name",
       headerName: "Tên sinh viên",
+      align: "center",
       headerAlign: "center",
       minWidth: 300,
       flex: 3,
@@ -170,6 +159,7 @@ const TAAssistListScreen = () => {
       field: "subjectName",
       headerName: "Tên môn học",
       headerAlign: "center",
+      align: "center",
       flex: 3,
       minWidth: 300,
     },
@@ -177,6 +167,7 @@ const TAAssistListScreen = () => {
       field: "time",
       headerName: "Thời gian",
       headerAlign: "center",
+      align: "center",
       flex: 2,
       minWidth: 200,
     },
