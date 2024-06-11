@@ -2,8 +2,8 @@ package openerp.openerpresourceserver.tarecruitment.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import openerp.openerpresourceserver.tarecruitment.dto.ChartDTO;
-import openerp.openerpresourceserver.tarecruitment.dto.PaginationDTO;
+import openerp.openerpresourceserver.tarecruitment.entity.dto.ChartDTO;
+import openerp.openerpresourceserver.tarecruitment.entity.dto.PaginationDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.ClassCall;
 import openerp.openerpresourceserver.tarecruitment.repo.ClassCallRepo;
 import org.apache.poi.ss.usermodel.*;
