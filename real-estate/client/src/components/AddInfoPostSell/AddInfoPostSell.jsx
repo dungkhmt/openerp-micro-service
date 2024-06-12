@@ -1,14 +1,15 @@
 import {
+  ActionIcon,
   Box,
   Button,
   Grid,
   NumberInput,
+  rem,
   Select,
   TextInput,
 } from "@mantine/core";
 import Map from "../Map/Map";
 import { AiOutlineCloudUpload } from "react-icons/ai";
-import { ImBin } from "react-icons/im";
 import React, { useEffect, useState } from "react";
 import "./AddInfoPostSell.css";
 import {
@@ -17,13 +18,14 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { storage } from "../UploadImage/FireBaseConfig";
+import { storage } from "../../utils/FireBaseConfig";
 import { v4 } from "uuid";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { toast, ToastContainer } from "react-toastify";
-import { transferPrice } from "../../utils/common";
+import { transferPrice, uploadImage } from "../../utils/common";
 import DistrictRequest from "../../services/DistrictRequest";
+import { IoClose } from "react-icons/io5";
 
 const AddInfoPostSell = ({
   propertyDetails,
@@ -59,7 +61,7 @@ const AddInfoPostSell = ({
   const [acreage, setAcreage] = useState(propertyDetails?.acreage || 0);
   const [bedroom, setBedroom] = useState(propertyDetails?.bedroom || 0);
   const [bathroom, setBathroom] = useState(propertyDetails?.bathroom || 0);
-  const [parking, setParking] = useState(propertyDetails?.parking) || 0;
+  const [parking, setParking] = useState(propertyDetails?.parking || 0);
   const [floor, setFloor] = useState(propertyDetails?.floor || 0);
   const [legalDocument, setLegalDocument] = useState(
     propertyDetails?.legalDocument || null,
@@ -85,32 +87,6 @@ const AddInfoPostSell = ({
     key: item.districtId,
   }));
 
-  const uploadImage = (image) => {
-    return new Promise((resolve, reject) => {
-      const storageRef = ref(storage, `images/${v4()}`);
-      const uploadTask = uploadBytesResumable(storageRef, image);
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          // Xử lý tiến trình tải lên
-        },
-        (error) => {
-          // Xử lý lỗi
-          console.log(error);
-          reject(error);
-        },
-        () => {
-          // Xử lý khi tải lên thành công
-          getDownloadURL(uploadTask.snapshot.ref)
-            .then((url) => {
-              // console.log(url);
-              resolve(url);
-            })
-            .catch((error) => reject(error));
-        },
-      );
-    });
-  };
   const handleUpload = (e) => {
     const files = e.target.files;
     if (files.length <= 4) {
@@ -133,7 +109,7 @@ const AddInfoPostSell = ({
       address === null ||
       imageUrls.length < 1 ||
       title.length < 20 ||
-      title.length > 50 ||
+      title.length > 70 ||
       acreage === 0 ||
       price === 0 ||
       typeProperty === null ||
@@ -258,7 +234,7 @@ const AddInfoPostSell = ({
           flexdirectionProperty: "row",
         }}
       >
-        <div className="flexColStart" style={{ flex: 1, gap: "1rem" }}>
+        <div className="flexColCenter" style={{ flex: 1, gap: "1rem" }}>
           <Select
             w={"60%"}
             withAsterisk
@@ -328,20 +304,35 @@ const AddInfoPostSell = ({
         />
 
         <div className="flexColEnd uploadView">
-          {imageUrls?.map((image, index) => {
-            return (
-              <div className="imageContainer" key={index + 1}>
-                <img src={image} alt="" className="imageUpload" />
-                <span
-                  title="Xóa"
-                  onClick={() => handleDeleteImage(image)}
-                  className="deleteImage"
-                >
-                  <ImBin />
-                </span>
-              </div>
-            );
-          })}
+          <Grid
+            w={"100%"}
+            style={{
+              width: "100%",
+              height: "100%",
+            }}
+          >
+            {imageUrls?.map((image, index) => {
+              return (
+                <Grid.Col span={6} key={index} style={{ minHeight: rem(200) }}>
+                  <div className="imageContainer">
+                    <img src={image} alt="" className="imageUpload" />
+                    <ActionIcon
+                      size={20}
+                      radius="xl"
+                      variant="filled"
+                      onClick={() => handleDeleteImage(image)}
+                      className="deleteImage"
+                    >
+                      <IoClose
+                        style={{ width: rem(18), height: rem(18) }}
+                        stroke={1.5}
+                      />
+                    </ActionIcon>
+                  </div>
+                </Grid.Col>
+              );
+            })}
+          </Grid>
         </div>
       </div>
 

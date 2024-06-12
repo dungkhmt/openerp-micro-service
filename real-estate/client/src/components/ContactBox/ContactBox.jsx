@@ -51,16 +51,19 @@ const ContactBox = ({ account, isOwner }) => {
       )}
 
       <Dialog
+        className="custom-dialog"
         opened={opened}
         withCloseButton
         onClose={close}
-        size="lg"
+        // size="lg"
+        spaci
         radius="md"
         zIndex={1001}
         style={{
           width: "450px",
           height: "500px",
           backgroundColor: "rgba(17, 25, 40, 1)",
+          padding: "0 !important",
         }}
       >
         <ConversationDetail

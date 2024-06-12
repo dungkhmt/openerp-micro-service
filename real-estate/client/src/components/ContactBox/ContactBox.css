@@ -12,3 +12,7 @@
 .contact-box-container > button {
     margin: 5px 0;
 }
+
+.custom-dialog {
+    padding: 0px !important;
+}

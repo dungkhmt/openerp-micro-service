@@ -2,15 +2,11 @@
     /*background-color: aquamarine;*/
     /*margin: 0 30px;*/
     /*border-bottom: 1px solid red;*/
-    width: 100%;
+    width: 80%;
     display: block;
     position: relative;
-    /*height: 500px;*/
     padding: 0 30px;
-}
-
-.addLocation {
-    height: 350px;
+    margin: 0 auto;
 }
 
 .uploadWrapper {
@@ -32,47 +28,3 @@
     cursor: pointer;
 }
 
-.uploadView {
-    width: 60%;
-    height: 100%;
-    /*border: 5px solid black;*/
-    /*background-color: #1f3e72;*/
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-
-    gap: 5px;
-}
-
-.imageContainer {
-    width: 100%;
-    height: 100%;
-    display: block;
-    /*padding:10px;*/
-    position: relative;
-    /*border: 2px solid red;*/
-}
-
-.imageUpload {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 10px;
-    z-index: 0;
-}
-
-.deleteImage {
-    color: blue;
-    position: absolute;
-    right: -5px;
-    /*background-color: #ff922d;*/
-    /*width: 400px;*/
-    z-index: 1;
-    cursor: pointer;
-}
-
-.information {
-    background-color: #1f3e72;
-    width: 100%;
-}

@@ -43,9 +43,11 @@ const Chatlist = ({ setConversationSelect, conversations }) => {
           className="item"
           key={index}
           onClick={() => setConversationSelect(coversation)}
-          style={{
-            backgroundColor: "#5183fe",
-          }}
+          style={
+            {
+              // backgroundColor: "#5183fe",
+            }
+          }
         >
           <img src={coversation.other.avatar || "./avatar.png"} alt="" />
           <div className="texts">

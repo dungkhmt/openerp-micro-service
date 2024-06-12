@@ -2,6 +2,7 @@ package com.real_estate.post.daos.impls;
 
 
 import com.real_estate.post.daos.interfaces.PostBuyDao;
+import com.real_estate.post.dtos.response.CountPostByProvinceResponseDto;
 import com.real_estate.post.dtos.response.PostBuyResponseDto;
 import com.real_estate.post.models.AccountEntity;
 import com.real_estate.post.models.PostBuyEntity;
@@ -11,6 +12,7 @@ import com.real_estate.post.utils.PostStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -59,7 +61,7 @@ public class PostBuyImpl implements PostBuyDao {
 	}
 
 	@Override
-	public List<PostBuyResponseDto> findPostBuyBy(Pageable pageable, String province, String district) {
+	public List<PostBuyResponseDto> findPostBuyBy(Pageable pageable, String provinceId) {
 		int limit = pageable.getPageSize();
 		int offset = (int) pageable.getOffset();
 
@@ -69,13 +71,9 @@ public class PostBuyImpl implements PostBuyDao {
 						"from PostBuyPostgresEntity p " +
 						"left join AccountPostgresEntity a on p.authorId = a.accountId " +
 						"where p.postStatus = 'OPENING' ");
-		if (province != null && province != "") {
-			rawQuery.append("and p.province = '" + province + "' ");
+		if (provinceId != null && provinceId != "") {
+			rawQuery.append("and p.provinceId = '" + provinceId + "' ");
 		}
-		if (district != null && district != "") {
-			rawQuery.append("and p.district = '" + district + "' ");
-		}
-
 		rawQuery.append("order by p.createdAt desc ");
 
 		Query query = entityManager.createQuery(rawQuery.toString());
@@ -93,18 +91,15 @@ public class PostBuyImpl implements PostBuyDao {
 	}
 
 	@Override
-	public Long countBy(String province, String district) {
+	public Long countBy(String provinceId) {
 		StringBuilder rawQuery = new StringBuilder();
 		rawQuery.append(
 				"select p, a " +
 						"from PostBuyPostgresEntity p " +
 						"left join AccountPostgresEntity a on p.authorId = a.accountId " +
 						"where p.postStatus = 'OPENING' ");
-		if (province != null && province != "") {
-			rawQuery.append("and p.province = '" + province + "' ");
-		}
-		if (district != null && district != "") {
-			rawQuery.append("and p.district = '" + district + "' ");
+		if (provinceId != null && provinceId != "") {
+			rawQuery.append("and p.provinceId = '" + provinceId + "' ");
 		}
 		Query query = entityManager.createQuery(rawQuery.toString());
 		List<Object[]> resultList = query.getResultList();
@@ -136,5 +131,21 @@ public class PostBuyImpl implements PostBuyDao {
 	@Override
 	public Integer updateStatusBy(Long postBuyId, Long accountId, PostStatus status) {
 		return repository.updateStatusBy(postBuyId, accountId, status.toString());
+	}
+
+	@Override
+	public List<CountPostByProvinceResponseDto> countPost() {
+		TypedQuery query = entityManager.createQuery(
+				"select new com.real_estate.post.dtos.response.CountPostByProvinceResponseDto(" +
+						"p.provinceId," +
+						"p.nameProvince," +
+						"count(p.provinceId)) " +
+						"from PostBuyPostgresEntity p " +
+						"group by p.provinceId, p.nameProvince " +
+						"order by count(p.provinceId) desc",
+				CountPostByProvinceResponseDto.class
+		);
+
+		return query.getResultList();
 	}
 }

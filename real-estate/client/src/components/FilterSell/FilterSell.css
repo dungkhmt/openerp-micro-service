@@ -1,7 +1,7 @@
 .filterContainer{
-    width: 85%;
+    /*width: 85%;*/
     /*background-color: #ffb978;*/
-    margin: 0 auto;
+    margin: 0 0;
 }
 
 .filterContainer > div {

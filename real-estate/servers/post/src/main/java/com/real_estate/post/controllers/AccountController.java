@@ -7,10 +7,22 @@ import com.real_estate.post.dtos.response.ResponseDto;
 import com.real_estate.post.services.AccountService;
 import com.real_estate.post.services.AuthenticationService;
 import com.real_estate.post.services.GmailSenderService;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.OAuth2RefreshToken;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/account")
@@ -43,5 +55,20 @@ public class AccountController {
         Long accountId = authenticationService.getAccountIdFromContext();
         accountService.updatePassword(requestDto, accountId);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, "Cập nhật mật khẩu thành công"));
+    }
+
+    @GetMapping("/logout")
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null){
+                new SecurityContextLogoutHandler().logout(request, response, auth);
+            }
+            System.out.println("logout");
+            request.logout();
+            response.sendRedirect("http://localhost:2804/");
+        } catch (ServletException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

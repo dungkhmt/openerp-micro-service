@@ -1,6 +1,7 @@
 package com.real_estate.post.daos.interfaces;
 
 
+import com.real_estate.post.dtos.response.CountPostByProvinceResponseDto;
 import com.real_estate.post.dtos.response.PostBuyResponseDto;
 import com.real_estate.post.models.PostBuyEntity;
 import com.real_estate.post.utils.PostStatus;
@@ -17,16 +18,16 @@ public interface PostBuyDao {
 
 	public List<PostBuyResponseDto> findPostBuyBy(
 			Pageable pageable,
-			String province,
-			String district
+			String provinceId
 	);
 
 	public Long countBy(
-			String province,
-			String district
+			String provinceId
 	);
 
 	public List<PostBuyResponseDto> findByAccountId(Long accountId);
 
 	public Integer updateStatusBy(Long postBuyId, Long accountId, PostStatus status);
+
+	public List<CountPostByProvinceResponseDto> countPost();
 }

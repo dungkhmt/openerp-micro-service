@@ -1,5 +1,6 @@
 package com.real_estate.post.controllers;
 
+import com.real_estate.post.dtos.response.CountPostByProvinceResponseDto;
 import com.real_estate.post.dtos.response.PageResponseDto;
 import com.real_estate.post.dtos.response.PostBuyResponseDto;
 import com.real_estate.post.dtos.response.ResponseDto;
@@ -26,10 +27,9 @@ public class PublicPostBuyController {
     public ResponseEntity<PageResponseDto<PostBuyResponseDto>> getPagePostBuy(
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "size", defaultValue = "10") Integer size,
-            @RequestParam(value = "province", required = false) String province,
-            @RequestParam(value = "district", required = false) String district
+            @RequestParam(value = "provinceId", required = false) String provinceId
     ) {
-        Page<PostBuyResponseDto> result = postBuyService.getPageBuy(page, size, province, district);
+        Page<PostBuyResponseDto> result = postBuyService.getPageBuy(page, size, provinceId);
         return ResponseEntity.status(HttpStatus.OK).body(new PageResponseDto<PostBuyResponseDto>(200, result));
     }
 
@@ -41,4 +41,10 @@ public class PublicPostBuyController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, entities));
     }
 
+    @GetMapping("/count")
+    @Operation(summary = "count post by province", operationId = "publicBuy.count")
+    public ResponseEntity<?> countPostByProvince() {
+        List<CountPostByProvinceResponseDto> result = postBuyService.getTotalPost();
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, result));
+    }
 }

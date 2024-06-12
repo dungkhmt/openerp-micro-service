@@ -1,7 +1,7 @@
 .conversationList {
-    background-color: #F2F2F2;
+    /*background-color: #F2F2F2;*/
     flex: 1;
-    border-radius: 12px;
+    /*border-radius: 12px;*/
     /*overflow: scroll;*/
     .search {
         display: flex;

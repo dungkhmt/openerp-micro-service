@@ -59,7 +59,7 @@ const MultilplySelect = ({ data, value, setValue, transferContent }) => {
 
   return (
     <Combobox
-      width={250}
+      width={300}
       position="bottom-start"
       withArrow
       zIndex={1001}
