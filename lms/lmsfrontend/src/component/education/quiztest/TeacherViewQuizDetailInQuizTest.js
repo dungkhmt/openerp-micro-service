@@ -18,6 +18,8 @@ import PrimaryButton from "../../button/PrimaryButton";
 import TertiaryButton from "../../button/TertiaryButton";
 import CustomizedDialogs from "../../dialog/CustomizedDialogs";
 import ErrorDialog from "../../dialog/ErrorDialog";
+import { useHistory } from "react-router";
+import { successNoti } from "utils/notification";
 
 export const style = (theme) => ({
   testBtn: {
@@ -79,6 +81,7 @@ export default function TeacherViewQuizDetailInQuizTest({
   testId,
   quizGroups,
   isCourse,
+  onRemoveSuccess,
 }) {
   const classes = useStyles();
 
@@ -101,6 +104,8 @@ export default function TeacherViewQuizDetailInQuizTest({
 
   const [openQuizTest, setOpenQuizTest] = useState(null);
   const [selectedTestId, setSelectedTestId] = useState(null);
+  const history = useHistory();
+  const isQuizTest = history.location.pathname.includes("quiztest");
 
   //
   const onOpenDialog = () => {
@@ -128,10 +133,19 @@ export default function TeacherViewQuizDetailInQuizTest({
       // token,
       // history,
       "post",
-      "/remove-question-from-quiz-test",
-      (res) => {},
+      isQuizTest
+        ? "/remove-question-from-quiz-test"
+        : isCourse
+        ? "/remove-question-from-course-interactive-quiz"
+        : "/remove-question-from-interactive-quiz",
+      (res) => {
+        !isQuizTest && onRemoveSuccess(quiz.questionId);
+        successNoti("Xóa thành công", 3000);
+      },
       { rest: () => setError(true) },
-      { testId: testId, questionId: quiz.questionId }
+      isQuizTest
+        ? { testId: testId, questionId: quiz.questionId }
+        : { interactiveQuizId: testId, questionId: quiz.questionId }
     );
   };
 
@@ -154,7 +168,7 @@ export default function TeacherViewQuizDetailInQuizTest({
         {quiz.statusId})&nbsp;&nbsp;
         {parse(quiz.statement)}
       </Box>
-      {!isCourse && (
+      {isQuizTest && (
         <Button
           color="primary"
           variant="contained"

@@ -12,6 +12,8 @@ import com.hust.baseweb.applications.education.model.quiz.QuizQuestionDetailMode
 import com.hust.baseweb.applications.education.quiztest.entity.EduQuizTestQuizQuestion;
 import com.hust.baseweb.applications.education.quiztest.entity.InteractiveQuiz;
 import com.hust.baseweb.applications.education.quiztest.entity.InteractiveQuizQuestion;
+import com.hust.baseweb.applications.education.quiztest.entity.compositeid.CompositeInteractiveQuizQuestionId;
+import com.hust.baseweb.applications.education.quiztest.model.InteractiveQuizQuestionInputModel;
 import com.hust.baseweb.applications.education.quiztest.repo.InteractiveQuizQuestionRepo;
 import com.hust.baseweb.applications.education.quiztest.repo.InteractiveQuizRepo;
 import com.hust.baseweb.applications.education.repo.QuizQuestionRepo;
@@ -78,4 +80,11 @@ public class InteractiveQuizQuestionServiceImpl implements InteractiveQuizQuesti
 
         return quizQuestionDetailModels;
     };
+
+    public void removeFromInteractiveQuiz(InteractiveQuizQuestionInputModel input){
+        CompositeInteractiveQuizQuestionId id = new CompositeInteractiveQuizQuestionId();
+        id.setInteractiveQuizId(input.getInteractiveQuizId());
+        id.setQuestionId(input.getQuestionId());
+        interactiveQuizQuestionRepo.deleteById(id);
+    }
 }

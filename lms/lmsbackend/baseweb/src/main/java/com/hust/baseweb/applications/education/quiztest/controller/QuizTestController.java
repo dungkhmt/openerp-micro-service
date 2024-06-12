@@ -12,6 +12,7 @@ import com.hust.baseweb.applications.education.entity.EduCourseSessionInteractiv
 import com.hust.baseweb.applications.education.entity.EduCourseSessionInteractiveQuizQuestion;
 import com.hust.baseweb.applications.education.entity.QuizQuestion;
 import com.hust.baseweb.applications.education.entity.QuizTag;
+import com.hust.baseweb.applications.education.entity.compositeid.CompositeCourseSessionInteractiveQuizQuestionId;
 import com.hust.baseweb.applications.education.model.quiz.QuizQuestionDetailModel;
 import com.hust.baseweb.applications.education.model.quiz.QuizTagCreateModel;
 import com.hust.baseweb.applications.education.quiztest.UserQuestionQuizExecutionOM;
@@ -134,6 +135,21 @@ public class QuizTestController {
     }
 
     @Secured({"ROLE_TEACHER"})
+    @PostMapping("/remove-question-from-interactive-quiz")
+    public ResponseEntity<?> removeQuestionFromInteractiveQuiz(
+        Principal principal,
+        @RequestBody InteractiveQuizQuestionInputModel input
+    ) {
+        // InteractiveQuizQuestion interactiveQuizQuestion = new InteractiveQuizQuestion();
+        // interactiveQuizQuestion.setInteractiveQuizId(input.getInteractiveQuizId());
+        // interactiveQuizQuestion.setQuestionId(input.getQuestionId());
+        // interactiveQuizQuestion.setCreatedStamp(new Date());
+        // interactiveQuizQuestion.setLastUpdated(new Date());
+        interactiveQuizQuestionService.removeFromInteractiveQuiz(input);
+        return ResponseEntity.ok().build();
+    }
+
+    @Secured({"ROLE_TEACHER"})
     @PostMapping("/add-question-to-course-interactive-quiz")
     public ResponseEntity<?> addQuestionToCourseInteractiveQuiz(
         Principal principal,
@@ -145,6 +161,24 @@ public class QuizTestController {
         eduCourseSessionInteractiveQuizQuestion.setCreatedStamp(new Date());
         eduCourseSessionInteractiveQuizQuestion.setLastUpdated(new Date());
         return ResponseEntity.ok().body(eduCourseSessionInteractiveQuizQuestionRepo.save(eduCourseSessionInteractiveQuizQuestion));
+    }
+
+    @Secured({"ROLE_TEACHER"})
+    @PostMapping("/remove-question-from-course-interactive-quiz")
+    public ResponseEntity<?> removeQuestionFromCourseInteractiveQuiz(
+        Principal principal,
+        @RequestBody InteractiveQuizQuestionInputModel input
+    ) {
+        // EduCourseSessionInteractiveQuizQuestion eduCourseSessionInteractiveQuizQuestion = new EduCourseSessionInteractiveQuizQuestion();
+        // eduCourseSessionInteractiveQuizQuestion.setInteractiveQuizId(input.getInteractiveQuizId());
+        // eduCourseSessionInteractiveQuizQuestion.setQuestionId(input.getQuestionId());
+        // eduCourseSessionInteractiveQuizQuestion.setCreatedStamp(new Date());
+        // eduCourseSessionInteractiveQuizQuestion.setLastUpdated(new Date());
+        CompositeCourseSessionInteractiveQuizQuestionId id = new CompositeCourseSessionInteractiveQuizQuestionId();
+        id.setInteractiveQuizId(input.getInteractiveQuizId());
+        id.setQuestionId(input.getQuestionId());
+        eduCourseSessionInteractiveQuizQuestionRepo.deleteById(id);
+        return ResponseEntity.ok().build();
     }
     
     @Secured({"ROLE_TEACHER"})
