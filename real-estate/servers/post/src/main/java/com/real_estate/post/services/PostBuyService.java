@@ -5,6 +5,7 @@ import com.real_estate.post.daos.interfaces.PostBuyDao;
 import com.real_estate.post.daos.interfaces.PostSellDao;
 import com.real_estate.post.dtos.request.CreatePostBuyRequestDto;
 import com.real_estate.post.dtos.request.UpdatePostBuyRequestDto;
+import com.real_estate.post.dtos.response.CountPostByProvinceResponseDto;
 import com.real_estate.post.dtos.response.PostBuyResponseDto;
 import com.real_estate.post.dtos.response.PostSellResponseDto;
 import com.real_estate.post.models.PostBuyEntity;
@@ -96,18 +97,16 @@ public class PostBuyService {
 	public Page<PostBuyResponseDto> getPageBuy(
 			Integer page,
 			Integer size,
-			String province,
-			String district
+			String provinceId
 	) {
 		Pageable pageable = PageRequest.of(page-1, size);
-		long totalRecords = postBuyDao.countBy(province, district);
+		long totalRecords = postBuyDao.countBy(provinceId);
 		if (totalRecords == 0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không có bài viết nào phù hợp");
 		} else {
 			List<PostBuyResponseDto> entities = postBuyDao.findPostBuyBy(
 					pageable,
-					province,
-					district
+					provinceId
 			);
 			return new PageImpl<>(entities, pageable, totalRecords);
 		}
@@ -174,5 +173,9 @@ public class PostBuyService {
 		}
 		List<PostSellResponseDto> result = postSellDao.findBy(buyEntity);
 		return result;
+	}
+
+	public List<CountPostByProvinceResponseDto> getTotalPost() {
+		return postBuyDao.countPost();
 	}
 }
