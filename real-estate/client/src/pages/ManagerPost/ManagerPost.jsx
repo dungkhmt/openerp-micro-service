@@ -10,7 +10,7 @@ import { FaTrash } from "react-icons/fa";
 import { IoHammerOutline } from "react-icons/io5";
 import { HiOutlineLockOpen } from "react-icons/hi2";
 import { toast, ToastContainer } from "react-toastify";
-import AddInfoPostSell from "../../components/AddInfoPostSell/AddInfoPostSell";
+import FixPostSell from "../../components/FixPostSell/FixPostSell";
 import InfoPostSell from "../../components/InfoPostSell/InfoPostSell";
 import ContactBox from "../../components/ContactBox/ContactBox";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,8 +22,7 @@ import { PostBuyRequest } from "../../services/PostBuyRequest";
 const ManagerPost = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  // const { pathname } = useLocation();
-  // const accountId = pathname.split("/").slice(-1)[0];
+
   const { accountId } = useParams();
 
   const currentAccount = useSelector((state) => state.account.currentData);
@@ -40,9 +39,6 @@ const ManagerPost = () => {
   const [buySelect, setBuySelect] = useState({});
   const [showPost, setShowPost] = useState(false);
 
-  const handleFix = () => {
-    setShowPost(false);
-  };
   const handleChangeStatusSell = (status, postSellId) => {
     sellRequest
       .update_status({
@@ -89,11 +85,15 @@ const ManagerPost = () => {
 
   const handleUpdatePost = () => {
     sellRequest.updatePost(sellSelect).then((response) => {
-      const statusCode = response.code;
-      if (statusCode === 200) {
+      if (response.code === 200) {
         toast.success(response.data);
+        setListPostSell((prevListPostSell) =>
+          prevListPostSell.map((post) =>
+            post.postSellId === sellSelect.postSellId ? sellSelect : post,
+          ),
+        );
         setSellSelect({});
-        // return response.data;
+        setShowPost(false);
       } else {
         toast.error(response.data.message);
       }
@@ -357,7 +357,7 @@ const ManagerPost = () => {
                   style={{
                     margin: "0 15px",
                   }}
-                  onClick={handleFix}
+                  onClick={() => setShowPost(false)}
                 >
                   Chỉnh sửa
                 </Button>
@@ -367,7 +367,7 @@ const ManagerPost = () => {
           )}
 
           {!showPost && Object.keys(sellSelect).length > 0 && (
-            <AddInfoPostSell
+            <FixPostSell
               propertyDetails={sellSelect}
               setPropertyDetails={setSellSelect}
               setShowPost={setShowPost}
@@ -386,17 +386,17 @@ const ManagerPost = () => {
           ))}
         </Modal>
 
-        <ToastContainer
-          position="top-left"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-        />
+        {/*<ToastContainer*/}
+        {/*  position="top-left"*/}
+        {/*  autoClose={2000}*/}
+        {/*  hideProgressBar={false}*/}
+        {/*  newestOnTop={false}*/}
+        {/*  closeOnClick*/}
+        {/*  rtl={false}*/}
+        {/*  pauseOnFocusLoss*/}
+        {/*  draggable*/}
+        {/*  pauseOnHover*/}
+        {/*/>*/}
       </div>
     );
   }

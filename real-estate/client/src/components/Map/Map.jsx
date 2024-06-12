@@ -26,7 +26,7 @@ const Map = ({ address, district, province, position, setPosition }) => {
       }}
     >
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-      {district !== null && province !== null && address !== null && (
+      {district !== null && province !== null && address !== "" && (
         <GeoCoderMarker
           address={`${address} ${district} ${province} Việt Nam`}
           setPosition={setPosition}

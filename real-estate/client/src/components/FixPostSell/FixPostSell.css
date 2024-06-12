@@ -10,11 +10,12 @@
     /*background-color: #ff922d;*/
     height: 400px;
     width: 100%;
+    /*border: 1px solid #F2F2F2;*/
     /*background-color: #ff922d;*/
 }
 
 .uploadZone {
-    /*background-color: #61dafb;*/
+    background-color: #61dafb;
     width: 25%;
     height: 12rem;
     border: 2px dashed grey;
@@ -33,7 +34,8 @@
     display: block;
     /*padding:10px;*/
     position: relative;
-    /*border: 2px solid red;*/
+    border-radius: 10px;
+    border: 2px solid #F2F2F2;
 
 }
 
