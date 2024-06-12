@@ -1,8 +1,10 @@
 import React, { useContext, useEffect } from "react";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
-import { Outlet } from "react-router-dom";
-import { AppShell } from "@mantine/core";
+import { Outlet, useNavigate } from "react-router-dom";
+import { AppShell, Burger, UnstyledButton } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { useSelector } from "react-redux";
 
 const Layout = () => {
   return (

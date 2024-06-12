@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import DistrictRequest from "../../services/DistrictRequest";
-import { Accordion, Select } from "@mantine/core";
+import { Accordion, Divider, Grid, Group, Select } from "@mantine/core";
 import DashboardRequest from "../../services/DashboardRequest";
 import { transferTimeToDate } from "../../utils/common";
 import { BarChart, LineChart } from "@mantine/charts";
@@ -144,10 +144,15 @@ const Report = () => {
   }));
 
   return (
-    <div className="flexColCenter">
+    <div
+      className="flexColCenter"
+      style={{
+        marginTop: "20px",
+      }}
+    >
       <Select
-        w={"100px"}
-        label="Tỉnh"
+        w={"120px"}
+        placeholder="Tỉnh"
         searchable
         data={optionsProvince}
         value={provinceId}
@@ -156,15 +161,10 @@ const Report = () => {
         }}
       />
 
-      <div style={{ display: "flex", margin: "10px", width: "95%" }}>
-        <div
-          style={{
-            width: "33%",
-            margin: "0 10px",
-          }}
-        >
-          <h2>Top 5 giá đất</h2>
-          {topLandData.length > 0 ? (
+      <Grid w={"95%"} style={{ margin: "20px" }} justify="space-around">
+        {topLandData.length > 0 && (
+          <Grid.Col span={{ base: 12, md: 4 }}>
+            <h2>Top 5 giá đất</h2>
             <BarChart
               h={300}
               data={topLandData}
@@ -177,60 +177,11 @@ const Report = () => {
                 barSize: 30,
               }}
             />
-          ) : (
-            <div
-              style={{
-                color: "rgb(224, 60, 49)",
-                fontSize: "20px",
-              }}
-            >
-              Khu vực chưa có đủ dữ liệu
-            </div>
-          )}
-        </div>
-
-        <div
-          style={{
-            width: "33%",
-            padding: "0 20px",
-            borderLeft: "1px solid #F2F2F2",
-            borderRight: "1px solid #f2f2f2",
-          }}
-        >
-          <h2>Top 5 giá nhà</h2>
-          {topHouseData.length > 0 ? (
-            <BarChart
-              h={300}
-              data={topHouseData}
-              dataKey="name"
-              series={[{ name: "price", color: "violet.6" }]}
-              tickLine="y"
-              yAxisLabel="triệu/m²"
-              withBarValueLabel
-              barChartProps={{
-                barSize: 30,
-              }}
-            />
-          ) : (
-            <div
-              style={{
-                color: "rgb(224, 60, 49)",
-                fontSize: "20px",
-              }}
-            >
-              Khu vực chưa có đủ dữ liệu
-            </div>
-          )}
-        </div>
-
-        <div
-          style={{
-            width: "33%",
-            margin: "0 10px",
-          }}
-        >
-          <h2>Top 5 giá chung cư</h2>
-          {topApartmentData.length > 0 ? (
+          </Grid.Col>
+        )}
+        {topApartmentData.length > 0 && (
+          <Grid.Col span={{ base: 12, md: 4 }}>
+            <h2>Top 5 giá chung cư</h2>
             <BarChart
               h={300}
               data={topApartmentData}
@@ -243,34 +194,43 @@ const Report = () => {
                 barSize: 30,
               }}
             />
-          ) : (
-            <div
-              style={{
-                color: "rgb(224, 60, 49)",
-                fontSize: "20px",
+          </Grid.Col>
+        )}
+        {topHouseData.length > 0 && (
+          <Grid.Col span={{ base: 12, md: 4 }}>
+            <h2>Top 5 giá nhà</h2>
+            <BarChart
+              h={300}
+              data={topHouseData}
+              dataKey="name"
+              series={[{ name: "price", color: "violet.6" }]}
+              tickLine="y"
+              yAxisLabel="triệu/m²"
+              withBarValueLabel
+              barChartProps={{
+                barSize: 30,
               }}
-            >
-              Khu vực chưa có đủ dữ liệu
-            </div>
-          )}
-        </div>
-      </div>
+            />
+          </Grid.Col>
+        )}
+      </Grid>
 
       {Array.from(priceDistricts.entries()).map(
         ([nameDistrict, values], index) => {
           const priceMax = findPriceMax(values);
-          return (
-            <Accordion
-              key={index}
-              style={{
-                width: "70%",
-                margin: "10px auto",
-              }}
-            >
-              <Accordion.Item value={nameDistrict}>
-                <Accordion.Control>{nameDistrict}</Accordion.Control>
-                <Accordion.Panel>
-                  {findPriceMax(values) > 0 ? (
+
+          if (priceMax > 0)
+            return (
+              <Accordion
+                key={index}
+                style={{
+                  width: "70%",
+                  margin: "10px auto",
+                }}
+              >
+                <Accordion.Item value={nameDistrict}>
+                  <Accordion.Control>{nameDistrict}</Accordion.Control>
+                  <Accordion.Panel>
                     <LineChart
                       style={{ width: "100%" }}
                       id={uniqueId}
@@ -278,13 +238,13 @@ const Report = () => {
                       data={values}
                       dataKey="date"
                       series={[
-                        { name: "house", label: "Nhà ở", color: "indigo.6" },
+                        { name: "house", label: "Nhà ở", color: "red" },
                         {
                           name: "apartment",
                           label: "Chung cư",
                           color: "green.6",
                         },
-                        { name: "land", label: "Đất", color: "teal.6" },
+                        { name: "land", label: "Đất", color: "yellow" },
                         // {name: 'totalPost', label: 'Tổng số bài viết', color: 'green.6'},
                       ]}
                       curveType="linear"
@@ -297,20 +257,10 @@ const Report = () => {
                       xAxisLabel="Ngày"
                       yAxisLabel="triệu/m²"
                     />
-                  ) : (
-                    <div
-                      style={{
-                        color: "rgb(224, 60, 49)",
-                        fontSize: "20px",
-                      }}
-                    >
-                      Khu vực chưa có đủ dữ liệu
-                    </div>
-                  )}
-                </Accordion.Panel>
-              </Accordion.Item>
-            </Accordion>
-          );
+                  </Accordion.Panel>
+                </Accordion.Item>
+              </Accordion>
+            );
         },
       )}
     </div>

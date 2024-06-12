@@ -6,6 +6,11 @@ export default class AccountRequest extends BaseRequest {
     return this.post(url, data);
   }
 
+  logout() {
+    const url = "/account/logout";
+    return this.get(url);
+  }
+
   signup(data) {
     const url = "/public/account/signup";
     return this.post(url, data);

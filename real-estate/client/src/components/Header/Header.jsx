@@ -4,9 +4,24 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout_success } from "../../store/auth";
 import ProfileMenu from "../ProfileMenu/ProfileMenu";
-import { Box, Button, Center, Menu, rem } from "@mantine/core";
+import {
+  Box,
+  Burger,
+  Button,
+  Center,
+  Collapse,
+  Drawer,
+  Menu,
+  rem,
+  UnstyledButton,
+  Group,
+  Divider,
+  Text,
+  Accordion,
+} from "@mantine/core";
 import { WebSocketContext } from "../../context/WebSocketContext";
 import { IconChevronDown } from "@tabler/icons-react";
+import AccountRequest from "../../services/AccountRequest";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -15,19 +30,33 @@ const Header = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const current_account = useSelector((state) => state.account.currentData);
   const dispatch = useDispatch();
+  const [openDrawer, setOpenDrawer] = useState(false);
 
-  const logout = () => {
+  const [collapseList, setCollapseList] = useState(false);
+  const [collapsePost, setCollapsePost] = useState(false);
+
+  const logout = async () => {
+    const accountRequest = new AccountRequest();
     dispatch(logout_success());
     localStorage.clear();
     sessionStorage.clear();
-    navigate("/", { replace: true });
     disconnect();
+    await accountRequest.logout();
+    navigate("/", { replace: true });
   };
 
   return (
     <section className="h-wrapper">
       <div className="flexCenter flexColEnd innerWidth paddings h-container">
-        <div className="flexCenter h-menu">
+        <Burger
+          color={"white"}
+          opened={openDrawer}
+          onClick={() => setOpenDrawer(true)}
+          hiddenFrom="sm"
+          size="sm"
+        />
+
+        <Box className="flexCenter h-menu" visibleFrom="sm">
           <Menu zIndex={1002}>
             <Menu.Target>
               <Center>
@@ -90,8 +119,24 @@ const Header = () => {
               <ProfileMenu user={current_account} logout={logout} />
             </div>
           )}
-        </div>
+        </Box>
       </div>
+
+      <Drawer opened={false} onClose={() => setOpenDrawer(false)}>
+        <Accordion variant="separated">
+          <Accordion.Item value="another-account">
+            <Accordion.Control>Bài viết</Accordion.Control>
+            <Accordion.Panel>
+              <Button>
+                <NavLink to={"/login"}>Đăng Nhập</NavLink>
+              </Button>
+              <Button>
+                <NavLink to={"/login"}>Đăng Nhập</NavLink>
+              </Button>
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion>
+      </Drawer>
     </section>
   );
 };

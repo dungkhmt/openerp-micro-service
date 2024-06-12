@@ -1,4 +1,4 @@
-import { storage } from "../components/UploadImage/FireBaseConfig";
+import { storage } from "../utils/FireBaseConfig";
 import {
   deleteObject,
   getDownloadURL,

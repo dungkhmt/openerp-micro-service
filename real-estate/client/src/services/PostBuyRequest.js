@@ -25,4 +25,9 @@ export class PostBuyRequest extends BaseRequest {
     const url = "/post/buy/matching";
     return this.get(url, data);
   }
+
+  countPost() {
+    const url = "/public/post/buy/count";
+    return this.get(url);
+  }
 }

@@ -265,7 +265,7 @@ const Login = () => {
               </a>
             </div>
             <Divider
-              label="hoặc tiếp tực với email"
+              label="hoặc tiếp tục với email"
               labelPosition="center"
               my="sm"
             />
@@ -293,9 +293,12 @@ const Login = () => {
               <Anchor
                 component="button"
                 size="sm"
-                onClick={() => setOpenedReset(true)}
+                onClick={(event) => {
+                  event.preventDefault();
+                  setOpenedReset(true);
+                }}
               >
-                Forgot password?
+                Quên mật khẩu?
               </Anchor>
             </Group>
             <Button

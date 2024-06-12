@@ -24,12 +24,6 @@
 .uploadView {
     width: 60%;
     height: 100%;
-    /*border: 5px solid black;*/
-    /*background-color: #1f3e72;*/
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-
     gap: 5px;
 }
 

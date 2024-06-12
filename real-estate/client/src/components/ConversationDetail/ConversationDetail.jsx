@@ -1,17 +1,17 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import AccountRequest from "../../services/AccountRequest";
 import { MessageType, TransportActionEnum } from "../../utils/dataType";
 import ConversationRequest from "../../services/ConversationRequest";
 import { WebSocketContext } from "../../context/WebSocketContext";
 import { AccountContext } from "../../context/AccountContext";
 import EmojiPicker from "emoji-picker-react";
-import { format } from "timeago.js";
 import "./ConversationDetail.css";
 import { ImBin } from "react-icons/im";
-import { ScrollArea } from "@mantine/core";
+import { ActionIcon, rem, ScrollArea } from "@mantine/core";
 import { LuSendHorizonal } from "react-icons/lu";
 import { ConversationContext } from "../../context/ConversationContext";
 import { uploadImage } from "../../utils/common";
+import { CiFaceSmile } from "react-icons/ci";
+import { IoClose, IoImageOutline } from "react-icons/io5";
 
 const ConversationDetail = ({ conversationSelect }) => {
   const { addMessage, addConversation } = useContext(ConversationContext);
@@ -29,11 +29,12 @@ const ConversationDetail = ({ conversationSelect }) => {
 
   const viewport = useRef(null);
 
-  const scrollToBottom = () =>
+  const scrollToBottom = () => {
     viewport.current.scrollTo({
       top: viewport.current.scrollHeight,
       behavior: "smooth",
     });
+  };
 
   const handleEmoji = (e) => {
     setContent((prev) => prev + e.emoji);
@@ -118,7 +119,7 @@ const ConversationDetail = ({ conversationSelect }) => {
 
   useEffect(() => {
     setCurrentConversation(conversationSelect);
-    scrollToBottom();
+    setTimeout(scrollToBottom, 100);
   }, [conversationSelect]);
   return (
     <div className="conversationDetailContainer">
@@ -139,32 +140,42 @@ const ConversationDetail = ({ conversationSelect }) => {
           {currentConversation?.messages
             ?.slice()
             .reverse()
-            .map((message) => (
-              <div
-                className={
-                  message.senderId === account?.accountId
-                    ? "message own"
-                    : "message"
-                }
-                key={message?.createdAt}
-              >
-                <div className="texts">
-                  {message.messageType === MessageType.TEXT ? (
-                    <p>{message.content}</p>
-                  ) : (
-                    <img src={message.content} alt="" />
-                  )}
-                  <span
-                    style={{
-                      color: "white",
-                    }}
+            .map((message, index, arr) => {
+              const isFirstMessage = index === 0;
+              return (
+                <div
+                  ref={isFirstMessage ? viewport : null}
+                  className={
+                    message.senderId === account?.accountId
+                      ? "message own"
+                      : "message"
+                  }
+                  key={index}
+                >
+                  <div
+                    className="texts"
+                    title={
+                      new Date(message.createdAt).getHours() +
+                      ":" +
+                      new Date(message.createdAt).getMinutes()
+                    }
                   >
-                    {format(message.createdAt)}
-                  </span>
+                    {message.messageType === MessageType.TEXT ? (
+                      <p>{message.content}</p>
+                    ) : (
+                      <img src={message.content} alt="" />
+                    )}
+                    {/*<span*/}
+                    {/*  style={{*/}
+                    {/*    color: "white",*/}
+                    {/*  }}*/}
+                    {/*>*/}
+                    {/*  {format(message.createdAt)}*/}
+                    {/*</span>*/}
+                  </div>
                 </div>
-              </div>
-            ))}
-          <div ref={viewport}></div>
+              );
+            })}
         </div>
       </ScrollArea>
 
@@ -192,13 +203,18 @@ const ConversationDetail = ({ conversationSelect }) => {
                   zIndex: 0,
                 }}
               />
-              <span
-                title="Xóa"
+              <ActionIcon
+                size={20}
+                radius="xl"
+                variant="filled"
                 onClick={() => setImg({ file: null, url: "" })}
                 className="deleteImage"
               >
-                <ImBin />
-              </span>
+                <IoClose
+                  style={{ width: rem(18), height: rem(18) }}
+                  stroke={1.5}
+                />
+              </ActionIcon>
             </div>
             <button
               className="sendButton"
@@ -213,7 +229,13 @@ const ConversationDetail = ({ conversationSelect }) => {
           <div className="bottom">
             <div className="icons">
               <label htmlFor="file">
-                <img src="../img.png" alt="" />
+                <IoImageOutline
+                  style={{
+                    cursor: "pointer",
+                    color: "white",
+                  }}
+                  className="icon"
+                />
               </label>
               <input
                 type="file"
@@ -229,9 +251,12 @@ const ConversationDetail = ({ conversationSelect }) => {
               onChange={(e) => setContent(e.target.value)}
             />
             <div className="emoji">
-              <img
-                src="../emoji.png"
-                alt=""
+              <CiFaceSmile
+                style={{
+                  cursor: "pointer",
+                  color: "white",
+                }}
+                className="icon"
                 onClick={() => setOpenEmoji((prev) => !prev)}
               />
               <div className="picker">

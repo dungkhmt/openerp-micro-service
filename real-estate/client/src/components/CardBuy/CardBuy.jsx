@@ -1,6 +1,6 @@
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import { Avatar, Grid, SimpleGrid } from "@mantine/core";
+import { Avatar, Divider, Grid, SimpleGrid } from "@mantine/core";
 import {
   MdOutlineHomeWork,
   MdOutlineMail,
@@ -21,6 +21,7 @@ import { FaBed } from "react-icons/fa";
 import { FaCarSide, FaPhoneVolume } from "react-icons/fa6";
 import React from "react";
 import { Link } from "react-router-dom";
+import { Divide } from "lucide-react";
 
 const CardBuy = ({ item }) => {
   return (
@@ -31,9 +32,9 @@ const CardBuy = ({ item }) => {
       }}
     >
       <div className="infoAuthor">
-        <Grid w={"100%"}>
+        <Grid w={"100%"} style={{ margin: "10px 0" }}>
           <Grid.Col span={"content"}>
-            <Link to="/">
+            <Link to={"/manager-post/" + item.authorId}>
               <Avatar src={item.avatarAuthor} size="lg" />
             </Link>
           </Grid.Col>
@@ -77,57 +78,34 @@ const CardBuy = ({ item }) => {
 
       <h2
         style={{
-          fontWeight: "600",
-          marginBottom: "5px",
+          // fontWeight: "600",
+          marginBottom: "10px",
+          letterSpacing: "1px",
+          // color: "yellow",
         }}
       >
         {item?.title.toUpperCase()}
       </h2>
-      <h3>Thông tin mô tả</h3>
-      <CKEditor
-        style={{ height: "300px" }}
-        editor={ClassicEditor}
-        data={item?.description}
-        disabled={true}
-        onReady={(editor) => {
-          // You can store the "editor" and use when it is needed.
-          // editor.editing.view.change((writer) => {
-          //     writer.setStyle(
-          //         'width',
-          //         "200px",
-          //         editor.editing.view.document.getRoot()
-          //     )
-          // })
-          // console.log('Editor is ready to use!', editor);
-        }}
-        onChange={(event, editor) => {
-          // console.log( event );
-          // setDescription(editor.getData())
-        }}
-        onBlur={(event, editor) => {
-          console.log("Blur.", editor);
-        }}
-        onFocus={(event, editor) => {
-          console.log("Focus.", editor);
-        }}
-      />
+      {/*<h3>Thông tin mô tả</h3>*/}
 
-      <h2>Tỉnh: {item.nameProvince}</h2>
-      <h3>Huyện: {item.nameDistricts.join(", ")}</h3>
+      <Divider label={"Đặc điểm bất động sản"} my="md" />
+
+      <h2>Tỉnh/ Thành phố: {item.nameProvince}</h2>
+      <h3>Quận/ Huyện: {item.nameDistricts.join(", ")}</h3>
       <div
         style={{
           margin: "15px 0",
           padding: "5px 0",
-          borderTop: "1px solid #F2F2F2",
+          // borderTop: "1px solid #F2F2F2",
         }}
       >
-        <h3
-          style={{
-            padding: "15px 0",
-          }}
-        >
-          Đặc điểm bất động sản
-        </h3>
+        {/*<h3*/}
+        {/*  style={{*/}
+        {/*    padding: "15px 0",*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  */}
+        {/*</h3>*/}
 
         <Grid w={"100%"}>
           <Grid.Col
@@ -314,6 +292,35 @@ const CardBuy = ({ item }) => {
           )}
         </Grid>
       </div>
+      <Divider label={"Yêu cầu khác"} my="md" />
+
+      <CKEditor
+        style={{ height: "300px" }}
+        editor={ClassicEditor}
+        data={item?.description}
+        disabled={true}
+        onReady={(editor) => {
+          // You can store the "editor" and use when it is needed.
+          // editor.editing.view.change((writer) => {
+          //     writer.setStyle(
+          //         'width',
+          //         "200px",
+          //         editor.editing.view.document.getRoot()
+          //     )
+          // })
+          // console.log('Editor is ready to use!', editor);
+        }}
+        onChange={(event, editor) => {
+          // console.log( event );
+          // setDescription(editor.getData())
+        }}
+        onBlur={(event, editor) => {
+          console.log("Blur.", editor);
+        }}
+        onFocus={(event, editor) => {
+          console.log("Focus.", editor);
+        }}
+      />
     </div>
   );
 };

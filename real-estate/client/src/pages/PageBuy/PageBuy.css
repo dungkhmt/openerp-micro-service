@@ -1,5 +1,5 @@
 .page-buy-container {
-    margin: 10px 0 10px 10%;
+    margin: 10px auto;
     display: flex;
 }
 .list-card-buy-container {
@@ -12,7 +12,7 @@
     border-radius: 5px;
     border: 1px solid #F2F2F2;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.05);
-    margin: 20px 0;
+    margin: 30px 0;
 }
 
 .filter-post-buy {
@@ -25,4 +25,15 @@
     width: 20%;
     border-radius: 5px;
     border: 1px solid #F2F2F2;
+}
+
+.province {
+    color: #666666;
+    letter-spacing: 0.5px;
+    margin: 5px 10px;
+
+}
+
+.province:hover {
+    color: black;
 }
