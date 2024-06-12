@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Box,
   Button,
+  Divider,
   Grid,
   NumberInput,
   rem,
@@ -11,7 +12,7 @@ import {
 import Map from "../Map/Map";
 import { AiOutlineCloudUpload } from "react-icons/ai";
 import React, { useEffect, useState } from "react";
-import "./AddInfoPostSell.css";
+import "./FixPostSell.css";
 import {
   deleteObject,
   getDownloadURL,
@@ -27,11 +28,7 @@ import { transferPrice, uploadImage } from "../../utils/common";
 import DistrictRequest from "../../services/DistrictRequest";
 import { IoClose } from "react-icons/io5";
 
-const AddInfoPostSell = ({
-  propertyDetails,
-  setPropertyDetails,
-  setShowPost,
-}) => {
+const FixPostSell = ({ propertyDetails, setPropertyDetails, setShowPost }) => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [provinceId, setProvinceId] = useState(propertyDetails?.provinceId);
@@ -225,12 +222,13 @@ const AddInfoPostSell = ({
   return (
     <div>
       {/*  vi tri dia ly  */}
+      <Divider label="Khu Vực" />
       <div
         className="flexCenter addLocation"
         style={{
           justifyContent: "space-between",
           gap: "3rem",
-          marginTop: "3rem",
+          margin: "3rem 0",
           flexdirectionProperty: "row",
         }}
       >
@@ -284,11 +282,12 @@ const AddInfoPostSell = ({
         </div>
       </div>
 
+      <Divider label="Ảnh" />
       {/* them anh */}
       <div className="uploadWrapper flexCenter">
         <label className="flexColStart uploadZone" htmlFor="file">
           <AiOutlineCloudUpload
-            style={{ marginLeft: "43%" }}
+            style={{ margin: "0 auto" }}
             size={50}
             color="grey"
             className="flexColCenter"
@@ -336,41 +335,22 @@ const AddInfoPostSell = ({
         </div>
       </div>
 
+      <Divider label="Thông tin chi tiết" />
+
       {/* tiêu đề và mô tả*/}
-      <Box maw="50%" mx="auto" my="md">
+      <Box maw="50%" mx="auto" my="md" className="fix-info-post-sell">
         <TextInput
           // w={"100%"}
           withAsterisk
           label="Tiêu đề"
           value={title}
           onChange={(event) => setTitle(event.currentTarget.value)}
-          style={{ paddingBottom: "30px" }}
+          // style={{ paddingBottom: "30px" }}
           error={
-            title?.length > 50 || title?.length < 20
-              ? "Nhập 20 đến 50 ký tự"
+            title?.length > 70 || title?.length < 20
+              ? "Nhập 20 đến 70 ký tự"
               : ""
           }
-        />
-
-        <span>Mô tả</span>
-        <CKEditor
-          style={{ height: "300px" }}
-          editor={ClassicEditor}
-          data={description}
-          onReady={(editor) => {
-            // You can store the "editor" and use when it is needed.
-            // console.log('Editor is ready to use!', editor);
-          }}
-          onChange={(event, editor) => {
-            // console.log( event );
-            setDescription(editor.getData());
-          }}
-          onBlur={(event, editor) => {
-            console.log("Blur.", editor);
-          }}
-          onFocus={(event, editor) => {
-            console.log("Focus.", editor);
-          }}
         />
 
         <NumberInput
@@ -539,29 +519,49 @@ const AddInfoPostSell = ({
             </Grid.Col>
           </Grid>
         )}
+        <small>Thông tin khác</small>
+        <CKEditor
+          style={{ height: "300px" }}
+          editor={ClassicEditor}
+          data={description}
+          onReady={(editor) => {
+            // You can store the "editor" and use when it is needed.
+            // console.log('Editor is ready to use!', editor);
+          }}
+          onChange={(event, editor) => {
+            // console.log( event );
+            setDescription(editor.getData());
+          }}
+          onBlur={(event, editor) => {
+            console.log("Blur.", editor);
+          }}
+          onFocus={(event, editor) => {
+            console.log("Focus.", editor);
+          }}
+        />
       </Box>
 
       <Button
         onClick={handleNext}
         className="flexCenter"
-        style={{ margin: "3rem 45%" }}
+        style={{ margin: "2rem 45%" }}
       >
         Xem Trước
       </Button>
 
-      <ToastContainer
-        position="top-left"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
+      {/*<ToastContainer*/}
+      {/*  position="top-left"*/}
+      {/*  autoClose={3000}*/}
+      {/*  hideProgressBar={false}*/}
+      {/*  newestOnTop={false}*/}
+      {/*  closeOnClick*/}
+      {/*  rtl={false}*/}
+      {/*  pauseOnFocusLoss*/}
+      {/*  draggable*/}
+      {/*  pauseOnHover*/}
+      {/*/>*/}
     </div>
   );
 };
 
-export default AddInfoPostSell;
+export default FixPostSell;

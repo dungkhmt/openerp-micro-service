@@ -5,26 +5,39 @@
     width: 80%;
     display: block;
     position: relative;
-    padding: 0 30px;
-    margin: 0 auto;
+    padding: 10px 30px;
+    margin: 20px auto;
+    box-shadow: 4px 4px 6px 4px rgba(44, 44, 44, 0.4);
+    /*border: 1px solid red;*/
+
+    .uploadWrapper {
+        margin-top: 3rem;
+        gap: 2rem;
+        /*width: 60rem;*/
+        /*height: 25rem;*/
+        /*background-color: #ff922d;*/
+        height: 400px;
+        width: 100%;
+        /*background-color: #ff922d;*/
+    }
+
+    .uploadZone {
+        background-color: #61dafb;
+        width: 25%;
+        height: 12rem;
+        border: 2px dashed grey;
+        cursor: pointer;
+    }
+
+    input {
+        margin-bottom: 10px;
+    }
 }
 
-.uploadWrapper {
-    margin-top: 3rem;
-    gap: 2rem;
-    /*width: 60rem;*/
-    /*height: 25rem;*/
-    background-color: #ff922d;
-    height: 400px;
-    width: 100%;
-    /*background-color: #ff922d;*/
+.fix-info-post-sell input {
+    margin-bottom: 10px;
 }
 
-.uploadZone {
-    background-color: #61dafb;
-    width: 25%;
-    height: 12rem;
-    border: 2px dashed grey;
-    cursor: pointer;
-}
+
+
 
