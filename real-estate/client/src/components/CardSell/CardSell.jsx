@@ -15,6 +15,7 @@ import { RxHeight, RxWidth } from "react-icons/rx";
 import { ImCompass2 } from "react-icons/im";
 import { FaPhoneVolume } from "react-icons/fa6";
 import { Avatar, Grid } from "@mantine/core";
+import { GrDirections } from "react-icons/gr";
 
 const CardSell = ({ item }) => {
   function capitalizeFirstLetterOfEachWord(string) {
@@ -94,7 +95,7 @@ const CardSell = ({ item }) => {
               </span>
             </div>
             <div className="flexStart facility">
-              <ImCompass2 size={20} color="#1F3E72" />
+              <GrDirections size={20} color="#1F3E72" />
               <span style={{}}>
                 {" "}
                 {transferDirection(item?.directionProperty)}

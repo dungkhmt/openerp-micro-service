@@ -69,7 +69,7 @@ const ListPageSell = ({}) => {
             onChange={handleChangePage}
           />
 
-          <ScrollArea h={"95%"}>
+          <ScrollArea h={"95%"} offsetScrollbars>
             {listPost.map((item) => (
               <div key={item.postSellId} className="cardContainer">
                 <CardSell key={item.postSellId} item={item} />
@@ -82,17 +82,6 @@ const ListPageSell = ({}) => {
           <MarkerMap posts={listPost} />
         </div>
       </div>
-      {/*<ToastContainer*/}
-      {/*  position="top-left"*/}
-      {/*  autoClose={3000}*/}
-      {/*  hideProgressBar={false}*/}
-      {/*  newestOnTop={false}*/}
-      {/*  closeOnClick*/}
-      {/*  rtl={false}*/}
-      {/*  pauseOnFocusLoss*/}
-      {/*  draggable*/}
-      {/*  pauseOnHover*/}
-      {/*/>*/}
     </div>
   );
 };

@@ -189,7 +189,9 @@ const FilterSell = ({ setParams }) => {
             }}
             rightSection={<IconAdjustments size={14} />}
           >
-            Diện Tích
+            {checkMaxAcreage
+              ? "> 100m²"
+              : fromAcreage + " - " + toAcreage + " m²"}
           </Button>
         </Popover.Target>
         <Popover.Dropdown>
@@ -237,7 +239,9 @@ const FilterSell = ({ setParams }) => {
             }}
             rightSection={<IconAdjustments size={14} />}
           >
-            Mức Giá
+            {checkMaxPrice
+              ? "> 10 Tỷ"
+              : transferPrice(fromPrice) + " - " + transferPrice(toPrice)}
           </Button>
         </Popover.Target>
         <Popover.Dropdown>
@@ -301,7 +305,7 @@ const FilterSell = ({ setParams }) => {
         leftSection={<IconSearch size={14} />}
         onClick={handleSearch}
       >
-        Mức Giá
+        Tìm kiếm
       </Button>
     </div>
   );

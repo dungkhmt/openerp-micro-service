@@ -166,7 +166,7 @@ const ManagerPost = () => {
         <Tabs
           style={{
             width: "70%",
-            margin: "10px 20px 10px 10%",
+            margin: "10px 50px 10px 10%",
             display: "flex",
             // backgroundColor: "aqua",
             position: "relative",
@@ -180,7 +180,7 @@ const ManagerPost = () => {
             style={{
               position: "sticky",
               left: "5px",
-              top: "10px",
+              top: "80px",
               height: "100px",
               marginRight: "5px",
             }}
@@ -340,7 +340,7 @@ const ManagerPost = () => {
           </Tabs.Panel>
         </Tabs>
         <div className="information-author-post">
-          <ContactBox account={infoOwner} isOwner={isOwnerPost} />
+          <ContactBox author={infoOwner} isOwner={isOwnerPost} />
         </div>
 
         <Modal

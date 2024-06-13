@@ -1,6 +1,7 @@
 .profileContainer {
-    background-color: #61dafb;
+    /*background-color: #61dafb;*/
     margin: 20px auto;
     width: 50%;
-    height: 350px;
+    /*height: 350px;*/
+    box-shadow: 4px 4px 6px 4px rgba(44, 44, 44, 0.4);
 }
