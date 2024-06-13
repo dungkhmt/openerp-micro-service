@@ -40,7 +40,7 @@ public interface ApplicationRepo extends JpaRepository<Application, Integer> {
             "OR LOWER(a.classCall.subjectName) LIKE CONCAT('%', LOWER(:search), '%') " +
             "OR LOWER(CAST(a.classCall.id AS string)) LIKE CONCAT('%', LOWER(:search), '%') " +
             "OR LOWER(a.classCall.subjectId) LIKE CONCAT('%', LOWER(:search), '%')) " +
-            "ORDER BY a.classCall.id ASC, a.user.id ASC")
+            "ORDER BY a.user.id ASC, a.classCall.id ASC")
     Page<Application> getTABySemester(String applicationStatus, String assignStatus, String semester, String search, Pageable pageable);
 
     @Query("SELECT a FROM Application a WHERE a.id IN " +
@@ -73,9 +73,9 @@ public interface ApplicationRepo extends JpaRepository<Application, Integer> {
     @Query("SELECT a FROM Application a WHERE a.classCall.semester = :semester")
     List<Application> getAllApplicationBySemester(String semester);
 
-    @Query("SELECT a FROM Application a WHERE a.classCall.semester = :semester AND a.applicationStatus = 'APPROVED' " +
+    @Query("SELECT DISTINCT a.user.id FROM Application a WHERE a.classCall.semester = :semester AND a.applicationStatus = 'APPROVED' " +
             "AND a.assignStatus = 'APPROVED'")
-    List<Application> getTADataBySemester(String semester);
+    List<String> getTADataBySemester(String semester);
 
     @Query("SELECT DISTINCT a.classCall FROM Application a WHERE a.classCall.semester = :semester")
     List<ClassCall> findDistinctClassCallBySemester(String semester);
@@ -90,4 +90,10 @@ public interface ApplicationRepo extends JpaRepository<Application, Integer> {
 
     @Query("SELECT a FROM Application a WHERE a.classCall.semester = :semester AND a.classCall.subjectId = :course")
     List<Application> getApplicationByCourseAndSemester(String semester, String course);
+
+    @Query("SELECT DISTINCT a.name FROM Application a WHERE a.user.id = :userId")
+    String getApplicatorName(String userId);
+
+    @Query("SELECT a FROM Application a WHERE a.classCall.semester = :semester AND a.name = :name")
+    List<Application> getApplicationByNameAndSemester(String name, String semester);
 }

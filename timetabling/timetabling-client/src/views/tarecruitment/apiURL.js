@@ -16,6 +16,8 @@ export const applicationUrl = {
   deleteMultipleApplication: "/application/delete-multiple-application",
   autoAssignClass: "/application/auto-assign-class",
   getTaBySemester: "/application/get-ta-by-semester",
+  getUniqueTaName: "/application/get-unique-ta",
+  getTaInfo: "application/get-ta-info",
 };
 
 export const classCallUrl = {
