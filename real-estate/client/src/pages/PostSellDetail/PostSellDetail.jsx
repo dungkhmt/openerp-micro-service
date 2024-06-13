@@ -118,7 +118,7 @@ const PostSellDetail = () => {
         </div>
         <div className="information-author-post">
           <ContactBox
-            account={author}
+            author={author}
             isOwner={author.accountId == current_accountId}
           />
         </div>

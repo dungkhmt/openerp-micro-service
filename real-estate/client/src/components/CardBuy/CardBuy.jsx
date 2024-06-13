@@ -21,7 +21,6 @@ import { FaBed } from "react-icons/fa";
 import { FaCarSide, FaPhoneVolume } from "react-icons/fa6";
 import React from "react";
 import { Link } from "react-router-dom";
-import { Divide } from "lucide-react";
 
 const CardBuy = ({ item }) => {
   return (
@@ -299,17 +298,7 @@ const CardBuy = ({ item }) => {
         editor={ClassicEditor}
         data={item?.description}
         disabled={true}
-        onReady={(editor) => {
-          // You can store the "editor" and use when it is needed.
-          // editor.editing.view.change((writer) => {
-          //     writer.setStyle(
-          //         'width',
-          //         "200px",
-          //         editor.editing.view.document.getRoot()
-          //     )
-          // })
-          // console.log('Editor is ready to use!', editor);
-        }}
+        onReady={(editor) => {}}
         onChange={(event, editor) => {
           // console.log( event );
           // setDescription(editor.getData())

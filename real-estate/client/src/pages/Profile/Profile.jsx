@@ -130,44 +130,48 @@ const Profile = () => {
           <h2>Thông tin cá nhân</h2>
           <Grid align="center">
             <Grid.Col span={6}>
-              <Input.Wrapper label="Email">
-                <Input
-                  style={{ marginBottom: "10px" }}
-                  defaultValue={profile.email}
-                  disabled={true}
-                />
-              </Input.Wrapper>
+              <div style={{ width: "70%", margin: "0 auto" }}>
+                <Input.Wrapper label="Email">
+                  <Input
+                    style={{ marginBottom: "10px" }}
+                    defaultValue={profile.email}
+                    disabled={true}
+                  />
+                </Input.Wrapper>
 
-              <form
-                onSubmit={formInfo.onSubmit((values) =>
-                  handleChangeNamePhone(values),
-                )}
-              >
-                <TextInput
-                  style={{ marginBottom: "10px" }}
-                  label="Biệt danh"
-                  key={formInfo.key("name")}
-                  {...formInfo.getInputProps("name")}
-                />
-
-                <TextInput
-                  style={{ marginBottom: "10px" }}
-                  component={IMaskInput}
-                  mask="0000-000-000"
-                  label="Số điện thoại"
-                  unmask={true}
-                  key={formInfo.key("phone")}
-                  {...formInfo.getInputProps("phone")}
-                />
-
-                <Button
-                  style={{ backgroundColor: "rgb(224, 60, 49)" }}
-                  type="submit"
-                  mt="sm"
+                <form
+                  onSubmit={formInfo.onSubmit((values) =>
+                    handleChangeNamePhone(values),
+                  )}
                 >
-                  Lưu Thay Đổi
-                </Button>
-              </form>
+                  <TextInput
+                    variant="filled"
+                    style={{ marginBottom: "10px" }}
+                    label="Biệt danh"
+                    key={formInfo.key("name")}
+                    {...formInfo.getInputProps("name")}
+                  />
+
+                  <TextInput
+                    variant="filled"
+                    style={{ marginBottom: "10px" }}
+                    component={IMaskInput}
+                    mask="0000-000-000"
+                    label="Số điện thoại"
+                    unmask={true}
+                    key={formInfo.key("phone")}
+                    {...formInfo.getInputProps("phone")}
+                  />
+
+                  <Button
+                    style={{ backgroundColor: "rgb(224, 60, 49)" }}
+                    type="submit"
+                    mt="sm"
+                  >
+                    Lưu Thay Đổi
+                  </Button>
+                </form>
+              </div>
             </Grid.Col>
             <Grid.Col span={6}>
               <div className="flexColCenter">
@@ -206,6 +210,7 @@ const Profile = () => {
               }}
             >
               <TextInput
+                variant="filled"
                 style={{
                   marginBottom: "5px",
                 }}
@@ -214,6 +219,7 @@ const Profile = () => {
                 {...formPassword.getInputProps("oldPassword")}
               />
               <PasswordInput
+                variant="filled"
                 style={{
                   marginBottom: "5px",
                 }}
@@ -223,14 +229,23 @@ const Profile = () => {
               />
 
               <PasswordInput
+                variant="filled"
                 mt="sm"
                 label="Nhập lại mật khẩu"
                 key={formPassword.key("confirmPassword")}
                 {...formPassword.getInputProps("confirmPassword")}
               />
 
-              <Group justify="space-between" mt="md">
-                <Button type="submit">Đổi Mật Khẩu</Button>
+              <Group justify="center" mt="md">
+                <Button
+                  style={{
+                    marginBottom: "10px",
+                    backgroundColor: "rgb(224, 60, 49)",
+                  }}
+                  type="submit"
+                >
+                  Đổi Mật Khẩu
+                </Button>
               </Group>
             </form>
           </div>

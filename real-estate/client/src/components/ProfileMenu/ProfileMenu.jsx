@@ -36,7 +36,7 @@ const ProfileMenu = ({ user, logout }) => {
             logout();
           }}
         >
-          Logout
+          Đăng xuất
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>

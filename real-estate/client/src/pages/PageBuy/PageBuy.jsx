@@ -4,9 +4,11 @@ import { toast } from "react-toastify";
 import { PostBuyRequest } from "../../services/PostBuyRequest";
 import CardBuy from "../../components/CardBuy/CardBuy";
 import { Spoiler, Image, LoadingOverlay, Loader } from "@mantine/core";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 const PageBuy = () => {
-  const provinceId = useParams();
+  const location = useLocation();
+  const queryParameters = new URLSearchParams(location.search);
+  const provinceId = queryParameters.get("provinceId");
   const [listPost, setListPost] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -47,7 +49,6 @@ const PageBuy = () => {
     buyRequest.countPost().then((response) => {
       if (response.code === 200) {
         let totalPosts = 0;
-        console.log(response.data);
         response.data.forEach((item) => (totalPosts += item.totalPost));
         setCountPost([
           {
@@ -92,15 +93,6 @@ const PageBuy = () => {
     setPage(1);
   }, [provinceId]);
 
-  // useEffect(() => {
-  //   getCountPost();
-  //   getListPost({
-  //     page: page,
-  //     size: 10,
-  //     provinceId: provinceId,
-  //   });
-  // }, [page]);
-  // console.log(countPost);
   return (
     <div className="page-buy-container">
       <div className="list-card-buy-container">

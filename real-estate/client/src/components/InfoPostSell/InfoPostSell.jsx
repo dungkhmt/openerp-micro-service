@@ -1,6 +1,10 @@
 import "./InfoPostSell.css";
 import ImageSlider from "../ImageSlider/ImageSlider";
-import { MdOutlineHomeWork, MdOutlineSquareFoot } from "react-icons/md";
+import {
+  MdLocationPin,
+  MdOutlineHomeWork,
+  MdOutlineSquareFoot,
+} from "react-icons/md";
 import MarkerMap from "../MarkerMap/MarkerMap";
 import { FaBed } from "react-icons/fa";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
@@ -43,6 +47,7 @@ const InfoPostSell = ({ propertyDetails }) => {
               borderBottom: "1px solid #F2F2F2",
             }}
           >
+            <MdLocationPin className="icon" />
             {capitalizeFirstLetterOfEachWord(
               propertyDetails?.address +
                 ", " +
@@ -54,9 +59,9 @@ const InfoPostSell = ({ propertyDetails }) => {
           <Grid
             w={"50%"}
             style={{
-              padding: "15px 0",
+              padding: "15px 0 0 0",
               fontSize: "14px",
-              borderBottom: "1px solid #F2F2F2",
+              // borderBottom: "1px solid #F2F2F2",
             }}
           >
             <Grid.Col span={4}>
@@ -103,35 +108,6 @@ const InfoPostSell = ({ propertyDetails }) => {
               <div>{transferTypeProperty(propertyDetails?.typeProperty)}</div>
             </Grid.Col>
           </Grid>
-
-          <h3>Thông tin mô tả</h3>
-          <CKEditor
-            style={{ height: "300px" }}
-            editor={ClassicEditor}
-            data={propertyDetails?.description}
-            disabled={true}
-            onReady={(editor) => {
-              // You can store the "editor" and use when it is needed.
-              // editor.editing.view.change((writer) => {
-              //     writer.setStyle(
-              //         'width',
-              //         "200px",
-              //         editor.editing.view.document.getRoot()
-              //     )
-              // })
-              // console.log('Editor is ready to use!', editor);
-            }}
-            onChange={(event, editor) => {
-              // console.log( event );
-              // setDescription(editor.getData())
-            }}
-            onBlur={(event, editor) => {
-              console.log("Blur.", editor);
-            }}
-            onFocus={(event, editor) => {
-              console.log("Focus.", editor);
-            }}
-          />
 
           <div
             style={{
@@ -273,6 +249,25 @@ const InfoPostSell = ({ propertyDetails }) => {
               )}
             </Grid>
           </div>
+
+          <h3>Thông tin khác</h3>
+          <CKEditor
+            style={{ height: "300px" }}
+            editor={ClassicEditor}
+            data={propertyDetails?.description}
+            disabled={true}
+            onReady={(editor) => {}}
+            onChange={(event, editor) => {
+              // console.log( event );
+              // setDescription(editor.getData())
+            }}
+            onBlur={(event, editor) => {
+              console.log("Blur.", editor);
+            }}
+            onFocus={(event, editor) => {
+              console.log("Focus.", editor);
+            }}
+          />
         </div>
 
         <div

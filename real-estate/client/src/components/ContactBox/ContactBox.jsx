@@ -5,21 +5,23 @@ import { useDisclosure } from "@mantine/hooks";
 import ConversationDetail from "../ConversationDetail/ConversationDetail";
 import React, { useContext } from "react";
 import { ConversationContext } from "../../context/ConversationContext";
+import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
-const ContactBox = ({ account, isOwner }) => {
+const ContactBox = ({ author, isOwner }) => {
   const [opened, { toggle, close }] = useDisclosure(false);
   const { findConversationWith } = useContext(ConversationContext);
-
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   return (
     <div className="contact-box-container flexColCenter">
-      <Avatar src={account?.avatar} size={"xl"} />
+      <Avatar src={author?.avatar} size={"xl"} />
       <div
         style={{
           fontSize: "16px",
           color: "#2C2C2C",
         }}
       >
-        {account?.name}
+        {author?.name}
       </div>
       <div
         style={{
@@ -27,25 +29,34 @@ const ContactBox = ({ account, isOwner }) => {
           color: "#505050",
         }}
       >
-        <Link to={"/manager-post/" + account.accountId}>
-          Xem {account?.totalPostSell} tin bán khác
+        <Link to={"/manager-post/" + author.accountId}>
+          Xem {author?.totalPostSell} tin bán khác
         </Link>
       </div>
-      {account.phone !== null && (
-        <CopyButton value={account?.phone}>
+      {author.phone !== null && (
+        <CopyButton value={author?.phone}>
           {({ copied, copy }) => (
             <Button fullWidth color={copied ? "teal" : "blue"} onClick={copy}>
-              {copied ? "Đã sao chép" : account?.phone}
+              {copied ? "Đã sao chép" : author?.phone}
             </Button>
           )}
         </CopyButton>
       )}
       <Button fullWidth>
-        <a href={`mailto:${account?.email}`}>Gửi emai</a>
+        <a href={`mailto:${author?.email}`}>Gửi emai</a>
       </Button>
 
       {!isOwner && (
-        <Button fullWidth onClick={toggle}>
+        <Button
+          fullWidth
+          onClick={() => {
+            if (isLoggedIn) {
+              toggle();
+            } else {
+              toast.info("Đăng nhập để liên lạc");
+            }
+          }}
+        >
           Gửi tin nhắn
         </Button>
       )}
@@ -66,9 +77,7 @@ const ContactBox = ({ account, isOwner }) => {
           padding: "0 !important",
         }}
       >
-        <ConversationDetail
-          conversationSelect={findConversationWith(account)}
-        />
+        <ConversationDetail conversationSelect={findConversationWith(author)} />
       </Dialog>
     </div>
   );
