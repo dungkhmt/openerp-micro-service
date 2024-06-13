@@ -172,7 +172,6 @@ public class PostSellService {
 
 	public void updateStatus(Long postSellId, Long accountId, PostStatus status) {
 		int record = postSellDao.updateStatusBy(postSellId, accountId, status);
-		System.out.println(" thong tin " + accountId + postSellId + status + record);
 		if (record == 0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cập nhập không thành công");
 		}
