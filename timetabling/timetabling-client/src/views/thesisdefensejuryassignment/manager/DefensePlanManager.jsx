@@ -38,6 +38,9 @@ export default function DefensePlanManager() {
       title: "Phòng", field: "defenseRoom", render: (rowData) => rowData?.defenseRoom?.name,
     },
     {
+      title: "Phân ban", field: "juryTopic",
+    },
+    {
       title: "Keywords",
       field: "keywords",
       render: (rowData) =>
@@ -110,7 +113,8 @@ export default function DefensePlanManager() {
         setDefenseJuries(
           data.map((item) => ({
             ...item,
-            keywords: item?.academicKeywordList.map((item) => item.keyword),
+            juryTopic: item?.juryTopic?.name,
+            keywords: item?.juryTopic?.academicKeywordList.map((item) => item.keyword),
           }))
         );
         setLoading(false)

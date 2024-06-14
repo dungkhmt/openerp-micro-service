@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.thesisdefensejuryassignment.service;
 
+import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.TeacherSupervisedThesisDTO;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.ThesisDTO;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.Thesis;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.TrainingProgram;
@@ -7,6 +8,7 @@ import openerp.openerpresourceserver.thesisdefensejuryassignment.models.ThesisMo
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface ThesisService {
     Thesis createNewThesis(ThesisModel thesisModel);
@@ -15,4 +17,9 @@ public interface ThesisService {
 
     List<ThesisDTO> getAllByStudentEmail(String studentEmail);
 
+    List<TeacherSupervisedThesisDTO> getAllThesisSupervisedByTeacher(String teacherId);
+
+    Thesis getById(String id);
+
+    String assignJuryTopicToThesis(String thesisId, int juryTopicId);
 }

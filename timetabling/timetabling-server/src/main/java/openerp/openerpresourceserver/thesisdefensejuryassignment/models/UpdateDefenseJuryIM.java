@@ -16,15 +16,24 @@ public class UpdateDefenseJuryIM {
     private int defenseRoomId;
     private int defenseSessionId;
     private int maxThesis;
-    private List<String> academicKeywordList;
+    private int juryTopicId;
 
-    public List<String> getAcademicKeywordList() {
-        return academicKeywordList;
+    public int getJuryTopicId() {
+        return juryTopicId;
     }
 
-    public void setAcademicKeywordList(List<String> academicKeywordList) {
-        this.academicKeywordList = academicKeywordList;
+    public void setJuryTopicId(int juryTopicId) {
+        this.juryTopicId = juryTopicId;
     }
+    //    private List<String> academicKeywordList;
+
+//    public List<String> getAcademicKeywordList() {
+//        return academicKeywordList;
+//    }
+//
+//    public void setAcademicKeywordList(List<String> academicKeywordList) {
+//        this.academicKeywordList = academicKeywordList;
+//    }
 
     public String getId() {
         return id;

@@ -45,6 +45,9 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
     @Autowired
     private DefenseJuryTeacherRoleRepo defenseJuryTeacherRoleRepo;
 
+    @Autowired
+    private JuryTopicRepo juryTopicRepo;
+
     @Override
     public String createNewDefenseJury(DefenseJuryIM defenseJury) {
         DefenseJury newDefenseJury = new DefenseJury();
@@ -63,14 +66,15 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
         if (defenseJury.getDefenseDate().after(planEndDate)) return "Ngày tổ chức phải trước ngày " + planEndDate.toString() ;
         if (defenseJury.getDefenseDate().before(planStartDate)) return "Ngày tổ chức phải sau ngày " + planStartDate.toString();
         //
-        List<AcademicKeyword> academicKeywordList = new LinkedList<>();
-        for (int i = 0; i < defenseJury.getAcademicKeywordList().size(); i++) {
-            AcademicKeyword foundAcademicKeyword = academicKeywordRepo.findById(defenseJury.getAcademicKeywordList().get(i)).orElse(null);
-            if (foundAcademicKeyword == null) {
-                return null;
-            }
-            academicKeywordList.add(foundAcademicKeyword);
-        }
+//        List<AcademicKeyword> academicKeywordList = new LinkedList<>();
+//        for (int i = 0; i < defenseJury.getAcademicKeywordList().size(); i++) {
+//            AcademicKeyword foundAcademicKeyword = academicKeywordRepo.findById(defenseJury.getAcademicKeywordList().get(i)).orElse(null);
+//            if (foundAcademicKeyword == null) {
+//                return null;
+//            }
+//            academicKeywordList.add(foundAcademicKeyword);
+//        }
+        JuryTopic juryTopic = juryTopicRepo.findById(defenseJury.getJuryTopicId()).orElse(null);
         int defenseRoomId = defenseJury.getDefenseRoomId();
         DefenseRoom defenseRoom = defenseRoomRepo.findById(defenseRoomId).orElse(null);
         if (defenseRoom == null) {
@@ -94,7 +98,8 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
         newDefenseJury.setDefenseRoom(defenseRoom);
         newDefenseJury.setDefenseSession(defenseSession);
         newDefenseJury.setThesisDefensePlan(thesisDefensePlan);
-        newDefenseJury.setAcademicKeywordList(academicKeywordList);
+//        newDefenseJury.setAcademicKeywordList(academicKeywordList);
+        newDefenseJury.setJuryTopic(juryTopic);
         newDefenseJury.setName(defenseJury.getName());
         newDefenseJury.setDefenseDate(defenseJury.getDefenseDate());
         newDefenseJury.setCreatedTime(new Date());
@@ -216,18 +221,18 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
         Date planEndDate = defenseJury.getThesisDefensePlan().getEndDate();
         if (defenseDate.after(planEndDate)) return "Ngày tổ chức phải trước ngày " + planEndDate.toString() ;
         if (defenseDate.before(planStartDate)) return "Ngày tổ chức phải sau ngày " + planStartDate.toString();
-
-        List<AcademicKeyword> academicKeywordList = new ArrayList<>();
-        for (String keyword : updateDefenseJuryIM.getAcademicKeywordList()) {
-            AcademicKeyword academicKeyword = academicKeywordRepo.findById(keyword).orElse(null);
-            if (academicKeyword == null) return null;
-            academicKeywordList.add(academicKeyword);
-        }
+        JuryTopic juryTopic  = juryTopicRepo.findById(updateDefenseJuryIM.getJuryTopicId()).orElse(null);
+//        List<AcademicKeyword> academicKeywordList = new ArrayList<>();
+//        for (String keyword : updateDefenseJuryIM.getAcademicKeywordList()) {
+//            AcademicKeyword academicKeyword = academicKeywordRepo.findById(keyword).orElse(null);
+//            if (academicKeyword == null) return null;
+//            academicKeywordList.add(academicKeyword);
+//        }
         List<DefenseJury> duplicateDefenseJury = defenseJuryRepo.findByThesisDefensePlanAndDefenseDateAndDefenseSessionAndDefenseRoom(defenseJury.getThesisDefensePlan(),
                 defenseDate,
                 defenseSession,
                 defenseRoom);
-
+        boolean isRemoved = duplicateDefenseJury.remove(defenseJury);
         if (!duplicateDefenseJury.isEmpty()){
             return "Hội đồng " + duplicateDefenseJury.get(0).getName() + " đã được tổ chức vào phòng " + defenseRoom.getName() + " cùng buổi";
         }
@@ -235,7 +240,8 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
         defenseJury.setMaxThesis(updateDefenseJuryIM.getMaxThesis());
         defenseJury.setDefenseSession(defenseSession);
         defenseJury.setDefenseRoom(defenseRoom);
-        defenseJury.setAcademicKeywordList(academicKeywordList);
+//        defenseJury.setAcademicKeywordList(academicKeywordList);
+        defenseJury.setJuryTopic(juryTopic);
         defenseJury.setDefenseDate(defenseDate);
         DefenseJury updatedDefenseJury = defenseJuryRepo.save(defenseJury);
         return "SUCCESS";
