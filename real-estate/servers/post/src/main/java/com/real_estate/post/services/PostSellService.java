@@ -2,7 +2,7 @@ package com.real_estate.post.services;
 
 import com.real_estate.post.daos.interfaces.AccountDao;
 import com.real_estate.post.daos.interfaces.PostSellDao;
-import com.real_estate.post.daos.interfaces.SavePostDao;
+import com.real_estate.post.daos.interfaces.LikeDao;
 import com.real_estate.post.dtos.request.CreatePostSellRequestDto;
 import com.real_estate.post.dtos.request.UpdatePostSellRequestDto;
 import com.real_estate.post.dtos.response.PostSellResponseDto;
@@ -32,8 +32,8 @@ public class PostSellService {
 	private AccountDao accountDao;
 
 	@Autowired
-	@Qualifier("savePostImpl")
-	private SavePostDao savePostDao;
+	@Qualifier("likeImpl")
+	private LikeDao likeDao;
 
 	@Transactional
 	public void createPostSell(CreatePostSellRequestDto requestDto, Long accountId) {
@@ -123,8 +123,8 @@ public class PostSellService {
 
 			if (finderId != null && finderId > 0) {
 				entities = entities.stream().map(entity -> {
-					Long saveId = savePostDao.getId(entity.getPostSellId(), finderId, TypePost.SELL);
-					entity.setSaveId(saveId);
+					Long likeId = likeDao.getId(entity.getPostSellId(), finderId, TypePost.SELL);
+					entity.setLikeId(likeId);
 					return entity;
 				}).toList();
 			}
@@ -182,8 +182,8 @@ public class PostSellService {
 
 		if (finderId != null && finderId != accountId) {
 			dtos = dtos.stream().map(dto -> {
-				Long saveId = savePostDao.getId(dto.getPostSellId(), finderId, TypePost.SELL);
-				dto.setSaveId(saveId);
+				Long likeId = likeDao.getId(dto.getPostSellId(), finderId, TypePost.SELL);
+				dto.setLikeId(likeId);
 				return dto;
 			}).toList();
 		}

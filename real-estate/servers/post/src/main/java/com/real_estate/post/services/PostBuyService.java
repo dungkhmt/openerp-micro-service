@@ -3,7 +3,7 @@ package com.real_estate.post.services;
 import com.real_estate.post.daos.interfaces.AccountDao;
 import com.real_estate.post.daos.interfaces.PostBuyDao;
 import com.real_estate.post.daos.interfaces.PostSellDao;
-import com.real_estate.post.daos.interfaces.SavePostDao;
+import com.real_estate.post.daos.interfaces.LikeDao;
 import com.real_estate.post.dtos.request.CreatePostBuyRequestDto;
 import com.real_estate.post.dtos.request.UpdatePostBuyRequestDto;
 import com.real_estate.post.dtos.response.CountPostByProvinceResponseDto;
@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,8 +42,8 @@ public class PostBuyService {
 	private PostSellDao postSellDao;
 
 	@Autowired
-	@Qualifier("savePostImpl")
-	private SavePostDao savePostDao;
+	@Qualifier("likeImpl")
+	private LikeDao likeDao;
 
 	@Transactional
 	public void createPostBuy(CreatePostBuyRequestDto requestDto, Long accountId) {
@@ -118,8 +117,8 @@ public class PostBuyService {
 
 			if (finderId != null && finderId > 0) {
 				entities = entities.stream().map(entity -> {
-					Long saveId = savePostDao.getId(entity.getPostBuyId(), finderId, TypePost.BUY);
-					entity.setSaveId(saveId);
+					Long likeId = likeDao.getId(entity.getPostBuyId(), finderId, TypePost.BUY);
+					entity.setLikeId(likeId);
 					return entity;
 				}).toList();
 			}
@@ -132,8 +131,8 @@ public class PostBuyService {
 
 		if (finderId != null && finderId != accountId && finderId > 0) {
 			dtos = dtos.stream().map(dto -> {
-				Long saveId = savePostDao.getId(dto.getPostBuyId(), finderId, TypePost.BUY);
-				dto.setSaveId(saveId);
+				Long likeId = likeDao.getId(dto.getPostBuyId(), finderId, TypePost.BUY);
+				dto.setLikeId(likeId);
 				return dto;
 			}).toList();
 		}
@@ -197,8 +196,8 @@ public class PostBuyService {
 		}
 		List<PostSellResponseDto> result = postSellDao.findBy(buyEntity);
 		result = result.stream().map(dto -> {
-			Long saveId = savePostDao.getId(dto.getPostSellId(), accountId, TypePost.SELL);
-			dto.setSaveId(saveId);
+			Long likeId = likeDao.getId(dto.getPostSellId(), accountId, TypePost.SELL);
+			dto.setLikeId(likeId);
 			return dto;
 		}).toList();
 		return result;
