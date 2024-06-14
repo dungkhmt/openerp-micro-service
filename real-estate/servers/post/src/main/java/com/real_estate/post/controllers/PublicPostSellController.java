@@ -4,6 +4,7 @@ import com.real_estate.post.dtos.response.PageResponseDto;
 import com.real_estate.post.dtos.response.PostSellResponseDto;
 import com.real_estate.post.dtos.response.ResponseDto;
 import com.real_estate.post.models.PostSellEntity;
+import com.real_estate.post.services.AuthenticationService;
 import com.real_estate.post.services.PostSellService;
 import com.real_estate.post.utils.DirectionsStatus;
 import com.real_estate.post.utils.TypeProperty;
@@ -23,6 +24,9 @@ public class PublicPostSellController {
     @Autowired
     PostSellService postSellService;
 
+    @Autowired
+    AuthenticationService authenticationService;
+
     @GetMapping()
     @Operation(summary = "Get page sell", operationId = "publicSell.getPage")
     public ResponseEntity<PageResponseDto<PostSellResponseDto>> getPageSell(
@@ -37,6 +41,7 @@ public class PublicPostSellController {
             @RequestParam(value = "typeProperties", required = false) List<TypeProperty> typeProperties,
             @RequestParam(value = "directions", required = false) List<DirectionsStatus> directions
     ) {
+        Long finderId = authenticationService.getAccountIdFromContext();
         List<String> typePropertiesString = typeProperties.stream().map((item) -> {
             return item.toString();
         }).collect(Collectors.toList());
@@ -52,7 +57,8 @@ public class PublicPostSellController {
                                                                       fromPrice,
                                                                       toPrice,
                                                                       typePropertiesString,
-                                                                      directionsString
+                                                                      directionsString,
+                                                                      finderId
         );
         return ResponseEntity.status(HttpStatus.OK).body(new PageResponseDto<PostSellResponseDto>(200, sells));
     }
@@ -68,8 +74,11 @@ public class PublicPostSellController {
 
     @GetMapping("/my-post/{accountId}")
     @Operation(summary = "Get list post of accountId", operationId = "sell.mypostsell")
-    public ResponseEntity<ResponseDto<List<PostSellResponseDto>>> getPostSellBy(@PathVariable("accountId") Long accountId) {
-        List<PostSellResponseDto> entities = postSellService.getPostByAccountId(accountId);
+    public ResponseEntity<ResponseDto<List<PostSellResponseDto>>> getPostSellBy(
+            @PathVariable("accountId") Long accountId
+    ) {
+        Long finderId = authenticationService.getAccountIdFromContext();
+        List<PostSellResponseDto> entities = postSellService.getPostByAccountId(accountId, finderId);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, entities));
     }
 

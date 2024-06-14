@@ -69,10 +69,9 @@ public class PostBuyImpl implements PostBuyDao {
 		rawQuery.append(
 				"select p, a " +
 						"from PostBuyPostgresEntity p " +
-						"left join AccountPostgresEntity a on p.authorId = a.accountId " +
-						"where p.postStatus = 'OPENING' ");
+						"left join AccountPostgresEntity a on p.authorId = a.accountId " );
 		if (provinceId != null && provinceId != "") {
-			rawQuery.append("and p.provinceId = '" + provinceId + "' ");
+			rawQuery.append("where p.provinceId = '" + provinceId + "' ");
 		}
 		rawQuery.append("order by p.createdAt desc ");
 

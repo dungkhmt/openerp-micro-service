@@ -2,12 +2,14 @@ package com.real_estate.post.services;
 
 import com.real_estate.post.daos.interfaces.AccountDao;
 import com.real_estate.post.daos.interfaces.PostSellDao;
+import com.real_estate.post.daos.interfaces.SavePostDao;
 import com.real_estate.post.dtos.request.CreatePostSellRequestDto;
 import com.real_estate.post.dtos.request.UpdatePostSellRequestDto;
 import com.real_estate.post.dtos.response.PostSellResponseDto;
 import com.real_estate.post.models.DashboardPriceEntity;
 import com.real_estate.post.models.PostSellEntity;
 import com.real_estate.post.utils.PostStatus;
+import com.real_estate.post.utils.TypePost;
 import org.hibernate.TransactionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,6 +30,10 @@ public class PostSellService {
 	@Autowired
 	@Qualifier("accountImpl")
 	private AccountDao accountDao;
+
+	@Autowired
+	@Qualifier("savePostImpl")
+	private SavePostDao savePostDao;
 
 	@Transactional
 	public void createPostSell(CreatePostSellRequestDto requestDto, Long accountId) {
@@ -87,7 +93,8 @@ public class PostSellService {
 			Long fromPrice,
 			Long toPrice,
 			List<String> typeProperties,
-			List<String> directions
+			List<String> directions,
+			Long finderId
 	) {
 		Pageable pageable = PageRequest.of(page-1, size);
 		long totalRecords = postSellDao.countBy(provinceId,
@@ -113,6 +120,14 @@ public class PostSellService {
 					typeProperties,
 					directions
 			);
+
+			if (finderId != null && finderId > 0) {
+				entities = entities.stream().map(entity -> {
+					Long saveId = savePostDao.getId(entity.getPostSellId(), finderId, TypePost.SELL);
+					entity.setSaveId(saveId);
+					return entity;
+				}).toList();
+			}
 			return new PageImpl<>(entities, pageable, totalRecords);
 		}
 	}
@@ -162,8 +177,17 @@ public class PostSellService {
 		postSellDao.save(entity);
 	}
 
-	public List<PostSellResponseDto> getPostByAccountId(Long accountId) {
-		return postSellDao.findByAccountId(accountId);
+	public List<PostSellResponseDto> getPostByAccountId(Long accountId, Long finderId) {
+		List<PostSellResponseDto> dtos = postSellDao.findByAccountId(accountId);
+
+		if (finderId != null && finderId != accountId) {
+			dtos = dtos.stream().map(dto -> {
+				Long saveId = savePostDao.getId(dto.getPostSellId(), finderId, TypePost.SELL);
+				dto.setSaveId(saveId);
+				return dto;
+			}).toList();
+		}
+		return dtos;
 	}
 
 	public List<DashboardPriceEntity> calculatePricePerM2(Long startTime, Long endTime) {
