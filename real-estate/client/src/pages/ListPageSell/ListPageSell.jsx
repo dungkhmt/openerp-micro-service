@@ -1,7 +1,7 @@
 import CardSell from "../../components/CardSell/CardSell";
 import React, { useEffect, useState } from "react";
 import MarkerMap from "../../components/MarkerMap/MarkerMap";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "./ListPageSell.css";
 import FilterSell from "../../components/FilterSell/FilterSell";
 import { Pagination, ScrollArea } from "@mantine/core";
@@ -9,8 +9,6 @@ import PostSellRequest from "../../services/PostSellRequest";
 
 const ListPageSell = ({}) => {
   const [listPost, setListPost] = useState([]);
-  const [page, setPage] = useState(1);
-  const [size, setSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [params, setParams] = useState({
     page: 1,
@@ -51,9 +49,17 @@ const ListPageSell = ({}) => {
       .then();
   };
 
+  const changeItemInList = (item) => {
+    setListPost((prevListPost) =>
+      prevListPost.map((post) =>
+        post.postSellId === item.postSellId ? item : post,
+      ),
+    );
+  };
+
   useEffect(() => {
     getListPostSell(params);
-  }, [page, params]);
+  }, [params]);
 
   return (
     <div className="listPage">
@@ -72,7 +78,11 @@ const ListPageSell = ({}) => {
           <ScrollArea h={"95%"} offsetScrollbars>
             {listPost.map((item) => (
               <div key={item.postSellId} className="cardContainer">
-                <CardSell key={item.postSellId} item={item} />
+                <CardSell
+                  key={item.postSellId}
+                  item={item}
+                  changeItem={changeItemInList}
+                />
               </div>
             ))}
           </ScrollArea>

@@ -1,6 +1,6 @@
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import { Avatar, Divider, Grid, SimpleGrid } from "@mantine/core";
+import { ActionIcon, Avatar, Divider, Grid, SimpleGrid } from "@mantine/core";
 import {
   MdOutlineHomeWork,
   MdOutlineMail,
@@ -8,8 +8,10 @@ import {
 } from "react-icons/md";
 import { TbCoin } from "react-icons/tb";
 import {
+  transferColorPostStatus,
   transferDirections,
   transferLegalDocuments,
+  transferPostStatus,
   transferPrice,
   transferTime,
 } from "../../utils/common";
@@ -19,15 +21,54 @@ import { BsArrowsVertical } from "react-icons/bs";
 import { IoDocumentOutline } from "react-icons/io5";
 import { FaBed } from "react-icons/fa";
 import { FaCarSide, FaPhoneVolume } from "react-icons/fa6";
-import React from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
+import { IconHeart } from "@tabler/icons-react";
+import SaveRequest from "../../services/SaveRequest";
+import { AccountContext } from "../../context/AccountContext";
+import { toast } from "react-toastify";
 
-const CardBuy = ({ item }) => {
+const CardBuy = ({ item, changeItem }) => {
+  const [isSave, setIsSave] = useState(item?.saveId > 0);
+  const { account } = useContext(AccountContext);
+
+  const save = () => {
+    if (item?.postBuyId > 0 && Object.keys(account).length > 0) {
+      const saveRequest = new SaveRequest();
+      saveRequest
+        .createSave({
+          postId: item.postBuyId,
+          typePost: "BUY",
+        })
+        .then((response) => {
+          if (response.code === 200) {
+            setIsSave(true);
+            changeItem({ ...item, saveId: response.data });
+          }
+        });
+    }
+    {
+      toast.error("Hãy đăng nhập để thích bài viết");
+    }
+  };
+
+  const deleteSave = () => {
+    const saveRequest = new SaveRequest();
+    saveRequest.deleteSave({ saveId: item.saveId }).then((response) => {
+      if (response.code === 200) {
+        setIsSave(false);
+        changeItem({ ...item, saveId: 0 });
+      }
+    });
+  };
+
   return (
     <div
       style={{
-        width: "90%",
+        width: "100%",
         margin: "0 auto",
+        padding: "0 20px 10px 20px",
+        position: "relative",
       }}
     >
       <div className="infoAuthor">
@@ -60,12 +101,14 @@ const CardBuy = ({ item }) => {
             {item.emailAuthor !== null && (
               <a
                 href={"mailto:" + item.emailAuthor}
+                target="_blank"
                 className="flexStart"
                 style={{
                   // backgroundColor: "#007C80",
                   textAlign: "center",
                   alignItems: "center",
                 }}
+                rel="noreferrer"
               >
                 <MdOutlineMail className="icon" />
                 <span>{item.emailAuthor}</span>
@@ -77,7 +120,6 @@ const CardBuy = ({ item }) => {
 
       <h2
         style={{
-          // fontWeight: "600",
           marginBottom: "10px",
           letterSpacing: "1px",
           // color: "yellow",
@@ -98,14 +140,6 @@ const CardBuy = ({ item }) => {
           // borderTop: "1px solid #F2F2F2",
         }}
       >
-        {/*<h3*/}
-        {/*  style={{*/}
-        {/*    padding: "15px 0",*/}
-        {/*  }}*/}
-        {/*>*/}
-        {/*  */}
-        {/*</h3>*/}
-
         <Grid w={"100%"}>
           <Grid.Col
             span={6}
@@ -310,6 +344,35 @@ const CardBuy = ({ item }) => {
           console.log("Focus.", editor);
         }}
       />
+
+      <div
+        className="postStatus"
+        style={{ backgroundColor: transferColorPostStatus(item.postStatus) }}
+      >
+        {transferPostStatus(item.postStatus)}
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          top: "0",
+          right: "0",
+        }}
+      >
+        {isSave ? (
+          <ActionIcon
+            variant="filled"
+            color="red"
+            size="xs"
+            onClick={deleteSave}
+          >
+            <IconHeart />
+          </ActionIcon>
+        ) : (
+          <ActionIcon variant="outline" color="red" size="xs" onClick={save}>
+            <IconHeart />
+          </ActionIcon>
+        )}
+      </div>
     </div>
   );
 };

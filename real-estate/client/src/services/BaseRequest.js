@@ -45,6 +45,21 @@ export default class BaseRequest {
     }
   }
 
+  async delete(url, params) {
+    try {
+      const config = {
+        params,
+        paramsSerializer: (params) => {
+          return qs.stringify(params, { arrayFormat: "repeat" });
+        },
+      };
+      const response = await axios.delete(urlPrefix + url, config);
+      return this._responseHandler(response);
+    } catch (error) {
+      return this._errorHandler(error);
+    }
+  }
+
   async patch(url, data) {
     try {
       const response = await axios.patch(this.getUrlPrefix() + url, data);

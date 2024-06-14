@@ -1,5 +1,5 @@
 import "./CardSell.css";
-import React from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { MdLocationPin, MdOutlineMail } from "react-icons/md";
 import {
@@ -12,12 +12,15 @@ import {
 } from "../../utils/common";
 import { GoLaw } from "react-icons/go";
 import { RxHeight, RxWidth } from "react-icons/rx";
-import { ImCompass2 } from "react-icons/im";
 import { FaPhoneVolume } from "react-icons/fa6";
-import { Avatar, Grid } from "@mantine/core";
+import { ActionIcon, Avatar, Grid } from "@mantine/core";
 import { GrDirections } from "react-icons/gr";
+import { IconHeart } from "@tabler/icons-react";
+import SaveRequest from "../../services/SaveRequest";
+import { AccountContext } from "../../context/AccountContext";
+import { toast } from "react-toastify";
 
-const CardSell = ({ item }) => {
+const CardSell = ({ item, changeItem }) => {
   function capitalizeFirstLetterOfEachWord(string) {
     return string
       ?.split(" ")
@@ -27,6 +30,37 @@ const CardSell = ({ item }) => {
       .join(" ");
   }
 
+  const [isSave, setIsSave] = useState(item?.saveId > 0);
+  const { account } = useContext(AccountContext);
+
+  const save = () => {
+    if (item?.postSellId > 0 && Object.keys(account).length > 0) {
+      const saveRequest = new SaveRequest();
+      saveRequest
+        .createSave({
+          postId: item.postSellId,
+          typePost: "SELL",
+        })
+        .then((response) => {
+          if (response.code === 200) {
+            setIsSave(true);
+            changeItem({ ...item, saveId: response.data });
+          }
+        });
+    } else {
+      toast.error("Hãy đăng nhập để thích bài viết");
+    }
+  };
+
+  const deleteSave = () => {
+    const saveRequest = new SaveRequest();
+    saveRequest.deleteSave({ saveId: item.saveId }).then((response) => {
+      if (response.code === 200) {
+        setIsSave(false);
+        changeItem({ ...item, saveId: 0 });
+      }
+    });
+  };
   return (
     <div className="card">
       <div className="infoPost">
@@ -153,6 +187,28 @@ const CardSell = ({ item }) => {
         style={{ backgroundColor: transferColorPostStatus(item.postStatus) }}
       >
         {transferPostStatus(item.postStatus)} Bán
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          top: "0",
+          right: "0",
+        }}
+      >
+        {isSave ? (
+          <ActionIcon
+            variant="filled"
+            color="red"
+            size="xs"
+            onClick={deleteSave}
+          >
+            <IconHeart />
+          </ActionIcon>
+        ) : (
+          <ActionIcon variant="outline" color="red" size="xs" onClick={save}>
+            <IconHeart />
+          </ActionIcon>
+        )}
       </div>
     </div>
   );

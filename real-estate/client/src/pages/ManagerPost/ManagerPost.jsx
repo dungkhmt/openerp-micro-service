@@ -1,15 +1,28 @@
 import "./ManagerPost.css";
 import React, { useEffect, useState } from "react";
 import PostSellRequest from "../../services/PostSellRequest";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import CardSell from "../../components/CardSell/CardSell";
-import { ActionIcon, Button, Menu, Modal, rem, Tabs } from "@mantine/core";
+import {
+  ActionIcon,
+  Button,
+  Menu,
+  Modal,
+  rem,
+  Tabs,
+  Table,
+  Avatar,
+  Group,
+  Text,
+  Anchor,
+  ScrollArea,
+} from "@mantine/core";
 import { IoIosMore } from "react-icons/io";
 import { MdOutlineDone } from "react-icons/md";
 import { FaTrash } from "react-icons/fa";
 import { IoHammerOutline } from "react-icons/io5";
 import { HiOutlineLockOpen } from "react-icons/hi2";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import FixPostSell from "../../components/FixPostSell/FixPostSell";
 import InfoPostSell from "../../components/InfoPostSell/InfoPostSell";
 import ContactBox from "../../components/ContactBox/ContactBox";
@@ -18,6 +31,9 @@ import AccountRequest from "../../services/AccountRequest";
 import { set_current_account } from "../../store/account";
 import CardBuy from "../../components/CardBuy/CardBuy";
 import { PostBuyRequest } from "../../services/PostBuyRequest";
+import SaveRequest from "../../services/SaveRequest";
+import { IMaskInput } from "react-imask";
+import { IconHeart } from "@tabler/icons-react";
 
 const ManagerPost = () => {
   const navigate = useNavigate();
@@ -29,16 +45,77 @@ const ManagerPost = () => {
   const isOwnerPost = currentAccount.accountId == accountId;
 
   const [infoOwner, setInfoOwner] = useState({});
+
   const sellRequest = new PostSellRequest();
   const [listPostSell, setListPostSell] = useState([]);
   const [sellSelect, setSellSelect] = useState({});
 
   const buyRequest = new PostBuyRequest();
   const [listPostBuy, setListPostBuy] = useState([]);
-  const [sellsFIt, setSellsFIt] = useState([]);
+  const [sellsFit, setSellsFit] = useState([]);
   const [buySelect, setBuySelect] = useState({});
   const [showPost, setShowPost] = useState(false);
 
+  const saveRequest = new SaveRequest();
+  const [listSave, setListSave] = useState([]);
+  const [listSaverPost, setListSaverPost] = useState([]);
+
+  const getSaverPost = (item) => {
+    saveRequest
+      .getSaverOfPost(
+        item?.postSellId > 0
+          ? { postId: item.postSellId, typePost: "SELL" }
+          : { postId: item.postBuyId, typePost: "BUY" },
+      )
+      .then((response) => {
+        if (response.code === 200) {
+          if (response.data.length > 0) {
+            setListSaverPost(response.data);
+          } else {
+            toast.success("Chưa có người nào thích bài viết của bạn");
+          }
+        }
+      });
+  };
+
+  const changeItemInSellFit = (item) => {
+    setSellsFit((prevListPost) =>
+      prevListPost.map((post) =>
+        post.postSellId === item.postSellId ? item : post,
+      ),
+    );
+  };
+  const changeItemSell = (item) => {
+    setListPostSell((prevListPost) =>
+      prevListPost.map((post) =>
+        post.postSellId === item.postSellId ? item : post,
+      ),
+    );
+
+    if (item.saveId > 0) {
+      setListSave([item, ...listSave]);
+    }
+  };
+
+  const changeItemBuy = (item) => {
+    setListPostBuy((prevListPost) =>
+      prevListPost.map((post) =>
+        post.postBuyId === item.postBuyId ? item : post,
+      ),
+    );
+    if (item.saveId > 0) {
+      setListSave([item, ...listSave]);
+    }
+  };
+
+  const deleteItemSave = (item) => {
+    toast.info("Hãy reload lại trang để nhận dữ liệu mới");
+    const updatedListSave = listSave.filter(
+      (save) => save.createdAt !== item.createdAt,
+    );
+
+    setListSave(updatedListSave);
+  };
   const handleChangeStatusSell = (status, postSellId) => {
     sellRequest
       .update_status({
@@ -116,6 +193,14 @@ const ManagerPost = () => {
     });
   };
 
+  const refreshSave = () => {
+    saveRequest.getPostSave().then((response) => {
+      if (response.code === 200) {
+        setListSave(response.data);
+      }
+    });
+  };
+
   const match_buy = (itemBuy) => {
     buyRequest
       .matching({
@@ -123,7 +208,7 @@ const ManagerPost = () => {
       })
       .then((response) => {
         if (response.code === 200 && response.data.length > 0) {
-          setSellsFIt(response.data);
+          setSellsFit(response.data);
         } else {
           toast.error("Không có bài viết nào phù hợp");
         }
@@ -150,10 +235,17 @@ const ManagerPost = () => {
 
   useEffect(() => {
     get_account();
+    if (isOwnerPost) {
+      refreshSave();
+    }
     Object.keys(sellSelect).length === 0 && refreshPostSells();
     Object.keys(buySelect).length === 0 && refreshPostBuys();
   }, [accountId]);
-  if (listPostSell.length === 0) {
+  if (
+    listPostSell.length === 0 &&
+    listPostBuy.length === 0 &&
+    listSave.length === 0
+  ) {
     return (
       <div>
         <h2>Bạn chưa có bài viết nào</h2>
@@ -181,7 +273,7 @@ const ManagerPost = () => {
               position: "sticky",
               left: "5px",
               top: "80px",
-              height: "100px",
+              height: "150px",
               marginRight: "5px",
             }}
           >
@@ -189,6 +281,11 @@ const ManagerPost = () => {
               Bài viết bán ({listPostSell.length})
             </Tabs.Tab>
             <Tabs.Tab value="buy">Bài viết mua ({listPostBuy.length})</Tabs.Tab>
+            {isOwnerPost && (
+              <Tabs.Tab value="save">
+                Bài viết đã lưu ({listSave.length})
+              </Tabs.Tab>
+            )}
           </Tabs.List>
 
           <Tabs.Panel value="sell">
@@ -197,144 +294,189 @@ const ManagerPost = () => {
                 key={item.postSellId}
                 className="manager-post-sell-container"
               >
-                <CardSell key={item.postSellId} item={item} />
-                <div className="feature-more">
-                  <Menu shadow="sm">
-                    <Menu.Target>
-                      <ActionIcon variant="subtle" color="gray">
-                        <IoIosMore
-                          style={{ margin: "0 auto" }}
-                          className="icon"
-                        />
-                      </ActionIcon>
-                    </Menu.Target>
+                <CardSell
+                  key={item.postSellId}
+                  item={item}
+                  changeItem={changeItemSell}
+                />
+                {isOwnerPost && (
+                  <div className="feature-more">
+                    <Menu shadow="sm">
+                      <Menu.Target>
+                        <ActionIcon variant="subtle" color="gray">
+                          <IoIosMore
+                            style={{ margin: "0 auto" }}
+                            className="icon"
+                          />
+                        </ActionIcon>
+                      </Menu.Target>
 
-                    <Menu.Dropdown>
-                      {item.postStatus === "OPENING" ? (
+                      <Menu.Dropdown>
+                        {item.postStatus === "OPENING" ? (
+                          <Menu.Item
+                            onClick={() =>
+                              handleChangeStatusSell("DONE", item.postSellId)
+                            }
+                            leftSection={
+                              <MdOutlineDone
+                                style={{ width: rem(14), height: rem(14) }}
+                              />
+                            }
+                          >
+                            Đã bán
+                          </Menu.Item>
+                        ) : (
+                          <Menu.Item
+                            onClick={() =>
+                              handleChangeStatusSell("OPENING", item.postSellId)
+                            }
+                            leftSection={
+                              <HiOutlineLockOpen
+                                style={{ width: rem(14), height: rem(14) }}
+                              />
+                            }
+                          >
+                            Mở bán
+                          </Menu.Item>
+                        )}
                         <Menu.Item
                           onClick={() =>
-                            handleChangeStatusSell("DONE", item.postSellId)
+                            handleChangeStatusSell("CLOSED", item.postSellId)
                           }
                           leftSection={
-                            <MdOutlineDone
+                            <FaTrash
                               style={{ width: rem(14), height: rem(14) }}
                             />
                           }
                         >
-                          Đã bán
+                          Xóa bài viết
                         </Menu.Item>
-                      ) : (
                         <Menu.Item
-                          onClick={() =>
-                            handleChangeStatusSell("OPENING", item.postSellId)
-                          }
+                          onClick={() => setSellSelect(item)}
                           leftSection={
-                            <HiOutlineLockOpen
+                            <IoHammerOutline
                               style={{ width: rem(14), height: rem(14) }}
                             />
                           }
+                          color="red"
                         >
-                          Mở bán
+                          Sửa
                         </Menu.Item>
-                      )}
-                      <Menu.Item
-                        onClick={() =>
-                          handleChangeStatusSell("CLOSED", item.postSellId)
-                        }
-                        leftSection={
-                          <FaTrash
-                            style={{ width: rem(14), height: rem(14) }}
-                          />
-                        }
-                      >
-                        Xóa bài viết
-                      </Menu.Item>
-                      <Menu.Item
-                        onClick={() => setSellSelect(item)}
-                        leftSection={
-                          <IoHammerOutline
-                            style={{ width: rem(14), height: rem(14) }}
-                          />
-                        }
-                        color="red"
-                      >
-                        Sửa
-                      </Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
-                </div>
+                        <Menu.Item
+                          onClick={() => getSaverPost(item)}
+                          leftSection={
+                            <IconHeart
+                              style={{ width: rem(14), height: rem(14) }}
+                            />
+                          }
+                          color="red"
+                        >
+                          Đã thích
+                        </Menu.Item>
+                      </Menu.Dropdown>
+                    </Menu>
+                  </div>
+                )}
               </div>
             ))}
           </Tabs.Panel>
           <Tabs.Panel value="buy">
             {listPostBuy.map((item) => (
               <div key={item.postBuyId} className="manager-post-buy-container">
-                <CardBuy item={item} />
-                <div className="feature-more">
-                  <Menu shadow="sm">
-                    <Menu.Target>
-                      <ActionIcon variant="subtle" color="gray">
-                        <IoIosMore
-                          style={{ margin: "0 auto" }}
-                          className="icon"
-                        />
-                      </ActionIcon>
-                    </Menu.Target>
+                <CardBuy item={item} changeItem={changeItemBuy} />
+                {isOwnerPost && (
+                  <div className="feature-more">
+                    <Menu shadow="sm">
+                      <Menu.Target>
+                        <ActionIcon variant="subtle" color="gray">
+                          <IoIosMore
+                            style={{ margin: "0 auto" }}
+                            className="icon"
+                          />
+                        </ActionIcon>
+                      </Menu.Target>
 
-                    <Menu.Dropdown>
-                      {item.postStatus === "OPENING" ? (
+                      <Menu.Dropdown>
+                        {item.postStatus === "OPENING" ? (
+                          <Menu.Item
+                            onClick={() =>
+                              handleChangeStatusBuy("DONE", item.postBuyId)
+                            }
+                            leftSection={
+                              <MdOutlineDone
+                                style={{ width: rem(14), height: rem(14) }}
+                              />
+                            }
+                          >
+                            Đã tìm thấy
+                          </Menu.Item>
+                        ) : (
+                          <Menu.Item
+                            onClick={() =>
+                              handleChangeStatusBuy("OPENING", item.postBuyId)
+                            }
+                            leftSection={
+                              <HiOutlineLockOpen
+                                style={{ width: rem(14), height: rem(14) }}
+                              />
+                            }
+                          >
+                            Mở
+                          </Menu.Item>
+                        )}
                         <Menu.Item
                           onClick={() =>
-                            handleChangeStatusBuy("DONE", item.postSellId)
+                            handleChangeStatusBuy("CLOSED", item.postBuyId)
                           }
                           leftSection={
-                            <MdOutlineDone
+                            <FaTrash
                               style={{ width: rem(14), height: rem(14) }}
                             />
                           }
                         >
-                          Đã tìm thấy
+                          Xóa bài viết
                         </Menu.Item>
-                      ) : (
                         <Menu.Item
-                          onClick={() =>
-                            handleChangeStatusBuy("OPENING", item.postSellId)
-                          }
+                          onClick={() => match_buy(item)}
                           leftSection={
-                            <HiOutlineLockOpen
+                            <IoHammerOutline
                               style={{ width: rem(14), height: rem(14) }}
                             />
                           }
+                          color="red"
                         >
-                          Mở
+                          Khớp
                         </Menu.Item>
-                      )}
-                      <Menu.Item
-                        onClick={() =>
-                          handleChangeStatusBuy("CLOSED", item.postSellId)
-                        }
-                        leftSection={
-                          <FaTrash
-                            style={{ width: rem(14), height: rem(14) }}
-                          />
-                        }
-                      >
-                        Xóa bài viết
-                      </Menu.Item>
-                      <Menu.Item
-                        onClick={() => match_buy(item)}
-                        leftSection={
-                          <IoHammerOutline
-                            style={{ width: rem(14), height: rem(14) }}
-                          />
-                        }
-                        color="red"
-                      >
-                        Khớp
-                      </Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
-                </div>
+                        <Menu.Item
+                          onClick={() => getSaverPost(item)}
+                          leftSection={
+                            <IconHeart
+                              style={{ width: rem(14), height: rem(14) }}
+                            />
+                          }
+                          color="red"
+                        >
+                          Đã thích
+                        </Menu.Item>
+                      </Menu.Dropdown>
+                    </Menu>
+                  </div>
+                )}
+              </div>
+            ))}
+          </Tabs.Panel>
+          <Tabs.Panel value="save">
+            {listSave?.map((item, index) => (
+              <div style={{ width: "100%" }} key={index}>
+                {item?.postSellId > 0 ? (
+                  <div className="manager-post-sell-container">
+                    <CardSell item={item} changeItem={deleteItemSave} />
+                  </div>
+                ) : (
+                  <div className="manager-post-buy-container">
+                    <CardBuy item={item} changeItem={deleteItemSave} />
+                  </div>
+                )}
               </div>
             ))}
           </Tabs.Panel>
@@ -348,6 +490,8 @@ const ManagerPost = () => {
           onClose={() => setSellSelect({})}
           size={"90%"}
           title="Thay đổi thông tin"
+          scrollAreaComponent={ScrollArea.Autosize}
+          yOffset="15vh"
         >
           {showPost && Object.keys(sellSelect).length > 0 && (
             <div>
@@ -376,27 +520,83 @@ const ManagerPost = () => {
         </Modal>
 
         <Modal
-          opened={sellsFIt.length > 0}
-          onClose={() => setSellsFIt([])}
+          opened={sellsFit.length > 0}
+          onClose={() => setSellsFit([])}
           size={"90%"}
           title="Những bài viết phù hợp"
+          scrollAreaComponent={ScrollArea.Autosize}
+          yOffset="15vh"
         >
-          {sellsFIt.map((item) => (
-            <CardSell key={item.postSellId} item={item} />
+          {sellsFit.map((item) => (
+            <CardSell
+              key={item.postSellId}
+              item={item}
+              changeItem={changeItemInSellFit}
+            />
           ))}
         </Modal>
 
-        {/*<ToastContainer*/}
-        {/*  position="top-left"*/}
-        {/*  autoClose={2000}*/}
-        {/*  hideProgressBar={false}*/}
-        {/*  newestOnTop={false}*/}
-        {/*  closeOnClick*/}
-        {/*  rtl={false}*/}
-        {/*  pauseOnFocusLoss*/}
-        {/*  draggable*/}
-        {/*  pauseOnHover*/}
-        {/*/>*/}
+        <Modal
+          opened={listSaverPost.length > 0}
+          onClose={() => setListSaverPost([])}
+          size="auto"
+          title="Danh sách người đã lưu bài viết của bạn"
+          zIndex={1100}
+          yOffset="15vh"
+        >
+          <Table.ScrollContainer minWidth={500}>
+            <Table verticalSpacing="sm">
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Người dùng</Table.Th>
+                  <Table.Th>Email</Table.Th>
+                  <Table.Th>Số điện thoại</Table.Th>
+                  <Table.Th />
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {listSaverPost.map((item, index) => {
+                  return (
+                    <Table.Tr key={index}>
+                      <Table.Td>
+                        <Group gap="sm">
+                          {/*<Link to={"/manager-post/" + item.accountId}>*/}
+                          <Avatar
+                            size={30}
+                            src={item.avatar}
+                            radius={30}
+                            component="a"
+                            href={"/manager-post/" + item.accountId}
+                            target="_blank"
+                          />
+                          {/*</Link>*/}
+                          <Text fz="sm" fw={500}>
+                            {item.name}
+                          </Text>
+                        </Group>
+                      </Table.Td>
+
+                      <Table.Td>
+                        <Anchor component="button" size="sm">
+                          {item.email}
+                        </Anchor>
+                      </Table.Td>
+                      <Table.Td>
+                        <Text
+                          fz="sm"
+                          // component={IMaskInput}
+                          // mask="0000-000-000"
+                        >
+                          {item.phone}
+                        </Text>
+                      </Table.Td>
+                    </Table.Tr>
+                  );
+                })}
+              </Table.Tbody>
+            </Table>
+          </Table.ScrollContainer>
+        </Modal>
       </div>
     );
   }
