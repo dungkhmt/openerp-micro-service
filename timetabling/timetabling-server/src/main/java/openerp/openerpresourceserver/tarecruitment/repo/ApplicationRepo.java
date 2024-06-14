@@ -17,6 +17,9 @@ public interface ApplicationRepo extends JpaRepository<Application, Integer> {
     @Query("SELECT a FROM Application a WHERE a.classCall.id = :classCallId ORDER BY a.classCall.id ASC, a.user.id ASC")
     Page<Application> findByClassCallId(int classCallId, Pageable pageable);
 
+    @Query("SELECT a FROM Application a WHERE a.user.id = :userId AND a.classCall.id = :classCallId")
+    Application findByUserAndClassCall(String userId, int classCallId);
+
     @Query("SELECT a " +
             "FROM Application a " +
             "WHERE a.classCall.semester = :semester " +
