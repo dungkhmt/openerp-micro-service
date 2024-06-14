@@ -2,6 +2,9 @@ package com.real_estate.post.dtos.response;
 
 import com.real_estate.post.models.AccountEntity;
 import com.real_estate.post.models.PostSellEntity;
+import com.real_estate.post.models.postgresql.AccountPostgresEntity;
+import com.real_estate.post.models.postgresql.PostSellPostgresEntity;
+import com.real_estate.post.models.postgresql.SavePostPostgresEntity;
 import lombok.*;
 
 import java.util.List;
@@ -44,6 +47,8 @@ public class PostSellResponseDto {
     Long createdAt;
     Long updatedAt;
 
+    Long saveId = 0L;
+
     public PostSellResponseDto(PostSellEntity p, AccountEntity a) {
         this.postSellId = p.getPostSellId();
         this.authorId = p.getAuthorId();
@@ -78,5 +83,43 @@ public class PostSellResponseDto {
         this.isAvailable = p.getIsAvailable();
         this.createdAt = p.getCreatedAt();
         this.updatedAt = p.getUpdatedAt();
+    }
+
+    public PostSellResponseDto(PostSellPostgresEntity p, AccountPostgresEntity a, SavePostPostgresEntity s) {
+        this.postSellId = p.getPostSellId();
+        this.authorId = p.getAuthorId();
+        this.nameAuthor = a.getName();
+        this.avatarAuthor = a.getAvatar();
+        this.phoneAuthor = a.getPhone();
+        this.emailAuthor = a.getEmail();
+        this.title = p.getTitle();
+        this.description = p.getDescription();
+        this.typeProperty = p.getTypeProperty();
+        this.price = p.getPrice();
+        this.pricePerM2 = p.getPricePerM2();
+        this.acreage = p.getAcreage();
+        this.bathroom = p.getBathroom();
+        this.parking = p.getParking();
+        this.bedroom = p.getBedroom();
+        this.floor = p.getFloor();
+        this.legalDocument = p.getLegalDocument();
+        this.directionProperty = p.getDirectionProperty();
+        this.horizontal = p.getHorizontal();
+        this.vertical = p.getVertical();
+        this.position = p.getPosition();
+
+        this.provinceId = p.getProvinceId();
+        this.nameProvince = p.getNameProvince();
+        this.districtId = p.getDistrictId();
+        this.nameDistrict = p.getNameDistrict();
+
+        this.address = p.getAddress();
+        this.imageUrls = p.getImageUrls();
+        this.postStatus = p.getPostStatus();
+        this.isAvailable = p.getIsAvailable();
+        this.createdAt = p.getCreatedAt();
+        this.updatedAt = p.getUpdatedAt();
+
+        this.saveId = s.getSaveId();
     }
 }

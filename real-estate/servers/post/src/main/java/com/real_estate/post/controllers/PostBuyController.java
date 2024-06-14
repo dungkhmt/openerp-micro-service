@@ -24,10 +24,8 @@ import java.util.List;
 @RequestMapping("/post/buy")
 public class PostBuyController {
 	@Autowired
-	PostBuyService buyService;
-
-	@Autowired
 	AuthenticationService authenticationService;
+
 	@Autowired
 	private PostBuyService postBuyService;
 
@@ -35,7 +33,7 @@ public class PostBuyController {
 	@Operation(summary = "create a new post buy", operationId = "buy.createPost")
 	public ResponseEntity<ResponseDto<String>> createPostBuy(@Valid @RequestBody CreatePostBuyRequestDto requestDto) {
 		Long accountId = authenticationService.getAccountIdFromContext();
-		buyService.createPostBuy(requestDto, accountId);
+		postBuyService.createPostBuy(requestDto, accountId);
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, "Đăng tin mua thành công"));
 	}
 
@@ -64,7 +62,6 @@ public class PostBuyController {
 	public ResponseEntity<ResponseDto<List<PostSellResponseDto>>> findPostSellMatch(
 			@RequestParam("postBuyId") Long postBuyId
 	) {
-		System.out.println("tim post" + postBuyId);
 		Long accountId = authenticationService.getAccountIdFromContext();
 		List<PostSellResponseDto> entities = postBuyService.findSellMatch(postBuyId, accountId);
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, entities));

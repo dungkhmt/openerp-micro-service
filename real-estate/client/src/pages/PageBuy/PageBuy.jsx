@@ -14,6 +14,14 @@ const PageBuy = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [countPost, setCountPost] = useState([]);
+  const changeItemBuy = (item) => {
+    setListPost((prevListPost) =>
+      prevListPost.map((post) =>
+        post.postBuyId === item.postBuyId ? item : post,
+      ),
+    );
+  };
+
   const getListPost = (params) => {
     setLoading(true);
     if (page <= totalPages) {
@@ -68,10 +76,10 @@ const PageBuy = () => {
     const clientHeight = document.documentElement.clientHeight;
 
     // console.log(scrollHeight, scrollTop, clientHeight)
-    if (scrollTop + clientHeight >= scrollHeight && loading === "") {
+    if (scrollTop + clientHeight >= scrollHeight && loading === false) {
       getListPost({
         page: page + 1,
-        size: 10,
+        size: 5,
         provinceId: provinceId,
       });
       setPage((prevPage) => prevPage + 1); // Lấy thêm 10 bài viết
@@ -85,9 +93,10 @@ const PageBuy = () => {
 
   useEffect(() => {
     getCountPost();
+    setTotalPages(1);
     getListPost({
       page: 1,
-      size: 10,
+      size: 5,
       provinceId: provinceId,
     });
     setPage(1);
@@ -99,7 +108,11 @@ const PageBuy = () => {
         {listPost?.map((item) => (
           <div key={item.postBuyId} className="card-buy-container">
             <Spoiler maxHeight={350} showLabel="Đọc thêm..." hideLabel="Ẩn...">
-              <CardBuy key={item.postBuyId} item={item} />
+              <CardBuy
+                key={item.postBuyId}
+                item={item}
+                changeItem={changeItemBuy}
+              />
             </Spoiler>
           </div>
         ))}

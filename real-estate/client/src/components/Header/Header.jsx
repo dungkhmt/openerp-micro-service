@@ -22,10 +22,14 @@ import {
 import { WebSocketContext } from "../../context/WebSocketContext";
 import { IconChevronDown } from "@tabler/icons-react";
 import AccountRequest from "../../services/AccountRequest";
+import { AccountContext } from "../../context/AccountContext";
+import { ConversationContext } from "../../context/ConversationContext";
 
 const Header = () => {
   const navigate = useNavigate();
   const { disconnect } = useContext(WebSocketContext);
+  const { setAccount } = useContext(AccountContext);
+  const { setConversations } = useContext(ConversationContext);
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const current_account = useSelector((state) => state.account.currentData);
@@ -41,6 +45,8 @@ const Header = () => {
     localStorage.clear();
     sessionStorage.clear();
     disconnect();
+    setAccount({});
+    setConversations([]);
     await accountRequest.logout();
     navigate("/", { replace: true });
   };

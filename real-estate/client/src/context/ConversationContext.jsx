@@ -78,6 +78,7 @@ const ConversationContextProvider = ({ children }) => {
         addMessage,
         findConversationWith,
         addConversation,
+        setConversations,
       }}
     >
       {children}

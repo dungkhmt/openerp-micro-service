@@ -10,8 +10,12 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AuthenticationService {
     public long getAccountIdFromContext() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        return userPrincipal.getId();
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+            return userPrincipal.getId();
+        } catch (Exception e) {
+            return 0;
+        }
     }
 }

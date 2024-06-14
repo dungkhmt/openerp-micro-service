@@ -242,7 +242,7 @@ const AddPostBuy = () => {
     <div className="postBuy-wrapper">
       {isPreview && Object.keys(post).length > 0 ? (
         <div>
-          <CardBuy item={post} />
+          <CardBuy item={post} changeItem={null} />
           <Group
             justify="center"
             style={{

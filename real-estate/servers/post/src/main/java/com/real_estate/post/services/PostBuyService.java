@@ -3,6 +3,7 @@ package com.real_estate.post.services;
 import com.real_estate.post.daos.interfaces.AccountDao;
 import com.real_estate.post.daos.interfaces.PostBuyDao;
 import com.real_estate.post.daos.interfaces.PostSellDao;
+import com.real_estate.post.daos.interfaces.SavePostDao;
 import com.real_estate.post.dtos.request.CreatePostBuyRequestDto;
 import com.real_estate.post.dtos.request.UpdatePostBuyRequestDto;
 import com.real_estate.post.dtos.response.CountPostByProvinceResponseDto;
@@ -10,6 +11,7 @@ import com.real_estate.post.dtos.response.PostBuyResponseDto;
 import com.real_estate.post.dtos.response.PostSellResponseDto;
 import com.real_estate.post.models.PostBuyEntity;
 import com.real_estate.post.utils.PostStatus;
+import com.real_estate.post.utils.TypePost;
 import org.hibernate.TransactionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -39,6 +41,10 @@ public class PostBuyService {
 	@Autowired
 	@Qualifier("postSellImpl")
 	private PostSellDao postSellDao;
+
+	@Autowired
+	@Qualifier("savePostImpl")
+	private SavePostDao savePostDao;
 
 	@Transactional
 	public void createPostBuy(CreatePostBuyRequestDto requestDto, Long accountId) {
@@ -97,7 +103,8 @@ public class PostBuyService {
 	public Page<PostBuyResponseDto> getPageBuy(
 			Integer page,
 			Integer size,
-			String provinceId
+			String provinceId,
+			Long finderId
 	) {
 		Pageable pageable = PageRequest.of(page-1, size);
 		long totalRecords = postBuyDao.countBy(provinceId);
@@ -108,12 +115,29 @@ public class PostBuyService {
 					pageable,
 					provinceId
 			);
+
+			if (finderId != null && finderId > 0) {
+				entities = entities.stream().map(entity -> {
+					Long saveId = savePostDao.getId(entity.getPostBuyId(), finderId, TypePost.BUY);
+					entity.setSaveId(saveId);
+					return entity;
+				}).toList();
+			}
 			return new PageImpl<>(entities, pageable, totalRecords);
 		}
 	}
 
-    public List<PostBuyResponseDto> getPostByAccountId(Long accountId) {
-		return postBuyDao.findByAccountId(accountId);
+    public List<PostBuyResponseDto> getPostByAccountId(Long accountId, Long finderId) {
+		List<PostBuyResponseDto> dtos = postBuyDao.findByAccountId(accountId);
+
+		if (finderId != null && finderId != accountId && finderId > 0) {
+			dtos = dtos.stream().map(dto -> {
+				Long saveId = savePostDao.getId(dto.getPostBuyId(), finderId, TypePost.BUY);
+				dto.setSaveId(saveId);
+				return dto;
+			}).toList();
+		}
+		return dtos;
     }
 
 	public void updateStatus(Long postBuyId, Long accountId, PostStatus status) {
@@ -172,6 +196,11 @@ public class PostBuyService {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chức năng này chỉ dành cho chủ bài viết");
 		}
 		List<PostSellResponseDto> result = postSellDao.findBy(buyEntity);
+		result = result.stream().map(dto -> {
+			Long saveId = savePostDao.getId(dto.getPostSellId(), accountId, TypePost.SELL);
+			dto.setSaveId(saveId);
+			return dto;
+		}).toList();
 		return result;
 	}
 
