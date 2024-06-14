@@ -1,5 +1,5 @@
 import "./CardSell.css";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MdLocationPin, MdOutlineMail } from "react-icons/md";
 import {
@@ -16,7 +16,7 @@ import { FaPhoneVolume } from "react-icons/fa6";
 import { ActionIcon, Avatar, Grid } from "@mantine/core";
 import { GrDirections } from "react-icons/gr";
 import { IconHeart } from "@tabler/icons-react";
-import SaveRequest from "../../services/SaveRequest";
+import LikeRequest from "../../services/LikeRequest";
 import { AccountContext } from "../../context/AccountContext";
 import { toast } from "react-toastify";
 
@@ -30,21 +30,21 @@ const CardSell = ({ item, changeItem }) => {
       .join(" ");
   }
 
-  const [isSave, setIsSave] = useState(item?.saveId > 0);
+  const [isLike, setIsLike] = useState();
   const { account } = useContext(AccountContext);
 
-  const save = () => {
+  const like = () => {
     if (item?.postSellId > 0 && Object.keys(account).length > 0) {
-      const saveRequest = new SaveRequest();
-      saveRequest
-        .createSave({
+      const likeRequest = new LikeRequest();
+      likeRequest
+        .createLike({
           postId: item.postSellId,
           typePost: "SELL",
         })
         .then((response) => {
           if (response.code === 200) {
-            setIsSave(true);
-            changeItem({ ...item, saveId: response.data });
+            setIsLike(true);
+            changeItem({ ...item, likeId: response.data });
           }
         });
     } else {
@@ -52,15 +52,19 @@ const CardSell = ({ item, changeItem }) => {
     }
   };
 
-  const deleteSave = () => {
-    const saveRequest = new SaveRequest();
-    saveRequest.deleteSave({ saveId: item.saveId }).then((response) => {
+  const deleteLike = () => {
+    const likeRequest = new LikeRequest();
+    likeRequest.deleteLike({ likeId: item.likeId }).then((response) => {
       if (response.code === 200) {
-        setIsSave(false);
-        changeItem({ ...item, saveId: 0 });
+        setIsLike(false);
+        changeItem({ ...item, likeId: 0 });
       }
     });
   };
+
+  useEffect(() => {
+    setIsLike(item?.likeId > 0);
+  }, [item?.likeId]);
   return (
     <div className="card">
       <div className="infoPost">
@@ -195,17 +199,17 @@ const CardSell = ({ item, changeItem }) => {
           right: "0",
         }}
       >
-        {isSave ? (
+        {isLike ? (
           <ActionIcon
             variant="filled"
             color="red"
             size="xs"
-            onClick={deleteSave}
+            onClick={deleteLike}
           >
             <IconHeart />
           </ActionIcon>
         ) : (
-          <ActionIcon variant="outline" color="red" size="xs" onClick={save}>
+          <ActionIcon variant="outline" color="red" size="xs" onClick={like}>
             <IconHeart />
           </ActionIcon>
         )}

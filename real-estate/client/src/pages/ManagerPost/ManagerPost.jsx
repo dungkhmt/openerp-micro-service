@@ -31,7 +31,7 @@ import AccountRequest from "../../services/AccountRequest";
 import { set_current_account } from "../../store/account";
 import CardBuy from "../../components/CardBuy/CardBuy";
 import { PostBuyRequest } from "../../services/PostBuyRequest";
-import SaveRequest from "../../services/SaveRequest";
+import LikeRequest from "../../services/LikeRequest";
 import { IMaskInput } from "react-imask";
 import { IconHeart } from "@tabler/icons-react";
 
@@ -56,13 +56,13 @@ const ManagerPost = () => {
   const [buySelect, setBuySelect] = useState({});
   const [showPost, setShowPost] = useState(false);
 
-  const saveRequest = new SaveRequest();
-  const [listSave, setListSave] = useState([]);
-  const [listSaverPost, setListSaverPost] = useState([]);
+  const likeRequest = new LikeRequest();
+  const [listLike, setListLike] = useState([]);
+  const [listLikerPost, setListLikerPost] = useState([]);
 
-  const getSaverPost = (item) => {
-    saveRequest
-      .getSaverOfPost(
+  const getLikerPost = (item) => {
+    likeRequest
+      .getLiker(
         item?.postSellId > 0
           ? { postId: item.postSellId, typePost: "SELL" }
           : { postId: item.postBuyId, typePost: "BUY" },
@@ -70,9 +70,9 @@ const ManagerPost = () => {
       .then((response) => {
         if (response.code === 200) {
           if (response.data.length > 0) {
-            setListSaverPost(response.data);
+            setListLikerPost(response.data);
           } else {
-            toast.success("Chưa có người nào thích bài viết của bạn");
+            toast.info("Chưa có người nào thích bài viết của bạn");
           }
         }
       });
@@ -92,8 +92,8 @@ const ManagerPost = () => {
       ),
     );
 
-    if (item.saveId > 0) {
-      setListSave([item, ...listSave]);
+    if (item.likeId > 0) {
+      setListLike([item, ...listLike]);
     }
   };
 
@@ -103,18 +103,34 @@ const ManagerPost = () => {
         post.postBuyId === item.postBuyId ? item : post,
       ),
     );
-    if (item.saveId > 0) {
-      setListSave([item, ...listSave]);
+    if (item.likeId > 0) {
+      setListLike([item, ...listLike]);
     }
   };
 
-  const deleteItemSave = (item) => {
-    toast.info("Hãy reload lại trang để nhận dữ liệu mới");
-    const updatedListSave = listSave.filter(
-      (save) => save.createdAt !== item.createdAt,
+  const deleteItemLike = (item) => {
+    const updatedListLike = listLike.filter(
+      (like) => like.createdAt !== item.createdAt,
     );
-
-    setListSave(updatedListSave);
+    setListLike(updatedListLike);
+    if (item.authorId === currentAccount.accountId) {
+      if (item?.postBuyId > 0) {
+        setListPostBuy(
+          listPostBuy.map((post) =>
+            post.postBuyId === item.postBuyId ? item : post,
+          ),
+        );
+      } else {
+        setListPostSell(
+          listPostSell.map((post) =>
+            post.postSellId === item.postSellId ? item : post,
+          ),
+        );
+      }
+    }
+    setTimeout(() => {
+      toast.info("Hãy tải lại trang để nhận dữ liệu mới");
+    }, 500);
   };
   const handleChangeStatusSell = (status, postSellId) => {
     sellRequest
@@ -193,10 +209,10 @@ const ManagerPost = () => {
     });
   };
 
-  const refreshSave = () => {
-    saveRequest.getPostSave().then((response) => {
+  const refreshLike = () => {
+    likeRequest.getLike().then((response) => {
       if (response.code === 200) {
-        setListSave(response.data);
+        setListLike(response.data);
       }
     });
   };
@@ -236,7 +252,7 @@ const ManagerPost = () => {
   useEffect(() => {
     get_account();
     if (isOwnerPost) {
-      refreshSave();
+      refreshLike();
     }
     Object.keys(sellSelect).length === 0 && refreshPostSells();
     Object.keys(buySelect).length === 0 && refreshPostBuys();
@@ -244,7 +260,7 @@ const ManagerPost = () => {
   if (
     listPostSell.length === 0 &&
     listPostBuy.length === 0 &&
-    listSave.length === 0
+    listLike.length === 0
   ) {
     return (
       <div>
@@ -282,8 +298,8 @@ const ManagerPost = () => {
             </Tabs.Tab>
             <Tabs.Tab value="buy">Bài viết mua ({listPostBuy.length})</Tabs.Tab>
             {isOwnerPost && (
-              <Tabs.Tab value="save">
-                Bài viết đã lưu ({listSave.length})
+              <Tabs.Tab value="like">
+                Bài viết đã thích ({listLike.length})
               </Tabs.Tab>
             )}
           </Tabs.List>
@@ -363,7 +379,7 @@ const ManagerPost = () => {
                           Sửa
                         </Menu.Item>
                         <Menu.Item
-                          onClick={() => getSaverPost(item)}
+                          onClick={() => getLikerPost(item)}
                           leftSection={
                             <IconHeart
                               style={{ width: rem(14), height: rem(14) }}
@@ -448,7 +464,7 @@ const ManagerPost = () => {
                           Khớp
                         </Menu.Item>
                         <Menu.Item
-                          onClick={() => getSaverPost(item)}
+                          onClick={() => getLikerPost(item)}
                           leftSection={
                             <IconHeart
                               style={{ width: rem(14), height: rem(14) }}
@@ -465,16 +481,16 @@ const ManagerPost = () => {
               </div>
             ))}
           </Tabs.Panel>
-          <Tabs.Panel value="save">
-            {listSave?.map((item, index) => (
+          <Tabs.Panel value="like">
+            {listLike?.map((item, index) => (
               <div style={{ width: "100%" }} key={index}>
                 {item?.postSellId > 0 ? (
                   <div className="manager-post-sell-container">
-                    <CardSell item={item} changeItem={deleteItemSave} />
+                    <CardSell item={item} changeItem={deleteItemLike} />
                   </div>
                 ) : (
                   <div className="manager-post-buy-container">
-                    <CardBuy item={item} changeItem={deleteItemSave} />
+                    <CardBuy item={item} changeItem={deleteItemLike} />
                   </div>
                 )}
               </div>
@@ -537,8 +553,8 @@ const ManagerPost = () => {
         </Modal>
 
         <Modal
-          opened={listSaverPost.length > 0}
-          onClose={() => setListSaverPost([])}
+          opened={listLikerPost.length > 0}
+          onClose={() => setListLikerPost([])}
           size="auto"
           title="Danh sách người đã lưu bài viết của bạn"
           zIndex={1100}
@@ -555,7 +571,7 @@ const ManagerPost = () => {
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {listSaverPost.map((item, index) => {
+                {listLikerPost.map((item, index) => {
                   return (
                     <Table.Tr key={index}>
                       <Table.Td>
