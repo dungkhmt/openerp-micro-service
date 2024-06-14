@@ -76,7 +76,7 @@ const TAPdf = ({ data }) => {
       fontSize: 12,
     },
     col5: {
-      width: "10%",
+      width: "20%",
       fontSize: 12,
     },
     col6: {

@@ -45,6 +45,11 @@ public class ApplicationServiceImpl implements ApplicationService{
         if(existClassCall.isEmpty()) {
             throw new IllegalArgumentException("Class with ID " + application.getClassCall().getId() + " not found");
         }
+        Optional<Application> existApplication = Optional.ofNullable(applicationRepo.findByUserAndClassCall(existUser.get().getId(), existClassCall.get().getId()));
+        if(existApplication.isPresent()) {
+            throw new IllegalArgumentException("Application existed");
+        }
+
         application.setApplicationStatus("PENDING");
         application.setAssignStatus("PENDING");
         applicationRepo.save(application);
