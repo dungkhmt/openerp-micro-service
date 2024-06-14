@@ -5,7 +5,7 @@ import React, { useContext, useEffect } from "react";
 import AddPostSell from "./pages/AddPostSell/AddPostSell";
 import AddPostBuy from "./pages/AddPostBuy/AddPostBuy";
 import PostSellDetail from "./pages/PostSellDetail/PostSellDetail";
-import ListPageSell from "./pages/ListPageSell/ListPageSell";
+import PageSell from "./pages/PageSell/PageSell";
 import Oauth2Redirect from "./pages/Oauth2Redirect/Oauth2Redirect";
 import Login from "./pages/Login/Login";
 import { useDispatch, useSelector } from "react-redux";
@@ -41,7 +41,7 @@ function App() {
           <Route path={"/login"} element={<Login />} />
 
           <Route element={<Layout />}>
-            <Route path={"/*"} element={<ListPageSell />} />
+            <Route path={"/*"} element={<PageSell />} />
             <Route path={"/add-post-sell"} element={<AddPostSell />} />
             <Route path={"/add-post-buy"} element={<AddPostBuy />} />
             <Route
@@ -49,7 +49,7 @@ function App() {
               element={<ManagerPost />}
             />
             <Route path="/sell/properties">
-              <Route index element={<ListPageSell />} />
+              <Route index element={<PageSell />} />
               <Route path=":propertyId" element={<PostSellDetail />} />
             </Route>
             <Route path={"/report"} element={<Report />} />

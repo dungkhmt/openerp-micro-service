@@ -4,7 +4,7 @@ import com.real_estate.post.models.AccountEntity;
 import com.real_estate.post.models.PostSellEntity;
 import com.real_estate.post.models.postgresql.AccountPostgresEntity;
 import com.real_estate.post.models.postgresql.PostSellPostgresEntity;
-import com.real_estate.post.models.postgresql.SavePostPostgresEntity;
+import com.real_estate.post.models.postgresql.LikePostgresEntity;
 import lombok.*;
 
 import java.util.List;
@@ -47,7 +47,7 @@ public class PostSellResponseDto {
     Long createdAt;
     Long updatedAt;
 
-    Long saveId = 0L;
+    Long likeId = 0L;
 
     public PostSellResponseDto(PostSellEntity p, AccountEntity a) {
         this.postSellId = p.getPostSellId();
@@ -85,7 +85,7 @@ public class PostSellResponseDto {
         this.updatedAt = p.getUpdatedAt();
     }
 
-    public PostSellResponseDto(PostSellPostgresEntity p, AccountPostgresEntity a, SavePostPostgresEntity s) {
+    public PostSellResponseDto(PostSellPostgresEntity p, AccountPostgresEntity a, LikePostgresEntity s) {
         this.postSellId = p.getPostSellId();
         this.authorId = p.getAuthorId();
         this.nameAuthor = a.getName();
@@ -120,6 +120,6 @@ public class PostSellResponseDto {
         this.createdAt = p.getCreatedAt();
         this.updatedAt = p.getUpdatedAt();
 
-        this.saveId = s.getSaveId();
+        this.likeId = s.getLikeId();
     }
 }

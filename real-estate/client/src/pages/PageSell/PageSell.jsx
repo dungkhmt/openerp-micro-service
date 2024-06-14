@@ -2,12 +2,12 @@ import CardSell from "../../components/CardSell/CardSell";
 import React, { useEffect, useState } from "react";
 import MarkerMap from "../../components/MarkerMap/MarkerMap";
 import { toast } from "react-toastify";
-import "./ListPageSell.css";
+import "./PageSell.css";
 import FilterSell from "../../components/FilterSell/FilterSell";
 import { Pagination, ScrollArea } from "@mantine/core";
 import PostSellRequest from "../../services/PostSellRequest";
 
-const ListPageSell = ({}) => {
+const PageSell = ({}) => {
   const [listPost, setListPost] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [params, setParams] = useState({
@@ -96,4 +96,4 @@ const ListPageSell = ({}) => {
   );
 };
 
-export default ListPageSell;
+export default PageSell;

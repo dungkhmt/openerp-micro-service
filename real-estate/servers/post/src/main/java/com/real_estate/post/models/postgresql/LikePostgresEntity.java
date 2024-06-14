@@ -11,19 +11,19 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Table(
-        name = "save_post"
+        name = "like_post"
 )
-public class SavePostPostgresEntity {
+public class LikePostgresEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "save_id")
-    Long saveId;
+    @Column(name = "like_id")
+    Long likeId;
 
     @Column(name = "post_id")
     Long postId;
 
-    @Column(name = "account_id")
-    Long accountId;
+    @Column(name = "liker_id")
+    Long likerId;
 
     @Column(name = "type_post")
     @Enumerated(EnumType.STRING)

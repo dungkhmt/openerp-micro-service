@@ -103,9 +103,7 @@ public class WebSecurityConfig {
 				.logoutSuccessHandler(oidcLogoutSuccessHandler(clientRegistrationRepository))
 		);
 		http.csrf(AbstractHttpConfigurer::disable);
-//		http.csrf(c -> c
-//				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-//		);
+
 		http.cors(Customizer.withDefaults());
 		/** This is solely required to support H2 console viewing in Spring MVC with Spring Security */
 		http.headers(httpSecurityHeadersConfigurer -> httpSecurityHeadersConfigurer.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))

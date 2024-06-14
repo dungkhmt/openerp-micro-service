@@ -20,7 +20,6 @@ public class AccountEntity {
   Integer totalPostSell;
   Integer totalPostBuy;
   Set<String> role;
-//  Integer reputation;
   AuthProvider provider;
   String providerId;
   Boolean isActive;

@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
-public class SavePostEntity {
-    Long saveId;
+public class LikeEntity {
+    Long likeId;
     Long postId;
-    Long accountId;
+    Long likerId;
     TypePost typePost;
     Long createdAt;
 }

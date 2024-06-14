@@ -4,7 +4,7 @@ import com.real_estate.post.models.AccountEntity;
 import com.real_estate.post.models.PostBuyEntity;
 import com.real_estate.post.models.postgresql.AccountPostgresEntity;
 import com.real_estate.post.models.postgresql.PostBuyPostgresEntity;
-import com.real_estate.post.models.postgresql.SavePostPostgresEntity;
+import com.real_estate.post.models.postgresql.LikePostgresEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -52,7 +52,7 @@ public class PostBuyResponseDto {
     Long createdAt;
     Long updatedAt;
 
-    Long saveId = 0L;
+    Long likeId = 0L;
     public PostBuyResponseDto(PostBuyEntity p, AccountEntity a) {
         this.postBuyId = p.getPostBuyId();
         this.authorId = p.getAuthorId();
@@ -87,7 +87,7 @@ public class PostBuyResponseDto {
         this.createdAt = p.getCreatedAt();
         this.updatedAt = p.getUpdatedAt();
     }
-    public PostBuyResponseDto(PostBuyPostgresEntity p, AccountPostgresEntity a, SavePostPostgresEntity s) {
+    public PostBuyResponseDto(PostBuyPostgresEntity p, AccountPostgresEntity a, LikePostgresEntity s) {
         this.postBuyId = p.getPostBuyId();
         this.authorId = p.getAuthorId();
         this.nameAuthor = a.getName();
@@ -121,7 +121,7 @@ public class PostBuyResponseDto {
         this.createdAt = p.getCreatedAt();
         this.updatedAt = p.getUpdatedAt();
 
-        this.saveId = s.getSaveId();
+        this.likeId = s.getLikeId();
     }
 
 }
