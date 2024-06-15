@@ -1,22 +1,38 @@
+import { makeStyles } from "@material-ui/core/styles";
 import InfoIcon from "@mui/icons-material/Info";
-import { IconButton } from "@mui/material";
+import { IconButton, Stack } from "@mui/material";
 import Box from "@mui/material/Box";
 import { request } from "api";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
-import HustModal from "component/common/HustModal";
+import { FacebookCircularProgress } from "component/common/progressBar/CustomizedCircularProgress";
+import CustomizedDialogs from "component/dialog/CustomizedDialogs";
 import StandardTable from "component/table/StandardTable";
 import { useEffect, useState } from "react";
 import { localeOption } from "utils/NumberFormat";
 import { toFormattedDateTime } from "utils/dateutils";
 
+const useStyles = makeStyles((theme) => ({
+  paper: { maxWidth: 900 },
+  content: {
+    minWidth: 640,
+    maxHeight: 500,
+    overflowY: "auto",
+    marginBottom: 12,
+    padding: "4px 12px",
+  },
+}));
+
 export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase(
   props
 ) {
   const { submissionId } = props;
-  const [submissionTestCase, setSubmissionTestCase] = useState([]);
-  const [openModal, setOpenModal] = useState(false);
-  // const [testcaseDetailList, setTestcaseDetailList] = useState([]);
-  const [selectedTestcase, setSelectedTestcase] = useState();
+
+  const classes = useStyles();
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [testCasesResult, setTestCasesResult] = useState([]);
+  const [testCasesResultDetail, setTestCasesResultDetail] = useState({});
+  const [selectedTestCase, setSelectedTestCase] = useState();
 
   const columns = [
     {
@@ -44,10 +60,6 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
       cellStyle: { minWidth: 200 },
     },
     {
-      title: "Graded",
-      field: "graded"
-    },
-    {
       title: "Detail",
       sorting: false,
       // align: "center",
@@ -55,21 +67,34 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
         <IconButton
           color="primary"
           onClick={() => {
-            // for (let i = 0; i < testcaseDetailList.length; i++) {
-            //   if (testcaseDetailList[i].testCaseId === rowData.testCaseId) {
-            //     testcaseDetailList[i].participantAnswer =
-            //       rowData.participantAnswer;
-            //     setSelectedTestcase(testcaseDetailList[i]);
+            const testCaseId = rowData.testCaseId;
 
-            //   }
-            // }
+            setOpen(true);
 
-            setSelectedTestcase({
-              testcase: rowData.testCase,
-              correctAns: rowData.testCaseAnswer,
-              participantAnswer: rowData.participantAnswer,
-            });
-            setOpenModal(true);
+            if (testCasesResultDetail[testCaseId]) {
+              fillModalData(testCasesResultDetail[testCaseId]);
+            } else {
+              setLoading(true);
+
+              request(
+                "get",
+                `/teacher/submissions/${submissionId}/testcases/${testCaseId}`,
+                (res) => {
+                  setLoading(false);
+                  setTestCasesResultDetail((prev) => ({
+                    ...prev,
+                    [testCaseId]: res.data[0] || {},
+                  }));
+
+                  fillModalData(res.data[0]);
+                },
+                {
+                  onError: (e) => {
+                    setLoading(false);
+                  },
+                }
+              );
+            }
           }}
         >
           <InfoIcon />
@@ -78,90 +103,80 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
     },
   ];
 
-  function getSubmissionDetailTestCaseByTestCase() {
-    request(
-      "get",
-      "/teacher/submissions/" + submissionId,
-      (res) => {
-        let L = res.data.map((c) => ({
-          ...c,
-          createdAt: toFormattedDateTime(c.createdAt),
-        }));
-        setSubmissionTestCase(L);
-      },
-      {
-        401: () => {},
-      }
-    );
+  function fillModalData(testCaseResult) {
+    setSelectedTestCase({
+      testCase: testCaseResult.testCase,
+      correctAns: testCaseResult.testCaseAnswer,
+      participantAnswer: testCaseResult.participantAnswer,
+    });
   }
 
-  // function getTestcaseDetail(testcaseId) {
-  //   request(
-  //     "get",
-  //     "/testcases/" + testcaseId,
-  //     (res) => {
-  //       setTestcaseDetailList((prev) => [...prev, res.data]);
-  //     },
-  //     {
-  //       401: () => {},
-  //     }
-  //   );
-  // }
+  function getTestCasesResult() {
+    request("get", "/teacher/submissions/" + submissionId, (res) => {
+      const testCases = res.data.map((tc) => ({
+        ...tc,
+        createdAt: toFormattedDateTime(tc.createdAt),
+      }));
 
-  useEffect(() => {
-    getSubmissionDetailTestCaseByTestCase();
-  }, []);
+      setTestCasesResult(testCases);
+    });
+  }
 
-  // useEffect(() => {
-  //   var testcaseIdsList = submissionTestCase.map(
-  //     (testcase) => testcase.testCaseId
-  //   );
-  //   testcaseIdsList.forEach((id) => {
-  //     getTestcaseDetail(id);
-  //   });
-  // }, [submissionTestCase]);
-
-  const ModalPreview = ({ testcase }) => {
+  const ModalPreview = ({ data }) => {
     return (
-      <HustModal
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-        isNotShowCloseButton
-        showCloseBtnTitle={false}
-        maxWidthPaper={800}
-      >
-        <HustCopyCodeBlock title="Input" text={testcase?.testcase} mb={2} />
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            width: "100%",
-            justifyContent: "space-between",
-            marginTop: "14px",
-          }}
-        >
-          <Box width="48%">
-            <HustCopyCodeBlock
-              title="Correct output"
-              text={testcase?.correctAns}
-            />
-          </Box>
-          <Box width="48%">
-            <HustCopyCodeBlock
-              title="User output"
-              text={testcase?.participantAnswer}
-            />
-          </Box>
-        </Box>
-      </HustModal>
+      <CustomizedDialogs
+        open={open}
+        handleClose={() => setOpen(false)}
+        contentTopDivider
+        classNames={{ paper: classes.paper, content: classes.content }}
+        content={
+          loading ? (
+            <Stack
+              direction="row"
+              justifyContent="center"
+              alignItems="center"
+              sx={{ minHeight: 128 }}
+            >
+              <FacebookCircularProgress />
+            </Stack>
+          ) : (
+            <Box sx={{ minWidth: 859 }}>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                spacing={2}
+                sx={{ mb: 2 }}
+              >
+                <Box sx={{ width: "calc(50% - 8px)" }}>
+                  <HustCopyCodeBlock
+                    title="Correct output"
+                    text={data?.correctAns}
+                  />
+                </Box>
+                <Box sx={{ width: "calc(50% - 8px)" }}>
+                  <HustCopyCodeBlock
+                    title="User output"
+                    text={data?.participantAnswer}
+                  />
+                </Box>
+              </Stack>
+              <HustCopyCodeBlock title="Input" text={data?.testCase} />
+            </Box>
+          )
+        }
+      />
     );
   };
 
+  useEffect(() => {
+    getTestCasesResult();
+  }, []);
+
   return (
-    <div>
+    <>
       <StandardTable
         columns={columns}
-        data={submissionTestCase}
+        data={testCasesResult}
         hideCommandBar
         options={{
           selection: false,
@@ -170,7 +185,7 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
           sorting: true,
         }}
       />
-      <ModalPreview testcase={selectedTestcase} />
-    </div>
+      <ModalPreview data={selectedTestCase} />
+    </>
   );
 }
