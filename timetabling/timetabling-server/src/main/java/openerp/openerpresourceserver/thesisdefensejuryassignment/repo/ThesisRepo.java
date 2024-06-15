@@ -18,4 +18,6 @@ public interface ThesisRepo extends JpaRepository<Thesis, UUID>{
     Optional<Thesis> findById(UUID Id);
 
     public Optional<List<Thesis>> findByStudentEmail(String studentEmail);
+
+    public List<Thesis> findBySupervisorId(String supervisorId);
 }

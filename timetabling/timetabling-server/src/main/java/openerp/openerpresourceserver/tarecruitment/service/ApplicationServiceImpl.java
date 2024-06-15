@@ -45,6 +45,11 @@ public class ApplicationServiceImpl implements ApplicationService{
         if(existClassCall.isEmpty()) {
             throw new IllegalArgumentException("Class with ID " + application.getClassCall().getId() + " not found");
         }
+        Optional<Application> existApplication = Optional.ofNullable(applicationRepo.findByUserAndClassCall(existUser.get().getId(), existClassCall.get().getId()));
+        if(existApplication.isPresent()) {
+            throw new IllegalArgumentException("Application existed");
+        }
+
         application.setApplicationStatus("PENDING");
         application.setAssignStatus("PENDING");
         applicationRepo.save(application);
@@ -243,6 +248,7 @@ public class ApplicationServiceImpl implements ApplicationService{
             if ("APPROVED".equals(status)) {
                 int startPeriod = updateApplication.getClassCall().getStartPeriod();
                 int endPeriod = updateApplication.getClassCall().getEndPeriod();
+                int day = updateApplication.getClassCall().getDay();
 
                 String semester = updateApplication.getClassCall().getSemester();
 
@@ -256,9 +262,10 @@ public class ApplicationServiceImpl implements ApplicationService{
                     for (Application app : existedApplications) {
                         int existingStartPeriod = app.getClassCall().getStartPeriod();
                         int existingEndPeriod = app.getClassCall().getEndPeriod();
+                        int existingDay = app.getClassCall().getDay();
 
                         // Check if there is an overlap in time periods
-                        if (!(endPeriod <= existingStartPeriod || startPeriod >= existingEndPeriod)) {
+                        if (day == existingDay && !(endPeriod <= existingStartPeriod || startPeriod >= existingEndPeriod)) {
                             throw new IllegalArgumentException("Trùng lịch với mã lớp " + app.getClassCall().getId());
                         }
                     }
@@ -437,7 +444,7 @@ public class ApplicationServiceImpl implements ApplicationService{
         List<ChartDTO> chart = new ArrayList<>();
         List<String> semesters = semesterService.getAllSemester();
         for(String semester : semesters) {
-            List<Application> applications = applicationRepo.getTADataBySemester(semester);
+            List<String> applications = applicationRepo.getTADataBySemester(semester);
             ChartDTO data = new ChartDTO(semester, applications.size());
             chart.add(data);
         }
