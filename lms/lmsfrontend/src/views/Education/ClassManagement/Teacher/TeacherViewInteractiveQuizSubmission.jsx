@@ -4,6 +4,7 @@ import { makeStyles, MuiThemeProvider } from "@material-ui/core/styles";
 import { useEffect, useState } from "react";
 import { request } from "../../../../api";
 import StandardTable from "component/table/StandardTable";
+import { toFormattedDateTime } from "utils/dateutils";
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -32,7 +33,7 @@ export default function TeacherViewInteractiveQuizSubmission(props) {
       title: "Kết quả",
     },
     {
-      field: "createdStamp",
+      field: "createAt",
       title: "Thời gian nộp",
     },
   ];
@@ -46,7 +47,12 @@ export default function TeacherViewInteractiveQuizSubmission(props) {
       `/get-interactive-quiz-submission/` + props.interactiveQuizId,
       (res) => {
         //console.log("getClassesOfUser, lst = ", lst);
-        setResults(res.data);
+        const data = res.data;
+        const content = data.map((submission) => ({
+          ...submission,
+          createAt: toFormattedDateTime(submission.createdStamp),
+        }));
+        setResults(content);
       }
     );
   }
