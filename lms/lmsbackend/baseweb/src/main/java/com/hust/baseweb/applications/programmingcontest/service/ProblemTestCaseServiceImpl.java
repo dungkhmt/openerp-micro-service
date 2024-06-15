@@ -162,7 +162,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                    .tags(tags)
                                                    .userId(userID)
                                                    .statusId(ProblemEntity.PROBLEM_STATUS_HIDDEN)
-                                                    .sampleTestcase(modelCreateContestProblem.getSampleTestCase())
+                                                   .sampleTestcase(modelCreateContestProblem.getSampleTestCase())
                                                    .build();
         problemEntity = problemService.saveProblemWithCache(problemEntity);
 
@@ -833,7 +833,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public List<SubmissionDetailByTestcaseOM> getSubmissionDetailByTestcase(UUID submissionId) {
+    public List<SubmissionDetailByTestcaseOM> getSubmissionDetailByTestcase(UUID submissionId, UUID testcaseId) {
         ContestSubmissionEntity submission = contestSubmissionRepo.findById(submissionId).orElse(null);
         ContestEntity contest = null;
         String contestId = "";
@@ -859,6 +859,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             .findAllActiveTestcaseOfProblem(problemId)
             .stream()
             .map(TestCaseEntity::getTestCaseId)
+            .filter(id -> testcaseId == null || testcaseId.compareTo(id) == 0)
             .collect(Collectors.toList());
 
         List<ContestSubmissionTestCaseEntity> submissionTestcases = contestSubmissionTestCaseEntityRepo.findAllByContestSubmissionId(
@@ -872,32 +873,40 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
         for (ContestSubmissionTestCaseEntity st : mapTestcaseIdToLatestSubmission.values()) {
             TestCaseEntity tc = testCaseRepo.findTestCaseByTestCaseId(st.getTestCaseId());
-            String testcaseContent = "";
-            String testcaseOutput = "";
-            String participantSolutionOutput = "";
-
-            if (contest != null && tc != null) {
-                testcaseContent = tc.getTestCase();
-                testcaseOutput = tc.getCorrectAnswer();
-                participantSolutionOutput = st.getParticipantSolutionOtput();
-            }
-
-            result.add(new SubmissionDetailByTestcaseOM(
+            SubmissionDetailByTestcaseOM testcaseOM = new SubmissionDetailByTestcaseOM(
 //                st.getContestSubmissionTestcaseId(),
 //                st.getContestId(),
 //                st.getProblemId(),
 //                st.getSubmittedByUserLoginId(),
                 st.getTestCaseId(),
-                testcaseContent,
+                null,
                 st.getStatus(),
                 st.getPoint(),
                 st.getUsedToGrade(),
                 st.getRuntime(),
-                testcaseOutput,
-                participantSolutionOutput,
+                null,
+                null,
                 st.getCreatedStamp(),
                 viewSubmitSolutionOutputMode
-            ));
+            );
+
+            if (testcaseId != null) {
+                String testcaseContent = "";
+                String testcaseOutput = "";
+                String participantSolutionOutput = "";
+
+                if (contest != null && tc != null) {
+                    testcaseContent = tc.getTestCase();
+                    testcaseOutput = tc.getCorrectAnswer();
+                    participantSolutionOutput = st.getParticipantSolutionOtput();
+                }
+
+                testcaseOM.setTestCase(testcaseContent);
+                testcaseOM.setTestCaseAnswer(testcaseOutput);
+                testcaseOM.setParticipantAnswer(participantSolutionOutput);
+            }
+
+            result.add(testcaseOM);
         }
 
         return result;
@@ -1012,12 +1021,12 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                         break;
 
                     case ContestEntity.CONTEST_PARTICIPANT_VIEW_TESTCASE_DETAIL_DISABLED:
-                        if(tc.getIsPublic().equals("Y")){
+                        if (tc.getIsPublic().equals("Y")) {
                             testCaseContent = tc.getTestCase();
                             testCaseOutput = tc.getCorrectAnswer();
                             participantSolutionOutput = st.getParticipantSolutionOtput();
 
-                        }else {
+                        } else {
                             testCaseContent = "---HIDDEN---";
                             testCaseOutput = "---HIDDEN---";
                             participantSolutionOutput = "---HIDDEN---";
@@ -1744,10 +1753,10 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         List<String> problemIds = new ArrayList<>();
 
         List<ContestProblem> contestProblems = contestProblemRepo.findAllByContestId(contestId);
-        if(contestProblems!=null){
-            for(ContestProblem cp: contestProblems){
-                if(cp.getSubmissionMode()!=null){
-                    if(!cp.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_HIDDEN)){
+        if (contestProblems != null) {
+            for (ContestProblem cp : contestProblems) {
+                if (cp.getSubmissionMode() != null) {
+                    if (!cp.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_HIDDEN)) {
                         problemIds.add(cp.getProblemId());
                     }
                 }
@@ -2391,14 +2400,15 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         List<ContestProblem> contestProblems = contestProblemRepo.findAllByContestId(contestId);
         Map<String, List<String>> mPro2ForbiddenIns = new HashMap();
         for (ContestProblem cp : contestProblems) {
-           // log.info("checkForbiddenInstructions, forbidden instructions = " + cp.getForbiddenInstructions());
+            // log.info("checkForbiddenInstructions, forbidden instructions = " + cp.getForbiddenInstructions());
             String[] forbiddens = cp.getForbiddenInstructions().split(",");
             if (forbiddens != null) {
                 List<String> L = new ArrayList();
                 for (String s : forbiddens) {
                     s = s.trim();
-                    if(s != null && s != "" && !s.equals("") && s.length() > 0)
+                    if (s != null && s != "" && !s.equals("") && s.length() > 0) {
                         L.add(s.trim());
+                    }
                 }
                 mPro2ForbiddenIns.put(cp.getProblemId(), L);
                 //log.info("checkForbiddenInstructions, forbidden list L = " + L.toString());
@@ -2413,20 +2423,22 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 List<String> forbiddenFound = new ArrayList<String>();
                 for (String f : mPro2ForbiddenIns.get(problemId)) {
                     //log.info("checkForbiddenInstructions, , sourcecode " + sub.getSourceCode() + " forbidden f = " + f);
-                    if(sub.getSourceCode()!=null)
+                    if (sub.getSourceCode() != null) {
                         if (sub.getSourceCode().contains(f)) {
-                        sub.setViolateForbiddenInstruction(ContestSubmissionEntity.VIOLATION_FORBIDDEN_YES);
-                        //msg = msg + f + ",";
+                            sub.setViolateForbiddenInstruction(ContestSubmissionEntity.VIOLATION_FORBIDDEN_YES);
+                            //msg = msg + f + ",";
                             forbiddenFound.add(f);
-                        cnt++;
+                            cnt++;
                             //log.info("checkForbiddenInstructions, , sourcecode " + sub.getSourceCode() + " forbidden f = " + f + " DISCOVER violations!!!");
 
                         }
+                    }
                 }
-                for(int i = 0; i < forbiddenFound.size(); i++){
+                for (int i = 0; i < forbiddenFound.size(); i++) {
                     msg = msg + forbiddenFound.get(i);
-                    if(i < forbiddenFound.size()-1)
+                    if (i < forbiddenFound.size() - 1) {
                         msg = msg + " :: ";
+                    }
                 }
             }
             sub.setViolateForbiddenInstructionMessage(msg);
@@ -3698,9 +3710,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     public List<ContestProblemModelResponse> extApiGetAllProblems(String userID) {
         List<ProblemEntity> problems = problemRepo.findAll();
         List<ContestProblemModelResponse> res = new ArrayList<>();
-        for(ProblemEntity pe: problems){
+        for (ProblemEntity pe : problems) {
             ContestProblemModelResponse p = new ContestProblemModelResponse(
-                pe.getProblemId(),pe.getProblemName(),pe.getLevelId());
+                pe.getProblemId(), pe.getProblemName(), pe.getLevelId());
         }
         return res;
     }
@@ -3709,8 +3721,13 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     public List<SubmissionModelResponse> extApiGetSubmissions(String participantId) {
         List<ContestSubmissionEntity> sub = contestSubmissionPagingAndSortingRepo.findAllByUserId(participantId);
         List<SubmissionModelResponse> res = new ArrayList<SubmissionModelResponse>();
-        for(ContestSubmissionEntity s: sub){
-            SubmissionModelResponse r = new SubmissionModelResponse(s.getUserId(),s.getProblemId(),s.getContestId(),s.getPoint(),s.getCreatedAt());
+        for (ContestSubmissionEntity s : sub) {
+            SubmissionModelResponse r = new SubmissionModelResponse(
+                s.getUserId(),
+                s.getProblemId(),
+                s.getContestId(),
+                s.getPoint(),
+                s.getCreatedAt());
             res.add(r);
         }
         return res;
