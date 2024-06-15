@@ -1,16 +1,16 @@
 package com.real_estate.post.daos.impls;
 
-import com.real_estate.post.daos.interfaces.DashboardPriceDao;
+import com.real_estate.post.daos.interfaces.DashboardDao;
 import com.real_estate.post.dtos.PriceDistrict;
 import com.real_estate.post.dtos.PriceDistrictQuery;
 import com.real_estate.post.dtos.response.DashboardTopResponseDto;
-import com.real_estate.post.models.DashboardPriceEntity;
-import com.real_estate.post.models.postgresql.DashboardPricePostgresEntity;
-import com.real_estate.post.repositories.DashboardPriceRepository;
+import com.real_estate.post.models.DashboardEntity;
+import com.real_estate.post.models.postgresql.DashboardPostgresEntity;
+import com.real_estate.post.repositories.DashboardRepository;
+import com.real_estate.post.utils.TypeProperty;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import jakarta.persistence.TypedQuery;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,32 +20,32 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component("dashboardPriceImpl")
-public class DashboardPriceImpl implements DashboardPriceDao {
+@Component("dashboardImpl")
+public class DashboardImpl implements DashboardDao {
     @Autowired
     ModelMapper mapper;
 
     @Autowired
-    DashboardPriceRepository repository;
+    DashboardRepository repository;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Override
-    public DashboardPriceEntity save(DashboardPriceEntity entity) {
-        DashboardPricePostgresEntity postgres = this.mapper.map(entity, DashboardPricePostgresEntity.class);
+    public DashboardEntity save(DashboardEntity entity) {
+        DashboardPostgresEntity postgres = this.mapper.map(entity, DashboardPostgresEntity.class);
         postgres = repository.save(postgres);
-        return mapper.map(postgres, DashboardPriceEntity.class);
+        return mapper.map(postgres, DashboardEntity.class);
     }
 
     @Override
-    public List<DashboardPriceEntity> saveAll(List<DashboardPriceEntity> entities) {
-        List<DashboardPricePostgresEntity> postgresEntities = entities.stream().map(entity -> {
-            return mapper.map(entity, DashboardPricePostgresEntity.class);
+    public List<DashboardEntity> saveAll(List<DashboardEntity> entities) {
+        List<DashboardPostgresEntity> postgresEntities = entities.stream().map(entity -> {
+            return mapper.map(entity, DashboardPostgresEntity.class);
         }).collect(Collectors.toList());
         postgresEntities = repository.saveAll(postgresEntities);
         return postgresEntities.stream().map(postgreEntity -> {
-            return mapper.map(postgreEntity, DashboardPriceEntity.class);
+            return mapper.map(postgreEntity, DashboardEntity.class);
         }).collect(Collectors.toList());
     }
 
@@ -55,10 +55,10 @@ public class DashboardPriceImpl implements DashboardPriceDao {
     }
 
     @Override
-    public List<DashboardPriceEntity> findBy(Long fromTime, Long toTime, String typeProperty, String districtId) {
-        List<DashboardPricePostgresEntity> postgresEntities = repository.findBy(fromTime, toTime, typeProperty, districtId);
+    public List<DashboardEntity> findBy(Long fromTime, Long toTime, TypeProperty typeProperty, String districtId) {
+        List<DashboardPostgresEntity> postgresEntities = repository.findBy(fromTime, toTime, typeProperty, districtId);
         return postgresEntities.stream().map(postEntity -> {
-            return this.mapper.map(postEntity, DashboardPriceEntity.class);
+            return this.mapper.map(postEntity, DashboardEntity.class);
         }).collect(Collectors.toList());
     }
 
@@ -70,10 +70,10 @@ public class DashboardPriceImpl implements DashboardPriceDao {
 
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("SELECT pdq.districtId, pdq.nameDistrict,")
-                .append(" MAX(CASE WHEN dpe.type_property = 'HOUSE' THEN dpe.medium_price_perm2 ELSE NULL END) AS mediumHouse,")
-                .append(" MAX(CASE WHEN dpe.type_property = 'APARTMENT' THEN dpe.medium_price_perm2 ELSE NULL END) AS mediumApartment,")
-                .append(" MAX(CASE WHEN dpe.type_property = 'LAND' THEN dpe.medium_price_perm2 ELSE NULL END) AS mediumLand,")
-                .append(" COALESCE(SUM(dpe.total_post), 0) AS totalPost,")
+                .append(" MAX(CASE WHEN db.type_property = 'HOUSE' THEN db.medium_price_per_m2 ELSE NULL END) AS mediumHouse,")
+                .append(" MAX(CASE WHEN db.type_property = 'APARTMENT' THEN db.medium_price_per_m2 ELSE NULL END) AS mediumApartment,")
+                .append(" MAX(CASE WHEN db.type_property = 'LAND' THEN db.medium_price_per_m2 ELSE NULL END) AS mediumLand,")
+                .append(" COALESCE(SUM(db.total_post), 0) AS totalPost,")
                 .append(" pdq.startTime")
                 .append(" FROM (VALUES ");
 
@@ -87,8 +87,8 @@ public class DashboardPriceImpl implements DashboardPriceDao {
         }
 
         queryBuilder.append(") AS pdq(districtId, nameDistrict, startTime)")
-                .append(" LEFT JOIN dashboard_price dpe")
-                .append(" ON pdq.districtId = dpe.district_id AND pdq.nameDistrict = dpe.name_district AND pdq.startTime = dpe.start_time")
+                .append(" LEFT JOIN dashboard db")
+                .append(" ON pdq.districtId = db.district_id AND pdq.nameDistrict = db.name_district AND pdq.startTime = db.start_time")
                 .append(" GROUP BY pdq.districtId, pdq.nameDistrict, pdq.startTime")
                 .append(" ORDER BY pdq.startTime ASC");;
 
@@ -113,10 +113,10 @@ public class DashboardPriceImpl implements DashboardPriceDao {
     }
 
     @Override
-    public List<DashboardTopResponseDto> find5mediumHighest(String provinceId, String typeProperty, Long startTime) {
+    public List<DashboardTopResponseDto> find5mediumHighest(String provinceId, TypeProperty typeProperty, Long startTime) {
         Query query = entityManager.createQuery(
                 "select db " +
-                        "from DashboardPricePostgresEntity db " +
+                        "from DashboardPostgresEntity db " +
                         "join DistrictPostgresEntity d " +
                         "on db.districtId = d.districtId " +
                         "where d.provinceId = :provinceId " +
@@ -126,7 +126,7 @@ public class DashboardPriceImpl implements DashboardPriceDao {
         query.setParameter("provinceId", provinceId);
         query.setParameter("typeProperty", typeProperty);
         query.setParameter("startTime", startTime);
-        List<DashboardPricePostgresEntity> postgresEntities = query.getResultList();
+        List<DashboardPostgresEntity> postgresEntities = query.getResultList();
         return postgresEntities.stream().map(item -> {
             return new DashboardTopResponseDto(item.getDistrictId(), item.getNameDistrict(), item.getMediumPricePerM2());
         }).toList();

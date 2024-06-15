@@ -1,7 +1,7 @@
 package com.real_estate.post.runner;
 
-import com.real_estate.post.models.DashboardPriceEntity;
-import com.real_estate.post.services.DashboardPriceService;
+import com.real_estate.post.models.DashboardEntity;
+import com.real_estate.post.services.DashboardService;
 import com.real_estate.post.services.PostSellService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ public class StartCalculatePricePerM2 implements CommandLineRunner {
     private final Logger logger = LoggerFactory.getLogger(StartCalculatePricePerM2.class);
 
     @Autowired
-    DashboardPriceService dashboardPriceService;
+    DashboardService dashboardService;
 
     @Autowired
     PostSellService postSellService;
@@ -31,15 +31,15 @@ public class StartCalculatePricePerM2 implements CommandLineRunner {
     public void tick(Long startTime) {
         Long endTime = startTime + DURATION - 1;
         logger.info("Start time: " + new Date(startTime) + " end time: " + new Date(endTime));
-        List<DashboardPriceEntity> entities = postSellService.calculatePricePerM2(startTime, endTime);
-        dashboardPriceService.saveAll(entities);
+        List<DashboardEntity> entities = postSellService.calculatePricePerM2(startTime, endTime);
+        dashboardService.saveAll(entities);
         logger.info("Done calculate pricePerM2: " + entities.size());
     }
 
     @Override
     public void run(String... args) throws Exception {
         long now = System.currentTimeMillis();
-        long lastTimeTrigger = dashboardPriceService.getLastTimeTrigger();
+        long lastTimeTrigger = dashboardService.getLastTimeTrigger();
         lastTimeTrigger = lastTimeTrigger > 0 ? lastTimeTrigger : (now - now % DURATION - 10 * DURATION - 1);
         while (true) {
             try {

@@ -1,5 +1,8 @@
 package com.real_estate.post.dtos.request;
 
+import com.real_estate.post.utils.TypeDirection;
+import com.real_estate.post.utils.TypeLegalDocument;
+import com.real_estate.post.utils.TypeProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,13 +28,13 @@ public class CreatePostSellRequestDto {
 	Long price;
 	Float pricePerM2;
 
-	String typeProperty;
-	String legalDocument;
-	String directionProperty;
+	TypeProperty typeProperty;
+	TypeLegalDocument legalDocument;
+	TypeDirection directionProperty;
 	Integer floor;
 	Integer bathroom;
 	Integer parking;
 	Integer bedroom;
-	Long horizontal;
-	Long vertical;
+	Float horizontal;
+	Float vertical;
 }

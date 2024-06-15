@@ -123,7 +123,9 @@ const Profile = () => {
       <Tabs defaultValue="info" color="green" variant="pills">
         <Tabs.List grow>
           <Tabs.Tab value="info">Thiết Lập Thông Tin</Tabs.Tab>
-          <Tabs.Tab value="password">Thiết Lập Mật Khẩu</Tabs.Tab>
+          {current_account.provider === "local" && (
+            <Tabs.Tab value="password">Thiết Lập Mật Khẩu</Tabs.Tab>
+          )}
         </Tabs.List>
 
         <Tabs.Panel value="info">
@@ -251,18 +253,6 @@ const Profile = () => {
           </div>
         </Tabs.Panel>
       </Tabs>
-
-      {/*<ToastContainer*/}
-      {/*  position="top-left"*/}
-      {/*  autoClose={3000}*/}
-      {/*  hideProgressBar={false}*/}
-      {/*  newestOnTop={false}*/}
-      {/*  closeOnClick*/}
-      {/*  rtl={false}*/}
-      {/*  pauseOnFocusLoss*/}
-      {/*  draggable*/}
-      {/*  pauseOnHover*/}
-      {/*/>*/}
     </div>
   );
 };

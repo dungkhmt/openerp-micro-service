@@ -1,5 +1,9 @@
 package com.real_estate.post.models;
 
+import com.real_estate.post.utils.PostStatus;
+import com.real_estate.post.utils.TypeDirection;
+import com.real_estate.post.utils.TypeLegalDocument;
+import com.real_estate.post.utils.TypeProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,7 +22,7 @@ public class PostSellEntity {
 	String title;
 	String description;
 
-	String typeProperty;
+	TypeProperty typeProperty;
 	Long price;
 	Float pricePerM2;
 	Long acreage;
@@ -26,10 +30,10 @@ public class PostSellEntity {
 	Integer parking;
 	Integer bedroom;
 	Integer floor;
-	String legalDocument;
-	String directionProperty;
-	Long horizontal;
-	Long vertical;
+	TypeLegalDocument legalDocument;
+	TypeDirection directionProperty;
+	Float horizontal;
+	Float vertical;
 
 	List<Float> position;
 
@@ -41,9 +45,9 @@ public class PostSellEntity {
 	String address;
 
 	List<String> imageUrls;
-	String postStatus;
+	PostStatus postStatus;
 
-	Boolean isAvailable;
+	Boolean isAvailable; // sau nay de admin quan ly
 	Long createdAt;
 	Long updatedAt;
 }

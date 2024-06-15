@@ -38,24 +38,26 @@ const Chatlist = ({ setConversationSelect, conversations }) => {
           />
         </div>
       </div>
-      {filteredConversations.map((coversation, index) => (
-        <div
-          className="item"
-          key={index}
-          onClick={() => setConversationSelect(coversation)}
-          style={
-            {
-              // backgroundColor: "#5183fe",
+      <ScrollArea>
+        {filteredConversations.map((conversation, index) => (
+          <div
+            className="item"
+            key={index}
+            onClick={() => setConversationSelect(conversation)}
+            style={
+              {
+                // backgroundColor: "#5183fe",
+              }
             }
-          }
-        >
-          <img src={coversation.other.avatar || "./avatar.png"} alt="" />
-          <div className="texts">
-            <span>{coversation.other.name}</span>
-            <p>{transferLastMessage(coversation?.messages[0])}</p>
+          >
+            <img src={conversation.other.avatar || "./avatar.png"} alt="" />
+            <div className="texts">
+              <span>{conversation.other.name}</span>
+              <p>{transferLastMessage(conversation?.messages[0])}</p>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </ScrollArea>
     </div>
   );
 };

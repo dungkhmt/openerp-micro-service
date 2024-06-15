@@ -44,8 +44,8 @@ public class ConversationImpl implements ConversationDao {
         StringBuilder sql = new StringBuilder();
         sql.append(
                 "select c " +
-                        "from ConversationPostgresEntity c " +
-                        "where " + id + " member of c.memberIds "
+                "from ConversationPostgresEntity c " +
+                "where " + id + " member of c.memberIds "
         );
         if (otherId > 0) {
             sql.append("and " + otherId + " member of c.memberIds");

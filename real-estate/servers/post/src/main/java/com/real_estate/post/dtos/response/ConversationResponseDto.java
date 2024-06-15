@@ -1,5 +1,6 @@
 package com.real_estate.post.dtos.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.real_estate.post.models.MessageEntity;
 import lombok.*;
 
@@ -11,11 +12,12 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class ConversationResponseDto {
-    Long conversationId;
+    private Long conversationId;
 
+    @JsonProperty("isLastMessage")
     private boolean isLastMessage;
 
-    Long lastTimeMessage;
+    private Long lastTimeMessage;
 
     private AccountResponseDto other;
 

@@ -1,7 +1,8 @@
 package com.real_estate.post.dtos.request;
 
-import com.real_estate.post.utils.DirectionsStatus;
-import com.real_estate.post.utils.LegalDocument;
+import com.real_estate.post.utils.PostStatus;
+import com.real_estate.post.utils.TypeDirection;
+import com.real_estate.post.utils.TypeLegalDocument;
 import com.real_estate.post.utils.TypeProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,17 +32,17 @@ public class UpdatePostBuyRequestDto {
     Integer minParking;
     Integer minBedroom;
     Integer minFloor;
-    List<LegalDocument> legalDocuments;
-    List<DirectionsStatus> directionProperties;
-    Long minHorizontal;
-    Long minVertical;
+    List<TypeLegalDocument> legalDocuments;
+    List<TypeDirection> directionProperties;
+    Float minHorizontal;
+    Float minVertical;
 
     String provinceId;
     String nameProvince;
     List<String> nameDistricts;
     List<String> districtIds;
 
-    String postStatus;
+    PostStatus postStatus;
 
     Boolean isAvailable;
     Long createdAt;

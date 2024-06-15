@@ -413,7 +413,7 @@ const AddPostBuy = () => {
                 min={0}
                 value={minHorizontal}
                 onChange={(value) => setMinHorizontal(value)}
-                allowDecimal={false}
+                decimalScale={1}
               />
             </Grid.Col>
 
@@ -423,7 +423,7 @@ const AddPostBuy = () => {
                 min={0}
                 value={minVertical}
                 onChange={(value) => setMinVertical(value)}
-                allowDecimal={false}
+                decimalScale={1}
               />
             </Grid.Col>
           </Grid>
@@ -486,7 +486,7 @@ const AddPostBuy = () => {
 
               <Grid.Col span={6}>
                 <NumberInput
-                  label="Có thể đậu ít nhất bao nhiêu xe ô tô"
+                  label="Chỗ đỗ ô tô"
                   min={0}
                   value={minParking}
                   onChange={(value) => setMinParking(value)}

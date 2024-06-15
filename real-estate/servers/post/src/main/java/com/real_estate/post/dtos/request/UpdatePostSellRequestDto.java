@@ -1,7 +1,8 @@
 package com.real_estate.post.dtos.request;
 
-import com.real_estate.post.utils.DirectionsStatus;
-import com.real_estate.post.utils.LegalDocument;
+import com.real_estate.post.utils.PostStatus;
+import com.real_estate.post.utils.TypeDirection;
+import com.real_estate.post.utils.TypeLegalDocument;
 import com.real_estate.post.utils.TypeProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,10 +30,10 @@ public class UpdatePostSellRequestDto {
     Integer parking;
     Integer bedroom;
     Integer floor;
-    LegalDocument legalDocument;
-    DirectionsStatus directionProperty;
-    Long horizontal;
-    Long vertical;
+    TypeLegalDocument legalDocument;
+    TypeDirection directionProperty;
+    Float horizontal;
+    Float vertical;
 
     List<Float> position;
 
@@ -43,7 +44,7 @@ public class UpdatePostSellRequestDto {
     String address;
 
     List<String> imageUrls;
-    String postStatus;
+    PostStatus postStatus;
 
     Boolean isAvailable;
     Long createdAt;

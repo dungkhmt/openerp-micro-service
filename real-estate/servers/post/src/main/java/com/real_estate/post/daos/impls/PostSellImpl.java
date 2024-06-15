@@ -3,12 +3,14 @@ package com.real_estate.post.daos.impls;
 import com.real_estate.post.daos.interfaces.PostSellDao;
 import com.real_estate.post.dtos.response.PostSellResponseDto;
 import com.real_estate.post.models.AccountEntity;
-import com.real_estate.post.models.DashboardPriceEntity;
+import com.real_estate.post.models.DashboardEntity;
 import com.real_estate.post.models.PostBuyEntity;
 import com.real_estate.post.models.PostSellEntity;
 import com.real_estate.post.models.postgresql.PostSellPostgresEntity;
 import com.real_estate.post.repositories.PostSellRepository;
 import com.real_estate.post.utils.PostStatus;
+import com.real_estate.post.utils.TypeDirection;
+import com.real_estate.post.utils.TypeProperty;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -21,7 +23,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component("postSellImpl")
 public class PostSellImpl implements PostSellDao {
@@ -50,8 +51,8 @@ public class PostSellImpl implements PostSellDao {
             Long toAcreage,
             Long fromPrice,
             Long toPrice,
-            List<String> typeProperties,
-            List<String> directions
+            List<TypeProperty> typeProperties,
+            List<TypeDirection> directions
     ) {
         int limit = pageable.getPageSize();
         int offset = (int) pageable.getOffset();
@@ -109,8 +110,8 @@ public class PostSellImpl implements PostSellDao {
             Long toAcreage,
             Long fromPrice,
             Long toPrice,
-            List<String> typeProperties,
-            List<String> directions
+            List<TypeProperty> typeProperties,
+            List<TypeDirection> directions
     ) {
         StringBuilder rawQuery = new StringBuilder();
         rawQuery.append(
@@ -179,9 +180,9 @@ public class PostSellImpl implements PostSellDao {
     }
 
     @Override
-    public List<DashboardPriceEntity> calculatePricePerM2(Long startTime, Long endTime) {
-        TypedQuery<DashboardPriceEntity> query = entityManager.createQuery(
-                "select new com.real_estate.post.models.DashboardPriceEntity(" +
+    public List<DashboardEntity> calculatePricePerM2(Long startTime, Long endTime) {
+        TypedQuery<DashboardEntity> query = entityManager.createQuery(
+                "select new com.real_estate.post.models.DashboardEntity(" +
                         "p.districtId," +
                         "p.nameDistrict," +
                         "p.typeProperty," +
@@ -195,16 +196,16 @@ public class PostSellImpl implements PostSellDao {
                         "from PostSellPostgresEntity p " +
                         "where p.createdAt > :startTime and p.createdAt < :endTime " +
                         "group by p.districtId, p.nameDistrict, p.typeProperty"
-                , DashboardPriceEntity.class);
+                , DashboardEntity.class);
         query.setParameter("startTime", startTime);
         query.setParameter("endTime", endTime);
-        List<DashboardPriceEntity> entities = query.getResultList();
+        List<DashboardEntity> entities = query.getResultList();
         return entities;
     }
 
     @Override
     public Integer updateStatusBy(Long postSellId, Long accountId, PostStatus status) {
-        return repository.updateStatusBy(postSellId, accountId, status.toString());
+        return repository.updateStatusBy(postSellId, accountId, status);
     }
 
     @Override

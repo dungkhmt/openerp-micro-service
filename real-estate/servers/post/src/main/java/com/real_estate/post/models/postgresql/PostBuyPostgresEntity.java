@@ -1,5 +1,9 @@
 package com.real_estate.post.models.postgresql;
 
+import com.real_estate.post.utils.PostStatus;
+import com.real_estate.post.utils.TypeDirection;
+import com.real_estate.post.utils.TypeLegalDocument;
+import com.real_estate.post.utils.TypeProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,7 +34,8 @@ public class PostBuyPostgresEntity {
 	String description;
 
 	@Column(name = "type_property")
-	String typeProperty;
+	@Enumerated(EnumType.STRING)
+	TypeProperty typeProperty;
 
 	@Column(name = "min_acreage")
 	Long minAcreage;
@@ -59,26 +64,28 @@ public class PostBuyPostgresEntity {
 	@Column(name = "legal_documents")
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "post_buy_postgres_entity_legal_documents", joinColumns = @JoinColumn(name = "post_buy_id"))
-	List<String> legalDocuments;
+	@Enumerated(EnumType.STRING)
+	List<TypeLegalDocument> legalDocuments;
 
 	@Column(name = "direction_properties")
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "post_buy_postgres_entity_direction_properties", joinColumns = @JoinColumn(name = "post_buy_id"))
-	List<String> directionProperties;
+	@Enumerated(EnumType.STRING)
+	List<TypeDirection> directionProperties;
 
 	@Column(name = "min_horizontal")
-	Long minHorizontal;
+	Float minHorizontal;
 
 	@Column(name = "min_vertical")
-	Long minVertical;
+	Float minVertical;
 
-	@Column(name = "provinceId")
+	@Column(name = "province_id")
 	String provinceId;
 
-	@Column(name = "name_pronvince")
+	@Column(name = "name_province")
 	String nameProvince;
 
-	@Column(name = "districtIds")
+	@Column(name = "district_ids")
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "post_buy_postgres_entity_district_ids", joinColumns = @JoinColumn(name = "post_buy_id"))
 	List<String> districtIds;
@@ -89,7 +96,8 @@ public class PostBuyPostgresEntity {
 	List<String> nameDistricts;
 
 	@Column(name = "post_status")
-	String postStatus;
+	@Enumerated(EnumType.STRING)
+	PostStatus postStatus;
 
 	@Column(name = "is_available")
 	Boolean isAvailable;

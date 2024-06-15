@@ -1,6 +1,7 @@
 package com.real_estate.post.dtos.response;
 
 import com.real_estate.post.models.AccountEntity;
+import com.real_estate.post.utils.AuthProvider;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,7 @@ public class AccountResponseDto {
     String avatar;
     Integer totalPostSell;
     Integer totalPostBuy;
+    AuthProvider provider;
 
     public AccountResponseDto(AccountEntity entity) {
         this.accountId = entity.getAccountId();
@@ -27,5 +29,6 @@ public class AccountResponseDto {
         this.email = entity.getEmail();
         this.totalPostBuy = entity.getTotalPostBuy();
         this.totalPostSell = entity.getTotalPostSell();
+        this.provider = entity.getProvider();
     }
 }

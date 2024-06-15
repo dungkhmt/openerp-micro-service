@@ -20,12 +20,12 @@ const MarkerMap = ({ posts }) => {
 
   return (
     <div className="map-wrapper">
-      {mapLoaded ? (
+      {mapLoaded && (
         <MapContainer
           id={uniqueId}
           center={posts[0]?.position}
           // center={[10 , 105]}
-          zoom={7}
+          zoom={posts.length > 1 ? 8 : 11}
           scrollWheelZoom={false}
           className="map"
           // style={{
@@ -43,8 +43,6 @@ const MarkerMap = ({ posts }) => {
             <Pin post={post} key={index} />
           ))}
         </MapContainer>
-      ) : (
-        <p>Loading...</p>
       )}
     </div>
   );

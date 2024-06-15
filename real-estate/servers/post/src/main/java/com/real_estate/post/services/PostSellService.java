@@ -6,10 +6,12 @@ import com.real_estate.post.daos.interfaces.LikeDao;
 import com.real_estate.post.dtos.request.CreatePostSellRequestDto;
 import com.real_estate.post.dtos.request.UpdatePostSellRequestDto;
 import com.real_estate.post.dtos.response.PostSellResponseDto;
-import com.real_estate.post.models.DashboardPriceEntity;
+import com.real_estate.post.models.DashboardEntity;
 import com.real_estate.post.models.PostSellEntity;
 import com.real_estate.post.utils.PostStatus;
+import com.real_estate.post.utils.TypeDirection;
 import com.real_estate.post.utils.TypePost;
+import com.real_estate.post.utils.TypeProperty;
 import org.hibernate.TransactionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -65,7 +67,7 @@ public class PostSellService {
 		post.setDirectionProperty(requestDto.getDirectionProperty());
 		post.setHorizontal(requestDto.getHorizontal());
 		post.setVertical(requestDto.getVertical());
-		post.setPostStatus(PostStatus.OPENING.toString());
+		post.setPostStatus(PostStatus.OPENING);
 
 		post.setIsAvailable(true);
 		post.setCreatedAt(now);
@@ -92,8 +94,8 @@ public class PostSellService {
 			Long toAcreage,
 			Long fromPrice,
 			Long toPrice,
-			List<String> typeProperties,
-			List<String> directions,
+			List<TypeProperty> typeProperties,
+			List<TypeDirection> directions,
 			Long finderId
 	) {
 		Pageable pageable = PageRequest.of(page-1, size);
@@ -147,7 +149,7 @@ public class PostSellService {
 				.authorId(requestDto.getAuthorId())
 				.title(requestDto.getTitle())
 				.description(requestDto.getDescription())
-				.typeProperty(requestDto.getTypeProperty().toString())
+				.typeProperty(requestDto.getTypeProperty())
 				.price(requestDto.getPrice())
 				.pricePerM2(requestDto.getPricePerM2())
 				.acreage(requestDto.getAcreage())
@@ -155,8 +157,8 @@ public class PostSellService {
 				.parking(requestDto.getParking())
 				.bedroom(requestDto.getBedroom())
 				.floor(requestDto.getFloor())
-				.legalDocument(requestDto.getLegalDocument().toString())
-				.directionProperty(requestDto.getDirectionProperty().toString())
+				.legalDocument(requestDto.getLegalDocument())
+				.directionProperty(requestDto.getDirectionProperty())
 				.horizontal(requestDto.getHorizontal())
 				.vertical(requestDto.getVertical())
 				.position(requestDto.getPosition())
@@ -190,7 +192,7 @@ public class PostSellService {
 		return dtos;
 	}
 
-	public List<DashboardPriceEntity> calculatePricePerM2(Long startTime, Long endTime) {
+	public List<DashboardEntity> calculatePricePerM2(Long startTime, Long endTime) {
 		return postSellDao.calculatePricePerM2(startTime, endTime);
 	}
 

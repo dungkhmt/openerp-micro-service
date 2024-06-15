@@ -58,21 +58,13 @@ public class PostBuyService {
 		entity.setMinPrice(requestDto.getMinPrice());
 		entity.setMaxPrice(requestDto.getMaxPrice());
 
-		entity.setTypeProperty(requestDto.getTypeProperty().toString());
+		entity.setTypeProperty(requestDto.getTypeProperty());
         entity.setMinBathroom(requestDto.getMinBathroom());
 		entity.setMinBedroom(requestDto.getMinBedroom());
 		entity.setMinParking(requestDto.getMinParking());
 		entity.setMinFloor(requestDto.getMinFloor());
-		entity.setLegalDocuments(
-				requestDto.getLegalDocuments().stream().map(item -> {
-					return item.toString();
-				}).collect(Collectors.toList())
-		);
-		entity.setDirectionProperties(
-				requestDto.getDirectionProperties().stream().map(item -> {
-					return item.toString();
-				}).collect(Collectors.toList())
-		);
+		entity.setLegalDocuments(requestDto.getLegalDocuments());
+		entity.setDirectionProperties(requestDto.getDirectionProperties());
 
 		entity.setMinHorizontal(requestDto.getMinHorizontal());
 		entity.setMinVertical(requestDto.getMinVertical());
@@ -82,7 +74,7 @@ public class PostBuyService {
 		entity.setDistrictIds(requestDto.getDistrictIds());
 		entity.setNameDistricts(requestDto.getNameDistricts());
 
-		entity.setPostStatus(PostStatus.OPENING.toString());
+		entity.setPostStatus(PostStatus.OPENING);
 		entity.setIsAvailable(true);
 		entity.setCreatedAt(now);
 		entity.setUpdatedAt(now);
@@ -153,7 +145,7 @@ public class PostBuyService {
 				.authorId(requestDto.getAuthorId())
 				.title(requestDto.getTitle())
 				.description(requestDto.getDescription())
-				.typeProperty(requestDto.getTypeProperty().toString())
+				.typeProperty(requestDto.getTypeProperty())
 				.minAcreage(requestDto.getMinAcreage())
 				.maxAcreage(requestDto.getMaxAcreage())
 				.minPrice(requestDto.getMinPrice())
@@ -163,12 +155,8 @@ public class PostBuyService {
 				.minFloor(requestDto.getMinFloor())
 				.minParking(requestDto.getMinParking())
 
-				.legalDocuments(requestDto.getLegalDocuments().stream().map(
-						item -> item.toString()
-				).toList())
-				.directionProperties(requestDto.getDirectionProperties().stream().map(
-						item -> item.toString()
-				).toList())
+				.legalDocuments(requestDto.getLegalDocuments())
+				.directionProperties(requestDto.getDirectionProperties())
 				.minHorizontal(requestDto.getMinHorizontal())
 				.minVertical(requestDto.getMinVertical())
 

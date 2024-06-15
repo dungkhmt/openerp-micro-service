@@ -1,6 +1,7 @@
 package com.real_estate.post.repositories;
 
 import com.real_estate.post.models.postgresql.PostSellPostgresEntity;
+import com.real_estate.post.utils.PostStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -19,5 +20,5 @@ public interface PostSellRepository extends JpaRepository<PostSellPostgresEntity
     @Transactional
     @Modifying
     @Query("update PostSellPostgresEntity p set p.postStatus = :status where p.postSellId = :postSellId and p.authorId = :accountId")
-    public Integer updateStatusBy(Long postSellId, Long accountId, String status);
+    public Integer updateStatusBy(Long postSellId, Long accountId, PostStatus status);
 }

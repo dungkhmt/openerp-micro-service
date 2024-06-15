@@ -1,6 +1,7 @@
 package com.real_estate.post.repositories;
 
 import com.real_estate.post.models.postgresql.PostBuyPostgresEntity;
+import com.real_estate.post.utils.PostStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,12 +14,12 @@ import java.util.List;
 public interface PostBuyRepository extends JpaRepository<PostBuyPostgresEntity, Long> {
     @Query("select p from PostBuyPostgresEntity p " +
             "where p.authorId = :accountId " +
-            "order by p.createdAt desc ")
+            "order by p.createdAt desc")
     List<PostBuyPostgresEntity> findByAccountId(Long accountId);
 
     @Transactional
     @Modifying
     @Query("update PostBuyPostgresEntity p set p.postStatus = :status where p.postBuyId = :postBuyId and p.authorId = :accountId")
-    public Integer updateStatusBy(Long postBuyId, Long accountId, String status);
+    public Integer updateStatusBy(Long postBuyId, Long accountId, PostStatus status);
 
 }

@@ -1,6 +1,6 @@
 package com.real_estate.post.services;
 
-import com.real_estate.post.daos.interfaces.DashboardPriceDao;
+import com.real_estate.post.daos.interfaces.DashboardDao;
 import com.real_estate.post.daos.interfaces.DistrictDao;
 import com.real_estate.post.dtos.Location;
 import com.real_estate.post.dtos.PriceDistrict;
@@ -25,8 +25,8 @@ public class DistrictService {
 	DistrictDao districtDao;
 
 	@Autowired
-	@Qualifier("dashboardPriceImpl")
-	DashboardPriceDao dashboardPriceDao;
+	@Qualifier("dashboardImpl")
+	DashboardDao dashboardDao;
 
 	@Value("${dashboard.duration}")
 	Long DURATION;
@@ -80,7 +80,7 @@ public class DistrictService {
 			);
 			startTime += DURATION;
 		}
-		List<PriceDistrict> priceDistricts = dashboardPriceDao.findPriceDistricts(queries);
+		List<PriceDistrict> priceDistricts = dashboardDao.findPriceDistricts(queries);
 		Map<String, List<PriceDistrict>> priceDistrictMap = new HashMap<>();
 		for (PriceDistrict pd : priceDistricts) {
 			priceDistrictMap.computeIfAbsent(pd.getDistrictId(), k -> new ArrayList<>()).add(pd);

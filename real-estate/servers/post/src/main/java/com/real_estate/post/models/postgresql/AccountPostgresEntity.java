@@ -1,5 +1,6 @@
 package com.real_estate.post.models.postgresql;
 
+import com.real_estate.post.utils.AuthProvider;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -7,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
-import java.security.AuthProvider;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -41,11 +41,11 @@ public class AccountPostgresEntity {
 	@Column(name = "avatar")
 	String avatar;
 
-	@Column(name = "total_postSell")
+	@Column(name = "total_post_sell")
 	@ColumnDefault(value = "0")
 	Integer totalPostSell = 0;
 
-	@Column(name = "total_postBuy")
+	@Column(name = "total_post_buy")
 	@ColumnDefault(value = "0")
 	Integer totalPostBuy = 0;
 
@@ -54,14 +54,12 @@ public class AccountPostgresEntity {
 	@CollectionTable(name = "account_postgres_entity_role", joinColumns = @JoinColumn(name = "account_id"))
 	Set<String> role;
 
-//	@Column(name = "repotation", nullable = false)
-//	@ColumnDefault(value = "100")
-//	Integer reputation;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "provider")
+	AuthProvider provider;
 
-	@NotNull
-	private String provider;
-
-	private String providerId;
+	@Column(name = "provider_id")
+	String providerId;
 
 	@Column(name = "is_active")
 	@ColumnDefault("false")
