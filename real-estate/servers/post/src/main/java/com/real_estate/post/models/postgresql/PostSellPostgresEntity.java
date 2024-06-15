@@ -2,6 +2,10 @@ package com.real_estate.post.models.postgresql;
 
 //import com.vladmihalcea.hibernate.type.array.ListArrayType;
 
+import com.real_estate.post.utils.PostStatus;
+import com.real_estate.post.utils.TypeDirection;
+import com.real_estate.post.utils.TypeLegalDocument;
+import com.real_estate.post.utils.TypeProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,8 +36,9 @@ public class PostSellPostgresEntity {
 	@Column(name = "description", columnDefinition="TEXT")
 	String description;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "type_property")
-	String typeProperty;
+	TypeProperty typeProperty;
 
 	@Column(name = "price", nullable = false)
 	Long price;
@@ -62,13 +67,13 @@ public class PostSellPostgresEntity {
 	@CollectionTable(name = "post_sell_postgres_entity_position", joinColumns = @JoinColumn(name = "post_sell_id"))
 	List<Float> position;
 
-	@Column(name = "provinceId")
+	@Column(name = "province_id")
 	String provinceId;
 
 	@Column(name = "name_province")
 	String nameProvince;
 
-	@Column(name = "districtId")
+	@Column(name = "district_id")
 	String districtId;
 
 	@Column(name = "name_district")
@@ -78,16 +83,18 @@ public class PostSellPostgresEntity {
 	String address;
 
 	@Column(name = "legal_document")
-	String legalDocument;
+	@Enumerated(EnumType.STRING)
+	TypeLegalDocument legalDocument;
 
 	@Column(name = "direction_property")
-	String directionProperty;
+	@Enumerated(EnumType.STRING)
+	TypeDirection directionProperty;
 
 	@Column(name = "horizontal")
-	Long horizontal;
+	Float horizontal;
 
 	@Column(name = "vertical")
-	Long vertical;
+	Float vertical;
 
 	@Column(name = "image_urls")
 	@ElementCollection(fetch = FetchType.EAGER)
@@ -95,15 +102,16 @@ public class PostSellPostgresEntity {
 	List<String> imageUrls;
 
 	@Column(name = "post_status", columnDefinition = "varchar(255) default 'OPENING'")
-	String postStatus;
+	@Enumerated(EnumType.STRING)
+	PostStatus postStatus;
 
-	@Column(name = "is_availble")
+	@Column(name = "is_available")
 	@ColumnDefault(value = "false")
 	Boolean isAvailable;
 
 	@Column(name = "created_at")
 	Long createdAt;
 
-	@Column(name = "updared_at")
+	@Column(name = "updated_at")
 	Long updatedAt;
 }

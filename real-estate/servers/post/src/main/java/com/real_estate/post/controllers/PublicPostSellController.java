@@ -6,7 +6,7 @@ import com.real_estate.post.dtos.response.ResponseDto;
 import com.real_estate.post.models.PostSellEntity;
 import com.real_estate.post.services.AuthenticationService;
 import com.real_estate.post.services.PostSellService;
-import com.real_estate.post.utils.DirectionsStatus;
+import com.real_estate.post.utils.TypeDirection;
 import com.real_estate.post.utils.TypeProperty;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,15 +39,9 @@ public class PublicPostSellController {
             @RequestParam(value = "fromPrice", required = false) Long fromPrice,
             @RequestParam(value = "toPrice", required = false) Long toPrice,
             @RequestParam(value = "typeProperties", required = false) List<TypeProperty> typeProperties,
-            @RequestParam(value = "directions", required = false) List<DirectionsStatus> directions
+            @RequestParam(value = "directions", required = false) List<TypeDirection> directions
     ) {
         Long finderId = authenticationService.getAccountIdFromContext();
-        List<String> typePropertiesString = typeProperties.stream().map((item) -> {
-            return item.toString();
-        }).collect(Collectors.toList());
-        List<String> directionsString = directions.stream().map((item) -> {
-            return item.toString();
-        }).collect(Collectors.toList());
         Page<PostSellResponseDto> sells = postSellService.getPageSell(page,
                                                                       size,
                                                                       provinceId,
@@ -56,8 +50,8 @@ public class PublicPostSellController {
                                                                       toAcreage,
                                                                       fromPrice,
                                                                       toPrice,
-                                                                      typePropertiesString,
-                                                                      directionsString,
+                                                                      typeProperties,
+                                                                      directions,
                                                                       finderId
         );
         return ResponseEntity.status(HttpStatus.OK).body(new PageResponseDto<PostSellResponseDto>(200, sells));

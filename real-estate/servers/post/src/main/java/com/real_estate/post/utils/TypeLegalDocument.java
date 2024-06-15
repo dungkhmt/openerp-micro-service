@@ -1,6 +1,6 @@
 package com.real_estate.post.utils;
 
-public enum LegalDocument {
+public enum TypeLegalDocument {
     HAVE("HAVE"),
     WAIT("WAIT"),
     HAVE_NOT("HAVE_NOT");
@@ -8,7 +8,7 @@ public enum LegalDocument {
 
     private final String text;
 
-    LegalDocument(final String text) {
+    TypeLegalDocument(final String text) {
         this.text = text;
     }
 
@@ -17,8 +17,8 @@ public enum LegalDocument {
         return text;
     }
 
-    public static LegalDocument fromText(String text) {
-        for (LegalDocument document : LegalDocument.values()) {
+    public static TypeLegalDocument fromText(String text) {
+        for (TypeLegalDocument document : TypeLegalDocument.values()) {
             if (document.text.equalsIgnoreCase(text)) {
                 return document;
             }

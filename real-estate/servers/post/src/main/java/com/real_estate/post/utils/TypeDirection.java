@@ -1,6 +1,6 @@
 package com.real_estate.post.utils;
 
-public enum DirectionsStatus {
+public enum TypeDirection {
 	NORTH("NORTH"),
 	SOUTH("SOUTH"),
 	WEST("WEST"),
@@ -12,7 +12,7 @@ public enum DirectionsStatus {
 
 	private final String text;
 
-	DirectionsStatus(final String text) {
+	TypeDirection(final String text) {
 		this.text = text;
 	}
 

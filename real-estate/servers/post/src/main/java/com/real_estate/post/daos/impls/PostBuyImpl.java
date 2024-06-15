@@ -1,6 +1,5 @@
 package com.real_estate.post.daos.impls;
 
-
 import com.real_estate.post.daos.interfaces.PostBuyDao;
 import com.real_estate.post.dtos.response.CountPostByProvinceResponseDto;
 import com.real_estate.post.dtos.response.PostBuyResponseDto;
@@ -36,7 +35,6 @@ public class PostBuyImpl implements PostBuyDao {
 
 	@Override
 	public PostBuyEntity save(PostBuyEntity entity) {
-		System.out.println("entity" + entity);
 		PostBuyPostgresEntity postgres = this.mapper.map(entity, PostBuyPostgresEntity.class);
 		postgres = repository.saveAndFlush(postgres);
 		return this.mapper.map(postgres, PostBuyEntity.class);
@@ -129,7 +127,7 @@ public class PostBuyImpl implements PostBuyDao {
 
 	@Override
 	public Integer updateStatusBy(Long postBuyId, Long accountId, PostStatus status) {
-		return repository.updateStatusBy(postBuyId, accountId, status.toString());
+		return repository.updateStatusBy(postBuyId, accountId, status);
 	}
 
 	@Override

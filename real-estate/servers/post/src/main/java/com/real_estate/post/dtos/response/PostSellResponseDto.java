@@ -5,6 +5,10 @@ import com.real_estate.post.models.PostSellEntity;
 import com.real_estate.post.models.postgresql.AccountPostgresEntity;
 import com.real_estate.post.models.postgresql.PostSellPostgresEntity;
 import com.real_estate.post.models.postgresql.LikePostgresEntity;
+import com.real_estate.post.utils.PostStatus;
+import com.real_estate.post.utils.TypeDirection;
+import com.real_estate.post.utils.TypeLegalDocument;
+import com.real_estate.post.utils.TypeProperty;
 import lombok.*;
 
 import java.util.List;
@@ -21,7 +25,7 @@ public class PostSellResponseDto {
     String emailAuthor;
     String title;
     String description;
-    String typeProperty;
+    TypeProperty typeProperty;
     Long price;
     Float pricePerM2;
     Long acreage;
@@ -29,10 +33,10 @@ public class PostSellResponseDto {
     Integer parking;
     Integer bedroom;
     Integer floor;
-    String legalDocument;
-    String directionProperty;
-    Long horizontal;
-    Long vertical;
+    TypeLegalDocument legalDocument;
+    TypeDirection directionProperty;
+    Float horizontal;
+    Float vertical;
     List<Float> position;
 
     String provinceId;
@@ -42,7 +46,7 @@ public class PostSellResponseDto {
 
     String address;
     List<String> imageUrls;
-    String postStatus;
+    PostStatus postStatus;
     Boolean isAvailable;
     Long createdAt;
     Long updatedAt;

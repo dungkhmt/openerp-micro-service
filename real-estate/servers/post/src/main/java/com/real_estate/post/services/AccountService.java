@@ -73,16 +73,7 @@ public class AccountService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không thể tìm được tài khoản");
         }
         AccountEntity entity = entityOptional.get();
-        AccountResponseDto dto = new AccountResponseDto().builder()
-                .accountId(entity.getAccountId())
-                .name(entity.getName())
-                .phone(entity.getPhone())
-                .email(entity.getEmail())
-                .avatar(entity.getAvatar())
-                .totalPostSell(entity.getTotalPostSell())
-                .totalPostBuy(entity.getTotalPostBuy())
-                .build();
-
+        AccountResponseDto dto = new AccountResponseDto(entity);
         return dto;
     }
 
