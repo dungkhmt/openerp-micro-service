@@ -27,6 +27,22 @@ export const ThesisDefensePlanManagement = {
       isPublic: true,
       child: [],
     },
+    {
+      id: "MENU_EDUCATION_THESIS_DEFENSE_PLAN_MANAGEMENT.MENU_VIEW__LIST_SUPERVISING_THESIS",
+      path: "/thesis/teacher/superviser",
+      icon: "",
+      text: "DS Đồ án hướng dẫn",
+      isPublic: true,
+      child: [],
+    },
+    {
+      id: "MENU_EDUCATION_THESIS_DEFENSE_PLAN_MANAGEMENT.MENU_VIEW__LIST_JURY_TOPIC",
+      path: "/thesis/topic",
+      icon: "",
+      text: "Quản lý phân ban",
+      isPublic: true,
+      child: [],
+    },
   ],
 };
 

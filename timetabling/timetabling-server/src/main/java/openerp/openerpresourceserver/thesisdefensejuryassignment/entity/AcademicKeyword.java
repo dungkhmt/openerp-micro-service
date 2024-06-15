@@ -30,9 +30,6 @@ public class AcademicKeyword implements Serializable {
     @Column(name = "created_stamp")
     private LocalDateTime createdTime;
 
-    @ManyToMany(mappedBy = "academicKeywordList")
-    @JsonIgnore
-    private List<DefenseJury> defenseJuryList;
 
     @ManyToMany(mappedBy = "academicKeywordList")
     @JsonIgnore
@@ -42,6 +39,9 @@ public class AcademicKeyword implements Serializable {
     @JsonIgnore
     private List<Thesis> thesisList;
 
+    @ManyToMany(mappedBy = "academicKeywordList")
+    @JsonIgnore
+    private List<JuryTopic> juryTopicList;
 
 
     public String getKeyword() {
