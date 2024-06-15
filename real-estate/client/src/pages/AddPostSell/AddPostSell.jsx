@@ -28,6 +28,8 @@ import { transferPrice, uploadImage } from "../../utils/common";
 const AddPostSell = () => {
   const navigate = useNavigate();
 
+  const [isLoadingUpload, setIsLoadingUpload] = useState(false);
+
   const [post, setPost] = useState({});
 
   const [active, setActive] = useState(0);
@@ -186,13 +188,15 @@ const AddPostSell = () => {
   };
 
   const nextStep4 = () => {
+    setIsLoadingUpload(true);
     Promise.all(imagesVirtual.files.map((file) => uploadImage(file)))
       .then((urls) => {
         console.log(urls);
         const data = { ...post, imageUrls: urls };
         handleDonePost(data);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => console.log(error))
+      .finally(() => setIsLoadingUpload(false));
   };
 
   const handleDonePost = (data) => {
@@ -677,7 +681,9 @@ const AddPostSell = () => {
             >
               Trước
             </Button>
-            <Button onClick={nextStep4}>Đăng bài</Button>
+            <Button onClick={nextStep4} loading={isLoadingUpload}>
+              Đăng bài
+            </Button>
           </Group>
         </Stepper.Step>
       </Stepper>

@@ -6,12 +6,13 @@ import { AccountContext } from "../../context/AccountContext";
 import EmojiPicker from "emoji-picker-react";
 import "./ConversationDetail.css";
 import { ImBin } from "react-icons/im";
-import { ActionIcon, rem, ScrollArea } from "@mantine/core";
+import { ActionIcon, rem, ScrollArea, Text, Code } from "@mantine/core";
 import { LuSendHorizonal } from "react-icons/lu";
 import { ConversationContext } from "../../context/ConversationContext";
 import { uploadImage } from "../../utils/common";
 import { CiFaceSmile } from "react-icons/ci";
 import { IoClose, IoImageOutline } from "react-icons/io5";
+import MessageRequest from "../../services/MessageRequest";
 
 const ConversationDetail = ({ conversationSelect }) => {
   const { addMessage, addConversation } = useContext(ConversationContext);
@@ -27,13 +28,42 @@ const ConversationDetail = ({ conversationSelect }) => {
     url: "",
   });
 
+  const isFirstLoad = useRef(true);
+
+  const [scrollPosition, onScrollPositionChange] = useState({ x: 0, y: 0 });
+
   const viewport = useRef(null);
 
+  const getMoreMessage = () => {
+    if (currentConversation?.isLastMessage === false) {
+      const lastMessageId =
+        currentConversation.messages[currentConversation.messages.length - 1]
+          .messageId;
+      const messageRequest = new MessageRequest();
+      messageRequest
+        .getMoreMessage({
+          conversationId: conversationSelect.conversationId,
+          lastMessageId: lastMessageId,
+        })
+        .then((response) => {
+          if (response.code === 200) {
+            setCurrentConversation({
+              ...currentConversation,
+              messages: [...currentConversation.messages, ...response.data],
+              isLastMessage: response.data.length < 20,
+            });
+          }
+        });
+    }
+  };
+
   const scrollToBottom = () => {
-    viewport.current.scrollTo({
-      top: viewport.current.scrollHeight,
-      behavior: "smooth",
-    });
+    if (viewport.current) {
+      viewport.current.scrollTo({
+        top: viewport.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
   };
 
   const handleEmoji = (e) => {
@@ -119,8 +149,18 @@ const ConversationDetail = ({ conversationSelect }) => {
 
   useEffect(() => {
     setCurrentConversation(conversationSelect);
-    setTimeout(scrollToBottom, 100);
   }, [conversationSelect]);
+
+  useEffect(() => {
+    if (isFirstLoad.current) {
+      setTimeout(scrollToBottom, 100);
+      isFirstLoad.current = false;
+    } else {
+      if (scrollPosition.y === 0) {
+        getMoreMessage();
+      }
+    }
+  }, [scrollPosition]);
   return (
     <div className="conversationDetailContainer">
       <div className="top">
@@ -135,7 +175,12 @@ const ConversationDetail = ({ conversationSelect }) => {
         </div>
       </div>
 
-      <ScrollArea h={"100%"} w={"100%"} viewportRef={viewport}>
+      <ScrollArea
+        h={"100%"}
+        w={"100%"}
+        viewportRef={viewport}
+        onScrollPositionChange={onScrollPositionChange}
+      >
         <div className="center">
           {currentConversation?.messages
             ?.slice()
@@ -178,7 +223,6 @@ const ConversationDetail = ({ conversationSelect }) => {
             })}
         </div>
       </ScrollArea>
-
       <form onSubmit={handleSendMessage}>
         {img.url ? (
           <div className="bottom">

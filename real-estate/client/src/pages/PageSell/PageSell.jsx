@@ -43,7 +43,7 @@ const PageSell = ({}) => {
         } else {
           setListPost([]);
           setTotalPages(0);
-          toast.error(response.data.message);
+          toast.info(response.data.message);
         }
       })
       .then();
@@ -69,23 +69,34 @@ const PageSell = ({}) => {
 
       <div className="flexCenter post_map_container">
         <div className="postSellContainer" style={{ flex: 3 }}>
-          <Pagination
-            total={totalPages}
-            value={params.page}
-            onChange={handleChangePage}
-          />
+          {listPost.length > 0 ? (
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+              }}
+            >
+              <Pagination
+                total={totalPages}
+                value={params.page}
+                onChange={handleChangePage}
+              />
 
-          <ScrollArea h={"95%"} offsetScrollbars>
-            {listPost.map((item) => (
-              <div key={item.postSellId} className="cardContainer">
-                <CardSell
-                  key={item.postSellId}
-                  item={item}
-                  changeItem={changeItemInList}
-                />
-              </div>
-            ))}
-          </ScrollArea>
+              <ScrollArea h={"95%"} offsetScrollbars>
+                {listPost.map((item) => (
+                  <div key={item.postSellId} className="cardContainer">
+                    <CardSell
+                      key={item.postSellId}
+                      item={item}
+                      changeItem={changeItemInList}
+                    />
+                  </div>
+                ))}
+              </ScrollArea>
+            </div>
+          ) : (
+            <p>Chưa có bài đăng</p>
+          )}
         </div>
 
         <div className="mapContainer">
