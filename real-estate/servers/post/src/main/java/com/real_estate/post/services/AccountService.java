@@ -44,26 +44,36 @@ public class AccountService {
 
     public void register(CreateAccountRequestDto dto) {
         Long now = System.currentTimeMillis();
-        AccountEntity entity = new AccountEntity();
-        entity.setName(dto.getName());
-        entity.setEmail(dto.getEmail());
-        entity.setPassword(passwordEncoder.encode(dto.getPassword()));
-        entity.setAvatar(avatar_default);
-        entity.setTotalPostSell(0);
-        entity.setTotalPostBuy(0);
-        entity.setRole(new HashSet<>(Collections.singletonList("USER")));
-        entity.setIsActive(false);
-        entity.setProvider(AuthProvider.local);
-        entity.setCreatedAt(now);
-        entity.setUpdatedAt(now);
 
-        try {
+        Optional<AccountEntity> exist = accountDao.findByEmail(dto.getEmail());
+        if (exist.isEmpty()) {
+            AccountEntity entity = new AccountEntity();
+            entity.setName(dto.getName());
+            entity.setEmail(dto.getEmail());
+            entity.setPassword(passwordEncoder.encode(dto.getPassword()));
+            entity.setAvatar(avatar_default);
+            entity.setTotalPostSell(0);
+            entity.setTotalPostBuy(0);
+            entity.setRole(new HashSet<>(Collections.singletonList("USER")));
+            entity.setIsActive(false);
+            entity.setProvider(AuthProvider.local);
+            entity.setCreatedAt(now);
+            entity.setUpdatedAt(now);
             entity = accountDao.save(entity);
             String token = tokenProvider.createToken(entity.getAccountId());
             gmailSenderService.sendEmail(token, entity);
-        }
-        catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email đã được dùng");
+        } else {
+            if (exist.get().getIsActive()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email đã được dùng");
+            } else {
+                AccountEntity entity = exist.get();
+                entity.setName(dto.getName());
+                entity.setPassword(passwordEncoder.encode(dto.getPassword()));
+                entity.setUpdatedAt(now);
+                entity = accountDao.save(entity);
+                String token = tokenProvider.createToken(entity.getAccountId());
+                gmailSenderService.sendEmail(token, entity);
+            }
         }
     }
 
