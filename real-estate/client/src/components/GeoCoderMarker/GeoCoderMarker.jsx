@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Marker, Popup, useMap } from "react-leaflet";
 import L, { Icon } from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -28,8 +28,28 @@ const GeoCoderMarker = ({ address, setPosition }) => {
       fetchData();
     }
   }, [address]);
+  const markerRef = useRef(null);
+  const eventHandlers = useMemo(
+    () => ({
+      dragend() {
+        const marker = markerRef.current;
+        if (marker != null) {
+          const positionMaker = marker.getLatLng();
+          console.log(positionMaker);
+          setPosition([positionMaker.lat, positionMaker.lng]);
+        }
+      },
+    }),
+    [],
+  );
   return (
-    <Marker position={positionMarker} icon={customIcon}>
+    <Marker
+      draggable={true}
+      eventHandlers={eventHandlers}
+      ref={markerRef}
+      position={positionMarker}
+      icon={customIcon}
+    >
       <Popup />
     </Marker>
   );
