@@ -1,13 +1,16 @@
 .conversationList {
     /*background-color: #F2F2F2;*/
-    flex: 1;
+    /*flex: 1;*/
+    width: 30%;
     /*border-radius: 12px;*/
-    /*overflow: scroll;*/
+    /*overflow-y: scroll;*/
+    /*overflow-x: hidden;*/
     .search {
         display: flex;
         align-items: center;
         gap: 20px;
         padding: 20px;
+        width: 100%;
 
         .searchBar {
             flex: 1;
@@ -24,6 +27,7 @@
                 outline: none;
                 color: white;
                 flex: 1;
+                width: 100%;
             }
 
             img {
@@ -49,18 +53,23 @@
         padding: 20px;
         cursor: pointer;
         border-bottom: 1px solid #dddddd35;
+        width: 90%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
 
-        img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
+        /*img {*/
+        /*    width: 50px;*/
+        /*    height: 50px;*/
+        /*    border-radius: 50%;*/
+        /*    object-fit: cover;*/
+        /*}*/
 
         .texts {
             display: flex;
             flex-direction: column;
             gap: 10px;
+            background-color: white;
 
             span {
                 font-weight: 500;
@@ -72,4 +81,16 @@
             }
         }
     }
+}
+
+.conversation {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin:0 10px;
+    border-bottom: 1px solid #F2F2F2;
+}
+
+.conversation:hover {
+    background-color: #F2F2F2;
 }

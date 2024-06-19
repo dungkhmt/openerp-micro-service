@@ -1,6 +1,7 @@
 .conversationDetailContainer {
     /*background-color: rgba(17, 25, 40, 0.75);*/
-    flex: 2;
+    /*flex: 3;*/
+    width: 100%;
     border-left: 1px solid #dddddd35;
     border-right: 1px solid #dddddd35;
     height: 100%;
@@ -56,6 +57,8 @@
     }
 
     .center {
+        width: 100%;
+        background-color: white;
         padding: 0 20px;
         flex: 1;
         /*overflow-y: scroll;*/
@@ -65,19 +68,23 @@
         margin-bottom: 10px;
 
         .message {
-            max-width: 70%;
+            /*max-width: 70%;*/
             display: flex;
             align-self: flex-start;
             gap: 20px;
             flex-direction: column;
+            width: 100%;
 
             &.own {
                 align-self: flex-end;
 
                 .texts {
+                    max-width: 70%;
                     p {
                         border-radius: 1rem 1rem 0 1rem;
                         background-color: #5183fe;
+                        word-wrap: break-word; /* Đảm bảo từ dài xuống dòng */
+                        overflow-wrap: break-word;
                     }
                 }
             }
@@ -174,4 +181,30 @@
             }
         }
     }
+}
+
+.message-item {
+    padding: 0 20px
+    /*max-width: 70%;*/
+}
+
+.message-item p {
+    max-width: 70%;
+    padding: 20px;
+    border-radius: 1rem 1rem 0 1rem;
+    background-color: #5183fe;
+    word-wrap: break-word; /* Đảm bảo từ dài xuống dòng */
+    overflow-wrap: break-word;
+}
+
+.other {
+    padding: 0 20px;
+}
+.other p {
+    border-radius: 1rem 1rem 1rem 0;
+    background-color: #666666;
+    max-width: 70%;
+    padding: 20px;
+    word-wrap: break-word; /* Đảm bảo từ dài xuống dòng */
+    overflow-wrap: break-word;
 }

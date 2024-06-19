@@ -1,6 +1,13 @@
 import React, { useContext, useRef, useState } from "react";
 import "./Chatlist.css";
-import { ScrollArea } from "@mantine/core";
+import {
+  Avatar,
+  Group,
+  ScrollArea,
+  UnstyledButton,
+  Text,
+  Box,
+} from "@mantine/core";
 import { AccountContext } from "../../context/AccountContext";
 
 const Chatlist = ({ setConversationSelect, conversations }) => {
@@ -38,25 +45,65 @@ const Chatlist = ({ setConversationSelect, conversations }) => {
           />
         </div>
       </div>
-      <ScrollArea>
-        {filteredConversations.map((conversation, index) => (
-          <div
-            className="item"
-            key={index}
-            onClick={() => setConversationSelect(conversation)}
-            style={
-              {
-                // backgroundColor: "#5183fe",
-              }
-            }
-          >
-            <img src={conversation.other.avatar || "./avatar.png"} alt="" />
-            <div className="texts">
-              <span>{conversation.other.name}</span>
-              <p>{transferLastMessage(conversation?.messages[0])}</p>
-            </div>
-          </div>
-        ))}
+      <ScrollArea
+        scrollbars="y"
+        w={"100%"}
+        style={
+          {
+            // backgroundColor: "red",
+          }
+        }
+      >
+        <div
+          style={{
+            width: "80%",
+            // backgroundColor: "yellow",
+            // overflow: "hidden",
+          }}
+        >
+          {filteredConversations.map((conversation, index) => (
+            <UnstyledButton
+              key={index}
+              className="conversation"
+              onClick={() => setConversationSelect(conversation)}
+            >
+              <Group
+                preventGrowOverflow={false}
+                wrap="nowrap"
+                style={{
+                  width: "80%",
+                }}
+              >
+                <Avatar src={conversation.other.avatar} radius="xl" size="lg" />
+                <div style={{ width: "50%" }}>
+                  <Text size="sm" style={{ fontWeight: "500" }}>
+                    {conversation.other.name}
+                  </Text>
+                  <Box w={"80%"}>
+                    <Text size="xs" truncate="end">
+                      {transferLastMessage(conversation.messages[0])}
+                    </Text>
+                  </Box>
+                </div>
+              </Group>
+            </UnstyledButton>
+            // <Group
+            //   // className="item"
+            //   key={index}
+            //   onClick={() => setConversationSelect(conversation)}
+            //   style={{
+            //     width: "100%",
+            //     // backgroundColor: "#5183fe",
+            //   }}
+            // >
+            //   <Avatar src={conversation.other.avatar} size="lg" />
+            //   <div className="texts">
+            //     <span>{conversation.other.name}</span>
+            //     <p>{transferLastMessage(conversation?.messages[0])}</p>
+            //   </div>
+            // </Group>
+          ))}
+        </div>
       </ScrollArea>
     </div>
   );

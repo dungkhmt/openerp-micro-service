@@ -47,4 +47,8 @@ public class LikeService {
             return new AccountResponseDto(item);
         }).toList();
     }
+
+    public Long getLikeId(Long postId, Long finderId, TypePost typePost) {
+        return likeDao.getId(postId, finderId, typePost);
+    }
 }

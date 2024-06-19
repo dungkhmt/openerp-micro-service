@@ -57,4 +57,14 @@ public class LikeController {
         List<AccountResponseDto> dtos = likeService.getLiker(postId, typePost);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, dtos));
     }
+
+    @GetMapping("/likeId")
+    public ResponseEntity<ResponseDto<Long>> getLikeId(
+            @RequestParam("postId") Long postId,
+            @RequestParam("typePost") TypePost typePost
+    ) {
+        Long finderId = authenticationService.getAccountIdFromContext();
+        Long likeId = likeService.getLikeId(postId, finderId, typePost);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, likeId));
+    }
 }

@@ -6,7 +6,15 @@ import { AccountContext } from "../../context/AccountContext";
 import EmojiPicker from "emoji-picker-react";
 import "./ConversationDetail.css";
 import { ImBin } from "react-icons/im";
-import { ActionIcon, rem, ScrollArea, Text, Code } from "@mantine/core";
+import {
+  ActionIcon,
+  rem,
+  ScrollArea,
+  Text,
+  Code,
+  SimpleGrid,
+  Button,
+} from "@mantine/core";
 import { LuSendHorizonal } from "react-icons/lu";
 import { ConversationContext } from "../../context/ConversationContext";
 import { uploadImage } from "../../utils/common";
@@ -33,6 +41,8 @@ const ConversationDetail = ({ conversationSelect }) => {
   const [scrollPosition, onScrollPositionChange] = useState({ x: 0, y: 0 });
 
   const viewport = useRef(null);
+
+  const [loadingSend, setLoadingSend] = useState(false);
 
   const getMoreMessage = () => {
     if (currentConversation?.isLastMessage === false) {
@@ -84,6 +94,7 @@ const ConversationDetail = ({ conversationSelect }) => {
   const handleSendMessage = async (event) => {
     event.preventDefault();
     let image;
+    setLoadingSend(true);
     if (messageType === MessageType.IMAGE) {
       image = await uploadImage(img.file);
     }
@@ -145,10 +156,12 @@ const ConversationDetail = ({ conversationSelect }) => {
       file: null,
       url: "",
     });
+    setLoadingSend(false);
   };
 
   useEffect(() => {
     setCurrentConversation(conversationSelect);
+    isFirstLoad.current = true;
   }, [conversationSelect]);
 
   useEffect(() => {
@@ -181,7 +194,16 @@ const ConversationDetail = ({ conversationSelect }) => {
         viewportRef={viewport}
         onScrollPositionChange={onScrollPositionChange}
       >
-        <div className="center">
+        <SimpleGrid
+          cols={1}
+          spacing="xs"
+          verticalSpacing="lg"
+          style={{
+            width: "100%",
+            margin: "10px 0",
+          }}
+          // className="center"
+        >
           {currentConversation?.messages
             ?.slice()
             .reverse()
@@ -190,15 +212,24 @@ const ConversationDetail = ({ conversationSelect }) => {
               return (
                 <div
                   ref={isFirstMessage ? viewport : null}
-                  className={
-                    message.senderId === account?.accountId
-                      ? "message own"
-                      : "message"
-                  }
+                  style={{
+                    // backgroundColor: "red",
+                    width: "100%",
+                  }}
+                  // className={
+                  //   message.senderId === account?.accountId
+                  //     ? "message own"
+                  //     : "message"
+                  // }
                   key={index}
                 >
                   <div
-                    className="texts"
+                    // className="texts"
+                    className={
+                      message.senderId === account?.accountId
+                        ? "message-item flexColEnd"
+                        : "other flexColStart "
+                    }
                     title={
                       new Date(message.createdAt).getHours() +
                       ":" +
@@ -208,7 +239,16 @@ const ConversationDetail = ({ conversationSelect }) => {
                     {message.messageType === MessageType.TEXT ? (
                       <p>{message.content}</p>
                     ) : (
-                      <img src={message.content} alt="" />
+                      <img
+                        style={{
+                          ObjectFit: "contain",
+                          width: "70%",
+                          height: "300px",
+                          borderRadius: "10px",
+                        }}
+                        src={message.content}
+                        alt=""
+                      />
                     )}
                     {/*<span*/}
                     {/*  style={{*/}
@@ -221,7 +261,7 @@ const ConversationDetail = ({ conversationSelect }) => {
                 </div>
               );
             })}
-        </div>
+        </SimpleGrid>
       </ScrollArea>
       <form onSubmit={handleSendMessage}>
         {img.url ? (
@@ -260,14 +300,15 @@ const ConversationDetail = ({ conversationSelect }) => {
                 />
               </ActionIcon>
             </div>
-            <button
+            <Button
               className="sendButton"
               disabled={img.url === ""}
               // onClick={handleSendMessage}
               type="submit"
+              loading={loadingSend}
             >
               <LuSendHorizonal className="icon" />
-            </button>
+            </Button>
           </div>
         ) : (
           <div className="bottom">
@@ -311,14 +352,15 @@ const ConversationDetail = ({ conversationSelect }) => {
                 />
               </div>
             </div>
-            <button
+            <Button
               className="sendButton flexCenter"
               disabled={content === ""}
               // onClick={handleSendMessage}
               type="submit"
+              loading={loadingSend}
             >
               <LuSendHorizonal className="icon" />
-            </button>
+            </Button>
           </div>
         )}
       </form>
