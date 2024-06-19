@@ -6,11 +6,6 @@ export default class PostSellRequest extends BaseRequest {
     return this.post(url, data);
   }
 
-  addPostBuy(data) {
-    const url = "/post/buy";
-    return this.post(url, data);
-  }
-
   getPostSellById(id) {
     const url = `/public/post/sell/${id}`;
     return this.get(url);

@@ -666,7 +666,7 @@ const AddPostSell = () => {
           label="Xem Trước"
           allowStepSelect={shouldAllowSelectStep(3)}
         >
-          <InfoPostSell propertyDetails={post} />
+          <InfoPostSell item={post} />
           <Group
             w={"100%"}
             style={{

@@ -20,4 +20,9 @@ export default class LikeRequest extends BaseRequest {
     const url = "/like/liker";
     return this.get(url, params);
   }
+
+  getLikeId(params) {
+    const url = "/like/likeId";
+    return this.get(url, params);
+  }
 }

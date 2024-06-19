@@ -9,7 +9,7 @@ import MarkerMap from "../MarkerMap/MarkerMap";
 import { FaBed } from "react-icons/fa";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   capitalizeFirstLetterOfEachWord,
   transferDirection,
@@ -17,19 +17,69 @@ import {
   transferPrice,
   transferTypeProperty,
 } from "../../utils/common";
-import { Grid, SimpleGrid } from "@mantine/core";
+import { ActionIcon, Grid, SimpleGrid } from "@mantine/core";
 import { TbCoin } from "react-icons/tb";
 import { GrDirections } from "react-icons/gr";
 import { IoDocumentOutline } from "react-icons/io5";
 import { PiArrowsHorizontal, PiBathtub } from "react-icons/pi";
 import { BsArrowsVertical } from "react-icons/bs";
 import { FaCarSide } from "react-icons/fa6";
+import { IconHeart } from "@tabler/icons-react";
+import LikeRequest from "../../services/LikeRequest";
+import { toast } from "react-toastify";
+import { AccountContext } from "../../context/AccountContext";
 
-const InfoPostSell = ({ propertyDetails }) => {
+const InfoPostSell = ({ item }) => {
+  console.log(item);
+  const [likeId, setLikeId] = useState(0);
+  const { account } = useContext(AccountContext);
+
+  const like = () => {
+    if (item?.postSellId > 0 && Object.keys(account).length > 0) {
+      const likeRequest = new LikeRequest();
+      likeRequest
+        .createLike({
+          postId: item.postSellId,
+          typePost: "SELL",
+        })
+        .then((response) => {
+          if (response.code === 200) {
+            setLikeId(response.data);
+          }
+        });
+    } else {
+      toast.error("Hãy đăng nhập để thích bài viết");
+    }
+  };
+  const deleteLike = () => {
+    const likeRequest = new LikeRequest();
+    likeRequest.deleteLike({ likeId }).then((response) => {
+      if (response.code === 200) {
+        setLikeId(0);
+      }
+    });
+  };
+  useEffect(() => {
+    const getLikeId = () => {
+      const likeRequest = new LikeRequest();
+      likeRequest
+        .getLikeId({
+          postId: item.postSellId,
+          typePost: "SELL",
+        })
+        .then((response) => {
+          setLikeId(response.data);
+        });
+    };
+    if (Object.keys(account).length > 0 && item?.postSellId > 0) {
+      getLikeId();
+    }
+  }, []);
+
   return (
     <div className="singlePage">
       <div className="details">
-        <ImageSlider images={propertyDetails?.imageUrls} />
+        <ImageSlider images={item?.imageUrls} />
 
         <div className="wrapper">
           <h1
@@ -37,7 +87,7 @@ const InfoPostSell = ({ propertyDetails }) => {
               fontWeight: "600",
             }}
           >
-            {propertyDetails?.title.toUpperCase()}
+            {item?.title.toUpperCase()}
           </h1>
           <div
             style={{
@@ -49,22 +99,22 @@ const InfoPostSell = ({ propertyDetails }) => {
           >
             <MdLocationPin className="icon" />
             {capitalizeFirstLetterOfEachWord(
-              propertyDetails?.address +
+              item?.address +
                 ", " +
-                propertyDetails?.nameDistrict +
+                item?.nameDistrict +
                 ", " +
-                propertyDetails?.nameProvince,
+                item?.nameProvince,
             )}
           </div>
           <Grid
-            w={"50%"}
+            w={"100%"}
             style={{
               padding: "15px 0 0 0",
               fontSize: "14px",
               // borderBottom: "1px solid #F2F2F2",
             }}
           >
-            <Grid.Col span={4}>
+            <Grid.Col span={3}>
               <div
                 style={{
                   color: "#999",
@@ -77,11 +127,11 @@ const InfoPostSell = ({ propertyDetails }) => {
                   color: "#E03C31",
                 }}
               >
-                {transferPrice(propertyDetails?.price)} ~
-                {transferPrice(propertyDetails?.pricePerM2)}/m²
+                {transferPrice(item?.price)} ~{transferPrice(item?.pricePerM2)}
+                /m²
               </div>
             </Grid.Col>
-            <Grid.Col span={4}>
+            <Grid.Col span={3}>
               <div
                 style={{
                   color: "#999",
@@ -94,10 +144,10 @@ const InfoPostSell = ({ propertyDetails }) => {
                   color: "#E03C31",
                 }}
               >
-                {propertyDetails?.acreage} m²
+                {item?.acreage} m²
               </div>
             </Grid.Col>
-            <Grid.Col span={4}>
+            <Grid.Col span={3}>
               <div
                 style={{
                   color: "#999",
@@ -105,7 +155,43 @@ const InfoPostSell = ({ propertyDetails }) => {
               >
                 Kiểu bất động sản
               </div>
-              <div>{transferTypeProperty(propertyDetails?.typeProperty)}</div>
+              <div
+                style={{
+                  color: "#E03C31",
+                }}
+              >
+                {transferTypeProperty(item?.typeProperty)}
+              </div>
+            </Grid.Col>
+            <Grid.Col span={3}>
+              <div
+                style={{
+                  color: "#999",
+                }}
+              >
+                Thích tin
+              </div>
+              <div>
+                {likeId > 0 ? (
+                  <ActionIcon
+                    variant="filled"
+                    color="red"
+                    size="xs"
+                    onClick={deleteLike}
+                  >
+                    <IconHeart />
+                  </ActionIcon>
+                ) : (
+                  <ActionIcon
+                    variant="outline"
+                    color="red"
+                    size="xs"
+                    onClick={like}
+                  >
+                    <IconHeart />
+                  </ActionIcon>
+                )}
+              </div>
             </Grid.Col>
           </Grid>
 
@@ -136,37 +222,35 @@ const InfoPostSell = ({ propertyDetails }) => {
                     <MdOutlineSquareFoot className="icon" />
                     <span>Diện tích</span>
                   </div>
-                  <div>{propertyDetails?.acreage} m²</div>
+                  <div>{item?.acreage} m²</div>
                 </SimpleGrid>
                 <SimpleGrid cols={2} className="border-top-bottom flexStart">
                   <div className="flexStart">
                     <TbCoin className="icon" />
                     <span>Mức giá</span>
                   </div>
-                  <div>{transferPrice(propertyDetails?.price)}</div>
+                  <div>{transferPrice(item?.price)}</div>
                 </SimpleGrid>
                 <SimpleGrid cols={2} className="border-top-bottom flexStart">
                   <div className="flexStart">
                     <GrDirections className="icon" />
                     <span>Hướng</span>
                   </div>
-                  <div>
-                    {transferDirection(propertyDetails?.directionProperty)}
-                  </div>
+                  <div>{transferDirection(item?.directionProperty)}</div>
                 </SimpleGrid>
                 <SimpleGrid cols={2} className="border-top-bottom flexStart">
                   <div className="flexStart">
                     <BsArrowsVertical className="icon" />
                     <span>Chiều dài</span>
                   </div>
-                  <div>{propertyDetails?.horizontal} m</div>
+                  <div>{item?.horizontal} m</div>
                 </SimpleGrid>
                 <SimpleGrid cols={2} className="border-top-bottom flexStart">
                   <div className="flexStart">
                     <PiArrowsHorizontal className="icon" />
                     <span>Chiều rộng</span>
                   </div>
-                  <div>{propertyDetails?.vertical} m</div>
+                  <div>{item?.vertical} m</div>
                 </SimpleGrid>
                 <SimpleGrid
                   cols={2}
@@ -179,19 +263,17 @@ const InfoPostSell = ({ propertyDetails }) => {
                     <IoDocumentOutline className="icon" />
                     <span>Pháp lý</span>
                   </div>
-                  <div>
-                    {transferLegalDocument(propertyDetails?.legalDocument)}
-                  </div>
+                  <div>{transferLegalDocument(item?.legalDocument)}</div>
                 </SimpleGrid>
               </Grid.Col>
-              {propertyDetails?.typeProperty === "APARTMENT" && (
+              {item?.typeProperty === "APARTMENT" && (
                 <Grid.Col span={6}>
                   <SimpleGrid cols={2} className="border-top-bottom flexStart">
                     <div className="flexStart">
                       <PiBathtub className="icon" />
                       <span>Phòng tắm</span>
                     </div>
-                    <div>{propertyDetails?.bathroom} phòng</div>
+                    <div>{item?.bathroom} phòng</div>
                   </SimpleGrid>
                   <SimpleGrid
                     cols={2}
@@ -204,33 +286,33 @@ const InfoPostSell = ({ propertyDetails }) => {
                       <FaBed className="icon" />
                       <span>Phòng ngủ</span>
                     </div>
-                    <div>{propertyDetails?.bedroom} phòng</div>
+                    <div>{item?.bedroom} phòng</div>
                   </SimpleGrid>
                 </Grid.Col>
               )}
 
-              {propertyDetails?.typeProperty === "HOUSE" && (
+              {item?.typeProperty === "HOUSE" && (
                 <Grid.Col span={6}>
                   <SimpleGrid cols={2} className="border-top-bottom flexStart">
                     <div className="flexStart">
                       <MdOutlineHomeWork className="icon" />
                       <span>Số tầng</span>
                     </div>
-                    <div>{propertyDetails?.floor} tầng</div>
+                    <div>{item?.floor} tầng</div>
                   </SimpleGrid>
                   <SimpleGrid cols={2} className="border-top-bottom flexStart">
                     <div className="flexStart">
                       <PiBathtub className="icon" />
                       <span>Phòng tắm</span>
                     </div>
-                    <div>{propertyDetails?.bathroom} phòng</div>
+                    <div>{item?.bathroom} phòng</div>
                   </SimpleGrid>
                   <SimpleGrid cols={2} className="border-top-bottom flexStart">
                     <div className="flexStart">
                       <FaBed className="icon" />
                       <span>Phòng ngủ</span>
                     </div>
-                    <div>{propertyDetails?.bedroom} phòng</div>
+                    <div>{item?.bedroom} phòng</div>
                   </SimpleGrid>
                   <SimpleGrid
                     cols={2}
@@ -243,7 +325,7 @@ const InfoPostSell = ({ propertyDetails }) => {
                       <FaCarSide className="icon" />
                       <span>Chỗ đậu xe</span>
                     </div>
-                    <div>{propertyDetails?.parking} chỗ</div>
+                    <div>{item?.parking} chỗ</div>
                   </SimpleGrid>
                 </Grid.Col>
               )}
@@ -254,7 +336,7 @@ const InfoPostSell = ({ propertyDetails }) => {
           <CKEditor
             style={{ height: "300px" }}
             editor={ClassicEditor}
-            data={propertyDetails?.description}
+            data={item?.description}
             disabled={true}
             onReady={(editor) => {}}
             onChange={(event, editor) => {
@@ -278,7 +360,7 @@ const InfoPostSell = ({ propertyDetails }) => {
             zIndex: "3",
           }}
         >
-          <MarkerMap posts={[propertyDetails]} />
+          <MarkerMap posts={[item]} />
         </div>
       </div>
     </div>

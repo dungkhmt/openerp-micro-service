@@ -18,9 +18,17 @@ const Chat = () => {
         setConversationSelect={setConversationSelect}
         conversations={conversations}
       />
-      {Object.keys(conversationSelect).length > 0 && (
-        <ConversationDetail conversationSelect={conversationSelect} />
-      )}
+      <div
+        style={{
+          width: "70%",
+        }}
+      >
+        {Object.keys(conversationSelect).length > 0 ? (
+          <ConversationDetail conversationSelect={conversationSelect} />
+        ) : (
+          <h2>Chọn cuộc trò chuyện để bắt đầu</h2>
+        )}
+      </div>
     </div>
   );
 };

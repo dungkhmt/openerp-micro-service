@@ -110,7 +110,7 @@ const PostSellDetail = () => {
     return (
       <div className="postSellDetail-container">
         <div className="information-post-sell">
-          <InfoPostSell propertyDetails={post} />
+          <InfoPostSell item={post} />
           <Dashboard
             historyPrice={exposeHistory(dashboard)}
             currentPrice={post.pricePerM2}

@@ -511,7 +511,7 @@ const ManagerPost = () => {
         >
           {showPost && Object.keys(sellSelect).length > 0 && (
             <div>
-              <InfoPostSell propertyDetails={sellSelect} />
+              <InfoPostSell item={sellSelect} />
               <div>
                 <Button
                   style={{
