@@ -31,11 +31,15 @@ import { AccountContext } from "../../context/AccountContext";
 
 const InfoPostSell = ({ item }) => {
   console.log(item);
-  const [likeId, setLikeId] = useState(0);
+  const [likeId, setLikeId] = useState(item?.likeId);
   const { account } = useContext(AccountContext);
 
   const like = () => {
-    if (item?.postSellId > 0 && Object.keys(account).length > 0) {
+    if (
+      item?.postSellId > 0 &&
+      Object.keys(account).length > 0 &&
+      likeId === 0
+    ) {
       const likeRequest = new LikeRequest();
       likeRequest
         .createLike({
@@ -52,29 +56,31 @@ const InfoPostSell = ({ item }) => {
     }
   };
   const deleteLike = () => {
-    const likeRequest = new LikeRequest();
-    likeRequest.deleteLike({ likeId }).then((response) => {
-      if (response.code === 200) {
-        setLikeId(0);
-      }
-    });
-  };
-  useEffect(() => {
-    const getLikeId = () => {
+    if (likeId > 0) {
       const likeRequest = new LikeRequest();
-      likeRequest
-        .getLikeId({
-          postId: item.postSellId,
-          typePost: "SELL",
-        })
-        .then((response) => {
-          setLikeId(response.data);
-        });
-    };
-    if (Object.keys(account).length > 0 && item?.postSellId > 0) {
-      getLikeId();
+      likeRequest.deleteLike({ likeId }).then((response) => {
+        if (response.code === 200) {
+          setLikeId(0);
+        }
+      });
     }
-  }, []);
+  };
+  // useEffect(() => {
+  //   const getLikeId = () => {
+  //     const likeRequest = new LikeRequest();
+  //     likeRequest
+  //       .getLikeId({
+  //         postId: item.postSellId,
+  //         typePost: "SELL",
+  //       })
+  //       .then((response) => {
+  //         setLikeId(response.data);
+  //       });
+  //   };
+  //   if (Object.keys(account).length > 0 && item?.postSellId > 0) {
+  //     getLikeId();
+  //   }
+  // }, []);
 
   return (
     <div className="singlePage">
