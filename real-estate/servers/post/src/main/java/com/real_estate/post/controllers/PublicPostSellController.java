@@ -59,10 +59,11 @@ public class PublicPostSellController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get detail post sell by postsellId", operationId = "sell.getPostById")
-    public ResponseEntity<ResponseDto<PostSellEntity>> getPostSellById(
+    public ResponseEntity<ResponseDto<PostSellResponseDto>> getPostSellById(
             @PathVariable("id") Long postSellId
     ) {
-        PostSellEntity entity = postSellService.getSellById(postSellId);
+        Long finderId = authenticationService.getAccountIdFromContext();
+        PostSellResponseDto entity = postSellService.getSellById(postSellId, finderId);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, entity));
     }
 

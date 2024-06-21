@@ -24,7 +24,7 @@ const PageBuy = () => {
 
   const getListPost = (params) => {
     setLoading(true);
-    if (page <= totalPages) {
+    if (params.page <= totalPages) {
       const postRequest = new PostBuyRequest();
       postRequest
         .get_page(params)
@@ -77,11 +77,19 @@ const PageBuy = () => {
 
     // console.log(scrollHeight, scrollTop, clientHeight)
     if (scrollTop + clientHeight >= scrollHeight && loading === false) {
-      getListPost({
-        page: page + 1,
-        size: 5,
-        provinceId: provinceId,
-      });
+      if (provinceId !== "") {
+        getListPost({
+          page: page + 1,
+          size: 5,
+          provinceId: provinceId,
+        });
+      } else {
+        getListPost({
+          page: page + 1,
+          size: 5,
+        });
+      }
+
       setPage((prevPage) => prevPage + 1); // Lấy thêm 10 bài viết
     }
   };
@@ -93,13 +101,34 @@ const PageBuy = () => {
 
   useEffect(() => {
     getCountPost();
-    setTotalPages(1);
-    getListPost({
-      page: 1,
-      size: 5,
-      provinceId: provinceId,
-    });
     setPage(1);
+    setTotalPages(1);
+    if (provinceId !== "" && provinceId !== undefined) {
+      getListPost({
+        page: 1,
+        size: 5,
+        provinceId: provinceId,
+      });
+    } else {
+      getListPost({
+        page: 1,
+        size: 5,
+      });
+    }
+    // setTimeout(() => {
+    //   if (provinceId !== "") {
+    //     getListPost({
+    //       page: 1,
+    //       size: 5,
+    //       provinceId: provinceId,
+    //     });
+    //   } else {
+    //     getListPost({
+    //       page: 1,
+    //       size: 5,
+    //     });
+    //   }
+    // }, 200);
   }, [provinceId]);
 
   return (

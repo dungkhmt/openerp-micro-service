@@ -47,14 +47,14 @@ public class AccountController {
     public ResponseEntity<ResponseDto<String>> updateInfo(@RequestBody UpdateAccountRequestDto requestDto) {
         Long accountId = authenticationService.getAccountIdFromContext();
         accountService.updateInfo(requestDto, accountId);
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, "Cập nhật thông tin thành công"));
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, "Cập nhập thông tin thành công"));
     }
 
     @PostMapping("/updatePassword")
     public ResponseEntity<ResponseDto<String>> updatePassword(@RequestBody UpdatePasswordRequestDto requestDto) {
         Long accountId = authenticationService.getAccountIdFromContext();
         accountService.updatePassword(requestDto, accountId);
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, "Cập nhật mật khẩu thành công"));
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(200, "Cập nhập mật khẩu thành công"));
     }
 
     @GetMapping("/logout")
