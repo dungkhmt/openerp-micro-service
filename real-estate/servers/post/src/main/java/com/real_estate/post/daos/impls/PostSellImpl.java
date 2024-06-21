@@ -149,13 +149,29 @@ public class PostSellImpl implements PostSellDao {
     }
 
     @Override
-    public PostSellEntity findById(Long postSellId) {
-        Optional<PostSellPostgresEntity> postgresEntityOptional = repository.findById(postSellId);
-        if (postgresEntityOptional.isPresent()) {
-            return this.mapper.map(postgresEntityOptional.get(), PostSellEntity.class);
-        } else {
-            return null;
+    public PostSellResponseDto findById(Long postSellId) {
+//        Optional<PostSellPostgresEntity> postgresEntityOptional = repository.findById(postSellId);
+//        if (postgresEntityOptional.isPresent()) {
+//            return this.mapper.map(postgresEntityOptional.get(), PostSellEntity.class);
+//        } else {
+//            return null;
+//        }
+
+        Query query = entityManager.createQuery(
+                "select p, a " +
+                        "from PostSellPostgresEntity p " +
+                        "left join AccountPostgresEntity a " +
+                        "on p.authorId = a.accountId " +
+                        "where p.postSellId = :postSellId"
+        );
+        query.setParameter("postSellId", postSellId);
+        List<Object[]> resultList = query.getResultList();
+        if (resultList.size() > 0) {
+            PostSellEntity post = this.mapper.map(resultList.get(0)[0], PostSellEntity.class);
+            AccountEntity account = this.mapper.map(resultList.get(0)[1], AccountEntity.class);
+            return new PostSellResponseDto(post, account);
         }
+        return null;
     }
 
     @Override

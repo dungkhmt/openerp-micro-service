@@ -134,10 +134,14 @@ public class PostSellService {
 		}
 	}
 
-	public PostSellEntity getSellById(Long postSellId) {
-		PostSellEntity entity = postSellDao.findById(postSellId);
+	public PostSellResponseDto getSellById(Long postSellId, Long finderId) {
+		PostSellResponseDto entity = postSellDao.findById(postSellId);
 		if (entity == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không tìm thấy bài viết");
+		}
+		if (finderId > 0) {
+			Long likeId = likeDao.getId(entity.getPostSellId(), finderId, TypePost.SELL);
+			entity.setLikeId(likeId);
 		}
 		return entity;
 	}

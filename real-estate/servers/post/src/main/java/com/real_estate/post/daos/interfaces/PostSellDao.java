@@ -37,7 +37,7 @@ public interface PostSellDao {
             List<TypeDirection> directions
     );
 
-    public PostSellEntity findById(Long postSellId);
+    public PostSellResponseDto findById(Long postSellId);
 
     public List<PostSellResponseDto> findByAccountId(Long accountId);
 
