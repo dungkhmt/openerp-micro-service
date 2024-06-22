@@ -108,10 +108,9 @@ export default function DefensePlanManager() {
       `/thesis-defense-plan/${id}`,
       (res) => {
         const data = res.data?.defenseJuries;
-        console.log(data);
         setThesisDefensePlan(res.data);
         setDefenseJuries(
-          data.map((item) => ({
+          data?.reverse()?.map((item) => ({
             ...item,
             juryTopic: item?.juryTopic?.name,
             keywords: item?.juryTopic?.academicKeywordList.map((item) => item.keyword),
