@@ -1,26 +1,23 @@
 import AppBar from "@material-ui/core/AppBar";
-import IconButton from "@material-ui/core/IconButton";
-import SvgIcon from "@material-ui/core/SvgIcon";
-import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import {makeStyles, styled} from "@material-ui/core/styles";
-import {default as MenuIcon} from "@material-ui/icons/Menu";
-import {useKeycloak} from "@react-keycloak/web";
-import clsx from "clsx";
-import React, {useEffect, useState} from "react";
-import {useLocation} from "react-router-dom";
-import {ReactComponent as HustProgrammingLogo} from "../assets/icons/hust-programming-icon.svg";
+import { makeStyles } from "@material-ui/core/styles";
+import { default as MenuIcon } from "@mui/icons-material/Menu";
+import { Box, IconButton, SvgIcon, Toolbar } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { useKeycloak } from "@react-keycloak/web";
+import { useState } from "react";
+import { ReactComponent as HustProgrammingLogo } from "../assets/icons/hust-programming-icon.svg";
 import bgImage from "../assets/img/sidebar1.jpg";
+import { PLATFORM_NAME } from "../config/config";
 import AccountButton from "./account/AccountButton";
 import LanguageSwitch from "./languageswitcher/LanguageSwitch";
 import NotificationButton from "./notification/NotificationButton";
-import SideBar, {drawerWidth} from "./sidebar/v1/SideBar";
-import {PLATFORM_NAME} from "../config/config";
+import SideBar, { drawerWidth } from "./sidebar/v1/SideBar";
 
 /**
  * https://mui.com/material-ui/react-app-bar/#fixed-placement
  */
-const Offset = styled("div")(({theme}) => ({
+const Offset = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   padding: theme.spacing(0, 1),
@@ -29,10 +26,26 @@ const Offset = styled("div")(({theme}) => ({
   justifyContent: "flex-end",
 }));
 
+const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
+  ({ theme, open }) => ({
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    transition: theme.transitions.create("margin", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    marginLeft: `-${drawerWidth}px`,
+    ...(open && {
+      transition: theme.transitions.create("margin", {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginLeft: 0,
+    }),
+  })
+);
+
 const useStyles = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-  },
   appBar: {
     // position: "sticky", // sticky is not supported by IE11.
     top: 0,
@@ -41,9 +54,6 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: `inset 0px -1px 1px ${theme.palette.grey[100]}`,
     backgroundColor: "rgba(255,255,255,0.72)",
     zIndex: theme.zIndex.drawer + 1,
-  },
-  menuButton: {
-    marginRight: 24,
   },
   sectionDesktop: {
     display: "none",
@@ -60,57 +70,31 @@ const useStyles = makeStyles((theme) => ({
       display: "block",
     },
   },
-  content: {
-    flexShrink: 1,
-    flexGrow: 1,
-    maxWidth: "100%",
-    padding: theme.spacing(3),
-    transition: theme.transitions.create(["maxWidth", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    marginLeft: -drawerWidth,
-  },
-  contentShift: {
-    maxWidth: "calc(100% - 300px)",
-    transition: theme.transitions.create(["maxWidth", "margin"], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginLeft: 0,
-  },
 }));
 
 function Layout({ children }) {
   const classes = useStyles();
-  const {pathname} = useLocation();
-  const isMeeting = pathname.startsWith("/chat/voice/main");
 
-  const {keycloak} = useKeycloak();
-
-  const [open, setOpen] = React.useState(true);
+  const { keycloak } = useKeycloak();
+  const [open, setOpen] = useState(true);
   const [image] = useState(bgImage);
   const [color] = useState("blue");
 
-  useEffect(() => {
-    if (isMeeting) setOpen(false);
-  }, [isMeeting]);
-
   return (
-    <div className={classes.root}>
+    <Box sx={{ display: "flex" }}>
       <AppBar position="fixed" color="inherit" className={classes.appBar}>
         <Toolbar>
           <IconButton
             color="inherit"
             aria-label="open drawer"
-            onClick={() => setOpen(!open)}
             edge="start"
-            className={classes.menuButton}
+            sx={{ mr: 3 }}
+            onClick={() => setOpen(!open)}
           >
-            <MenuIcon/>
+            <MenuIcon />
           </IconButton>
           <SvgIcon fontSize="large">
-            <HustProgrammingLogo width={22} height={19} x={2} y={2}/>
+            <HustProgrammingLogo width={22} height={19} x={2} y={2} />
           </SvgIcon>
 
           <Typography className={classes.appName} variant="h6" noWrap>
@@ -118,28 +102,24 @@ function Layout({ children }) {
           </Typography>
 
           {/* Use this div tag to push the icons to the right */}
-          <div style={{flexGrow: 1}}/>
+          <Box sx={{ flexGrow: 1 }} />
           <div className={classes.sectionDesktop}>
-            <LanguageSwitch/>
+            <LanguageSwitch />
             {keycloak.authenticated && (
               <>
-                <NotificationButton/>
-                <AccountButton/>
+                <NotificationButton />
+                <AccountButton />
               </>
             )}
           </div>
         </Toolbar>
       </AppBar>
-      <SideBar open={open} image={image} color={color}/>
-      <main
-        className={clsx(classes.content, {
-          [classes.contentShift]: open,
-        })}
-      >
-        <Offset/>
+      <SideBar open={open} image={image} color={color} />
+      <Main open={open}>
+        <Offset />
         {children}
-      </main>
-    </div>
+      </Main>
+    </Box>
   );
 }
 
