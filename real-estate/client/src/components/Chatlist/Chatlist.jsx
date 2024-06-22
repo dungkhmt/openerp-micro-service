@@ -14,7 +14,7 @@ const Chatlist = ({ setConversationSelect, conversations }) => {
   const [input, setInput] = useState("");
   const { account } = useContext(AccountContext);
 
-  const filteredConversations = conversations.filter((c) =>
+  const filteredConversations = conversations?.filter((c) =>
     c.other.name.toLowerCase().includes(input.toLowerCase()),
   );
 
@@ -56,12 +56,12 @@ const Chatlist = ({ setConversationSelect, conversations }) => {
       >
         <div
           style={{
-            width: "80%",
+            width: "100%",
             // backgroundColor: "yellow",
             // overflow: "hidden",
           }}
         >
-          {filteredConversations.map((conversation, index) => (
+          {filteredConversations?.map((conversation, index) => (
             <UnstyledButton
               key={index}
               className="conversation"
@@ -72,6 +72,7 @@ const Chatlist = ({ setConversationSelect, conversations }) => {
                 wrap="nowrap"
                 style={{
                   width: "80%",
+                  margin: "5px 0 5px 5px",
                 }}
               >
                 <Avatar src={conversation.other.avatar} radius="xl" size="lg" />
@@ -87,21 +88,6 @@ const Chatlist = ({ setConversationSelect, conversations }) => {
                 </div>
               </Group>
             </UnstyledButton>
-            // <Group
-            //   // className="item"
-            //   key={index}
-            //   onClick={() => setConversationSelect(conversation)}
-            //   style={{
-            //     width: "100%",
-            //     // backgroundColor: "#5183fe",
-            //   }}
-            // >
-            //   <Avatar src={conversation.other.avatar} size="lg" />
-            //   <div className="texts">
-            //     <span>{conversation.other.name}</span>
-            //     <p>{transferLastMessage(conversation?.messages[0])}</p>
-            //   </div>
-            // </Group>
           ))}
         </div>
       </ScrollArea>

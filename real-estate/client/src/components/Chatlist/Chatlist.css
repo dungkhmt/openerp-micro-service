@@ -86,9 +86,10 @@
 .conversation {
     display: block;
     width: 100%;
-    padding: 10px;
-    margin:0 10px;
-    border-bottom: 1px solid #F2F2F2;
+    /*padding: 10px;*/
+    /*margin: 5px 0 5px 5px;*/
+    /*background-color: #F2F2F2;*/
+    /*border-bottom: 1px solid red;*/
 }
 
 .conversation:hover {

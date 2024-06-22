@@ -11,7 +11,7 @@ const ConversationContextProvider = ({ children }) => {
   const findConversationWith = (other) => {
     // console.log("other", other);
     // console.log(conversations);
-    const conversation = conversations.find(
+    const conversation = conversations?.find(
       (conv) => conv.other.accountId === other?.accountId,
     );
     // console.log(conversation);
@@ -39,13 +39,13 @@ const ConversationContextProvider = ({ children }) => {
   const addMessage = (message) => {
     setConversations((prevConversations) => {
       // Tìm conversation có chứa message mới
-      const existingConversation = prevConversations.find(
+      const existingConversation = prevConversations?.find(
         (conv) => conv.conversationId === message.conversationId,
       );
 
       if (existingConversation) {
         // Nếu tìm thấy conversation, cập nhật lại messages
-        const updatedConversations = prevConversations.filter(
+        const updatedConversations = prevConversations?.filter(
           (conv) => conv.conversationId !== message.conversationId,
         );
         return [
