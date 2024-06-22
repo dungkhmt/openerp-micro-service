@@ -344,5 +344,13 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
         return defenseJury;
     }
 
+    @Override
+    public List<Thesis> getAvailableThesisByJuryTopic(String thesisDefensePlanId, String defenseJuryId) {
+        DefenseJury defenseJury = defenseJuryRepo.findById(UUID.fromString(defenseJuryId)).orElse(null);
+        if (defenseJury == null) return null;
+        int juryTopic= defenseJury.getJuryTopic().getId();
+        return thesisRepo.findByThesisDefensePlanIdAndDefenseJuryAndJuryTopicId(thesisDefensePlanId, null, juryTopic);
+    }
+
 
 }

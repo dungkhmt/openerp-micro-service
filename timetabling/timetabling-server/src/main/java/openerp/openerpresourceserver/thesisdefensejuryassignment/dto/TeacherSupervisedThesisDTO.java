@@ -18,7 +18,6 @@ public class TeacherSupervisedThesisDTO {
     public String getThesisDefensePlan() {
         return thesisDefensePlan;
     }
-
     public void setThesisDefensePlan(String thesisDefensePlan) {
         this.thesisDefensePlan = thesisDefensePlan;
     }

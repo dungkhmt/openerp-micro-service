@@ -28,4 +28,6 @@ public interface DefenseJuryService {
     public DefenseJury reassignTeacherAndThesis(AssignTeacherAndThesisToDefenseJuryIM teacherAndThesisList);
 
     public DefenseJury deleteDefenseJuryByID(UUID id);
+
+    public List<Thesis> getAvailableThesisByJuryTopic(String thesisDefensePlanId, String defenseJuryId);
 }
