@@ -83,7 +83,7 @@ function AssignTeacherAndThesisToDefenseJury() {
         <div className="defense-jury-info">
           Ngày tổ chức: {defenseJury?.defenseDate?.split("T")[0]}
         </div>
-        {defenseJury?.academicKeywordList?.map(({ keyword, description }) => (
+        {defenseJury?.juryTopic?.academicKeywordList?.map(({ keyword, description }) => (
           <KeywordChip key={keyword} keyword={description} />
         ))}
 
