@@ -379,7 +379,7 @@ const AddPostBuy = () => {
 
           <MultiSelect
             withAsterisk
-            label="Hướng nhà"
+            label="Hướng tài sản"
             data={[
               { value: "NORTH", label: "Bắc" },
               { value: "EAST_NORTH", label: "Đông Bắc" },
