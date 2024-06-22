@@ -79,20 +79,29 @@ function CreateDefenseJury({
             name: "",
             maxThesis: "",
             defenseDate: "",
-            defenseRoomId: 1,
-            defenseSessionId: 1,
-            juryTopicId: 1,
+            defenseRoomId: 0,
+            defenseSessionId: 0,
+            juryTopicId: 0,
         },
     });
     const handleFormSubmit = (data) => {
         data.thesisPlanName = thesisPlanName;
+        if (data?.defenseRoomId === 0) {
+            return errorNoti("Bạn cần chọn phòng tổ chức hội đồng", true)
+        }
+        if (data?.defenseSessionId === 0) {
+            return errorNoti("Bạn cần chọn buổi tổ chức hội đồng", true)
+        }
+        if (data?.juryTopicId === 0) {
+            return errorNoti("Bạn cần chọn phân ban của hội đồng", true)
+        }
         request(
             "post",
             "/defense-jury/save",
             (res) => {
                 if (res.data) {
                     const message = res.data;
-                    if (message == "Success") {
+                    if (message === "Success") {
                         handleClose();
                         handleToggle();
                         successNoti("Tạo hội đồng mới thành công", true);
@@ -181,7 +190,7 @@ function CreateDefenseJury({
                                         <Select
                                             MenuProps={MenuProps}
                                             name="defenseRoomId"
-                                            {...register("defenseRoomId")}
+                                            {...register("defenseRoomId", { required: true })}
                                             label="Room"
                                             input={<OutlinedInput label="Tag" />}
                                         >

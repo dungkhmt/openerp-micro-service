@@ -127,5 +127,8 @@ public class DefenseJuryController {
         return new ResponseEntity<>(defenseJury, HttpStatus.CREATED);
     }
 
-
+    @GetMapping("/thesis/get-all-available/{thesisDefensePlanId}/{defenseJuryId}")
+    public ResponseEntity<List<Thesis>> getAllAvailableThesis(@PathVariable String thesisDefensePlanId, @PathVariable String defenseJuryId) {
+        return new ResponseEntity<>(juryService.getAvailableThesisByJuryTopic(thesisDefensePlanId, defenseJuryId), HttpStatus.OK);
+    }
 }

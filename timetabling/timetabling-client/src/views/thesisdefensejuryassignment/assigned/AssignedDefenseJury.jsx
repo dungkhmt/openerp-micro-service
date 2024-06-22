@@ -16,14 +16,17 @@ export default function AssignedDefenseJury() {
     {
       title: "Ngày",
       field: "defenseDate",
-      render: (rowData) => rowData.defenseDate.split("T")[0],
+      render: (rowData) => rowData?.defenseDate?.split("T")[0],
     },
     { title: "Số luận án tối đa", field: "maxThesis" },
+    {
+      title: "Phân ban", field: "juryTopic",
+    },
     {
       title: "Keywords",
       field: "keywords",
       render: (rowData) =>
-        rowData.keywords.map((item) => <KeywordChip keyword={item} />),
+        rowData?.keywords?.map((item) => <KeywordChip keyword={item} />),
     },
     {
       title: "",
@@ -50,7 +53,8 @@ export default function AssignedDefenseJury() {
     data &&
     data?.defenseJuries?.map((item) => ({
       ...item,
-      keywords: item?.academicKeywordList.map((item) => item.keyword),
+      juryTopic: item?.juryTopic?.name,
+      keywords: item?.juryTopic?.academicKeywordList?.map((item) => item.keyword),
     }));
   return (
     <StandardTable
