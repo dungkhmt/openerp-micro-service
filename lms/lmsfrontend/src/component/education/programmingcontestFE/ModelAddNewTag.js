@@ -47,6 +47,7 @@ const ModelAddNewTag = ({isOpen, handleSuccess, handleClose}) => {
         required
         label={"Tag"}
         placeholder="Tag"
+        defaultValue={tagName}
         value={tagName}
         onChange={(event) => {
           setTagName(event.target.value);
