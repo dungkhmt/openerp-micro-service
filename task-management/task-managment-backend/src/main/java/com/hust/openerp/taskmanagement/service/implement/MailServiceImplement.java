@@ -1,13 +1,12 @@
 package com.hust.openerp.taskmanagement.service.implement;
 
-import com.hust.openerp.taskmanagement.service.MailService;
-import freemarker.template.Configuration;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import lombok.AllArgsConstructor;
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import java.util.Date;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -15,10 +14,12 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.Date;
+import com.hust.openerp.taskmanagement.config.MailConfig;
+import com.hust.openerp.taskmanagement.service.MailService;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import lombok.AllArgsConstructor;
 
 /**
  * @author Le Anh Tuan
@@ -28,20 +29,18 @@ import java.util.Date;
 public class MailServiceImplement implements MailService {
     private JavaMailSender mailSender;
 
-    private MailProperties properties;
-
-    private Configuration config;
+    private MailConfig mailConfig;
 
     public SimpleMailMessage createSimpleMail(
-        String[] to,
-        String[] cc,
-        String[] bcc,
-        String subject,
-        String body,
-        String replyTo) {
+            String[] to,
+            String[] cc,
+            String[] bcc,
+            String subject,
+            String body,
+            String replyTo) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
 
-        mailMessage.setFrom(properties.getUsername());
+        // mailMessage.setFrom(properties.getUsername());
         mailMessage.setTo(to);
         mailMessage.setCc(cc);
         mailMessage.setBcc(bcc);
@@ -87,14 +86,14 @@ public class MailServiceImplement implements MailService {
      */
 
     public MimeMessageHelper createMimeMessage(
-        String[] to,
-        String[] cc,
-        String[] bcc,
-        String subject,
-        String body,
-        boolean isHtml,
-        String replyTo,
-        String replyPersonal) throws MessagingException {
+            String[] to,
+            String[] cc,
+            String[] bcc,
+            String subject,
+            String body,
+            boolean isHtml,
+            String replyTo,
+            String replyPersonal) throws MessagingException {
         MimeMessageHelper messageHelper = initMimeMessage(to, cc, bcc, subject, replyTo, replyPersonal);
 
         messageHelper.setText(body, isHtml);
@@ -109,10 +108,10 @@ public class MailServiceImplement implements MailService {
     }
 
     public MimeMessageHelper createMimeMessage(
-        String[] to,
-        String subject,
-        String body,
-        boolean isHtml) throws MessagingException {
+            String[] to,
+            String subject,
+            String body,
+            boolean isHtml) throws MessagingException {
         return createMimeMessage(to, null, null, subject, body, isHtml, null, null);
     }
 
@@ -124,14 +123,14 @@ public class MailServiceImplement implements MailService {
      */
 
     public MimeMessageHelper createMimeMessage(
-        String[] to,
-        String[] cc,
-        String[] bcc,
-        String subject,
-        String plainText,
-        String htmlText,
-        String replyTo,
-        String replyPersonal) throws MessagingException {
+            String[] to,
+            String[] cc,
+            String[] bcc,
+            String subject,
+            String plainText,
+            String htmlText,
+            String replyTo,
+            String replyPersonal) throws MessagingException {
         MimeMessageHelper messageHelper = initMimeMessage(to, cc, bcc, subject, replyTo, replyPersonal);
 
         messageHelper.setText(plainText, htmlText);
@@ -139,10 +138,10 @@ public class MailServiceImplement implements MailService {
     }
 
     public MimeMessageHelper createMimeMessage(
-        String[] to,
-        String subject,
-        String plainText,
-        String htmlText) throws MessagingException {
+            String[] to,
+            String subject,
+            String plainText,
+            String htmlText) throws MessagingException {
         return createMimeMessage(to, null, null, subject, plainText, htmlText, null, null);
     }
 
@@ -159,9 +158,9 @@ public class MailServiceImplement implements MailService {
                 if (null != attachment && null != attachment.getContentType()) {
                     // Note: name or content type == null will cause exception.
                     messageHelper.addAttachment(
-                        null != attachment.getOriginalFilename() ? attachment.getOriginalFilename() : "file",
-                        attachment,
-                        attachment.getContentType());
+                            null != attachment.getOriginalFilename() ? attachment.getOriginalFilename() : "file",
+                            attachment,
+                            attachment.getContentType());
                 }
             }
         }
@@ -172,8 +171,8 @@ public class MailServiceImplement implements MailService {
             for (File attachment : attachments) {
                 if (null != attachment) {
                     messageHelper.addAttachment(
-                        attachment.getName().equals("") ? "file" : attachment.getName(),
-                        attachment);
+                            attachment.getName().equals("") ? "file" : attachment.getName(),
+                            attachment);
                 }
             }
         }
@@ -193,17 +192,18 @@ public class MailServiceImplement implements MailService {
      * @throws MessagingException
      */
     private MimeMessageHelper initMimeMessage(
-        String[] to,
-        String[] cc,
-        String[] bcc,
-        String subject,
-        String replyTo,
-        String replyPersonal) throws MessagingException {
+            String[] to,
+            String[] cc,
+            String[] bcc,
+            String subject,
+            String replyTo,
+            String replyPersonal) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
 
         try {
-            messageHelper.setFrom(properties.getUsername(), "Open ERP"); // Personal names that accompany mail addresses
+            messageHelper.setFrom(mailConfig.getMailServerUsername(), "Open ERP Team"); // Personal names that accompany
+                                                                                        // mail addresses
 
             // Only require not blank.
             if (StringUtils.isNotBlank(replyTo)) {
@@ -242,25 +242,25 @@ public class MailServiceImplement implements MailService {
 
     // TODO: test
     public void sendMailWithAttachments(
-        String[] to,
-        String[] cc,
-        String[] bcc,
-        String subject,
-        String body,
-        boolean isHtml,
-        String replyTo,
-        String replyPersonal,
-        MultipartFile[] attachments) {
+            String[] to,
+            String[] cc,
+            String[] bcc,
+            String subject,
+            String body,
+            boolean isHtml,
+            String replyTo,
+            String replyPersonal,
+            MultipartFile[] attachments) {
         try {
             MimeMessageHelper messageHelper = createMimeMessage(
-                to,
-                cc,
-                bcc,
-                subject,
-                body,
-                isHtml,
-                replyTo,
-                replyPersonal);
+                    to,
+                    cc,
+                    bcc,
+                    subject,
+                    body,
+                    isHtml,
+                    replyTo,
+                    replyPersonal);
 
             addAttachments(messageHelper, attachments);
             mailSender.send(messageHelper.getMimeMessage());
@@ -270,11 +270,11 @@ public class MailServiceImplement implements MailService {
     }
 
     public void sendMailWithAttachments(
-        String[] to,
-        String subject,
-        String body,
-        boolean isHtml,
-        MultipartFile[] attachments) {
+            String[] to,
+            String subject,
+            String body,
+            boolean isHtml,
+            MultipartFile[] attachments) {
         sendMailWithAttachments(to, null, null, subject, body, isHtml, null, null, attachments);
     }
 
@@ -287,25 +287,25 @@ public class MailServiceImplement implements MailService {
 
     // TODO: test
     public void sendMailWithAttachments(
-        String[] to,
-        String[] cc,
-        String[] bcc,
-        String subject,
-        String plainText,
-        String htmlText,
-        String replyTo,
-        String replyPersonal,
-        MultipartFile[] attachments) {
+            String[] to,
+            String[] cc,
+            String[] bcc,
+            String subject,
+            String plainText,
+            String htmlText,
+            String replyTo,
+            String replyPersonal,
+            MultipartFile[] attachments) {
         try {
             MimeMessageHelper messageHelper = createMimeMessage(
-                to,
-                cc,
-                bcc,
-                subject,
-                plainText,
-                htmlText,
-                replyTo,
-                replyPersonal);
+                    to,
+                    cc,
+                    bcc,
+                    subject,
+                    plainText,
+                    htmlText,
+                    replyTo,
+                    replyPersonal);
 
             addAttachments(messageHelper, attachments);
             mailSender.send(messageHelper.getMimeMessage());
@@ -315,11 +315,11 @@ public class MailServiceImplement implements MailService {
     }
 
     public void sendMailWithAttachments(
-        String[] to,
-        String subject,
-        String plainText,
-        String htmlText,
-        MultipartFile[] attachments) {
+            String[] to,
+            String subject,
+            String plainText,
+            String htmlText,
+            MultipartFile[] attachments) {
         sendMailWithAttachments(to, null, null, subject, plainText, htmlText, null, null, attachments);
     }
 
@@ -332,25 +332,25 @@ public class MailServiceImplement implements MailService {
 
     // TODO: test
     public void sendMailWithAttachments(
-        String[] to,
-        String[] cc,
-        String[] bcc,
-        String subject,
-        String body,
-        boolean isHtml,
-        String replyTo,
-        String replyPersonal,
-        File[] attachments) {
+            String[] to,
+            String[] cc,
+            String[] bcc,
+            String subject,
+            String body,
+            boolean isHtml,
+            String replyTo,
+            String replyPersonal,
+            File[] attachments) {
         try {
             MimeMessageHelper messageHelper = createMimeMessage(
-                to,
-                cc,
-                bcc,
-                subject,
-                body,
-                isHtml,
-                replyTo,
-                replyPersonal);
+                    to,
+                    cc,
+                    bcc,
+                    subject,
+                    body,
+                    isHtml,
+                    replyTo,
+                    replyPersonal);
 
             addAttachments(messageHelper, attachments);
             mailSender.send(messageHelper.getMimeMessage());
@@ -372,25 +372,25 @@ public class MailServiceImplement implements MailService {
 
     // TODO: test
     public void sendMailWithAttachments(
-        String[] to,
-        String[] cc,
-        String[] bcc,
-        String subject,
-        String plainText,
-        String htmlText,
-        String replyTo,
-        String replyPersonal,
-        File[] attachments) {
+            String[] to,
+            String[] cc,
+            String[] bcc,
+            String subject,
+            String plainText,
+            String htmlText,
+            String replyTo,
+            String replyPersonal,
+            File[] attachments) {
         try {
             MimeMessageHelper messageHelper = createMimeMessage(
-                to,
-                cc,
-                bcc,
-                subject,
-                plainText,
-                htmlText,
-                replyTo,
-                replyPersonal);
+                    to,
+                    cc,
+                    bcc,
+                    subject,
+                    plainText,
+                    htmlText,
+                    replyTo,
+                    replyPersonal);
 
             addAttachments(messageHelper, attachments);
             mailSender.send(messageHelper.getMimeMessage());
@@ -400,11 +400,11 @@ public class MailServiceImplement implements MailService {
     }
 
     public void sendMailWithAttachments(
-        String[] to,
-        String subject,
-        String plainText,
-        String htmlText,
-        File[] attachments) {
+            String[] to,
+            String subject,
+            String plainText,
+            String htmlText,
+            File[] attachments) {
         sendMailWithAttachments(to, null, null, subject, plainText, htmlText, null, null, attachments);
     }
 

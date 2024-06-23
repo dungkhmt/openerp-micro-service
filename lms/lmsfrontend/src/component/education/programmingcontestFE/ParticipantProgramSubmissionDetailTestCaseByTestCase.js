@@ -2,20 +2,20 @@ import InfoIcon from "@mui/icons-material/Info";
 import { CircularProgress, IconButton, LinearProgress } from "@mui/material";
 import Box from "@mui/material/Box";
 import { request } from "api";
-import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
-import HustModal from "component/common/HustModal";
 import { useEffect, useState } from "react";
 import { toFormattedDateTime } from "utils/dateutils";
 import StandardTable from "../../table/StandardTable";
+import { SubmissionTestCaseResultDetail } from "./SubmissionTestCaseResultDetail";
 
 export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
   props
 ) {
   const { submissionId } = props;
+
   const [submissionTestCase, setSubmissionTestCase] = useState([]);
-  const [openModal, setOpenModal] = useState(false);
-  const [testcaseDetailList, setTestcaseDetailList] = useState([]);
-  const [selectedTestcase, setSelectedTestcase] = useState();
+  const [open, setOpen] = useState(false);
+  const [testCaseDetailList, setTestCaseDetailList] = useState([]);
+  const [selectedTestCase, setSelectedTestCase] = useState();
 
   const [isProcessing, setIsProcessing] = useState(true);
 
@@ -38,7 +38,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
     },
     {
       title: "Graded",
-      field: "graded"
+      field: "graded",
     },
     {
       title: "Detail",
@@ -47,13 +47,13 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
         <IconButton
           color="primary"
           onClick={() => {
-            for (let i = 0; i < testcaseDetailList.length; i++) {
-              if (testcaseDetailList[i].testCaseId === rowData.testCaseId) {
-                setSelectedTestcase(testcaseDetailList[i]);
+            for (let i = 0; i < testCaseDetailList.length; i++) {
+              if (testCaseDetailList[i].testCaseId === rowData.testCaseId) {
+                setSelectedTestCase(testCaseDetailList[i]);
               }
             }
 
-            setOpenModal(true);
+            setOpen(true);
           }}
         >
           <InfoIcon />
@@ -90,9 +90,9 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
 
   function handleFormSubmit(event, testCaseId) {
     let selectedFile = null;
-    for (let i = 0; i < testcaseDetailList.length; i++) {
-      if (testcaseDetailList[i].testCaseId === testCaseId) {
-        selectedFile = testcaseDetailList[i].file;
+    for (let i = 0; i < testCaseDetailList.length; i++) {
+      if (testCaseDetailList[i].testCaseId === testCaseId) {
+        selectedFile = testCaseDetailList[i].file;
         break;
       }
     }
@@ -142,15 +142,15 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
   function onFileChange(e, testCaseId) {
     //alert("testCase " + testCaseId + " change file " + e.target.files[0].name);
     let arr = [];
-    for (let i = 0; i < testcaseDetailList.length; i++) {
-      arr.push(testcaseDetailList[i]);
+    for (let i = 0; i < testCaseDetailList.length; i++) {
+      arr.push(testCaseDetailList[i]);
     }
     for (let i = 0; i < arr.length; i++) {
       if (arr[i].testCaseId === testCaseId) {
         arr[i].file = e.target.files[0];
       }
     }
-    setTestcaseDetailList(arr);
+    setTestCaseDetailList(arr);
   }
 
   function getSubmissionDetailTestCaseByTestCase() {
@@ -175,7 +175,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
           });
         });
         // console.log("testCaseDetailList tcl = ", tcl);
-        setTestcaseDetailList(tcl);
+        setTestCaseDetailList(tcl);
       },
       {
         401: () => {},
@@ -187,42 +187,6 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
     getSubmissionDetailTestCaseByTestCase();
   }, []);
 
-  const ModalPreview = ({ testCase }) => {
-    return (
-      <HustModal
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-        isNotShowCloseButton
-        showCloseBtnTitle={false}
-        maxWidthPaper={800}
-      >
-        <HustCopyCodeBlock title="Input" text={testCase?.testCase} />
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            width: "100%",
-            justifyContent: "space-between",
-            marginTop: "14px",
-          }}
-        >
-          <Box width="48%">
-            <HustCopyCodeBlock
-              title="Correct output"
-              text={testCase?.testCaseAnswer}
-            />
-          </Box>
-          <Box width="48%">
-            <HustCopyCodeBlock
-              title="User output"
-              text={testCase?.participantAnswer}
-            />
-          </Box>
-        </Box>
-      </HustModal>
-    );
-  };
-
   return (
     <Box>
       {isProcessing && <LinearProgress />}
@@ -230,6 +194,7 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
         columns={columns}
         data={submissionTestCase}
         hideCommandBar
+        hideToolBar
         options={{
           selection: false,
           pageSize: 5,
@@ -237,7 +202,11 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
           sorting: true,
         }}
       />
-      <ModalPreview testCase={selectedTestcase} />
+      <SubmissionTestCaseResultDetail
+        open={open}
+        data={selectedTestCase}
+        handleClose={() => setOpen(false)}
+      />
     </Box>
   );
 }

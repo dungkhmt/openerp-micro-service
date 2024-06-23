@@ -91,6 +91,7 @@ function ViewProgrammingContestSubmission() {
     <div>
       <StandardTable
         hideCommandBar
+        hideToolBar
         columns={columns}
         data={(query) =>
           new Promise((resolve, reject) => {

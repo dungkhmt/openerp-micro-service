@@ -152,17 +152,18 @@ export default function StandardTable(props) {
           components={{
             ...components,
             Container: (props) => <Paper {...props} elevation={2} />,
-            Toolbar: (props) => (
-              <MTableToolbar
-                {...props}
-                classes={{
-                  highlight: classes.tableToolbarHighlight,
-                }}
-                searchFieldStyle={{
-                  height: 40,
-                }}
-              />
-            ),
+            Toolbar: (toolBarProps) =>
+              props.hideToolBar ? null : (
+                <MTableToolbar
+                  {...toolBarProps}
+                  classes={{
+                    highlight: classes.tableToolbarHighlight,
+                  }}
+                  searchFieldStyle={{
+                    height: 40,
+                  }}
+                />
+              ),
             Cell: (props) => (
               <MTableCell {...props} style={{ padding: "12px" }} />
             ),
