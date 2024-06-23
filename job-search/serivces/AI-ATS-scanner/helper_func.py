@@ -29,7 +29,7 @@ def get_gemini_response_keywords_2(input,pdf_content,prompt):
 def input_pdf_setup(uploaded_file):
     if uploaded_file is not None:
         ## Convert the PDF to image
-        images=pdf2image.convert_from_bytes(uploaded_file.read(), poppler_path=r"C:\Users\ADMIN\Downloads\Release-24.02.0-0\poppler-24.02.0\Library\bin")
+        images=pdf2image.convert_from_bytes(uploaded_file.read(), poppler_path=r"Release-24.02.0-0\poppler-24.02.0\Library\bin")
 
         first_page=images[0]
 
