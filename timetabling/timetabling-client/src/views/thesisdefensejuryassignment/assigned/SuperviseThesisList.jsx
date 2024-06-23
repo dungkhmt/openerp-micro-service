@@ -1,63 +1,77 @@
 import React, { useState } from 'react'
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import KeywordChip from 'components/common/KeywordChip';
 import { useKeycloak } from '@react-keycloak/web';
 import { useFetch } from 'hooks/useFetch';
-import KeywordChip from 'components/common/KeywordChip';
 import { StandardTable } from 'erp-hust/lib/StandardTable';
 import ModalLoading from 'components/common/ModalLoading';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Collapse, Box, Typography } from '@mui/material';
-import IconButton from '@mui/material/IconButton';
+import { Select, Card, MenuItem, FormControl, InputLabel } from '@mui/material';
 import PrimaryButton from 'components/button/PrimaryButton';
-import Row from 'components/thesisdefensejury/Row'
+import { useHistory } from "react-router-dom";
 const SuperviseThesisList = () => {
-    const [open, setOpen] = useState(true);
+    const [currentThesisDefensePlan, setCurrentThesisDefensePlan] = useState("");
     const { keycloak } = useKeycloak();
-    console.log(keycloak?.tokenParsed?.email)
+    const history = useHistory();
     const { loading, data: supervisedThesisList } = useFetch(
         `/thesis/get-all-by-supervisor?teacher=${keycloak?.tokenParsed?.email}`
     );
-    const handleClick = () => {
-        setOpen(!open);
-    };
-    return (
-        <div>
-            {loading && <ModalLoading loading={loading} />}
-            {supervisedThesisList?.length > 0 ? <TableContainer component={Paper}>
-                <Table aria-label="collapsible table">
-                    <TableBody>
-                        {supervisedThesisList?.map((row) => (
-                            <Row row={row} />
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-                : <TableContainer component={Paper}>
-                    <Table size="small" aria-label="purchases">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Tên đồ án</TableCell>
-                                <TableCell>Sinh viên</TableCell>
-                                <TableCell align="right">MSSV</TableCell>
-                                <TableCell align="right">Keyword</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            <TableRow>
-                                <TableCell colSpan={4}>Không có đồ án nào đang được phân công</TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-                </TableContainer>}
+    const columns = [
+        { title: "Tên đồ án", field: "thesisName" },
+        { title: "Tên sinh viên", field: "studentName" },
+        { title: "Mã số sinh viên", field: "studentId" },
+        {
+            title: "Keyword",
+            field: "academicKeywordList",
+            render: (rowData) => rowData?.academicKeywordList?.map((kw) => <KeywordChip key={kw?.keyword} keyword={kw?.description} />),
+        },
+        {
+            title: "Phân ban",
+            field: "juryTopic",
+            sorting: false,
+            render: (rowData) =>
+                rowData?.juryTopic
+                    ? <KeywordChip keyword={rowData?.juryTopic?.name} />
+                    : <PrimaryButton onClick={() => { history.push(`/thesis/teacher/superviser/assign/${rowData?.id}`) }}>
+                        Phân loại đồ án
+                    </PrimaryButton>
+        }
 
-        </div>
+    ];
+    const data = supervisedThesisList?.find((item) => item?.thesisDefensePlan === currentThesisDefensePlan);
+    const thesisList = data && data?.thesisList;
+    const handleChange = (event) => {
+        setCurrentThesisDefensePlan(event.target.value);
+    };
+
+    return (
+        <Card sx={{ paddingBottom: 2, paddingTop: 2, paddingLeft: 2, paddingRight: 1 }}>
+            {loading && <ModalLoading loading={loading} />}
+            <FormControl sx={{ width: '30%' }}>
+                <InputLabel id="thesisDefensePlan">Chọn đợt bảo vệ đồ án</InputLabel>
+                <Select
+                    labelId="thesisDefensePlan"
+                    id="thesisDefensePlanSelect"
+                    value={currentThesisDefensePlan}
+                    label="thesisDefensePlan"
+                    onChange={handleChange}
+                >
+                    {supervisedThesisList?.map(({ thesisDefensePlan }) =>
+                        <MenuItem key={thesisDefensePlan} value={thesisDefensePlan}>{thesisDefensePlan}</MenuItem>
+                    )}
+                </Select>
+            </FormControl>
+            <StandardTable
+                title={"Danh sách đợt bảo vệ"}
+                data={thesisList}
+                columns={columns}
+                options={{
+                    selection: false,
+                    pageSize: 5,
+                    search: true,
+                    sorting: true,
+                }}
+            />
+        </Card>
+
     )
 }
 
