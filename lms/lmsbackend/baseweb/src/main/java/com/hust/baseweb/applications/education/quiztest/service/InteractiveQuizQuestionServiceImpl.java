@@ -7,11 +7,14 @@ import lombok.extern.log4j.Log4j2;
 
 import org.springframework.stereotype.Service;
 
+import com.hust.baseweb.applications.education.cache.QuizQuestionServiceCache;
 import com.hust.baseweb.applications.education.entity.QuizQuestion;
 import com.hust.baseweb.applications.education.model.quiz.QuizQuestionDetailModel;
 import com.hust.baseweb.applications.education.quiztest.entity.EduQuizTestQuizQuestion;
 import com.hust.baseweb.applications.education.quiztest.entity.InteractiveQuiz;
 import com.hust.baseweb.applications.education.quiztest.entity.InteractiveQuizQuestion;
+import com.hust.baseweb.applications.education.quiztest.entity.compositeid.CompositeInteractiveQuizQuestionId;
+import com.hust.baseweb.applications.education.quiztest.model.InteractiveQuizQuestionInputModel;
 import com.hust.baseweb.applications.education.quiztest.repo.InteractiveQuizQuestionRepo;
 import com.hust.baseweb.applications.education.quiztest.repo.InteractiveQuizRepo;
 import com.hust.baseweb.applications.education.repo.QuizQuestionRepo;
@@ -32,14 +35,20 @@ public class InteractiveQuizQuestionServiceImpl implements InteractiveQuizQuesti
     private InteractiveQuizRepo interactiveQuizRepo;
     private QuizQuestionRepo quizQuestionRepo;
     private QuizQuestionService quizQuestionService;
+    private QuizQuestionServiceCache cacheService;
 
     @Override
     public List<QuizQuestionDetailModel> findAllByInteractiveQuizId(UUID interactiveQuizId){
         //List<EduQuizTestQuizQuestion> eduQuizTestQuizQuestions = eduQuizTestQuizQuestionRepo.findAllByTestId(testId);
-        InteractiveQuiz interactiveQuiz = interactiveQuizRepo.findById(interactiveQuizId).orElse(null);
+        // InteractiveQuiz interactiveQuiz = interactiveQuizRepo.findById(interactiveQuizId).orElse(null);
         // if (interactiveQuiz == null || !interactiveQuiz.getStatusId().equals("OPENED")) {
         //     return new ArrayList<>();
         // }
+        List<QuizQuestionDetailModel> interactiveQuizQuestionsCache = cacheService.findInteractiveQuizQuestionInCache(interactiveQuizId.toString());
+        if(interactiveQuizQuestionsCache != null){
+            return interactiveQuizQuestionsCache;
+        }
+
         List<InteractiveQuizQuestion> interactiveQuizQuestions = interactiveQuizQuestionRepo.findAllByInteractiveQuizId(interactiveQuizId);
             // .findAllByTestIdAndStatusId(testId, EduQuizTestQuizQuestion.STATUS_CREATED);
 
@@ -76,6 +85,15 @@ public class InteractiveQuizQuestionServiceImpl implements InteractiveQuizQuesti
         // log.info("findAllByTestId, testId = " + testId
         //          + " RETURN list.sz = " + quizQuestionDetailModels.size());
 
+        cacheService.addInteractiveQuizQuestionToCache(interactiveQuizId.toString(), quizQuestionDetailModels);
+
         return quizQuestionDetailModels;
     };
+
+    public void removeFromInteractiveQuiz(InteractiveQuizQuestionInputModel input){
+        CompositeInteractiveQuizQuestionId id = new CompositeInteractiveQuizQuestionId();
+        id.setInteractiveQuizId(input.getInteractiveQuizId());
+        id.setQuestionId(input.getQuestionId());
+        interactiveQuizQuestionRepo.deleteById(id);
+    }
 }

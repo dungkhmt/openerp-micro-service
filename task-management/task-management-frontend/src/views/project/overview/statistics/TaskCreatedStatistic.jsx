@@ -36,7 +36,7 @@ const TaskCreatedStatistic = forwardRef(function TaskCreatedStatistic(
         horizontal: 10,
       },
     },
-    colors: ["#32baff"],
+    colors: ["#6AD01F"],
     plotOptions: {
       radialBar: {
         inverseOrder: true,
@@ -122,7 +122,7 @@ const TaskCreatedStatistic = forwardRef(function TaskCreatedStatistic(
             </Grid>
             <Grid item xs={6} md={6} lg={7} xl={8} sx={{ mt: 2 }}>
               <Tooltip title={`${created.percentage}%`}>
-                <div>
+                <div style={{ minWidth: "120px" }}>
                   <ReactApexcharts
                     type="radialBar"
                     height={120}

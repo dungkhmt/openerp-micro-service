@@ -4,7 +4,6 @@ import StandardTable from "../../../components/table/StandardTable";
 import { request } from "api";
 import { formatDecimal } from "../../../utils/number";
 import withScreenSecurity from "../../../components/common/withScreenSecurity";
-// import { Tooltip } from "@mui/material";
 import { Link } from "react-router-dom";
 
 function StudentListScreen() {
@@ -56,15 +55,15 @@ function StudentListScreen() {
         minWidth: "128px",
       },
     },
-    // {
-    //   title: "First Submission Score Rate",
-    //   field: "firstSubmissionAccuracyRate",
-    //   cellStyle: {
-    //     minWidth: "128px",
-    //   },
-    //   render: (rowData) =>
-    //     formatDecimal(rowData?.firstSubmissionAccuracyRate, 1) + "%",
-    // },
+    {
+      title: "First Submission Score Rate",
+      field: "firstSubmissionAccuracyRate",
+      cellStyle: {
+        minWidth: "128px",
+      },
+      render: (rowData) =>
+        formatDecimal(rowData?.firstSubmissionAccuracyRate * 100, 1) + "%",
+    },
     {
       title: "Average Submissions To Success",
       field: "averageMinimumSubmissionToAccept",

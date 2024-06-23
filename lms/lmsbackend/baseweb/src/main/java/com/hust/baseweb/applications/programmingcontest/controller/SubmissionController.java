@@ -62,14 +62,23 @@ public class SubmissionController {
         return ResponseEntity.ok().body(managementStatus);
     }
 
-
     @Secured("ROLE_TEACHER")
     @GetMapping("/teacher/submissions/{submissionId}")
-    public ResponseEntity<?> getContestProblemSubmissionDetailByTestCaseOfASubmission(
+    public ResponseEntity<?> getTestCasesResult(
         @PathVariable UUID submissionId
     ) {
         List<SubmissionDetailByTestcaseOM> result = problemTestCaseService
-            .getSubmissionDetailByTestcase(submissionId);
+            .getSubmissionDetailByTestcase(submissionId, null);
+        return ResponseEntity.ok().body(result);
+    }
+
+    @Secured("ROLE_TEACHER")
+    @GetMapping("/teacher/submissions/{submissionId}/testcases/{testcaseId}")
+    public ResponseEntity<?> getTestCasesResultDetail(
+        @PathVariable UUID submissionId, @PathVariable UUID testcaseId
+    ) {
+        List<SubmissionDetailByTestcaseOM> result = problemTestCaseService
+            .getSubmissionDetailByTestcase(submissionId, testcaseId);
         return ResponseEntity.ok().body(result);
     }
 

@@ -68,7 +68,7 @@ const RequestTable = ({ request123 }) => {
         }).then();
         
     };
-    console.log("1111", requests);
+
     const style = {
 		position: 'absolute',
 		top: '50%',
@@ -213,8 +213,6 @@ const RequestTable = ({ request123 }) => {
     };
 
     const approveApi = () => {
-        // console.log("222");
-        // return;
         request("put", `/request/approve/${currentId}`, successHandlerApprove, errorHandlers, {});
         setOpenApprove(false);
     };
@@ -443,7 +441,7 @@ const RequestTable = ({ request123 }) => {
             title: "Payback",
             sorting: false,
             render: (rowData) => {
-                if(rowData["status"] === 1){
+                if(rowData["status"] === 1 && !rowData.parent_id){
                     return (
                         <Button
                             variant="contained"

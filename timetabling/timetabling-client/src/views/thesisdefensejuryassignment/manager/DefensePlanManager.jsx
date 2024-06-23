@@ -4,7 +4,7 @@ import { request } from "api";
 import PrimaryButton from "components/button/PrimaryButton";
 import { StandardTable } from "erp-hust/lib/StandardTable";
 import CreateDefenseJury from "components/thesisdefensejury/modal/ModalCreateDefenseJury";
-import { Box, IconButton } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Chip from "@mui/material/Chip";
@@ -17,6 +17,7 @@ export default function DefensePlanManager() {
   const [loading, setLoading] = useState(true);
   const history = useHistory();
   const [defenseJuries, setDefenseJuries] = useState([]);
+  const [thesisDefensePlan, setThesisDefensePlan] = useState({});
   const [open, setOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [toggle, setToggle] = useState(false);
@@ -25,9 +26,20 @@ export default function DefensePlanManager() {
     {
       title: "Ngày",
       field: "defenseDate",
-      render: (rowData) => rowData.defenseDate.split("T")[0],
+      render: (rowData) => rowData?.defenseDate,
     },
-    { title: "Số luận án tối đa", field: "maxThesis" },
+    {
+      title: "Ca bảo vệ",
+      field: "defenseSession",
+      render: (rowData) => rowData?.defenseSession?.name,
+    },
+
+    {
+      title: "Phòng", field: "defenseRoom", render: (rowData) => rowData?.defenseRoom?.name,
+    },
+    {
+      title: "Phân ban", field: "juryTopic",
+    },
     {
       title: "Keywords",
       field: "keywords",
@@ -52,7 +64,7 @@ export default function DefensePlanManager() {
           </IconButton>
           <PrimaryButton
             onClick={() => {
-              history.push(`/thesis/thesis_defense_plan/${id}/defense_jury/${rowData.id}`);
+              history.push(`/thesis/thesis_defense_plan/${id}/defense_jury/${rowData.id}?isassigned=${rowData?.defenseJuryTeacherRoles?.length > 0 ? "True" : "False"}`);
             }}
             variant="contained"
             color="error"
@@ -95,11 +107,13 @@ export default function DefensePlanManager() {
       "GET",
       `/thesis-defense-plan/${id}`,
       (res) => {
-        const data = res.data.defenseJuries;
+        const data = res.data?.defenseJuries;
+        setThesisDefensePlan(res.data);
         setDefenseJuries(
-          data.map((item) => ({
+          data?.reverse()?.map((item) => ({
             ...item,
-            keywords: item?.academicKeywordList.map((item) => item.keyword),
+            juryTopic: item?.juryTopic?.name,
+            keywords: item?.juryTopic?.academicKeywordList.map((item) => item.keyword),
           }))
         );
         setLoading(false)
@@ -129,6 +143,7 @@ export default function DefensePlanManager() {
         </PrimaryButton>
 
       </Box>
+
       <StandardTable
         title={"Danh sách hội đồng bảo vệ"}
         data={defenseJuries}

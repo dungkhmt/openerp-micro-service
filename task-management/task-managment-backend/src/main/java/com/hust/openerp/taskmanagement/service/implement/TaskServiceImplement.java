@@ -1,16 +1,18 @@
 package com.hust.openerp.taskmanagement.service.implement;
 
 import java.text.SimpleDateFormat;
-import java.util.TimeZone;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,13 +33,16 @@ import com.hust.openerp.taskmanagement.entity.TaskLog;
 import com.hust.openerp.taskmanagement.entity.TaskLogDetail;
 import com.hust.openerp.taskmanagement.entity.TaskSkill;
 import com.hust.openerp.taskmanagement.entity.Task_;
+import com.hust.openerp.taskmanagement.entity.User;
 import com.hust.openerp.taskmanagement.exception.ApiException;
 import com.hust.openerp.taskmanagement.exception.ErrorCode;
 import com.hust.openerp.taskmanagement.repository.TaskRepository;
 import com.hust.openerp.taskmanagement.repository.TaskSkillRepository;
+import com.hust.openerp.taskmanagement.service.NotificationService;
 import com.hust.openerp.taskmanagement.service.ProjectMemberService;
 import com.hust.openerp.taskmanagement.service.TaskLogService;
 import com.hust.openerp.taskmanagement.service.TaskService;
+import com.hust.openerp.taskmanagement.service.UserService;
 import com.hust.openerp.taskmanagement.specification.TaskSpecification;
 import com.hust.openerp.taskmanagement.specification.builder.GenericSpecificationsBuilder;
 import com.hust.openerp.taskmanagement.util.CriteriaParser;
@@ -47,10 +52,8 @@ import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class TaskServiceImplement implements TaskService {
     private final ModelMapper modelMapper;
 
@@ -61,6 +64,31 @@ public class TaskServiceImplement implements TaskService {
     private TaskSkillRepository taskSkillRepository;
 
     private TaskLogService taskLogService;
+
+    private NotificationService notiService;
+
+    private UserService userService;
+
+    @Value("${app.endpoint.client}")
+    private String clientEndpoint;
+
+    @Autowired
+    public TaskServiceImplement(
+            ModelMapper modelMapper,
+            TaskRepository taskRepository,
+            ProjectMemberService projectMemberService,
+            TaskSkillRepository taskSkillRepository,
+            TaskLogService taskLogService,
+            NotificationService notiService,
+            UserService userService) {
+        this.modelMapper = modelMapper;
+        this.taskRepository = taskRepository;
+        this.projectMemberService = projectMemberService;
+        this.taskSkillRepository = taskSkillRepository;
+        this.taskLogService = taskLogService;
+        this.notiService = notiService;
+        this.userService = userService;
+    }
 
     @Override
     @Transactional
@@ -161,6 +189,10 @@ public class TaskServiceImplement implements TaskService {
 
         taskLogService.addLog(taskLog);
 
+        if (task.getAssigneeId() != null && !task.getAssigneeId().equals(creatorId)) {
+            sendNotification(userService.findById(creatorId), userService.findById(taskForm.getAssigneeId()), task);
+        }
+
         return convertToDto(savedTask);
     }
 
@@ -246,6 +278,7 @@ public class TaskServiceImplement implements TaskService {
             return null;
         }
         Date updatedTime = new Date();
+        boolean isPushNoti = false;
 
         var dateFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
         dateFormatter.setTimeZone(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
@@ -339,6 +372,7 @@ public class TaskServiceImplement implements TaskService {
                             .oldValue(task.getAssigneeId())
                             .newValue(taskForm.getAssigneeId()).build());
             task.setAssigneeId(taskForm.getAssigneeId());
+            isPushNoti = true;
         }
 
         taskLog.setDetails(taskLogDetails);
@@ -347,6 +381,13 @@ public class TaskServiceImplement implements TaskService {
             taskLogService.addLog(taskLog);
 
             task.setLastUpdatedStamp(updatedTime);
+            var savedTask = taskRepository.save(task);
+
+            if (isPushNoti) {
+                sendNotification(userService.findById(updateBy), userService.findById(taskForm.getAssigneeId()),
+                        savedTask);
+            }
+
             return convertToDto(taskRepository.save(task));
         } else {
             return null;
@@ -469,5 +510,36 @@ public class TaskServiceImplement implements TaskService {
 
     private TaskDTO convertToDto(Task task) {
         return modelMapper.map(task, TaskDTO.class);
+    }
+
+    private void sendNotification(User from, User to, Task task) {
+        try {
+            if (to == null || (from != null && from.getId().equals(to.getId()))) {
+                return;
+            }
+
+            String subject = "Bạn được phân công nhiệm vụ mới: " + task.getName();
+
+            notiService.createInAppNotification(Optional.of(from).map(f -> f.getId()).orElse(null), to.getId(),
+                    subject,
+                    "/project/" + task.getProjectId() + "/task/" + task.getId());
+
+            if (to.getEmail() == null || to.getEmail().isEmpty()) {
+                return;
+            }
+
+            Map<String, Object> model = new HashMap<>();
+            model.put("assigneeName", to.getFirstName() == null && to.getLastName() == null ? to.getId()
+                    : to.getFirstName() + " " + to.getLastName());
+            model.put("taskName", task.getName());
+            model.put("assignedBy", from.getFirstName() == null && from.getLastName() == null ? from.getId()
+                    : from.getFirstName() + " " + from.getLastName());
+            model.put("dueDate", task.getDueDate() == null ? "Không xác định"
+                    : new SimpleDateFormat("dd-MM-yyyy HH:mm").format(task.getDueDate()));
+            model.put("link", clientEndpoint + "/project/" + task.getProjectId() + "/task/" + task.getId());
+            notiService.createMailNotification(from.getEmail(), to.getEmail(), subject, "new-assign", model);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

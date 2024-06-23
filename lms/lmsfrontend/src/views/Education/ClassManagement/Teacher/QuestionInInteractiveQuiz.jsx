@@ -109,6 +109,10 @@ function QuestionInInteractiveQuiz({ testId, isCourse }) {
     if (!isCourse) getInteractiveQuizStatus();
   }, []);
 
+  function updateQuestionListWhenRemoveSuccess(questionId) {
+    setQuizList(quizList.filter((item) => item.questionId !== questionId));
+  }
+
   return (
     <Paper elevation={8}>
       <div>
@@ -198,6 +202,7 @@ function QuestionInInteractiveQuiz({ testId, isCourse }) {
                 index={index}
                 testId={testId}
                 // quizGroups={quizGroups}
+                onRemoveSuccess={updateQuestionListWhenRemoveSuccess}
               />
             ))
           )}

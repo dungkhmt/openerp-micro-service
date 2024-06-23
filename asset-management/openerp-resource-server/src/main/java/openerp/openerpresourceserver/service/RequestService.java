@@ -24,4 +24,8 @@ public interface RequestService {
     List<Request> getAdminRequests(String admin_id);
 
     Request paybackRequest(Integer request_id, String user_id);
+
+    List<String> getTopUsers();
+
+    List<Request> getByUser(String user_id);
 }

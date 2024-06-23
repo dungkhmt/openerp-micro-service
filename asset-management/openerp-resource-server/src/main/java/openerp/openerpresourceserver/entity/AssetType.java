@@ -35,6 +35,8 @@ public class AssetType {
     @Column(nullable = false, unique = true)
     private String code_prefix;
 
+    private Integer num_assets;
+
     @CreatedDate
     private Date since;
 

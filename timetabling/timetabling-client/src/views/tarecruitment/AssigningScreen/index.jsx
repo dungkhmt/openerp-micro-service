@@ -1,5 +1,6 @@
 import { request } from "api";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
+import useDebounce from "../config/debounce";
 import { SEMESTER } from "../config/localize";
 import {
   Button,
@@ -45,40 +46,23 @@ const AssigningScreen = () => {
 
   const [search, setSearch] = useState("");
 
+  const debouncedSearch = useDebounce(search, 1000);
+
   useEffect(() => {
     request("get", semesterUrl.getCurrentSemester, (res) => {
       setSemester(res.data);
     });
   }, []);
 
-  const debouncedSearch = useCallback(
-    (search, statusFilter) => {
-      const timer = setTimeout(() => {
-        setPaginationModel({
-          ...DEFAULT_PAGINATION_MODEL,
-          page: 0,
-        });
-        handleFetchData();
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [search, statusFilter]
-  );
-
-  useEffect(() => {
-    return debouncedSearch(search, statusFilter);
-  }, [search, statusFilter, debouncedSearch, semester]);
-
   useEffect(() => {
     handleFetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paginationModel, semester]);
+  }, [paginationModel, semester, debouncedSearch, statusFilter]);
 
   const handleFetchData = () => {
-    const searchParam =
-      search !== "" ? `&search=${encodeURIComponent(search)}` : "";
+    const searchParam = debouncedSearch
+      ? `&search=${encodeURIComponent(debouncedSearch)}`
+      : "";
     const assignStatusParam =
       statusFilter !== "" ? `&assignStatus=${statusFilter}` : "";
 
@@ -156,9 +140,12 @@ const AssigningScreen = () => {
     setStatusFilter(e.target.value);
   };
 
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
-  };
+  const handleSearch = useMemo(
+    () => (e) => {
+      setSearch(e.target.value);
+    },
+    []
+  );
 
   const assignStatusCell = (params) => {
     const rowData = params.row;

@@ -79,12 +79,12 @@ public interface TaskRepository extends JpaRepository<Task, UUID>, JpaSpecificat
                 si.statusId,
                 count(t.statusId)
             ) from Task t
-            right join StatusItem si on t.statusId = si.statusId and (
+            right join TaskStatus si on t.statusId = si.statusId and (
                         ( t.projectId = :projectId and
                           t.lastUpdatedStamp between :startDate and :endDate )
                         or t.projectId is null
                     )
-            where si.type.id = 'BACKLOG_STATUS'
+            where si.type = 'BACKLOG_STATUS'
             group by si.statusId
             """)
     List<TaskStatisticByStatusDTO> getTaskStatisticWorkloadByStatus(UUID projectId, Date startDate, Date endDate);

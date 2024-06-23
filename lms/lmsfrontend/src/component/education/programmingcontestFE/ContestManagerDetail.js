@@ -110,7 +110,7 @@ export function ContestManagerDetail(props) {
           ],
           ["Action on submission", contestDetail.submissionActionType],
           [
-            "Evaluate private testcases",
+            "Evaluate both public and private testcases",
             contestDetail.evaluateBothPublicPrivateTestcase,
           ],
           [

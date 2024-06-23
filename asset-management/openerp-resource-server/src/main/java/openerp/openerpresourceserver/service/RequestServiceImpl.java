@@ -51,6 +51,9 @@ public class RequestServiceImpl implements RequestService{
         newRequest.setType(request.getType());
         Integer asset_id = request.getAsset_id();
         Asset asset = assetRepo.findById(asset_id).get();
+        if(asset.getStatus_id().equals(3) || asset.getStatus_id().equals(4)) {
+            return null;
+        }
         newRequest.setAdmin_id(asset.getAdmin_id());
 
         if(request.getType() == 1){ // request borrow
@@ -100,6 +103,7 @@ public class RequestServiceImpl implements RequestService{
                 return foundRequest;
             }
             asset.setStatus_id(2); // inuse
+            asset.setAssignee_id(foundRequest.getUser_id());
         }
         // else if request is pay
         else if(foundRequest.getType().equals(PAY)){
@@ -174,5 +178,15 @@ public class RequestServiceImpl implements RequestService{
         foundRequest.setLast_updated(current);
         assetRepo.save(asset);
         return requestRepo.save(foundRequest);
+    }
+
+    @Override
+    public List<String> getTopUsers() {
+        return requestRepo.getTopUsers();
+    }
+
+    @Override
+    public List<Request> getByUser(String user_id) {
+        return requestRepo.findByCreatorId(user_id);
     }
 }

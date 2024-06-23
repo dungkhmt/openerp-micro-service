@@ -34,6 +34,12 @@ export const EditThesisDefensePlan = () => {
     });
 
     const handleFormSubmit = data => {
+        const start = new Date(data?.startDate);
+        const end = new Date(data?.endDate);
+        if (end.getTime() <= start.getTime()) {
+            return errorNoti("Ngày kết thúc phải diễn ra sau ngày bắt đầu", true)
+        }
+
         request(
             "POST",
             "/thesis-defense-plan/edit?id=" + id,

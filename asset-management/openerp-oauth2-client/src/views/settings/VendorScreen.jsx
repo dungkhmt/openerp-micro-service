@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from "react";
 import {request} from "../../api";
 import {StandardTable} from "erp-hust/lib/StandardTable";
+import { Link as RouterLink } from "react-router-dom";
+import { Link } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
@@ -15,7 +16,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { errorNoti, successNoti } from "utils/notification";
-import { Image } from "@mui/icons-material";
 
 export const VendorScreen = () => {
     const [vendors, setVendors] = useState([]);
@@ -99,6 +99,7 @@ export const VendorScreen = () => {
     const handleEdit = (vendor) => {
         setData({
             name: vendor.name,
+            description: vendor.description,
             address: vendor.address,
             phone: vendor.phone,
             email: vendor.email,
@@ -143,19 +144,13 @@ export const VendorScreen = () => {
         {
             title: "Name",
             field: "name",
-        },
-        {
-            title: "Image",
-            field: "image",
-            sorting: false,
             render: (rowData) => (
-                <img
-                    src="https://vcdn-vnexpress.vnecdn.net/2022/05/10/DHBKHN-7506-1652177227.jpg"
-                    alt="Dai hoc Bach khoa Ha Noi"
-                    fit="contain"
-                    width={70}
-                    height={70}
-                />
+                <Link
+                    component={RouterLink}
+                    to={`/vendor/${rowData["id"]}`}
+                >
+                    {rowData["name"]}
+                </Link>
             )
         },
         {
@@ -228,7 +223,7 @@ export const VendorScreen = () => {
 				onClose={handleClose}
 			>
 				<Box sx={style}>
-                    <div>CREATE LOCATION</div>
+                    <div>{title}</div>
                     <hr/>
                     <form onSubmit={handleSubmit}>
                         <TextField
@@ -238,7 +233,8 @@ export const VendorScreen = () => {
                             margin="normal"
                             required
                             name='name'
-                            placeholder='Location name'
+                            placeholder='Vendor Name'
+                            value={data.name}
                             onChange={handleInputChange}
                         />
                         <TextField
@@ -247,7 +243,8 @@ export const VendorScreen = () => {
                             fullWidth
                             margin="normal"
                             name='description'
-                            placeholder='Location description'
+                            placeholder='Vendor Description'
+                            value={data.description}
                             onChange={handleInputChange}
                         />
                         <TextField
@@ -257,7 +254,8 @@ export const VendorScreen = () => {
                             margin="normal"
                             required
                             name='email'
-                            placeholder='Location email'
+                            placeholder='Vendor Email'
+                            value={data.email}
                             onChange={handleInputChange}
                         />                        
                         <div style={{display: "flex", gap: "20px"}}>
@@ -268,7 +266,8 @@ export const VendorScreen = () => {
                                 margin="normal"
                                 required
                                 name='phone'
-                                placeholder='Location phone'
+                                placeholder='Vendor Phone'
+                                value={data.phone}
                                 onChange={handleInputChange}
                             />
                             <TextField
@@ -278,7 +277,8 @@ export const VendorScreen = () => {
                                 margin="normal"
                                 required
                                 name='url'
-                                placeholder='Location url'
+                                placeholder='Vendor URL'
+                                value={data.url}
                                 onChange={handleInputChange}
                             />
                         </div>
@@ -289,7 +289,8 @@ export const VendorScreen = () => {
                             margin="normal"
                             required
                             name='address'
-                            placeholder='Location address'
+                            placeholder='Vendor Address'
+                            value={data.address}
                             onChange={handleInputChange}
                         />            
                         <div style={{display: "flex", justifyContent: "space-between", marginTop: "20px"}}>
@@ -311,7 +312,7 @@ export const VendorScreen = () => {
                         </div>
                     </form>
 				</Box>
-      		</Modal>  
+      		</Modal>
             <Dialog
                 open={openDelete}
                 onClose={handleClose}

@@ -12,9 +12,33 @@ import com.hust.baseweb.applications.education.quiztest.repo.EduQuizTestRepo.Stu
 public interface InteractiveQuizRepo extends JpaRepository<InteractiveQuiz, UUID> {
     public List<InteractiveQuiz> findAllBySessionId(@Param("session_id") UUID sessionId);
 
-    public interface StudentResult {
-        String getUserId();
-        Integer getScore();
+    // public interface StudentResult {
+    //     String getUserId();
+    //     Integer getScore();
+    // }
+
+    public class StudentResult {
+        private String userId;
+        private Integer score;
+    
+        public StudentResult(String userId, Integer score) {
+            this.userId = userId;
+            this.score = score;
+        }
+    
+        public String getUserId(){
+            return userId;
+        }
+        public Integer getScore(){
+            return score;
+        }
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
+    
+        public void setScore(Integer score) {
+            this.score = score;
+        }
     }
 
     public interface StudentSubmission {

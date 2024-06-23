@@ -2,7 +2,7 @@ package openerp.openerpresourceserver.tarecruitment.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import openerp.openerpresourceserver.tarecruitment.dto.UserInfoDTO;
+import openerp.openerpresourceserver.tarecruitment.entity.dto.UserInfoDTO;
 import openerp.openerpresourceserver.tarecruitment.service.TARecruitment_UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -37,6 +37,8 @@ public class Vendor {
     @Column(columnDefinition = "TEXT")
     private  String description;
 
+    private Integer num_assets;
+
     @CreatedDate
     private Date since;
 

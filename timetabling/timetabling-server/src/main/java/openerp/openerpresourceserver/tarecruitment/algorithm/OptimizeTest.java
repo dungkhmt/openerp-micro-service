@@ -6,15 +6,30 @@ import com.google.ortools.linearsolver.MPObjective;
 import com.google.ortools.linearsolver.MPSolver;
 import com.google.ortools.linearsolver.MPVariable;
 
+import java.util.Random;
+
 public class OptimizeTest {
+
+    static int[][] graph(int m, int n) {
+        Random random = new Random();
+        int[][] result = new int[m][n];
+        for(int i = 0; i < m; i ++) {
+            for(int j = 0; j < n; j++) {
+                result[i][j] = random.nextInt(2);
+            }
+        }
+        return result;
+    }
 
     public static void main(String[] args) {
 
         Loader.loadNativeLibraries();
 
-        int numClasses = 3;
+        int numTest = 100;
 
-        int numStudents = 3;
+        int numClasses = numTest;
+
+        int numStudents = numTest;
 
         int maxClassesPerStudent = 4;
 
@@ -30,11 +45,15 @@ public class OptimizeTest {
 //                {0, 0, 0, 0, 0, 1}
 //        };
 
-        final int[][] request = {
-                {1, 0, 0},
-                {1, 1, 1},
-                {1, 1, 1}
-        };
+//        final int[][] request = {
+//                {1, 0, 0, 0, 0},
+//                {1, 1, 1, 1, 1},
+//                {1, 1, 1, 1, 1},
+//                {1, 1, 1, 1, 1},
+//                {1, 1, 1, 0, 1}
+//        };
+
+        int[][] request = graph(numStudents, numClasses);
 
         // Các lớp conflict về mặt thời gian với nhau
 //        final int[][] conflictBetweenClasses = new int[][] {
@@ -46,11 +65,13 @@ public class OptimizeTest {
 //                {0, 0, 0, 0, 1, 0}
 //        };
 
-        final int[][] conflictBetweenClasses = new int[][] {
-                {0, 0, 0},
-                {0, 0, 0},
-                {0, 0, 0},
-        };
+//        final int[][] conflictBetweenClasses = new int[][] {
+//                {0, 0, 0, 0, 0},
+//                {0, 0, 0, 0, 0},
+//                {0, 0, 0, 0, 0},
+//                {0, 0, 0, 0, 0},
+//                {0, 0, 0, 0, 0},
+//        };
 
         // Create the linear solver with the SCIP backend.
         MPSolver solver = MPSolver.createSolver("SCIP");
@@ -66,7 +87,7 @@ public class OptimizeTest {
                 x[i][j] = solver.makeIntVar(0, 1, "");
             }
         }
-        System.out.println("Number of variables = " + solver.numVariables());
+//        System.out.println("Number of variables = " + solver.numVariables());
 
         // Mỗi lớp chỉ được có 1 sinh viên
         for(int j = 0; j < numClasses; j++) {
@@ -86,19 +107,19 @@ public class OptimizeTest {
 
 
         // Conflict về mặt thời gian các lớp
-        for(int i = 0; i < numClasses; i++) {
-            for(int j = i + 1; j < numClasses; j++) {
-                if(conflictBetweenClasses[i][j] == 1) {
-                    for(int k = 0; k < numStudents; k++) {
-                        MPConstraint c2 = solver.makeConstraint(0, 1, "c2");
-                        c2.setCoefficient(x[k][i], 1);
-                        c2.setCoefficient(x[k][j], 1);
-                    }
-                }
-            }
-        }
+//        for(int i = 0; i < numClasses; i++) {
+//            for(int j = i + 1; j < numClasses; j++) {
+//                if(conflictBetweenClasses[i][j] == 1) {
+//                    for(int k = 0; k < numStudents; k++) {
+//                        MPConstraint c2 = solver.makeConstraint(0, 1, "c2");
+//                        c2.setCoefficient(x[k][i], 1);
+//                        c2.setCoefficient(x[k][j], 1);
+//                    }
+//                }
+//            }
+//        }
 
-        System.out.println("Number of constraints = " + solver.numConstraints());
+//        System.out.println("Number of constraints = " + solver.numConstraints());
 
         // Hàm max
         MPObjective objective = solver.objective();
@@ -117,7 +138,7 @@ public class OptimizeTest {
             System.out.println("maxClassesGotAssign: " + maxClassesGotAssign);
             for(int i = 0; i < numStudents; i++) {
                 for(int j = 0; j < numClasses; j++) {
-                    System.out.println("x[" + i + "][" + j + "] = " + x[i][j].solutionValue());
+//                    System.out.println("x[" + i + "][" + j + "] = " + x[i][j].solutionValue());
                 }
             }
             System.out.println();
@@ -171,7 +192,7 @@ public class OptimizeTest {
                 System.out.println("Objective2 value = " + classPerStudent.solutionValue());
                 for(int i = 0; i < numStudents; i++) {
                     for(int j = 0; j < numClasses; j++) {
-                        System.out.println("x[" + i + "][" + j + "] = " + x[i][j].solutionValue());
+//                        System.out.println("x[" + i + "][" + j + "] = " + x[i][j].solutionValue());
                     }
                 }
                 System.out.println();

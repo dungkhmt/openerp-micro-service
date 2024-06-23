@@ -5,12 +5,50 @@ import CodeBracket from "@heroicons/react/24/solid/CodeBracketIcon";
 import CommandLine from "@heroicons/react/24/solid/CommandLineIcon";
 import AcademicCap from "@heroicons/react/24/solid/AcademicCapIcon";
 import Users from "@heroicons/react/24/solid/UsersIcon";
-import React from "react";
-import BarsDataset from "components/reports/BarsDataset";
-import PieActiveArc from "components/reports/PieActiveArc";
-import BasicTable from "components/reports/BasicTable";
+import React, { useEffect, useState } from "react";
+import { request } from "api";
+import PieActiveArc from "components/reports/request/RequestPieActive";
+import BarsDataset from "components/reports/request/BarsDataset";
+import BasicTable from "components/reports/request/BasicTable";
 
 const RequestReport = () => {
+  const [allRequests, setAllRequests] = useState([]);
+  const [allAssets, setAllAssets] = useState([]);
+  const [allTypes, setAllTypes] = useState([]);
+  const [allVendors, setAllVendors] = useState([]);
+
+  const getAllTotalRequests = async() => {
+    await request("get", "/request/get-all", (res) => {
+      setAllRequests(res.data);
+    });
+  };
+
+  const getAllAssets = async() => {
+    await request("get", "/asset/get-all", (res) => {
+      setAllAssets(res.data);
+    });
+  };
+
+  const getAllTypes = async() => {
+    await request("get", "/asset-type/get-all", (res) => {
+      setAllTypes(res.data);
+    });
+  };
+
+  const getAllVendors = async() => {
+    await request("get", "/vendor/get-all", (res) => {
+      setAllVendors(res.data);
+    });
+  };
+
+  useEffect(() => {
+    getAllTotalRequests();
+    getAllAssets();
+    getAllTypes();
+    getAllVendors();
+  }, []);
+
+
   return (
     <div>
       <Grid container>
@@ -18,7 +56,7 @@ const RequestReport = () => {
           <motion.div
             initial={{ opacity: 0.1 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
+            // transition={{ delay: 0.2, duration: 0.5 }}
           >
             <Typography
               variant="h6"
@@ -45,12 +83,12 @@ const RequestReport = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
+              // transition={{ delay: 0.6, duration: 0.5 }}
               children={
                 <InfoCard
                   icon={CodeBracket}
                   iconColor="#0d2d80"
-                  mainTitle="100"
+                  mainTitle={allRequests.length}
                   subTitle="Requests"
                 />
               }
@@ -60,12 +98,12 @@ const RequestReport = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.9, duration: 0.5 }}
+              // transition={{ delay: 0.9, duration: 0.5 }}
               children={
                 <InfoCard
                   icon={AcademicCap}
                   iconColor="#1976d2"
-                  mainTitle="450+"
+                  mainTitle={allAssets.length}
                   subTitle="Assets"
                 />
               }
@@ -75,13 +113,13 @@ const RequestReport = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1.2, duration: 0.5 }}
+              // transition={{ delay: 1.2, duration: 0.5 }}
               children={
                 <InfoCard
                   icon={Users}
                   iconColor="#139529"
-                  mainTitle="10,000+"
-                  subTitle="Active Users"
+                  mainTitle={allTypes.length}
+                  subTitle="Request Types"
                 />
               }
             />
@@ -90,13 +128,13 @@ const RequestReport = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1.4, duration: 0.5 }}
+              // transition={{ delay: 1.4, duration: 0.5 }}
               children={
                 <InfoCard
                   icon={CommandLine}
                   iconColor="#b5ba0d"
-                  mainTitle="500,000+"
-                  subTitle="Code Submissions"
+                  mainTitle={allVendors.length}
+                  subTitle="Vendors"
                 />
               }
             />
@@ -111,15 +149,15 @@ const RequestReport = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.8, duration: 0.8 }}
-              children={<BarsDataset />}
+              // transition={{ delay: 1.8, duration: 0.8 }}
+              children={<BarsDataset data={allRequests} />}
             />
           </Grid>
           <Grid item xs={5.5}>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.8, duration: 0.8 }}
+              // transition={{ delay: 1.8, duration: 0.8 }}
               children={<PieActiveArc />}
             />
           </Grid>
@@ -133,7 +171,7 @@ const RequestReport = () => {
 					<motion.div
 						initial={{opacity: 0, y: 20}}
 						animate={{opacity: 1, y: 0}}
-						transition={{delay: 2.3, duration: 1.1}}
+						// transition={{delay: 2.3, duration: 1.1}}
 						children={<BasicTable/>}
 					/>
 					</Grid>

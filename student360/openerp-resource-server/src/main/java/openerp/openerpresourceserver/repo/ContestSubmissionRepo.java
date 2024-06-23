@@ -11,7 +11,8 @@ import java.util.List;
 
 public interface ContestSubmissionRepo extends JpaRepository<ContestSubmission, String> {
 
-    List<ContestSubmission> findByUserSubmissionId(String studentId);
+    @Query("SELECT cs FROM ContestSubmission cs WHERE cs.userSubmissionId = :userId ORDER BY cs.createdDate ASC")
+    List<ContestSubmission> findAllByUserSubmissionIdOrderByCreatedDateAsc(@Param("userId") String userId);
     List<ContestSubmission> findByContestIdAndUserSubmissionId(String contestId, String studentId);
 
     long count();
@@ -53,7 +54,7 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmission, 
             "END AS grouped_language, " +
             "COUNT(*) AS submission_count " +
             "FROM contest_submission_new " +
-            "WHERE point > 0 and user_submission_id = :userId " +
+            "WHERE user_submission_id = :userId " +
             "GROUP BY user_submission_id, grouped_language " +
             "ORDER BY user_submission_id, submission_count DESC",nativeQuery = true)
     Object[] findNumberCountLanguagesDetailByUserId(@Param("userId") String userId);

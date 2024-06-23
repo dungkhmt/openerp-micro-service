@@ -5,12 +5,51 @@ import CodeBracket from "@heroicons/react/24/solid/CodeBracketIcon";
 import CommandLine from "@heroicons/react/24/solid/CommandLineIcon";
 import AcademicCap from "@heroicons/react/24/solid/AcademicCapIcon";
 import Users from "@heroicons/react/24/solid/UsersIcon";
-import React from "react";
-import BarsDataset from "components/reports/BarsDataset";
-import PieActiveArc from "components/reports/PieActiveArc";
-import BasicTable from "components/reports/BasicTable";
+import React, { useEffect, useState } from "react";
+import BarsDataset from "components/reports/asset/BarsDataset";
+import PieActiveArc from "components/reports/asset/AssetPieActive";
+import BasicTable from "components/reports/asset/AdminTable";
+import { request } from "api";
+import AssetTypeTable from "components/reports/asset/AssetTypeTable";
+import AssetTypePie from "components/reports/asset/AssetTypePie";
 
 const AssetReport = () => {
+  const [allAssets, setAllAssets] = useState([]);
+  const [allTypes, setAllTypes] = useState([]);
+  const [allVendors, setAllVendors] = useState([]);
+  const [allLocations, setAllLocations] = useState([]);
+
+  const getAllAssets = async () => {
+    await request("get", "/asset/get-all", (res) => {
+      setAllAssets(res.data);
+    });
+  };
+
+  const getAllTypes = async () => {
+    await request("get", "/asset-type/get-all", (res) => {
+      setAllTypes(res.data);
+    });
+  };
+
+  const getAllVendors = async () => {
+    await request("get", "/vendor/get-all", (res) => {
+      setAllVendors(res.data);
+    });
+  };
+
+  const getAllLocations = async () => {
+    await request("get", "/location/get-all", (res) => {
+      setAllLocations(res.data);
+    });
+  };
+
+  useEffect(() => {
+    getAllAssets();
+    getAllTypes();
+    getAllVendors();
+    getAllLocations();
+  }, []);
+
   return (
     <div>
       <Grid container>
@@ -18,7 +57,7 @@ const AssetReport = () => {
           <motion.div
             initial={{ opacity: 0.1 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
+            // transition={{ delay: 0.2, duration: 0.5 }}
           >
             <Typography
               variant="h6"
@@ -45,12 +84,12 @@ const AssetReport = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
+              // transition={{ delay: 0.6, duration: 0.5 }}
               children={
                 <InfoCard
                   icon={CodeBracket}
                   iconColor="#0d2d90"
-                  mainTitle="800"
+                  mainTitle={allAssets.length}
                   subTitle="Assets"
                 />
               }
@@ -60,13 +99,13 @@ const AssetReport = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.9, duration: 0.5 }}
+              // transition={{ delay: 0.9, duration: 0.5 }}
               children={
                 <InfoCard
                   icon={AcademicCap}
                   iconColor="#1976d2"
-                  mainTitle="450+"
-                  subTitle="Quiz Tests"
+                  mainTitle={allTypes.length}
+                  subTitle="Asset Types"
                 />
               }
             />
@@ -75,13 +114,13 @@ const AssetReport = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1.2, duration: 0.5 }}
+              // transition={{ delay: 1.2, duration: 0.5 }}
               children={
                 <InfoCard
                   icon={Users}
                   iconColor="#139529"
-                  mainTitle="10,000+"
-                  subTitle="Active Users"
+                  mainTitle={allVendors.length}
+                  subTitle="Vendors"
                 />
               }
             />
@@ -90,13 +129,13 @@ const AssetReport = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1.4, duration: 0.5 }}
+              // transition={{ delay: 1.4, duration: 0.5 }}
               children={
                 <InfoCard
                   icon={CommandLine}
                   iconColor="#b5ba0d"
-                  mainTitle="500,000+"
-                  subTitle="Code Submissions"
+                  mainTitle={allLocations.length}
+                  subTitle="Locations"
                 />
               }
             />
@@ -111,16 +150,37 @@ const AssetReport = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.8, duration: 0.8 }}
-              children={<BarsDataset />}
+              // transition={{ delay: 1.8, duration: 0.8 }}
+              children={<BarsDataset data={allAssets} />}
             />
           </Grid>
           <Grid item xs={5.5}>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.8, duration: 0.8 }}
+              // transition={{ delay: 1.8, duration: 0.8 }}
               children={<PieActiveArc />}
+            />
+          </Grid>
+        </Grid>
+        <Grid
+          container
+          justifyContent={"space-between"}
+          sx={{ marginTop: "30px" }}
+        >
+          <Grid item xs={6} sx={{ marginLeft: "10px" }}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              children={<AssetTypeTable/>}
+            />
+          </Grid>
+          <Grid item xs={5}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              // transition={{ delay: 1.8, duration: 0.8 }}
+              children={<AssetTypePie />}
             />
           </Grid>
         </Grid>
@@ -133,7 +193,7 @@ const AssetReport = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 2.3, duration: 1.1 }}
+              // transition={{ delay: 2.3, duration: 1.1 }}
               children={<BasicTable />}
             />
           </Grid>

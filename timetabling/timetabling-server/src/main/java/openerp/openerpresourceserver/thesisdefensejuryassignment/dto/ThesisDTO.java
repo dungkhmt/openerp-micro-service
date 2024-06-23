@@ -20,6 +20,8 @@ public class ThesisDTO {
 
     private String scheduledReviewer;
 
+    private String juryTopicName;
+
     public String getDefenseJuryName() {
         return defenseJuryName;
     }
@@ -83,5 +85,13 @@ public class ThesisDTO {
 
     public void setDefenseJuryId(UUID defenseJuryId) {
         this.defenseJuryId = defenseJuryId;
+    }
+
+    public String getJuryTopicName() {
+        return juryTopicName;
+    }
+
+    public void setJuryTopicName(String juryTopicName) {
+        this.juryTopicName = juryTopicName;
     }
 }

@@ -16,6 +16,8 @@ export const applicationUrl = {
   deleteMultipleApplication: "/application/delete-multiple-application",
   autoAssignClass: "/application/auto-assign-class",
   getTaBySemester: "/application/get-ta-by-semester",
+  getUniqueTaName: "/application/get-unique-ta",
+  getTaInfo: "application/get-ta-info",
 };
 
 export const classCallUrl = {
@@ -36,4 +38,12 @@ export const userUrl = {
 export const semesterUrl = {
   getAllSemester: "/ta-semester/get-all-semester",
   getCurrentSemester: "/ta-semester/get-current-semester",
+};
+
+export const dashboardUrl = {
+  getApplicatorData: "/application/get-applicator-data",
+  getApplicationData: "/application/get-application-data",
+  getTaData: "/application/get-ta-data",
+  getCourseData: "/application/get-course-data",
+  getClassNumbData: "/class-call/get-class-numb-data",
 };

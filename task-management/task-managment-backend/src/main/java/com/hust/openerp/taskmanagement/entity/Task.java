@@ -102,7 +102,7 @@ public class Task {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id", insertable = false, updatable = false)
-    private StatusItem status;
+    private TaskStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "priority_id", insertable = false, updatable = false)

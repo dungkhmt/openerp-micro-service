@@ -3,8 +3,12 @@ package openerp.openerpresourceserver.service;
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.entity.Asset;
 import openerp.openerpresourceserver.entity.AssetType;
+import openerp.openerpresourceserver.entity.Location;
+import openerp.openerpresourceserver.entity.Vendor;
 import openerp.openerpresourceserver.repo.AssetRepo;
 import openerp.openerpresourceserver.repo.AssetTypeRepo;
+import openerp.openerpresourceserver.repo.LocationRepo;
+import openerp.openerpresourceserver.repo.VendorRepo;
 import openerp.openerpresourceserver.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +22,8 @@ import java.util.Optional;
 public class AssetServiceImpl implements AssetService{
     private AssetRepo assetRepo;
     private AssetTypeRepo assetTypeRepo;
+    private LocationRepo locationRepo;
+    private VendorRepo vendorRepo;
 
     private final Integer AVAILABLE = 1;
     private final Integer INUSE = 2;
@@ -55,10 +61,19 @@ public class AssetServiceImpl implements AssetService{
         newAsset.setName(asset.getName());
         AssetType assetType = assetTypeRepo.findById(asset.getType_id()).get();
         newAsset.setType_id(assetType.getId());
-        System.out.println(assetType);
+        Integer num_assets = assetType.getNum_assets();
+        assetType.setNum_assets(num_assets + 1);
+
         String prefix = assetType.getCode_prefix();
         Utils utils = new Utils();
         newAsset.setCode(prefix + "-" + utils.generateRandomHash(8));
+
+        Location location = locationRepo.findById(asset.getLocation_id()).get();
+        location.setNum_assets(location.getNum_assets() + 1);
+
+        Vendor vendor = vendorRepo.findById(asset.getVendor_id()).get();
+        vendor.setNum_assets(vendor.getNum_assets() + 1);
+
         newAsset.setAdmin_id(asset.getAdmin_id());
         newAsset.setStatus_id(AVAILABLE);
         newAsset.setAssignee_id(asset.getAssignee_id());
@@ -70,6 +85,12 @@ public class AssetServiceImpl implements AssetService{
         Date currentDate = new Date();
         newAsset.setSince(currentDate);
         newAsset.setLast_updated(currentDate);
+        assetType.setLast_updated(currentDate);
+        location.setLast_updated(currentDate);
+        vendor.setLast_updated(currentDate);
+        assetTypeRepo.save(assetType);
+        locationRepo.save(location);
+        vendorRepo.save(vendor);
         return assetRepo.save(newAsset);
     }
 
@@ -98,10 +119,25 @@ public class AssetServiceImpl implements AssetService{
 
     @Override
     public void deleteAsset(Integer Id) {
-        Optional<Asset> asset = assetRepo.findById(Id);
-        if(asset.isPresent()){
-            assetRepo.deleteById(Id);
+        Asset asset = assetRepo.findById(Id).get();
+        if(asset.getStatus_id() == REPAIR || asset.getStatus_id() == INUSE) {
+            return;
         }
+
+        AssetType assetType = assetTypeRepo.findById(asset.getType_id()).get();
+        Integer num_assets = assetType.getNum_assets();
+        assetType.setNum_assets(num_assets - 1);
+
+        Location location = locationRepo.findById(asset.getLocation_id()).get();
+        location.setNum_assets(location.getNum_assets() - 1);
+
+        Vendor vendor = vendorRepo.findById(asset.getVendor_id()).get();
+        vendor.setNum_assets(vendor.getNum_assets() - 1);
+
+        assetTypeRepo.save(assetType);
+        locationRepo.save(location);
+        vendorRepo.save(vendor);
+        assetRepo.delete(asset);
     }
 
     @Override
@@ -132,5 +168,65 @@ public class AssetServiceImpl implements AssetService{
         foundAsset.setAssignee_id(null);
         foundAsset.setLast_updated(new Date());
         return assetRepo.save(foundAsset);
+    }
+
+    @Override
+    public Asset repairAsset(Integer Id, String admin_id, Boolean is_repair) {
+        Asset foundAsset = assetRepo.findById(Id).get();
+        if(!foundAsset.getAdmin_id().equals(admin_id)){
+            return null;
+        }
+        if(is_repair){
+            foundAsset.setStatus_id(REPAIR);
+        } else {
+            foundAsset.setStatus_id(AVAILABLE);
+        }
+
+        foundAsset.setLast_updated(new Date());
+        return assetRepo.save(foundAsset);
+    }
+
+    @Override
+    public Asset deprecatedAsset(Integer Id, String admin_id) {
+        Asset foundAsset = assetRepo.findById(Id).get();
+        if(foundAsset.getStatus_id().equals(DEPRECATED)){
+            return null;
+        }
+        if(!foundAsset.getAdmin_id().equals(admin_id)){
+            return null;
+        }
+        foundAsset.setStatus_id(DEPRECATED);
+        foundAsset.setLast_updated(new Date());
+        return assetRepo.save(foundAsset);
+    }
+
+    @Override
+    public List<String> getTopAssignUsers() {
+        return assetRepo.getTopAssignUsers();
+    }
+
+    @Override
+    public List<String> getTopAdminUsers() {
+        return assetRepo.getTopAdminUsers();
+    }
+
+    @Override
+    public List<Asset> getByAdminUser(String user_id) {
+        return assetRepo.findByAdminId(user_id);
+    }
+
+    @Override
+    public List<Asset> getByTypes(Integer type_id) {
+        return assetRepo.findByTypes(type_id);
+    }
+
+    @Override
+    public List<Asset> getAssignToMe(String user_id) {
+        return assetRepo.assignToMe(user_id);
+    }
+
+    @Override
+    public List<Asset> getManageByMe(String user_id) {
+        return assetRepo.manageByMe(user_id);
     }
 }

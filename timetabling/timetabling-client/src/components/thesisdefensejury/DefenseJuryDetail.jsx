@@ -58,10 +58,32 @@ function DefenseJuryDetail(props) {
         <Typography variant="h4" mb={1} component={"h4"}>
           {defenseJury?.name}
         </Typography>
-        <div className="defense-jury-info">
+        <Box sx={{ display: 'flex' }}>
+          <Box sx={{ marginRight: 5, display: 'flex' }}>
+            Ngày tổ chức :
+            <Typography variant="body1" sx={{ marginLeft: 5, fontWeight: 'bold', fontFamily: 'Roboto Condensed', color: 'black' }}> {defenseJury?.defenseDate?.split("T")[0]}</Typography>
+          </Box>
+          <Box sx={{ marginRight: 5, display: 'flex' }}>
+            Ca tổ chức :
+            <Typography variant="body1" sx={{ marginLeft: 5, fontWeight: 'bold', fontFamily: 'Roboto Condensed', color: 'black' }}> {defenseJury?.defenseSession?.name}</Typography>
+          </Box>
+          <Box sx={{ marginRight: 5, display: 'flex' }}>
+            Phân ban :
+            <Typography variant="body1" sx={{ marginLeft: 5, fontWeight: 'bold', fontFamily: 'Roboto Condensed', color: 'black' }}> {defenseJury?.juryTopic?.name}</Typography>
+          </Box>
+        </Box>
+
+        {/* <div className="defense-jury-info">
           Ngày tổ chức: {defenseJury?.defenseDate?.split("T")[0]}
         </div>
-        {defenseJury?.academicKeywordList.map(({ keyword, description }) => (
+        <div className="defense-jury-info">
+          Ca tổ chức: {defenseJury?.defenseSession?.name}
+        </div>
+        <div className="defense-jury-info">
+          Phân ban: {defenseJury?.juryTopic?.name}
+        </div> */}
+
+        {defenseJury?.juryTopic?.academicKeywordList.map(({ keyword, description }) => (
           <KeywordChip key={keyword} keyword={description} />
         ))}
 

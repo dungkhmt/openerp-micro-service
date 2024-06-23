@@ -1,15 +1,17 @@
 package openerp.openerpresourceserver.tarecruitment.controller;
 
 import lombok.AllArgsConstructor;
-import openerp.openerpresourceserver.tarecruitment.dto.PaginationDTO;
+import openerp.openerpresourceserver.tarecruitment.entity.dto.ChartDTO;
+import openerp.openerpresourceserver.tarecruitment.entity.dto.PaginationDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.Application;
-import openerp.openerpresourceserver.tarecruitment.entity.ClassCall;
 import openerp.openerpresourceserver.tarecruitment.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -18,6 +20,8 @@ import java.util.List;
 @RestController
 @AllArgsConstructor(onConstructor_ = @Autowired)
 @RequestMapping("/application")
+@Configuration
+@EnableAsync
 public class ApplicationController {
     private ApplicationService applicationService;
 
@@ -187,4 +191,27 @@ public class ApplicationController {
         return ResponseEntity.ok().body(applications);
     }
 
+    @GetMapping("/get-applicator-data")
+    public ResponseEntity<?> getApplicatorData() {
+        List<ChartDTO> chart = applicationService.getApplicatorEachSemesterData();
+        return ResponseEntity.ok().body(chart);
+    }
+
+    @GetMapping("/get-application-data")
+    public ResponseEntity<?> getApplicationData() {
+        List<ChartDTO> chart = applicationService.getNumbApplicationEachSemesterData();
+        return ResponseEntity.ok().body(chart);
+    }
+
+    @GetMapping("/get-ta-data")
+    public ResponseEntity<?> getTaData() {
+        List<ChartDTO> chart = applicationService.getNumbApplicationApproveEachSemesterData();
+        return ResponseEntity.ok().body(chart);
+    }
+
+    @GetMapping("/get-course-data")
+    public ResponseEntity<?> getCourseData() {
+        List<ChartDTO> chart = applicationService.dataApplicationEachCourseThisSemester();
+        return ResponseEntity.ok().body(chart);
+    }
 }

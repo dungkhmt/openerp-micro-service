@@ -36,7 +36,7 @@ const TaskInprogressStatistic = forwardRef(function TaskInprogressStatistic(
         horizontal: 10,
       },
     },
-    colors: ["#7367f0"],
+    colors: ["#1986C2"],
     plotOptions: {
       radialBar: {
         inverseOrder: true,
@@ -121,7 +121,7 @@ const TaskInprogressStatistic = forwardRef(function TaskInprogressStatistic(
           </Grid>
           <Grid item xs={6} md={6} lg={7} xl={8} sx={{ mt: 2 }}>
             <Tooltip title={`${inprogress.percentage}%`}>
-              <div>
+              <div style={{ minWidth: "120px" }}>
                 <ReactApexcharts
                   type="radialBar"
                   height={120}

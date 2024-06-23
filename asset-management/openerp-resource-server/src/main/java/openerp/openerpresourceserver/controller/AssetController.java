@@ -72,7 +72,7 @@ public class AssetController {
     @DeleteMapping("/delete/{Id}")
     public ResponseEntity<?> deleteAsset(@PathVariable Integer Id, Principal principal){
         assetService.deleteAsset(Id);
-        assetLogService.createNewAssetLog(Id, principal.getName(), "delete");
+//        assetLogService.createNewAssetLog(Id, principal.getName(), "delete");
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -103,5 +103,67 @@ public class AssetController {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(asset);
+    }
+
+    @PutMapping("/repair/{Id}/{isRepair}")
+    public ResponseEntity<?> repairAsset(@PathVariable Integer Id, @PathVariable Boolean isRepair, Principal principal){
+        String admin_id = principal.getName();
+        Asset asset = assetService.repairAsset(Id, admin_id, isRepair);
+        assetLogService.createNewAssetLog(asset.getId(), admin_id, "repair");
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(asset);
+    }
+
+    @PutMapping("/deprecated/{Id}")
+    public ResponseEntity<?> deprecatedAsset(@PathVariable Integer Id, Principal principal){
+        String admin_id = principal.getName();
+        Asset asset = assetService.deprecatedAsset(Id, admin_id);
+        assetLogService.createNewAssetLog(asset.getId(), admin_id, "deprecated");
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(asset);
+    }
+
+    @GetMapping("/top-admin-users")
+    public ResponseEntity<?> getTopAdminUsers(){
+        List<String> users = assetService.getTopAdminUsers();
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(users);
+    }
+
+    @GetMapping("/get-by-admin/{userId}")
+    public ResponseEntity<?> getByAdminUser(@PathVariable String userId){
+        List<Asset> assets = assetService.getByAdminUser(userId);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(assets);
+    }
+
+    @GetMapping("/assign-to-me")
+    public ResponseEntity<?> getAssignToMe(Principal principal){
+        String userId = principal.getName();
+        List<Asset> assets = assetService.getAssignToMe(userId);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(assets);
+    }
+
+    @GetMapping("/manage-by-me")
+    public ResponseEntity<?> getManageByMe(Principal principal){
+        String userId = principal.getName();
+        List<Asset> assets = assetService.getManageByMe(userId);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(assets);
+    }
+
+    @GetMapping("/get-by-type/{typeId}")
+    public ResponseEntity<?> getByTypes(@PathVariable Integer typeId){
+        List<Asset> assets = assetService.getByTypes(typeId);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(assets);
     }
 }

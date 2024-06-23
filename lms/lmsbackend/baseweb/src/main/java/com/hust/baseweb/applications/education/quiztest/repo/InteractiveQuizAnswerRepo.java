@@ -10,4 +10,5 @@ import com.hust.baseweb.applications.education.quiztest.entity.compositeid.Compo
 
 public interface InteractiveQuizAnswerRepo extends JpaRepository<InteractiveQuizAnswer, CompositeInteractiveQuizAnswerId> {
     public List<InteractiveQuizAnswer> findAllByInteractiveQuizIdAndQuestionIdAndUserId(UUID interactiveQuizId, UUID questionId, String userId);
+    public List<InteractiveQuizAnswer> findByInteractiveQuizId(UUID interactiveQuizId);
 }
