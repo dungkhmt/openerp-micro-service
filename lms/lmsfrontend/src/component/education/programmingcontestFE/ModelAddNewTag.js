@@ -45,6 +45,7 @@ const ModelAddNewTag = ({isOpen, handleSuccess, handleClose}) => {
       <TextField
         fullWidth
         required
+        id="tag-name"
         label={"Tag"}
         placeholder="Tag"
         defaultValue={tagName}
@@ -55,6 +56,7 @@ const ModelAddNewTag = ({isOpen, handleSuccess, handleClose}) => {
       />
       <TextField
         fullWidth
+        id="tag-description"
         label={t("common:description")}
         placeholder={t("common:description")}
         value={tagDescription}
