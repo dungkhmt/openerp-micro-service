@@ -398,13 +398,6 @@ function CreateProblem() {
                 >
                   {t("common:addNew")}
                 </Button>
-                <ModelAddNewTag
-                  isOpen={openModalAddNewTag}
-                  handleSuccess={() => {
-                    getAllTags(handleGetTagsSuccess)
-                  }}
-                  handleClose={() => setOpenModalAddNewTag(false)}
-                />
               </ListSubheader>
 
               {tags.map((tag) => (
@@ -543,6 +536,14 @@ function CreateProblem() {
           {t("save", {ns: "common"})}
         </LoadingButton>
       </Box>
+
+      <ModelAddNewTag
+        isOpen={openModalAddNewTag}
+        handleSuccess={() => {
+          getAllTags(handleGetTagsSuccess)
+        }}
+        handleClose={() => setOpenModalAddNewTag(false)}
+      />
     </HustContainerCard>
   );
 }
