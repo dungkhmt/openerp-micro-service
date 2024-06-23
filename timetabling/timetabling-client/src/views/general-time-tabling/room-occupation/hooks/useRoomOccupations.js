@@ -10,14 +10,15 @@ export const useRoomOccupations = (semester, weekIndex) => {
 
   const mergePeriods = (periods) => {
     // Sort periods by start time
-    periods.sort((a, b) => a.start - b.start);
+    const sortedPeriods = periods
+      .sort((a, b) => a.start - b.start);
 
     const mergedPeriods = [];
-    let current = { ...periods[0] };
+    let current = { ...sortedPeriods[0] };
 
-    for (let i = 1; i < periods.length; i++) {
-      const period = periods[i];
-      if (period.start <= current.start + current.duration) {
+    for (let i = 1; i < sortedPeriods.length; i++) {
+      const period = sortedPeriods[i];
+      if (period.start < current.start + current.duration) {
         // Overlapping periods, merge them
         const end = Math.max(
           current.start + current.duration,
@@ -71,8 +72,8 @@ export const useRoomOccupations = (semester, weekIndex) => {
         "get",
         `/room-occupation/?semester=${semester}&weekIndex=${weekIndex}`,
         (res) => {
-          toast.success("Truy vấn thành công!");
           setData(convertSchedule(res.data));
+          console.log(res.data);
         },
         (error) => {
           console.log(error);

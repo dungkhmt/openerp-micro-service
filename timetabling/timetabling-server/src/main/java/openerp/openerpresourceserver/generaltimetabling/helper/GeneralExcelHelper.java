@@ -30,7 +30,7 @@ public class GeneralExcelHelper {
     /**
      * Start row in excel file to classes
      */
-    private final static int START_ROW_TO_READ_CLASS = 4;
+    private final static int START_ROW_TO_READ_CLASS = 0;
     /**
      * Start column in excel to read class information (Start with column A)
      */
@@ -132,7 +132,11 @@ public class GeneralExcelHelper {
                         } else {
                             switch (classInfoCell.getColumnIndex()) {
                                 case 0:
-                                    generalClass.setQuantity(Integer.valueOf(cellValue));
+                                    if (cellValue.isEmpty() || cellValue.trim().isEmpty()) {
+                                        generalClass.setQuantity(null);
+                                    } else {
+                                        generalClass.setQuantity(Integer.valueOf(cellValue));
+                                    }
                                     break;
                                 case 1:
                                     generalClass.setClassType(cellValue);
@@ -168,13 +172,6 @@ public class GeneralExcelHelper {
                                         generalClass.setRefClassId(Long.valueOf(cellValue));
                                     }
                                     break;
-                                case 11:
-                                    if (cellValue.isEmpty()) {
-                                        generalClass.setId(null);
-                                    } else {
-                                        generalClass.setId(Long.valueOf(cellValue));
-                                    }
-                                    break;
                                 case 12:
                                     if (cellValue.isEmpty()) {
                                         generalClass.setParentClassId(null);
@@ -206,7 +203,8 @@ public class GeneralExcelHelper {
             workbook.close();
             return convertedList;
         } catch (Exception ex) {
-            log.error(ex.getMessage());
+            ex.printStackTrace();
+            log.error(ex);
             return null;
         }
     }
