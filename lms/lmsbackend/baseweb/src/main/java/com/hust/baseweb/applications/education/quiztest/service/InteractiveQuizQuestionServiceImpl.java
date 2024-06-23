@@ -7,6 +7,7 @@ import lombok.extern.log4j.Log4j2;
 
 import org.springframework.stereotype.Service;
 
+import com.hust.baseweb.applications.education.cache.QuizQuestionServiceCache;
 import com.hust.baseweb.applications.education.entity.QuizQuestion;
 import com.hust.baseweb.applications.education.model.quiz.QuizQuestionDetailModel;
 import com.hust.baseweb.applications.education.quiztest.entity.EduQuizTestQuizQuestion;
@@ -34,14 +35,20 @@ public class InteractiveQuizQuestionServiceImpl implements InteractiveQuizQuesti
     private InteractiveQuizRepo interactiveQuizRepo;
     private QuizQuestionRepo quizQuestionRepo;
     private QuizQuestionService quizQuestionService;
+    private QuizQuestionServiceCache cacheService;
 
     @Override
     public List<QuizQuestionDetailModel> findAllByInteractiveQuizId(UUID interactiveQuizId){
         //List<EduQuizTestQuizQuestion> eduQuizTestQuizQuestions = eduQuizTestQuizQuestionRepo.findAllByTestId(testId);
-        InteractiveQuiz interactiveQuiz = interactiveQuizRepo.findById(interactiveQuizId).orElse(null);
+        // InteractiveQuiz interactiveQuiz = interactiveQuizRepo.findById(interactiveQuizId).orElse(null);
         // if (interactiveQuiz == null || !interactiveQuiz.getStatusId().equals("OPENED")) {
         //     return new ArrayList<>();
         // }
+        List<QuizQuestionDetailModel> interactiveQuizQuestionsCache = cacheService.findInteractiveQuizQuestionInCache(interactiveQuizId.toString());
+        if(interactiveQuizQuestionsCache != null){
+            return interactiveQuizQuestionsCache;
+        }
+
         List<InteractiveQuizQuestion> interactiveQuizQuestions = interactiveQuizQuestionRepo.findAllByInteractiveQuizId(interactiveQuizId);
             // .findAllByTestIdAndStatusId(testId, EduQuizTestQuizQuestion.STATUS_CREATED);
 
@@ -77,6 +84,8 @@ public class InteractiveQuizQuestionServiceImpl implements InteractiveQuizQuesti
         });
         // log.info("findAllByTestId, testId = " + testId
         //          + " RETURN list.sz = " + quizQuestionDetailModels.size());
+
+        cacheService.addInteractiveQuizQuestionToCache(interactiveQuizId.toString(), quizQuestionDetailModels);
 
         return quizQuestionDetailModels;
     };

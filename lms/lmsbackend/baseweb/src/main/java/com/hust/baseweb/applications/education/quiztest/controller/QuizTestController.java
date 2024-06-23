@@ -2,6 +2,7 @@ package com.hust.baseweb.applications.education.quiztest.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.hust.baseweb.applications.education.cache.QuizQuestionServiceCache;
 import com.hust.baseweb.applications.education.classmanagement.entity.EduClassSession;
 import com.hust.baseweb.applications.education.classmanagement.repo.EduClassSessionRepo;
 import com.hust.baseweb.applications.education.classmanagement.service.ClassService;
@@ -96,6 +97,7 @@ public class QuizTestController {
     private EduCourseSessionInteractiveQuizRepo eduCourseSessionInteractiveQuizRepo;
     private EduCourseSessionInteractiveQuizQuestionRepo eduCourseSessionInteractiveQuizQuestionRepo;
     private EduCourseSessionInteractiveQuizQuestionService eduCourseSessionInteractiveQuizQuestionService;
+    private QuizQuestionServiceCache cacheService;
 
     @Secured({"ROLE_TEACHER"})
     @PostMapping("/create-quiz-test")
@@ -113,7 +115,7 @@ public class QuizTestController {
         return ResponseEntity.ok().body(quizTestService.save(input, user));
     }
 
-        @Secured({"ROLE_TEACHER"})
+    @Secured({"ROLE_TEACHER"})
     @PostMapping("/create-interactive-quiz")
     public ResponseEntity<?> createInteractiveQuiz(Principal principal,  @RequestBody InteractiveQuizInputModel input){
 
@@ -131,6 +133,7 @@ public class QuizTestController {
         interactiveQuizQuestion.setQuestionId(input.getQuestionId());
         interactiveQuizQuestion.setCreatedStamp(new Date());
         interactiveQuizQuestion.setLastUpdated(new Date());
+        cacheService.flushCache();
         return ResponseEntity.ok().body(interactiveQuizQuestionRepo.save(interactiveQuizQuestion));
     }
 
@@ -146,6 +149,7 @@ public class QuizTestController {
         // interactiveQuizQuestion.setCreatedStamp(new Date());
         // interactiveQuizQuestion.setLastUpdated(new Date());
         interactiveQuizQuestionService.removeFromInteractiveQuiz(input);
+        cacheService.flushCache();
         return ResponseEntity.ok().build();
     }
 
@@ -664,6 +668,14 @@ public class QuizTestController {
     @GetMapping("/get-interactive-quiz-result/{interactiveQuizId}")
     public ResponseEntity<?> getInteractiveQuizResult(Principal principal, @PathVariable UUID interactiveQuizId) {
         List<StudentResult> results = interactiveQuizRepo.getResultOfInteractiveQuiz(interactiveQuizId);
+        return ResponseEntity.ok().body(results);
+
+    }
+
+    @Secured({"ROLE_TEACHER"})
+    @GetMapping("/get-result-of-interactive-quiz/{interactiveQuizId}")
+    public ResponseEntity<?> getResultsOfInteractiveQuiz(Principal principal, @PathVariable UUID interactiveQuizId) {
+        List<StudentResult> results = interactiveQuizService.getQuizResults(interactiveQuizId);
         return ResponseEntity.ok().body(results);
 
     }

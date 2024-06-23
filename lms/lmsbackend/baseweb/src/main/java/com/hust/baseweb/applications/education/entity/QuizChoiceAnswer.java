@@ -36,4 +36,8 @@ public class QuizChoiceAnswer {
 
     @Column(name = "created_stamp")
     private Date createdStamp;
+
+    public boolean isCorrectAnswer() {
+        return isCorrectAnswer == 'Y';
+    }
 }

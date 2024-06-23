@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
+import com.hust.baseweb.applications.education.entity.QuizChoiceAnswer;
+import com.hust.baseweb.applications.education.entity.QuizQuestion;
 import com.hust.baseweb.applications.education.quiztest.entity.compositeid.CompositeInteractiveQuizAnswerId;
 
 @Getter
@@ -37,4 +39,12 @@ public class InteractiveQuizAnswer {
 
     @Column(name = "last_updated")
     private Date lastUpdated;
+
+     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "quiz_question_id", insertable = false, updatable = false)
+    private QuizQuestion quizQuestion;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "choice_answer_id", insertable = false, updatable = false)
+    private QuizChoiceAnswer quizChoiceAnswer;
 }
