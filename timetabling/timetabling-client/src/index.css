@@ -100,3 +100,19 @@ code {
   height: auto !important;
   border-radius: 1rem !important;
 }
+
+/* CSS for room-occupation */
+
+.room-occupation-table {
+  table-layout: fixed;
+
+}
+
+.cell {
+  padding: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 26px;
+  height: 41px;
+}

@@ -110,6 +110,11 @@ export default function LearningSessionStudentViewQuizTestList(props) {
   const handleClick = (quesId) => {
     console.log(quesId);
     console.log(stateCheckBox);
+    if (Object.keys(stateCheckBox).length === 0) {
+      setMessageRequest("Không được để trống!");
+      setErrorRequest(true);
+      return;
+    }
     let listAns = [];
     Object.keys(stateCheckBox[quesId]).map((element, index) => {
       if (stateCheckBox[quesId][element] === true) {
@@ -122,6 +127,11 @@ export default function LearningSessionStudentViewQuizTestList(props) {
       // quizGroupId: quizGroupTestDetail.quizGroupId,
       choiceAnswerId: listAns,
     };
+    if (listAns.length === 0) {
+      setMessageRequest("Không được để trống!");
+      setErrorRequest(true);
+      return;
+    }
     console.log(tmpOb);
     request(
       // token,
@@ -137,7 +147,7 @@ export default function LearningSessionStudentViewQuizTestList(props) {
       },
       {
         400: () => {
-          setMessageRequest("Không được để trống!");
+          setMessageRequest("Quá thời gian làm bài!");
           setErrorRequest(true);
         },
         406: () => {

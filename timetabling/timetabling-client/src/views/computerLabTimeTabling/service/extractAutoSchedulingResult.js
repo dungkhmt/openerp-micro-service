@@ -16,7 +16,20 @@ function createFixed2DArray(rows, columns) {
     return arr;
   }
 
-const download_result_file = async (submission, result_array) =>{  
+// const download_result_file = async (submission, result_array) =>{  
+//     const data = await produce_result_data(submission, result_array)
+//     writeXlsxFile(data, {
+//         fileName: `result_${datetimeForFN(new Date())}.xlsx`,
+//     });
+// }
+
+const download_result_file = async (data) =>{  
+    writeXlsxFile(data, {
+        fileName: `result_${datetimeForFN(new Date())}.xlsx`,
+    });
+}
+
+const produce_result_data = async (submission, result_array) =>{
     var class_list = []
     var room_list = []
     await request("get", `/lab-timetabling/class/semester/${submission.semester_id}`, (res)=>{
@@ -49,7 +62,6 @@ const download_result_file = async (submission, result_array) =>{
         item.class_name = class_list.find(c=>c.id == item.class_id)?.note;
         item.room_name = room_list.find(r=>r.id == item.room_id).name;
     })
-    console.log(groupedData);
     
     var data = createFixed2DArray(groupedData.length+2, 7)
     data[0][0] = {
@@ -73,9 +85,6 @@ const download_result_file = async (submission, result_array) =>{
             }
         })
     }
-    console.log(data)
-    writeXlsxFile(data, {
-        fileName: `result_${datetimeForFN(new Date())}.xlsx`,
-    });
+    return data
 }
-export {download_result_file}
+export {download_result_file, produce_result_data}

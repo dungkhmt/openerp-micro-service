@@ -17,6 +17,8 @@ import java.util.UUID;
 @Table(name = "contest_submission_testcase_new")
 
 public class ContestSubmissionTestCaseEntity {
+    public static final String USED_TO_GRADE_YES = "Y";
+    public static final String USED_TO_GRADE_NO = "N";
     @Id
     @Column(name = "contest_submission_testcase_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -39,6 +41,10 @@ public class ContestSubmissionTestCaseEntity {
 
     @Column(name = "point")
     private int point;
+
+    @Column(name = "used_to_grade")
+    private String usedToGrade; // Y/N: means that the point of this is (not) accounted to grade of submission
+
 
     @Column(name = "status")
     private String status;

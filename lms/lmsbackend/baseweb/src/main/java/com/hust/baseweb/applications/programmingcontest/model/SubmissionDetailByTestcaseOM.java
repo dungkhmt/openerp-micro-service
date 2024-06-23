@@ -28,11 +28,15 @@ public class SubmissionDetailByTestcaseOM {
 
     private int point;
 
+    private String graded;// graded = Y means that the point is accounted to the grade
+
     private Long runtime;
 
     private String testCaseAnswer;
 
     private String participantAnswer;
+
+
 
     private Date createdAt;
 

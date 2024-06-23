@@ -29,7 +29,7 @@ public class VendorController {
     public ResponseEntity<?> getVendorById(@PathVariable Integer Id){
         Optional<Vendor> vendor = vendorService.getVendorById(Id);
         return ResponseEntity
-            .status(HttpStatus.FOUND)
+            .status(HttpStatus.OK)
             .body(vendor);
     }
 

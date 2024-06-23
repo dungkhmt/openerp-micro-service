@@ -66,6 +66,7 @@ export default function LearningSessionFormAddQuizInClassTests(props) {
           <TextField
             label="TestName"
             onChange={handleChangeTestName}
+            required
           ></TextField>
           <TextField
             label="Mô tả"

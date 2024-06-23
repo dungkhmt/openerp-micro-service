@@ -66,11 +66,9 @@ const ImportDialog = ({ open, handleClose, fetchData, semester }) => {
         setResponse(res.data);
         fetchData();
       },
-      {
-        onError: (e) => {
-          setIsImportSuccess(false);
-          setResponse("File không đúng định dạng");
-        },
+      () => {
+        setIsImportSuccess(false);
+        setResponse("File không đúng định dạng");
       },
       formData,
       {

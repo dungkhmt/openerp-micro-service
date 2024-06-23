@@ -1,5 +1,7 @@
 package openerp.openerpresourceserver.thesisdefensejuryassignment.repo;
 
+import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.JuryTopic;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.ThesisDefensePlan;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.DefenseJury;
@@ -18,4 +20,8 @@ public interface ThesisRepo extends JpaRepository<Thesis, UUID>{
     Optional<Thesis> findById(UUID Id);
 
     public Optional<List<Thesis>> findByStudentEmail(String studentEmail);
+
+    public List<Thesis> findBySupervisorId(String supervisorId);
+
+    public List<Thesis> findByThesisDefensePlanIdAndDefenseJuryAndJuryTopicId(String thesisDefensePlanId, UUID defenseJuryId, int juryTopicId);
 }

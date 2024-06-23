@@ -38,5 +38,12 @@ export const generalTimeTabling = {
       text: "Xem tình trạng phòng học",
       child: [],
     },
+    {
+      id: "MENU_GENERAL_TIME_TABLING.FIND_EMPTY_ROOM",
+      path: "/general-time-tabling/find-empty-room",
+      isPublic: true,
+      text: "Tìm phòng học trống",
+      child: [],
+    },
   ],
 };

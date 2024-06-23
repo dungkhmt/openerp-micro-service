@@ -52,6 +52,15 @@ public class ClassServiceImpl implements ClassService {
             if (_class.getQuantity() != null) {
                 c.setQuantity(_class.getQuantity());
             }
+            if (_class.getLessons_per_semester() != null){
+                c.setLessons_per_semester(_class.getLessons_per_semester());
+            }
+            if (_class.getWeek_schedule_constraint()!=null){
+                c.setWeek_schedule_constraint(_class.getWeek_schedule_constraint());
+            }
+            if(_class.getAvoid_week_schedule_constraint() != null){
+                c.setAvoid_week_schedule_constraint(_class.getAvoid_week_schedule_constraint());
+            }
             c.setNote(_class.getNote());
             c.setDepartment_id(_class.getDepartment_id());
 //            c.setLastModifiedDate(currentDate);

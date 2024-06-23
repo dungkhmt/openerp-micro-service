@@ -40,6 +40,9 @@ const GeneralScheduleTable = ({
         rows={classes}
         pageSize={10}
         initialState={{
+          sorting: {
+            sortModel: [{ field: 'classCode', sort: 'asc' }],
+          },
           filter: {
             filterModel: {
               items: [],

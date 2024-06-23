@@ -35,6 +35,9 @@ const ClassOpenPlanTable = ({
       />
       <DataGrid
         initialState={{
+          sorting: {
+            sortModel: [{ field: 'id', sort: 'asc' }],
+          },
           filter: {
             filterModel: {
               items: [],

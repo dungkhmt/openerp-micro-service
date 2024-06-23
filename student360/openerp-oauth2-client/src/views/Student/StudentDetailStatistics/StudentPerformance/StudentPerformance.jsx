@@ -7,6 +7,7 @@ import {
   Typography,
   Stack,
   Divider,
+  Tooltip,
   useTheme,
 } from "@mui/material";
 import { errorNoti } from "../../../../utils/notification";
@@ -16,21 +17,21 @@ function StudentPerformance(props) {
   const studentLoginId = props.studentLoginId;
   const [studentDetail, setStudentDetail] = useState({});
 
-  useEffect(getStudentDetail, []);
+  useEffect(getStudentDetail, [studentLoginId]);
 
   function getStudentDetail() {
     let successHandler = (res) => {
       let detail = res.data;
 
-      if (detail.firstSubmissionAccuracyRate > 80) {
+      if (detail?.firstSubmissionAccuracyRate > 80) {
         detail.carefulness = "Cao";
-      } else if (detail.firstSubmissionAccuracyRate > 50) {
+      } else if (detail?.firstSubmissionAccuracyRate > 50) {
         detail.carefulness = "Trung bình";
       } else {
         detail.carefulness = "Thấp";
       }
 
-      if (detail.numberProgramLanguage > 5) {
+      if (detail?.numberProgramLanguage > 5) {
         detail.languageVariety = "Đa dạng";
       } else if (detail.numberProgramLanguage > 3) {
         detail.languageVariety = "Nhiều";
@@ -40,52 +41,53 @@ function StudentPerformance(props) {
         detail.languageVariety = "Hạn chế";
       }
 
-      if (detail.averageSubmissionPerDay > "1") {
+      if (detail?.averageSubmissionPerDay > "1") {
         detail.attitude = "Tích cực";
-      } else if (detail.averageSubmissionPerDay > "0.5") {
+      } else if (detail?.averageSubmissionPerDay > "0.5") {
         detail.attitude = "Trung bình";
       } else {
         detail.attitude = "Cẩn cải thiện";
       }
 
       if (
-        detail.averageMinimumSubmissionToAccept <= 3 &&
-        detail.averageMinimumSubmissionToAccept !== 0
+        detail?.averageMinimumSubmissionToAccept <= 3 &&
+        detail?.averageMinimumSubmissionToAccept !== 0
       )
         detail.evaluation = "Tốt";
       else if (
-        detail.averageMinimumSubmissionToAccept <= 5 &&
-        detail.averageMinimumSubmissionToAccept !== 0
+        detail?.averageMinimumSubmissionToAccept <= 5 &&
+        detail?.averageMinimumSubmissionToAccept !== 0
       )
         detail.evaluation = "Khá";
       else if (
-        detail.averageMinimumSubmissionToAccept <= 10 &&
-        detail.averageMinimumSubmissionToAccept !== 0
+        detail?.averageMinimumSubmissionToAccept <= 10 &&
+        detail?.averageMinimumSubmissionToAccept !== 0
       )
         detail.evaluation = "Trung bình";
       else detail.evaluation = "Kém";
 
-      if (detail.submittedMultipleTimes && detail.hasProgress)
+      if (detail?.submittedMultipleTimes && detail?.hasProgress)
         detail.learningStatus = "Tích cực, mong muốn hoàn thiện bài tập";
 
-      if (detail.submittedMultipleTimes && !detail.hasProgress)
+      if (detail?.submittedMultipleTimes && !detail?.hasProgress)
         detail.learningStatus = "Thiếu tự tin, chưa nắm vững kiến thức";
 
-      if (!detail.submittedMultipleTimes && detail.hasHighScore)
+      if (!detail?.submittedMultipleTimes && detail?.hasHighScore)
         detail.learningStatus =
           "Tự tin, chủ động, khả năng hoàn thành bài tập tốt";
 
-      if (!detail.submittedMultipleTimes && !detail.hasHighScore)
+      if (!detail?.submittedMultipleTimes && !detail?.hasHighScore)
         detail.learningStatus = "Thiếu quan tâm, không đầu tư bài tập";
 
       detail.numberProgramLanguage =
-        detail.numberProgramLanguage +
-        `  (${detail.programmingLanguageSubmitCounts
+        detail?.numberProgramLanguage +
+        `  (${detail?.programmingLanguageSubmitCounts
           .map((obj) => obj[0])
           .join(", ")})`;
+
       detail.studentSemesterResult = detail?.studentSemesterResult.map(
         (semesterResult) => {
-          switch (semesterResult.appearedInPlagiarism) {
+          switch (semesterResult?.appearedInPlagiarism) {
             case 0:
               semesterResult.appearedInPlagiarism = "Không";
               break;
@@ -96,13 +98,14 @@ function StudentPerformance(props) {
               semesterResult.appearedInPlagiarism = "Gian lận bài thi cuối kỳ";
               break;
             default:
-            // You can add a default action here
           }
           return semesterResult;
         }
       );
 
-      detail.mostLanguageUsed = detail.programmingLanguageSubmitCounts[0][0];
+      if (detail.programmingLanguageSubmitCounts.length > 0)
+        detail.mostLanguageUsed = detail?.programmingLanguageSubmitCounts[0][0];
+      else detail.mostLanguageUsed = "Không có";
 
       setStudentDetail(detail);
     };
@@ -112,7 +115,7 @@ function StudentPerformance(props) {
     };
     request(
       "GET",
-      `/student-statistics/student-performance/${studentLoginId}`,
+      `/student-performance/student-performance/${studentLoginId}`,
       successHandler,
       errorHandlers
     );
@@ -139,7 +142,7 @@ function StudentPerformance(props) {
     "endTimeActive",
     "mostSubmittedTime",
     "mostEffectiveSubmittedTime",
-    "learningBehavior",
+    // "learningBehavior",
   ];
 
   const studentLearningRoutineAttrLabels = {
@@ -147,6 +150,14 @@ function StudentPerformance(props) {
     endTimeActive: "Thời gian kết thúc học",
     mostSubmittedTime: "Thời gian active nhiều nhất",
     mostEffectiveSubmittedTime: "Thời gian hiệu quả nhất",
+    learningBehavior: "Xu hướng học tập trong học kỳ",
+  };
+
+  const studentLearningRoutineAttrTooltip = {
+    startTimeActive: "Thời gian đầu tiên học trong ngày",
+    endTimeActive: "Thời gian kết thúc học trong học",
+    mostSubmittedTime: "Thời gian nộp bài tập nhiều nhất",
+    mostEffectiveSubmittedTime: "Thời gian nộp bài tập hiệu quả, được điểm cao",
     learningBehavior: "Xu hướng học tập trong học kỳ",
   };
 
@@ -166,23 +177,25 @@ function StudentPerformance(props) {
     learningStatus: "Tình trạng học tập",
   };
 
+  const studentCharacterAttrTooltips = {
+    carefulness: "Tỷ lệ lần nộp bài đầu tiên được điểm",
+    languageVariety: "Số ngôn ngữ lập trình có thể sử dụng",
+    attitude: "Trung bình số lần nộp bài trong ngày",
+    evaluation: "Trung bình số lần tối thiểu nộp bài được điểm tối đa",
+    learningStatus: "Tình trạng học tập",
+  };
+
   const studentSemesterResultAttrs = [
-    "totalSubmission",
-    "totalProblem",
     "midtermPoint",
     "finalPoint",
     "appearedInPlagiarism",
     "passingState",
-    "passingRate",
   ];
   const studentSemesterResultAttrLabels = {
-    totalSubmission: "Tổng số submissions",
-    totalProblem: "Tổng số bài đã nộp",
     midtermPoint: "Kết quả thi giữa kỳ",
     finalPoint: "Kết quả thi cuối kỳ",
     appearedInPlagiarism: "Phát hiện gian lận",
     passingState: "Trạng thái",
-    passingRate: "Tỷ lệ qua môn",
   };
   return (
     <Stack gap={2}>
@@ -221,15 +234,15 @@ function StudentPerformance(props) {
                   <Typography variant="contentMBold" py={1} key={attr}>
                     <b>:</b>{" "}
                     {attr === "passState" ? (
-                      studentDetail.passState !== 1 ? (
+                      studentDetail.passState === -1 ? (
                         <span style={{ color: theme.palette.error.main }}>
-                          Chưa đạt
+                          Không đạt
                         </span>
-                      ) : (
+                      ) : studentDetail.passState === 1 ? (
                         <span style={{ color: theme.palette.success.main }}>
                           Đạt
                         </span>
-                      )
+                      ) : null // Handle cases where passState is neither -1 nor 1
                     ) : (
                       studentDetail[attr]
                     )}
@@ -240,6 +253,8 @@ function StudentPerformance(props) {
           </Grid>
         </CardContent>
       </Card>
+
+      {/* Kết quả các kỳ */}
       <Grid container spacing={2}>
         {studentDetail.studentSemesterResult?.map((semesterResult, index) => (
           <Grid key={index} item xs={6}>
@@ -303,6 +318,7 @@ function StudentPerformance(props) {
           </Grid>
         ))}
       </Grid>
+
       {/* Thói quen học tập  */}
       <Card>
         <CardHeader
@@ -335,15 +351,18 @@ function StudentPerformance(props) {
                     flexItem
                     sx={{ color: "grey.300" }}
                   />
-                  <Typography variant="contentMBold" py={1} key={attr}>
-                    <b>:</b> {studentDetail[attr]}
-                  </Typography>
+                  <Tooltip title={studentLearningRoutineAttrTooltip[attr]}>
+                    <Typography variant="contentMBold" py={1} key={attr}>
+                      <b>:</b> {studentDetail[attr]}
+                    </Typography>
+                  </Tooltip>
                 </>
               ))}
             </Grid>
           </Grid>
         </CardContent>
       </Card>
+
       {/* Tính cách sinh viên */}
       <Card>
         <CardHeader
@@ -374,10 +393,12 @@ function StudentPerformance(props) {
                     flexItem
                     sx={{ color: "grey.300" }}
                   />
-                  <Typography variant="contentMBold" py={1} key={attr}>
-                    <b>:</b>
-                    {studentDetail[attr]}
-                  </Typography>
+                  <Tooltip title={studentCharacterAttrTooltips[attr]}>
+                    <Typography variant="contentMBold" py={1} key={attr}>
+                      <b>: </b>
+                      {studentDetail[attr]}
+                    </Typography>
+                  </Tooltip>
                 </>
               ))}
             </Grid>

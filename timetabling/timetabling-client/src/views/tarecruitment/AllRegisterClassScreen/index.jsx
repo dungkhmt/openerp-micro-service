@@ -5,7 +5,7 @@ import { useHistory } from "react-router-dom";
 import { SEMESTER } from "../config/localize";
 import { DataGrid } from "@mui/x-data-grid";
 import styles from "./index.style";
-import { classCallUrl } from "../apiURL";
+import { classCallUrl, semesterUrl } from "../apiURL";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -17,6 +17,8 @@ const AllRegisterClassScreen = () => {
   const [classes, setClasses] = useState([]);
   const [registeredClass, setRegisteredClass] = useState([]);
 
+  const [semester, setSemester] = useState(SEMESTER);
+
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
 
@@ -25,6 +27,12 @@ const AllRegisterClassScreen = () => {
   const [paginationModel, setPaginationModel] = useState(
     DEFAULT_PAGINATION_MODEL
   );
+
+  useEffect(() => {
+    request("get", semesterUrl.getCurrentSemester, (res) => {
+      setSemester(res.data);
+    });
+  }, []);
 
   const debouncedSearch = useCallback(
     (search) => {
@@ -49,11 +57,12 @@ const AllRegisterClassScreen = () => {
   useEffect(() => {
     handleFetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paginationModel]);
+  }, [paginationModel, semester]);
 
   useEffect(() => {
     fetchRegisteredData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [semester]);
 
   const handleFetchData = () => {
     const searchParam =
@@ -61,7 +70,7 @@ const AllRegisterClassScreen = () => {
     setIsLoading(true);
     request(
       "get",
-      `${classCallUrl.getClassBySemesterL}/${SEMESTER}?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}`,
+      `${classCallUrl.getClassBySemesterL}/${semester}?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}`,
       (res) => {
         setClasses(res.data.data);
         setTotalElements(res.data.totalElement);
@@ -71,7 +80,7 @@ const AllRegisterClassScreen = () => {
   };
 
   const fetchRegisteredData = () => {
-    request("get", `${classCallUrl.getMyRegisterClass}/${SEMESTER}`, (res) => {
+    request("get", `${classCallUrl.getMyRegisterClass}/${semester}`, (res) => {
       setRegisteredClass(res.data);
     });
   };

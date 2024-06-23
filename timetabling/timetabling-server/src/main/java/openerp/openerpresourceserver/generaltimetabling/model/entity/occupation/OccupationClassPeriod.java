@@ -11,6 +11,7 @@ public class OccupationClassPeriod {
     private long startPeriodIndex;
     private long endPeriodIndex;
     private String classCode;
+    private String room;
 
     @Override
     public String toString() {

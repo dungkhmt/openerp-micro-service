@@ -8,7 +8,6 @@ import java.util.*;
 
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
-import openerp.openerpresourceserver.generaltimetabling.model.entity.general.PlanGeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.OccupationClassPeriod;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
@@ -23,15 +22,15 @@ import org.springframework.web.multipart.MultipartFile;
 @Component
 public class GeneralExcelHelper {
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    static String[] HEADERS = { "SL thực", "Loại lớp", "Mã HP", "Tuần học", "Thời lượng", "SL max",
-            "Lớp học", "Thời lượng", "Trạng thái", "Mã lớp", "Mã lớp tham chiếu", "Mã lớp tạm thời", "Mã lớp cha", "Kíp", "Đợt", "Khóa", "Giáo viên nước ngoài"};
+    static String[] HEADERS = { "SL thực", "Loại lớp", "Mã HP","Tên HP", "Tuần học", "Thời lượng", "SL max",
+            "Lớp học", "Trạng thái", "Mã lớp", "Mã lớp tham chiếu", "Mã lớp tạm thời", "Mã lớp cha", "Kíp", "Đợt", "Khóa", "Giáo viên nước ngoài"};
     static String SHEET = "Sheet1";
     static String DEFAULT_SHEET = "Sheet1";
 
     /**
      * Start row in excel file to classes
      */
-    private final static int START_ROW_TO_READ_CLASS = 4;
+    private final static int START_ROW_TO_READ_CLASS = 0;
     /**
      * Start column in excel to read class information (Start with column A)
      */
@@ -133,7 +132,11 @@ public class GeneralExcelHelper {
                         } else {
                             switch (classInfoCell.getColumnIndex()) {
                                 case 0:
-                                    generalClass.setQuantity(cellValue);
+                                    if (cellValue.isEmpty() || cellValue.trim().isEmpty()) {
+                                        generalClass.setQuantity(null);
+                                    } else {
+                                        generalClass.setQuantity(Integer.valueOf(cellValue));
+                                    }
                                     break;
                                 case 1:
                                     generalClass.setClassType(cellValue);
@@ -151,7 +154,7 @@ public class GeneralExcelHelper {
                                     generalClass.setMass(cellValue);
                                     break;
                                 case 6:
-                                    generalClass.setQuantityMax(cellValue);
+                                    generalClass.setQuantityMax(Integer.valueOf(cellValue));
                                     break;
                                 case 7:
                                     generalClass.setStudyClass(cellValue);
@@ -167,13 +170,6 @@ public class GeneralExcelHelper {
                                         generalClass.setRefClassId(null);
                                     } else {
                                         generalClass.setRefClassId(Long.valueOf(cellValue));
-                                    }
-                                    break;
-                                case 11:
-                                    if (cellValue.isEmpty()) {
-                                        generalClass.setId(null);
-                                    } else {
-                                        generalClass.setId(Long.valueOf(cellValue));
                                     }
                                     break;
                                 case 12:
@@ -207,7 +203,8 @@ public class GeneralExcelHelper {
             workbook.close();
             return convertedList;
         } catch (Exception ex) {
-            log.error(ex.getMessage());
+            ex.printStackTrace();
+            log.error(ex);
             return null;
         }
     }
@@ -216,13 +213,13 @@ public class GeneralExcelHelper {
     public ByteArrayInputStream convertRoomOccupationToExcel(List<RoomOccupation> rooms) {
         /*Init the data to map*/
         HashMap<String, List<OccupationClassPeriod>> periodMap = new HashMap<>();
-        HashMap<String, List<OccupationClassPeriod>> conflictMap = new HashMap<>();
+        HashMap<OccupationClassPeriod, List<OccupationClassPeriod>> conflictMap = new HashMap<>();
         for(RoomOccupation room : rooms) {
             String classRoom = room.getClassRoom();
             long crewPeriod = room.getCrew().equals("S") ? 0 : 6;
             long startPeriodIndex = room.getStartPeriod() + 12L *(room.getDayIndex()-2) + crewPeriod;
             long endPeriodIndex = room.getEndPeriod() + 12L *(room.getDayIndex()-2) + crewPeriod;
-            OccupationClassPeriod period = new OccupationClassPeriod(startPeriodIndex, endPeriodIndex, room.getClassCode());
+            OccupationClassPeriod period = new OccupationClassPeriod(startPeriodIndex, endPeriodIndex, room.getClassCode(), classRoom);
             if(periodMap.get(classRoom) == null) {
                 List<OccupationClassPeriod> initList = new ArrayList<>();
                 initList.add(period);
@@ -230,16 +227,13 @@ public class GeneralExcelHelper {
             } else {
                 periodMap.get(classRoom).add(period);
             }
-            if(/*Check conflict at here*/!ClassTimeComparator.isPeriodConflict(period, periodMap)) {
-                if(conflictMap.get(classRoom) == null) {
-                    List<OccupationClassPeriod> initList = new ArrayList<>();
-                    initList.add(period);
-                    conflictMap.put(classRoom, initList);
-                } else {
-                    conflictMap.get(classRoom).add(period);
-                }
+            if(conflictMap.get(period) == null) {
+                List<OccupationClassPeriod> initList = new ArrayList<>();
+                conflictMap.put(period, initList);
             }
         }
+
+
 
 
         /*Handle Excel write*/
@@ -297,11 +291,12 @@ public class GeneralExcelHelper {
                     Row roomRow = sheet.createRow(rowIndex);
                     Cell roomNameCell = roomRow.createCell(0);
                     roomNameCell.setCellValue(room);
-                    roomNameCell.setCellStyle(roomStyle);
+                    roomNameCell.setCellStyle(headerStyle);
                     for (int cellIndex = 1; cellIndex <= 84; cellIndex++) {
                         Cell c = roomRow.createCell(cellIndex);
                         c.setCellStyle(boldStyle);
                         for (OccupationClassPeriod roomPeriod : periodMap.get(room)) {
+                            sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, (int) roomPeriod.getStartPeriodIndex(), (int) roomPeriod.getEndPeriodIndex()));
                             if(cellIndex >=  roomPeriod.getStartPeriodIndex() && cellIndex <= roomPeriod.getEndPeriodIndex()) {
                                 // If cell value is not empty, append class code with comma
                                 if (c.getStringCellValue() != null && !c.getStringCellValue().isEmpty()) {
@@ -311,6 +306,7 @@ public class GeneralExcelHelper {
                                     c.setCellStyle(errorStyle);
                                 } else {
                                     c.setCellValue(roomPeriod.getClassCode());
+                                    c.setCellStyle(roomStyle);
                                 }
                             }
                         }
@@ -318,6 +314,7 @@ public class GeneralExcelHelper {
                     rowIndex++;
                 }
             }
+
             workbook.write(out);
             return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException e) {
@@ -377,7 +374,9 @@ public class GeneralExcelHelper {
                     Cell c = classRow.createCell(i);
                     switch (i) {
                         case 0:
-                            c.setCellValue(generalClass.getQuantity());
+                            if (generalClass.getQuantity() != null) {
+                                c.setCellValue(generalClass.getQuantity());
+                            }
                             break;
                         case 1:
                             c.setCellValue(generalClass.getClassType());
@@ -395,7 +394,9 @@ public class GeneralExcelHelper {
                             c.setCellValue(generalClass.getMass());
                             break;
                         case 6:
-                            c.setCellValue(generalClass.getQuantityMax());
+                            if (generalClass.getQuantityMax() != null) {
+                                c.setCellValue(generalClass.getQuantityMax());
+                            }
                             break;
                         case 7:
                             c.setCellValue(generalClass.getStudyClass());
@@ -441,6 +442,7 @@ public class GeneralExcelHelper {
                 for (int j = START_COL_TO_READ_CLASS_SCHEDULE; j < START_COL_TO_READ_CLASS_SCHEDULE + 42; j++) {
                     Cell c = classRow.createCell(j);
                     for (RoomReservation rr : generalClass.getTimeSlots().stream().filter(RoomReservation::isScheduleNotNull).toList()) {
+                        sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, (rr.getWeekday()-2)*6 + rr.getStartTime() -1 + START_COL_TO_READ_CLASS_SCHEDULE, START_COL_TO_READ_CLASS_SCHEDULE + (rr.getWeekday()-2)*6 + rr.getEndTime() -1));
                         if (j - START_COL_TO_READ_CLASS_SCHEDULE >= (rr.getWeekday()-2)*6 + rr.getStartTime() -1 && j-START_COL_TO_READ_CLASS_SCHEDULE <= (rr.getWeekday()-2)*6 + rr.getEndTime() -1) {
                             c.setCellValue(rr.getRoom());
                             c.setCellStyle(roomStyle);

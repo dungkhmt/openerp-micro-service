@@ -1,6 +1,5 @@
-import { request } from "api";
-import { useEffect, useState, useCallback } from "react";
-import { SEMESTER } from "../config/localize";
+import { useEffect, useMemo, useState } from "react";
+import useDebounce from "../config/debounce";
 import {
   Chip,
   IconButton,
@@ -11,14 +10,18 @@ import {
   TextField,
   Collapse,
   Typography,
+  Button,
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { DataGrid } from "@mui/x-data-grid";
+import { request } from "api";
+import { SEMESTER } from "../config/localize";
+import { applicationUrl, semesterUrl } from "../apiURL";
+import { successNoti } from "utils/notification";
 import styles from "./index.style";
-import { applicationUrl } from "../apiURL";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -29,54 +32,43 @@ const RequestApprovalScreen = () => {
   const [applications, setApplications] = useState([]);
   const [originalApplications, setOriginalApplications] = useState([]);
 
+  const [rowSelect, setRowSelect] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
+  const [semester, setSemester] = useState(SEMESTER);
 
   const [paginationModel, setPaginationModel] = useState(
     DEFAULT_PAGINATION_MODEL
   );
 
   const [isFilter, setIsFilter] = useState(false);
-
   const [statusFilter, setStatusFilter] = useState("ALL");
-
   const [search, setSearch] = useState("");
 
-  const debouncedSearch = useCallback(
-    (search, statusFilter) => {
-      const timer = setTimeout(() => {
-        setPaginationModel({
-          ...DEFAULT_PAGINATION_MODEL,
-          page: 0,
-        });
-        handleFetchData();
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [search, statusFilter]
-  );
+  const debouncedSearch = useDebounce(search, 1000);
 
   useEffect(() => {
-    return debouncedSearch(search, statusFilter);
-  }, [search, statusFilter, debouncedSearch]);
+    request("get", semesterUrl.getCurrentSemester, (res) => {
+      setSemester(res.data);
+    });
+  }, []);
 
   useEffect(() => {
     handleFetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paginationModel]);
+  }, [paginationModel, semester, debouncedSearch, statusFilter]);
 
   const handleFetchData = () => {
-    const searchParam =
-      search !== "" ? `&search=${encodeURIComponent(search)}` : "";
+    const searchParam = debouncedSearch
+      ? `&search=${encodeURIComponent(debouncedSearch)}`
+      : "";
     const applicationStatusParam =
       statusFilter !== "" ? `&appStatus=${statusFilter}` : "";
 
     setIsLoading(true);
     request(
       "get",
-      `${applicationUrl.getApplicationBySemester}/${SEMESTER}?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}${applicationStatusParam}`,
+      `${applicationUrl.getApplicationBySemester}/${semester}?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}${applicationStatusParam}`,
       (res) => {
         setApplications(res.data.data);
         setOriginalApplications(res.data.data);
@@ -90,14 +82,13 @@ const RequestApprovalScreen = () => {
     setStatusFilter(e.target.value);
   };
 
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
-  };
+  const handleSearch = useMemo(
+    () => (e) => {
+      setSearch(e.target.value);
+    },
+    []
+  );
 
-  /**
-   * @description Handle change status of application
-   * @index Find the index of the application in the applications array
-   */
   const handleChangeStatus = (event, rowData) => {
     const { value } = event.target;
     const { id } = rowData;
@@ -117,17 +108,12 @@ const RequestApprovalScreen = () => {
     }
   };
 
-  /**
-   * @index Find the index of the application in the applications array
-   * @value Get the application status of the application
-   */
   const handleSaveData = (rowData) => {
     const { id } = rowData;
 
     const index = applications.findIndex(
       (application) => application.id === id
     );
-
     const value = applications[index].applicationStatus;
     const updatedApplication = { ...rowData, applicationStatus: value };
 
@@ -219,9 +205,7 @@ const RequestApprovalScreen = () => {
           id="application-status"
           name="application-status"
           sx={styles.selection}
-          onChange={(e) => {
-            handleChangeStatusFilter(e);
-          }}
+          onChange={handleChangeStatusFilter}
         >
           <MenuItem value="ALL">
             <Chip label="ALL" color="primary" variant="outlined" />
@@ -307,6 +291,21 @@ const RequestApprovalScreen = () => {
     note: application.note,
   }));
 
+  const updateMultipleApplicationStatus = (status) => {
+    let idList = rowSelect;
+    request(
+      "put",
+      `${applicationUrl.updateMultipleApplicationStatus}/${status}`,
+      (res) => {
+        successNoti(res.data, 5000);
+        handleFetchData();
+        setRowSelect([]);
+      },
+      {},
+      idList
+    );
+  };
+
   return (
     <Paper elevation={3}>
       <div style={styles.tableToolBar}>
@@ -331,6 +330,26 @@ const RequestApprovalScreen = () => {
                 )}
               </IconButton>
             </Tooltip>
+
+            <Button
+              style={styles.firstButton}
+              variant="outlined"
+              color="success"
+              disabled={rowSelect.length === 0}
+              onClick={() => updateMultipleApplicationStatus("APPROVED")}
+            >
+              Duyệt
+            </Button>
+
+            <Button
+              style={styles.firstButton}
+              variant="outlined"
+              color="error"
+              disabled={rowSelect.length === 0}
+              onClick={() => updateMultipleApplicationStatus("REJECTED")}
+            >
+              Không duyệt
+            </Button>
           </div>
 
           <TextField
@@ -359,7 +378,11 @@ const RequestApprovalScreen = () => {
         paginationModel={paginationModel}
         onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[10, 20, 50]}
-        checkboxSelection={false}
+        checkboxSelection
+        onRowSelectionModelChange={(newRowSelectionModel) => {
+          setRowSelect(newRowSelectionModel);
+        }}
+        rowSelectionModel={rowSelect}
         disableRowSelectionOnClick
       />
     </Paper>

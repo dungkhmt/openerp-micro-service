@@ -7,13 +7,19 @@ import {
   MenuItem,
   Button,
   TextField,
+  IconButton,
 } from "@mui/material";
-import { SEMESTER, SEMESTER_LIST } from "../config/localize";
+import { SEMESTER } from "../config/localize";
 import { styles } from "./index.style";
 import { DataGrid } from "@mui/x-data-grid";
-import { useCallback, useEffect, useState } from "react";
+import { useMemo, useEffect, useState } from "react";
+import useDebounce from "../config/debounce";
 import { request } from "api";
-import { applicationUrl } from "../apiURL";
+import { applicationUrl, semesterUrl } from "../apiURL";
+import { pdf } from "@react-pdf/renderer";
+import TAPdf from "./TAPdf";
+import FileSaver from "file-saver";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -23,43 +29,37 @@ const DEFAULT_PAGINATION_MODEL = {
 const TAAssistListScreen = () => {
   const [ta, setTa] = useState([]);
   const [semester, setSemester] = useState(SEMESTER);
+  const [allSemester, setAllSemester] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
 
   const [search, setSearch] = useState("");
 
+  const debouncedSearch = useDebounce(search, 1000);
+
   const [paginationModel, setPaginationModel] = useState(
     DEFAULT_PAGINATION_MODEL
   );
 
-  const debouncedSearch = useCallback(
-    (search) => {
-      const timer = setTimeout(() => {
-        setPaginationModel({
-          ...DEFAULT_PAGINATION_MODEL,
-          page: 0,
-        });
-        handleFetchData();
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [search]
-  );
-
   useEffect(() => {
-    return debouncedSearch(search);
-  }, [search, debouncedSearch]);
+    request("get", semesterUrl.getCurrentSemester, (res) => {
+      setSemester(res.data);
+    });
+    request("get", semesterUrl.getAllSemester, (res) => {
+      setAllSemester(res.data);
+    });
+  }, []);
 
   useEffect(() => {
     handleFetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [semester, paginationModel]);
+  }, [semester, paginationModel, debouncedSearch]);
 
   const handleFetchData = () => {
     const searchParam =
-      search !== "" ? `&search=${encodeURIComponent(search)}` : "";
+      debouncedSearch !== ""
+        ? `&search=${encodeURIComponent(debouncedSearch)}`
+        : "";
     setIsLoading(true);
     request(
       "get",
@@ -76,9 +76,12 @@ const TAAssistListScreen = () => {
     setSemester(event.target.value);
   };
 
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
-  };
+  const handleSearch = useMemo(
+    () => (e) => {
+      setSearch(e.target.value);
+    },
+    []
+  );
 
   const handleDownloadFile = () => {
     request(
@@ -101,10 +104,34 @@ const TAAssistListScreen = () => {
     );
   };
 
+  const downloadPdf = async (data) => {
+    console.log(data);
+    const blob = await pdf(<TAPdf data={data} />).toBlob();
+    FileSaver.saveAs(blob, `${data.mssv}_${data.classId}.pdf`);
+  };
+
+  const actionCell = (params) => {
+    const row = params.row;
+    return (
+      <IconButton onClick={() => downloadPdf(row)}>
+        <FileDownloadIcon />
+      </IconButton>
+    );
+  };
+
   const dataGridColumns = [
+    {
+      headerName: "Hợp đồng",
+      align: "center",
+      headerAlign: "center",
+      flex: 1,
+      minWidth: 100,
+      renderCell: actionCell,
+    },
     {
       field: "name",
       headerName: "Tên sinh viên",
+      align: "center",
       headerAlign: "center",
       minWidth: 300,
       flex: 3,
@@ -160,6 +187,7 @@ const TAAssistListScreen = () => {
       field: "subjectName",
       headerName: "Tên môn học",
       headerAlign: "center",
+      align: "center",
       flex: 3,
       minWidth: 300,
     },
@@ -167,6 +195,7 @@ const TAAssistListScreen = () => {
       field: "time",
       headerName: "Thời gian",
       headerAlign: "center",
+      align: "center",
       flex: 2,
       minWidth: 200,
     },
@@ -185,11 +214,13 @@ const TAAssistListScreen = () => {
     mssv: elm.mssv,
     email: elm.email,
     cpa: elm.cpa,
+    phoneNumber: elm.phoneNumber,
     englishScore: elm.englishScore,
     note: elm.note,
     subjectId: elm.classCall.subjectId,
     subjectName: elm.classCall.subjectName,
     classId: elm.classCall.id,
+    classRoom: elm.classCall.classRoom,
     time:
       "Thứ " +
       elm.classCall.day +
@@ -200,65 +231,68 @@ const TAAssistListScreen = () => {
   }));
 
   return (
-    <Paper elevation={3}>
-      <div style={styles.tableToolBar}>
-        <Typography variant="h4" style={styles.title}>
-          Danh sách trợ giảng
-        </Typography>
-        <div style={styles.searchArea}>
-          <FormControl style={styles.dropdown} fullWidth size="small">
-            <InputLabel id="semester-label">Học kì</InputLabel>
-            <Select
-              labelId="semester-label"
-              id="semester-select"
-              value={semester}
-              name="day"
-              label="Học kì"
-              onChange={handleChangeSemester}
-              MenuProps={{ PaperProps: { sx: styles.selection } }}
+    <>
+      <Paper elevation={3}>
+        <div style={styles.tableToolBar}>
+          <Typography variant="h4" style={styles.title}>
+            Danh sách trợ giảng
+          </Typography>
+          <div style={styles.searchArea}>
+            <FormControl style={styles.dropdown} fullWidth size="small">
+              <InputLabel id="semester-label">Học kì</InputLabel>
+              <Select
+                labelId="semester-label"
+                id="semester-select"
+                value={semester}
+                name="day"
+                label="Học kì"
+                onChange={handleChangeSemester}
+                MenuProps={{ PaperProps: { sx: styles.selection } }}
+              >
+                {allSemester.map((semester, index) => (
+                  <MenuItem key={index} value={semester}>
+                    {semester}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <Button
+              style={styles.firstButton}
+              variant="outlined"
+              onClick={handleDownloadFile}
             >
-              {SEMESTER_LIST.map((semester, index) => (
-                <MenuItem key={index} value={semester}>
-                  {semester}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+              Export danh sách trợ giảng
+            </Button>
 
-          <Button
-            style={styles.firstButton}
-            variant="outlined"
-            onClick={handleDownloadFile}
-          >
-            Export danh sách trợ giảng
-          </Button>
-
-          <TextField
-            style={styles.searchBox}
-            variant="outlined"
-            name="search"
-            value={search}
-            onChange={handleSearch}
-            placeholder="Tìm kiếm"
-          />
+            <TextField
+              style={styles.searchBox}
+              variant="outlined"
+              name="search"
+              value={search}
+              onChange={handleSearch}
+              placeholder="Tìm kiếm"
+            />
+          </div>
         </div>
-      </div>
-      <DataGrid
-        loading={isLoading}
-        rowHeight={60}
-        sx={styles.table}
-        rows={dataGridRows}
-        columns={dataGridColumns}
-        rowCount={totalElements}
-        pagination
-        paginationMode="server"
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
-        pageSizeOptions={[10, 20, 50]}
-        checkboxSelection={false}
-        disableRowSelectionOnClick
-      />
-    </Paper>
+        <DataGrid
+          loading={isLoading}
+          rowHeight={60}
+          style={{ height: "65vh" }}
+          sx={styles.table}
+          rows={dataGridRows}
+          columns={dataGridColumns}
+          rowCount={totalElements}
+          pagination
+          paginationMode="server"
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+          pageSizeOptions={[10, 20, 50]}
+          checkboxSelection={false}
+          disableRowSelectionOnClick
+        />
+      </Paper>
+    </>
   );
 };
 

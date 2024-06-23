@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {request} from "../../api";
+import { Link as RouterLink } from "react-router-dom";
+import { Link } from "@mui/material";
 import {StandardTable} from "erp-hust/lib/StandardTable";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
@@ -8,7 +10,6 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import TextField from '@mui/material/TextField';
-import Switch from '@mui/material/Switch';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -33,16 +34,7 @@ export const TypeScreen = () => {
     const successHandler = (res) => {
         const msg = title === "CREATE NEW ASSET TYPE" ? "CREATE SUCCESSFULLY" : "EDIT SUCCESSFULLY";
         successNoti(msg, 3000);
-        console.log("res", res);
-        const typeIndex = types.findIndex(type => type.id === res.data.id);
-
-        if (typeIndex !== -1) {
-            const updatedTypes = [...types];
-            updatedTypes[typeIndex] = res.data;
-            setTypes(updatedTypes);
-        } else {
-            setTypes(prevTypes => [...prevTypes, res.data]);
-        }
+        window.location.reload();
     };    
 
     const successHandlerDelete = () => {
@@ -131,6 +123,14 @@ export const TypeScreen = () => {
         {
             title: "Name",
             field: "name",
+            render: (rowData) => (
+                <Link
+                    component={RouterLink}
+                    to={`/type/${rowData["id"]}`}
+                >
+                    {rowData["name"]}
+                </Link>
+            )
         },
         {
             title: "Description",
@@ -139,6 +139,10 @@ export const TypeScreen = () => {
         {
             title: "Code Prefix",
             field: "code_prefix",
+        },
+        {
+            title: "Num Assets",
+            field: "num_assets"
         },
         {
             title: "Edit",

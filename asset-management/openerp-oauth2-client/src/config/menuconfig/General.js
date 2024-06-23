@@ -10,5 +10,12 @@ export const GeneralManagement = {
             text: "My Asset",
             child: []
         },
+        {
+            id: "MENU_GENERAL_MANAGEMENT.REQUEST",
+            path: "/my-request",
+            isPublic: true,
+            text: "My Request",
+            child: []
+        },
     ]
 };

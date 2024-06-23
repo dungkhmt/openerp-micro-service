@@ -1,8 +1,12 @@
 package openerp.openerpresourceserver.labtimetabling.entity;
 
+import com.vladmihalcea.hibernate.type.array.IntArrayType;
+import io.swagger.models.auth.In;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CollectionType;
+import org.hibernate.annotations.Type;
 
 import java.io.Serializable;
 import java.util.List;
@@ -29,6 +33,11 @@ public class Class implements Serializable {
     private String course_name;
     private Long department_id;
     private Long semester_id;
+    private Integer lessons_per_semester;
+    private Integer week_schedule_constraint;
+
+    @Type(IntArrayType.class)
+    private Integer[] avoid_week_schedule_constraint;
 
     @OneToMany(mappedBy = "lesson", cascade = {CascadeType.PERSIST})
     private List<Assign> assigns;
@@ -36,12 +45,4 @@ public class Class implements Serializable {
     @ManyToOne
     @JoinColumn(name = "semester_id", insertable=false, updatable=false)
     private Semester_ semester;
-
-//    @CreatedDate
-//    @Column(name = "created_at")
-//    private Date createdDate;
-//    //
-//    @LastModifiedDate
-//    @Column(name = "updated_at")
-//    private Date lastModifiedDate;
 }

@@ -18,16 +18,12 @@ public class RoomReservation {
     @JoinColumn(name = "general_class_id")
     @JsonIgnore
     private GeneralClass generalClass;
-    @JsonProperty("crew")
     private String crew;
-
-    @JsonProperty("startTime")
     private Integer startTime;
-    @JsonProperty("endTime")
     private Integer endTime;
-
     private Integer weekday;
     private String room;
+    private String duration;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -55,6 +51,11 @@ public class RoomReservation {
         return generalClass.getClassCode() + ":" + startTime + "-" + endTime + "/" + "D" + weekday+ "/" + room;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        RoomReservation that = (RoomReservation) obj;
+        return this.id.equals(that.id);
+    }
 
     public boolean isScheduleNotNull() {
         return this.getStartTime() != null && this.getEndTime() != null && this.getWeekday() != null && this.getRoom()!= null && !this.getRoom().isEmpty();

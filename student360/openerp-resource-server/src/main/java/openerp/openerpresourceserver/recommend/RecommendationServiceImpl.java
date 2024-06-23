@@ -1,26 +1,17 @@
 package openerp.openerpresourceserver.recommend;
 
 import openerp.openerpresourceserver.model.StudentPerformance;
-import openerp.openerpresourceserver.service.StudentSubmissionStatisticsService;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
+import openerp.openerpresourceserver.recommend.util.CoursesLoader;
+import openerp.openerpresourceserver.service.StudentPerformanceService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.recommend.model.Course;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -29,12 +20,14 @@ import java.util.stream.Collectors;
 public class RecommendationServiceImpl implements RecommendationService {
 
     @Autowired
-    private StudentSubmissionStatisticsService studentSubmissionStatisticsService;
+    private StudentPerformanceService studentPerformanceService;
     @Override
-    public List<Course> getRecommendCourses(String studentId, String price) {
-        List<Course> courses = loadCoursesFromCSV("course.csv");
-        StudentPerformance student = studentSubmissionStatisticsService.getPerformanceStudentId(studentId);
-        List<Course> recommendedCourses = new ArrayList<>();
+    public List<Course> getRecommendCourses(String studentId, String price, String rating, String duration) {
+        List<Course> courses = CoursesLoader.loadCoursesFromCSV("course.csv");
+        StudentPerformance student = studentPerformanceService.getPerformanceStudentId(studentId);
+        List<Course> recommendedCourses;
+        double defaultRating = (rating != null) ? Double.parseDouble(rating) : 4.0;
+        double defaultHour = (duration != null) ? Double.parseDouble(duration) : 3.0;
 
         if (price.equalsIgnoreCase("free")) {
             courses = courses.stream()
@@ -48,146 +41,42 @@ public class RecommendationServiceImpl implements RecommendationService {
         }
 
         if (student.getPassState() != 1) {
-            List<Course> beginnerCourses = courses.stream()
-                    .filter(course -> course.getLevel().equalsIgnoreCase("beginner"))
-                    .toList();
-
-            // Lọc các khóa học có title chứa các từ khóa quan trọng và không nằm trong beginnerCourses
-            List<String> allDescriptions = courses.stream()
-                    .map(Course::getSubtitle)
-                    .toList();
-
-            List<String> allKeywords = new ArrayList<>();
-
-            for (String description : allDescriptions) {
-                String[] words = description.toLowerCase().split("\\s+");
-                for (String word : words) {
-                    // You can add more conditions to filter out irrelevant words
-                    if (word.equals("simple") || word.equals("basic") || word.equals("begin") || word.equals("zero") || word.equals("part 1") || word.equals("essentials")) {
-                        allKeywords.add(word);
-                    }
-                }
-            }
-            Map<String, Long> keywordCount = allKeywords.stream()
-                    .collect(Collectors.groupingBy(w -> w, Collectors.counting()));
-            List<String> topKeywords = keywordCount.entrySet().stream()
-                    .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-                    .map(Map.Entry::getKey)
-                    .toList();
-
-            List<Course> filteredCoursesByTitle = courses.stream()
-                    .filter(course -> topKeywords.stream().anyMatch(course.getTitle().toLowerCase()::contains))
-                    .filter(course -> !beginnerCourses.contains(course))
-                    .toList();
-
-            List<Course> filteredCoursesBySubtitle = courses.stream()
-                    .filter(course -> topKeywords.stream().anyMatch(course.getSubtitle().toLowerCase()::contains))
-                    .filter(course -> !beginnerCourses.contains(course))
-                    .toList();
-
-            // Kết hợp beginnerCourses và filteredCourses
-            recommendedCourses.addAll(beginnerCourses);
-            recommendedCourses.addAll(filteredCoursesByTitle);
-            recommendedCourses.addAll(filteredCoursesBySubtitle);
-
-            // Giới hạn số lượng khóa học trả về là 20
-            recommendedCourses = recommendedCourses.stream()
-                    .limit(20)
+            recommendedCourses = courses.stream()
+                    .filter(course -> course.getRating() >= defaultRating)
+                    .filter(course -> {
+                        if (defaultHour == 0)
+                            return course.getHours() < 1 && course.getHours() >= 0;
+                        else if (defaultHour == 1)
+                            return course.getHours() > 1 && course.getHours() <= 3;
+                        if (defaultHour == 3)
+                            return course.getHours() > 3 && course.getHours() <= 6;
+                        else if (defaultHour == 6)
+                            return course.getHours() > 6 && course.getHours() <= 17;
+                        return course.getHours() > 17;
+                    })
+                    .sorted(Comparator.comparingDouble(Course::getBasicTfIdfScore).reversed())
+                    .limit(10)
                     .collect(Collectors.toList());
         }
         else {
-            List<Course> intermediateCourses = courses.stream()
-                    .filter(course -> course.getLevel().equalsIgnoreCase("intermediate"))
-                    .toList();
-
-            // Lọc các khóa học có title chứa các từ khóa quan trọng và không nằm trong beginnerCourses
-            List<String> allDescriptions = courses.stream()
-                    .map(Course::getSubtitle)
-                    .toList();
-
-            List<String> allKeywords = new ArrayList<>();
-
-            for (String description : allDescriptions) {
-                String[] words = description.toLowerCase().split("\\s+");
-                for (String word : words) {
-                    // You can add more conditions to filter out irrelevant words
-                    if (word.equals("advance") || word.equals("mastery")) {
-                        allKeywords.add(word);
-                    }
-                }
-            }
-            Map<String, Long> keywordCount = allKeywords.stream()
-                    .collect(Collectors.groupingBy(w -> w, Collectors.counting()));
-            List<String> topKeywords = keywordCount.entrySet().stream()
-                    .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-                    .map(Map.Entry::getKey)
-                    .toList();
-
-            List<Course> filteredCoursesByTitle = courses.stream()
-                    .filter(course -> topKeywords.stream().anyMatch(course.getTitle().toLowerCase()::contains))
-                    .filter(course -> !intermediateCourses.contains(course))
-                    .toList();
-
-            List<Course> filteredCoursesBySubtitle = courses.stream()
-                    .filter(course -> topKeywords.stream().anyMatch(course.getSubtitle().toLowerCase()::contains))
-                    .filter(course -> !intermediateCourses.contains(course))
-                    .toList();
-
-            // Kết hợp beginnerCourses và filteredCourses
-            recommendedCourses.addAll(intermediateCourses);
-            recommendedCourses.addAll(filteredCoursesByTitle);
-            recommendedCourses.addAll(filteredCoursesBySubtitle);
-
-            // Giới hạn số lượng khóa học trả về là 20
-            recommendedCourses = recommendedCourses.stream()
-                    .limit(20)
+            recommendedCourses = courses.stream()
+                    .filter(course -> course.getRating() >= defaultRating)
+                    .filter(course -> {
+                        if (defaultHour == 0)
+                            return course.getHours() < 1 && course.getHours() >= 0;
+                        else if (defaultHour == 1)
+                            return course.getHours() > 1 && course.getHours() <= 3;
+                        if (defaultHour == 3)
+                            return course.getHours() > 3 && course.getHours() <= 6;
+                        else if (defaultHour == 6)
+                            return course.getHours() > 6 && course.getHours() <= 17;
+                        return course.getHours() > 17;
+                    })
+                    .sorted(Comparator.comparingDouble(Course::getAdvanceTfIdfScore).reversed())
+                    .limit(10)
                     .collect(Collectors.toList());
 
         }
         return recommendedCourses;
-    }
-
-    public List<Course> loadCoursesFromCSV(String csvFileName) {
-        List<Course> courses = new ArrayList<>();
-        BufferedReader br = null;
-
-        try {
-            // Load file từ thư mục resources
-            Resource resource = new ClassPathResource(csvFileName);
-            InputStream inputStream = resource.getInputStream();
-            br = new BufferedReader(new InputStreamReader(inputStream));
-
-            // Sử dụng Apache Commons CSV để parse CSV
-            CSVParser csvParser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(br);
-
-            for (CSVRecord csvRecord : csvParser) {
-                Course course = new Course();
-                course.setId(csvRecord.get("id"));
-                course.setTitle(csvRecord.get("title"));
-                course.setUrl(csvRecord.get("url"));
-                course.setSubtitle(csvRecord.get("subtitle"));
-                course.setRating(csvRecord.get("rating"));
-                course.setReviews(csvRecord.get("reviews"));
-                course.setHours(csvRecord.get("hours"));
-                course.setLectures(csvRecord.get("lectures"));
-                course.setLevel(csvRecord.get("level"));
-                course.setCurrentPrice(csvRecord.get("currentPrice"));
-                course.setOriginalPrice(csvRecord.get("originalPrice"));
-                courses.add(course);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            System.err.println("Lỗi khi phân tích dữ liệu: " + e.getMessage());
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return courses;
     }
 }

@@ -17,7 +17,7 @@ import com.hust.baseweb.applications.education.quiztest.repo.InteractiveQuizRepo
 @Service
 public class InteractiveQuizAnswerServiceImpl implements InteractiveQuizAnswerService {
     private InteractiveQuizAnswerRepo interactiveQuizAnswerRepo;
-    private InteractiveQuizQuestionRepo interactiveQuizQuestionRepo;
+    // private InteractiveQuizQuestionRepo interactiveQuizQuestionRepo;
     private InteractiveQuizRepo interactiveQuizRepo;
 
     @Override

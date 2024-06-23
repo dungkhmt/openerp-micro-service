@@ -307,13 +307,19 @@ const DefaultSuggestions = ({ setOpenDialog }) => {
                     color: "text.primary",
                     textDecoration: "none",
                     "&:hover > *": { color: "primary.main" },
+                    maxWidth: "100%",
                   }}
                 >
                   <Icon icon={suggestionItem.icon} fontSize={20} />
                   <Typography
-                    noWrap
                     variant="body2"
-                    sx={{ color: "text.primary" }}
+                    sx={{
+                      color: "text.primary",
+                      flex: 1,
+                      "&:first-letter": {
+                        textTransform: "uppercase",
+                      },
+                    }}
                   >
                     {suggestionItem.suggestion}
                   </Typography>

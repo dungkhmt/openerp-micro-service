@@ -19,7 +19,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "user_register")
+@Table(name = "user_login")
 public class User implements Serializable {
 
     @Id
@@ -30,13 +30,7 @@ public class User implements Serializable {
 
     private String firstName;
 
-    private String middleName;
-
     private String lastName;
-
-    private String affiliations;
-
-//    private String affiliations;
 
     @CreatedDate
     @Column(name = "created_stamp")
@@ -52,11 +46,6 @@ public class User implements Serializable {
             fullNameBuilder.append(" ");
         }
 
-        if (middleName != null && !middleName.isEmpty()) {
-            fullNameBuilder.append(middleName);
-            fullNameBuilder.append(" ");
-        }
-
         // Thêm lastName vào fullName nếu có
         if (lastName != null && !lastName.isEmpty()) {
             fullNameBuilder.append(lastName);
@@ -65,5 +54,4 @@ public class User implements Serializable {
         // Trả về chuỗi tên đầy đủ
         return fullNameBuilder.toString();
     }
-
 }

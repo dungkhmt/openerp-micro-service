@@ -7,6 +7,8 @@ import java.util.List;
 public interface RequestService {
     List<Request> getAllRequests();
 
+    Request getById(Integer id);
+
     Request createNewRequest(Request request);
 
     Request editRequest(Integer Id, Request request);
@@ -17,5 +19,13 @@ public interface RequestService {
 
     void deleteRequest(Integer id);
 
-    List<Request> getUserRequests(String user_id);
+    List<Request> getCreatorRequests(String user_id);
+
+    List<Request> getAdminRequests(String admin_id);
+
+    Request paybackRequest(Integer request_id, String user_id);
+
+    List<String> getTopUsers();
+
+    List<Request> getByUser(String user_id);
 }

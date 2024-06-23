@@ -24,7 +24,7 @@ public class StudentStatisticContest {
     private double averageSubmissionPerDay;
     private List<ContestSubmissionByStudent> contestDetails;
     private Map<LocalDate, Integer> dailySubmissionCounts;
-    private List<StudentSubmissionBySemster> studentSubmissionBySemsters;
+    private List<StudentSubmissionBySemester> studentSubmissionBySemsters;
     private Object[] programmingLanguageSubmitCounts;
     private Object[] submissionHourlySummary;
     private Map<String, Integer> firstTimeAcceptList;

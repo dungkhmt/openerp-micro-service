@@ -1,13 +1,12 @@
-import {grey} from "@material-ui/core/colors";
+import { grey } from "@material-ui/core/colors";
 import Dialog from "@material-ui/core/Dialog";
 import MuiDialogActions from "@material-ui/core/DialogActions";
 import MuiDialogContent from "@material-ui/core/DialogContent";
 import MuiDialogTitle from "@material-ui/core/DialogTitle";
 import IconButton from "@material-ui/core/IconButton";
-import {makeStyles, withStyles} from "@material-ui/core/styles";
+import { makeStyles, withStyles } from "@material-ui/core/styles";
 import CloseIcon from "@material-ui/icons/Close";
 import clsx from "clsx";
-import React from "react";
 
 const dialogTitleStyles = (theme) => ({
   root: {
@@ -116,7 +115,7 @@ export default function CustomizedDialogs(props) {
         open={open}
         onClose={handleClose}
         aria-labelledby="customized-dialog-title"
-        classes={{ paper: classes.paper }}
+        classes={{ paper: clsx(classes.paper, classNames?.paper) }}
       >
         <DialogTitle
           id="customized-dialog-title"

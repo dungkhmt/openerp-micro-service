@@ -3,7 +3,6 @@ package openerp.openerpresourceserver.generaltimetabling.service;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
-import openerp.openerpresourceserver.generaltimetabling.model.dto.RoomOccupationDto;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 

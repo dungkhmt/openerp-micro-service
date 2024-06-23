@@ -3,14 +3,44 @@ import PropTypes from "prop-types";
 import ReactApexcharts from "react-apexcharts";
 import { DashboardCard } from "../../../../components/card/DashboardCard";
 import { Box, CardContent, useTheme } from "@mui/material";
+import { useSelector } from "react-redux";
+import { useMemo } from "react";
 
 const statusColors = {
   active: "#FFCA64",
   inactive: "#9C9FA4",
   closed: "#FF6166",
   open: "#6AD01F",
-  inprogress: "#9E69FD",
-  resolved: "#1986C2",
+  resolved: "#9E69FD",
+  inprogress: "#1986C2",
+};
+
+// ! Hard code status id here
+const statuses = {
+  ASSIGNMENT_ACTIVE: {
+    label: "Đang kích hoạt",
+    color: statusColors.active,
+  },
+  ASSIGNMENT_INACTIVE: {
+    label: "Không hoạt động",
+    color: statusColors.inactive,
+  },
+  TASK_CLOSED: {
+    label: "Đóng",
+    color: statusColors.closed,
+  },
+  TASK_INPROGRESS: {
+    label: "Đang xử lý",
+    color: statusColors.inprogress,
+  },
+  TASK_OPEN: {
+    label: "Mở",
+    color: statusColors.open,
+  },
+  TASK_RESOLVED: {
+    label: "Đã xử lý",
+    color: statusColors.resolved,
+  },
 };
 
 const WorkloadByStatus = forwardRef(function WorkloadByStatus(
@@ -18,102 +48,111 @@ const WorkloadByStatus = forwardRef(function WorkloadByStatus(
   ref
 ) {
   const theme = useTheme();
+  const { workloadByStatus: data } = useSelector((state) => state.statistic);
 
-  const options = {
-    stroke: { width: 0 },
-    labels: [
-      "Đang kích hoạt",
-      "Không hoạt động",
-      "Đóng",
-      "Đang xử lý",
-      "Mở",
-      "Đã xử lý",
-    ],
-    colors: [
-      statusColors.active,
-      statusColors.inactive,
-      statusColors.closed,
-      statusColors.inprogress,
-      statusColors.open,
-      statusColors.resolved,
-    ],
-    dataLabels: {
-      enabled: true,
-      formatter: (val) => `${parseInt(val, 10)}%`,
-    },
-    legend: {
-      position: "bottom",
-      markers: { offsetX: -3 },
-      labels: { colors: theme.palette.text.secondary },
-      itemMargin: {
-        vertical: 3,
-        horizontal: 10,
+  const series = data.load.map((i) => i.count ?? 0);
+  const allZero = series.every((val) => val === 0);
+
+  /**
+   * @type {import("apexcharts").ApexOptions}
+   */
+  const options = useMemo(
+    () => ({
+      stroke: { width: 0 },
+      labels: allZero
+        ? ["Không có dữ liệu"]
+        : data.load.map((i) => statuses[i.status]?.label),
+      colors: allZero
+        ? ["#dfdfdf"]
+        : data.load.map((i) => statuses[i.status]?.color),
+      dataLabels: {
+        enabled: !allZero,
+        formatter: (val) => `${parseInt(val, 10)}%`,
       },
-    },
-    plotOptions: {
-      pie: {
-        donut: {
-          labels: {
-            show: true,
-            name: {
-              fontSize: "1rem",
-            },
-            value: {
-              fontSize: "1rem",
-              color: theme.palette.text.secondary,
-              formatter: (val) => `${parseInt(val, 10)}`,
-            },
-            total: {
+      legend: {
+        position: "bottom",
+        markers: { offsetX: -3 },
+        labels: { colors: theme.palette.text.secondary },
+        itemMargin: {
+          vertical: 3,
+          horizontal: 10,
+        },
+      },
+      plotOptions: {
+        pie: {
+          donut: {
+            labels: {
               show: true,
-              fontSize: "1rem",
-              label: "Đã xử lý",
-              formatter: () => "21%",
-              color: theme.palette.text.primary,
+              name: {
+                fontSize: "1rem",
+              },
+              value: {
+                fontSize: "1rem",
+                color: theme.palette.text.secondary,
+                formatter: (val) => `${parseInt(val, 10)}`,
+              },
+              total: {
+                show: true,
+                fontSize: "1rem",
+                label: "Đã xử lý",
+                formatter: () =>
+                  allZero
+                    ? `0%`
+                    : `${Math.floor(
+                        ((data.load.find((i) => i.status === "TASK_RESOLVED")
+                          ?.count || 0) /
+                          data.load.reduce((acc, cur) => acc + cur.count, 0)) *
+                          100
+                      )}%`,
+                color: theme.palette.text.primary,
+              },
             },
           },
         },
       },
-    },
-    responsive: [
-      {
-        breakpoint: 992,
-        options: {
-          chart: {
-            height: 380,
-          },
-          legend: {
-            position: "bottom",
+      responsive: [
+        {
+          breakpoint: 992,
+          options: {
+            chart: {
+              height: 380,
+            },
+            legend: {
+              position: "bottom",
+            },
           },
         },
-      },
-      {
-        breakpoint: 576,
-        options: {
-          chart: {
-            height: 320,
-          },
-          plotOptions: {
-            pie: {
-              donut: {
-                labels: {
-                  show: true,
-                  name: {
-                    fontSize: "1rem",
-                  },
-                  value: {
-                    fontSize: "1rem",
-                  },
-                  total: {
-                    fontSize: "1rem",
+        {
+          breakpoint: 576,
+          options: {
+            chart: {
+              height: 320,
+            },
+            plotOptions: {
+              pie: {
+                donut: {
+                  labels: {
+                    show: true,
+                    name: {
+                      fontSize: "1rem",
+                    },
+                    value: {
+                      fontSize: "1rem",
+                    },
+                    total: {
+                      fontSize: "1rem",
+                    },
                   },
                 },
               },
             },
           },
         },
-      },
-    ],
-  };
+      ],
+    }),
+    [data.load, theme]
+  );
+
   return (
     <DashboardCard
       ref={ref}
@@ -130,7 +169,7 @@ const WorkloadByStatus = forwardRef(function WorkloadByStatus(
           <ReactApexcharts
             type="donut"
             options={options}
-            series={[10, 16, 50, 50, 50, 50]}
+            series={allZero ? [1] : series}
             height={300}
           />
         </Box>

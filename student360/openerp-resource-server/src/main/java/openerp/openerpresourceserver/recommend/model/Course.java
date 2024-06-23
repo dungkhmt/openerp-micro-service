@@ -1,7 +1,6 @@
 package openerp.openerpresourceserver.recommend.model;
 
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,15 +14,29 @@ public class Course {
 
     @Id
     private String id;
-
     private String title;
     private String url;
     private String subtitle;
-    private String rating;
+    private Double rating;
     private String reviews;
-    private String hours;
+    private Double hours;
     private String lectures;
     private String level;
     private String currentPrice;
     private String originalPrice;
+    private Double basicTfIdfScore;
+    private Double advanceTfIdfScore;
+
+    public void setHours(String hoursStr) {
+        if (hoursStr == null || hoursStr.isEmpty()) {
+            this.hours = 1.0;
+        } else {
+            try {
+                this.hours = Double.parseDouble(hoursStr);
+            } catch (NumberFormatException e) {
+                this.hours = 1.0; // Giá trị mặc định nếu có lỗi khi chuyển đổi
+            }
+        }
+    }
+
 }

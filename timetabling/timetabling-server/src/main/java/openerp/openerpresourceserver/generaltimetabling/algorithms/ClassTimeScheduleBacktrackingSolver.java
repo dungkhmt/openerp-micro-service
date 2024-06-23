@@ -15,7 +15,8 @@ public class ClassTimeScheduleBacktrackingSolver {
     private boolean found;
     private double timeLimit;// time limit in seconds
     private double t_start;
-    public ClassTimeScheduleBacktrackingSolver(int n, int[] durations, List<Integer>[] domains, List<int[]> C, double timeLimit) {
+    public
+    ClassTimeScheduleBacktrackingSolver(int n, int[] durations, List<Integer>[] domains, List<int[]> C, double timeLimit) {
         this.n = n;
         this.durations = durations;
         this.domains = domains;

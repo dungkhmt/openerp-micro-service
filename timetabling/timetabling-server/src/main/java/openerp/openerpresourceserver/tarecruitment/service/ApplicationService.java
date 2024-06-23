@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.tarecruitment.service;
 
-import openerp.openerpresourceserver.tarecruitment.dto.PaginationDTO;
+import openerp.openerpresourceserver.tarecruitment.entity.dto.ChartDTO;
+import openerp.openerpresourceserver.tarecruitment.entity.dto.PaginationDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.Application;
 
 import java.io.IOException;
@@ -31,6 +32,8 @@ public interface ApplicationService {
 
     Application updateApplicationStatus(int id, String status);
 
+    String updateMultipleApplicationStatus(List<Integer> idList, String status);
+
     Application updateAssignStatus(int id, String status);
 
     void autoAssignApplication(String semester);
@@ -38,4 +41,12 @@ public interface ApplicationService {
     byte[] generateExcelFile(String semester) throws IOException;
 
     PaginationDTO<Application> getTABySemester(String semester, String search, int page, int limit);
+
+    List<ChartDTO> getApplicatorEachSemesterData();
+
+    List<ChartDTO> getNumbApplicationEachSemesterData();
+
+    List<ChartDTO> getNumbApplicationApproveEachSemesterData();
+
+    List<ChartDTO> dataApplicationEachCourseThisSemester();
 }

@@ -75,7 +75,8 @@ public interface SubmissionHourlySummaryRepo extends JpaRepository<SubmissionHou
             "LEFT JOIN  " +
             "    subquery sm ON cm.user_submission_id = sm.user_submission_id AND cm.max_total_submissions = sm.total_submissions " +
             "LEFT JOIN  " +
-            "    subquery pm ON cm.user_submission_id = pm.user_submission_id AND cm.max_total_pass_submissions = pm.total_pass_submissions ", nativeQuery = true)
+            "    subquery pm ON cm.user_submission_id = pm.user_submission_id AND cm.max_total_pass_submissions = pm.total_pass_submissions " +
+            "LIMIT 1 ", nativeQuery = true)
     Object findMaxTotalSubmissionsByUserId(@Param("userId") String userId);
 
     @Query(value =
@@ -88,7 +89,7 @@ public interface SubmissionHourlySummaryRepo extends JpaRepository<SubmissionHou
                     "FROM " +
                     "    submission_hourly_summary  " +
                     "WHERE  " +
-                    "    user_submission_id = :userId " + // Thêm dấu cách sau :userId
+                    "    user_submission_id = :userId " +
                     "GROUP BY " +
                     "    user_submission_id", nativeQuery = true)
     Object findStartEndTimeSubmittedByUserId(@Param("userId") String userId);
@@ -116,7 +117,7 @@ public interface SubmissionHourlySummaryRepo extends JpaRepository<SubmissionHou
                     "FROM AllHours " +
                     "LEFT JOIN submission_hourly_summary shs " +
                     "       ON AllHours.hour_of_day = shs.hour_of_day " +
-                    "       AND shs.user_submission_id = 'admin' " +
+                    "       AND shs.user_submission_id = :userId " +
                     "GROUP BY AllHours.hour_of_day " +
                     "ORDER BY AllHours.hour_of_day ", nativeQuery = true)
     Object[] submissionHourlySummariesByHourByUserID(@Param("userId") String userId);

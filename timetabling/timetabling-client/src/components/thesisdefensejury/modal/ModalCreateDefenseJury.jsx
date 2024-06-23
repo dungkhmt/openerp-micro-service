@@ -41,7 +41,28 @@ const styles = {
         justifyContent: "end",
     },
 };
-
+// const juryType = [
+//     {
+//         id: 1,
+//         name: "AIoT"
+//     },
+//     {
+//         id: 2,
+//         name: "An toàn không gian số"
+//     },
+//     {
+//         id: 3,
+//         name: "Blockchain và ứng dụng"
+//     },
+//     {
+//         id: 4,
+//         name: "eCommerce & Logistic"
+//     },
+//     {
+//         id: 5,
+//         name: "EdTech"
+//     }
+// ]
 function CreateDefenseJury({
     open,
     handleClose,
@@ -58,22 +79,36 @@ function CreateDefenseJury({
             name: "",
             maxThesis: "",
             defenseDate: "",
-            defenseRoomId: 1,
-            defenseSessionId: 1,
-            academicKeywordList: [],
+            defenseRoomId: 0,
+            defenseSessionId: 0,
+            juryTopicId: 0,
         },
     });
     const handleFormSubmit = (data) => {
-        data.academicKeywordList = [...data.academicKeywordList, ...keyword];
         data.thesisPlanName = thesisPlanName;
+        if (data?.defenseRoomId === 0) {
+            return errorNoti("Bạn cần chọn phòng tổ chức hội đồng", true)
+        }
+        if (data?.defenseSessionId === 0) {
+            return errorNoti("Bạn cần chọn buổi tổ chức hội đồng", true)
+        }
+        if (data?.juryTopicId === 0) {
+            return errorNoti("Bạn cần chọn phân ban của hội đồng", true)
+        }
         request(
             "post",
             "/defense-jury/save",
             (res) => {
                 if (res.data) {
-                    handleClose();
-                    handleToggle();
-                    successNoti("Create Successfully", true);
+                    const message = res.data;
+                    if (message === "Success") {
+                        handleClose();
+                        handleToggle();
+                        successNoti("Tạo hội đồng mới thành công", true);
+                    }
+                    else {
+                        errorNoti(message, true);
+                    }
                 } else {
                     errorNoti("Create failed", true);
                 }
@@ -87,7 +122,7 @@ function CreateDefenseJury({
         ).then();
     };
     const { data: roomList } = useFetch("/defense-room/get-all");
-    const { data: keywordList } = useFetch("/academic_keywords/get-all");
+    const { data: juryType } = useFetch("/jury-topic/get-all");
     const { data: sessionList } = useFetch("/defense-session/get-all");
     const handleChange = (event) => {
         const {
@@ -155,7 +190,7 @@ function CreateDefenseJury({
                                         <Select
                                             MenuProps={MenuProps}
                                             name="defenseRoomId"
-                                            {...register("defenseRoomId")}
+                                            {...register("defenseRoomId", { required: true })}
                                             label="Room"
                                             input={<OutlinedInput label="Tag" />}
                                         >
@@ -189,31 +224,26 @@ function CreateDefenseJury({
                                     </FormControl>
                                 </Grid>
                                 <Grid item={true} xs={6} spacing={2} p={2}>
-                                    <span>Keyword hội đồng</span>
+                                    <span>Phân ban của hội đồng</span>
                                     <FormControl fullWidth margin="normal">
-                                        <InputLabel id="demo-multiple-name-label">
-                                            Keyword
+                                        <InputLabel id="defense-jury-topic-label">
+                                            Chọn phân ban
                                         </InputLabel>
                                         <Select
-                                            multiple
                                             MenuProps={MenuProps}
-                                            value={keyword}
-                                            name="academicKeywordList"
-                                            label="Keyword"
-                                            renderValue={(selected) => selected.join(", ")}
+                                            label="jury-topic"
+                                            name="juryTopicId"
                                             input={<OutlinedInput label="Tag" />}
-                                            onChange={handleChange}
+                                            {...register("juryTopicId", { required: true })}
                                         >
-                                            {keywordList?.map((item) => (
-                                                <MenuItem key={item?.id} value={item?.keyword}>
-                                                    <Checkbox
-                                                        checked={keyword.indexOf(item?.keyword) > -1}
-                                                    />
-                                                    <ListItemText primary={item?.keyword} />
+                                            {juryType?.map((item) => (
+                                                <MenuItem key={item?.id} value={item?.id} >
+                                                    {item?.name}
                                                 </MenuItem>
                                             ))}
                                         </Select>
                                     </FormControl>
+
                                 </Grid>
                             </Grid>
                         </Box>

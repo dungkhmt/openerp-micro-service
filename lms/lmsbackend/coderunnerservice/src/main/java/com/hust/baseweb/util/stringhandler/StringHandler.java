@@ -108,7 +108,13 @@ public class StringHandler {
             runtime = problemTimeLimit * 1000;
         } else {
             int secondLastNewlineIndex = response.lastIndexOf('\n', lastNewlineIndex - 1);
-            runtime = Integer.parseInt(response.substring(secondLastNewlineIndex + 1, lastNewlineIndex).trim());
+            try {
+                runtime = Integer.parseInt(response.substring(secondLastNewlineIndex + 1, lastNewlineIndex).trim());
+            }
+            catch (NumberFormatException e) {
+                log.error("Submission Response: " + response);
+                throw e;
+            }
         }
 
         // get testcase answer of participant

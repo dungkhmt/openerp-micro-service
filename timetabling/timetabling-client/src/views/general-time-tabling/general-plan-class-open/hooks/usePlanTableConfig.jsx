@@ -28,19 +28,14 @@ export const usePlanTableConfig = (setPlanClasses) => {
 
   const handleOnCellChange = (e, params) => {
     setPlanClasses((prevClasses) => {
-      const updatedClass = {
-        ...params.row,
-        [params.field]: e.target.value !== "" ? e.target.value : null,
-      };
-      const newClasses = prevClasses?.map((prevClass) => {
-        if (prevClass?.id === params?.id) {
-          return updatedClass;
-        } else {
-          return prevClass;
-        }
-      });
-
-      return newClasses;
+      return prevClasses?.map((prevClass) =>
+        prevClass?.id === params?.id
+          ? {
+              ...prevClass,
+              [params.field]: e.target.value !== "" ? e.target.value : null,
+            }
+          : prevClass
+      );
     });
   };
 
@@ -68,20 +63,11 @@ export const usePlanTableConfig = (setPlanClasses) => {
 
   const handleOnCellSelect = (e, params, option) => {
     setPlanClasses((prevClasses) => {
-      const updatedClass = {
-        ...params.row,
-        [params.field]: option,
-      };
-      const newClasses = prevClasses?.map((prevClass) => {
-        console.log(prevClass?.id, params?.id);
-        if (prevClass?.id === params?.id) {
-          return updatedClass;
-        } else {
-          return prevClass;
-        }
-      });
-
-      return newClasses;
+      return prevClasses?.map((prevClass) =>
+        prevClass?.id === params?.id
+          ? { ...prevClass, [params.field]: option }
+          : prevClass
+      );
     });
   };
 
@@ -94,12 +80,19 @@ export const usePlanTableConfig = (setPlanClasses) => {
     {
       headerName: "Tổng số lớp",
       field: "numberOfClasses",
-      width: 120,
+      width: 100,
+      renderCell: (params) => (
+        <Input
+          type="number"
+          value={params.value}
+          onChange={(e) => handleOnCellChange(e, params)}
+        />
+      ),
     },
     {
       headerName: "Max SV/LT",
       field: "lectureMaxQuantity",
-      width: 120,
+      width: 100,
       renderCell: (params) => (
         <Input
           type="number"
@@ -111,7 +104,7 @@ export const usePlanTableConfig = (setPlanClasses) => {
     {
       headerName: "Max SV/BT",
       field: "exerciseMaxQuantity",
-      width: 120,
+      width: 100,
       renderCell: (params) => (
         <Input
           type="number"
@@ -123,7 +116,7 @@ export const usePlanTableConfig = (setPlanClasses) => {
     {
       headerName: "Max SV/LT+BT",
       field: "lectureExerciseMaxQuantity",
-      width: 120,
+      width: 100,
       renderCell: (params) => (
         <Input
           type="number"
@@ -146,17 +139,28 @@ export const usePlanTableConfig = (setPlanClasses) => {
       ),
     },
     {
-      headerName: "Loại lớp",
-      field: "classType",
+      headerName: "Loại Tuần",
+      field: "weekType",
       width: 100,
       renderCell: (params) => (
         <Autocomplete
           {...params}
-          options={["LT", "BT", "LT+BT"]}
+          options={["Chẵn", "Lẻ", "Chẵn+Lẻ"]}
           onChange={(e, option) => handleOnCellSelect(e, params, option)}
           renderInput={(option) => {
-            return <TextField variant='standard' {...option} sx={{width: 80}} />;
+            return (
+              <TextField variant="standard" {...option} sx={{ width: 80 }} />
+            );
           }}
+          renderOption={(props, option) => (
+            <Box
+              component="li"
+              sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+              {...props}
+            >
+              {option}
+            </Box>
+          )}
         />
       ),
     },
@@ -186,7 +190,9 @@ export const usePlanTableConfig = (setPlanClasses) => {
           options={["S", "C"]}
           onChange={(e, option) => handleOnCellSelect(e, params, option)}
           renderInput={(option) => {
-            return <TextField variant='standard' {...option} sx={{width: 80}}/>;
+            return (
+              <TextField variant="standard" {...option} sx={{ width: 80 }} />
+            );
           }}
         />
       ),
