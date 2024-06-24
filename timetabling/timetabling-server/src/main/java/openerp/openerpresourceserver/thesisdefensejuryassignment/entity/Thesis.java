@@ -86,7 +86,11 @@ public class Thesis implements Serializable {
     @JoinColumn(name = "scheduled_reviewer_id")
     private Teacher scheduledReviewer;
 
+    @ManyToOne
+    @JoinColumn(name = "jury_topic_id")
+    private JuryTopic juryTopic;
 
+    /*-------------------------------------------------------*/
     public Teacher getScheduledReviewer() {
         return scheduledReviewer;
     }
@@ -94,7 +98,6 @@ public class Thesis implements Serializable {
     public void setScheduledReviewer(Teacher scheduledReviewer) {
         this.scheduledReviewer = scheduledReviewer;
     }
-    /*-------------------------------------------------------*/
 
     public List<AcademicKeyword> getAcademicKeywordList() {
         return academicKeywordList;
@@ -181,5 +184,11 @@ public class Thesis implements Serializable {
         this.studentEmail = studentEmail;
     }
 
+    public JuryTopic getJuryTopic() {
+        return juryTopic;
+    }
 
+    public void setJuryTopic(JuryTopic juryTopic) {
+        this.juryTopic = juryTopic;
+    }
 }

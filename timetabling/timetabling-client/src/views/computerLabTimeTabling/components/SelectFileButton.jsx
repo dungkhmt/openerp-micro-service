@@ -23,7 +23,7 @@ function SelectFileButton({disabled, onClick, onChange}) {
         disabled={disabled}
       >
         <FileUploadOutlinedIcon/>
-        Import from excel
+        Nhập từ excel
       </Button>
       {/* ref: https://stackoverflow.com/questions/39484895/how-to-allow-input-type-file-to-select-the-same-file-in-react-component */}
       <input

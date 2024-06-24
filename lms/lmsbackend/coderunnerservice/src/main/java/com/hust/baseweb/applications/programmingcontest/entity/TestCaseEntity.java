@@ -19,6 +19,9 @@ public class TestCaseEntity implements Serializable {
     public static final String STATUS_DISABLED = "DISABLED";
     public static final String STATUS_ENABLED = "ENABLED";
 
+    public static final String PUBLIC_YES= "Y";
+    public static final String PUBLIC_NO = "N";
+
     @Id
     @Column(name = "test_case_id")
     @GeneratedValue(strategy = GenerationType.AUTO)

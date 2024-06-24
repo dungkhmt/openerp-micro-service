@@ -6,11 +6,11 @@ import {
   ListItemIcon,
   ListItemText,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { blue, grey } from "@material-ui/core/colors";
 import { makeStyles } from "@material-ui/core/styles";
 import parse from "html-react-parser";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FcDocument } from "react-icons/fc";
 import SimpleBar from "simplebar-react";
 import { request } from "../../../api";
@@ -18,6 +18,14 @@ import PrimaryButton from "../../button/PrimaryButton";
 import TertiaryButton from "../../button/TertiaryButton";
 import CustomizedDialogs from "../../dialog/CustomizedDialogs";
 import ErrorDialog from "../../dialog/ErrorDialog";
+import { useHistory } from "react-router";
+import { successNoti } from "utils/notification";
+import { randomImageName } from "utils/FileUpload/covert";
+
+function isPDF(base64Data) {
+  const decodedData = atob(base64Data);
+  return decodedData.startsWith("%PDF");
+}
 
 export const style = (theme) => ({
   testBtn: {
@@ -79,6 +87,7 @@ export default function TeacherViewQuizDetailInQuizTest({
   testId,
   quizGroups,
   isCourse,
+  onRemoveSuccess,
 }) {
   const classes = useStyles();
 
@@ -98,9 +107,22 @@ export default function TeacherViewQuizDetailInQuizTest({
   const [open, setOpen] = useState(false);
   const [error, setError] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState();
+  const [fileAttachments, setFileAttachments] = useState([]);
 
   const [openQuizTest, setOpenQuizTest] = useState(null);
   const [selectedTestId, setSelectedTestId] = useState(null);
+  const history = useHistory();
+  const isQuizTest = history.location.pathname.includes("quiztest");
+
+  useEffect(() => {
+    if (quiz.attachment && quiz.attachment.length !== 0) {
+      const newFileURLArray = quiz.attachment.map((url) => ({
+        id: randomImageName(),
+        url,
+      }));
+      setFileAttachments(newFileURLArray);
+    }
+  }, [quiz]);
 
   //
   const onOpenDialog = () => {
@@ -128,10 +150,19 @@ export default function TeacherViewQuizDetailInQuizTest({
       // token,
       // history,
       "post",
-      "/remove-question-from-quiz-test",
-      (res) => {},
+      isQuizTest
+        ? "/remove-question-from-quiz-test"
+        : isCourse
+        ? "/remove-question-from-course-interactive-quiz"
+        : "/remove-question-from-interactive-quiz",
+      (res) => {
+        !isQuizTest && onRemoveSuccess(quiz.questionId);
+        successNoti("Xóa thành công", 3000);
+      },
       { rest: () => setError(true) },
-      { testId: testId, questionId: quiz.questionId }
+      isQuizTest
+        ? { testId: testId, questionId: quiz.questionId }
+        : { interactiveQuizId: testId, questionId: quiz.questionId }
     );
   };
 
@@ -154,7 +185,27 @@ export default function TeacherViewQuizDetailInQuizTest({
         {quiz.statusId})&nbsp;&nbsp;
         {parse(quiz.statement)}
       </Box>
-      {!isCourse && (
+      {fileAttachments.length !== 0 &&
+        fileAttachments.map((file) => (
+          <div key={file.id} className={classes.imageContainer}>
+            <div className={classes.imageWrapper}>
+              {isPDF(file.url) ? (
+                <iframe
+                  width={"860px"}
+                  height={"500px"}
+                  src={`data:application/pdf;base64,${file.url}`}
+                />
+              ) : (
+                <img
+                  src={`data:image/jpeg;base64,${file.url}`}
+                  alt="quiz test"
+                  className={classes.imageQuiz}
+                />
+              )}
+            </div>
+          </div>
+        ))}
+      {isQuizTest && (
         <Button
           color="primary"
           variant="contained"
@@ -166,7 +217,7 @@ export default function TeacherViewQuizDetailInQuizTest({
       )}
 
       <Button
-        color="primary"
+        color="error"
         variant="contained"
         onClick={onOpenDialogQuizTest}
         className={classes.btn}

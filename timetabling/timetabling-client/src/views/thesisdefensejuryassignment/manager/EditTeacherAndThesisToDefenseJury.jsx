@@ -33,7 +33,7 @@ export const EditTeacherAndThesisToDefenseJury = () => {
         setAssignedThesis
     } = useAssignTeacherThesis();
     const { data: availableThesisList } = useFetch(
-        `/defense-jury/thesis/get-all-available/${id}`
+        `/defense-jury/thesis/get-all-available/${id}/${juryId}`
     );
     const { data: defenseJury, error } = useFetch(`/defense-jury/${juryId}`);
     const { loading, data: teacherList } = useFetch("/defense-jury/teachers");
@@ -58,6 +58,9 @@ export const EditTeacherAndThesisToDefenseJury = () => {
         }
         if (assignedThesis.length === 0) {
             return errorNoti("Bạn hãy lựa chọn đồ án vào hội đồng", true);
+        }
+        if (assignedThesis?.length > defenseJury?.maxThesis) {
+            return errorNoti(`Hội đồng chỉ có tối đa ${defenseJury?.maxThesis} đồ án`, true);
         }
         request(
             "post",
@@ -92,8 +95,8 @@ export const EditTeacherAndThesisToDefenseJury = () => {
             <div className="defense-jury-info">
                 Ngày tổ chức: {defenseJury?.defenseDate?.split("T")[0]}
             </div>
-            {defenseJury?.academicKeywordList.map(({ keyword, description }) => (
-                <KeywordChip key={keyword} keyword={description} />
+            {defenseJury?.juryTopic?.academicKeywordList?.map(({ keyword, description }) => (
+                <KeywordChip key={keyword} keyword={keyword} />
             ))}
 
             <form>
@@ -102,7 +105,7 @@ export const EditTeacherAndThesisToDefenseJury = () => {
                     aria-label="student-view-class-detail-tabs"
                     scrollButtons="auto"
                     variant="scrollable">
-                    {tabsLabel.map((label, idx) => (
+                    {tabsLabel?.map((label, idx) => (
                         <AntTab key={label} label={label} {...a11yProps(idx)} />
                     ))}
                 </AntTabs>

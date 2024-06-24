@@ -3,7 +3,8 @@ import RoomStatusChart from "./components/RoomStatusChart";
 import { request } from "api";
 import BasicSelect from "./components/SelectBox";
 import { weeks_Of_Semester } from "utils/formatter";
-import { Box } from "@mui/material";
+import { Box, CircularProgress, LinearProgress } from "@mui/material";
+import { set } from "react-hook-form";
 
 function RoomAvailibilityScreen() {
   const [heatData, setHeatData] = useState([]);
@@ -17,6 +18,7 @@ function RoomAvailibilityScreen() {
   const [selectedWeek, setSelectedWeek] = useState(null);
   const [totalHeight, setTotalHeight] = useState(0);
   const wrapperRef = useRef(null);
+  const [dataTransformProgress, setDataTransformProgress] = useState(false); 
 
   useEffect(() => {
     if (wrapperRef.current) {
@@ -80,13 +82,13 @@ function RoomAvailibilityScreen() {
     return {heatmap_data, heatmap_data_array};
   };
   const handleInputChange = async (semesterValue, weekValue) => {
+    setDataTransformProgress(true);
     const res = await fetch_heat_data(semesterValue, weekValue);
-    console.log(res);
     const { heatMap, classList, roomList } = res;
     const {heatmap_data, heatmap_data_array} = await heatmap_data_transform(heatMap.heatValues);
     setGridData(heatMap.heatValues);
     setHeatData(heatmap_data_array);
-    console.log(heatmap_data_array);
+    setDataTransformProgress(false)
     setClassList(classList);
     setRoomList(roomList);
     setRoomChartKey(prevKey => prevKey + 1);
@@ -128,7 +130,7 @@ function RoomAvailibilityScreen() {
         </div>
       </div>
       <Box sx={{ width: 1, height: '75%', display: (selectedWeek==null)?'none':'display'}}>
-        {(gridData?.length>0)?<RoomStatusChart key={roomChartKey} classList={classList} roomList={roomList} data={heatData} />:"Không có dữ liệu"}
+        {(dataTransformProgress?<CircularProgress/>:(<RoomStatusChart key={roomChartKey} classList={classList} roomList={roomList} data={heatData} />))}
       </Box>
     </Box>
   );

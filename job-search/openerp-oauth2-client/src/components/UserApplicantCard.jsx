@@ -12,6 +12,8 @@ import {
   Avatar,
 } from '@mui/material';
 import { Menu } from '@mui/material'; // Import Menu for IconButton action (v5.0.3)
+import { useState, useEffect } from "react"
+import { request } from "../../src/api"
 
 const jobDescription = {
     companyLogo: 'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRHi40jeiiRjreg9siBaoR6S3HsAcZen4-EG5zM4Tvbrfu0DDcV',
@@ -20,6 +22,7 @@ const jobDescription = {
 
 function UserApplicantCard({applicant}) {
   const [anchorEl, setAnchorEl] = React.useState(null); // State for IconButton menu (v5.0.3)
+  const [CV, setCV] = useState([])
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -28,6 +31,12 @@ function UserApplicantCard({applicant}) {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
+  useEffect(() => {
+    request("get", `/employee-cv/${applicant.cvId}`, (res) => {
+        setCV(res.data)
+    }).then();
+}, [])
 
   return (
     <Card sx={{ maxWidth: 800 }}  style={{ width: "100%" }}>
@@ -64,7 +73,7 @@ function UserApplicantCard({applicant}) {
       <CardContent>
 
         <Typography variant="body1">Applicant Name: {applicant.user?.firstName + " "+applicant.user?.lastName}</Typography>
-        <Typography variant="body1">ApplicantCV: <a href={applicant?.description ? "xnxx.com": "https://facebook.com"}>applicant CV</a></Typography>
+        <Typography variant="body1">ApplicantCV: <a target='blank' href={CV?.employeeCV?.cvLink ? CV?.employeeCV?.cvLink + "?alt=media": "https://facebook.com"}>applicant CV</a></Typography>
         <Typography variant="body1">status: {applicant.status}</Typography>
         <Typography variant="body1">description : {applicant.jobId?.description}</Typography>
 

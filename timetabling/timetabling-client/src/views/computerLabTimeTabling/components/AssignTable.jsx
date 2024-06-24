@@ -289,17 +289,19 @@ const checkTimeAssignedConstraint = (object, assignedSetArray) => {
       <table>
         <thead>
           <tr>
-            <th>Class</th>
-            <th>Assign</th>
+            <th>Mã lớp</th>
+            <th>Lớp</th>
+            <th>Thời khóa biểu</th>
           </tr>
         </thead>
         <tbody renderKey={renderKey}>
           {data?.map((obj, index) => (
             <tr style={{ height: "100px", maxHeight: "100px" }} id={obj.id} key={obj.id}>
+              <td>
+                {obj.class_code}
+              </td>
               <td style={{ padding: "0 12px" }}>
-                <Button onClick={edit_btn_onclick} color="primary">
                   {obj.note}
-                </Button>
               </td>
               <td style={{ backgroundColor: "#f3f3f3" }}>
                 <ul style={{ display: "flex", flexDirection: "row" }}>

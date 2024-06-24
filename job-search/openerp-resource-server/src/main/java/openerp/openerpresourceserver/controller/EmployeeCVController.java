@@ -37,23 +37,22 @@ public class EmployeeCVController {
             List<CVEducation> cvEducationList = cvEducationService.getAllByCVId(employeeCV.getId());
             List<CVWorkingExperience> cvWorkingExperienceList = cvWorkingExperienceService.getAllByCVId(employeeCV.getId());
             List<CVSkill> cvSkillList = cvSkillService.getAllByCVId(employeeCV.getId());
-
             List<Education> educations = new ArrayList<>();
             for (CVEducation cvEducation : cvEducationList) {
-                Integer cvEducationId = cvEducation.getId();
+                Integer cvEducationId = cvEducation.getEducationId();
                 Education education = educationService.getById(cvEducationId);
                 educations.add(education);
             }
 
             List<Experience> experiences = new ArrayList<>();
             for (CVWorkingExperience cvWorkingExperience : cvWorkingExperienceList) {
-                Experience experience = experienceService.getById(cvWorkingExperience.getId());
+                Experience experience = experienceService.getById(cvWorkingExperience.getWorkingExperienceId());
                 experiences.add(experience);
             }
 
             List<Skill> skills = new ArrayList<>();
             for (CVSkill cvSkill : cvSkillList) {
-                Skill skill = skillService.getById(cvSkill.getId());
+                Skill skill = skillService.getById(cvSkill.getSkillId());
                 skills.add(skill);
             }
 
@@ -147,8 +146,8 @@ public class EmployeeCVController {
 //        System.out.println(skills);
 //        System.out.println(educations);
         employeeCV.setUser(user);
-        employeeCVService.save(employeeCV);
-        Integer cvId = employeeCV.getId();
+        EmployeeCV newEmployeeCV = employeeCVService.save(employeeCV);
+        Integer cvId = newEmployeeCV.getId();
 
         List<CVEducation> cvEducationList = new ArrayList<>();
         for(Education education : educations) {

@@ -6,7 +6,11 @@ import org.springframework.mail.*;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.multipart.MultipartFile;
 
+import freemarker.template.TemplateException;
+
 import java.io.File;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author Le Anh Tuan
@@ -27,12 +31,12 @@ public interface MailService {
      * @see #sendSimpleMail(String[], String[], String[], String, String, String)
      */
     SimpleMailMessage createSimpleMail(
-        String[] to,
-        String[] cc,
-        String[] bcc,
-        String subject,
-        String body,
-        String replyTo);
+            String[] to,
+            String[] cc,
+            String[] bcc,
+            String subject,
+            String body,
+            String replyTo);
 
     /**
      * Create simple mail message. You just need this method when you want to send
@@ -110,17 +114,17 @@ public interface MailService {
      * @return
      * @throws MessagingException
      * @see #sendMailWithAttachments(String[], String[], String[], String, String,
-     * boolean, String, String, MultipartFile[])
+     *      boolean, String, String, MultipartFile[])
      */
     MimeMessageHelper createMimeMessage(
-        String[] to,
-        String[] cc,
-        String[] bcc,
-        String subject,
-        String body,
-        boolean isHtml,
-        String replyTo,
-        String replyPersonal) throws MessagingException;
+            String[] to,
+            String[] cc,
+            String[] bcc,
+            String subject,
+            String body,
+            boolean isHtml,
+            String replyTo,
+            String replyPersonal) throws MessagingException;
 
     /**
      * Create mime message. You just need this method when you want to send multiple
@@ -129,13 +133,13 @@ public interface MailService {
      * @return
      * @throws MessagingException
      * @see #createMimeMessage(String[], String[], String[], String, String,
-     * boolean, String, String)
+     *      boolean, String, String)
      */
     MimeMessageHelper createMimeMessage(
-        String[] to,
-        String subject,
-        String body,
-        boolean isHtml) throws MessagingException;
+            String[] to,
+            String subject,
+            String body,
+            boolean isHtml) throws MessagingException;
 
     /*
      * -----------------------------------------------------------------------------
@@ -151,17 +155,17 @@ public interface MailService {
      * @return
      * @throws MessagingException
      * @see #sendMailWithAttachments(String[], String[], String[], String, String,
-     * String, String, String, MultipartFile[])
+     *      String, String, String, MultipartFile[])
      */
     MimeMessageHelper createMimeMessage(
-        String[] to,
-        String[] cc,
-        String[] bcc,
-        String subject,
-        String plainText,
-        String htmlText,
-        String replyTo,
-        String replyPersonal) throws MessagingException;
+            String[] to,
+            String[] cc,
+            String[] bcc,
+            String subject,
+            String plainText,
+            String htmlText,
+            String replyTo,
+            String replyPersonal) throws MessagingException;
 
     /**
      * Create mime message. You just need this method when you want to send multiple
@@ -170,13 +174,13 @@ public interface MailService {
      * @return
      * @throws MessagingException
      * @see #createMimeMessage(String[], String[], String[], String, String, String,
-     * String, String)
+     *      String, String)
      */
     MimeMessageHelper createMimeMessage(
-        String[] to,
-        String subject,
-        String plainText,
-        String htmlText) throws MessagingException;
+            String[] to,
+            String subject,
+            String plainText,
+            String htmlText) throws MessagingException;
 
     /*
      * -----------------------------------------------------------------------------
@@ -242,15 +246,15 @@ public interface MailService {
      *                                                              message
      */
     void sendMailWithAttachments(
-        String[] to,
-        String[] cc,
-        String[] bcc,
-        String subject,
-        String body,
-        boolean isHtml,
-        String replyTo,
-        String replyPersonal,
-        MultipartFile[] attachments);
+            String[] to,
+            String[] cc,
+            String[] bcc,
+            String subject,
+            String body,
+            boolean isHtml,
+            String replyTo,
+            String replyPersonal,
+            MultipartFile[] attachments);
 
     /**
      * Send a JavaMail MIME message. All mail address must be valid RFC-5321
@@ -272,11 +276,11 @@ public interface MailService {
      *                                                              message
      */
     void sendMailWithAttachments(
-        String[] to,
-        String subject,
-        String body,
-        boolean isHtml,
-        MultipartFile[] attachments);
+            String[] to,
+            String subject,
+            String body,
+            boolean isHtml,
+            MultipartFile[] attachments);
 
     /**
      * Send a JavaMail MIME message. All mail address must be valid RFC-5321
@@ -305,15 +309,15 @@ public interface MailService {
      *                                                              message
      */
     void sendMailWithAttachments(
-        String[] to,
-        String[] cc,
-        String[] bcc,
-        String subject,
-        String plainText,
-        String htmlText,
-        String replyTo,
-        String replyPersonal,
-        MultipartFile[] attachments);
+            String[] to,
+            String[] cc,
+            String[] bcc,
+            String subject,
+            String plainText,
+            String htmlText,
+            String replyTo,
+            String replyPersonal,
+            MultipartFile[] attachments);
 
     /**
      * Send a JavaMail MIME message. All mail address must be valid RFC-5321
@@ -334,11 +338,11 @@ public interface MailService {
      *                                                              message
      */
     void sendMailWithAttachments(
-        String[] to,
-        String subject,
-        String plainText,
-        String htmlText,
-        MultipartFile[] attachments);
+            String[] to,
+            String subject,
+            String plainText,
+            String htmlText,
+            MultipartFile[] attachments);
 
     /*
      * -----------------------------------------------------------------------------
@@ -375,15 +379,15 @@ public interface MailService {
      *                                                              message
      */
     void sendMailWithAttachments(
-        String[] to,
-        String[] cc,
-        String[] bcc,
-        String subject,
-        String body,
-        boolean isHtml,
-        String replyTo,
-        String replyPersonal,
-        File[] attachments);
+            String[] to,
+            String[] cc,
+            String[] bcc,
+            String subject,
+            String body,
+            boolean isHtml,
+            String replyTo,
+            String replyPersonal,
+            File[] attachments);
 
     /**
      * Send a JavaMail MIME message. All mail address must be valid RFC-5321
@@ -405,11 +409,11 @@ public interface MailService {
      *                                                              message
      */
     void sendMailWithAttachments(
-        String[] to,
-        String subject,
-        String body,
-        boolean isHtml,
-        File[] attachments);
+            String[] to,
+            String subject,
+            String body,
+            boolean isHtml,
+            File[] attachments);
 
     /**
      * Send a JavaMail MIME message. All mail address must be valid RFC-5321
@@ -438,15 +442,15 @@ public interface MailService {
      *                                                              message
      */
     void sendMailWithAttachments(
-        String[] to,
-        String[] cc,
-        String[] bcc,
-        String subject,
-        String plainText,
-        String htmlText,
-        String replyTo,
-        String replyPersonal,
-        File[] attachments);
+            String[] to,
+            String[] cc,
+            String[] bcc,
+            String subject,
+            String plainText,
+            String htmlText,
+            String replyTo,
+            String replyPersonal,
+            File[] attachments);
 
     /**
      * Send a JavaMail MIME message. All mail address must be valid RFC-5321
@@ -467,11 +471,11 @@ public interface MailService {
      *                                                              message
      */
     void sendMailWithAttachments(
-        String[] to,
-        String subject,
-        String plainText,
-        String htmlText,
-        File[] attachments);
+            String[] to,
+            String subject,
+            String plainText,
+            String htmlText,
+            File[] attachments);
 
     /**
      * Send the given mime messages in batch.

@@ -52,6 +52,21 @@ export default function LearningStatisticResults(props) {
     request("POST", "/statistic/learning/basic", successHandler, errorHandlers);
   }
 
+  function getSubmissions(){
+    alert("getSubmissions");
+    request("get", "/admin/data/get-accepted-submission", (res) => {
+      const info = res.data;
+      console.log('getSubmissions, info = ',info);
+      
+    },
+    {
+      onError: (e) => {
+        console.error("Error", e);
+        errorNoti("Đã xảy ra lỗi trong khi tải dữ liệu", 3000);
+      },
+    });
+  }
+
   const StatisticAction = (
     <LoadingButton loading={doingStatistics}
                    loadingPosition="start"
@@ -59,6 +74,15 @@ export default function LearningStatisticResults(props) {
                    color="primary" variant="contained"
                    onClick={statisticLearningGeneral}>
       Statistic
+    </LoadingButton>
+  )
+  const GetSubmissionsAction = (
+    <LoadingButton loading={doingStatistics}
+                   loadingPosition="start"
+                   startIcon={<TrendingUpIcon/>}
+                   color="primary" variant="contained"
+                   onClick={getSubmissions}>
+      Get Accepted Submissions
     </LoadingButton>
   )
 
@@ -77,7 +101,8 @@ export default function LearningStatisticResults(props) {
     { title: "Total error submissions", field: "totalErrorSubmissions" }
   ]
 
-  const actions = [{ icon: () => StatisticAction, isFreeAction: true }];
+  const actions = [{ icon: () => StatisticAction, isFreeAction: true },
+    { icon: () => GetSubmissionsAction, isFreeAction: true }];
 
   return (
     <Card>

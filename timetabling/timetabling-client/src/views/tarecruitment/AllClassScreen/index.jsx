@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
+import useDebounce from "../config/debounce";
 import { request } from "api";
 import { useHistory } from "react-router-dom";
 import {
@@ -12,12 +13,12 @@ import {
   Button,
 } from "@mui/material";
 import { styles } from "./index.style";
-import { SEMESTER, SEMESTER_LIST } from "../config/localize";
+import { SEMESTER } from "../config/localize";
 import DeleteDialog from "../components/DeleteDialog";
 import ApplicatorDialog from "./ApplicatorDialog";
 import { DataGrid } from "@mui/x-data-grid";
 import ImportDialog from "./ImportDialog";
-import { classCallUrl } from "../apiURL";
+import { classCallUrl, semesterUrl } from "../apiURL";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -27,6 +28,7 @@ const DEFAULT_PAGINATION_MODEL = {
 const AllClassScreen = () => {
   const [classes, setClasses] = useState([]);
   const [semester, setSemester] = useState(SEMESTER);
+  const [allSemester, setAllSemester] = useState([]);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [deleteId, setDeleteId] = useState("");
   const [openApplicatorDialog, setOpenApplicatorDialog] = useState(false);
@@ -38,6 +40,8 @@ const AllClassScreen = () => {
 
   const [search, setSearch] = useState("");
 
+  const debouncedSearch = useDebounce(search, 1000);
+
   const [paginationModel, setPaginationModel] = useState(
     DEFAULT_PAGINATION_MODEL
   );
@@ -46,34 +50,25 @@ const AllClassScreen = () => {
 
   const history = useHistory();
 
-  const debouncedSearch = useCallback(
-    (search) => {
-      const timer = setTimeout(() => {
-        setPaginationModel({
-          ...DEFAULT_PAGINATION_MODEL,
-          page: 0,
-        });
-        handleFetchData();
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [search]
-  );
-
   useEffect(() => {
-    return debouncedSearch(search);
-  }, [search, debouncedSearch]);
+    request("get", semesterUrl.getCurrentSemester, (res) => {
+      setSemester(res.data);
+    });
+    request("get", semesterUrl.getAllSemester, (res) => {
+      setAllSemester(res.data);
+    });
+  }, []);
 
   useEffect(() => {
     handleFetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [semester, paginationModel]);
+  }, [paginationModel, semester, debouncedSearch]);
 
   const handleFetchData = () => {
     const searchParam =
-      search !== "" ? `&search=${encodeURIComponent(search)}` : "";
+      debouncedSearch !== ""
+        ? `&search=${encodeURIComponent(debouncedSearch)}`
+        : "";
     setIsLoading(true);
     request(
       "get",
@@ -146,9 +141,12 @@ const AllClassScreen = () => {
     setOpenApplicatorDialog(true);
   };
 
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
-  };
+  const handleSearch = useMemo(
+    () => (e) => {
+      setSearch(e.target.value);
+    },
+    []
+  );
 
   const handleCloseApplicatorDialog = () => {
     setOpenApplicatorDialog(false);
@@ -244,7 +242,7 @@ const AllClassScreen = () => {
               onChange={handleChangeSemester}
               MenuProps={{ PaperProps: { sx: styles.selection } }}
             >
-              {SEMESTER_LIST.map((semester, index) => (
+              {allSemester.map((semester, index) => (
                 <MenuItem key={index} value={semester}>
                   {semester}
                 </MenuItem>

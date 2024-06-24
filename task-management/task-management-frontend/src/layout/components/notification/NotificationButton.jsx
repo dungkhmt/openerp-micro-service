@@ -4,10 +4,11 @@ import { styled } from "@mui/material/styles";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import randomColor from "randomcolor";
 import React from "react";
-import { bearerAuth } from "../../../api";
+import { BASE_URL, bearerAuth } from "../../../api";
 import keycloak from "../../../config/keycloak";
 import { useNotificationState } from "../../../state/NotificationState";
 import NotificationMenu from "./NotificationMenu";
+import { request } from "../../../api";
 
 const StyledAvatar = styled(Box)(({ isOpen, theme }) => ({
   width: 25,
@@ -27,8 +28,7 @@ const StyledAvatar = styled(Box)(({ isOpen, theme }) => ({
 
 const StyledBadge = styled(Badge)(() => ({
   "& .MuiBadge-badge": {
-    top: -3,
-    right: -3,
+    fontSize: "0.6rem",
   },
 }));
 
@@ -66,39 +66,35 @@ function NotificationButton() {
   };
 
   const fetchNotification = () => {
-    // let fromId = null;
-    // const fetchedNoties = notifications.get();
-    // if (fetchedNoties && fetchedNoties.length > 0) {
-    //   fromId = fetchedNoties[fetchedNoties.length - 1].id;
-    // }
-    // try {
-    //   request(
-    //     "get",
-    //     `/notification?fromId=${fromId || ""}&page=${0}&size=${20}`,
-    //     (res) => {
-    //       let data = res.data;
-    //       const noties = processNotificationsContent(
-    //         data.notifications.content
-    //       );
-    //       if (fromId === null) {
-    //         notifications.set(noties);
-    //       } else {
-    //         notifications.merge(noties);
-    //       }
-    //       numUnRead.set(data.numUnRead);
-    //       hasMore.set(!data.notifications.last);
-    //     },
-    //     { 401: () => {} },
-    //     null,
-    //     {
-    //       baseURL: config.url.NOTIFICATION_SERVER_URL,
-    //     }
-    //   );
-    // } catch (e) {
-    //   notifications.set([]);
-    //   numUnRead.set(0);
-    //   hasMore.set(false);
-    // }
+    let fromId = null;
+    const fetchedNoties = notifications.get();
+    if (fetchedNoties && fetchedNoties.length > 0) {
+      fromId = fetchedNoties[fetchedNoties.length - 1].id;
+    }
+    try {
+      request(
+        "get",
+        `/notification?fromId=${fromId || ""}&page=${0}&size=${20}`,
+        (res) => {
+          let data = res.data;
+          const noties = processNotificationsContent(
+            data.notifications.content
+          );
+          if (fromId === null) {
+            notifications.set(noties);
+          } else {
+            notifications.merge(noties);
+          }
+          numUnRead.set(data.numUnRead);
+          hasMore.set(!data.notifications.last);
+        },
+        { 401: () => {} }
+      );
+    } catch (e) {
+      notifications.set([]);
+      numUnRead.set(0);
+      hasMore.set(false);
+    }
   };
 
   React.useEffect(() => {
@@ -215,7 +211,7 @@ function NotificationButton() {
     function setupEventSource() {
       fetchNotification();
 
-      es = new EventSourcePolyfill(`/notification/subscription`, {
+      es = new EventSourcePolyfill(`${BASE_URL}/notification/subscription`, {
         headers: {
           Authorization: bearerAuth(keycloak.token),
           // Count: count++,
@@ -261,7 +257,7 @@ function NotificationButton() {
         aria-label="notification button"
         aria-controls={open ? "menu-list-grow" : undefined}
         onClick={handleToggle}
-        sx={{ p: 0 }}
+        sx={{ p: 0, mr: 1 }}
       >
         <StyledAvatar alt="notification button" isOpen={open}>
           {open ? (

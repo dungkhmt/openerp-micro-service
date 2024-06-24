@@ -17,7 +17,7 @@ function AssignTeacherAndThesisToDefenseJury() {
   const history = useHistory();
   const { data: defenseJury } = useFetch(`/defense-jury/${juryId}`);
   const { data: availableThesisList } = useFetch(
-    `/defense-jury/thesis/get-all-available/${id}`
+    `/defense-jury/thesis/get-all-available/${id}/${juryId}`
   );
   const { loading, data: teacherList } = useFetch("/defense-jury/teachers");
   const [activeTab, setActiveTab] = useState(0);
@@ -36,15 +36,25 @@ function AssignTeacherAndThesisToDefenseJury() {
     if (assignedThesis?.length === 0) {
       return errorNoti("Bạn hãy lựa chọn đồ án vào hội đồng", true);
     }
+    if (assignedThesis?.length > defenseJury?.maxThesis) {
+      return errorNoti(`Hội đồng chỉ có tối đa ${defenseJury?.maxThesis} đồ án`, true);
+    }
 
     request(
       "post",
       "/defense-jury/assign",
       (res) => {
-        successNoti("Phân chia hội đồng thành công", true);
-        clearAssignedTeacher();
-        clearAssignedThesis();
-        return history.goBack();
+        if (res?.data) {
+          if (res?.data === "Successed") {
+            successNoti("Phân chia hội đồng thành công", true);
+            clearAssignedTeacher();
+            clearAssignedThesis();
+            return history.goBack();
+          }
+          else {
+            errorNoti(res?.data, true);
+          }
+        }
       },
       {
         onError: (e) => {
@@ -73,7 +83,7 @@ function AssignTeacherAndThesisToDefenseJury() {
         <div className="defense-jury-info">
           Ngày tổ chức: {defenseJury?.defenseDate?.split("T")[0]}
         </div>
-        {defenseJury?.academicKeywordList.map(({ keyword, description }) => (
+        {defenseJury?.juryTopic?.academicKeywordList?.map(({ keyword, description }) => (
           <KeywordChip key={keyword} keyword={description} />
         ))}
 
@@ -83,7 +93,7 @@ function AssignTeacherAndThesisToDefenseJury() {
             aria-label="student-view-class-detail-tabs"
             scrollButtons="auto"
             variant="scrollable">
-            {tabsLabel.map((label, idx) => (
+            {tabsLabel?.map((label, idx) => (
               <AntTab key={label} label={label} {...a11yProps(idx)} />
             ))}
           </AntTabs>

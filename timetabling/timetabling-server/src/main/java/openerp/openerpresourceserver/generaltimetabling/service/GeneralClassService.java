@@ -32,4 +32,10 @@ public interface GeneralClassService {
     InputStream exportExcel(String semester);
 
     List<GeneralClass> v2UpdateClassSchedule(String semester, List<V2UpdateClassScheduleRequest> request);
+
+    GeneralClass deleteClassById(Long generalClassId);
+
+    GeneralClass addRoomReservation(Long generalClassId);
+
+    void deleteRoomReservation(Long generalClassId, Long roomReservationId);
 }

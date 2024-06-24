@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { request } from "api";
-import { warningNoti, successNoti } from "utils/notification";
+import { warningNoti, successNoti, errorNoti } from "utils/notification";
 import styles from "./index.style";
 import { useParams, useHistory } from "react-router-dom";
 import { classCallUrl } from "../apiURL";
@@ -63,7 +63,10 @@ const RegisterClassScreen = () => {
           successNoti("Tạo lớp học thành công", 5000);
           history.push("/ta-recruitment/teacher/class-list");
         },
-        {},
+        (res) => {
+          console.log(res);
+          errorNoti(res.response.data, 5000);
+        },
         formData
       );
     }

@@ -17,8 +17,7 @@ public class AssetTypeServiceImpl implements AssetTypeService{
 
     @Override
     public List<AssetType> getAllAssetTypes() {
-        List<AssetType> assetTypes = assetTypeRepo.findAll();
-        return assetTypes;
+        return assetTypeRepo.getAllByLastUpdate();
     }
 
     @Override
@@ -33,6 +32,7 @@ public class AssetTypeServiceImpl implements AssetTypeService{
         newType.setName(assetType.getName());
         newType.setCode_prefix(assetType.getCode_prefix());
         newType.setDescription(assetType.getDescription());
+        newType.setNum_assets(0);
 
         Date currentDate = new Date();
         newType.setSince(currentDate);
@@ -58,5 +58,10 @@ public class AssetTypeServiceImpl implements AssetTypeService{
         if(foundType.isPresent()){
             assetTypeRepo.deleteById(Id);
         }
+    }
+
+    @Override
+    public List<Integer> getTopTypes() {
+        return assetTypeRepo.getTopTypes();
     }
 }

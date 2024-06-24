@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import {
-    Backdrop,
     Box,
     Button,
     Card,
@@ -58,22 +57,21 @@ export default function ModalCreateThesisDefensePlan({
         },
     });
     async function createThesisDefensePlan(body) {
+        const start = new Date(body?.startDate);
+        const end = new Date(body?.endDate);
+        if (end.getTime() <= start.getTime()) {
+            return errorNoti("Ngày kết thúc phải diễn ra sau ngày bắt đầu", true)
+        }
         request(
             "post",
             "/thesis-defense-plan/save",
             (res) => {
                 if (res.data === "Create successfully") {
-                    // setShowSubmitSuccess(true);
-                    // setOpenAlert(true);
                     successNoti('Bạn vừa tạo đợt bảo vệ mới thành công', true)
-                    setTimeout(() => {
-                        handleClose();
-                        handleToggle();
-                    }, 3000);
+                    handleClose();
+                    handleToggle();
                 } else {
                     errorNoti('Thêm mới thất bại', true)
-                    // setShowSubmitSuccess(false);
-                    // setOpenAlert(true);
                 }
             },
             {

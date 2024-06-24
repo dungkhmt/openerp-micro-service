@@ -40,8 +40,8 @@ const ViewAllJobPost = () => {
     return (
         <>
         <Grid container spacing={4} style={{backgroundColor:  "#F7F7FF"}} display="flex" justifyContent="center" paddingTop={"50px"}>
-        {allJobPostForm.map((jobPost, index) => (
-            <Grid item xs={5} style={{ boxShadow: '1px 1px 1px 1px rgba(0.5,0.5,0.5,0.5)', margin: '20px', borderRadius: '20px', backgroundColor: "white"}} onClick={() => goToUrl(`/view-job-post/${jobPost.id}`)}>
+        {allJobPostForm.reverse().map((jobPost, index) => (
+            <Grid item xs={5} style={{ boxShadow: '1px 1px 1px 1px rgba(0.5,0.5,0.5,0.5)', margin: '20px', borderRadius: '20px', backgroundColor: "white"}} onClick={() => goToUrl(`/view-job-posts/user/${jobPost.id}`)}>
             <JobCard job={jobPost}></JobCard>
             </Grid>
             // <Card  sx={{ minWidth: 275 }}>

@@ -38,10 +38,12 @@ export const EditDefenseJury = () => {
     const { data: roomList } = useFetch("/defense-room/get-all");
     const { data: keywordList } = useFetch("/academic_keywords/get-all");
     const { data: sessionList } = useFetch("/defense-session/get-all");
+    const { data: juryTopicList } = useFetch("/jury-topic/get-all");
     // const prevKeywordList = defenseJury?.academicKeywordList?.map((item) => item?.keyword);
     const [keyword, setKeyword] = useState([]);
     const [defenseSessionId, setDefenseSessionId] = useState(0);
     const [defenseRoomId, setDefenseRoomId] = useState(0);
+    const [juryTopicId, setJuryTopicId] = useState(0);
     const handleChange = (event) => {
         const {
             target: { value },
@@ -61,15 +63,15 @@ export const EditDefenseJury = () => {
             id: juryId,
             name: defenseJury?.name,
             maxThesis: defenseJury?.maxThesis,
-            defenseDate: defenseJury?.defenseDate?.split("T")[0],
+            defenseDate: defenseJury?.defenseDate,
             defenseRoomId: 1,
             defenseSessionId: 1,
-            academicKeywordList: [],
+            juryTopicId: 1,
         },
     });
 
     const handleFormSubmit = data => {
-        data.academicKeywordList = [...keyword];
+        data.juryTopicId = juryTopicId;
         data.defenseRoomId = defenseRoomId;
         data.defenseSessionId = defenseSessionId;
         data.maxThesis = parseInt(data.maxThesis);
@@ -78,8 +80,14 @@ export const EditDefenseJury = () => {
             "/defense-jury/update",
             (res) => {
                 if (res.data) {
-                    successNoti("cập nhật hội đồng thành công", true)
-                    return history.goBack();
+                    const message = res.data;
+                    if (message.toUpperCase() === "SUCCESS") {
+                        successNoti("cập nhật hội đồng thành công", true)
+                        return history.goBack();
+                    }
+                    else {
+                        return errorNoti(message, true);
+                    }
                 }
             },
             {
@@ -91,7 +99,7 @@ export const EditDefenseJury = () => {
         ).then();
     }
     useEffect(() => {
-        setLoading(false);
+        setLoading(true);
         request('GET', `/defense-jury/${juryId}`, (res) => {
             setDefenseJury(res.data)
             reset({
@@ -102,8 +110,9 @@ export const EditDefenseJury = () => {
             })
             setDefenseRoomId(res.data.defenseRoom?.id)
             setDefenseSessionId(res.data.defenseSession?.id)
-            const prevKeyword = res.data?.academicKeywordList?.map((item) => item?.keyword);
-            setKeyword(prevKeyword)
+            // const prevKeyword = res.data?.academicKeywordList?.map((item) => item?.keyword);
+            // setKeyword(prevKeyword)
+            setJuryTopicId(res.data?.juryTopic?.id)
             setLoading(false);
         })
     }, [])
@@ -114,17 +123,17 @@ export const EditDefenseJury = () => {
                     Cập nhật Hội Đồng
                 </Typography>
                 <Box mb={3}>
+                    <div>Tên hội đồng</div>
                     <TextField
                         {...register("name", { required: true })}
                         fullWidth={true}
                         id="input-with-icon-grid"
-                        label="Tên hội đồng"
                         variant="outlined"
                         margin="normal"
                     />
+                    <div>Số lượng đồ án tối đa</div>
                     <TextField
                         fullWidth={true}
-                        label="Số lượng đồ án tối đa"
                         name="maxThesis"
                         {...register("maxThesis", { required: true })}
                         variant="outlined"
@@ -189,27 +198,22 @@ export const EditDefenseJury = () => {
                             </FormControl>
                         </Grid>
                         <Grid item={true} xs={6} spacing={2} p={2}>
-                            <span>Keyword hội đồng</span>
+                            <span>Phân ban của hội đồng</span>
                             <FormControl fullWidth margin="normal">
-                                <InputLabel id="demo-multiple-name-label">
-                                    Keyword
+                                <InputLabel id="defense-jury-topic-label">
+                                    Chọn phân ban
                                 </InputLabel>
                                 <Select
-                                    multiple
                                     MenuProps={MenuProps}
-                                    value={keyword}
-                                    name="academicKeywordList"
-                                    label="Keyword"
+                                    label="jury-topic"
+                                    name="juryTopicId"
                                     input={<OutlinedInput label="Tag" />}
-                                    onChange={handleChange}
-                                    renderValue={(selected) => selected?.join(", ")}
+                                    value={juryTopicId}
+                                    onChange={(e) => setJuryTopicId(e.target.value)}
                                 >
-                                    {keywordList?.map((item) => (
-                                        <MenuItem key={item?.id} value={item?.keyword}>
-                                            <Checkbox
-                                                checked={keyword?.indexOf(item?.keyword) > -1}
-                                            />
-                                            <ListItemText primary={item?.keyword} />
+                                    {juryTopicList?.map((item) => (
+                                        <MenuItem key={item?.id} value={item?.id} >
+                                            {item?.name}
                                         </MenuItem>
                                     ))}
                                 </Select>

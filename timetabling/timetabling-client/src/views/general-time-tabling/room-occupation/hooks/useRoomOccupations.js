@@ -1,147 +1,95 @@
 import { request } from "api";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ReactDOMServer from "react-dom/server";
+import { toast } from "react-toastify";
 
-export const useRoomOccupations = (semester, startDate, weekIndex) => {
+export const useRoomOccupations = (semester, weekIndex) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [data, setData] = useState(null);
+  const [data, setData] = useState([]);
 
-  function convertToToolTip(classCode, startTime, endTime) {
-    return (
-      <div class="custom-tooltip">
-        <div class="header-title">Mã lớp: {classCode}</div>
-        <div class="divider"></div>
-        <div class="body-content">
-          <div>Thời gian bắt đầu: {formatDate(startTime)}</div>
-          <div>Thời gian kết thúc: {formatDate(endTime)}</div>
-          <div>
-            Thời gian kéo dài:{" "}
-            {Math.floor(Math.abs(endTime - startTime) / (1000 * 60))} phút
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const mergePeriods = (periods) => {
+    // Sort periods by start time
+    const sortedPeriods = periods
+      .sort((a, b) => a.start - b.start);
+
+    const mergedPeriods = [];
+    let current = { ...sortedPeriods[0] };
+
+    for (let i = 1; i < sortedPeriods.length; i++) {
+      const period = sortedPeriods[i];
+      if (period.start < current.start + current.duration) {
+        // Overlapping periods, merge them
+        const end = Math.max(
+          current.start + current.duration,
+          period.start + period.duration
+        );
+        current.duration = end - current.start;
+        current.classCode += `,${period.classCode}`;
+      } else {
+        // No overlap, push the current period and update the current period
+        mergedPeriods.push(current);
+        current = { ...period };
+      }
+    }
+    // Push the last period
+    mergedPeriods.push(current);
+
+    return mergedPeriods;
+  };
+
+  const convertSchedule = (schedule) => {
+    const periodsMap = {};
+
+    schedule.forEach((item) => {
+      const { classRoom, classCode, startPeriod, endPeriod, dayIndex, crew } =
+        item;
+      const dayOffset = (dayIndex - 2) * 6; // Convert dayIndex to zero-based and calculate offset
+
+      const start = dayOffset + startPeriod - 1; // Calculate start index
+      const duration = endPeriod - startPeriod + 1; // Calculate duration
+
+      // Initialize room entry if not present
+      if (!periodsMap[classRoom]) {
+        periodsMap[classRoom] = [];
+      }
+
+      // Add period to the respective room
+      periodsMap[classRoom].push({ start, duration, classCode, crew });
+    });
+
+    // Convert the map to the desired array format
+    return Object.entries(periodsMap).map(([room, periods]) => ({
+      room,
+      periods: mergePeriods(periods),
+    }));
+  };
+
+  const fetchRoomOccupations = useCallback(() => {
+    setLoading(true);
+    try {
+      request(
+        "get",
+        `/room-occupation/?semester=${semester}&weekIndex=${weekIndex}`,
+        (res) => {
+          setData(convertSchedule(res.data));
+          console.log(res.data);
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  }, [semester, weekIndex]);
 
   useEffect(() => {
-    if (!semester || !startDate) return;
-
-    const fetchRoomOccupations = async () => {
-      setLoading(true);
-      try {
-        request(
-          "get",
-          `/room-occupation/?semester=${semester}&weekIndex=${weekIndex}`,
-          (res) => {
-            console.log(res.data);
-            const formattedData = res.data?.map((timeSlot) => {
-              if (
-                timeSlot?.startTime !== null &&
-                timeSlot?.endTime !== null &&
-                timeSlot?.weekIndex !== null &&
-                timeSlot?.dayIndex !== null
-              ) {
-                return formatTimeSlot(timeSlot, startDate);
-              }
-              return null;
-            });
-            setData(formattedData?.filter((x) => x !== null));
-            console.log(formattedData);
-          },
-          (error) => {
-            console.log(error);
-          }
-        );
-      } catch (error) {
-        setError(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    if (!semester) return;
     fetchRoomOccupations();
-  }, [weekIndex]);
+  }, [semester, weekIndex]);
 
-  const getTimeByPeriod = (period) => {
-    switch (period) {
-      case 1:
-        return { hours: 6, minutes: 45 };
-      case 2:
-        return { hours: 7, minutes: 30 };
-      case 3:
-        return { hours: 8, minutes: 25 };
-      case 4:
-        return { hours: 9, minutes: 10 };
-      case 5:
-        return { hours: 10, minutes: 5 };
-      case 6:
-        return { hours: 10, minutes: 50 };
-      case 7:
-        return { hours: 12, minutes: 30 };
-      case 8:
-        return { hours: 13, minutes: 15 };
-      case 9:
-        return { hours: 14, minutes: 15 };
-      case 10:
-        return { hours: 15, minutes: 0 };
-      case 11:
-        return { hours: 15, minutes: 45 };
-      case 12:
-        return { hours: 16, minutes: 30 };
-      default:
-        console.log("Wrong period: " + period);
-        return null;
-    }
-  };
-
-  function formatDate(date) {
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Month is zero-based, so add 1
-    const year = date.getFullYear();
-
-    return `${hours}:${minutes}, ngày ${day}/${month}/${year}`;
-  }
-
-  const formatTimeSlot = (timeSlot, startDate) => {
-    const offset = timeSlot.crew === "C" ? 6 : 0;
-    const start = new Date(startDate);
-    console.log(timeSlot?.weekIndex);
-
-    const { hours: startHours, minutes: startMinutes } = getTimeByPeriod(
-      timeSlot.startPeriod + offset
-    );
-    const { hours: endHours, minutes: endMinutes } = getTimeByPeriod(
-      timeSlot.endPeriod + offset
-    );
-    start.setHours(startHours);
-    start.setDate(
-      start.getDate() +
-        (Number(timeSlot.weekIndex) - 1) * 7 +
-        Number(timeSlot.dayIndex) -
-        2
-    );
-    start.setMinutes(startMinutes);
-    const end = new Date(startDate);
-    end.setHours(endHours);
-    end.setDate(
-      end.getDate() +
-        (Number(timeSlot.weekIndex) - 1) * 7 +
-        Number(timeSlot.dayIndex) -
-        2
-    );
-    end.setMinutes(endMinutes);
-    return [
-      timeSlot.classRoom,
-      timeSlot.classCode,
-      ReactDOMServer.renderToStaticMarkup(
-        convertToToolTip(timeSlot.classCode, start, end)
-      ),
-      start,
-      end,
-    ];
-  };
-  return { loading, error, data };
+  return { loading, error, data, refresh: fetchRoomOccupations };
 };

@@ -76,7 +76,7 @@ const AddNewGroupDialogue = ({ open, setOpen, selectedClasses, setClasses }) => 
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Thêm vào nhóm đã tạo</DialogTitle>
+      <DialogTitle>Thêm vào nhóm mới</DialogTitle>
       <DialogContent>
         <div className="flex gap-2 flex-col">
           <TextField

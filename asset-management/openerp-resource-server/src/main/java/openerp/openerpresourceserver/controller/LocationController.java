@@ -30,7 +30,7 @@ public class LocationController {
         Optional<Location> location = locationService.getLocationById(Id);
         if(location.isPresent()){
             return ResponseEntity
-                .status(HttpStatus.FOUND)
+                .status(HttpStatus.OK)
                 .body(location);
         } else {
             return (ResponseEntity<?>) ResponseEntity

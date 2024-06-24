@@ -11,15 +11,29 @@ import {
 import { errorNoti } from "../../../../utils/notification";
 import { request } from "../../../../api";
 import SwitchText from "../../../../components/switch/SwitchText";
+import SkeletonCourse from "../../../../components/skeleton/Skeleton";
+import RatingIndexMenu from "../../../../components/menu/RatingIndexMenu";
+import EmptyState from "../../../../components/emtystate/EmptyState";
+import HoursIndexMenu from "../../../../components/menu/HoursIndexMenu";
 
 function StudentCourseRecommend(props) {
   const theme = useTheme();
   const studentLoginId = props.studentLoginId;
   const [studentDetail, setStudentDetail] = useState({});
+  const [changeRating, setChangeRating] = useState();
+  const [changeHour, setChangeHour] = useState();
+
   const navigation = ["free", "Paid"];
   const [active, setActive] = useState(navigation[0]);
 
-  useEffect(getStudentDetail, [active]);
+  const listHour = [0, 1, 3, 6, 17];
+
+  useEffect(getStudentDetail, [
+    active,
+    studentLoginId,
+    changeRating,
+    changeHour,
+  ]);
 
   function getStudentDetail() {
     let successHandler = (res) => {
@@ -32,34 +46,43 @@ function StudentCourseRecommend(props) {
     };
     request(
       "GET",
-      `/course-recommender/${studentLoginId}?price=${active}`,
+      `/course-recommender/${studentLoginId}?price=${active}&rating=${changeRating}&duration=${changeHour}`,
       successHandler,
       errorHandlers
     );
   }
 
+  const handleChangeRating = (value) => {
+    setChangeRating(value);
+  };
+
+  const handleChangeHour = (value) => {
+    setChangeHour(listHour[value]);
+  };
+
   if (Array.isArray(studentDetail)) {
     return (
       <Stack gap={1.25}>
-        <Stack justifyContent="space-between" direction="row">
-          <Typography variant="h5">Course Recommendations</Typography>
+        <Stack justifyContent="space-between" marginBottom={1} direction="row">
+          <Stack direction="row" gap={2}>
+            <RatingIndexMenu handleChangeRating={handleChangeRating} />
+            <HoursIndexMenu handleChangeHours={handleChangeHour} />
+          </Stack>
           <SwitchText
-            sx={{ marginRight: "8%" }}
             active={active}
             setActive={setActive}
             option={navigation}
           />
         </Stack>
+
+        <Typography marginBottom={2} variant="h4">
+          Course Recommendations
+        </Typography>
+
         <Stack direction="column" gap={1}>
-          {studentDetail.length > 0 &&
-            studentDetail.map((item) => (
+          {studentDetail.length > 0 ? (
+            studentDetail?.map((item) => (
               <>
-                <Divider
-                  orientation="horizontal"
-                  flexItem
-                  width="75%"
-                  sx={{ color: "grey.400" }}
-                />
                 <Stack
                   key={`item-${item.id}`}
                   direction="row"
@@ -125,12 +148,20 @@ function StudentCourseRecommend(props) {
                     </Stack>
                   )}
                 </Stack>
+                <Divider
+                  orientation="horizontal"
+                  flexItem
+                  width="75%"
+                  sx={{ color: "grey.400" }}
+                />
               </>
-            ))}
+            ))
+          ) : (
+            <EmptyState search="courses" />
+          )}
         </Stack>
       </Stack>
     );
-  }
+  } else return <SkeletonCourse />;
 }
-
 export default StudentCourseRecommend;

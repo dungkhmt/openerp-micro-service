@@ -25,7 +25,9 @@ public class DefenseJuryIM {
 
     private int defenseSessionId;
 
-    private List<String> academicKeywordList;
+//    private List<String> academicKeywordList;
+
+    private int juryTopicId;
 
     public String getName() {
         return name;
@@ -67,13 +69,13 @@ public class DefenseJuryIM {
         this.defenseDate = defenseDate;
     }
 
-    public List<String> getAcademicKeywordList() {
-        return academicKeywordList;
-    }
-
-    public void setAcademicKeywordList(List<String> academicKeywordList) {
-        this.academicKeywordList = academicKeywordList;
-    }
+//    public List<String> getAcademicKeywordList() {
+//        return academicKeywordList;
+//    }
+//
+//    public void setAcademicKeywordList(List<String> academicKeywordList) {
+//        this.academicKeywordList = academicKeywordList;
+//    }
 
     public int getDefenseRoomId() {
         return defenseRoomId;
@@ -89,5 +91,13 @@ public class DefenseJuryIM {
 
     public void setDefenseSessionId(int defenseSessionId) {
         this.defenseSessionId = defenseSessionId;
+    }
+
+    public int getJuryTopicId() {
+        return juryTopicId;
+    }
+
+    public void setJuryTopicId(int juryTopicId) {
+        this.juryTopicId = juryTopicId;
     }
 }

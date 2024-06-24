@@ -1,8 +1,7 @@
 package openerp.openerpresourceserver.repo;
 
 import openerp.openerpresourceserver.entity.ContestSubmission;
-import openerp.openerpresourceserver.model.StudentSemesterResult;
-import openerp.openerpresourceserver.model.StudentSubmissionBySemster;
+import openerp.openerpresourceserver.model.StudentSubmissionBySemester;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,7 +11,8 @@ import java.util.List;
 
 public interface ContestSubmissionRepo extends JpaRepository<ContestSubmission, String> {
 
-    List<ContestSubmission> findByUserSubmissionId(String studentId);
+    @Query("SELECT cs FROM ContestSubmission cs WHERE cs.userSubmissionId = :userId ORDER BY cs.createdDate ASC")
+    List<ContestSubmission> findAllByUserSubmissionIdOrderByCreatedDateAsc(@Param("userId") String userId);
     List<ContestSubmission> findByContestIdAndUserSubmissionId(String contestId, String studentId);
 
     long count();
@@ -54,164 +54,10 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmission, 
             "END AS grouped_language, " +
             "COUNT(*) AS submission_count " +
             "FROM contest_submission_new " +
-            "WHERE point > 0 and user_submission_id = :userId " +
+            "WHERE user_submission_id = :userId " +
             "GROUP BY user_submission_id, grouped_language " +
             "ORDER BY user_submission_id, submission_count DESC",nativeQuery = true)
     Object[] findNumberCountLanguagesDetailByUserId(@Param("userId") String userId);
-
-    @Query(value =
-            "WITH MidtermFinalSemesters AS ( " +
-                    "  SELECT DISTINCT " +
-                    "    user_submission_id, " +
-                    "    CASE " +
-                    "       WHEN EXTRACT(MONTH FROM created_stamp) >= 10 THEN 'Kỳ ' || EXTRACT(YEAR FROM created_stamp) || '1' " +
-                    "       WHEN EXTRACT(MONTH FROM created_stamp) <= 3 THEN 'Kỳ ' || EXTRACT(YEAR FROM created_stamp) - 1 || '1' " +
-                    "       WHEN EXTRACT(MONTH FROM created_stamp) >= 4 AND EXTRACT(MONTH FROM created_stamp) <= 8 THEN 'Kỳ ' || EXTRACT(YEAR FROM created_stamp) - 1 || '2' " +
-                    "    END AS semester " +
-                    "  FROM contest_submission_new " +
-                    "  WHERE UPPER(contest_id) LIKE '%MIDTERM%' OR UPPER(contest_id) LIKE '%FINAL%' " +
-                    "  UNION ALL " +
-                    "  SELECT DISTINCT " +
-                    "    user_submission_id, " +
-                    "    CASE " +
-                    "       WHEN EXTRACT(MONTH FROM CURRENT_DATE) >= 8 THEN 'Kỳ ' || EXTRACT(YEAR FROM CURRENT_DATE) || '1' " +
-                    "       WHEN EXTRACT(MONTH FROM CURRENT_DATE) <= 3 THEN 'Kỳ ' || EXTRACT(YEAR FROM CURRENT_DATE) - 1 || '1' " +
-                    "       WHEN EXTRACT(MONTH FROM CURRENT_DATE) >= 3 AND EXTRACT(MONTH FROM CURRENT_DATE) <= 9 THEN 'Kỳ ' || EXTRACT(YEAR FROM CURRENT_DATE) - 1 || '2' " +
-                    "    END AS semester " +
-                    "  FROM contest_submission_new " +
-                    "  WHERE user_submission_id NOT IN ( " +
-                    "      SELECT user_submission_id " +
-                    "      FROM contest_submission_new " +
-                    "      WHERE UPPER(contest_id) LIKE '%midterm%' AND UPPER(contest_id) NOT LIKE '%demo%' " +
-                    "  ) " +
-                    "), " +
-                    "StudentSubmissionSemester AS ( " +
-                    "  SELECT " +
-                    "      mfs.semester, " +
-                    "      csn.* " +
-                    "  FROM contest_submission_new csn " +
-                    "  JOIN MidtermFinalSemesters mfs ON csn.user_submission_id = mfs.user_submission_id " +
-                    "      AND mfs.semester = CASE " +
-                    "                             WHEN EXTRACT(MONTH FROM csn.created_stamp) >= 10 THEN 'Kỳ ' || EXTRACT(YEAR FROM csn.created_stamp) || '1' " +
-                    "                             WHEN EXTRACT(MONTH FROM csn.created_stamp) <= 3 THEN 'Kỳ ' || EXTRACT(YEAR FROM csn.created_stamp) - 1 || '1' " +
-                    "                             WHEN EXTRACT(MONTH FROM csn.created_stamp) >= 4 AND EXTRACT(MONTH FROM csn.created_stamp) <= 8 THEN 'Kỳ ' || EXTRACT(YEAR FROM csn.created_stamp) - 1 || '2' " +
-                    "                         end " +
-                    "), " +
-            "maxp_point_student AS (" +
-                    "   SELECT " +
-                    "       semester, " +
-                    "       user_submission_id, " +
-                    "       MAX(point) AS point, " +
-                    "       problem_id, " +
-                    "       contest_id " +
-                    "   FROM " +
-                    "       StudentSubmissionSemester csn " +
-                    "   WHERE " +
-                    "       UPPER(csn.contest_id) LIKE UPPER('%midterm%') AND UPPER(csn.contest_id) NOT LIKE UPPER('%demo%') " +
-                    "   GROUP BY " +
-                    "       user_submission_id, contest_id, problem_id, semester " +
-                    "), " +
-                    "max_point AS (" +
-                    "   SELECT " +
-                    "       ccpn.contest_id, " +
-                    "       SUM(test_case_point) AS total_point " +
-                    "   FROM " +
-                    "       test_case_new tsn " +
-                    "   INNER JOIN " +
-                    "       contest_contest_problem_new ccpn ON tsn.contest_problem_id = ccpn.problem_id " +
-                    "   GROUP BY " +
-                    "       ccpn.contest_id " +
-                    "   ORDER BY " +
-                    "       ccpn.contest_id" +
-                    ") " +
-                    "SELECT CAST(SUM(mps.point) * 10.0 / total_point AS DECIMAL(10, 1)) AS average_point " +
-                    "FROM " +
-                    "    maxp_point_student mps " +
-                    "INNER JOIN " +
-                    "    max_point mp ON mps.contest_id = mp.contest_id " +
-                    "WHERE " +
-                    "    mps.user_submission_id = :userId " +
-                    "GROUP BY " +
-                    "    mps.user_submission_id, mps.contest_id, total_point, semester",
-            nativeQuery = true)
-    List<Double> findMidtermPointByUserId(@Param("userId") String userId);
-
-    @Query(value =
-            "WITH MidtermFinalSemesters AS ( " +
-                    "  SELECT DISTINCT " +
-                    "    user_submission_id, " +
-                    "    CASE " +
-                    "       WHEN EXTRACT(MONTH FROM created_stamp) >= 10 THEN 'Kỳ ' || EXTRACT(YEAR FROM created_stamp) || '1' " +
-                    "       WHEN EXTRACT(MONTH FROM created_stamp) <= 3 THEN 'Kỳ ' || EXTRACT(YEAR FROM created_stamp) - 1 || '1' " +
-                    "       WHEN EXTRACT(MONTH FROM created_stamp) >= 4 AND EXTRACT(MONTH FROM created_stamp) <= 8 THEN 'Kỳ ' || EXTRACT(YEAR FROM created_stamp) - 1 || '2' " +
-                    "    END AS semester " +
-                    "  FROM contest_submission_new " +
-                    "  WHERE UPPER(contest_id) LIKE '%MIDTERM%' OR UPPER(contest_id) LIKE '%FINAL%' " +
-                    "  UNION ALL " +
-                    "  SELECT DISTINCT " +
-                    "    user_submission_id, " +
-                    "    CASE " +
-                    "       WHEN EXTRACT(MONTH FROM CURRENT_DATE) >= 8 THEN 'Kỳ ' || EXTRACT(YEAR FROM CURRENT_DATE) || '1' " +
-                    "       WHEN EXTRACT(MONTH FROM CURRENT_DATE) <= 3 THEN 'Kỳ ' || EXTRACT(YEAR FROM CURRENT_DATE) - 1 || '1' " +
-                    "       WHEN EXTRACT(MONTH FROM CURRENT_DATE) >= 3 AND EXTRACT(MONTH FROM CURRENT_DATE) <= 9 THEN 'Kỳ ' || EXTRACT(YEAR FROM CURRENT_DATE) - 1 || '2' " +
-                    "    END AS semester " +
-                    "  FROM contest_submission_new " +
-                    "  WHERE user_submission_id NOT IN ( " +
-                    "      SELECT user_submission_id " +
-                    "      FROM contest_submission_new " +
-                    "      WHERE UPPER(contest_id) LIKE '%final%' AND UPPER(contest_id) NOT LIKE '%demo%' " +
-                    "  ) " +
-                    "), " +
-                    "StudentSubmissionSemester AS ( " +
-                    "  SELECT " +
-                    "      mfs.semester, " +
-                    "      csn.* " +
-                    "  FROM contest_submission_new csn " +
-                    "  JOIN MidtermFinalSemesters mfs ON csn.user_submission_id = mfs.user_submission_id " +
-                    "      AND mfs.semester = CASE " +
-                    "                             WHEN EXTRACT(MONTH FROM csn.created_stamp) >= 10 THEN 'Kỳ ' || EXTRACT(YEAR FROM csn.created_stamp) || '1' " +
-                    "                             WHEN EXTRACT(MONTH FROM csn.created_stamp) <= 3 THEN 'Kỳ ' || EXTRACT(YEAR FROM csn.created_stamp) - 1 || '1' " +
-                    "                             WHEN EXTRACT(MONTH FROM csn.created_stamp) >= 4 AND EXTRACT(MONTH FROM csn.created_stamp) <= 8 THEN 'Kỳ ' || EXTRACT(YEAR FROM csn.created_stamp) - 1 || '2' " +
-                    "                         end " +
-                    "), " +
-                    "maxp_point_student AS (" +
-                    "   SELECT " +
-                    "       semester, " +
-                    "       user_submission_id, " +
-                    "       MAX(point) AS point, " +
-                    "       problem_id, " +
-                    "       contest_id " +
-                    "   FROM " +
-                    "       StudentSubmissionSemester csn " +
-                    "   WHERE " +
-                    "       UPPER(csn.contest_id) LIKE UPPER('%final%') AND UPPER(csn.contest_id) NOT LIKE UPPER('%demo%') " +
-                    "   GROUP BY " +
-                    "       user_submission_id, contest_id, problem_id, semester " +
-                    "), " +
-                    "max_point AS (" +
-                    "   SELECT " +
-                    "       ccpn.contest_id, " +
-                    "       SUM(test_case_point) AS total_point " +
-                    "   FROM " +
-                    "       test_case_new tsn " +
-                    "   INNER JOIN " +
-                    "       contest_contest_problem_new ccpn ON tsn.contest_problem_id = ccpn.problem_id " +
-                    "   GROUP BY " +
-                    "       ccpn.contest_id " +
-                    "   ORDER BY " +
-                    "       ccpn.contest_id" +
-                    ") " +
-                    "SELECT CAST(SUM(mps.point) * 10.0 / total_point AS DECIMAL(10, 1)) AS average_point " +
-                    "FROM " +
-                    "    maxp_point_student mps " +
-                    "INNER JOIN " +
-                    "    max_point mp ON mps.contest_id = mp.contest_id " +
-                    "WHERE " +
-                    "    mps.user_submission_id = :userId " +
-                    "GROUP BY " +
-                    "    mps.user_submission_id, mps.contest_id, total_point, semester",
-            nativeQuery = true)
-    List<Double> findFinalPointByUserId(@Param("userId") String userId);
 
     @Query(value =
             "WITH ranked_submissions AS ( " +
@@ -250,7 +96,7 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmission, 
                 "WHERE  upper(contestId) NOT LIKE upper('%Midterm%') AND upper(contestId) NOT LIKE upper('%Final%') " +
                 "GROUP BY userSubmissionId, semester, submissionMonth " +
             ") " +
-            "SELECT new openerp.openerpresourceserver.model.StudentSubmissionBySemster (  " +
+            "SELECT new openerp.openerpresourceserver.model.StudentSubmissionBySemester (  " +
                 "r.userSubmissionId, " +
                 "r.semester, " +
                 "r.submissionMonth, " +
@@ -259,58 +105,172 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmission, 
             "FROM RankedSubmissions r " +
             "WHERE r.userSubmissionId = :userId and r.semester= :semesterMax  " +
             "ORDER BY r.submissionMonth " )
-    List<StudentSubmissionBySemster> findSemesterSubmissionHaveMaxSubmission(@Param("userId") String userId, @Param("semesterMax") String semesterMax);
+    List<StudentSubmissionBySemester> findSemesterSubmissionHaveMaxSubmission(@Param("userId") String userId, @Param("semesterMax") String semesterMax);
 
     @Query(value =
-            "SELECT new openerp.openerpresourceserver.model.StudentSemesterResult( " +
-                    "  mfs.semester AS semester, " +
-                    "  csn.userSubmissionId AS userSubmissionId, " +
-                    "  COUNT(csn.id) AS totalSubmission, " +
-                    "  COUNT(DISTINCT csn.problemId) AS totalProblem, " +
-                    " MAX(CASE " +
-                    "        WHEN EXISTS ( " +
-                    "            SELECT 1 " +
-                    "            FROM CodePlagiarism cp " +
-                    "            WHERE cp.submissionId1 = csn.id or cp.submissionId2 = csn.id " +
-                    "        ) THEN " +
-                    "            CASE " +
-                    "                WHEN UPPER(csn.contestId) LIKE '%MIDTERM%' THEN 1 " +
-                    "                WHEN UPPER(csn.contestId) LIKE '%FINAL%' THEN 2 " +
-                    "            END " +
-                    "        ELSE 0 " +
-                    "    end) AS appearedInPlagiarism, " +
-                    "  0.0 as midtermPoint, " +
-                    "  0.0 as finalPoint, " +
-                    "  0 as finalState, " +
-                    "  0.0 as passingRate ) " +
-                    "FROM ContestSubmission csn " +
-                    "JOIN ( " +
-                    "  SELECT DISTINCT csn.userSubmissionId AS userSubmissionId, " +
-                    "    CASE WHEN EXTRACT(MONTH FROM csn.createdDate) >= 10 THEN 'Kỳ ' || EXTRACT(YEAR FROM csn.createdDate) || '1' " +
-                    "         WHEN EXTRACT(MONTH FROM csn.createdDate) <= 3 THEN 'Kỳ ' || EXTRACT(YEAR FROM csn.createdDate) - 1 || '1' " +
-                    "         WHEN EXTRACT(MONTH FROM csn.createdDate) >= 4 AND EXTRACT(MONTH FROM csn.createdDate) <= 8 THEN 'Kỳ ' || EXTRACT(YEAR FROM csn.createdDate) - 1 || '2' " +
-                    "    END AS semester " +
-                    "  FROM ContestSubmission csn " +
-                    "  WHERE UPPER(csn.contestId) LIKE '%MIDTERM%' OR UPPER(csn.contestId) LIKE '%FINAL%' " +
-                    "  UNION ALL " +
-                    "  SELECT DISTINCT csn.userSubmissionId AS userSubmissionId, " +
-                    "    CASE WHEN EXTRACT(MONTH FROM CURRENT_DATE) >= 10 THEN 'Kỳ ' || EXTRACT(YEAR FROM CURRENT_DATE) || '1' " +
-                    "         WHEN EXTRACT(MONTH FROM CURRENT_DATE) <= 3 THEN 'Kỳ ' || EXTRACT(YEAR FROM CURRENT_DATE) - 1 || '1' " +
-                    "         WHEN EXTRACT(MONTH FROM CURRENT_DATE) >= 4 AND EXTRACT(MONTH FROM CURRENT_DATE) <= 9 THEN 'Kỳ ' || EXTRACT(YEAR FROM CURRENT_DATE) - 1 || '2' " +
-                    "    END AS semester " +
-                    "  FROM ContestSubmission csn " +
-                    "  WHERE csn.userSubmissionId NOT IN ( " +
-                    "      SELECT userSubmissionId FROM ContestSubmission WHERE UPPER(contestId) LIKE '%MIDTERM%' OR UPPER(contestId) LIKE '%FINAL%' " +
-                    "  ) " +
-                    ") AS mfs ON csn.userSubmissionId = mfs.userSubmissionId " +
-                    "WHERE  csn.userSubmissionId = :userId " +
-                    "      AND mfs.semester = CASE " +
-                    "                             WHEN EXTRACT(MONTH FROM csn.createdDate) >= 10 THEN 'Kỳ ' || EXTRACT(YEAR FROM csn.createdDate) || '1' " +
-                    "                             WHEN EXTRACT(MONTH FROM csn.createdDate) <= 3 THEN 'Kỳ ' || EXTRACT(YEAR FROM csn.createdDate) - 1 || '1' " +
-                    "                             WHEN EXTRACT(MONTH FROM csn.createdDate) >= 4 AND EXTRACT(MONTH FROM csn.createdDate) <= 8 THEN 'Kỳ ' || EXTRACT(YEAR FROM csn.createdDate) - 1 || '2' " +
-                    "                         end " +
-                    "GROUP BY mfs.semester, csn.userSubmissionId " +
-                    "ORDER BY mfs.semester DESC ")
-    List<StudentSemesterResult> findStudentSemesterResult(@Param("userId") String userId);
+            "WITH midterm_point AS ( "
+            + "SELECT "
+            + "mfs.user_submission_id, "
+            + "mfs.contest_id, "
+            + "semester, "
+            + "CAST(SUM(mfs.point) * 10.0 / mpc.total_point AS DECIMAL(15, 2)) AS midterm_point "
+            + "FROM "
+            + "midterm_final_submission_view mfs "
+            + "INNER JOIN "
+            + "max_point_contest_view mpc ON mfs.contest_id = mpc.contest_id "
+            + "WHERE "
+            + "semester IS NOT NULL "
+            + "AND UPPER(mfs.contest_id) LIKE UPPER('%midterm%') "
+            + "GROUP BY "
+            + "mfs.user_submission_id, mfs.contest_id, semester, mpc.total_point "
+            + "), "
+            + "final_point AS ( "
+            + "SELECT "
+            + "mfs.user_submission_id, "
+            + "mfs.contest_id, "
+            + "semester, "
+            + "CAST(SUM(mfs.point) * 10.0 / mpc.total_point AS DECIMAL(15, 2)) AS final_point "
+            + "FROM "
+            + "midterm_final_submission_view mfs "
+            + "INNER JOIN "
+            + "max_point_contest_view mpc ON mfs.contest_id = mpc.contest_id "
+            + "WHERE "
+            + "semester IS NOT NULL "
+            + "AND UPPER(mfs.contest_id) LIKE UPPER('%final%') "
+            + "GROUP BY "
+            + "mfs.user_submission_id, mfs.contest_id, semester, mpc.total_point "
+            + ") "
+            + "SELECT "
+            + "mp.user_submission_id, "
+            + "mp.semester, "
+            + "COALESCE(mp.midterm_point, 0) AS midterm_point, "
+            + "COALESCE(fp.final_point, 0) AS final_point, "
+            + "CASE "
+            + "WHEN EXISTS ( "
+            + "SELECT 1 "
+            + "FROM code_plagiarism cp "
+            + "WHERE mp.user_submission_id = cp.user_id_1 "
+            + "AND mp.contest_id = cp.contest_id "
+            + ") THEN "
+            + "CASE "
+            + "WHEN UPPER(mp.contest_id) LIKE '%MIDTERM%' THEN 1 "
+            + "WHEN UPPER(mp.contest_id) LIKE '%FINAL%' THEN 2 "
+            + "END "
+            + "ELSE 0 "
+            + "END AS appearedInPlagiarism, "
+            + "CASE "
+            + "WHEN COALESCE(mp.midterm_point, 0) < 2.5 "
+            + "OR COALESCE(fp.final_point, 0) < 2.5 "
+            + "OR (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) <= 3.5 THEN -1 "
+            + "ELSE 1 "
+            + "END AS evaluation_result "
+            + "FROM "
+            + "midterm_point mp "
+            + "FULL OUTER JOIN "
+            + "final_point fp ON mp.user_submission_id = fp.user_submission_id "
+            + "WHERE mp.user_submission_id = :userId "
+            + "ORDER BY mp.semester", nativeQuery = true)
+    Object[] findStudentSemesterResult(@Param("userId") String userId);
 
+    @Query(value =
+            "WITH midterm_point AS (\n" +
+                    "SELECT mfs.user_submission_id, mfs.contest_id, semester, CAST(SUM(mfs.point) * 10.0 / mpc.total_point AS DECIMAL(15, 2)) AS midterm_point \n" +
+                    "FROM midterm_final_submission_view mfs\n" +
+                    "INNER JOIN max_point_contest_view mpc ON mfs.contest_id = mpc.contest_id \n" +
+                    "WHERE semester IS NOT NULL AND UPPER(mfs.contest_id) LIKE UPPER('%midterm%')\n" +
+                    "GROUP BY mfs.user_submission_id, mfs.contest_id, semester, total_point\n" +
+                    "),\n" +
+                    "final_point AS (\n" +
+                    "SELECT mfs.user_submission_id, mfs.contest_id, semester, CAST(SUM(mfs.point) * 10.0 / mpc.total_point AS DECIMAL(15, 2)) AS final_point \n" +
+                    "FROM midterm_final_submission_view mfs\n" +
+                    "INNER JOIN max_point_contest_view mpc ON mfs.contest_id = mpc.contest_id \n" +
+                    "WHERE semester IS NOT NULL AND UPPER(mfs.contest_id) LIKE UPPER('%final%')\n" +
+                    "GROUP BY mfs.user_submission_id, mfs.contest_id, semester, total_point\n" +
+                    "),\n" +
+                    "state AS (\n" +
+                    "SELECT \n" +
+                    "    mp.user_submission_id,\n" +
+                    "    mp.semester,\n" +
+                    "    COALESCE(mp.midterm_point, 0) AS midterm_point,\n" +
+                    "    COALESCE(fp.final_point, 0) AS final_point,\n" +
+                    "    (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) AS final_grade,\n" +
+                    "    CASE \n" +
+                    "        WHEN midterm_point < 2.5 OR final_point < 2.5 OR (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) <= 3.5 THEN 'failed'\n" +
+                    "        ELSE 'pass'\n" +
+                    "    END AS evaluation_result\n" +
+                    "FROM \n" +
+                    "    midterm_point mp\n" +
+                    "FULL OUTER JOIN \n" +
+                    "    final_point fp ON mp.user_submission_id = fp.user_submission_id\n" +
+                    ")\n" +
+                    "SELECT s.semester, COALESCE(COUNT(user_submission_id), 0) AS total_student_pass\n" +
+                    "FROM (SELECT DISTINCT semester FROM state) s\n" +
+                    "LEFT JOIN state ON s.semester = state.semester AND state.evaluation_result = 'pass'\n" +
+                    "GROUP BY s.semester " +
+                    "ORDER BY s.semester "
+            , nativeQuery = true)
+    Object[] findResultAllSemester();
+
+    @Query(value =
+            "WITH midterm_point AS ( " +
+            "SELECT " +
+            "mfs.user_submission_id, " +
+            "mfs.contest_id, " +
+            "semester, " +
+            "CAST(SUM(mfs.point) * 10.0 / mpc.total_point AS DECIMAL(15, 2)) AS midterm_point " +
+            "FROM " +
+            "midterm_final_submission_view mfs " +
+            "INNER JOIN " +
+            "max_point_contest_view mpc ON mfs.contest_id = mpc.contest_id " +
+            "WHERE " +
+            "semester IS NOT NULL " +
+            "AND UPPER(mfs.contest_id) LIKE UPPER('%midterm%') " +
+            "GROUP BY " +
+            "mfs.user_submission_id, mfs.contest_id, semester, mpc.total_point " +
+            "), " +
+            "final_point AS ( " +
+            "SELECT " +
+            "mfs.user_submission_id, " +
+            "mfs.contest_id, " +
+            "semester, " +
+            "CAST(SUM(mfs.point) * 10.0 / mpc.total_point AS DECIMAL(15, 2)) AS final_point " +
+            "FROM " +
+            "midterm_final_submission_view mfs " +
+            "INNER JOIN " +
+            "max_point_contest_view mpc ON mfs.contest_id = mpc.contest_id " +
+            "WHERE " +
+            "semester IS NOT NULL " +
+            "AND UPPER(mfs.contest_id) LIKE UPPER('%final%') " +
+            "GROUP BY " +
+            "mfs.user_submission_id, mfs.contest_id, semester, mpc.total_point " +
+            ") " +
+            "SELECT " +
+            "mp.semester, " +
+            "CASE " +
+            "WHEN COALESCE(mp.midterm_point, 0) < 2.5 " +
+            "OR COALESCE(fp.final_point, 0) < 2.5 " +
+            "OR (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) <= 3.5 THEN 'F' " +
+            "WHEN (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) > 8.4 THEN 'A/A+' " +
+            "WHEN (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) > 6.9 THEN 'B/B+' " +
+            "WHEN (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) > 5.4 THEN 'C/C+' " +
+            "ELSE 'D/D+' " +
+            "END AS evaluation_result, " +
+            "COUNT(*) AS num_students " +
+            "FROM " +
+            "midterm_point mp " +
+            "FULL OUTER JOIN " +
+            "final_point fp ON mp.user_submission_id = fp.user_submission_id " +
+            "GROUP BY " +
+            "mp.semester, " +
+            "CASE " +
+            "WHEN COALESCE(mp.midterm_point, 0) < 2.5 " +
+            "OR COALESCE(fp.final_point, 0) < 2.5 " +
+            "OR (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) <= 3.5 THEN 'F' " +
+            "WHEN (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) > 8.4 THEN 'A/A+' " +
+            "WHEN (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) > 6.9 THEN 'B/B+' " +
+            "WHEN (0.4 * COALESCE(mp.midterm_point, 0)) + (0.6 * COALESCE(fp.final_point, 0)) > 5.4 THEN 'C/C+' " +
+            "ELSE 'D/D+' " +
+            "END " +
+            "ORDER BY mp.semester DESC ", nativeQuery = true)
+    Object[] numberScoreBySemester();
 }

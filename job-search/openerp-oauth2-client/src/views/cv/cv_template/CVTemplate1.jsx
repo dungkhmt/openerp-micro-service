@@ -25,7 +25,7 @@ const CvTemplate1 = (props) => {
               return (
                 <div>
                   <h3 style={{ fontWeight: 700, fontSize: "25px" }}>
-                    {id + 1}.{uWE.position}
+                    {id + 1}.{uWE.workingPosition}
                   </h3>
                   <h6
                     className="text-dark font-weight-bold"
@@ -37,15 +37,15 @@ const CvTemplate1 = (props) => {
                     className="text-dark font-weight-bold"
                     style={{ fontWeight: 700 }}
                   >
-                    {uWE.startingDate && formatDateToMMYYYY(uWE.startingDate)}
-                    {uWE.startingDate && uWE.endingDate ? "-" : ""}
-                    {uWE.endingDate && formatDateToMMYYYY(uWE.endingDate)}
+                    {uWE.startingTime && formatDateToMMYYYY(uWE.startingTime)}
+                    {uWE.startingTime && uWE.endingTime ? "-" : ""}
+                    {uWE.endingTime && formatDateToMMYYYY(uWE.endingTime)}
                   </p>
                   <p
                     className="text-dark font-weight-normal"
                     style={{ whiteSpace: "pre-line" }}
                   >
-                    {parse(uWE.description || "")}
+                    {parse(uWE.responsibility || "")}
                   </p>
                 </div>
               );
@@ -89,11 +89,11 @@ const CvTemplate1 = (props) => {
                     className="text-dark font-weight-bold"
                     style={{ fontWeight: 700 }}
                   >
-                    {education.startingDate &&
-                      formatDateToMMYYYY(education.startingDate)}
-                    {education.startingDate && education.endingDate ? "-" : ""}
-                    {education.endingDate &&
-                      formatDateToMMYYYY(education.endingDate)}
+                    {education.startingTime &&
+                      formatDateToMMYYYY(education.startingTime)}
+                    {education.startingTime && education.endingTime ? "-" : ""}
+                    {education.endingTime &&
+                      formatDateToMMYYYY(education.endingTime)}
                   </p>
                   <p
                     className="text-dark font-weight-normal"

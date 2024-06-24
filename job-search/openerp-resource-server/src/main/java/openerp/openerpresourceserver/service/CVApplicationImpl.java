@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.entity.CVApplication;
 import openerp.openerpresourceserver.entity.JobPost;
+import openerp.openerpresourceserver.entity.User;
 import openerp.openerpresourceserver.repo.CVApplicationRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,11 @@ public class CVApplicationImpl implements CVApplicationService {
     @Override
     public List<CVApplication> getAllByJobId(JobPost jobPost) {
         return cvApplicationRepo.findByJobId(jobPost);
+    }
+
+    @Override
+    public List<CVApplication> getAllByUserId(String userId) {
+        return cvApplicationRepo.findByUserId(userId);
     }
 
     @Override

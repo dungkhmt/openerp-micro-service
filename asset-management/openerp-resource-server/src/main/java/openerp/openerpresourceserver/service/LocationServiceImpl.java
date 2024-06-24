@@ -6,6 +6,7 @@ import openerp.openerpresourceserver.repo.LocationRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,8 +17,7 @@ public class LocationServiceImpl implements LocationService{
 
     @Override
     public List<Location> getAllLocations() {
-        List<Location> locations = locationRepo.findAll();
-        return locations;
+        return locationRepo.getAllByLastUpdate();
     }
 
     @Override
@@ -33,6 +33,10 @@ public class LocationServiceImpl implements LocationService{
         loc.setAddress(location.getAddress());
         loc.setDescription(location.getDescription());
         loc.setImage(location.getImage());
+        loc.setNum_assets(0);
+
+        loc.setSince(new Date());
+        loc.setLast_updated(new Date());
         return locationRepo.save(loc);
     }
 

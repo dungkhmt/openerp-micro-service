@@ -4,6 +4,7 @@ import AllRegisterClassScreen from "views/tarecruitment/AllRegisterClassScreen";
 import ApplicationResultScreen from "views/tarecruitment/ApplicationResultScreen";
 import AssigningScreen from "views/tarecruitment/AssigningScreen";
 import ClassInformationScreen from "views/tarecruitment/ClassInformationScreen";
+import Dashboard from "views/tarecruitment/Dashboard";
 import RegisterClassForStudentScreen from "views/tarecruitment/RegisterClassForStudentScreen";
 import RegisterClassScreen from "views/tarecruitment/RegisterClassScreen";
 import RequestApprovalScreen from "views/tarecruitment/RequestApprovalScreen";
@@ -34,6 +35,11 @@ export default function StudentRouter() {
           component={RegisterClassScreen}
           exact
           path={`${path}/teacher/create-class/:semester`}
+        ></Route>
+        <Route
+          component={Dashboard}
+          exact
+          path={`${path}/teacher/dashboard`}
         ></Route>
         <Route
           component={AllClassScreen}

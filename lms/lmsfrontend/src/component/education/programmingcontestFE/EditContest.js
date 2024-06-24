@@ -297,7 +297,7 @@ function EditContest() {
                   <StyledSelect
                     fullWidth
                     id="evaluateBothPublicPrivateTestcase"
-                    label="Evaluate private testcases"
+                    label="Evaluate both public and private testcases"
                     key={"evaluateBothPublicPrivateTestcase"}
                     value={evaluateBothPublicPrivateTestcase}
                     options={options.evaluateBothPublicPrivateTestcase}

@@ -31,7 +31,7 @@ export default function TeacherViewInteractiveQuizResult(props) {
     request(
       // token, history,
       "get",
-      `/get-interactive-quiz-result/` + props.interactiveQuizId,
+      `/get-result-of-interactive-quiz/` + props.interactiveQuizId,
       (res) => {
         //console.log("getClassesOfUser, lst = ", lst);
         setResults(res.data);

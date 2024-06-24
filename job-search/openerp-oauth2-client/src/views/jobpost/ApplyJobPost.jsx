@@ -40,16 +40,17 @@ const ApplyJobPost = ({ open, onClose, jobId, jobName }) => {
     const [submitForm, setSubmitForm] = useState({})
 
     useEffect(() => {
-        request("get", "/employee-cv/user/dungpq", (res) => {
+        request("get", `/employee-cv/user/${user.id}`, (res) => {
             setAllCV(res.data)
         }).then();
-    }, [])
+    }, [user])
 
     const sleep = (milliseconds) => {
         return new Promise(resolve => setTimeout(resolve, milliseconds));
       }
 
     const handleSubmit = async  (e) => {
+        console.log("selected cv: ", selectedCV)
         e.preventDefault()
         setLoading(true);
         await sleep(2000);
@@ -58,10 +59,10 @@ const ApplyJobPost = ({ open, onClose, jobId, jobName }) => {
             "cvId": selectedCV.employeeCV?.id
         };
         let data = fetchUserState()
-
+        submitToServerForm.user = user
         console.log(submitToServerForm)
         console.log(user)
-        request("post", `/cv-application/user/dungpq/${jobId}`, (res) => {
+        request("post", `/cv-application/user/${user.id}/${jobId}`, (res) => {
             console.log(res);
         }, (err) => {
             console.log(err);
@@ -85,7 +86,7 @@ const ApplyJobPost = ({ open, onClose, jobId, jobName }) => {
                     <Autocomplete
                         disablePortal
                         id="combo-box-demo"
-                        options={allCV.map(e => { return "name: " + e.employeeCV?.title + " id: " + e.employeeCV?.id })}
+                        options={allCV.map(e => { return "Name: " + e.employeeCV?.title + " - Description: " + e.employeeCV?.description })}
                         sx={{ width: 300, margin: '16px' }}
                         renderInput={(params) => <TextField {...params} label="select your cv" />}
                         value={selectedCVName}
@@ -96,7 +97,7 @@ const ApplyJobPost = ({ open, onClose, jobId, jobName }) => {
                             let cvName = cvExtracted.name
                             let index = cvExtracted.id
                             let idx = allCVArray.findIndex(e => { return e.title == cvName && e.id == index })
-                            setSelectedCV(allCV[idx])
+                            setSelectedCV(allCV.find(e => e.id == index))
                         }}
                     />
                     {/* Add more MenuItems here */}

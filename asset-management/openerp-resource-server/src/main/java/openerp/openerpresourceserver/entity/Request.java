@@ -38,12 +38,16 @@ public class Request {
 
     private String admin_id;
 
+    private Integer parent_id;
+
     @Column(columnDefinition = "TEXT")
     private String data;
 
-    private Instant start_date;
+    private Date start_date;
 
-    private Instant end_date;
+    private Date end_date;
+
+    private Date payback_date;
 
     @CreatedDate
     private Date since;

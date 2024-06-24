@@ -34,11 +34,14 @@ public class LabTimetablingSolver {
     private static IntVar[] y;
     private static IntVar[][] z;
 
-    public LabTimetablingSolver(List<Class> classList, List<Room> roomList){
+    private Long solvingTimeLimit;
+
+    public LabTimetablingSolver(List<Class> classList, List<Room> roomList, Long solvingTimeLimit){
         LabTimetablingSolver.classList = classList;
         LabTimetablingSolver.roomList = roomList;
         N_CLASSES = classList.size();
         N_ROOMS = roomList.size();
+        this.solvingTimeLimit = solvingTimeLimit;
 
         Loader.loadNativeLibraries();
 
@@ -96,7 +99,7 @@ public class LabTimetablingSolver {
             return Integer.parseInt(thirdPart.trim());
         }
 
-        public int getFirstNumber(String str) {
+        private int getFirstNumber(String str) {
             String[] parts = str.split(",")[0].split("\\[");
             String firstPart = parts[parts.length - 1];
             return Integer.parseInt(firstPart.trim());
@@ -104,8 +107,8 @@ public class LabTimetablingSolver {
     }
     public abstract static class OptionalConstraint {
         List<Long> classes_id;
-        List<Integer> weeks;
-        public OptionalConstraint(List<Long> classes_id, List<Integer> weeks){
+        List<List<Integer>> weeks;
+        public OptionalConstraint(List<Long> classes_id, List<List<Integer>> weeks){
             this.classes_id = classes_id;
             this.weeks = weeks;
         }
@@ -215,7 +218,7 @@ public class LabTimetablingSolver {
         }
     }
     public static class AvoidWeekScheduleConstraint extends OptionalConstraint{
-        public AvoidWeekScheduleConstraint(List<Long> classes_id, List<Integer> weeks ){
+        public AvoidWeekScheduleConstraint(List<Long> classes_id, List<List<Integer>> weeks ){
             super(classes_id, weeks);
         }
 
@@ -236,8 +239,10 @@ public class LabTimetablingSolver {
                                 model.addEquality(x[i][d][k][r][w], 0).onlyEnforceIf(c1.not());
                                 model.addEquality(z[i][w], 1).onlyEnforceIf(c1);
 
-                                LinearExpr e = LinearExpr.newBuilder().add(z[i][weeks.get(cl)]).build();
-                                model.addEquality(e, 0).onlyEnforceIf(c1);
+                                for(int v=0;v<weeks.get(cl).size();v++) {
+                                    LinearExpr e = LinearExpr.newBuilder().add(z[i][weeks.get(cl).get(v)]).build();
+                                    model.addEquality(e, 0).onlyEnforceIf(c1);
+                                }
                             }
                         }
                     }
@@ -390,27 +395,33 @@ public class LabTimetablingSolver {
             }
         }
         VarArraySolutionPrinter printer = new VarArraySolutionPrinter(xs);
+        if (this.getSolvingTimeLimit() >0) {
+            solver.getParameters().setMaxTimeInSeconds(this.getSolvingTimeLimit());
+            System.out.println(this.getSolvingTimeLimit());
+        }
         CpSolverStatus status = solver.solve(model, printer);
-        List<String> nameList = xs.stream().filter(var-> solver.value(var)==1).map(IntVar::getName).toList();
-        List<List<String>> filteredStrings = filterStrings(nameList);
-        List<List<AutoSchedulingVar>> autoSchedulingVars = filteredStrings.stream().map(group -> {
-            List<AutoSchedulingVar> vars = new ArrayList<>();
-            for(String var: group){
-                List<Long> nums = varToNumberList(var);
+        if (status == CpSolverStatus.OPTIMAL) {
+            List<String> nameList = xs.stream().filter(var-> solver.value(var)==1).map(IntVar::getName).toList();
+            List<List<String>> filteredStrings = filterStrings(nameList);
+            List<List<AutoSchedulingVar>> autoSchedulingVars = filteredStrings.stream().map(group -> {
+                List<AutoSchedulingVar> vars = new ArrayList<>();
+                for (String var : group) {
+                    List<Long> nums = varToNumberList(var);
 //              class_id period lesson room_id week
-                AutoSchedulingVar autoSchedulingVar = new AutoSchedulingVar.Builder()
-                                            .setClassId(nums.get(0))
-                                            .setPeriod(nums.get(1))
-                                            .setLesson(nums.get(2))
-                                            .setRoomId(nums.get(3))
-                                            .setWeek(nums.get(4))
-                                            .build();
-                vars.add(autoSchedulingVar);
-            }
-            return vars;
-        }).toList();
-
-        return autoSchedulingVars;
+                    AutoSchedulingVar autoSchedulingVar = new AutoSchedulingVar.Builder()
+                            .setClassId(nums.get(0))
+                            .setPeriod(nums.get(1))
+                            .setLesson(nums.get(2))
+                            .setRoomId(nums.get(3))
+                            .setWeek(nums.get(4))
+                            .build();
+                    vars.add(autoSchedulingVar);
+                }
+                return vars;
+            }).toList();
+            return autoSchedulingVars;
+        }
+        return null;
     }
     public List<List<String>> filterStrings(List<String> strings) {
         Map<Integer, List<String>> groups = new HashMap<>();

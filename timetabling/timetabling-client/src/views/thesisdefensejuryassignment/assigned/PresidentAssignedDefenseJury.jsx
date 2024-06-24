@@ -36,12 +36,14 @@ export default function PresidentAssignedDefenseJury() {
             field: "defenseDate",
             render: (rowData) => rowData.defenseDate.split("T")[0],
         },
-        { title: "Số luận án tối đa", field: "maxThesis" },
+        {
+            title: "Phân ban", field: "juryTopic",
+        },
         {
             title: "Keywords",
             field: "keywords",
             render: (rowData) =>
-                rowData.keywords.map((item) => <KeywordChip key={item} keyword={item} />),
+                rowData?.keywords?.map((item) => <KeywordChip keyword={item} />),
         },
         {
             title: "Trạng thái",
@@ -91,7 +93,8 @@ export default function PresidentAssignedDefenseJury() {
     const { loading, data } = useFetch(`thesis-defense-plan/get-assigned-for-teacher/${keycloak?.tokenParsed?.email}/${id}/president`);
     const defenseJuries = data?.defenseJuries?.map((item) => ({
         ...item,
-        keywords: item?.academicKeywordList.map((item) => item.keyword),
+        juryTopic: item?.juryTopic?.name,
+        keywords: item?.juryTopic?.academicKeywordList?.map((item) => item.keyword),
     }));
     return (
         <>

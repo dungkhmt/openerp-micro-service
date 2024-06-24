@@ -15,4 +15,6 @@ public interface AssetTypeService {
     AssetType editType(Integer Id, AssetType assetType);
 
     void deleteType(Integer Id);
+
+    List<Integer> getTopTypes();
 }

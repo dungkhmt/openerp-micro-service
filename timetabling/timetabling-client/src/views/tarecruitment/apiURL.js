@@ -8,12 +8,16 @@ export const applicationUrl = {
     "/application/get-application-by-status-and-semester",
   getAssignListFile: "/application/get-assign-list-file",
   updateApplicationStatus: "/application/update-application-status",
+  updateMultipleApplicationStatus:
+    "/application/update-multiple-application-status",
   updateApplication: "/application/update-application",
   updateAssignStatus: "/application/update-assign-status",
   deleteApplication: "/application/delete-application",
   deleteMultipleApplication: "/application/delete-multiple-application",
   autoAssignClass: "/application/auto-assign-class",
   getTaBySemester: "/application/get-ta-by-semester",
+  getUniqueTaName: "/application/get-unique-ta",
+  getTaInfo: "application/get-ta-info",
 };
 
 export const classCallUrl = {
@@ -29,4 +33,17 @@ export const classCallUrl = {
 
 export const userUrl = {
   getUserInfo: "/user/get-user-info",
+};
+
+export const semesterUrl = {
+  getAllSemester: "/ta-semester/get-all-semester",
+  getCurrentSemester: "/ta-semester/get-current-semester",
+};
+
+export const dashboardUrl = {
+  getApplicatorData: "/application/get-applicator-data",
+  getApplicationData: "/application/get-application-data",
+  getTaData: "/application/get-ta-data",
+  getCourseData: "/application/get-course-data",
+  getClassNumbData: "/class-call/get-class-numb-data",
 };

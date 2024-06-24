@@ -15,6 +15,9 @@ import { EditThesisDefensePlan } from "views/thesisdefensejuryassignment/manager
 import { EditDefenseJury } from "views/thesisdefensejuryassignment/manager/EditDefenseJury";
 import { EditTeacherAndThesisToDefenseJury } from "views/thesisdefensejuryassignment/manager/EditTeacherAndThesisToDefenseJury";
 import { ManagerDefenseJuryDetail } from "views/thesisdefensejuryassignment/manager/ManagerDefenseJuryDetail";
+import SuperviseThesisList from "views/thesisdefensejuryassignment/assigned/SuperviseThesisList";
+import AssignSupervisedThesis from "views/thesisdefensejuryassignment/assigned/AssignSupervisedThesis";
+import JuryTopicList from "views/thesisdefensejuryassignment/manager/JuryTopicList";
 const ThesisDefensePlanAssignmentRouter = () => {
     let { path } = useRouteMatch();
     return (
@@ -61,11 +64,16 @@ const ThesisDefensePlanAssignmentRouter = () => {
                     exact
                 />
                 <Route
+                    path={`${path}/topic`}
+                    component={JuryTopicList}
+                    exact
+                />
+
+                <Route
                     path={`${path}/teacher/assigned`}
                     exact
-                >
-                    <AssignedThesisDefensePlan />
-                </Route>
+                    component={AssignedThesisDefensePlan}
+                />
                 <Route
                     path={`${path}/teacher/assigned/:id`}
                     component={AssignedDefenseJury}
@@ -75,6 +83,16 @@ const ThesisDefensePlanAssignmentRouter = () => {
                     path={`${path}/teacher/assigned/:id/defense_jury/:juryId`}
                     component={DefenseJuryDetail}
                     exact
+                />
+                <Route
+                    path={`${path}/teacher/superviser`}
+                    component={SuperviseThesisList}
+                    exact
+                />
+                <Route
+                    path={`${path}/teacher/superviser/assign/:id`}
+                    exact
+                    component={AssignSupervisedThesis}
                 />
                 <Route
                     path={`${path}/teacher/president`}

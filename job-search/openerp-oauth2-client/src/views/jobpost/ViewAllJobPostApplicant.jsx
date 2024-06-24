@@ -21,9 +21,10 @@ const ViewAllJobPostApplicant = () => {
     const [salary, setSalary] = useState(0)
 
     const [cv, selectedCV] = useState({})
-    const [cvApplication, setCVApplication] = useState([])
+
     const [allCV, setAllCV] = useState([])
     const [user, setUser] = useState({})
+    const [cvApplication, setCVApplication] = useState([])    
     useEffect(() => {
         request("get", "/user/get-user-data", (res) => {
             setUser(res.data)

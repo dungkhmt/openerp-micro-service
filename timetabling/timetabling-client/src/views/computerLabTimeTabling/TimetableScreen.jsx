@@ -3,6 +3,7 @@ import { request } from "api";
 import { useEffect, useState } from "react";
 import AssignTable from "./components/AssignTable";
 import BasicSelect from "./components/SelectBox";
+import { CircularProgress } from "@mui/material";
 
 const TimetableScreen = () => {
   const [semesters, setSemesters] = useState([]);
@@ -10,6 +11,7 @@ const TimetableScreen = () => {
   const [classesBySemester, setClassesBySemester] = useState(null);
   const [rooms, setRooms] = useState([]);
   const [chartData, setChartData] = useState(null);
+  const [dataTransformProgress, setDataTransformProgress] = useState(false);
 
   const transform_data = (data) => {
     var res = new Array();
@@ -35,12 +37,13 @@ const TimetableScreen = () => {
     return res;
   };
   const semester_on_change = (e) => {
+    setDataTransformProgress(true);
     const semesterValue = e.target.value;
     setSelectedSemester(semesterValue);
     request("get", `/lab-timetabling/class/semester/${semesterValue}`, (res) => {
       setClassesBySemester(res.data);
-      console.log(res.data);
       setChartData(transform_data(res.data));
+      setDataTransformProgress(false);
     }).then();
   };
 
@@ -70,7 +73,7 @@ const TimetableScreen = () => {
           display: selectedSemester == null ? "none" : "display",
         }}
       >
-        {(classesBySemester?.length>0)?<AssignTable data={classesBySemester} />:"Không có dữ liệu"}
+        {dataTransformProgress?<CircularProgress/>:((classesBySemester?.length>0)?<AssignTable data={classesBySemester} />:"Không có dữ liệu")}
       </Box>
     </Box>
   );

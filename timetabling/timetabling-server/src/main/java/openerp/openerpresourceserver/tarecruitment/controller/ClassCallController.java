@@ -2,7 +2,8 @@ package openerp.openerpresourceserver.tarecruitment.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import openerp.openerpresourceserver.tarecruitment.dto.PaginationDTO;
+import openerp.openerpresourceserver.tarecruitment.entity.dto.ChartDTO;
+import openerp.openerpresourceserver.tarecruitment.entity.dto.PaginationDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.ClassCall;
 import openerp.openerpresourceserver.tarecruitment.service.ClassCallService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,12 @@ public class ClassCallController {
 
     @PostMapping("/create-class")
     public ResponseEntity<?> createClass(@RequestBody ClassCall classCall) {
-        ClassCall newClassCall = classCallService.createNewClass(classCall);
-        return ResponseEntity.ok().body(newClassCall);
+        try {
+            ClassCall newClassCall = classCallService.createNewClass(classCall);
+            return ResponseEntity.ok().body(newClassCall);
+        } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @GetMapping("/get-all-class")
@@ -111,4 +116,9 @@ public class ClassCallController {
         }
     }
 
+    @GetMapping("get-class-numb-data")
+    public ResponseEntity<?> getClassNumbData() {
+        List<ChartDTO> chart = classCallService.getNumberOfClassEachSemester();
+        return ResponseEntity.ok().body(chart);
+    }
 }

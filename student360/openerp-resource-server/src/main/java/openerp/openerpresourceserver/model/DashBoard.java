@@ -2,6 +2,8 @@ package openerp.openerpresourceserver.model;
 
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -13,4 +15,7 @@ public class DashBoard {
     private long totalUserActive;
     private long totalProblem;
     private long totalQuizQuestion;
+    private Object[] totalStudentPassBySemester;
+    private Object[] totalStudentPlagiarismBySemester;
+    private List<SemesterScore> semesterScores;
 }

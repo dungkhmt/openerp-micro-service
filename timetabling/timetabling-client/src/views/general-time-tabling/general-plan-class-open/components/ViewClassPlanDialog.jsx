@@ -1,5 +1,5 @@
 import { Button, Dialog, DialogContent, DialogTitle } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { request } from "api";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -46,8 +46,12 @@ const ViewClassPlanDialog = ({
         });
         toast.success("Thêm lớp thành công!");
       },
-      (err) => {
-        toast.error("Thêm lớp thất bại");
+      (error) => {
+        if (error.response.status == 410) {
+          toast.error(error.response.data);
+        } else {
+          toast.error("Thêm lớp thất bại");
+        }
       },
       {
         planClassId: planClassId,
@@ -68,6 +72,24 @@ const ViewClassPlanDialog = ({
           </Button>
         </div>
         <DataGrid
+          initialState={{
+            filter: {
+              filterModel: {
+                items: [],
+                quickFilterValues: [""],
+              },
+            },
+          }}
+          slots={{ toolbar: GridToolbar }}
+          slotProps={{
+            toolbar: {
+              printOptions: { disableToolbarButton: true },
+              csvOptions: { disableToolbarButton: true },
+              showQuickFilter: true,
+            },
+          }}
+          disableColumnSelector
+          disableDensitySelector
           sx={{ height: 550 }}
           rowSelection={true}
           columns={usePlanGeneralTableCol(setGeneralClasses)}

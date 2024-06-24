@@ -18,6 +18,8 @@ import { useHookstate } from '@hookstate/core';
 import fetchUserState from "state/userState";
 import { CircularProgress, Snackbar } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
+import Swal from "sweetalert2";
+import './styles.css';
 
 const SkillDetail = ({ Skill,  open, onClose }) => {
 
@@ -43,19 +45,38 @@ const SkillDetail = ({ Skill,  open, onClose }) => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         setLoading(true);
-        await sleep(2000);
         let submitToServerForm = {...Skill, ...skill}
         submitToServerForm.user = user
-        console.log(submitToServerForm)
-        console.log(user)
-        request("post", `/skill`, (res) => {
-            console.log(res);
-        }, (err) => {
-            console.log(err);
-        }, submitToServerForm).then();
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, submit it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                request("post", `/skill`, (res) => {
+                    Swal.fire(
+                        'Submitted!',
+                        'Your information has been submitted.',
+                        'success'
+                    );
+                    handleClose();
+                }, (err) => {
+                    Swal.fire(
+                        'Failed!',
+                        'There was a problem submitting your information.',
+                        'error'
+                    );
+                    handleClose();
+                }, submitToServerForm).then();
+            }
+        });
+
         setLoading(false);
-        setOpenSnackbar(true);
-        await sleep(1500);
         handleClose()
     }
 
@@ -94,12 +115,12 @@ const SkillDetail = ({ Skill,  open, onClose }) => {
                         <Grid item xs={11}>
                             <TextField fullWidth label="Skill score" value={skill.score} variant="outlined" name="score" onChange={handleInputChange} />
                         </Grid>
-                        <Snackbar
+                        {/* <Snackbar
                             open={openSnackbar}
                             autoHideDuration={3000} // Duration in milliseconds
                             onClose={() => setOpenSnackbar(false)}
                             message="Form submitted successfully!"
-                        />
+                        /> */}
 
                         {/* This button should submit the form */}
                         <Box display="flex" justifyContent="center" paddingTop={'50px'}>
@@ -107,12 +128,12 @@ const SkillDetail = ({ Skill,  open, onClose }) => {
                                 {'Submit'}
                             </Button>
                         </Box>
-                        <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+                        {/* <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
                             <CircularProgress color="inherit" />
                             <div>
                                 Please wait a few seconds...
                             </div>
-                        </Backdrop>
+                        </Backdrop> */}
                     </Grid>
                 </form>
             </Dialog>

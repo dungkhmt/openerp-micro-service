@@ -21,26 +21,34 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { errorNoti, successNoti } from 'utils/notification';
 import "./requestTable.css";
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import {Link as RouterLink} from "react-router-dom";
+import { Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Link } from '@mui/material';
+import { GiSandsOfTime } from 'react-icons/gi';
+import { FcApproval, FcDisapprove } from "react-icons/fc";
 
-const RequestTable = () => {
+const RequestTable = ({ request123 }) => {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
+    const [requestName, setRequestName] = useState("");
 
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
+    const [paybackDate, setPaybackDate] = useState(null);
 
     const [assets, setAssets] = useState([]);
+    const [allAssets, setAllAssets] = useState([]);
     const [requests, setRequests] = useState([]);
     const [assetName, setAssetName] = useState("");
 
     const [open, setOpen] = useState(false);
     const [currentId, setCurrentId] = useState(null);
     const [title, setTitle] = useState("");
+    const [parentId, setParentId] = useState(0);
 
     const [openDelete, setOpenDelete] = useState(false);
     const [openApprove, setOpenApprove] = useState(false);
     const [openReject, setOpenReject] = useState(false);
+    const [openPayback, setOpenPayback] = useState(false);
 
     const getAllAvailableAssets = async() => {
         request("get", "/asset/get-all-available", (res) => {
@@ -48,12 +56,19 @@ const RequestTable = () => {
         }).then();
     };
 
-    const getAllRequests = async() => {
-        request("get", "/request/get-all", (res) => {
-            setRequests(res.data);
+    const getAllAssets = async() => {
+        await request("get", "/asset/get-all", (res) => {
+            setAllAssets(res.data);
         }).then();
     };
-   
+
+    const getAllRequests = async() => {
+        await request("get", "/request/get-all", (res) => {
+            setRequests(res.data);
+        }).then();
+        
+    };
+
     const style = {
 		position: 'absolute',
 		top: '50%',
@@ -67,6 +82,13 @@ const RequestTable = () => {
         gap: "30px"
 	};
 
+    const convertToDate = (date_time) => {
+        const dateString = date_time;
+        const dateObj = new Date(dateString);
+        const options = { month: '2-digit', day: '2-digit', year: 'numeric' };
+        return dateObj.toLocaleDateString('en-US', options);
+    };
+
     const errorHandlers = {
         onError: (e) => {
             console.log(e);
@@ -74,11 +96,10 @@ const RequestTable = () => {
         },
     };
 
-    const successHandler = (res) => {
+    const successHandler = () => {
         const msg = title === "CREATE NEW REQUEST" ? "CREATE SUCCESSFULLY" : "EDIT SUCCESSFULLY";
         successNoti(msg, 3000);
         window.location.reload();
-        // setRequests(prevAsset => [...prevAsset, res.data]);
     };
 
     const successHandlerDelete = () => {
@@ -107,6 +128,7 @@ const RequestTable = () => {
         setAssetName("");
         setStartDate(null);
         setEndDate(null);
+        setPaybackDate(null);
     };
 
     const handleClose = () => {
@@ -128,20 +150,50 @@ const RequestTable = () => {
 
     const handleSubmit = (e) => {
     	e.preventDefault();
-        const foundAsset = assets.find(a => a.name === assetName);
-        const asset_id = foundAsset ? foundAsset.id : 0;
+        if(title === "CREATE NEW REQUEST"){
+            const foundAsset = assets.find(a => a.name === assetName);
+            const asset_id = foundAsset ? foundAsset.id : 0;
+    
+            const body = {
+                name: name,
+                description: description,
+                start_date: startDate.format(),
+                end_date: endDate.format(),
+                asset_id: asset_id,
+                type: 1
+            };
+    
+            request("post", "/request/add-new", successHandler, errorHandlers, body);
+        } else if(title === "EDIT REQUEST"){
+            const body = {
+                name: name,
+                description: description,
+                start_date: startDate,
+                end_date: endDate
+            };
+            request("put", `/request/edit/${currentId}`, successHandler, errorHandlers, body);
+        }
+
+        resetData();
+        setOpen(false);
+    };
+
+    const handleSubmitPayback = (e) => {
+        e.preventDefault();
+        const parent_request = requests.find(item => item.id === parentId);
 
         const body = {
             name: name,
             description: description,
-            start_date: startDate.format(),
-            end_date: endDate.format(),
-            asset_id: asset_id
+            parent_id: parentId,
+            asset_id: parent_request?.asset_id,
+            type: 2,
+            payback_date: paybackDate.format()
         };
 
         request("post", "/request/add-new", successHandler, errorHandlers, body);
         resetData();
-        setOpen(false);
+        setOpenPayback(false);
     };
 
 
@@ -175,8 +227,37 @@ const RequestTable = () => {
         setOpenReject(false);
     };
 
+    const handlePayback = (request) => {
+        setOpenPayback(true);
+        setCurrentId(request?.id);
+        setTitle("CREATE PAYBACK REQUEST");
+        setRequestName(request?.name);
+        const asset = allAssets.find(item => item.id === request.asset_id);
+        setAssetName(asset?.name);
+        setParentId(request?.id);
+    };
+
+    const closePayback = () => {
+        setOpenPayback(false);
+    };
+
+    const handleEdit = (req) => {
+        if(req.status === 0){ // pending
+            setName(req.name);
+            setDescription(req.description);
+            setStartDate(req.start_date);
+            setEndDate(req.end_date);
+            setCurrentId(req.id);
+            setTitle("EDIT REQUEST");
+            const asset = allAssets.find(a => a.id === req.asset_id);
+            setAssetName(asset["name"]);
+            setOpen(true);
+        }
+    };
+
     useEffect(() => {
         getAllAvailableAssets();
+        getAllAssets();
         getAllRequests();
     }, []);
 
@@ -184,25 +265,72 @@ const RequestTable = () => {
         {
             title: "Request",
             field: "name",
+            render: (rowData) => (
+                <Link
+                    component={RouterLink}
+                    to={`/request/${rowData["id"]}`}
+                >
+                    {rowData["name"]}
+                </Link>
+            ),
         },
         {
             title: "Creator",
             field: "user_id",
         },
         {
-            title: "Description",
-            field: "description",
+            title: "Asset",
+            render: (rowData) => {
+                const asset = allAssets.find(item => item.id === rowData.asset_id);
+                return (
+                    <div>{asset?.name}</div>
+                )
+            }
         },
         {
             title: "Status",
             sorting: true,
             render: (rowData) => {
                 if(rowData.status === 0){
-                    return <div>PENDING</div>;
+                    return (
+                        <Chip
+                            icon={<GiSandsOfTime size={24} />}
+                            label="PENDING"
+                            color="primary"
+                            variant="outlined"
+                            style={{fontSize: "1rem"}}
+                        />
+                    )
                 } else if(rowData.status === 1){
-                    return <div>APPROVED</div>;
-                } else {
-                    return <div>REJECTED</div>;
+                    return (
+                        <Chip
+                            icon={<FcApproval size={24} />}
+                            label="APPROVED"
+                            color="primary"
+                            variant="outlined"
+                            style={{fontSize: "1rem", color: "green", borderColor: "green"}}
+                        />
+                    )
+                } else if(rowData.status === 2){
+                    return (
+                        <Chip
+                            icon={<FcDisapprove size={24} />}
+                            label="REJECTED"
+                            color="primary"
+                            variant="outlined"
+                            style={{fontSize: "1rem", color: "red", borderColor: "red"}}
+                        />
+                    )
+                } else if(rowData.status === 3){
+                    return (
+                        <Chip
+                            icon={<FcApproval size={24} />}
+                            label="DONE"
+                            color="primary"
+                            variant="outlined"
+                            style={{fontSize: "1rem", color: "green", borderColor: "green"}}
+                        />
+                    )
                 }
             }
         },
@@ -212,55 +340,87 @@ const RequestTable = () => {
         },
         {
             title: "StartDate",
-            field: "startDate",
+            render: (rowData) => {
+                if(rowData.start_date){
+                    return <div>{convertToDate(rowData.start_date)}</div>;
+                }
+                return <div></div>;
+            }
         },
         {
             title: "EndDate",
-            field: "endDate",
+            render: (rowData) => {
+                if(rowData.end_date){
+                    return <div>{convertToDate(rowData.end_date)}</div>;
+                }
+                return <div></div>;
+            }
+        },
+        {
+            title: "PaybackDate",
+            render: (rowData) => {
+                if(rowData.payback_date){
+                    return <div>{convertToDate(rowData.payback_date)}</div>;
+                }
+                return <div></div>;
+            }
         },
         {
             title: "Approve",
             sorting: false,
-            render: (rowData) => (
-                <IconButton
-                    onClick={() => {
-                        handleApprove(rowData)
-                    }}
-                    variant="contained"
-                    color="success"
-                >
-                    <DoneIcon/>
-                </IconButton>
-            )
+            render: (rowData) => {
+                if(rowData.status === 0){
+                    return <IconButton
+                        onClick={() => {
+                            handleApprove(rowData)
+                        }}
+                        variant="contained"
+                        color="success"
+                    >
+                        <DoneIcon/>
+                    </IconButton>
+                } else {
+                    return ``;
+                }
+
+            }
         },
         {
             title: "Reject",
-            render: (rowData) => (
-                <IconButton
-                    onClick={() => {
-                        handleReject(rowData)
-                    }}
-                    variant="contained"
-                    color="error"
-                >
-                    <CloseIcon/>
-                </IconButton>
-            )
+            render: (rowData) => {
+                if(rowData.status === 0){
+                    return <IconButton
+                        onClick={() => {
+                            handleReject(rowData)
+                        }}
+                        variant="contained"
+                        color="error"
+                    >
+                        <CloseIcon/>
+                    </IconButton>
+                } else {
+                    return ``;
+                }
+            }
         },
         {
             title: "Edit",
             sorting: false,
-            render: (rowData) => (
-                <IconButton
-                    onClick={() => {
-                        demoFunction(rowData)
-                    }}
-                    variant="contained"
-                    color="success"
-                >
-                    <EditIcon/>
-                </IconButton>
-            ),
+            render: (rowData) => {
+                if(rowData.status === 0){
+                    return <IconButton
+                        onClick={() => {
+                            handleEdit(rowData)
+                        }}
+                        variant="contained"
+                        color="success"
+                    >
+                        <EditIcon/>
+                    </IconButton>
+                } else {
+                    return ``;
+                }
+            },
         },
         {
             title: "Delete",
@@ -277,11 +437,25 @@ const RequestTable = () => {
                 </IconButton>
             ),
         },
+        {
+            title: "Payback",
+            sorting: false,
+            render: (rowData) => {
+                if(rowData["status"] === 1 && !rowData.parent_id){
+                    return (
+                        <Button
+                            variant="contained"
+                            onClick={() => handlePayback(rowData)}
+                        >
+                            PAYBACK
+                        </Button>
+                    )
+                } else {
+                    return ``;
+                }
+            }
+        }
     ];
-
-    const demoFunction = (user) => {
-        alert("You clicked on User: " + user.id)
-    }
 
     return (
         <div>
@@ -328,7 +502,7 @@ const RequestTable = () => {
                             name='description'
                             placeholder='Request description'
                         /> 
-                        <FormControl sx={{ minWidth: 730, marginTop: "20px" }}>
+                        {title === "CREATE NEW REQUEST" ? (<FormControl sx={{ minWidth: 730, marginTop: "20px" }}>
                             <InputLabel id="demo-simple-select-label">Asset</InputLabel>
                             <Select
                                 labelId="demo-simple-select-label"
@@ -341,15 +515,30 @@ const RequestTable = () => {
                                     <MenuItem id={asset.id} value={asset.name}>{asset.name}</MenuItem>
                                 ))}
                             </Select>
-                        </FormControl>    
-                        <div style={{marginTop: "20px"}}>
+                        </FormControl>) : (
+                            <TextField
+                                disabled
+                                sx={{ minWidth: 730, marginTop: "20px" }}
+                                id="outlined-disabled"
+                                label="Asset"
+                                value={assetName}
+                            />
+                        )}
+                        {title === "CREATE NEW REQUEST" ? (<div style={{marginTop: "20px"}}>
                             <LocalizationProvider dateAdapter={AdapterDayjs} className='date-adapter'>
                             <DemoContainer components={['DatePicker', 'DatePicker']}>
                                 <DatePicker className='date-picker-request' label="Start Date" value={startDate} onChange={(newValue) => setStartDate(newValue)} />
                                 <DatePicker className='date-picker-request' label="End Date" value={endDate} onChange={(newValue) => setEndDate(newValue)} />
                             </DemoContainer>
                             </LocalizationProvider>
-                        </div>
+                        </div>) : (
+                            <LocalizationProvider dateAdapter={AdapterDayjs} className='date-adapter'>
+                            <DemoContainer components={['DatePicker', 'DatePicker']}>
+                                <DatePicker className='date-picker-request' label="Start Date" value={dayjs(convertToDate(startDate))} onChange={(newValue) => setStartDate(newValue)} />
+                                <DatePicker className='date-picker-request' label="End Date" value={dayjs(convertToDate(endDate))} onChange={(newValue) => setEndDate(newValue)} />
+                            </DemoContainer>
+                            </LocalizationProvider>
+                        )}
                         <div style={{display: "flex", justifyContent: "space-between", marginTop: "20px"}}>
                             <Button
                                 variant="outlined"
@@ -370,7 +559,7 @@ const RequestTable = () => {
                     </form>
 				</Box>
       		</Modal>     
-              <Dialog
+            <Dialog
                 open={openDelete}
                 onClose={handleClose}
                 aria-labelledby="alert-dialog-title"
@@ -432,7 +621,77 @@ const RequestTable = () => {
                         REJECT
                     </Button>
                 </DialogActions>
-            </Dialog>      
+            </Dialog>
+            <Modal
+                open={openPayback}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+                onClose={closePayback}
+            >
+                <Box sx={style}>
+                    <div>{title}</div>
+                    <hr/>
+                    <form onSubmit={handleSubmitPayback}>
+                        <TextField
+                            label="Name"
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            required
+                            value={name}
+                            name="name"
+                            placeholder="Request name"
+                            onChange={(e) => setName(e.target.value)}
+                        />
+                        <TextField
+                            label="Description"
+                            variant="outlined"
+                            fullWidth
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            margin="normal"
+                            name="description"
+                            placeholder="Request description"
+                        />
+                        <TextField
+                            disabled
+                            sx={{ minWidth: 730, marginTop: "20px" }}
+                            id="outlined-disabled"
+                            label="Parent Request"
+                            value={requestName}
+                        />
+                        <TextField
+                            disabled
+                            sx={{ minWidth: 730, marginTop: "20px", marginBottom: "20px" }}
+                            id="outlined-disabled"
+                            label="Asset Payback"
+                            value={assetName}
+                        />
+                        <LocalizationProvider dateAdapter={AdapterDayjs} className="date-adapter">
+                            <DemoContainer components={['DatePicker']}>
+                                <DatePicker className='date-picker-payback' label="Payback Date" value={paybackDate} onChange={(newValue) => setPaybackDate(newValue)}/>
+                            </DemoContainer>
+                        </LocalizationProvider>
+                        <div style={{display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                type="cancel"
+                                onClick={closePayback}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                type="submit"
+                            >
+                                Create
+                            </Button>
+                        </div>
+                    </form>
+                </Box>
+            </Modal>
         </div>
     );
 };
