@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.User;
 import openerp.openerpresourceserver.generaltimetabling.repo.UserRepo;
 import openerp.openerpresourceserver.tarecruitment.algorithm.ConvertDataV2;
+import openerp.openerpresourceserver.tarecruitment.algorithm.MaxMatching;
 import openerp.openerpresourceserver.tarecruitment.entity.dto.ChartDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.dto.PaginationDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.Application;
@@ -318,8 +319,13 @@ public class ApplicationServiceImpl implements ApplicationService{
         List<ClassCall> classCalls = applicationRepo.findDistinctClassCallBySemester(semester);
         log.info("Found " + classCalls.size() + " class");
 
-//        MaxMatching maxMatching = new MaxMatching(applications, userApplies, classCalls);
-//        List<Application> assignApplications = maxMatching.getAssignApplications();
+        List<Integer> classIds = new ArrayList<>();
+        for(ClassCall elm : classCalls) {
+            classIds.add(elm.getId());
+        }
+
+//        MaxMatching maxMatching = new MaxMatching(applications, userApplies, classIds);
+//        List<Application> assignApplication = maxMatching.getAssignApplications();
 
         ConvertDataV2 convertDataV2 = new ConvertDataV2(applications, userApplies, classCalls);
         List<Application> assignApplication = convertDataV2.solvingProblem();
