@@ -141,13 +141,15 @@ import { TextField } from "@mui/material";
 import { request } from "api";
 import StandardTable from "components/StandardTable"
 import { Fragment, useEffect, useState } from "react"
-import { API_PATH_2 } from "screens/apiPaths";
-import { convertTimeStampToDate, getCurrentDateInString } from "screens/utils/utils";
+import { API_PATH_2, API_PATH } from "screens/apiPaths";
+import { convertTimeStampToDate, getCurrentDateInString2 } from "screens/utils/utils";
 import { errorNoti, successNoti } from "utils/notification";
 import { useHistory } from "react-router";
 import { useRouteMatch } from "react-router-dom";
 import LoadingScreen from "components/common/loading/loading";
 import withScreenSecurity from "components/common/withScreenSecurity";
+import { format } from 'date-fns';
+
 
 const ShipmentListing = () => {
   const history = useHistory();
@@ -156,7 +158,7 @@ const ShipmentListing = () => {
   const [shipmentTableData, setShipmentTableData] = useState([]);
   const [numOrder, setNumOrder] = useState(1);
   const [userLoginId, setUserLoginId] = useState(null);
-  const now = getCurrentDateInString();
+  const now = getCurrentDateInString2();
   const [expectDeliveryDate, setExpectDeliveryDate] = useState(null);
   const [isLoading, setLoading] = useState(true);
 
@@ -177,7 +179,7 @@ const ShipmentListing = () => {
 
       await request(
         "get",
-        API_PATH_2.GET_USER_LOGIN_ID,
+        API_PATH.GET_USER_LOGIN_ID,
         (res) => {
           setUserLoginId(res.data);
         }
@@ -189,6 +191,11 @@ const ShipmentListing = () => {
     fetchData();
   }, []);
 
+  const formatDate = (date) => {
+    const [year, month, day] = date.split('-');
+    return `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
+  };
+
   return (
   isLoading ? <LoadingScreen /> :
   <Fragment>
@@ -198,12 +205,10 @@ const ShipmentListing = () => {
       title="Danh sách các đợt giao hàng"
       data={shipmentTableData}
       columns={[
-        // { title: "Số thứ tự", field: "numOrder", 
-        //   editComponent: <TextField value={numOrder}/> },
-        { title: "Mã chuyến", field: "shipmentId", 
+        { title: "Mã đợt giao hàng", field: "shipmentId", 
           editComponent: <TextField InputProps={{readOnly: true}}/> },
         { title: "Ngày tạo", field: "createdStamp", 
-          editComponent: <TextField value={now}/> },
+          editComponent: <TextField value={now} disabled='true'/> },
         { title: "Người tạo", field: "createdBy", 
           editComponent: <TextField value={userLoginId}/> }, 
         { title: "Ngày giao hàng dự kiến", field: "expectedDeliveryStr", 
@@ -228,13 +233,16 @@ const ShipmentListing = () => {
               (res) => {
                 if (res.status == 200) {
                   successNoti("Thêm mới đợt giao hàng thành công");
+                  
                   const adder = {
                     numOrder: numOrder,
                     createdStamp: now,
                     createdBy: userLoginId,
-                    expectedDeliveryStamp: convertTimeStampToDate(expectDeliveryDate),
+                    expectedDeliveryStr: formatDate(expectDeliveryDate),
                     shipmentId: res.data
                   };
+
+                  console.log('add oke: ', formatDate(expectDeliveryDate), adder);
                   setShipmentTableData([adder, ...shipmentTableData]);
                   resolve();
                 }

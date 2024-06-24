@@ -2,6 +2,7 @@ import ProductCustomerDetailView from "screens/ecommerce/productCustomerDetailVi
 import { Route, Switch, useRouteMatch } from "react-router";
 import ProductGeneralView from "screens/ecommerce/productGeneralView";
 import CartDetail from "screens/ecommerce/cartDetail";
+import OrderHistory from "screens/ecommerce/orderHistory";
 
 export default function CustomerRouter () {
   let { path } = useRouteMatch();
@@ -22,6 +23,11 @@ export default function CustomerRouter () {
           component={CartDetail}
           exact
           path={`${path}/cart`}
+        ></Route>
+        <Route
+          component={OrderHistory}
+          exact
+          path={`${path}/order_history`}
         ></Route>
       </Switch>
     </div>

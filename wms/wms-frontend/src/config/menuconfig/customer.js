@@ -17,5 +17,12 @@ export const customer = {
       text: "Giỏ hàng",
       child: [],
     },
+    {
+      id: "MENU_WMSv2_CUSTOMER.HISTORY",
+      path: "/customer/order_history",
+      isPublic: false,
+      text: "Đơn hàng của tôi",
+      child: [],
+    },
   ],
 };

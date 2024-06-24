@@ -2,7 +2,7 @@ import { useRouteMatch } from "react-router-dom";
 import { useHistory } from "react-router";
 import { request } from "api";
 import StandardTable from "components/StandardTable";
-import { API_PATH } from "../apiPaths";
+import { API_PATH_2 } from "../apiPaths";
 import { Link } from 'react-router-dom';
 import { errorNoti, successNoti } from "utils/notification";
 import { Fragment, useState, useEffect } from "react";
@@ -25,7 +25,7 @@ const ProductListing =  () => {
     async function fetchData() {
       await request(
         "get",
-        API_PATH.PRODUCT_WITHOUT_IMAGE,
+        API_PATH_2.PRODUCT_WITHOUT_IMAGE,
         (res) => {
           setProductTableData(res.data);
         }
@@ -79,7 +79,7 @@ const ProductListing =  () => {
 
               request(
                 "delete",
-                API_PATH.PRODUCT,
+                API_PATH_2.PRODUCT,
                 (res) => { 
                   const deleteData = productTableData.filter(
                     product => !selectedIds.includes(product["productId"])
