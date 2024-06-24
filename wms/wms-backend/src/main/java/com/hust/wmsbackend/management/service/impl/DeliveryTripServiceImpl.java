@@ -219,6 +219,7 @@ public class DeliveryTripServiceImpl implements DeliveryTripService {
 
     @Override
     public List<DeliveryTripDTO> getTodayDeliveryTrip(Principal principal) {
+        log.info(principal.getName());
         List<DeliveryTrip> trips = deliveryTripRepository.findTodayDeliveryTripsByPerson(principal.getName(),
             Arrays.asList(DeliveryTripStatus.CREATED.getCode(), DeliveryTripStatus.DELIVERING.getCode()));
         return trips.stream().map(trip -> getById(trip.getDeliveryTripId())).collect(Collectors.toList());

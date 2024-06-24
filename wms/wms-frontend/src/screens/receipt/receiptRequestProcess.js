@@ -533,7 +533,7 @@
 // By Diep
 import { Fragment, useState, useEffect } from "react";
 import useStyles from "screens/styles";
-import { useHistory } from "react-router";
+import { useHistory } from "react-router-dom";
 import { useRouteMatch } from "react-router-dom";
 import { Box, Button, Grid, Modal, Tab, TextField, Typography } from "@mui/material";
 import { request } from "api";
@@ -1039,7 +1039,9 @@ const ReceiptRequestProcess = (props) => {
                             sorting: true,
                           }}
                           onRowClick={ (event, rowData) => {
-                            history.push(`${path.replace('process-receipts', 'receipt-bill').replace(':id', '').substring(0, path.lastIndexOf('/'))}/${rowData.receiptBillId}`);
+                            const newPath = `${path.replace('process-receipts', 'receipt-bill').replace(':id', '').substring(0, path.lastIndexOf('/'))}${rowData.receiptBillId}`;
+                            console.log(newPath);
+                            history.push(newPath);
                           } }
                         />
                       </TabPanel>

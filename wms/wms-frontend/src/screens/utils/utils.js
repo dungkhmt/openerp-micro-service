@@ -27,6 +27,14 @@ const getCurrentDateInString = () => {
   return `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
 }
 
+const getCurrentDateInString2 = () => {
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+  const year = now.getFullYear();
+  return `${day}-${month}-${year}`;
+}
+
 const convertDateToRequestFormat = ( date ) => {
   return `${date.getFullYear()}`
 }
@@ -59,4 +67,5 @@ export { getCurrentDateInString,
   convertToVNDFormat, 
   getWarehouseNameByWarehouseId, 
   getProductNameFromProductId, 
-  convertTimeStampToDate };
+  convertTimeStampToDate,
+  getCurrentDateInString2 };

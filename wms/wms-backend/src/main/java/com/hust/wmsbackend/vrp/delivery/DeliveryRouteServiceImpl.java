@@ -24,6 +24,8 @@ public class DeliveryRouteServiceImpl implements DeliveryRouteService {
         // remove duplicate customer address
         List<DeliveryAddressDTO> originalDeliveryAddresses = request.getAddressDTOs();
         buildNormAddressList(request);
+
+        log.info("Remove duplicate address success");
         List<Double[]> matrix = calCostMatrix(request);
         log.info("Cost matrix => ");
         for (Double[] m : matrix) {
@@ -248,6 +250,7 @@ public class DeliveryRouteServiceImpl implements DeliveryRouteService {
         // calculate cost from warehouse to another custom addresses
         Double[] warehouseToCustomer = new Double[customerCount + 1]; // add 1 because of warehouse
         warehouseToCustomer[0] = INFINITY_VALUE;
+
         for (int i = 0; i < customerCount; i++) {
             DeliveryAddressDTO addressDTO = r.getAddressDTOs().get(i);
             ResponsePath responsePath = distanceCalculator.calculate(r.getWarehouseLat(), r.getWarehouseLon(),
