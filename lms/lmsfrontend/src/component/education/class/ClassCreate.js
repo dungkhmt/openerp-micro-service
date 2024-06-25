@@ -1,13 +1,13 @@
 import DateFnsUtils from "@date-io/date-fns";
-import { CircularProgress } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
-import Card from "@material-ui/core/Card";
-import CardActions from "@material-ui/core/CardActions";
-import CardContent from "@material-ui/core/CardContent";
-import MenuItem from "@material-ui/core/MenuItem";
+import { CircularProgress } from "@mui/material";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import MenuItem from "@mui/material/MenuItem";
 import { makeStyles } from "@material-ui/core/styles";
-import TextField from "@material-ui/core/TextField";
-import Typography from "@material-ui/core/Typography";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import { request } from "api";
 import { useEffect, useState } from "react";
@@ -371,6 +371,7 @@ function ClassCreate() {
           </Button>
           <Button
             variant="contained"
+            color="error"
             onClick={() => history.push("/edu/teacher/class/list")}
           >
             Hủy
