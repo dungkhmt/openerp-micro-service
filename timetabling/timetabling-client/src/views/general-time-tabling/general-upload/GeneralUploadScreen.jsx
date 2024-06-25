@@ -23,7 +23,7 @@ const GeneralUploadScreen = () => {
     setDeleteLoading(true);
     request(
       "delete",
-      `/general-classes/?semester=${selectedSemester?.semester}`,
+      `/general-classes/delete-by-semester?semester=${selectedSemester?.semester}`,
       (res) => {
         setDeleteLoading(false);
         setClasses([]);

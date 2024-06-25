@@ -89,7 +89,7 @@ public class GeneralClassController {
     }
 
     @PostMapping("/update-classes-group")
-    public ResponseEntity updateClassesGroup(@RequestBody UpdateClassesToNewGroupRequest request) {
+    public ResponseEntity requestUpdateClassesGroup(@RequestBody UpdateClassesToNewGroupRequest request) {
         try{
             if(request.getPriorityBuilding() == null) return ResponseEntity.ok(gService.addClassesToCreatedGroup(request.getIds(), request.getGroupName()));
             return ResponseEntity.ok(gService.addClassesToNewGroup(request.getIds(),request.getGroupName(),request.getPriorityBuilding()));
@@ -144,6 +144,12 @@ public class GeneralClassController {
     @PostMapping("/{generalClassId}/room-reservations/")
     public ResponseEntity<GeneralClass> requestAddRoomReservation(@PathVariable("generalClassId")Long generalClassId) {
         return ResponseEntity.ok(gService.addRoomReservation(generalClassId));
+    }
+
+    @DeleteMapping("/delete-by-semester")
+    public ResponseEntity<String> requestDeleteClassesBySemester(@RequestParam("semester")String semester) {
+        gService.deleteClassesBySemester(semester);
+        return ResponseEntity.ok("Xóa lớp thành công");
     }
 
     @DeleteMapping("/{generalClassId}/room-reservations/{roomReservationId}")

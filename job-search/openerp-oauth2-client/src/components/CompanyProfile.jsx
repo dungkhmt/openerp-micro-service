@@ -33,7 +33,7 @@ function CompanyProfile({company}) {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Stack direction="row" spacing={2} alignItems="center">
-            <img alt={company.company?.name} src={company.company?.companyLogoLink} />
+            <img alt={company.company?.name} src={company.company?.companyLogoLink} width={"200px"} height={"160px"} />
             <Typography variant="h5" gutterBottom>
               {company.company?.name}
             </Typography>

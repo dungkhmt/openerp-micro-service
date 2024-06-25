@@ -9,4 +9,5 @@ import java.util.UUID;
 @Repository
 public interface DeliveryPersonRepository extends JpaRepository<DeliveryPerson, String> {
 
+
 }

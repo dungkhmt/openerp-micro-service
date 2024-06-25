@@ -104,6 +104,7 @@ public class DeliveryTripItemServiceImpl implements DeliveryTripItemService {
     }
 
     @Override
+    @Transactional
     public List<AssignedOrderItemDTO> getDeliveryTripItemSuggest(DeliveryTripItemSuggestRequest request) {
         if (request.getWarehouseId() == null || request.getWarehouseId().isEmpty()
             || request.getAssignedOrderItemIds() == null || request.getAssignedOrderItemIds().isEmpty()

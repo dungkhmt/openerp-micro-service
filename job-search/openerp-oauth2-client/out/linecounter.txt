@@ -1,0 +1,235 @@
+===============================================================================
+EXTENSION NAME : linecounter
+EXTENSION VERSION : 0.2.7
+-------------------------------------------------------------------------------
+count time : 2024-06-19 20:56:10
+count workspace : c:\Users\ADMIN\Desktop\DATN\openerp-micro-service\job-search\openerp-oauth2-client
+total files : 209
+total code lines : 39069
+total comment lines : 763
+total blank lines : 999
+
+    statistics
+   |      extension|     total code|  total comment|    total blank|percent|
+   -------------------------------------------------------------------------
+   |          .json|          25610|              0|             50|     66|
+   |               |             43|              1|              8|   0.11|
+   |          .conf|             31|              0|             13|  0.079|
+   |           .txt|              3|              1|              0| 0.0077|
+   |            .js|           4472|            119|            124|     11|
+   |           .svg|              8|              0|              0|  0.020|
+   |           .jsx|           8355|            600|            716|     21|
+   |           .css|            506|             15|             73|    1.3|
+   |            .md|             21|              4|             15|  0.054|
+   |          .html|             20|             23|              0|  0.051|
+   -------------------------------------------------------------------------
+.gitignore, code is 30, comment is 1, blank is 7.
+default.conf, code is 31, comment is 0, blank is 13.
+Dockerfile, code is 13, comment is 0, blank is 1.
+jsconfig.json, code is 6, comment is 0, blank is 0.
+package-lock.json, code is 25507, comment is 0, blank is 47.
+package.json, code is 72, comment is 0, blank is 3.
+public\favicon.ico, it is a binary file.
+public\index.html, code is 20, comment is 23, blank is 0.
+public\logo192.png, it is a binary file.
+public\logo512.png, it is a binary file.
+public\manifest.json, code is 25, comment is 0, blank is 0.
+public\mbti\enfj.png, it is a binary file.
+public\mbti\enfp.png, it is a binary file.
+public\mbti\entj.png, it is a binary file.
+public\mbti\entp.png, it is a binary file.
+public\mbti\esfj.png, it is a binary file.
+public\mbti\esfp.png, it is a binary file.
+public\mbti\estj.png, it is a binary file.
+public\mbti\estp.png, it is a binary file.
+public\mbti\infj.png, it is a binary file.
+public\mbti\infp.png, it is a binary file.
+public\mbti\intj.png, it is a binary file.
+public\mbti\intp.png, it is a binary file.
+public\mbti\isfj.png, it is a binary file.
+public\mbti\isfp.png, it is a binary file.
+public\mbti\istj.png, it is a binary file.
+public\mbti\istp.png, it is a binary file.
+public\robots.txt, code is 3, comment is 1, blank is 0.
+public\static\images\undraw_page_not_found_su7k.svg, code is 1, comment is 0, blank is 0.
+README.md, code is 21, comment is 4, blank is 15.
+src\api.js, code is 79, comment is 39, blank is 11.
+src\App.js, code is 117, comment is 9, blank is 9.
+src\App.test.js, code is 7, comment is 0, blank is 1.
+src\assets\css\material-dashboard-react.css, code is 435, comment is 15, blank is 61.
+src\assets\icons\logo.svg, code is 1, comment is 0, blank is 0.
+src\assets\icons\mathematics.svg, code is 1, comment is 0, blank is 0.
+src\assets\icons\undraw_happy_announcement_ac67.svg, code is 1, comment is 0, blank is 0.
+src\assets\img\cover.jpeg, it is a binary file.
+src\assets\img\sidebar-1.jpg, it is a binary file.
+src\assets\img\sidebar-2.jpg, it is a binary file.
+src\assets\img\sidebar-2.webp, it is a binary file.
+src\assets\img\sidebar-3.jpg, it is a binary file.
+src\assets\img\sidebar-4.jpg, it is a binary file.
+src\assets\jss\material-dashboard-react.js, code is 257, comment is 26, blank is 19.
+src\components\ApplicantCard.jsx, code is 122, comment is 3, blank is 10.
+src\components\button\PrimaryButton.jsx, code is 17, comment is 0, blank is 3.
+src\components\button\TertiaryButton.jsx, code is 10, comment is 0, blank is 2.
+src\components\common\NotAuthorized.jsx, code is 22, comment is 0, blank is 2.
+src\components\common\progressBar\CustomizedCircularProgress.jsx, code is 38, comment is 1, blank is 1.
+src\components\common\withScreenSecurity.js, code is 49, comment is 12, blank is 5.
+src\components\CompanyCard.jsx, code is 50, comment is 15, blank is 4.
+src\components\CompanyProfile.jsx, code is 50, comment is 15, blank is 4.
+src\components\CVCard.jsx, code is 55, comment is 0, blank is 5.
+src\components\dialog\CustomizedDialogs.jsx, code is 128, comment is 0, blank is 8.
+src\components\dialog\ErrorDialog.jsx, code is 36, comment is 1, blank is 5.
+src\components\EducationCard.jsx, code is 68, comment is 0, blank is 7.
+src\components\ExperienceCard.jsx, code is 65, comment is 0, blank is 5.
+src\components\findjob\DetailScore.jsx, code is 104, comment is 0, blank is 3.
+src\components\findjob\Header.jsx, code is 26, comment is 0, blank is 4.
+src\components\findjob\Item.jsx, code is 122, comment is 0, blank is 8.
+src\components\findjob\Main.jsx, code is 390, comment is 9, blank is 29.
+src\components\JobCard.jsx, code is 71, comment is 3, blank is 7.
+src\components\JobDescription.jsx, code is 49, comment is 20, blank is 5.
+src\components\JobTitleCard.jsx, code is 50, comment is 9, blank is 2.
+src\components\layout\main-layout.jsx, code is 32, comment is 0, blank is 2.
+src\components\ProtectedScreen.jsx, code is 18, comment is 0, blank is 2.
+src\components\SkillCard.jsx, code is 62, comment is 0, blank is 4.
+src\components\styles.css, code is 3, comment is 0, blank is 0.
+src\components\tab\AntScrollButton.jsx, code is 18, comment is 28, blank is 4.
+src\components\tab\AntTab.jsx, code is 42, comment is 38, blank is 3.
+src\components\tab\AntTabs.jsx, code is 15, comment is 13, blank is 2.
+src\components\tab\index.js, code is 6, comment is 0, blank is 1.
+src\components\tab\StyledTab.jsx, code is 36, comment is 0, blank is 1.
+src\components\tab\StyledTabs.jsx, code is 25, comment is 0, blank is 1.
+src\components\tab\TabPanel.jsx, code is 21, comment is 0, blank is 3.
+src\components\test\test-answer-option.jsx, code is 33, comment is 0, blank is 2.
+src\components\test\test-display.jsx, code is 45, comment is 0, blank is 5.
+src\components\test\test-instructions.jsx, code is 50, comment is 0, blank is 2.
+src\components\test\test-menu.jsx, code is 28, comment is 0, blank is 3.
+src\components\test\test-progress.jsx, code is 16, comment is 0, blank is 4.
+src\components\test\test-question.jsx, code is 143, comment is 0, blank is 19.
+src\components\test\test-result-stats.jsx, code is 87, comment is 0, blank is 7.
+src\components\test\test-result-table-of-content.jsx, code is 62, comment is 0, blank is 7.
+src\components\test\test-result.jsx, code is 479, comment is 1, blank is 8.
+src\components\test\test-timer.jsx, code is 30, comment is 0, blank is 5.
+src\components\UserApplicantCard.jsx, code is 82, comment is 3, blank is 10.
+src\components\userinfoDetails\EducationDetails.jsx, code is 138, comment is 33, blank is 20.
+src\components\userinfoDetails\ExperienceDetals.jsx, code is 131, comment is 11, blank is 17.
+src\components\userinfoDetails\SkillDetails.jsx, code is 120, comment is 11, blank is 17.
+src\components\userinfoDetails\styles.css, code is 3, comment is 0, blank is 0.
+src\config\constant.js, code is 13, comment is 0, blank is 2.
+src\config\keycloak.js, code is 10, comment is 2, blank is 3.
+src\config\menuconfig.js, code is 84, comment is 1, blank is 3.
+src\config\menuconfig\analyseCV.js, code is 14, comment is 0, blank is 0.
+src\config\menuconfig\company.js, code is 14, comment is 0, blank is 0.
+src\config\menuconfig\createCV.js, code is 35, comment is 0, blank is 0.
+src\config\menuconfig\demo.js, code is 14, comment is 0, blank is 0.
+src\config\menuconfig\FindingJob.js, code is 14, comment is 0, blank is 0.
+src\config\menuconfig\general.js, code is 14, comment is 0, blank is 0.
+src\config\menuconfig\jobPost.js, code is 28, comment is 0, blank is 1.
+src\config\menuconfig\mbtiTest.js, code is 14, comment is 0, blank is 0.
+src\config\menuconfig\scanCV.js, code is 14, comment is 0, blank is 0.
+src\config\menuconfig\student.js, code is 21, comment is 0, blank is 0.
+src\config\menuconfig\teacher.js, code is 21, comment is 0, blank is 0.
+src\config\menuconfig\user.js, code is 18, comment is 8, blank is 1.
+src\config\menuconfig\userInfomation.js, code is 28, comment is 0, blank is 0.
+src\data\personality-class-groups.js, code is 2590, comment is 0, blank is 1.
+src\data\personality-classes.js, code is 34, comment is 0, blank is 2.
+src\data\personality-test.js, code is 590, comment is 0, blank is 2.
+src\history.js, code is 3, comment is 0, blank is 1.
+src\hooks\use-headings-observer.jsx, code is 24, comment is 0, blank is 7.
+src\index.css, code is 53, comment is 0, blank is 12.
+src\index.js, code is 18, comment is 6, blank is 4.
+src\layout\account\AccountButton.jsx, code is 58, comment is 6, blank is 11.
+src\layout\account\AccountMenu.jsx, code is 218, comment is 10, blank is 18.
+src\layout\account\FeedbackDialog.jsx, code is 324, comment is 10, blank is 18.
+src\layout\account\RejectFeedbackDialog.jsx, code is 36, comment is 0, blank is 3.
+src\layout\index.js, code is 2, comment is 0, blank is 0.
+src\layout\Layout.jsx, code is 126, comment is 7, blank is 11.
+src\layout\notification\ActionsWithNotificationButton.jsx, code is 261, comment is 7, blank is 19.
+src\layout\notification\Notification.jsx, code is 224, comment is 7, blank is 21.
+src\layout\notification\NotificationButton.jsx, code is 228, comment is 25, blank is 42.
+src\layout\notification\NotificationMenu.jsx, code is 176, comment is 11, blank is 13.
+src\layout\notification\NotificationReadIcon.jsx, code is 58, comment is 0, blank is 1.
+src\layout\notification\NotificationTitle.jsx, code is 38, comment is 0, blank is 1.
+src\layout\sidebar\GroupMenuItem.jsx, code is 197, comment is 14, blank is 20.
+src\layout\sidebar\ListItemLink.jsx, code is 30, comment is 4, blank is 4.
+src\layout\sidebar\MenuItem.jsx, code is 124, comment is 0, blank is 12.
+src\layout\sidebar\SideBar.jsx, code is 133, comment is 15, blank is 9.
+src\lib\personality-test.js, code is 83, comment is 0, blank is 12.
+src\logo.svg, code is 1, comment is 0, blank is 0.
+src\public\favicon.ico, it is a binary file.
+src\public\images\mbti\enfj.png, it is a binary file.
+src\public\images\mbti\enfp.png, it is a binary file.
+src\public\images\mbti\entj.png, it is a binary file.
+src\public\images\mbti\entp.png, it is a binary file.
+src\public\images\mbti\esfj.png, it is a binary file.
+src\public\images\mbti\esfp.png, it is a binary file.
+src\public\images\mbti\estj.png, it is a binary file.
+src\public\images\mbti\estp.png, it is a binary file.
+src\public\images\mbti\infj.png, it is a binary file.
+src\public\images\mbti\infp.png, it is a binary file.
+src\public\images\mbti\intj.png, it is a binary file.
+src\public\images\mbti\intp.png, it is a binary file.
+src\public\images\mbti\isfj.png, it is a binary file.
+src\public\images\mbti\isfp.png, it is a binary file.
+src\public\images\mbti\istj.png, it is a binary file.
+src\public\images\mbti\istp.png, it is a binary file.
+src\public\next.svg, code is 1, comment is 0, blank is 0.
+src\public\thirteen.svg, code is 1, comment is 0, blank is 0.
+src\public\vercel.svg, code is 1, comment is 0, blank is 0.
+src\reportWebVitals.js, code is 12, comment is 0, blank is 1.
+src\Router.js, code is 35, comment is 1, blank is 4.
+src\routers\MainAppRouter.jsx, code is 91, comment is 7, blank is 7.
+src\routers\PrivateRoute.jsx, code is 20, comment is 10, blank is 3.
+src\routers\TeacherRouter.jsx, code is 16, comment is 0, blank is 1.
+src\setupTests.js, code is 1, comment is 4, blank is 0.
+src\state\MenuState.js, code is 33, comment is 7, blank is 4.
+src\state\NotificationState.js, code is 10, comment is 0, blank is 2.
+src\state\RouteState.js, code is 7, comment is 1, blank is 2.
+src\state\userState.js, code is 14, comment is 3, blank is 3.
+src\store\use-user-test-answers.js, code is 9, comment is 0, blank is 2.
+src\theme\index.js, code is 22, comment is 0, blank is 2.
+src\utils\ConvertHTMLToFile\convertHtmlElementToPdfFile.js, code is 20, comment is 0, blank is 2.
+src\utils\ConvertHTMLToFile\convertMMtoPixel.js, code is 3, comment is 0, blank is 0.
+src\utils\ConvertHTMLToFile\convertPixelToMM.js, code is 3, comment is 0, blank is 0.
+src\utils\ConvertHTMLToFile\convertUSD.js, code is 9, comment is 0, blank is 2.
+src\utils\ConvertHTMLToFile\formatDateToMMYYYY.js, code is 6, comment is 0, blank is 0.
+src\utils\ConvertHTMLToFile\validateImageFile.js, code is 5, comment is 0, blank is 2.
+src\utils\formatDateToMMYYYY.js, code is 6, comment is 0, blank is 0.
+src\utils\MenuUtils.js, code is 29, comment is 0, blank is 10.
+src\utils\notification\index.js, code is 11, comment is 0, blank is 0.
+src\utils\notification\Notification.jsx, code is 161, comment is 3, blank is 14.
+src\utils\utils\formatDateToMMYYYY.js, code is 6, comment is 0, blank is 0.
+src\utils\utils\MenuUtils.js, code is 29, comment is 0, blank is 10.
+src\utils\utils\notification\index.js, code is 11, comment is 0, blank is 0.
+src\utils\utils\notification\Notification.jsx, code is 161, comment is 3, blank is 14.
+src\views\AnalyseCV.jsx, code is 14, comment is 0, blank is 2.
+src\views\Company.jsx, code is 150, comment is 1, blank is 8.
+src\views\cv\CreateCV.jsx, code is 446, comment is 50, blank is 30.
+src\views\cv\cv_template\CvTemplate1.css, code is 6, comment is 0, blank is 0.
+src\views\cv\cv_template\CVTemplate1.jsx, code is 260, comment is 0, blank is 4.
+src\views\cv\styles.css, code is 3, comment is 0, blank is 0.
+src\views\cv\ViewAllApplicantStatus.jsx, code is 50, comment is 24, blank is 8.
+src\views\cv\viewAllCV.jsx, code is 46, comment is 43, blank is 6.
+src\views\cvscanner\CVScanner.jsx, code is 202, comment is 4, blank is 20.
+src\views\DemoScreen.jsx, code is 73, comment is 1, blank is 8.
+src\views\errors\NotFound.jsx, code is 40, comment is 7, blank is 3.
+src\views\FindJob.jsx, code is 12, comment is 0, blank is 3.
+src\views\jobpost\ApplyJobPost.jsx, code is 141, comment is 3, blank is 13.
+src\views\jobpost\CreateJobPost.jsx, code is 242, comment is 14, blank is 10.
+src\views\jobpost\JobPostApplicantCard.jsx, code is 0, comment is 0, blank is 0.
+src\views\jobpost\styles.css, code is 3, comment is 0, blank is 0.
+src\views\jobpost\ViewAllApplicant.jsx, code is 60, comment is 19, blank is 7.
+src\views\jobpost\ViewAllApplicant2.jsx, code is 59, comment is 19, blank is 8.
+src\views\jobpost\ViewAllJobPost.jsx, code is 49, comment is 19, blank is 6.
+src\views\jobpost\ViewAllJobPost2.jsx, code is 50, comment is 19, blank is 6.
+src\views\jobpost\ViewAllJobPostApplicant.jsx, code is 92, comment is 0, blank is 9.
+src\views\jobpost\ViewJobPostApplication.jsx, code is 0, comment is 0, blank is 0.
+src\views\jobpost\ViewJobPostDetail.jsx, code is 70, comment is 24, blank is 11.
+src\views\mbti-page\HomePage.jsx, code is 60, comment is 0, blank is 2.
+src\views\mbti-page\test\result\history\index.jsx, code is 39, comment is 0, blank is 6.
+src\views\mbti-page\test\result\testResultId.jsx, code is 57, comment is 0, blank is 4.
+src\views\mbti-page\test\TestPage.jsx, code is 9, comment is 0, blank is 2.
+src\views\personalInfo\UserEducation.jsx, code is 45, comment is 0, blank is 7.
+src\views\personalInfo\UserExperience.jsx, code is 45, comment is 0, blank is 6.
+src\views\personalInfo\UserSkill.jsx, code is 45, comment is 0, blank is 5.
+src\views\skill\Skill.jsx, code is 89, comment is 0, blank is 8.
+src\views\UserInfoForm.jsx, code is 20, comment is 0, blank is 3.
+===============================================================================

@@ -407,6 +407,10 @@ const StandardTable = ({
         } else {
             await editable.onRowDelete(selected);
         }
+        if (editable.isDeletingDeliveryTrip) {
+            setSelected([]);
+            return;
+        }
         
         // delete data from UI
         const newTableData = rows.filter(

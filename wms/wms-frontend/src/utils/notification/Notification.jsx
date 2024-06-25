@@ -173,14 +173,14 @@ export const warningNoti = (message, autoClose) =>
 export const infoNoti = (message, autoClose) =>
   toast.info(
     <Box display="flex" alignItems="center">
-      <IconContext.Provider>
+      <IconContext.Provider value={{}}>
         <GiInfo size={20} style={{ marginRight: "5px" }} />
       </IconContext.Provider>
       {message}
     </Box>,
     {
       position: "bottom-right",
-      autoClose: autoClose === undefined ? false : autoClose,
+      autoClose: autoClose === undefined ? 2000 : autoClose,
       pauseOnHover: true,
       draggable: true,
       progress: undefined,

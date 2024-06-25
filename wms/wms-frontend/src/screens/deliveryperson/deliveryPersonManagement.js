@@ -4,7 +4,7 @@ import StandardTable from "components/StandardTable"
 import LoadingScreen from "components/common/loading/loading";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import { Fragment, useEffect, useState } from "react"
-import { API_PATH } from "screens/apiPaths";
+import { API_PATH, API_PATH_2 } from "screens/apiPaths";
 import { errorNoti, successNoti } from "utils/notification";
 
 const DeliveryPersonManagement = () => {
@@ -19,7 +19,7 @@ const DeliveryPersonManagement = () => {
     const fetchData = async () => {
       await request(
         "get",
-        API_PATH.DELIVERY_MANAGER_DELIVERY_PERSON,
+        API_PATH_2.DELIVERY_MANAGER_DELIVERY_PERSON,
         (res) => {
           setDeliveryPersonsTableData(res.data);
         }

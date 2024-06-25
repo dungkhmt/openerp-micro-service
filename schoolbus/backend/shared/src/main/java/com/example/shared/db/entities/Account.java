@@ -32,13 +32,18 @@ public class Account {
     private Long id;
 
     private String username;
+
     private String password;
+
     @Enumerated(EnumType.STRING)
     private UserRole role;
-    @Column
+
+    @Enumerated(EnumType.STRING)
     private AuthProvider provider;
+
     @Column(name = "provider_id")
     private String providerId;
+
     @CreatedDate
     @CreationTimestamp
     private Instant createdAt;

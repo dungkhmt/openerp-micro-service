@@ -510,7 +510,7 @@ const CreateNewCvForm = () => {
                         linkedInLink={userInfoForm.linkedInLink}
                         gitHubLink={userInfoForm.githubLink}
                         education={educations}
-                        skill={skills}
+                        skillDescription={skills}
                         workingExperience={experiences}
                         handleBackToEditButton={() => setShowCVDemo(false)}
                         handleSaveCVButton={() => createNewCv()}

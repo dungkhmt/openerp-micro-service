@@ -8,10 +8,9 @@ export function middleware(request: NextRequest) {
     // return NextResponse.redirect('/login')
     return Response.redirect(new URL('/login', request.url));
   }
-  // return Response.redirect(new URL('/admin', request.url))
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/admin'],
+  matcher: ['/admin/:path*'],
 }

@@ -1,3 +1,4 @@
 PyPDF2
-sklearn
+scikit-learn
 docx2txt
+flask-cors

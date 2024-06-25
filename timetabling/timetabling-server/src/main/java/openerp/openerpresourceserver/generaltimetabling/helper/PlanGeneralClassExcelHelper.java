@@ -27,7 +27,7 @@ public class PlanGeneralClassExcelHelper {
      */
     private final static int START_COL_TO_READ_CLASS_INFO = 1;
     /**
-     * End column in excel to read class information (End with column J)
+     * End column in excel to read class information (End with column M)
      */
     private final static int END_COL_TO_READ_CLASS_INFO = 12;
     public static boolean isNumeric(String str) {
@@ -110,7 +110,8 @@ public class PlanGeneralClassExcelHelper {
                 sheet = workbook.getSheet(DEFAULT_SHEET);
             }
             int rowIndex = START_ROW_TO_READ_CLASS;
-            while (sheet.getRow(rowIndex)!= null && sheet.getRow(rowIndex).getCell(START_COL_TO_READ_CLASS_INFO).getCellType() != Cell.CELL_TYPE_BLANK) {
+            while (sheet.getRow(rowIndex)!= null && sheet.getRow(rowIndex).getCell(START_ROW_TO_READ_CLASS).getCellType() != Cell.CELL_TYPE_BLANK) {
+
                 PlanGeneralClass planGeneralClass = new PlanGeneralClass();
                 for (int colIndex = START_COL_TO_READ_CLASS_INFO; colIndex<=END_COL_TO_READ_CLASS_INFO ; colIndex++) {
                     if (sheet.getRow(rowIndex).getCell(colIndex).getCellType() == Cell.CELL_TYPE_NUMERIC) {

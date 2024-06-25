@@ -101,7 +101,7 @@ const RoomOccupationScreen = () => {
               colSpan="6"
               className="cell text-center border-[1px] border-slate-600"
             >
-              {index + 2 !== 8 ? "CN" : index + 2}
+              {index + 2 === 8 ? "CN" : index + 2}
             </td>
           ))}
           <tr>

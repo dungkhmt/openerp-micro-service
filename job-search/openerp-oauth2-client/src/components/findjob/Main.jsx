@@ -89,7 +89,7 @@ const ButtonScore = styled.button`
   margin-right: 4rem;
 `;
 const Container = styled.div``;
-
+const apiUrl = process.env.REACT_APP_JOB_SEARCH_HOST;
 const Main = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFetch, setIsFetch] = useState(false);
@@ -162,7 +162,7 @@ const Main = () => {
 
       setIsLoading(true);
       const res = await axios.post(
-        "https://api-vx.onrender.com/suggest-job",
+        `${apiUrl}/suggest-job`,
         information,
         {
           params: { TvA: inputs.TvA, TvS: inputs.TvS, SvA: inputs.SvA },

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import CanvasJSReact from '@canvasjs/react-charts';
 import { request } from 'api';
-import { API_PATH } from 'screens/apiPaths';
+import { API_PATH_2 } from 'screens/apiPaths';
 
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
@@ -13,7 +13,7 @@ const RevuenueReport = () => {
   useEffect(() => {
     request(
       'get',
-      API_PATH.REVENUE_PROFIT_REPORT,
+      API_PATH_2.REVENUE_PROFIT_REPORT,
       (res) => {
         setProfit(res?.data?.profit);
         setRevenue(res?.data?.revenue);

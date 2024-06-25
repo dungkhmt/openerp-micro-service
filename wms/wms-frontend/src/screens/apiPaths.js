@@ -75,7 +75,7 @@ export const API_PATH_2 = {
   DELIVERY_MANAGER_DELIVERY_TRIP: "/wmsv3/delivery-manager/delivery-trip",
   DELIVERY_MANAGER_SHIPMENT_DELIVERY_TRIP: "/wmsv3/delivery-manager/shipment/delivery-trip",
   DELIVERY_MANAGER_ASSIGN_ORDER_ITEM: "/wmsv3/delivery-manager/assigned-order-items",
-  DELIVREY_MANAGER_AUTO_ROUTE: "/wmsv3/delivery-manager/auto-route",
+  DELIVERY_MANAGER_AUTO_ROUTE: "/wmsv3/delivery-manager/auto-route",
   DELIVERY_PERSON_TODAY: "/wmsv3/delivery-manager/delivery-trip/today",
   DELIVERY_TRIP_START: "/wmsv3/delivery-manager/delivery-trip/start-delivery",
   DELIVERY_TRIP_ITEM_COMPLETE: "/wmsv3/delivery-manager/delivery-trip-item/complete",

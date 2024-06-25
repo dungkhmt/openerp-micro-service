@@ -55,7 +55,7 @@ color: #2467BF;
 
 `
 
-
+const apiUrl = process.env.JOB_SEARCH_HOST;
 
 const Item = ({job}) => {
 

@@ -19,6 +19,8 @@ import { FilterIcon } from "../icons/sidebar/filter-icon";
 import { useSidebarContext } from "../layout/layout-context";
 import { ChangeLogIcon } from "../icons/sidebar/changelog-icon";
 import { usePathname } from "next/navigation";
+import { SupportIcon } from "../icons/navbar/support-icon";
+import { ManageIcon } from "../icons/sidebar/manage-icon";
 
 export const SidebarWrapper = () => {
   const pathname = usePathname();
@@ -35,95 +37,78 @@ export const SidebarWrapper = () => {
         })}
       >
         <div className={Sidebar.Header()}>
-          <CompaniesDropdown />
+          <CompaniesDropdown name="Admin" />
         </div>
         <div className="flex flex-col justify-between h-full">
           <div className={Sidebar.Body()}>
             <SidebarItem
               title="Trang chủ"
               icon={<HomeIcon />}
-              isActive={pathname === "/"}
+              isActive={pathname === "/admin"}
               href="/admin"
             />
             <SidebarMenu title="Main Menu">
               <SidebarItem
-                isActive={pathname === "/monitoring"}
+                isActive={pathname === "/admin/monitoring"}
                 title="Theo dõi & giám sát"
-                icon={<PaymentsIcon />}
+                icon={<ManageIcon />}
                 href="/admin/monitoring"
               />
               <SidebarItem
-                isActive={pathname === "/manipulating"}
+                isActive={pathname === "/admin/manipulating"}
                 title="Điều phối"
                 icon={<ProductsIcon />}
                 href="/admin/manipulating"
               />
               <SidebarItem
-                isActive={pathname === "/vehicles"}
+                isActive={pathname === "/admin/vehicles"}
                 title="Lực lượng xe"
                 icon={<AccountsIcon />}
                 href="/admin/vehicles"
               />
               <SidebarItem
-                isActive={pathname === "/parents-students"}
+                isActive={pathname === "/admin/employee"}
+                title="Đội ngũ"
+                icon={<AccountsIcon />}
+                href="/admin/employee"
+              />
+              <SidebarItem
+                isActive={pathname === "/admin/parents-students"}
                 title="Phụ huynh & học sinh"
                 icon={<CustomersIcon />}
                 href="/admin/parents-students"
               />
               <SidebarItem
-                isActive={pathname === "/register"}
+                isActive={pathname === "/admin/register"}
                 title="Đăng ký dịch vụ"
                 icon={<ReportsIcon />}
                 href="/admin/register"
               />
               <SidebarItem
-                isActive={pathname === "/history-ride"}
+                isActive={pathname === "/admin/history-ride"}
                 title="Lịch sử đưa đón"
-                icon={<ReportsIcon />}
+                icon={<ChangeLogIcon />}
                 href="/admin/history-ride"
               />
               <SidebarItem
-                isActive={pathname === "/help-center"}
+                isActive={pathname === "/admin/help-center"}
                 title="Trung tâm trợ giúp"
-                icon={<ReportsIcon />}
+                icon={<SupportIcon />}
                 href="/admin/help-center"
               />
               <SidebarItem
-                isActive={pathname === "/reports"}
+                isActive={pathname === "/admin/reports"}
                 title="Báo cáo"
                 icon={<ReportsIcon />}
                 href="/admin/reports"
-              />
-              <CollapseItems
-                icon={<BalanceIcon />}
-                items={["Banks Accounts", "Credit Cards", "Loans"]}
-                title="Balances"
               />
             </SidebarMenu>
 
             <SidebarMenu title="General">
               <SidebarItem
-                isActive={pathname === "/developers"}
-                title="Developers"
-                icon={<DevIcon />}
-              />
-              <SidebarItem
-                isActive={pathname === "/view"}
-                title="View Test Data"
-                icon={<ViewIcon />}
-              />
-              <SidebarItem
-                isActive={pathname === "/settings"}
+                isActive={pathname === "/admin/settings"}
                 title="Settings"
                 icon={<SettingsIcon />}
-              />
-            </SidebarMenu>
-
-            <SidebarMenu title="Updates">
-              <SidebarItem
-                isActive={pathname === "/changelog"}
-                title="Changelog"
-                icon={<ChangeLogIcon />}
               />
             </SidebarMenu>
           </div>

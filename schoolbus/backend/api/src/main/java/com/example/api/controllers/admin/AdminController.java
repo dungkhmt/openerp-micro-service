@@ -23,6 +23,7 @@ public class AdminController {
     private final ExampleServiceA exampleServiceA;
 
     @GetMapping("/example")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<CommonResponse<Object>> getExample(
         ExampleARequest request
     ) {
@@ -38,7 +39,7 @@ public class AdminController {
         );
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PostMapping("/example")
     public ResponseEntity<CommonResponse<Object>> postExample(
     ) {
@@ -47,6 +48,7 @@ public class AdminController {
     }
 
     @PostMapping("/testKafka")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<CommonResponse<Object>> testKafka(
     ) {
         log.info("This is testKafka");

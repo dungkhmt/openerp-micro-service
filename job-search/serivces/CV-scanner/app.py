@@ -2,7 +2,12 @@ from flask import Flask, jsonify, request
 import pickle
 from sklearn.metrics.pairwise import cosine_similarity
 import re
+from flask_cors import CORS
+
 app = Flask(__name__)
+
+# Disable CORS
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 def preprocess(text):
     # Lowercase the text

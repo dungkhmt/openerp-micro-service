@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import CanvasJSReact from '@canvasjs/react-charts';
 import { request } from 'api';
-import { API_PATH } from 'screens/apiPaths';
+import { API_PATH_2 } from 'screens/apiPaths';
 import { Box, Grid, MenuItem, Select } from '@mui/material';
 import { convertToVNDFormat } from 'screens/utils/utils';
 
@@ -16,7 +16,7 @@ const ProductCategoryMonthlyReport = () => {
   useEffect(() => {
     request(
       'get',
-      API_PATH.PRODUCT_CATEGORY_MONTHLY_REPORT,
+      API_PATH_2.PRODUCT_CATEGORY_MONTHLY_REPORT,
       (res) => {
         var resPoints = res?.data?.points;
         for (const month in resPoints) {
