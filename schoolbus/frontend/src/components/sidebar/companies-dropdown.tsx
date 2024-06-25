@@ -17,10 +17,14 @@ interface Company {
   logo: React.ReactNode;
 }
 
-export const CompaniesDropdown = () => {
+interface CompaniesDropdownProps {
+  name: string;
+}
+
+export const CompaniesDropdown = ({ name }: CompaniesDropdownProps) => {
   const [company, setCompany] = useState<Company>({
-    name: "Acme Co.",
-    location: "Palo Alto, CA",
+    name: name,
+    location: "School bus",
     logo: <AcmeIcon />,
   });
   return (
@@ -54,29 +58,22 @@ export const CompaniesDropdown = () => {
           }
           if (e === "2") {
             setCompany({
-              name: "Instagram",
-              location: "Austin, Tx",
+              name: "Client",
+              location: "School bus",
               logo: <AcmeLogo />,
             });
           }
           if (e === "3") {
             setCompany({
-              name: "Twitter",
-              location: "Brooklyn, NY",
-              logo: <AcmeIcon />,
-            });
-          }
-          if (e === "4") {
-            setCompany({
-              name: "Acme Co.",
-              location: "Palo Alto, CA",
+              name: "Employee",
+              location: "School bus",
               logo: <AcmeIcon />,
             });
           }
         }}
         aria-label="Avatar Actions"
       >
-        <DropdownSection title="Companies">
+        <DropdownSection title="Role">
           <DropdownItem
             key="1"
             startContent={<AcmeIcon />}
@@ -91,35 +88,24 @@ export const CompaniesDropdown = () => {
           <DropdownItem
             key="2"
             startContent={<AcmeLogo />}
-            description="Austin, Tx"
+            description="School bus"
             classNames={{
               base: "py-4",
               title: "text-base font-semibold",
             }}
           >
-            Instagram
+            Client
           </DropdownItem>
           <DropdownItem
             key="3"
             startContent={<AcmeIcon />}
-            description="Brooklyn, NY"
+            description="School bus"
             classNames={{
               base: "py-4",
               title: "text-base font-semibold",
             }}
           >
-            Twitter
-          </DropdownItem>
-          <DropdownItem
-            key="4"
-            startContent={<AcmeIcon />}
-            description="Palo Alto, CA"
-            classNames={{
-              base: "py-4",
-              title: "text-base font-semibold",
-            }}
-          >
-            Acme Co.
+            Employee
           </DropdownItem>
         </DropdownSection>
       </DropdownMenu>

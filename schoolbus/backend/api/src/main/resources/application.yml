@@ -1,8 +1,8 @@
 app:
   cors:
 #    allowed-origins: '*'
-    allowed-origins: http://localhost:3000
-  authorizedRedirectUris: http://localhost:3000/oauth2/callback
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
+  authorizedRedirectUris: ${CORS_AUTHORIZED_REDIRECT_URIS:http://localhost:3000/oauth2/callback}
 
 spring:
   application:
@@ -25,7 +25,7 @@ spring:
           time_zone: UTC
         format_sql: true
         order_inserts: true
-        ddl-auto: create
+        ddl-auto: update
   jackson:
     property-naming-strategy: SNAKE_CASE
   main:
