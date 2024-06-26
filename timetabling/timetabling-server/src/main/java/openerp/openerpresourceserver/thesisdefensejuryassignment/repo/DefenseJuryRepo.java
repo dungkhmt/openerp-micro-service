@@ -24,4 +24,7 @@ public interface DefenseJuryRepo extends JpaRepository<DefenseJury, UUID> {
                                                                                            Date defenseDate,
                                                                                            DefenseSession defenseSession,
                                                                                            DefenseRoom defenseRoom);
+    List<DefenseJury> findByThesisDefensePlanAndDefenseDateAndDefenseSession(ThesisDefensePlan thesisDefensePlan,
+                                                                             Date defenseDate,
+                                                                             DefenseSession defenseSession);
 }
