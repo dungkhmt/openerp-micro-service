@@ -22,6 +22,8 @@ public class Vendor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    private String user_id;
+
     private String name;
 
     private String phone;

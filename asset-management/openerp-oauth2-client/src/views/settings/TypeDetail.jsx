@@ -152,7 +152,7 @@ const TypeDetail = () => {
               <BiDetail size={32} />
             </Avatar>
           }
-          title={<Typography variant="h5">Asset Detail</Typography>}
+          title={<Typography variant="h5">Asset Type Detail</Typography>}
         />
         <div style={{ float: "right", paddingRight: "20px" }}>
           <Button onClick={handleEdit}>Edit</Button>
