@@ -31,6 +31,12 @@ const useAssignTeacherThesis = (teacherList = [], thesisList = []) => {
       );
     }
   };
+  const handleSelectTeacherList = (teacherList) => {
+    return setAssignedTeacher((prevAssignedTeacher) => [
+      ...prevAssignedTeacher,
+      ...teacherList,
+    ]);
+  };
   const handleAssignRole = (e) => {
     const role = e.target.value;
     const teacherId = e.target.name;
@@ -55,6 +61,7 @@ const useAssignTeacherThesis = (teacherList = [], thesisList = []) => {
     setAssignedThesis,
     clearAssignedTeacher,
     clearAssignedThesis,
+    handleSelectTeacherList,
   };
 };
 

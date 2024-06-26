@@ -138,10 +138,6 @@ export default function DefensePlanManager() {
         >
           Tạo hội đồng mới
         </PrimaryButton>
-        <PrimaryButton onClick={() => { history.push('assign-automatically') }} sx={{ float: "right", marginRight: "16px" }}>
-          Phân chia hội đồng tự động
-        </PrimaryButton>
-
       </Box>
 
       <StandardTable

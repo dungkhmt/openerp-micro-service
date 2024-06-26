@@ -108,12 +108,12 @@ public class DefenseJuryController {
         return new ResponseEntity<>(defenseJury, HttpStatus.CREATED);
     }
 
-    @PostMapping("/assign-automatically")
-    public ResponseEntity<String> assignTeacherAndThesisAutomatically(
-            @RequestBody AssignTeacherToDefenseJuryAutomaticallyIM teacherListAndDefensePlan
+    @GetMapping("/assign-automatically/{thesisDefensePlanId}/{defenseJuryId}")
+    public ResponseEntity<List<Teacher>> assignTeacherAutomatically(
+            @PathVariable String thesisDefensePlanId, @PathVariable String defenseJuryId
     ) {
-        String message = juryService.assignTeacherAndThesisAutomatically(teacherListAndDefensePlan);
-        return new ResponseEntity<>(message, HttpStatus.CREATED);
+        List<Teacher> teacherIdList = juryService.assignTeacherAutomatically(thesisDefensePlanId, defenseJuryId);
+        return new ResponseEntity<>(teacherIdList, HttpStatus.CREATED);
     }
 
     @PostMapping("/reassign")
