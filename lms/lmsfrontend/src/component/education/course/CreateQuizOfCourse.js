@@ -6,8 +6,9 @@ import {
   MenuItem,
   TextField,
   Typography,
-} from "@material-ui/core/";
-import Button from "@material-ui/core/Button";
+  Divider,
+} from "@mui/material/";
+import Button from "@mui/material/Button";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import { convertToRaw, EditorState } from "draft-js";
@@ -30,8 +31,8 @@ const useStyles = makeStyles((theme) => ({
   root: {
     padding: theme.spacing(4),
     "& .MuiTextField-root": {
-      margin: theme.spacing(1),
-      width: "100%",
+      marginTop: theme.spacing(1),
+      width: "51%",
       minWidth: 120,
     },
   },
@@ -43,7 +44,8 @@ const useStyles = makeStyles((theme) => ({
   selectBox: {
     padding: 20,
     minWidth: 150,
-    marginRight: 40,
+    width: "51%",
+    marginBottom: 20,
     height: 60,
   },
   wrapper: {
@@ -151,7 +153,10 @@ function CreateQuizOfCourse() {
 
   async function handleSubmit() {
     let statement = draftToHtml(convertToRaw(editorState.getCurrentContent()));
-
+    if (!quizCourseTopicId || !levelId || !editorState) {
+      errorNoti("Vui lòng nhập đầy đủ thông tin cần thiết");
+      return;
+    }
     const fileId = attachmentFiles.map((file) => file.name);
 
     console.log("handle submit");
@@ -187,7 +192,10 @@ function CreateQuizOfCourse() {
       (res) => {
         history.push("/edu/course/detail/" + courseId);
       },
-      {},
+      (res) => {
+        errorNoti("Đã xảy ra lỗi, vui lòng thử lại");
+        setOpenAlert(true);
+      },
       formData,
       config
     );
@@ -353,6 +361,7 @@ function CreateQuizOfCourse() {
               onChange={(files) => handleAttachmentFiles(files)}
             ></DropzoneArea>
 
+            <Divider style={{ margin: "60px 0" }} />
             <div>
               <Typography variant="h6">Hướng dẫn làm bài</Typography>
               <RichTextEditor
@@ -371,13 +380,17 @@ function CreateQuizOfCourse() {
         <CardActions>
           <Button
             variant="contained"
-            color="primary"
+            color="success"
             style={{ marginLeft: "45px" }}
             onClick={handleSubmit}
           >
             Lưu
           </Button>
-          <Button variant="contained" onClick={() => history.push("")}>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => history.push("")}
+          >
             Hủy
           </Button>
         </CardActions>

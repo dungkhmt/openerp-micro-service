@@ -245,8 +245,8 @@ public class QuizController {
     @GetMapping("/get-quiz-course-topics-of-course/{courseId}")
     public ResponseEntity<?> getQuizCourseTopicsOfCourse(Principal principal, @PathVariable String courseId) {
         log.info("getQuizCourseTopicsOfCourse, courseId = " + courseId);
-        //List<QuizCourseTopic> quizCourseTopics = quizCourseTopicService.findByEduCourse_Id(courseId);
-        List<QuizCourseTopicDetailOM> quizCourseTopics = quizCourseTopicService.findTopicByCourseId(courseId);
+        List<QuizCourseTopic> quizCourseTopics = quizCourseTopicService.findByEduCourse_Id(courseId);
+        // List<QuizCourseTopicDetailOM> quizCourseTopics = quizCourseTopicService.findTopicByCourseId(courseId);
         return ResponseEntity.ok().body(quizCourseTopics);
     }
 

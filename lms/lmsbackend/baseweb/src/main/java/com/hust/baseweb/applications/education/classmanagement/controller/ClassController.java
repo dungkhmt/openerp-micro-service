@@ -275,6 +275,7 @@ public class ClassController {
         UserLogin userLogin = userService.findById(principal.getName());
         EduClass aClass = classService.save(userLogin, addClassModel);
         eduClassSessionService.addCourseSessionToClass(aClass);
+        // eduClassMaterialService.addCourseMaterialsToClass(aClass);
         return ResponseEntity.ok().body(aClass);
     }
 
