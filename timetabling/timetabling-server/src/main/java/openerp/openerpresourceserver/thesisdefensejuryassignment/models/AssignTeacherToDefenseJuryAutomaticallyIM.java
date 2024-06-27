@@ -5,12 +5,20 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 public class AssignTeacherToDefenseJuryAutomaticallyIM {
-    String thesisDefensePlanId;
-    List<DefenseJuryTeacherRoleIM> defenseJuryTeacherRole;
+    private String thesisDefensePlanId;
+    private String defenseJuryId;
 
-    public AssignTeacherToDefenseJuryAutomaticallyIM(String thesisDefensePlanId, List<DefenseJuryTeacherRoleIM> defenseJuryTeacherRole) {
+    public AssignTeacherToDefenseJuryAutomaticallyIM(String defenseJuryId, String thesisDefensePlanId) {
+        this.defenseJuryId  = defenseJuryId;
         this.thesisDefensePlanId = thesisDefensePlanId;
-        this.defenseJuryTeacherRole = defenseJuryTeacherRole;
+    }
+
+    public String getDefenseJuryId() {
+        return defenseJuryId;
+    }
+
+    public void setDefenseJuryId(String defenseJuryId) {
+        this.defenseJuryId = defenseJuryId;
     }
 
     public String getThesisDefensePlanId() {
@@ -19,13 +27,5 @@ public class AssignTeacherToDefenseJuryAutomaticallyIM {
 
     public void setThesisDefensePlanId(String thesisDefensePlanId) {
         this.thesisDefensePlanId = thesisDefensePlanId;
-    }
-
-    public List<DefenseJuryTeacherRoleIM> getDefenseJuryTeacherRole() {
-        return defenseJuryTeacherRole;
-    }
-
-    public void setDefenseJuryTeacherRole(List<DefenseJuryTeacherRoleIM> defenseJuryTeacherRole) {
-        this.defenseJuryTeacherRole = defenseJuryTeacherRole;
     }
 }

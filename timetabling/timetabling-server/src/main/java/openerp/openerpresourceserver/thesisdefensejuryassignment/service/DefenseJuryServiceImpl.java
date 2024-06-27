@@ -5,7 +5,6 @@ import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.*;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.embedded.DefenseJuryTeacherRole;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.models.*;
-import openerp.openerpresourceserver.thesisdefensejuryassignment.or_tools.AssignTeacherAndThesisToDefenseJury;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.repo.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Log4j2
 @AllArgsConstructor
@@ -63,8 +62,10 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
         //compare date
         Date planStartDate = thesisDefensePlan.getStartDate();
         Date planEndDate = thesisDefensePlan.getEndDate();
-        if (defenseJury.getDefenseDate().after(planEndDate)) return "Ngày tổ chức phải trước ngày " + planEndDate.toString() ;
-        if (defenseJury.getDefenseDate().before(planStartDate)) return "Ngày tổ chức phải sau ngày " + planStartDate.toString();
+        if (defenseJury.getDefenseDate().after(planEndDate))
+            return "Ngày tổ chức phải trước ngày " + planEndDate.toString();
+        if (defenseJury.getDefenseDate().before(planStartDate))
+            return "Ngày tổ chức phải sau ngày " + planStartDate.toString();
         //
 //        List<AcademicKeyword> academicKeywordList = new LinkedList<>();
 //        for (int i = 0; i < defenseJury.getAcademicKeywordList().size(); i++) {
@@ -92,7 +93,7 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
                 defenseSession,
                 defenseRoom);
 
-        if (!duplicateDefenseJury.isEmpty()){
+        if (!duplicateDefenseJury.isEmpty()) {
             return "Hội đồng " + duplicateDefenseJury.get(0).getName() + " đã được tổ chức vào phòng " + defenseRoom.getName() + " cùng buổi";
         }
         newDefenseJury.setDefenseRoom(defenseRoom);
@@ -146,8 +147,8 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
                     defenseJury.getDefenseSession(),
                     teacherName
             );
-            System.out.println("Bị trùng giáo viên");
-            if (!defenseJuryAtTheSameDate.isEmpty()){
+            boolean removed = defenseJuryAtTheSameDate.remove(defenseJury);
+            if (!defenseJuryAtTheSameDate.isEmpty()) {
                 return "Giáo viên " + teacher.getTeacherName() + " đã được phân vào hội đồng "
                         + defenseJury.getName() + " cùng ngày";
             }
@@ -184,28 +185,75 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
     }
 
     @Override
-    public String assignTeacherAndThesisAutomatically(AssignTeacherToDefenseJuryAutomaticallyIM teacherIdList) {
-        String id = teacherIdList.getThesisDefensePlanId();
-        System.out.println(id);
-        List<Thesis> thesisList = getAllAvailableThesiss(id);
-        List<Teacher> teacherList = new ArrayList<>();
-        for (DefenseJuryTeacherRoleIM teacher : teacherIdList.getDefenseJuryTeacherRole()) {
-            teacherList.add(teacherRepo.findById(teacher.getTeacherName()).orElse(null));
+    public List<Teacher> assignTeacherAutomatically(String thesisDefensePlanId, String defenseJuryId) {
+        int MAX_TEACHER_NUM = 5;
+        DefenseJury defenseJury = defenseJuryRepo.findById(UUID.fromString(defenseJuryId)).orElse(null);
+        if (defenseJury == null) return null;
+        ThesisDefensePlan thesisDefensePlan = thesisDefensePlanRepo.findById(thesisDefensePlanId).orElse(null);
+        if (thesisDefensePlan == null) return null;
+        List<Teacher> teacherList = teacherRepo.findAll();
+        List<Integer> teacherAndDefenseJuryMatchingScore = new ArrayList<>();
+        int maxScore = 0;
+        for (Teacher teacher : teacherList) {
+            int score = calculateTeacherAndDefenseJuryMatchingScore(defenseJury, teacher);
+            if (score > maxScore) {
+                maxScore = score;
+            }
+            teacherAndDefenseJuryMatchingScore.add(score);
         }
-
-        ThesisDefensePlan thesisDefensePlan = thesisDefensePlanRepo.findById(id).orElse(null);
-        long dateStart = thesisDefensePlan.getStartDate().getTime();
-        long dateEnd = thesisDefensePlan.getEndDate().getTime();
-        long timeDiff = Math.abs(dateEnd - dateStart);
-        int sessionNumber = (int) TimeUnit.DAYS.convert(timeDiff, TimeUnit.MILLISECONDS) * 2;
-        AssignTeacherAndThesisToDefenseJury assignTeacherAndThesisToDefenseJury = new AssignTeacherAndThesisToDefenseJury(
-                thesisList,
-                teacherList,
-                14,
-                5
+        List<DefenseJury> defenseJuryListAtTheSameTime = defenseJuryRepo.findByThesisDefensePlanAndDefenseDateAndDefenseSession(
+                thesisDefensePlan,
+                defenseJury.getDefenseDate(),
+                defenseJury.getDefenseSession()
         );
-        assignTeacherAndThesisToDefenseJury.assignThesisAndTeacherToDefenseJury();
-        return "Check the console";
+        List<Teacher> mostMatchingTeacherList = new ArrayList<>();
+        if (defenseJuryListAtTheSameTime.size() == 1) { // only this jury at this time
+            for (int i = 0; i < teacherList.size(); i++) {
+                if (teacherAndDefenseJuryMatchingScore.get(i) == maxScore){
+                    mostMatchingTeacherList.add(teacherList.get(i));
+                    if (mostMatchingTeacherList.size() == MAX_TEACHER_NUM){
+                        break;
+                    }
+                }
+            }
+            if (mostMatchingTeacherList.size() < MAX_TEACHER_NUM){
+                for (int i = 0; i < teacherList.size(); i++) {
+                    if (teacherAndDefenseJuryMatchingScore.get(i) != 0) {
+                        mostMatchingTeacherList.add(teacherList.get(i));
+                        if (mostMatchingTeacherList.size() == MAX_TEACHER_NUM){
+                            break;
+                        }
+                    }
+                }
+
+            }
+            return mostMatchingTeacherList;
+        }
+        List <Teacher> teacherListInOtherJury = new LinkedList<>();
+        for (DefenseJury jury : defenseJuryListAtTheSameTime){
+            List<Teacher> teacherListInJury = jury.getDefenseJuryTeacherRoles().stream().map(DefenseJuryTeacherRole::getTeacher).toList();
+            teacherListInOtherJury.addAll(teacherListInJury);
+        }
+        for (int i = 0; i < teacherList.size(); i++) {
+            if (teacherAndDefenseJuryMatchingScore.get(i) == maxScore && !teacherListInOtherJury.contains(teacherList.get(i))){
+                mostMatchingTeacherList.add(teacherList.get(i));
+                if (mostMatchingTeacherList.size() == MAX_TEACHER_NUM){
+                    break;
+                }
+            }
+        }
+        if (mostMatchingTeacherList.size() < MAX_TEACHER_NUM){
+            for (int i = 0; i < teacherList.size(); i++) {
+                if (teacherAndDefenseJuryMatchingScore.get(i) != 0) {
+                    mostMatchingTeacherList.add(teacherList.get(i));
+                    if (mostMatchingTeacherList.size() == MAX_TEACHER_NUM){
+                        break;
+                    }
+                }
+            }
+
+        }
+        return mostMatchingTeacherList;
     }
 
     @Override
@@ -219,9 +267,9 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
         Date defenseDate = updateDefenseJuryIM.getDefenseDate();
         Date planStartDate = defenseJury.getThesisDefensePlan().getStartDate();
         Date planEndDate = defenseJury.getThesisDefensePlan().getEndDate();
-        if (defenseDate.after(planEndDate)) return "Ngày tổ chức phải trước ngày " + planEndDate.toString() ;
+        if (defenseDate.after(planEndDate)) return "Ngày tổ chức phải trước ngày " + planEndDate.toString();
         if (defenseDate.before(planStartDate)) return "Ngày tổ chức phải sau ngày " + planStartDate.toString();
-        JuryTopic juryTopic  = juryTopicRepo.findById(updateDefenseJuryIM.getJuryTopicId()).orElse(null);
+        JuryTopic juryTopic = juryTopicRepo.findById(updateDefenseJuryIM.getJuryTopicId()).orElse(null);
 //        List<AcademicKeyword> academicKeywordList = new ArrayList<>();
 //        for (String keyword : updateDefenseJuryIM.getAcademicKeywordList()) {
 //            AcademicKeyword academicKeyword = academicKeywordRepo.findById(keyword).orElse(null);
@@ -233,7 +281,7 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
                 defenseSession,
                 defenseRoom);
         boolean isRemoved = duplicateDefenseJury.remove(defenseJury);
-        if (!duplicateDefenseJury.isEmpty()){
+        if (!duplicateDefenseJury.isEmpty()) {
             return "Hội đồng " + duplicateDefenseJury.get(0).getName() + " đã được tổ chức vào phòng " + defenseRoom.getName() + " cùng buổi";
         }
         defenseJury.setName(updateDefenseJuryIM.getName());
@@ -348,9 +396,22 @@ public class DefenseJuryServiceImpl implements DefenseJuryService {
     public List<Thesis> getAvailableThesisByJuryTopic(String thesisDefensePlanId, String defenseJuryId) {
         DefenseJury defenseJury = defenseJuryRepo.findById(UUID.fromString(defenseJuryId)).orElse(null);
         if (defenseJury == null) return null;
-        int juryTopic= defenseJury.getJuryTopic().getId();
+        int juryTopic = defenseJury.getJuryTopic().getId();
         return thesisRepo.findByThesisDefensePlanIdAndDefenseJuryAndJuryTopicId(thesisDefensePlanId, null, juryTopic);
     }
 
+    public int calculateTeacherAndDefenseJuryMatchingScore(DefenseJury defenseJury, Teacher teacher) {
+        int score = 0;
+        HashMap<String, Integer> teacherKeyword = new HashMap<>();
+        for (AcademicKeyword academicKeyword : teacher.getAcademicKeywordList()) {
+            teacherKeyword.put(academicKeyword.getKeyword(), 1);
+        }
+        for (AcademicKeyword academicKeyword : defenseJury.getJuryTopic().getAcademicKeywordList()) {
+            if (teacherKeyword.containsKey(academicKeyword.getKeyword())) {
+                score += 1;
+            }
+        }
+        return score;
+    }
 
 }

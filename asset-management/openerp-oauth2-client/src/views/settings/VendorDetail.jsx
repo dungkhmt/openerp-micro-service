@@ -161,7 +161,7 @@ const VendorDetail = () => {
               <BiDetail size={32} />
             </Avatar>
           }
-          title={<Typography variant="h5">Asset Detail</Typography>}
+          title={<Typography variant="h5">Vendor Detail</Typography>}
         />
         <div style={{ float: "right", paddingRight: "20px" }}>
           <Button onClick={handleEdit}>Edit</Button>
@@ -253,7 +253,7 @@ const VendorDetail = () => {
                 margin="normal"
                 required
                 name="phone"
-                placeholder="Location phone"
+                placeholder="Vendor phone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
               />
@@ -264,7 +264,7 @@ const VendorDetail = () => {
                 margin="normal"
                 required
                 name="url"
-                placeholder="Location url"
+                placeholder="Vendor url"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
               />
@@ -311,7 +311,7 @@ const VendorDetail = () => {
         <DialogTitle id="alert-dialog-title">{"DELETE THIS ASSET"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Do you want to delete this location. It cannot be undone?
+            Do you want to delete this vendor. It cannot be undone?
           </DialogContentText>
         </DialogContent>
         <DialogActions>

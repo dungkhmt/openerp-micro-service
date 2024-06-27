@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Typography, Button } from "@mui/material";
 import { useParams, useHistory } from "react-router-dom";
 import { boxChildComponent, boxComponentStyle } from "components/thesisdefensejury/constant";
@@ -12,15 +12,30 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { request } from "api";
 import { successNoti, errorNoti } from "utils/notification";
 import useAssignTeacherThesis from "hooks/useAssignTeacherThesis";
+import PrimaryButton from "components/button/PrimaryButton";
 function AssignTeacherAndThesisToDefenseJury() {
   const { id, juryId } = useParams();
   const history = useHistory();
+  const [loading, setLoading] = useState(true);
   const { data: defenseJury } = useFetch(`/defense-jury/${juryId}`);
   const { data: availableThesisList } = useFetch(
-    `/defense-jury/thesis/get-all-available/${id}/${juryId}`
+    `/defense-jury/thesis/get-all-available/${id}`
   );
-  const { loading, data: teacherList } = useFetch("/defense-jury/teachers");
+  const { data: teacherList } = useFetch("/defense-jury/teachers");
   const [activeTab, setActiveTab] = useState(0);
+  const sortThesisInJuryTopicInFront = (thesisList) => {
+    function compare(a, b) {
+      if (a?.juryTopic?.id === defenseJury?.juryTopic.id) {
+        return -1;
+      } else if (b?.juryTopic?.id === defenseJury?.juryTopic?.id) {
+        return 1;
+      }
+      return a?.juryTopic?.id - b?.juryTopic?.id;
+    }
+    thesisList?.sort(compare)
+    return thesisList;
+  }
+  const sortedThesisList = sortThesisInJuryTopicInFront(availableThesisList)
   const handleChangeTab = (event, tabIndex) => {
     setActiveTab(tabIndex);
   };
@@ -28,7 +43,8 @@ function AssignTeacherAndThesisToDefenseJury() {
     "Danh sách giáo viên",
     "Danh sách đồ án",
   ];
-  const { assignedTeacher, assignedThesis, handleAssignRole, handleSelectTeacher, handleSelectThesis, clearAssignedTeacher, clearAssignedThesis } = useAssignTeacherThesis();
+  const { assignedTeacher, assignedThesis, handleAssignRole, handleSelectTeacher, handleSelectThesis, clearAssignedTeacher, clearAssignedThesis, handleSelectTeacherList } = useAssignTeacherThesis();
+  console.log(assignedTeacher);
   const onAssignTeacherAndThesis = () => {
     if (assignedTeacher?.length === 0) {
       return errorNoti("Bạn hãy lựa chọn giáo viên", true);
@@ -73,7 +89,25 @@ function AssignTeacherAndThesisToDefenseJury() {
       }
     ).then();
   };
-
+  const handleAssignTeacherAuto = (e) => {
+    setLoading(true);
+    request("GET", `/defense-jury/assign-automatically/${id}/${juryId}`, (res) => {
+      console.log(res.data);
+      handleSelectTeacherList(res.data);
+      setLoading(false)
+    }, {
+      onError: (e) => {
+        const errorMessage = e?.message;
+        console.log(e?.message, true);
+        errorNoti(errorMessage, true);
+      },
+    }).then()
+  }
+  useEffect(() => {
+    if (availableThesisList && teacherList && defenseJury) {
+      setLoading(false);
+    }
+  }, [availableThesisList, teacherList, defenseJury])
   return (
     <>
       <Box sx={{ ...boxComponentStyle, minHeight: "600px" }}>
@@ -98,6 +132,9 @@ function AssignTeacherAndThesisToDefenseJury() {
             ))}
           </AntTabs>
           <TabPanel value={activeTab} index={0}>
+            <Box display={"flex"} flexDirection={"row-reverse"} sx={{ width: "100%" }}>
+              <PrimaryButton onClick={handleAssignTeacherAuto}>Gợi ý giáo viên</PrimaryButton>
+            </Box>
             <Box sx={{ ...boxChildComponent, margin: "8px 0px 8px 0px" }}>
               <ElementAddTeacher loading={loading} teacherList={teacherList} assignedTeacher={assignedTeacher} handleAssignRole={handleAssignRole} handleSelectTeacher={handleSelectTeacher} />
             </Box>
@@ -108,7 +145,7 @@ function AssignTeacherAndThesisToDefenseJury() {
             </Box>
           </TabPanel>
           <TabPanel value={activeTab} index={1}>
-            <ElementAddThesis availableThesisList={availableThesisList} handleSelectThesis={handleSelectThesis} assignedThesis={assignedThesis} />
+            <ElementAddThesis availableThesisList={sortedThesisList} handleSelectThesis={handleSelectThesis} assignedThesis={assignedThesis} />
             <AssignTeacherThesisButton onClick={onAssignTeacherAndThesis} >Tạo hội đồng</AssignTeacherThesisButton>
           </TabPanel>
         </form>

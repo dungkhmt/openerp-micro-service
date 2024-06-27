@@ -62,6 +62,8 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
         if (this.role == UserRole.ADMIN) {
             return List.of(new SimpleGrantedAuthority("ADMIN"),
                            new SimpleGrantedAuthority("CLIENT"));
+        } else if ( this.role == UserRole.EMPLOYEE) {
+            return List.of(new SimpleGrantedAuthority("EMPLOYEE"));
         } else {
             return List.of(new SimpleGrantedAuthority("CLIENT"));
         }

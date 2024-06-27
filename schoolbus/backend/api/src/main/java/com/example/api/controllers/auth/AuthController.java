@@ -2,6 +2,8 @@ package com.example.api.controllers.auth;
 
 import com.example.api.configs.security.CustomUserDetails;
 import com.example.api.controllers.auth.dto.LoginRequest;
+import com.example.api.controllers.auth.dto.LoginResponse;
+import com.example.api.controllers.auth.dto.RefreshTokenRequest;
 import com.example.api.controllers.auth.dto.SignUpRequest;
 import com.example.api.services.auth.AuthService;
 import com.example.api.services.auth.dto.SignUpOutput;
@@ -50,8 +52,26 @@ public class AuthController {
         );
         Authentication authUser = authenticationManager.authenticate(authenticationToken);
         String accessToken = JwtUtil.generateAccessToken(((CustomUserDetails) authUser.getPrincipal()).toAccount());
+        String refreshToken = JwtUtil.generateRefreshToken(((CustomUserDetails) authUser.getPrincipal()).toAccount());
         return ResponseUtil.toSuccessCommonResponse(
-            accessToken
+            LoginResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build()
+        );
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<CommonResponse<Object>> refreshTokens(
+        @RequestBody @Validated RefreshTokenRequest request
+    ) {
+        String refreshToken = request.getRefreshToken();
+        // validate refresh token
+        JwtUtil.validateToken(refreshToken);
+        log.info("Refresh token 11111111111111111111: " + refreshToken);
+
+        return ResponseUtil.toSuccessCommonResponse(
+            JwtUtil.refreshAccessToken(refreshToken)
         );
     }
 }

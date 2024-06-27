@@ -26,6 +26,8 @@ public class AssetType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    private String user_id;
+
     @Column(nullable = false)
     private String name;
 
