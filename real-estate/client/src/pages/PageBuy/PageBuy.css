@@ -1,0 +1,39 @@
+.page-buy-container {
+    margin: 10px auto;
+    display: flex;
+}
+.list-card-buy-container {
+    width: 60%;
+    /*background-color: aquamarine;*/
+    margin: 0 auto;
+}
+
+.card-buy-container {
+    border-radius: 5px;
+    border: 1px solid #F2F2F2;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.05);
+    margin: 30px 0;
+}
+
+.filter-post-buy {
+    margin-left: 20px;
+    position: sticky;
+    height: 150px;
+    background-color: #ff922d;
+    top: 10px;
+    right: 10px;
+    width: 20%;
+    border-radius: 5px;
+    border: 1px solid #F2F2F2;
+}
+
+.province {
+    color: #666666;
+    letter-spacing: 0.5px;
+    margin: 5px 10px;
+
+}
+
+.province:hover {
+    color: black;
+}
