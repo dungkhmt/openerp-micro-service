@@ -6,8 +6,9 @@ import {
   MenuItem,
   TextField,
   Typography,
-} from "@material-ui/core/";
-import Button from "@material-ui/core/Button";
+  Divider,
+} from "@mui/material";
+import Button from "@mui/material/Button";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
@@ -37,8 +38,8 @@ const useStyles = makeStyles((theme) => ({
   root: {
     padding: theme.spacing(4),
     "& .MuiTextField-root": {
-      margin: theme.spacing(1),
-      width: "100%",
+      marginTop: theme.spacing(1),
+      width: "51%",
       minWidth: 120,
     },
   },
@@ -69,7 +70,8 @@ const useStyles = makeStyles((theme) => ({
   selectBox: {
     padding: 20,
     minWidth: 150,
-    marginRight: 40,
+    width: "51%",
+    marginBottom: 20,
     height: 60,
   },
   wrapper: {
@@ -419,8 +421,8 @@ function CreateQuizOfCourse() {
 
                 <InputLabel id="demo-multiple-name-label">Tags</InputLabel>
                 <Select
-                  labelId="demo-multiple-chip-label"
-                  id="demo-multiple-chip"
+                  // id="demo-multiple-chip"
+                  label="Tags"
                   multiple
                   required
                   value={chooseTags}
@@ -509,7 +511,7 @@ function CreateQuizOfCourse() {
                     </div>
                   </div>
                 ))}
-
+              <Divider style={{ margin: "60px 0" }} />
               <div>
                 <Typography variant="h6" style={{ marginBottom: "10px" }}>
                   Hướng dẫn làm bài
@@ -545,7 +547,7 @@ function CreateQuizOfCourse() {
           <CardActions>
             <Button
               variant="contained"
-              color="primary"
+              color="success"
               style={{ marginLeft: "45px" }}
               onClick={handleSubmit}
             >
@@ -553,6 +555,7 @@ function CreateQuizOfCourse() {
             </Button>
             <Button
               variant="contained"
+              color="error"
               onClick={() => history.push("/edu/course/detail/" + courseId)}
             >
               Hủy
