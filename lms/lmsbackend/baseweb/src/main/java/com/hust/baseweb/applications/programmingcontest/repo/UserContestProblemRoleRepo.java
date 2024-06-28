@@ -15,9 +15,13 @@ public interface UserContestProblemRoleRepo extends JpaRepository<UserContestPro
 
     List<UserContestProblemRole> findAllByProblemIdAndUserIdAndRoleId(String problemId, String userId, String roleId);
 
+    /*
     @Query(value = "SELECT DISTINCT problem_id FROM user_contest_problem_role WHERE user_id = ?1 AND problem_id NOT IN"
             +
             "(SELECT DISTINCT problem_id FROM user_contest_problem_role WHERE user_id = ?1 AND role_id = 'OWNER')", nativeQuery = true)
+    */
+    // updated by PQD
+    @Query(value = "SELECT DISTINCT problem_id FROM user_contest_problem_role WHERE user_id = ?1", nativeQuery = true)
     List<String> getProblemIdsShared(String userId);
 
     boolean existsByProblemIdAndUserIdAndRoleId(String problemId, String userId, String roleId);

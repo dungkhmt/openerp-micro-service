@@ -9,6 +9,8 @@ import com.hust.baseweb.applications.programmingcontest.model.*;
 import com.hust.baseweb.applications.programmingcontest.model.externalapi.ContestProblemModelResponse;
 import com.hust.baseweb.applications.programmingcontest.model.externalapi.GetSubmissionsOfParticipantModelInput;
 import com.hust.baseweb.applications.programmingcontest.model.externalapi.SubmissionModelResponse;
+import com.hust.baseweb.applications.programmingcontest.repo.ContestProblemRepo;
+import com.hust.baseweb.applications.programmingcontest.repo.ProblemRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.UserContestProblemRoleRepo;
 import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseService;
 import com.hust.baseweb.service.UserService;
@@ -26,6 +28,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import javax.validation.constraints.NotBlank;
 import java.security.Principal;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,6 +41,8 @@ public class ProblemController {
     ProblemTestCaseService problemTestCaseService;
     UserService userService;
     UserContestProblemRoleRepo userContestProblemRoleRepo;
+    ProblemRepo problemRepo;
+
     ChatGPTService chatGPTService;
 
     @Secured("ROLE_TEACHER")
@@ -250,5 +255,25 @@ public class ProblemController {
         String participantId = I.getParticipantId();
         List<SubmissionModelResponse> res = problemTestCaseService.extApiGetSubmissions(participantId);
         return ResponseEntity.ok().body(res);
+    }
+    @GetMapping("/grant-owner-role-problem-to-admin")
+    public ResponseEntity<?> grantOwnerRoleProblemToAdmin(Principal principal){
+        List<ProblemEntity> probs = problemRepo.findAll();
+        for(ProblemEntity p: probs){
+            List<UserContestProblemRole> ucpr = userContestProblemRoleRepo
+                .findAllByProblemIdAndUserIdAndRoleId(p.getProblemId(),"admin", UserContestProblemRole.ROLE_OWNER);
+            if(ucpr == null || ucpr.size() == 0){
+                UserContestProblemRole r = new UserContestProblemRole();
+                r.setProblemId(p.getProblemId());
+                r.setUserId("admin");
+                r.setRoleId(UserContestProblemRole.ROLE_OWNER);
+                r.setCreatedStamp(new Date());
+
+                r = userContestProblemRoleRepo.save(r);
+                log.info("grantOwnerRoleProblemToAdmin grant OWNER role of problem " + p.getProblemId() + " to admin");
+            }
+        }
+
+        return ResponseEntity.ok().body("OK");
     }
 }

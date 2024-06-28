@@ -69,6 +69,7 @@ function ListProblemV2() {
               "/programming-contest/manager-view-problem-detail/" +
               encodeURIComponent(rowData["problemId"]),
           }}
+          /*
           onClick={(e) => {
             if (
               rowData["userId"] !== keycloak.tokenParsed.preferred_username &&
@@ -78,11 +79,13 @@ function ListProblemV2() {
               e.preventDefault();
             }
           }}
+          */
           style={{
             textDecoration: "none",
             color: "blue",
             cursor: "",
           }}
+            
         >
           {rowData["problemId"]}
         </Link>
@@ -241,7 +244,13 @@ function ListProblemV2() {
     });
   }, [getProblems]);
 
-
+  /*
+  useEffect(() => {
+    request("get", "/grant-owner-role-problem-to-admin", (res) => {
+      console.log(res.data);
+    }).then();
+  }, []);
+  */
 
   /*
   useEffect(() => {
