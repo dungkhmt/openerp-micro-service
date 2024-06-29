@@ -240,6 +240,12 @@ public class ProblemController {
         return this.problemTestCaseService.getSharedProblems(owner.getName());
     }
     @Secured("ROLE_TEACHER")
+    @GetMapping("/teacher/public-problems")
+    public List<ProblemEntity> getPublicProblems(Principal owner) {
+        return this.problemTestCaseService.getPublicProblems(owner.getName());
+    }
+
+    @Secured("ROLE_TEACHER")
     @GetMapping("/teacher/all-problems")
     public List<ProblemEntity> getAllProblems(Principal owner) {
         return this.problemTestCaseService.getAllProblems(owner.getName());

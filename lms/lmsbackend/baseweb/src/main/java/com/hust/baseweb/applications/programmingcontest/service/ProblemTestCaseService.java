@@ -272,6 +272,7 @@ public interface ProblemTestCaseService {
     List<ProblemEntity> getOwnerProblems(String ownerId);
 
     List<ProblemEntity> getSharedProblems(String userId);
+    List<ProblemEntity> getPublicProblems(String userId);
 
     List<ProblemEntity> getAllProblems(String userId);
 

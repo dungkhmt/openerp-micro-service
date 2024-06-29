@@ -33,6 +33,7 @@ function ListProblemV2() {
   const [myProblems, setMyProblems] = useState([]);
   const [sharedProblems, setSharedProblems] = useState([]);
   const [allProblems, setAllProblems] = useState([]);
+  const [publicProblems, setPublicProblems] = useState([]);
   
 
   const [loading, setLoading] = useState(false);
@@ -244,6 +245,15 @@ function ListProblemV2() {
     });
   }, [getProblems]);
 
+  useEffect(() => {
+    setLoading(true);
+    getProblems("/teacher/public-problems", (data) => {
+      setPublicProblems(data);
+      setLoading(false);
+    });
+  }, [getProblems]);
+
+
   /*
   useEffect(() => {
     request("get", "/grant-owner-role-problem-to-admin", (res) => {
@@ -275,6 +285,7 @@ function ListProblemV2() {
         >
           <Tab label={t("problemList.myProblems")} {...a11yProps(0)} />
           <Tab label={t("problemList.sharedProblems")} {...a11yProps(1)} />
+           {<Tab label={t("problemList.publicProblems")} {...a11yProps(2)} />}
           {/*<Tab label={t("problemList.allProblems")} {...a11yProps(2)} />*/}
         </Tabs>
       </Box>
@@ -326,6 +337,24 @@ function ListProblemV2() {
           sx={{ marginTop: "8px" }}
         />
       </TabPanelVertical>
+      {
+      <TabPanelVertical value={value} index={2}>
+        <StandardTable
+          title="Public Problems"
+          columns={COLUMNS}
+          data={publicProblems}
+          hideCommandBar
+          key="publicProblems"
+          options={{
+            selection: false,
+            pageSize: 10,
+            search: true,
+            sorting: true,
+          }}
+          sx={{marginTop: "8px"}}
+        />
+      </TabPanelVertical>
+      }
       {/*
       <TabPanelVertical value={value} index={2}>
         <StandardTable
@@ -344,6 +373,7 @@ function ListProblemV2() {
         />
       </TabPanelVertical>
         */}
+
     </HustContainerCard>
   );
 }
