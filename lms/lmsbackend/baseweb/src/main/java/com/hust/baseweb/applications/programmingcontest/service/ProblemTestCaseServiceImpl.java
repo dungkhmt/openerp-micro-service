@@ -201,6 +201,15 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             upr = new UserContestProblemRole();
             upr.setProblemId(problemEntity.getProblemId());
             upr.setUserId(admin.getUserLoginId());
+            upr.setRoleId(UserContestProblemRole.ROLE_OWNER);
+            upr.setUpdateByUserId(userID);
+            upr.setCreatedStamp(new Date());
+            upr.setLastUpdated(new Date());
+            upr = userContestProblemRoleRepo.save(upr);
+
+            upr = new UserContestProblemRole();
+            upr.setProblemId(problemEntity.getProblemId());
+            upr.setUserId(admin.getUserLoginId());
             upr.setRoleId(UserContestProblemRole.ROLE_EDITOR);
             upr.setUpdateByUserId(userID);
             upr.setCreatedStamp(new Date());
@@ -3581,10 +3590,39 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             throw new MiniLeetCodeException("Problem not found", 404);
         }
 
+        if(problemEntity.isPublicProblem()!=true) {
+
+            List<UserContestProblemRole> ucpr = userContestProblemRoleRepo
+                .findAllByProblemIdAndUserId(problemEntity.getProblemId(), teacherId);
+
+            boolean ok = true;
+            if (!problemEntity.getUserId().equals(teacherId)) {
+                if (ucpr == null || ucpr.size() == 0) ok = false;
+                else {
+                    boolean owner = false;
+                    for (UserContestProblemRole e : ucpr) {
+                        if (e.getRoleId().equals(UserContestProblemRole.ROLE_OWNER)) {
+                            owner = true;
+                            break;
+                        }
+                    }
+                    if (!owner && problemEntity.getStatusId() != null &&
+                        !problemEntity.getStatusId().equals(ProblemEntity.PROBLEM_STATUS_OPEN)) {
+                        ok = false;
+                    }
+                }
+            }
+
+            if (!ok) {
+                throw new MiniLeetCodeException("Problem is not open or you do not have permission", 400);
+            }
+        }
+        /*
         if (!problemEntity.getUserId().equals(teacherId) &&
             !problemEntity.getStatusId().equals(ProblemEntity.PROBLEM_STATUS_OPEN)) {
             throw new MiniLeetCodeException("Problem is not open", 400);
         }
+        */
 
         ModelCreateContestProblemResponse problemResponse = new ModelCreateContestProblemResponse();
         problemResponse.setProblemId(problemEntity.getProblemId());
@@ -3688,6 +3726,19 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
     public List<ProblemEntity> getSharedProblems(String userId) {
         List<String> problemIds = this.userContestProblemRoleRepo.getProblemIdsShared(userId);
+
+        return this.problemRepo.findAll((root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (problemIds != null && problemIds.size() > 0) {
+                predicates.add(criteriaBuilder.in(root.get("problemId")).value(problemIds));
+            } else {
+                predicates.add(criteriaBuilder.equal(root.get("problemId"), ""));
+            }
+            return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+        });
+    }
+    public List<ProblemEntity> getPublicProblems(String userId) {
+        List<String> problemIds = this.userContestProblemRoleRepo.getProblemIdsPublic(userId);
 
         return this.problemRepo.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

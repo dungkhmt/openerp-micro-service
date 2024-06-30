@@ -30,6 +30,7 @@
     "edit": "Edit",
     "myProblems": "My Problems",
     "sharedProblems": "Shared Problems",
+    "publicProblems": "Public Problems",    
     "allProblems": "All Problems"
   },
   "createProblem": "Create new Problem",
