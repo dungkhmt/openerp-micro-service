@@ -34,6 +34,7 @@ import TestResultPage from "views/mbti-page/test/result/testResultId";
 import CVScanner from "views/cvscanner/CVScanner";
 import ViewAllApplicant2 from "views/jobpost/ViewAllApplicant2";
 import ViewAllJobPost2 from "views/jobpost/ViewAllJobPost2";
+import DashboardOverView from "views/Dashboard";
 
 const styles = {
   loadingProgress: {
@@ -69,7 +70,7 @@ function MainAppRouter(props) {
     <Layout>
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Switch>
-          <Route component={() => <></>} exact path="/" />
+          <Route component={DashboardOverView} exact path="/" />
           <PrivateRoute component={DemoScreen} exact path="/demo" />
           <PrivateRoute component={TeacherRouter} path="/teacher" />
           <PrivateRoute component={CreateNewCvForm} path="/create-cv" />
