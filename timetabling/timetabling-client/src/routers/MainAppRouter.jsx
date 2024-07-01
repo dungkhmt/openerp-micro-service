@@ -17,6 +17,7 @@ import ComputerLabTimeTabling from "./ComputerLabTimeTablingRouter";
 import TaRecruitmentRouter from "./TaRecruitmentRouter";
 import ThesisDefensePlanAssignmentRouter from "./ThesisDefensePlanAssignmentRouter";
 import MainPage from "views/mainPage";
+import AssetManagementRouter from "./AssetManagementRouter";
 
 const styles = {
   loadingProgress: {
@@ -76,6 +77,10 @@ function MainAppRouter(props) {
           <PrivateRoute
             component={ThesisDefensePlanAssignmentRouter}
             path="/thesis"
+          />
+          <PrivateRoute
+            component={AssetManagementRouter}
+            path="/asset-management"
           />
           <Route component={NotFound} />
         </Switch>
