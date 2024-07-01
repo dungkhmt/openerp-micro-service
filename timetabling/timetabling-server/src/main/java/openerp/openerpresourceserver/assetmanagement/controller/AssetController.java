@@ -2,6 +2,8 @@ package openerp.openerpresourceserver.assetmanagement.controller;
 
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.assetmanagement.entity.Asset;
+import openerp.openerpresourceserver.assetmanagement.service.AssetLogService;
+import openerp.openerpresourceserver.assetmanagement.service.AssetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
