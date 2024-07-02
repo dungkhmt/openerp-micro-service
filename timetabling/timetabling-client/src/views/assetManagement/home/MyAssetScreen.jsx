@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { request } from "../../api";
+import { request } from "api";
 import { StandardTable } from "erp-hust/lib/StandardTable";
 
 export const MyAssetScreen = () => {

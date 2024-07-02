@@ -1,9 +1,9 @@
-package openerp.openerpresourceserver.controller;
+package openerp.openerpresourceserver.assetmanagement.controller;
 
 import lombok.AllArgsConstructor;
-import openerp.openerpresourceserver.entity.Request;
-import openerp.openerpresourceserver.service.RequestLogService;
-import openerp.openerpresourceserver.service.RequestService;
+import openerp.openerpresourceserver.assetmanagement.entity.Request;
+import openerp.openerpresourceserver.assetmanagement.service.RequestLogService;
+import openerp.openerpresourceserver.assetmanagement.service.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +24,8 @@ public class RequestController {
         List<Request> requests = requestService.getAllRequests();
         String userId = principal.getName();
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(requests);
+                .status(HttpStatus.OK)
+                .body(requests);
     }
 
     @GetMapping("/id/{Id}")
@@ -33,8 +33,8 @@ public class RequestController {
         Request request = requestService.getById(Id);
         System.out.println("request123 " + request.toString());
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(request);
+                .status(HttpStatus.OK)
+                .body(request);
     }
 
     @PostMapping("/add-new")
@@ -43,8 +43,8 @@ public class RequestController {
         Request savedRequest = requestService.createNewRequest(request);
         requestLogService.createRequestLog(savedRequest.getId(), principal.getName(), "create");
         return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(savedRequest);
+                .status(HttpStatus.CREATED)
+                .body(savedRequest);
     }
 
     @PutMapping("/edit/{Id}")
@@ -52,8 +52,8 @@ public class RequestController {
         Request savedRequest = requestService.editRequest(Id, request);
         requestLogService.createRequestLog(savedRequest.getId(), principal.getName(), "edit");
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(savedRequest);
+                .status(HttpStatus.OK)
+                .body(savedRequest);
     }
 
     @DeleteMapping("/delete/{Id}")
@@ -69,8 +69,8 @@ public class RequestController {
         Request savedRequest = requestService.approveRequest(Id, approval_id);
         requestLogService.createRequestLog(savedRequest.getId(), principal.getName(), "approve");
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(savedRequest);
+                .status(HttpStatus.OK)
+                .body(savedRequest);
 
     }
 
@@ -80,8 +80,8 @@ public class RequestController {
         Request savedRequest = requestService.rejectRequest(Id, rejection_id);
         requestLogService.createRequestLog(savedRequest.getId(), principal.getName(), "reject");
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(savedRequest);
+                .status(HttpStatus.OK)
+                .body(savedRequest);
     }
 
     @GetMapping("/get-by-creator")
@@ -89,8 +89,8 @@ public class RequestController {
         String user_id = principal.getName();
         List<Request> requests = requestService.getCreatorRequests(user_id);
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(requests);
+                .status(HttpStatus.OK)
+                .body(requests);
     }
 
     @GetMapping("/get-by-admin")
@@ -98,8 +98,8 @@ public class RequestController {
         String user_id = principal.getName();
         List<Request> requests = requestService.getAdminRequests(user_id);
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(requests);
+                .status(HttpStatus.OK)
+                .body(requests);
     }
 
     @PutMapping("/payback/{Id}")
@@ -108,23 +108,23 @@ public class RequestController {
         Request savedRequest = requestService.paybackRequest(Id, approval_id);
         requestLogService.createRequestLog(savedRequest.getId(), principal.getName(), "done");
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(savedRequest);
+                .status(HttpStatus.OK)
+                .body(savedRequest);
     }
 
     @GetMapping("/top-users")
     public ResponseEntity<?> getTopUsers(){
         List<String> users = requestService.getTopUsers();
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(users);
+                .status(HttpStatus.OK)
+                .body(users);
     }
 
     @GetMapping("/get-by-user/{user_id}")
     public ResponseEntity<?> getByUser(@PathVariable String user_id){
         List<Request> requests = requestService.getCreatorRequests(user_id);
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(requests);
+                .status(HttpStatus.OK)
+                .body(requests);
     }
 }
