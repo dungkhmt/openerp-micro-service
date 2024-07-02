@@ -34,7 +34,7 @@ const ViewAllJobPost2 = () => {
     useEffect(() => {
         request("get", "/job-post", (res) => {
             setAllJobPostForm(res.data)
-            setResultSearch(res.data.slice(0, 6))
+            setResultSearch(res.data.reverse().slice(0, 6))
         }).then();
     }, [])
 
@@ -80,7 +80,7 @@ const ViewAllJobPost2 = () => {
                     // </Card>
                 ))
                 }
-                 <Pagination count={Math.ceil(resultSearch.length / 6)} page={page} onChange={handleChange} />
+                {((resultSearch.length == 6 || page == Math.ceil(allJobPostForm.length / 6))  && <Pagination count={Math.ceil(allJobPostForm.length / 6)} page={page} onChange={handleChange} /> )}
             </Grid>
 
         </>
