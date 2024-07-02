@@ -8,11 +8,11 @@ function SearchBar({ items, setResult }) {
 
   const handleSearch = (event) => {
     if (event.key === 'Enter') {
-    const filtered = items.filter((item) => {
+    let filtered = items.filter((item) => {
       const lowerCaseItem = item;
       return lowerCaseItem.title.toLowerCase().includes(searchTerm);
     });
-
+    if(searchTerm == "") filtered = items.slice(0, 6)
     setFilteredItems(filtered);
     setResult(filtered)
   }

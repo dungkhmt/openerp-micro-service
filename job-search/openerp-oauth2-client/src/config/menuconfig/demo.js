@@ -7,7 +7,7 @@ export const demo = {
       id: "MENU_DEMO.DEMO",
       path: "/demo",
       isPublic: true,
-      text: "Demo",
+      text: "User Management",
       child: [],
     },
   ],

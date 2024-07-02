@@ -498,7 +498,7 @@ const CreateNewCvForm = () => {
 
             {/* cv template */}
             {showCVDemo && (
-                <div className="w-100">
+                <div className="w-100" >
                     <CvTemplate1
                         name={userInfoForm.userName}
                         gender={userInfoForm.gender}
