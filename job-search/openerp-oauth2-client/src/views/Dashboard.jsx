@@ -64,7 +64,7 @@ const DashboardOverView = () => {
         ))
         }    
         </Grid>
-        <h4 style={{textAlign: 'center', backgroundColor:  "#F7F7FF", paddingTop: '24px',  paddingBottom: '60px' }}>And {allJob.length - 4} more are waiting for you !</h4>
+        {(allJob.length - 4 )> 0 && (<h4 style={{textAlign: 'center', backgroundColor:  "#F7F7FF", paddingTop: '24px',  paddingBottom: '60px' }}>And {allJob.length - 4} more are waiting for you !</h4>)}
         </>
 
     )
