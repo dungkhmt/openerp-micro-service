@@ -31,7 +31,6 @@ const RegisterClassForStudentScreen = (props) => {
       console.log(res.data);
       setFormData((prevData) => ({
         ...prevData,
-        name: res.data.name,
         email: res.data.email,
       }));
     });
