@@ -148,6 +148,7 @@ const ApplicationResultScreen = () => {
           color="error"
           style={styles.rightButton}
           onClick={() => handleOpenDialog(rowData)}
+          disabled={rowData.applicationStatus !== "PENDING"}
         >
           Xóa
         </Button>
