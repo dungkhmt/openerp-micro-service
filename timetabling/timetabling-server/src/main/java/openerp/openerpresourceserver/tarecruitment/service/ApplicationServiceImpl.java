@@ -190,6 +190,9 @@ public class ApplicationServiceImpl implements ApplicationService{
                 throw new IllegalArgumentException("Application with id " + id + " did not exist");
             }
             Application existApplication = application.get();
+            if(!Objects.equals(existApplication.getAssignStatus(), "PENDING")) {
+                throw new IllegalArgumentException("Đơn xin này đã có trạng thái xếp lớp");
+            }
             existApplication.setApplicationStatus(status);
             applicationRepo.save(existApplication);
             String textStatus;
@@ -211,6 +214,7 @@ public class ApplicationServiceImpl implements ApplicationService{
         }
         else {
             String textStatus;
+            int countSuccess = 0;
             if("PENDING".equals(status)) textStatus = "ĐANG CHỜ";
             else if ("APPROVED".equals(status)) textStatus = "DUYỆT";
             else textStatus = "TỪ CHỐI";
@@ -220,14 +224,18 @@ public class ApplicationServiceImpl implements ApplicationService{
                     throw new IllegalArgumentException("Application with id " + id + " did not exist");
                 }
                 Application existApplication = application.get();
+                if(!Objects.equals(existApplication.getAssignStatus(), "PENDING")) {
+                    continue;
+                }
                 existApplication.setApplicationStatus(status);
                 applicationRepo.save(existApplication);
+                countSuccess++;
                 String email = existApplication.getEmail();
                 String subject = "CẬP NHẬT TRẠNG THÁI ĐƠN ĐĂNG KÝ";
                 String body = "Đơn xin vào lớp " + existApplication.getClassCall().getSubjectId() + " đã được cập nhật sang trạng thái " + textStatus;
                 mailService.sendingEmail(email, subject, body);
             }
-            return "Cập nhật trạng thái thành công " + idList.size() + " đơn xin trợ giảng";
+            return "Cập nhật trạng thái thành công " + countSuccess + " đơn xin trợ giảng";
         }
     }
 
@@ -352,6 +360,38 @@ public class ApplicationServiceImpl implements ApplicationService{
             String subject = "CẬP NHẬT TRẠNG THÁI TRỢ GIẢNG";
             String body = "Đơn xin trợ giảng lớp " + app.getClassCall().getSubjectId() + " đã được DUYỆT";
             mailService.sendingEmail(email, subject, body);
+        }
+    }
+
+    @Override
+    public void oldAutoAssignApplication(String semester) {
+        List<String> userApplies = applicationRepo.findDistinctUserIdsBySemester(semester, "APPROVED", "PENDING");
+        log.info("Found " + userApplies.size() + " user");
+        for(String userInfo : userApplies) {
+            log.info("There is user " + userInfo);
+        }
+        List<Application> applications = applicationRepo.findApplicationToAutoAssign("APPROVED", "PENDING", semester);
+        log.info("Found " + applications.size() + " applications");
+        List<ClassCall> classCalls = applicationRepo.findDistinctClassCallBySemester(semester);
+        log.info("Found " + classCalls.size() + " class");
+
+        List<Integer> classIds = new ArrayList<>();
+        for(ClassCall elm : classCalls) {
+            classIds.add(elm.getId());
+        }
+
+        MaxMatching maxMatching = new MaxMatching(applications, userApplies, classIds);
+        List<Application> assignApplication = maxMatching.getAssignApplications();
+
+//        ConvertDataV2 convertDataV2 = new ConvertDataV2(applications, userApplies, classCalls);
+//        List<Application> assignApplication = convertDataV2.solvingProblem();
+
+        for(Application application : assignApplication) {
+            log.info("User " + application.getUser().getId() + " got assign to class id: " + application.getClassCall().getId());
+        }
+
+        for(Application app : assignApplication) {
+            updateAssignStatus(app.getId(), "APPROVED");
         }
     }
 
