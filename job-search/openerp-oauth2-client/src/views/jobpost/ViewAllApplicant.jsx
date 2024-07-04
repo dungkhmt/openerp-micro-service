@@ -46,11 +46,12 @@ const ViewAllApplicant = () => {
                     let UID = res.data[i].id
                     request("get", `/cv-application/${UID}`, (res) => {
                         if(hotestLength < res.data.length) {
-                            console.log(res.data)
-                            console.log("uid of hotest job", UID)
+                            // console.log(res.data)
+                            // console.log("uid of hotest job", UID)
                             hotestLength = res.data.length
                             hotestId = UID
                             hotestData = res.data
+                            // console.log("xnxx", hotestData)
                             setAllApplicant(hotestData)
                         }
                     }).then();

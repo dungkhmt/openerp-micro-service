@@ -52,8 +52,8 @@ function ApplicantCard({ applicant, index, id }) {
   }, [])
 
   useEffect(() => {
-    request("get", `/employee-cv/${applicant.cvId}`, (res) => {
-        setCV(res.data)
+    request("get", `/employee-cv/user/${applicant.user.id}`, (res) => {
+        setCV(res.data.find(data => data.employeeCV.id == applicant.cvId))
     }).then();
 }, [])
 
