@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Card, CardContent, Typography, Button, CardActions, Grid } from '@mui/material';
-import { EducatonDetail } from './userinfoDetails/EducationDetails';
+import { ExperienceDetail } from '../userinfoDetails/ExperienceDetals';
 import { useState, useEffect } from "react"
 
 const useStyles = makeStyles((theme) => ({
@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function EducationCard({education}) {
+function ExperienceCard({experience}) {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
 
@@ -36,35 +36,30 @@ function EducationCard({education}) {
   const handleClose = () => {
       setOpen(false);
   };
-
-
   return (
     <Card className={classes.card} style={{ width: "100%" }}>
       <CardContent className={classes.cardContent}>
         <Typography variant="h6" component="div" className={classes.title}>
-        School name: {education.schoolName}
+        Company name: {experience.companyName}
         </Typography>
         <Typography variant="body2" className={classes.subTitle}>
-        Major: {education.major}
+        Working position: {experience.workingPosition}
         </Typography>
         <Typography>
-        Description: {education.description}
-        </Typography>
-        <Typography>
-        Grade: {education.grade}
-        </Typography>        
-        <Typography variant="body2" className={classes.subTitle}>
-        From: {education.startingTime}
+        Responsibility: {experience.responsibility}
         </Typography>
         <Typography variant="body2" className={classes.subTitle}>
-        To: {education.endingTime}
+        From: {experience.createdTime}
+        </Typography>
+        <Typography variant="body2" className={classes.subTitle}>
+        To: {experience.endingTime}
         </Typography>
         <CardActions>
         <Grid display='flex' justifyContent={'center'} item xs={12}>
           <Button variant="contained" color="secondary"  onClick={handleClickOpen}>
             More details
           </Button>
-        <EducatonDetail open={open} onClose={handleClose} Education={education} />
+        <ExperienceDetail open={open} onClose={handleClose} Experience={experience} />
         </Grid>
         </CardActions>
       </CardContent>
@@ -72,4 +67,4 @@ function EducationCard({education}) {
   );
 }
 
-export default EducationCard;
+export default ExperienceCard;

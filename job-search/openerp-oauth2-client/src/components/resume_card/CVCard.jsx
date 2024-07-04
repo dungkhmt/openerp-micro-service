@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { makeStyles } from '@mui/styles';
-import { Card, CardContent, Typography, Button, CardActions, Grid } from '@mui/material';
-import { ExperienceDetail } from './userinfoDetails/ExperienceDetals';
-import { useState, useEffect } from "react"
+import { Card, CardContent, Typography, Button } from '@mui/material';
+import JobCard from '../job/JobCard';
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -25,46 +24,37 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function ExperienceCard({experience}) {
+function CVCard({cvData}) {
   const classes = useStyles();
-  const [open, setOpen] = useState(false);
 
-  const handleClickOpen = () => {
-      setOpen(true);
-  };
-
-  const handleClose = () => {
-      setOpen(false);
-  };
   return (
     <Card className={classes.card} style={{ width: "100%" }}>
       <CardContent className={classes.cardContent}>
         <Typography variant="h6" component="div" className={classes.title}>
-        Company name: {experience.companyName}
+        Job CV Title: {cvData.employeeCV?.title}
         </Typography>
         <Typography variant="body2" className={classes.subTitle}>
-        Working position: {experience.workingPosition}
+            CV Description: {cvData.employeeCV?.description}
         </Typography>
         <Typography>
-        Responsibility: {experience.responsibility}
+          Skill: {cvData.skills[0]?.skillName}...
         </Typography>
         <Typography variant="body2" className={classes.subTitle}>
-        From: {experience.createdTime}
+          Education: {cvData.educations[0]?.schoolName}...
         </Typography>
         <Typography variant="body2" className={classes.subTitle}>
-        To: {experience.endingTime}
+          Experiences: {cvData.experiences[0]?.companyName ? cvData.experiences[0]?.companyName : "project cá nhân"}...
         </Typography>
-        <CardActions>
-        <Grid display='flex' justifyContent={'center'} item xs={12}>
-          <Button variant="contained" color="secondary"  onClick={handleClickOpen}>
-            More details
-          </Button>
-        <ExperienceDetail open={open} onClose={handleClose} Experience={experience} />
-        </Grid>
-        </CardActions>
+        <Typography variant="body2" className={classes.subTitle}>
+          Created At: {cvData.employeeCV?.createdTime}
+        </Typography>
+        <Button>
+            <Typography><a target='_blank' href={cvData.employeeCV?.cvLink + "?alt=media"}>more details</a></Typography>
+
+        </Button>
       </CardContent>
     </Card>
   );
 }
 
-export default ExperienceCard;
+export default CVCard;

@@ -9,7 +9,7 @@ import {
     FormControl,
     Row,
 } from "react-bootstrap";
-import { request } from "../api"
+import { request } from "../../api"
 import { CircularProgress, Snackbar } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 

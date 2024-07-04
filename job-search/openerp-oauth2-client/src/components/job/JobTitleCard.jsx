@@ -26,7 +26,7 @@ function JobTitleCard({ jobListing, open, onClose, jobId, jobName, handleClick }
         </Grid>
         <Grid item xs={12} sm={12}>
           <Typography variant="subtitle1" gutterBottom>
-            salary: {jobListing.jobPost?.salary ? jobListing.jobPost?.salary : "thương lượng"}
+            salary: {jobListing.jobPost?.salary ? jobListing.jobPost?.salary +" vnđ": "thương lượng"}
           </Typography>
         </Grid>
         <Grid item xs={12} sm={12}>

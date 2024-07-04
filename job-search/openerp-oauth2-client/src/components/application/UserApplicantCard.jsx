@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { Menu } from '@mui/material'; // Import Menu for IconButton action (v5.0.3)
 import { useState, useEffect } from "react"
-import { request } from "../../src/api"
+import { request } from "../../api"
 
 const jobDescription = {
     companyLogo: 'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRHi40jeiiRjreg9siBaoR6S3HsAcZen4-EG5zM4Tvbrfu0DDcV',
