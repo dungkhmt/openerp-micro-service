@@ -11,8 +11,8 @@ import {
     Row,
 } from "react-bootstrap";
 import { Card, CardContent, CardActions } from '@mui/material';
-import JobCard from "components/JobCard";
-import SearchBar from "components/SearchBar";
+import JobCard from "components/job/JobCard";
+import SearchBar from "components/findjob/SearchBar";
 import Pagination from '@mui/material/Pagination';
 
 const ViewAllJobPost2 = () => {

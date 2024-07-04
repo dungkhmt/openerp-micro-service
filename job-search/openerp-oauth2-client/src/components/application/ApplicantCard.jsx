@@ -2,7 +2,7 @@ import * as React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Card, CardContent, Typography, Button, CardActions } from '@mui/material';
 import { useState, useEffect } from "react"
-import { request } from "../../src/api"
+import { request } from "../../api"
 import Swal from "sweetalert2";
 import './styles.css';
 
@@ -76,7 +76,7 @@ function ApplicantCard({ applicant, index, id }) {
       }
     });
     try {
-      const res = await request("put", `/cv-application/user/${user.id}/${id}`, null, null, submitToServerForm)
+      const res = await request("put", `/cv-application/user/${user.id}/${applicant.id}`, null, null, submitToServerForm)
       // Show a success Swal if the form is submitted
       Swal.fire({
         title: 'Submitted!',
@@ -124,8 +124,8 @@ return (
         Created At: {applicant.createdTime}
       </Typography>
       <CardActions>
-        <Button size="small" onClick={() => handleSubmit('reject', index)} name="reject" value="reject" cv={applicant}>Reject CV</Button>
-        <Button size="small" onClick={() => handleSubmit('accept', index)} name="accept" value="accept" cv={applicant}>Accept CV</Button>
+        {id && (<Button size="small" onClick={() => handleSubmit('reject', index)} name="reject" value="reject" cv={applicant}>Reject CV</Button>)}
+        {id && (<Button size="small" onClick={() => handleSubmit('accept', index)} name="accept" value="accept" cv={applicant}>Accept CV</Button>)}
       </CardActions>
     </CardContent>
   </Card>

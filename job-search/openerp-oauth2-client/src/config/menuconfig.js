@@ -38,6 +38,7 @@ import { mbti } from "./menuconfig/mbtiTest";
 import { scanCV } from "./menuconfig/scanCV";
 export const MENUS = [];
 
+
 MENUS.push(general);
 MENUS.push(user);
 MENUS.push(teacher);

@@ -11,7 +11,7 @@ import {
     Row,
 } from "react-bootstrap";
 import { Card, CardContent, CardActions } from '@mui/material';
-import JobCard from "components/JobCard";
+import JobCard from "components/job/JobCard";
 import { Dashboard } from "@mui/icons-material";
 
 const DashboardOverView = () => {
@@ -42,25 +42,6 @@ const DashboardOverView = () => {
             <Grid item xs={5} style={{ boxShadow: '1px 1px 1px 1px rgba(0.5,0.5,0.5,0.5)', margin: '20px', borderRadius: '20px', backgroundColor: "white"}} onClick={() => goToUrl(`/view-job-post/${jobPost.id}`)}>
             <JobCard job={jobPost}></JobCard>
             </Grid>
-            // <Card  sx={{ minWidth: 275 }}>
-            //     <CardContent>
-            //         <Typography variant="h4" component="div">
-            //             your dream job here
-            //         </Typography>
-            //         <Typography variant="body2">
-            //             <strong>Job title</strong>: {jobPost.title}
-            //         </Typography>
-            //         <Typography variant="body2">
-            //             <strong>Job location</strong>: {jobPost.locations}
-            //         </Typography>
-            //         <Typography variant="body2">
-            //             <strong>Job salary</strong>: {jobPost.salary ? jobPost.salary : "thương lượng"}
-            //         </Typography>
-            //         <CardActions>
-            //             <Button size="small" onClick={() => goToUrl(`/view-job-post/${jobPost.id}`)}>More Detail</Button>
-            //         </CardActions>
-            //     </CardContent>
-            // </Card>
         ))
         }    
         </Grid>

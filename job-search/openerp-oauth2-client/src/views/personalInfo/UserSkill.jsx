@@ -11,7 +11,7 @@ import {
     Row,
 } from "react-bootstrap";
 import { Card, CardContent, CardActions } from '@mui/material';
-import SkillCard from "components/SkillCard";
+import SkillCard from "components/resume_card/SkillCard";
 const UserSkills = () => {
 
     const [allSkill, setAllSkill] = useState([])

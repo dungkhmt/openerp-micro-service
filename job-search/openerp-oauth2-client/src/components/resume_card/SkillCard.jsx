@@ -2,7 +2,7 @@ import * as React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Card, CardContent, Typography, Button,CardActions, Grid } from '@mui/material';
 import { useState, useEffect } from "react"
-import { SkillDetail } from './userinfoDetails/SkillDetails';
+import { SkillDetail } from '../userinfoDetails/SkillDetails';
 const useStyles = makeStyles((theme) => ({
   card: {
     width: '300px',
