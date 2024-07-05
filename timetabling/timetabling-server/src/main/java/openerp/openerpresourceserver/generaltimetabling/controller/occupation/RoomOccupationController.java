@@ -37,16 +37,7 @@ public class RoomOccupationController {
         return ResponseEntity.ok(roomOccupationService.getRoomOccupationsBySemesterAndWeekIndex(semester, weekIndex));
     }
 
-    @PostMapping("/export")
-    public ResponseEntity exportExcel (@RequestParam("semester") String semester, @RequestParam("week") int week) {
-        String filename = "Room_Occupation.xlsx";
-        InputStreamResource file = new InputStreamResource(roomOccupationService.exportExcel(semester, week));
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-                .contentType(
-                        MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-                .body(file);
-    }
+
 
 
 

@@ -30,7 +30,7 @@ public class GeneralExcelHelper {
     /**
      * Start row in excel file to classes
      */
-    private final static int START_ROW_TO_READ_CLASS = 0;
+    private final static int START_ROW_TO_READ_CLASS = 2;
     /**
      * Start column in excel to read class information (Start with column A)
      */
@@ -78,16 +78,19 @@ public class GeneralExcelHelper {
                 sheet = workbook.getSheet(DEFAULT_SHEET);
             }
             int totalRowsNum = sheet.getLastRowNum();
-            for (int i = START_ROW_TO_READ_CLASS; i < totalRowsNum; i++) {
+            System.out.println(totalRowsNum);
+            for (int i = totalRowsNum; i >= START_ROW_TO_READ_CLASS; i--) {
                 Row classRow = sheet.getRow(i);
                 // skip if not exist classs code
-                if (classRow.getCell(9) != null) {
+                if (classRow != null && classRow.getCell(9) != null) {
                     Cell classCodeCell = classRow.getCell(9);
                     switch (classCodeCell.getCellType()) {
                         case Cell.CELL_TYPE_BLANK:
                             System.out.println("Cell blank, skip!");
                             continue;
                     }
+                } else {
+                    continue;
                 }
                 GeneralClass generalClass = new GeneralClass();
                 RoomReservation timeSlot = null;
@@ -210,7 +213,7 @@ public class GeneralExcelHelper {
     }
 
 
-    public ByteArrayInputStream convertRoomOccupationToExcel(List<RoomOccupation> rooms) {
+    public static ByteArrayInputStream convertRoomOccupationToExcel(List<RoomOccupation> rooms) {
         /*Init the data to map*/
         HashMap<String, List<OccupationClassPeriod>> periodMap = new HashMap<>();
         HashMap<OccupationClassPeriod, List<OccupationClassPeriod>> conflictMap = new HashMap<>();
@@ -324,7 +327,7 @@ public class GeneralExcelHelper {
 
 
 
-    public ByteArrayInputStream convertGeneralClassToExcel(List<GeneralClass> classes) {
+     public static ByteArrayInputStream convertGeneralClassToExcel(List<GeneralClass> classes) {
         /*Handle Excel write*/
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             /* Init the cell style*/

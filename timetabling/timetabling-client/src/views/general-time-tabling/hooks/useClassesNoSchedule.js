@@ -3,7 +3,7 @@ import { request } from "api";
 import { toast } from "react-toastify";
 import axios from "axios";
 
-export const useClasses = (group, semester) => {
+export const useClassesNoSchedule = (group, semester) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [classes, setClasses] = useState([]);
@@ -20,20 +20,8 @@ export const useClasses = (group, semester) => {
       (res) => {
         let generalClasses = [];
         res?.data?.forEach((classObj) => {
-          classObj.timeSlots.forEach((timeSlot, index) => {
-            const cloneObj = JSON.parse(
-              JSON.stringify({
-                ...classObj,
-                ...timeSlot,
-                classCode: classObj.classCode,
-                roomReservationId: timeSlot.id,
-                id: classObj.id + `-${index + 1}`,
-                crew: classObj.crew,
-              })
-            );
-            delete cloneObj.timeSlots;
-            generalClasses.push(cloneObj);
-          });
+          delete classObj.timeSlots;
+          generalClasses.push(classObj);
         });
         setClasses(generalClasses);
         setLoading(false);

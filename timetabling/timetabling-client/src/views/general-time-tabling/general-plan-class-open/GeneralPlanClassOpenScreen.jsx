@@ -48,8 +48,12 @@ const GeneralPlanClassOpenScreen = () => {
           setPlanClasses(res?.data);
         },
         (err) => {
+          if(err.response.status === 410) {
+            toast.error(err.response.data);
+          } else {
+            toast.error("Có lỗi khi upload file!");
+          }
           setImportLoading(false);
-          toast.success("Có lỗi khi upload file!");
           console.log(err);
         },
         formData,

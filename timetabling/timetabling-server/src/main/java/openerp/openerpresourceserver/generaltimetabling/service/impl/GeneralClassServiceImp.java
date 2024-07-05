@@ -9,7 +9,6 @@ import openerp.openerpresourceserver.generaltimetabling.exception.InvalidFieldEx
 import openerp.openerpresourceserver.generaltimetabling.exception.MinimumTimeSlotPerClassException;
 import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
 import openerp.openerpresourceserver.generaltimetabling.helper.ClassTimeComparator;
-import openerp.openerpresourceserver.generaltimetabling.helper.GeneralExcelHelper;
 import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekExtractor;
 import openerp.openerpresourceserver.generaltimetabling.mapper.RoomOccupationMapper;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.UpdateGeneralClassRequest;
@@ -25,9 +24,7 @@ import openerp.openerpresourceserver.generaltimetabling.service.GeneralClassServ
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.InputStream;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * GeneralClassOpenedServiceImp
@@ -48,7 +45,6 @@ public class GeneralClassServiceImp implements GeneralClassService {
 
     private ClassroomRepo classroomRepo;
 
-    private GeneralExcelHelper excelHelper;
 
 
     @Override
@@ -167,19 +163,20 @@ public class GeneralClassServiceImp implements GeneralClassService {
         return gClassOpened;
     }
 
+    @Transactional
     @Override
     public GeneralClass updateGeneralClass(UpdateGeneralClassRequest request) {
-        GeneralClass gClassOpened = gcoRepo.findById(Long.parseLong(request.getGeneralClassId())).orElse(null);
-        switch (request.getField()) {
-            case "studyClass":
-                gClassOpened.setStudyClass(request.getValue());
-                gcoRepo.save(gClassOpened);
-                break;
-            case "groupName":
-                gClassOpened.setGroupName(request.getValue());
-                gcoRepo.save(gClassOpened);
+        GeneralClass gClass = gcoRepo.findById(request.getGeneralClass().getId()).orElseThrow(()->new NotFoundException("Không tìm thấy lớp!"));
+        if(!gClass.getCrew().equals(request.getGeneralClass().getCrew())) {
+            List<RoomOccupation> roomOccupationList = roomOccupationRepo.findAllBySemesterAndClassCodeAndCrew(
+                    gClass.getSemester(),
+                    gClass.getClassCode(),
+                    gClass.getCrew());
+            roomOccupationList.forEach(ro->{ro.setCrew(request.getGeneralClass().getCrew());});
+            roomOccupationRepo.saveAll(roomOccupationList);
         }
-        return gClassOpened;
+        gClass.setInfo(request.getGeneralClass());
+        return gcoRepo.save(gClass);
     }
 
     @Override
@@ -292,23 +289,8 @@ public class GeneralClassServiceImp implements GeneralClassService {
         roomOccupationRepo.deleteAllByClassCodeIn(foundClasses.stream().map(GeneralClass::getClassCode).toList());
         /*Get the roomOccupations from scheduled classes and save them*/
         List<RoomOccupation> newRoomOccupationList = autoScheduleClasses.stream().map(RoomOccupationMapper::mapFromGeneralClass).flatMap(List::stream).toList();
-        roomOccupationRepo.saveAll(newRoomOccupationList);
+        roomOccupationRepo.saveAll(newRoomOccupationList.stream().filter(ro -> (ro.getClassRoom()!=null || !ro.getClassRoom().isEmpty())).toList());
         return autoScheduleClasses;
-    }
-
-    @Override
-    public InputStream exportExcel(String semester) {
-        List<GeneralClass> classes = gcoRepo.findAllBySemester(semester)
-                .stream()
-                .filter(c -> c.getClassCode() != null && !c.getClassCode().isEmpty())
-                .collect(Collectors.toCollection(ArrayList::new));
-        classes.sort((a, b) -> {
-            Comparable fieldValueA = a.getClassCode();
-            Comparable fieldValueB = b.getClassCode();
-            return fieldValueA.compareTo(fieldValueB);
-        });
-        if (classes.isEmpty()) throw new NotFoundException("Kỳ học không có bất kỳ lớp học nào!");
-        return excelHelper.convertGeneralClassToExcel(classes);
     }
 
     @Override
@@ -385,6 +367,9 @@ public class GeneralClassServiceImp implements GeneralClassService {
             }
             roomOccupations.addAll(foundRoomOccupations);
         });
+
+        var isConflict = false;
+        var conflictMsg = "";
         try {
             /*Check conflict*/
             for (RoomReservation roomReservation : roomReservationMap.values()) {
@@ -393,14 +378,14 @@ public class GeneralClassServiceImp implements GeneralClassService {
                 }
             }
         } catch (ConflictScheduleException e) {
-            /* Persist room reservation and room occupation */
-            roomReservationRepo.saveAll(roomReservationMap.values());
-            roomOccupationRepo.saveAll(roomOccupations);
-            throw new ConflictScheduleException(e.getCustomMessage());
+            isConflict = true;
+            conflictMsg = e.getCustomMessage();
         }
+
         /* Persist room reservation and room occupation */
         roomReservationRepo.saveAll(roomReservationMap.values());
         roomOccupationRepo.saveAll(roomOccupations);
+        if(isConflict) throw new ConflictScheduleException(conflictMsg);
         return roomReservationMap.values().stream().map(RoomReservation::getGeneralClass).toList();
     }
 
