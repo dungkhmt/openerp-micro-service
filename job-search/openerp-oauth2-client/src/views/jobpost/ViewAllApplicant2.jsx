@@ -12,7 +12,7 @@ import {
 } from "react-bootstrap";
 import { Card, CardContent, CardActions } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import ApplicantCard from "components/ApplicantCard";
+import ApplicantCard from "components/application/ApplicantCard";
 
 const ViewAllApplicant2 = () => {
 
@@ -32,6 +32,7 @@ const ViewAllApplicant2 = () => {
         request("get", "/user/get-user-data", (res) => {
             setUser(res.data)
             request("get", `/cv-application/${res.data.id}`, (res) => {
+                console.log(res.data)
                 setAllJobPostForm2(res.data)
             }).then();
         }).then();

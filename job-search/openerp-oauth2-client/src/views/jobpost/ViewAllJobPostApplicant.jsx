@@ -11,7 +11,7 @@ import {
     Row,
 } from "react-bootstrap";
 import { Card, CardContent, CardActions } from '@mui/material';
-import ApplicantCard from "components/ApplicantCard";
+import ApplicantCard from "components/application/ApplicantCard";
 const ViewAllJobPostApplicant = () => {
     let id = "4"
     const [title, setTitle] = useState("Thực tập sinh dot net")

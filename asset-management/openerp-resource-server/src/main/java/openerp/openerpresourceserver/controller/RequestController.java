@@ -22,6 +22,7 @@ public class RequestController {
     @GetMapping("/get-all")
     public ResponseEntity<?> getAllRequests(Principal principal){
         List<Request> requests = requestService.getAllRequests();
+        String userId = principal.getName();
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(requests);

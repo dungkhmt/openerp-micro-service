@@ -93,7 +93,7 @@ const apiUrl = process.env.REACT_APP_JOB_SEARCH_HOST;
 const Main = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFetch, setIsFetch] = useState(false);
-  const [data, setData] = useState([]);
+  const [jobData, setJobData] = useState([]);
   const [inputs, setInputs] = useState({});
   const [city, setCity] = useState([]);
   const [hide, setHide] = useState(false)
@@ -176,7 +176,7 @@ const Main = () => {
 
 
       setIsLoading(false);
-      setData(res.data);
+      setJobData(res.data);
       setIsFetch(true);
     } catch (e) {
       setIsLoading(false);
@@ -393,19 +393,25 @@ const Main = () => {
           <>
             <Suggest>
               <Title>Suitable jobs for you :</Title>
+              {jobData.map(data => (
               <SuggestInfo>
                 <Item job={data} key={data.id} />
               </SuggestInfo>
+              ))}              
               <ButtonScore onClick={handleClick}>Score</ButtonScore>
             </Suggest>
           </>
         )}
         {hide && (
           <Suggest>
-            <Title>job score</Title>
+            {jobData.map(data => (
+              <>
+            <Title>job score for job: {data.title}</Title>
             <SuggestInfo>
               <DetailScore job={data} score={data} key={data.id} />
             </SuggestInfo>
+            </>
+            ))}
           </Suggest>
         )}
       </>

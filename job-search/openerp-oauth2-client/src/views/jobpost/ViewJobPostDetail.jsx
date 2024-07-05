@@ -19,9 +19,9 @@ import {
 import { Card, CardContent, CardActions } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { ApplyJobPost } from './ApplyJobPost'
-import JobTitleCard from "components/JobTitleCard";
-import CompanyProfile from "components/CompanyProfile";
-import JobDescription from "components/JobDescription";
+import JobTitleCard from "components/job/JobTitleCard";
+import CompanyProfile from "components/company/CompanyProfile";
+import JobDescription from "components/job/JobDescription";
 import { light } from "@mui/material/styles/createPalette";
 import { grey } from "@mui/material/colors";
 
