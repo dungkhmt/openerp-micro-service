@@ -20,8 +20,8 @@ const AddCreatedGroupDialogue = ({ open, setOpen, setClasses, selectedClasses })
   };
 
   const handleSubmitAddToGroup = () => {
-    const ids = Array.from(new Set(selectedClasses.map((gClass) => gClass?.split("-")?.[0]).filter((id) => id !== null)));
-    console.log(ids);
+    const ids = Array.from(new Set(selectedClasses.map((gClass) => gClass).filter((id) => id !== null)));
+    
     setLoading(true);
     request(
       "post",
@@ -30,18 +30,8 @@ const AddCreatedGroupDialogue = ({ open, setOpen, setClasses, selectedClasses })
         let generalClasses = [];
         res.data?.forEach((classObj) => {
           if (classObj?.classCode !== null && classObj?.timeSlots) {
-            classObj.timeSlots.forEach((timeSlot, index) => {
-              const cloneObj = JSON.parse(
-                JSON.stringify({
-                  ...classObj,
-                  ...timeSlot,
-                  classCode: classObj.classCode,
-                  id: classObj.id + `-${index + 1}`,
-                })
-              );
-              delete cloneObj.timeSlots;
-              generalClasses.push(cloneObj);
-            });
+            delete classObj.timeSlots;
+            generalClasses.push(classObj);
           }
         });
         setClasses(generalClasses);
