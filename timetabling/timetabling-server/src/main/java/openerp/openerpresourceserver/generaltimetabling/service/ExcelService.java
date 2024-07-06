@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.generaltimetabling.service;
 
 import lombok.extern.log4j.Log4j2;
+import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
 import openerp.openerpresourceserver.generaltimetabling.helper.*;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.PlanGeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
@@ -18,9 +19,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -45,6 +48,21 @@ public class ExcelService {
 
     @Autowired
     private PlanGeneralClassRepository planGeneralClassRepository;
+
+    public InputStream exportGeneralExcel(String semester) {
+        List<GeneralClass> classes = gcoRepo.findAllBySemester(semester)
+                .stream()
+                .filter(c -> c.getClassCode() != null && !c.getClassCode().isEmpty())
+                .collect(Collectors.toCollection(ArrayList::new));
+        classes.sort((a, b) -> {
+            Comparable fieldValueA = a.getClassCode();
+            Comparable fieldValueB = b.getClassCode();
+            return fieldValueA.compareTo(fieldValueB);
+        });
+        if (classes.isEmpty()) throw new NotFoundException("Kỳ học không có bất kỳ lớp học nào!");
+        return GeneralExcelHelper.convertGeneralClassToExcel(classes);
+    }
+
 
     // public ByteArrayInputStream load() {
     // List<Schedule> schedules = this.getAllSchedules();
@@ -304,6 +322,12 @@ public class ExcelService {
     public List<Schedule> getAllSchedules() {
         return scheduleRepo.findAll();
     }
+
+    public ByteArrayInputStream exportRoomOccupationExcel(String semester, int week) {
+        return roomOccupationService.exportExcel(semester, week);
+    }
+
+
     @Transactional
     public List<PlanGeneralClass> savePlanClasses(MultipartFile file, String semester) {
         try {
@@ -316,4 +340,6 @@ public class ExcelService {
             return new ArrayList<>();
         }
     }
+
+
 }

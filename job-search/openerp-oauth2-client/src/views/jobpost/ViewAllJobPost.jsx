@@ -11,7 +11,7 @@ import {
     Row,
 } from "react-bootstrap";
 import { Card, CardContent, CardActions } from '@mui/material';
-import JobCard from "components/JobCard";
+import JobCard from "components/job/JobCard";
 const ViewAllJobPost = () => {
 
     const [title, setTitle] = useState("Thực tập sinh dot net")
@@ -25,13 +25,16 @@ const ViewAllJobPost = () => {
     useEffect(() => {
         request("get", "/user/get-user-data", (res) => {
             setUser(res.data)
+            request("get", `/job-post/user/${res.data.id}`, (res) => {
+                setAllJobPostForm(res.data)
+            }).then();
           }).then();
     }, [])
-    useEffect(() => {
-        request("get", "/job-post", (res) => {
-            setAllJobPostForm(res.data)
-        }).then();
-    }, [])
+    // useEffect(() => {
+    //     request("get", "/job-post", (res) => {
+    //         setAllJobPostForm(res.data)
+    //     }).then();
+    // }, [])
 
     function goToUrl(url) {
         window.location.href = url;

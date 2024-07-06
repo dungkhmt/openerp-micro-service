@@ -109,7 +109,8 @@ public class MaxMatching {
             maxFlow += pathFlow;
 
             // Reset visited array for the next iteration
-            visited = new boolean[V];
+            visited[s] = false;
+            visited[t] = false;
 
         }
         log.info("Max flow: " + maxFlow);

@@ -11,7 +11,7 @@ import {
     Row,
 } from "react-bootstrap";
 import { Card, CardContent, CardActions } from '@mui/material';
-import EducationCard from "components/EducationCard";
+import EducationCard from "components/resume_card/EducationCard";
 
 const UserEducation = () => {
 

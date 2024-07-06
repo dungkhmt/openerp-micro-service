@@ -34,7 +34,7 @@ const AddNewGroupDialogue = ({ open, setOpen, selectedClasses, setClasses }) => 
   };
 
   const handleRequestUpdateClassesGroupName = () => {
-    const ids = Array.from(new Set(selectedClasses.map((gClass) => gClass?.split("-")?.[0]).filter((id) => id !== null)));
+    const ids = Array.from(new Set(selectedClasses.filter((id) => id !== null)));
     console.log(ids);
     setLoading(true);
     request(
@@ -44,18 +44,8 @@ const AddNewGroupDialogue = ({ open, setOpen, selectedClasses, setClasses }) => 
         let generalClasses = [];
         res.data?.forEach((classObj) => {
           if (classObj?.classCode !== null && classObj?.timeSlots) {
-            classObj.timeSlots.forEach((timeSlot, index) => {
-              const cloneObj = JSON.parse(
-                JSON.stringify({
-                  ...classObj,
-                  ...timeSlot,
-                  classCode: classObj.classCode,
-                  id: classObj.id + `-${index + 1}`,
-                })
-              );
-              delete cloneObj.timeSlots;
-              generalClasses.push(cloneObj);
-            });
+            delete classObj.timeSlots;
+            generalClasses.push(classObj);
           }
         });
         console.log(generalClasses);

@@ -13,17 +13,19 @@ const GeneralGroupTable = ({
       <DataGrid
         onRowSelectionModelChange={handleSelectionModelChange}
         checkboxSelection
-        sortingOrder={'asc'}
         loading={dataLoading}
         className="text-xs"
         columns={useGroupTableConfig()}
         rows={classes}
         pageSize={10}
         initialState={{
+          sorting: {
+            sortModel: [{ field: 'classCode', sort: 'desc' }],
+          },
           filter: {
             filterModel: {
               items: [],
-              quickFilterValues: [''],
+              quickFilterValues: [""],
             },
           },
         }}

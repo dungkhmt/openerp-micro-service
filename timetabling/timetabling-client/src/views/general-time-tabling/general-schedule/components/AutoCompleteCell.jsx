@@ -63,7 +63,7 @@ const AutocompleteCell = ({
       options={options}
       sx={{ width: width }}
       getOptionLabel={(option) => option.label || ""}
-      renderInput={(params) => <TextField {...params} />}
+      renderInput={(params) => <TextField variant='standard' {...params} />}
     />
   );
 };
