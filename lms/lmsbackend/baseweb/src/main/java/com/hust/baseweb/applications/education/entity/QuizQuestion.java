@@ -32,11 +32,11 @@ public class QuizQuestion {
     @JoinColumn(name = "course_topic_id", referencedColumnName = "quiz_course_topic_id")
     private QuizCourseTopic quizCourseTopic;
 
-    @OneToMany(mappedBy = "quizQuestion", fetch = FetchType.LAZY)
-    private List<InteractiveQuizAnswer> interactiveQuizAnswers;
+    // @OneToMany(fetch = FetchType.LAZY)
+    // private List<InteractiveQuizAnswer> interactiveQuizAnswers;
 
-    @OneToMany(mappedBy = "quizQuestion", fetch = FetchType.LAZY)
-    private List<QuizChoiceAnswer> quizChoiceAnswers;
+    // @OneToMany(fetch = FetchType.LAZY)
+    // private List<QuizChoiceAnswer> quizChoiceAnswers;
 
     //@ManyToOne(fetch = FetchType.LAZY)
     //@JoinColumn(name = "created_by_user_login_id", referencedColumnName = "user_login_id")
