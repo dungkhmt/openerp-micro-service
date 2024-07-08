@@ -18,13 +18,13 @@ const InfoCard = (props) => {
     return (
         <Card elevation={3} sx={{ borderRadius: "8px" }}>
             <CardContent sx={{ paddingBottom: "16px !important" }}>
-                <Grid container>
-                    <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
+                <Grid container spacing={4}>
+                    <Grid item xs={2} sx={{ display: "flex", alignItems: "center" }}>
                         <Avatar
                             sx={{
                                 backgroundColor: iconColor,
-                                height: 42,
-                                width: 42,
+                                height: 38,
+                                width: 38,
                             }}
                         >
                             <SvgIcon>
@@ -32,8 +32,8 @@ const InfoCard = (props) => {
                             </SvgIcon>
                         </Avatar>
                     </Grid>
-                    <Grid item xs={9} sx={{ textAlign: "left" }}>
-                        <Typography variant="h5" color={iconColor} sx={{ fontWeight: 600 }}>
+                    <Grid item xs={10} sx={{ textAlign: "left" }}>
+                        <Typography variant="h6" color={iconColor} sx={{ fontWeight: 600 }}>
                             {mainTitle}
                         </Typography>
                         <Typography

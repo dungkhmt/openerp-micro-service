@@ -14,6 +14,10 @@ const JuryTopicList = () => {
     const [juryTopicList, setJuryTopicList] = useState([]);
     const [toggle, setToggle] = React.useState(false);
     const [open, setOpen] = React.useState(false);
+    const [action, setAction] = useState({
+        topicId: 0,
+        type: null,
+    })
     const history = useHistory();
     const handleToggle = () => {
         setToggle((prevToggle) => !prevToggle);
@@ -25,19 +29,6 @@ const JuryTopicList = () => {
     const columns = [
         { title: "Tên phân ban", field: "name" },
         { title: "Keyword", field: "academicKeywordList", render: (rowData) => rowData?.academicKeywordList?.map((item) => <KeywordChip key={item?.id} keyword={item?.description} />) },
-        {
-            title: "",
-            sorting: false,
-            render: (rowData) => (
-                <Box display={'flex'}>
-                    <IconButton aria-label="Chỉnh sửa" sx={{ marginRight: 2 }} onClick={() => {
-                        history.push(`/thesis/thesis_defense_plan/${rowData.id}/edit`);
-                    }}>
-                        <EditIcon />
-                    </IconButton>
-                </Box>
-            ),
-        },
     ];
 
     useEffect(() => {
@@ -61,7 +52,10 @@ const JuryTopicList = () => {
                 marginTop={3}
                 paddingRight={6}
             >
-                <PrimaryButton onClick={() => { setOpen((prevOpen) => !prevOpen) }}>
+                <PrimaryButton onClick={() => {
+                    setAction({ topicId: null, type: "CREATE" })
+                    setOpen((prevOpen) => !prevOpen)
+                }}>
                     Tạo phân ban mới
                 </PrimaryButton>
             </Box>
@@ -78,9 +72,10 @@ const JuryTopicList = () => {
                 }}
             />
             {open && (
-
                 <ModalJuryTopic
                     open={open}
+                    type={action.type}
+                    topicId={action.topicId}
                     handleClose={handleClose}
                     handleToggle={handleToggle}
                 />

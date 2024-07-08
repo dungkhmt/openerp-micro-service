@@ -33,18 +33,32 @@ export const EditTeacherAndThesisToDefenseJury = () => {
         setAssignedThesis
     } = useAssignTeacherThesis();
     const { data: availableThesisList } = useFetch(
-        `/defense-jury/thesis/get-all-available/${id}/${juryId}`
+        `/defense-jury/thesis/get-all-available/${id}`
     );
     const { data: defenseJury, error } = useFetch(`/defense-jury/${juryId}`);
     const { loading, data: teacherList } = useFetch("/defense-jury/teachers");
+
     useEffect(() => {
         let isFetched = false;
+        const sortThesisInJuryTopicInFront = (thesisList) => {
+            function compare(a, b) {
+                if (a?.juryTopic?.id === defenseJury?.juryTopic.id) {
+                    return -1;
+                } else if (b?.juryTopic?.id === defenseJury?.juryTopic?.id) {
+                    return 1;
+                }
+                return a?.juryTopic?.id - b?.juryTopic?.id;
+            }
+            thesisList?.sort(compare)
+            return thesisList;
+        }
         if (defenseJury && availableThesisList) {
+            const sortedAvailableThesisList = sortThesisInJuryTopicInFront(availableThesisList)
             const assignedTeacherList = defenseJury?.defenseJuryTeacherRoles?.map((item) =>
                 ({ ...item?.teacher, role: item?.role?.id })
             )
             const assignedThesisList = defenseJury?.thesisList?.map((item) => item?.id);
-            setThesisList((prev) => [...prev, ...defenseJury?.thesisList, ...availableThesisList]);
+            setThesisList((prev) => [...prev, ...defenseJury?.thesisList, ...sortedAvailableThesisList]);
             setAssignedTeacher(assignedTeacherList);
             setAssignedThesis(assignedThesisList)
         }
