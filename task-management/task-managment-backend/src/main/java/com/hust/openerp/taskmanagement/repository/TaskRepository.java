@@ -89,6 +89,12 @@ public interface TaskRepository extends JpaRepository<Task, UUID>, JpaSpecificat
             """)
     List<TaskStatisticByStatusDTO> getTaskStatisticWorkloadByStatus(UUID projectId, Date startDate, Date endDate);
 
+    @Query(value = """
+            select * from task_management_task t
+            where t.assignee_id is not null
+            and t.due_date between CURRENT_DATE AND DATE_TRUNC('day', CURRENT_DATE + INTERVAL '?1 days') + INTERVAL '1 day' - INTERVAL '1 second'""", nativeQuery = true)
+    List<Task> getTasksDueDateIntervalDay(Integer intervalDay);
+
     public static interface TaskStatistic {
         Long getTotalCount();
 
