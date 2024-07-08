@@ -95,7 +95,7 @@ function DefenseJuryDetail(props) {
               sx={{ marginTop: "16px" }}
             >
               {defenseJuryTeacherRoles?.map((item) => (
-                <Grid item xs={2.75}>
+                <Grid item xs={3}>
                   <InfoCard
                     icon={UsersIcon}
                     iconColor="#000"

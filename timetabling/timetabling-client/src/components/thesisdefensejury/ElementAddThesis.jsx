@@ -18,6 +18,11 @@ export default function ElementAddThesis({ availableThesisList, assignedThesis, 
         },
         { title: "Tên đồ án", field: "thesisName" },
         {
+            title: "Phân ban",
+            field: "juryTopic",
+            render: (rowData) => rowData?.secondaryJuryTopic ? `(1)${rowData?.juryTopic?.name} (2)${rowData?.secondaryJuryTopic?.name}` : `${rowData?.juryTopic?.name}`,
+        },
+        {
             title: "Keyword",
             field: "academicKeywordList",
             render: (rowData) =>

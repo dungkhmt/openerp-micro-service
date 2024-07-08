@@ -22,6 +22,8 @@ public class ThesisDTO {
 
     private String juryTopicName;
 
+    private String secondJuryTopicName;
+
     public String getDefenseJuryName() {
         return defenseJuryName;
     }
@@ -93,5 +95,13 @@ public class ThesisDTO {
 
     public void setJuryTopicName(String juryTopicName) {
         this.juryTopicName = juryTopicName;
+    }
+
+    public String getSecondJuryTopicName() {
+        return secondJuryTopicName;
+    }
+
+    public void setSecondJuryTopicName(String secondJuryTopicName) {
+        this.secondJuryTopicName = secondJuryTopicName;
     }
 }

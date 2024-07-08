@@ -71,7 +71,7 @@ public class ThesisController {
 
     @PostMapping("/assign")
     public ResponseEntity<String> assignJuryTopicToThesis(@RequestBody AssignJuryTopicToThesisIM assignJuryTopicToThesisIM) {
-        String message = thesisService.assignJuryTopicToThesis(assignJuryTopicToThesisIM.getThesisId(), assignJuryTopicToThesisIM.getJuryTopicId());
+        String message = thesisService.assignJuryTopicToThesis(assignJuryTopicToThesisIM.getThesisId(), assignJuryTopicToThesisIM);
         if (message.equals("ERROR")) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }

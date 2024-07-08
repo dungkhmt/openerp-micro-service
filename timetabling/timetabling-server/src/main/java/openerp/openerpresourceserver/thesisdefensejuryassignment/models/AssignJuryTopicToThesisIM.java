@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 public class AssignJuryTopicToThesisIM {
     private String thesisId;
     private int juryTopicId;
+    private int secondJuryTopicId;
 
     public String getThesisId() {
         return thesisId;
@@ -23,5 +24,13 @@ public class AssignJuryTopicToThesisIM {
 
     public void setJuryTopicId(int juryTopicId) {
         this.juryTopicId = juryTopicId;
+    }
+
+    public int getSecondJuryTopicId() {
+        return secondJuryTopicId;
+    }
+
+    public void setSecondJuryTopicId(int secondJuryTopicId) {
+        this.secondJuryTopicId = secondJuryTopicId;
     }
 }

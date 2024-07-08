@@ -5,11 +5,13 @@ import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.AcademicKeyword;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.JuryTopic;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.models.JuryTopicIM;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.models.UpdateJuryTopicIM;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.repo.AcademicKeywordRepo;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.repo.JuryTopicRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 @Log4j2
@@ -42,5 +44,20 @@ public class JuryTopicServiceImpl implements JuryTopicService{
         JuryTopic juryTopic = new JuryTopic(juryTopicIM.getName(), academicKeywordList);
         JuryTopic savedJuryTopic = juryTopicRepo.save(juryTopic);
         return "Tạo phân ban " + savedJuryTopic.getName() + " thành công";
+    }
+
+    @Override
+    public String updateJuryTopic(int juryTopicId, UpdateJuryTopicIM updateJuryTopicIM){
+        JuryTopic juryTopic = juryTopicRepo.findById(juryTopicId).orElse(null);
+        if (juryTopic == null) return "ERROR";
+        List<AcademicKeyword> academicKeywordList = new LinkedList<>();
+        for (String academicKeywordId : updateJuryTopicIM.getAcademicKeywordList()){
+            AcademicKeyword academicKeyword = academicKeywordRepo.findById(academicKeywordId).orElse(null);
+            if (academicKeyword == null) return "ERROR";
+            academicKeywordList.add(academicKeyword);
+        }
+        juryTopic.setAcademicKeywordList(academicKeywordList);
+        JuryTopic saved = juryTopicRepo.save(juryTopic);
+        return "Cập nhật phân ban thành công";
     }
 }
