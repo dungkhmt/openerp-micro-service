@@ -4,6 +4,7 @@ import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.TeacherSupe
 import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.ThesisDTO;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.Thesis;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.TrainingProgram;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.models.AssignJuryTopicToThesisIM;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.models.ThesisModel;
 
 import java.util.List;
@@ -21,5 +22,5 @@ public interface ThesisService {
 
     Thesis getById(String id);
 
-    String assignJuryTopicToThesis(String thesisId, int juryTopicId);
+    String assignJuryTopicToThesis(String thesisId, AssignJuryTopicToThesisIM assignJuryTopicToThesisIM);
 }

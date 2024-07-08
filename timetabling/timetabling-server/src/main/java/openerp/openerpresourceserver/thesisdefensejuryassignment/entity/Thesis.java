@@ -90,6 +90,11 @@ public class Thesis implements Serializable {
     @JoinColumn(name = "jury_topic_id")
     private JuryTopic juryTopic;
 
+    @ManyToOne
+    @JoinColumn(name = "second_jury_topic_id")
+    private JuryTopic secondaryJuryTopic;
+
+
     /*-------------------------------------------------------*/
     public Teacher getScheduledReviewer() {
         return scheduledReviewer;
@@ -190,5 +195,13 @@ public class Thesis implements Serializable {
 
     public void setJuryTopic(JuryTopic juryTopic) {
         this.juryTopic = juryTopic;
+    }
+
+    public JuryTopic getSecondaryJuryTopic() {
+        return secondaryJuryTopic;
+    }
+
+    public void setSecondaryJuryTopic(JuryTopic secondaryJuryTopic) {
+        this.secondaryJuryTopic = secondaryJuryTopic;
     }
 }

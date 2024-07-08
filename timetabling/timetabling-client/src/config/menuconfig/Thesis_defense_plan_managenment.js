@@ -8,7 +8,7 @@ export const ThesisDefensePlanManagement = {
       path: "/thesis/thesis_defense_plan",
       icon: "Schedule",
       text: "DS Đợt bảo vệ",
-      isPublic: false,
+      isPublic: true,
       child: [],
     },
     {
@@ -16,7 +16,7 @@ export const ThesisDefensePlanManagement = {
       path: "/thesis/teacher/assigned",
       icon: "",
       text: "DS Đợt bảo vệ được phân công",
-      isPublic: false,
+      isPublic: true,
       child: [],
     },
     {
@@ -24,7 +24,7 @@ export const ThesisDefensePlanManagement = {
       path: "/thesis/teacher/president",
       icon: "",
       text: "DS Đợt bảo vệ được phân công làm chủ tịch",
-      isPublic: false,
+      isPublic: true,
       child: [],
     },
     {
@@ -32,7 +32,7 @@ export const ThesisDefensePlanManagement = {
       path: "/thesis/teacher/superviser",
       icon: "",
       text: "DS Đồ án hướng dẫn",
-      isPublic: false,
+      isPublic: true,
       child: [],
     },
     {
@@ -40,7 +40,7 @@ export const ThesisDefensePlanManagement = {
       path: "/thesis/topic",
       icon: "",
       text: "Quản lý phân ban",
-      isPublic: false,
+      isPublic: true,
       child: [],
     },
   ],
@@ -56,7 +56,7 @@ export const ThesisDefensePlanStudent = {
       path: "/thesis/student/thesis_defense_plan/assigned",
       icon: "Schedule",
       text: "DS Đợt bảo vệ được phân công",
-      isPublic: false,
+      isPublic: true,
       child: [],
     },
     {
@@ -64,7 +64,7 @@ export const ThesisDefensePlanStudent = {
       path: "/thesis/student/create",
       icon: "",
       text: "Tạo đồ án tốt nghiệp mới",
-      isPublic: false,
+      isPublic: true,
       child: [],
     },
   ],

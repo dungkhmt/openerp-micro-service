@@ -7,6 +7,7 @@ import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.JuryTopi
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.Thesis;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.models.JuryTopicIM;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.models.ThesisModel;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.models.UpdateJuryTopicIM;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.service.AcademicKeywordServiceImpl;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.service.JuryTopicServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +31,27 @@ public class JuryTopicController {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<JuryTopic> getJuryTopicById(@PathVariable int id) {
+        JuryTopic res = juryTopicService.getById(id);
+        if (res == null){
+            return new ResponseEntity<>(res, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
     @PostMapping("/save")
     public ResponseEntity<String> createNewJuryTopic(@RequestBody JuryTopicIM juryTopicIM) {
         String mes = juryTopicService.createJuryTopic(juryTopicIM);
+        if (mes.equals("ERROR")) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(mes, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/update/{id}")
+    public ResponseEntity<String> updateJuryTopic(@PathVariable int juryTopicId, @RequestBody UpdateJuryTopicIM juryTopicIM) {
+        String mes = juryTopicService.updateJuryTopic(juryTopicId, juryTopicIM);
         if (mes.equals("ERROR")) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
