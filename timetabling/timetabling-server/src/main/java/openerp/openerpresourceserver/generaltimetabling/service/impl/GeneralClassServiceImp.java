@@ -287,9 +287,6 @@ public class GeneralClassServiceImp implements GeneralClassService {
         /*Save the scheduled timeslot of the classes*/
         gcoRepo.saveAll(autoScheduleClasses);
         roomOccupationRepo.deleteAllByClassCodeIn(foundClasses.stream().map(GeneralClass::getClassCode).toList());
-        /*Get the roomOccupations from scheduled classes and save them*/
-        List<RoomOccupation> newRoomOccupationList = autoScheduleClasses.stream().map(RoomOccupationMapper::mapFromGeneralClass).flatMap(List::stream).toList();
-        roomOccupationRepo.saveAll(newRoomOccupationList.stream().filter(ro -> (ro.getClassRoom()!=null || !ro.getClassRoom().isEmpty())).toList());
         return autoScheduleClasses;
     }
 
