@@ -75,7 +75,7 @@ public class V2ClassScheduler {
 
             if(!fixedTimeSlot) {// the class is not assigned time-slot yet
                 int KIP = classes.get(i).getCrew() == "S" ? 0 : 1;
-                for (int day = 0; day < 5; day++) {
+                for (int day = 0; day < 7; day++) {
                     for (int start = 1; start <= 6 - durations[i]; start++) {
                         int s = 12 * day + 6 * KIP + start;
                         domains[i].add(s);
