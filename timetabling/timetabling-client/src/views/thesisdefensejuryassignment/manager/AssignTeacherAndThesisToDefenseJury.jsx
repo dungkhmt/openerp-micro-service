@@ -35,7 +35,7 @@ function AssignTeacherAndThesisToDefenseJury() {
     thesisList?.sort(compare)
     return thesisList;
   }
-  const sortedThesisList = sortThesisInJuryTopicInFront(availableThesisList)
+  const sortedThesisList = sortThesisInJuryTopicInFront(availableThesisList);
   const handleChangeTab = (event, tabIndex) => {
     setActiveTab(tabIndex);
   };

@@ -60,13 +60,15 @@ const ModalJuryTopic = ({ open, handleClose, handleToggle, type = "CREATE", topi
     const [name, setName] = React.useState("");
     const handleFormSubmit = (e) => {
         e.preventDefault()
-        request("POST", '/jury-topic/save', (res) => {
-            if (res.data) {
-                successNoti(res.data, true)
-                handleClose();
-                handleToggle();
-            }
-        },
+        request("POST",
+            type === "CREATE" ?
+                '/jury-topic/save' : `/jury-topic/update/${topicId}`, (res) => {
+                    if (res.data) {
+                        successNoti(res.data, true)
+                        handleClose();
+                        handleToggle();
+                    }
+                },
             {
                 onError: (e) => {
                     errorNoti('Thêm mới thất bại', true)
@@ -87,11 +89,14 @@ const ModalJuryTopic = ({ open, handleClose, handleToggle, type = "CREATE", topi
             typeof value === "string" ? value.split(",") : value
         );
     };
-    // useEffect(()=>{
-    //     if (topicId && type==="UPDATE"){
-    //         request()
-    //     }
-    // },[type, topicId])
+    useEffect(() => {
+        if (topicId !== 0 && type === "UPDATE") {
+            request("GET", `/jury-topic/${topicId}`, (res) => {
+                setName(res?.data?.name)
+                setKeyword(res?.data?.academicKeywordList?.map((item) => item?.keyword))
+            })
+        }
+    }, [type, topicId])
     return (
         <Modal open={open}
             onClose={handleClose}
@@ -107,7 +112,7 @@ const ModalJuryTopic = ({ open, handleClose, handleToggle, type = "CREATE", topi
                         width: 900
                     }}>
                         <Typography variant="h4" mb={4} component={"h4"}>
-                            Thêm Phân ban mới
+                            {type === "CREATE" ? "Thêm Phân ban mới" : "Cập nhật thông tin phân ban"}
                         </Typography>
                         <Box sx={boxChildComponent} mb={3}>
                             <Grid container spacing={2}>
@@ -154,7 +159,8 @@ const ModalJuryTopic = ({ open, handleClose, handleToggle, type = "CREATE", topi
                             flexDirection={"row-reverse"}
                             marginTop={3}
                         >
-                            <PrimaryButton type="submit">Tạo phân ban</PrimaryButton>
+                            <PrimaryButton type="submit">
+                                {type === "CREATE" ? "Tạo phân ban" : "Cập nhật phân ban"}</PrimaryButton>
                         </Box>
                     </Box>
                 </form>

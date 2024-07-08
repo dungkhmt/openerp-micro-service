@@ -20,7 +20,11 @@ export default function StudentAssignedDefenseJury() {
         {
             title: "Phân ban",
             field: "juryTopicName",
-            render: (rowData) => rowData?.juryTopicName ? <KeywordChip keyword={rowData?.juryTopicName} /> : "Đang chờ phân công",
+            render: (rowData) => rowData?.juryTopicName ?
+                rowData?.secondJuryTopicName
+                    ? `(1)${rowData?.juryTopicName} (2)${rowData?.secondJuryTopicName}`
+                    : `${rowData?.juryTopicName}`
+                : "Đang chờ phân công",
         },
         {
             title: "Hội đồng được phân công",
