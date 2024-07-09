@@ -309,7 +309,7 @@ public class GeneralClassServiceImp implements GeneralClassService {
         request.forEach(updateRequest -> {
             RoomReservation updateRoomReservation = roomReservationMap.get(updateRequest.getRoomReservationId());
 
-            if (updateRequest.getStartTime() > updateRequest.getEndTime()) throw new InvalidFieldException("Tiết BĐ không thể lớn hơn tiết KT");
+            if ((updateRequest.getStartTime() != null && updateRequest.getEndTime() != null ) && updateRequest.getStartTime() > updateRequest.getEndTime()) throw new InvalidFieldException("Tiết BĐ không thể lớn hơn tiết KT");
 
             List<RoomOccupation> foundRoomOccupations = roomOccupationRepo.findAllBySemesterAndClassCodeAndDayIndexAndStartPeriodAndEndPeriodAndClassRoom(semester,
                     updateRoomReservation.getGeneralClass().getClassCode(),

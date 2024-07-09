@@ -59,6 +59,7 @@ const GeneralUploadScreen = () => {
                     ...timeSlot,
                     classCode: classObj.classCode,
                     id: classObj.id + `-${index + 1}`,
+                    crew:classObj.crew
                   })
                 );
                 delete cloneObj.timeSlots;
