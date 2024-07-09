@@ -147,9 +147,12 @@ const AssigningScreen = () => {
       (res) => {
         handleFetchData();
         successNoti("Sắp xếp tự động thành công", 5000);
-        setIsLoading(false);
+      },
+      (e) => {
+        errorNoti("Có lỗi xảy ra trong quá trình sắp xếp tự động", 5000);
       }
     );
+    setIsLoading(false);
   };
 
   const handleChangeStatusFilter = (e) => {
