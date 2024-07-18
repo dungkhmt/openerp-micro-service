@@ -1,10 +1,7 @@
 package openerp.openerpresourceserver.thesisdefensejuryassignment.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -47,9 +44,12 @@ public class ThesisDefensePlan implements Serializable {
 
     @Column(name="end_date")
     private Date endDate;
+//    @OneToMany(mappedBy = "thesisDefensePlan")
+////    @JsonIgnore
+//    private List<DefenseJury> defenseJuries;
     @OneToMany(mappedBy = "thesisDefensePlan")
-//    @JsonIgnore
-    private List<DefenseJury> defenseJuries;
+    @JsonIgnore
+    private List<JuryTopic> planTopicList;
 
     @OneToMany(mappedBy = "thesisDefensePlan")
 //    @JsonIgnore
@@ -131,13 +131,13 @@ public class ThesisDefensePlan implements Serializable {
         this.endDate = endDate;
     }
 
-    public List<DefenseJury> getDefenseJuries() {
-        return defenseJuries;
-    }
-
-    public void setDefenseJuries(List<DefenseJury> defenseJuries) {
-        this.defenseJuries = defenseJuries;
-    }
+//    public List<DefenseJury> getDefenseJuries() {
+//        return defenseJuries;
+//    }
+//
+//    public void setDefenseJuries(List<DefenseJury> defenseJuries) {
+//        this.defenseJuries = defenseJuries;
+//    }
 
     public List<Thesis> getThesisList() {
         return thesisList;
@@ -146,4 +146,13 @@ public class ThesisDefensePlan implements Serializable {
     public void setThesisList(List<Thesis> thesisList) {
         this.thesisList = thesisList;
     }
+
+    public List<JuryTopic> getPlanTopicList() {
+        return planTopicList;
+    }
+
+    public void setPlanTopicList(List<JuryTopic> planTopicList) {
+        this.planTopicList = planTopicList;
+    }
+
 }

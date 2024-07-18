@@ -23,8 +23,24 @@ public class DefenseSession implements Serializable {
     @Column(name = "name", unique = true, nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "defenseSession")
+    @OneToMany(mappedBy = "defenseSession", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<DefenseJury> defenseJuryList;
+    private List<DefenseJurySession> defenseJuryList;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
 }

@@ -1,5 +1,7 @@
 package openerp.openerpresourceserver.thesisdefensejuryassignment.service;
 
+import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.DefenseJuryDTO;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.ThesisDTO;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.DefenseJury;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.Teacher;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.Thesis;
@@ -14,14 +16,14 @@ public interface DefenseJuryService {
 
     public List<Teacher> getAllTeachers();
 
-    public DefenseJury getDefenseJuryByID(UUID id);
+    public DefenseJuryDTO getDefenseJuryByID(UUID id);
 
-    public List<Thesis> getAllAvailableThesiss(String thesisDefensePlanId);
+    public List<ThesisDTO> getAllAvailableThesiss(String thesisDefensePlanId);
 
     public String assignTeacherAndThesis(AssignTeacherAndThesisToDefenseJuryIM teacherAndThesisList);
 
     public DefenseJury assignReviewerToThesis(AssignReviewerToThesisIM teacherAndThesisList);
-    public List<Teacher> assignTeacherAutomatically(String thesisDefensePlanId, String defenseJuryId);
+    public List<Teacher> assignTeacherAutomatically(String thesisDefensePlanId, String defenseJuryId, AssignTeacherToDefenseJuryAutomaticallyIM thesisList);
 
     public String updateDefenseJury(UpdateDefenseJuryIM updateDefenseJuryIM);
 
@@ -30,4 +32,5 @@ public interface DefenseJuryService {
     public DefenseJury deleteDefenseJuryByID(UUID id);
 
     public List<Thesis> getAvailableThesisByJuryTopic(String thesisDefensePlanId, String defenseJuryId);
+
 }

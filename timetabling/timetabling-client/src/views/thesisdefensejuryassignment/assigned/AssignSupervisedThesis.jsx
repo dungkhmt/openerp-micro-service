@@ -26,7 +26,7 @@ const MenuProps = {
         },
     },
 };
-
+// - Phân ban cho đồ án đang hướng dẫn
 const AssignSupervisedThesis = () => {
     const { register, handleSubmit, formState: { errors } } = useForm({
         defaultValues: {
