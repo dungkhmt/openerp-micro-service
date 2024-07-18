@@ -1,6 +1,8 @@
 package openerp.openerpresourceserver.thesisdefensejuryassignment.controller;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.DefenseJuryDTO;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.ThesisDefensePlanDTO;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.ThesisDefensePlan;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.models.ThesisDefensePlanIM;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.models.UpdateThesisDefensePlanIM;
@@ -18,7 +20,7 @@ public class ThesisDefensePlanController {
     private ThesisDefensePlanService graduationTermService;
 
     @GetMapping("/get-all")
-    public ResponseEntity<List<ThesisDefensePlan>> getAllGraduationTerm (){
+    public ResponseEntity<List<ThesisDefensePlanDTO>> getAllGraduationTerm (){
         try{
             return new ResponseEntity<>(graduationTermService.getAllThesisDefensePlan(), HttpStatus.OK);
         }
@@ -47,7 +49,7 @@ public class ThesisDefensePlanController {
     }
 
     @GetMapping("/get-assigned-for-teacher/{teacherId}/{thesisDefensePlanId}")
-    public ResponseEntity<ThesisDefensePlan> getThesisDefensePlanAssignedForTeacherById (@PathVariable String teacherId, @PathVariable String thesisDefensePlanId ){
+    public ResponseEntity<List<DefenseJuryDTO>> getThesisDefensePlanAssignedForTeacherById (@PathVariable String teacherId, @PathVariable String thesisDefensePlanId ){
         System.out.println("Teacher "+ teacherId + "plan " + thesisDefensePlanId);
         try{
             return new ResponseEntity<>(graduationTermService.getThesisDefensePlanAssignedForTeacherWithTeacherId(teacherId, thesisDefensePlanId), HttpStatus.OK);
@@ -66,7 +68,7 @@ public class ThesisDefensePlanController {
         }
     }
     @GetMapping("/get-assigned-for-teacher/{teacherId}/{thesisDefensePlanId}/president")
-    public ResponseEntity<ThesisDefensePlan> getThesisDefensePlanAssignedForTeacherByIdAndRolePresident (@PathVariable String teacherId, @PathVariable String thesisDefensePlanId ){
+    public ResponseEntity<List<DefenseJuryDTO>> getThesisDefensePlanAssignedForTeacherByIdAndRolePresident (@PathVariable String teacherId, @PathVariable String thesisDefensePlanId ){
         System.out.println("Teacher "+ teacherId + "plan " + thesisDefensePlanId);
         try{
             return new ResponseEntity<>(graduationTermService.getThesisDefensePlanWithTeacherRoleAsPresidentAndTeacherIdById(teacherId, thesisDefensePlanId), HttpStatus.OK);

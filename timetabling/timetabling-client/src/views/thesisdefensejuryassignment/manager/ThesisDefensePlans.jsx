@@ -7,6 +7,7 @@ import PrimaryButton from "components/button/PrimaryButton";
 import { request } from "api";
 import ModalLoading from "components/common/ModalLoading";
 import EditIcon from '@mui/icons-material/Edit';
+// Màn quản lý đợt bảo vệ đồ án
 function ThesisDefensePlans() {
   const history = useHistory();
   const [loading, setLoading] = useState(true);
@@ -61,6 +62,7 @@ function ThesisDefensePlans() {
       "GET",
       `/thesis-defense-plan/get-all`,
       (res) => {
+        console.log(res.data);
         setPlans(res.data);
         setLoading(false)
       }

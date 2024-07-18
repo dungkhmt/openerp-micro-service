@@ -34,10 +34,10 @@ public class DefenseJury implements Serializable {
     @Column(name = "name", unique = true, nullable = false)
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "thesis_defense_plan_id", nullable = false, referencedColumnName = "id")
-    @JsonBackReference
-    private ThesisDefensePlan thesisDefensePlan;
+//    @ManyToOne
+//    @JoinColumn(name = "thesis_defense_plan_id", nullable = false, referencedColumnName = "id")
+//    @JsonBackReference
+//    private ThesisDefensePlan thesisDefensePlan;
 
     @CreatedDate
     @Column(name = "created_stamp")
@@ -52,9 +52,9 @@ public class DefenseJury implements Serializable {
     @JoinColumn(name ="defense_room_id", nullable = false, referencedColumnName = "id")
     private DefenseRoom defenseRoom;
 
-    @ManyToOne
-    @JoinColumn(name ="defense_session_id", nullable = false, referencedColumnName = "id")
-    private DefenseSession defenseSession;
+//    @ManyToOne
+//    @JoinColumn(name ="defense_session_id", nullable = false, referencedColumnName = "id")
+//    private DefenseSession defenseSession;
 
 //    @ManyToMany
 //    @JoinTable(
@@ -69,17 +69,24 @@ public class DefenseJury implements Serializable {
     @OneToMany(mappedBy = "defenseJury")
     private List<DefenseJuryTeacherRole> defenseJuryTeacherRoles;
 
+//    @ManyToOne
+//    @JoinColumn(name ="jury_topic_id", referencedColumnName = "id")
+//    private JuryTopic juryTopic;
+
     @ManyToOne
-    @JoinColumn(name ="jury_topic_id", referencedColumnName = "id")
-    private JuryTopic juryTopic;
+    @JoinColumn(name ="defense_jury_topic_id", referencedColumnName = "id")
+    @JsonIgnore
+    private JuryTopic planTopic;
 
     @Column(name = "isassigned")
     private boolean isAssigned;
+    @OneToMany(mappedBy = "defenseJury", cascade = CascadeType.ALL)
+    private List<DefenseJurySession> defenseJurySessionList;
     /*----------------------------------------------------------------*/
     public DefenseJury (Date defenseDate, String name, ThesisDefensePlan thesisDefensePlan, Date createdTime, int maxThesis,LocalDateTime updatedDateTime){
         this.defenseDate = defenseDate;
         this.name = name;
-        this.thesisDefensePlan = thesisDefensePlan;
+//        this.thesisDefensePlan = thesisDefensePlan;
         this.createdTime = createdTime;
         this.updatedDateTime = updatedDateTime;
         this.maxThesis = maxThesis;
@@ -93,13 +100,13 @@ public class DefenseJury implements Serializable {
         this.defenseDate = defenseDate;
     }
 
-    public ThesisDefensePlan getThesisDefensePlan() {
-        return thesisDefensePlan;
-    }
-
-    public void setThesisDefensePlan(ThesisDefensePlan thesisDefensePlan) {
-        this.thesisDefensePlan = thesisDefensePlan;
-    }
+//    public ThesisDefensePlan getThesisDefensePlan() {
+//        return thesisDefensePlan;
+//    }
+//
+//    public void setThesisDefensePlan(ThesisDefensePlan thesisDefensePlan) {
+//        this.thesisDefensePlan = thesisDefensePlan;
+//    }
 
     public Date getCreatedTime() {
         return createdTime;
@@ -141,9 +148,9 @@ public class DefenseJury implements Serializable {
 //        this.academicKeywordList = academicKeywordList;
 //    }
 
-    public String getThesisDefensePlanId() {
-        return thesisDefensePlan.getId();
-    }
+//    public String getThesisDefensePlanId() {
+//        return thesisDefensePlan.getId();
+//    }
 
     public DefenseRoom getDefenseRoom() {
         return defenseRoom;
@@ -153,13 +160,13 @@ public class DefenseJury implements Serializable {
         this.defenseRoom = defenseRoom;
     }
 
-    public DefenseSession getDefenseSession() {
-        return defenseSession;
-    }
-
-    public void setDefenseSession(DefenseSession defenseSession) {
-        this.defenseSession = defenseSession;
-    }
+//    public DefenseSession getDefenseSession() {
+//        return defenseSession;
+//    }
+//
+//    public void setDefenseSession(DefenseSession defenseSession) {
+//        this.defenseSession = defenseSession;
+//    }
 
     public UUID getId() {
         return id;
@@ -193,11 +200,19 @@ public class DefenseJury implements Serializable {
         isAssigned = assigned;
     }
 
-    public JuryTopic getJuryTopic() {
-        return juryTopic;
+    public JuryTopic getPlanTopic() {
+        return planTopic;
     }
 
-    public void setJuryTopic(JuryTopic juryTopic) {
-        this.juryTopic = juryTopic;
+    public void setPlanTopic(JuryTopic planTopic) {
+        this.planTopic = planTopic;
+    }
+
+    public List<DefenseJurySession> getDefenseJurySessionList() {
+        return defenseJurySessionList;
+    }
+
+    public void setDefenseJurySessionList(List<DefenseJurySession> defenseJurySessionList) {
+        this.defenseJurySessionList = defenseJurySessionList;
     }
 }
