@@ -1,5 +1,7 @@
 package openerp.openerpresourceserver.thesisdefensejuryassignment.service;
 
+import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.DefenseJuryDTO;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.ThesisDefensePlanDTO;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.ThesisDefensePlan;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.models.AssignTeacherAndThesisToDefenseJuryIM;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.models.ThesisDefensePlanIM;
@@ -8,7 +10,7 @@ import openerp.openerpresourceserver.thesisdefensejuryassignment.models.UpdateTh
 import java.util.List;
 
 public interface ThesisDefensePlanService {
-    List<ThesisDefensePlan> getAllThesisDefensePlan();
+    List<ThesisDefensePlanDTO> getAllThesisDefensePlan();
 
     ThesisDefensePlan createThesisDefensePlan(ThesisDefensePlanIM graduationTerm);
 
@@ -16,9 +18,9 @@ public interface ThesisDefensePlanService {
 
     List<ThesisDefensePlan> getAllThesisDefensePlanAssignedForTeacherWithId(String teacherId);
 
-    ThesisDefensePlan getThesisDefensePlanAssignedForTeacherWithTeacherId(String teacherId, String thesisDefensePlanId);
+    List<DefenseJuryDTO> getThesisDefensePlanAssignedForTeacherWithTeacherId(String teacherId, String thesisDefensePlanId);
 
-    ThesisDefensePlan getThesisDefensePlanWithTeacherRoleAsPresidentAndTeacherIdById(String teacherId, String thesisDefensePlanId);
+    List<DefenseJuryDTO> getThesisDefensePlanWithTeacherRoleAsPresidentAndTeacherIdById(String teacherId, String thesisDefensePlanId);
 
     List<ThesisDefensePlan> getAllThesisDefensePlanAssignedForTeacherAsPresidentWithId(String teacherId);
 
