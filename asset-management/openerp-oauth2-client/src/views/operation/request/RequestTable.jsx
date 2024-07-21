@@ -26,7 +26,7 @@ import { Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTi
 import { GiSandsOfTime } from 'react-icons/gi';
 import { FcApproval, FcDisapprove } from "react-icons/fc";
 
-const RequestTable = ({ request123 }) => {
+const RequestTable = () => {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [requestName, setRequestName] = useState("");
@@ -50,6 +50,8 @@ const RequestTable = ({ request123 }) => {
     const [openReject, setOpenReject] = useState(false);
     const [openPayback, setOpenPayback] = useState(false);
 
+    const [userId, setUserId] = useState("");
+
     const getAllAvailableAssets = async() => {
         request("get", "/asset/get-all-available", (res) => {
             setAssets(res.data);
@@ -64,7 +66,9 @@ const RequestTable = ({ request123 }) => {
 
     const getAllRequests = async() => {
         await request("get", "/request/get-all", (res) => {
-            setRequests(res.data);
+            console.log("res", res);
+            setRequests(res.data.data);
+            setUserId(res.data.user);
         }).then();
         
     };
@@ -369,7 +373,8 @@ const RequestTable = ({ request123 }) => {
             title: "Approve",
             sorting: false,
             render: (rowData) => {
-                if(rowData.status === 0){
+                console.log("row data", rowData);
+                if(rowData.status === 0 && rowData.admin_id === userId){
                     return <IconButton
                         onClick={() => {
                             handleApprove(rowData)
@@ -388,7 +393,7 @@ const RequestTable = ({ request123 }) => {
         {
             title: "Reject",
             render: (rowData) => {
-                if(rowData.status === 0){
+                if(rowData.status === 0 && rowData.admin_id === userId){
                     return <IconButton
                         onClick={() => {
                             handleReject(rowData)
@@ -407,7 +412,7 @@ const RequestTable = ({ request123 }) => {
             title: "Edit",
             sorting: false,
             render: (rowData) => {
-                if(rowData.status === 0){
+                if(rowData.status === 0 && rowData.admin_id === userId){
                     return <IconButton
                         onClick={() => {
                             handleEdit(rowData)
@@ -425,23 +430,27 @@ const RequestTable = ({ request123 }) => {
         {
             title: "Delete",
             sorting: false,
-            render: (rowData) => (
-                <IconButton
-                    onClick={() => {
-                        handleDelete(rowData)
-                    }}
-                    variant="contained"
-                    color="error"
-                >
-                    <DeleteIcon/>
-                </IconButton>
-            ),
+            render: (rowData) => {
+                if(rowData.admin_id === userId){
+                    return <IconButton
+                        onClick={() => {
+                            handleDelete(rowData)
+                        }}
+                        variant="contained"
+                        color="error"
+                    >
+                        <DeleteIcon/>
+                    </IconButton>
+                } else {
+                    return ``;
+                }
+            },
         },
         {
             title: "Payback",
             sorting: false,
             render: (rowData) => {
-                if(rowData["status"] === 1 && !rowData.parent_id){
+                if(rowData["status"] === 1 && !rowData.parent_id && rowData.user_id === userId){
                     return (
                         <Button
                             variant="contained"

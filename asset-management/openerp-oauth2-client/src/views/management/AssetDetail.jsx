@@ -22,6 +22,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { request } from "api";
 import { BiDetail } from "react-icons/bi";
 import { errorNoti, successNoti } from "utils/notification";
@@ -51,9 +55,13 @@ const AssetDetail = () => {
   const params = useParams();
   const history = useHistory();
 
+  const [currentUser, setCurrentUser] = useState("");
+
   const [assetDetail, setAssetDetail] = useState({});
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [openAssign, setOpenAssign] = useState(false);
+  const [openRevoke, setOpenRevoke] = useState(false);
   const [openRepair, setOpenRepair] = useState(false);
   const [openDeprecated, setOpenDeprecated] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -63,12 +71,16 @@ const AssetDetail = () => {
   const [types, setTypes] = useState([]);
   const [users, setUsers] = useState([]);
 
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [locationName, setLocationName] = useState("");
   const [vendorName, setVendorName] = useState("");
   const [typeName, setTypeName] = useState("");
   const [admin, setAdmin] = useState("");
+  const [assignee, setAssignee] = useState("");
 
   let status = "";
   let type_name = "";
@@ -86,6 +98,19 @@ const AssetDetail = () => {
     boxShadow: 24,
     p: 4,
     gap: "30px",
+  };
+
+  const convertToDate = (date_time) => {
+    const dateString = date_time;
+    const dateObj = new Date(dateString);
+    const options = { month: "2-digit", day: "2-digit", year: "numeric" };
+    return dateObj.toLocaleDateString("en-US", options);
+  };
+
+  const getCurrentUser = async() => {
+    await request("get", "/user/current-user", (res) => {
+      setCurrentUser(res.data);
+    });
   };
 
   const getAssetDetail = async () => {
@@ -171,13 +196,21 @@ const AssetDetail = () => {
     },
   };
 
-	const successHandlerDelete = () => {
-		successNoti("DELETE ASSET SUCCESSFULLY", 3000);
-		history.push("/assets");
-	};
+  const successHandlerDelete = () => {
+    successNoti("DELETE ASSET SUCCESSFULLY", 3000);
+    history.push("/assets");
+  };
 
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleCloseAssign = () => {
+    setOpenAssign(false);
+  };
+
+  const handleCloseRevoke = () => {
+    setOpenRevoke(false);
   };
 
   const handleCloseRepair = () => {
@@ -216,9 +249,23 @@ const AssetDetail = () => {
     handleClose();
   };
 
+  const handleSubmitAssign = (e) => {
+    e.preventDefault();
+    request("put", `/asset/assign/${params.id}/${assignee}`, successHandler, errorHandlers, {});
+    handleCloseAssign();
+  };
+
   const handleEdit = () => {
     initData();
     setOpen(true);
+  };
+
+  const handleAssign = () => {
+    setOpenAssign(true);
+  };
+
+  const handleRevoke = () => {
+    setOpenRevoke(true)
   };
 
   const handleRepair = () => {
@@ -233,36 +280,65 @@ const AssetDetail = () => {
     setOpenDelete(true);
   };
 
-	const handleCloseDelete = ()  => {
-		setOpenDelete(false);
-	};
+  const handleCloseDelete = () => {
+    setOpenDelete(false);
+  };
 
-  const repairApi = async() => {
+  const revokeApi = async() => {
+    await request("put", `/asset/revoke/${params.id}`, successHandler, errorHandlers, {});
+    setOpenRevoke(false);
+  };
+
+  const repairApi = async () => {
     let is_repair = true;
-    if(assetDetail["status_id"] === 1 || assetDetail["status_id"] === 2){
-      await request("put", `/asset/repair/${params.id}/${is_repair}`, successHandler, errorHandlers, {});
-    }
-    else if(assetDetail["status_id"] === 3){
+    if (assetDetail["status_id"] === 1 || assetDetail["status_id"] === 2) {
+      await request(
+        "put",
+        `/asset/repair/${params.id}/${is_repair}`,
+        successHandler,
+        errorHandlers,
+        {}
+      );
+    } else if (assetDetail["status_id"] === 3) {
       is_repair = false;
-      await request("put", `/asset/repair/${params.id}/${is_repair}`, successHandler, errorHandlers, {});
+      await request(
+        "put",
+        `/asset/repair/${params.id}/${is_repair}`,
+        successHandler,
+        errorHandlers,
+        {}
+      );
     }
-    
+
     setOpenRepair(false);
   };
 
-  const deprecatedApi = async() => {
-    await request("put", `/asset/deprecated/${params.id}`, successHandler, errorHandlers, {});
+  const deprecatedApi = async () => {
+    await request(
+      "put",
+      `/asset/deprecated/${params.id}`,
+      successHandler,
+      errorHandlers,
+      {}
+    );
     setOpenDeprecated(false);
   };
 
-	const deleteApi = () => {
-		request("delete", `/asset/delete/${params.id}`, successHandlerDelete, errorHandlers, {});
-		setOpenDelete(false);
-	};
+  const deleteApi = () => {
+    request(
+      "delete",
+      `/asset/delete/${params.id}`,
+      successHandlerDelete,
+      errorHandlers,
+      {}
+    );
+    setOpenDelete(false);
+  };
 
   syncData();
 
   useEffect(() => {
+    getCurrentUser();
     getAssetDetail();
     getAllLocations();
     getAllVendors();
@@ -286,10 +362,17 @@ const AssetDetail = () => {
           title={<Typography variant="h5">Asset Detail</Typography>}
         />
         <div style={{ float: "right", paddingRight: "20px" }}>
-          {/* {assetDetail["status_id"] === 1 && <Button>Assign</Button>} */}
+          {assetDetail["status_id"] === 1 && assetDetail["admin_id"] === currentUser && (
+            <Button onClick={handleAssign}>Assign</Button>
+          )}
+          {assetDetail["status_id"] === 2 && (
+            <Button onClick={handleRevoke}>Revoke</Button>
+          )}
           <Button onClick={handleEdit}>Edit</Button>
           <Button onClick={handleRepair}>Repair</Button>
-          {assetDetail["status_id"] !== 4 && <Button onClick={handleDeprecated}>Deprecated</Button>}
+          {assetDetail["status_id"] !== 4 && (
+            <Button onClick={handleDeprecated}>Deprecated</Button>
+          )}
           <Button onClick={handleDelete}>Delete</Button>
         </div>
         <CardContent style={{ paddingTop: "20px" }}>
@@ -337,7 +420,7 @@ const AssetDetail = () => {
           </Grid>
         </CardContent>
       </Card>
-      
+
       <Modal
         open={open}
         aria-labelledby="modal-modal-title"
@@ -461,6 +544,103 @@ const AssetDetail = () => {
           </form>
         </Box>
       </Modal>
+      <Modal
+        open={openAssign}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        onClose={handleCloseAssign}
+      >
+        <Box sx={style}>
+          <div>Assign asset</div>
+          <hr />
+          <form onSubmit={handleSubmitAssign}>
+            <FormControl
+              sx={{ marginLeft: "20px", width: 500, marginTop: "20px" }}
+            >
+              <InputLabel id="demo-simple-select-label">Admin</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={assignee}
+                label="Admin"
+                fullWidth
+                onChange={(e) => setAssignee(e.target.value)}
+                renderValue={() => assignee}
+              >
+                {users.map((user) => (
+                  <MenuItem key={user.id} value={user.id}>
+                    {user.id}
+                  </MenuItem>
+                ))}
+              </Select>
+              {/* <LocalizationProvider
+                dateAdapter={AdapterDayjs}
+                className="date-adapter"
+              >
+                <DemoContainer components={["DatePicker", "DatePicker"]}>
+                  <DatePicker
+                    className="date-picker-request"
+                    label="Start Date"
+                    value={startDate}
+                    onChange={(newValue) => setStartDate(newValue)}
+                  />
+                  <DatePicker
+                    className="date-picker-request"
+                    label="End Date"
+                    value={endDate}
+                    onChange={(newValue) => setEndDate(newValue)}
+                  />
+                </DemoContainer>
+              </LocalizationProvider> */}
+            </FormControl>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop: "20px",
+              }}
+            >
+              <Button
+                variant="outlined"
+                color="primary"
+                type="cancel"
+                onClick={handleCloseAssign}
+              >
+                Cancel
+              </Button>
+              <Button variant="contained" color="primary" type="submit">
+                Asssign
+              </Button>
+            </div>
+          </form>
+        </Box>
+      </Modal>
+      <Dialog
+        open={openRevoke}
+        onClose={handleCloseRevoke}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"REVOKE THIS ASSET"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Do you want to revoke this asset. Assignee cannot use this asset. It cannot be undone?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="outlined" onClick={handleCloseRevoke}>
+            CANCEL
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={revokeApi}
+            autoFocus
+          >
+            REVOKE
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Dialog
         open={openRepair}
         onClose={handleCloseRepair}
@@ -470,7 +650,9 @@ const AssetDetail = () => {
         <DialogTitle id="alert-dialog-title">{"REPAIR THIS ASSET"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            {assetDetail["status_id"] !== 3 ? `Do you want to repair this asset. This asset will be repaired and cannot be used when finish repairing.` : `Finish repairing this asset? Now it will be available and can be use.`}
+            {assetDetail["status_id"] !== 3
+              ? `Do you want to repair this asset. This asset will be repaired and cannot be used when finish repairing.`
+              : `Finish repairing this asset? Now it will be available and can be use.`}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -493,10 +675,13 @@ const AssetDetail = () => {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"DEPRECATE THIS ASSET"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">
+          {"DEPRECATE THIS ASSET"}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Do you want to deprecate this asset. This asset will be deprecated and cannot be used anymore.
+            Do you want to deprecate this asset. This asset will be deprecated
+            and cannot be used anymore.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

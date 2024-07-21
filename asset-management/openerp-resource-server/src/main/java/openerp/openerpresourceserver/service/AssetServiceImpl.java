@@ -61,6 +61,7 @@ public class AssetServiceImpl implements AssetService{
         newAsset.setName(asset.getName());
         AssetType assetType = assetTypeRepo.findById(asset.getType_id()).get();
         newAsset.setType_id(assetType.getId());
+        newAsset.setPrice(asset.getPrice());
         Integer num_assets = assetType.getNum_assets();
         assetType.setNum_assets(num_assets + 1);
 
@@ -99,6 +100,7 @@ public class AssetServiceImpl implements AssetService{
         Asset foundAsset = assetRepo.findById(Id).get();
         foundAsset.setName(asset.getName());
         foundAsset.setDescription(asset.getDescription());
+        foundAsset.setPrice(asset.getPrice());
 
         foundAsset.setVendor_id(asset.getVendor_id());
         foundAsset.setLocation_id(asset.getLocation_id());
@@ -143,7 +145,7 @@ public class AssetServiceImpl implements AssetService{
     @Override
     public Asset assignAsset(Integer Id, String user_id, String admin_id) {
         Asset foundAsset = assetRepo.findById(Id).get();
-        if(!foundAsset.getAssignee_id().equals(admin_id)){
+        if(!foundAsset.getAdmin_id().equals(admin_id)){
             return null;
         }
         if(!foundAsset.getStatus_id().equals(AVAILABLE)){
@@ -156,9 +158,9 @@ public class AssetServiceImpl implements AssetService{
     }
 
     @Override
-    public Asset revokeAsset(Integer Id, String user_id, String admin_id) {
+    public Asset revokeAsset(Integer Id, String admin_id) {
         Asset foundAsset = assetRepo.findById(Id).get();
-        if(!foundAsset.getAssignee_id().equals(admin_id)){
+        if(!foundAsset.getAdmin_id().equals(admin_id)){
             return null;
         }
         if(!foundAsset.getStatus_id().equals(INUSE)){

@@ -23,7 +23,7 @@ public interface AssetService {
 
     Asset assignAsset(Integer Id, String user_id, String admin_id);
 
-    Asset revokeAsset(Integer Id, String user_id, String admin_id);
+    Asset revokeAsset(Integer Id, String admin_id);
 
     Asset repairAsset(Integer Id, String admin_id, Boolean is_repair);
 

@@ -33,6 +33,7 @@ const AssetTable = () => {
     const [vendorName, setVendorName] = useState("");
     const [type, setType] = useState("");
     const [admin, setAdmin] = useState("");
+    const [assetPrice, setAssetPrice] = useState("");
 
     const [title, setTitle] = useState("");
     const [assets, setAssets] = useState([]);
@@ -99,6 +100,7 @@ const AssetTable = () => {
     const resetData = () => {
         setAssetName("");
         setDescription("");
+        setAssetPrice("");
         setLocationName("");
         setVendorName("");
         setType("");
@@ -123,6 +125,7 @@ const AssetTable = () => {
             description: description,
             location_id: foundLocation ? foundLocation.id : 0,
             vendor_id: foundVendor ? foundVendor.id : 0,
+            price: parseInt(assetPrice),
             type_id: foundType ? foundType.id : 0,
             admin_id: foundAdmin.id
         };
@@ -140,6 +143,7 @@ const AssetTable = () => {
     const handleEdit = (asset) => {
         setAssetName(asset.name);
         setDescription(asset.description);
+        setAssetPrice(asset.price);
         const foundLocation = locations.find(location => location.id === asset.location_id);
         const foundVendor = vendors.find(vendor => vendor.id === asset.vendor_id);
         const foundType = types.find(typ => typ.id === asset.type_id);
@@ -164,7 +168,6 @@ const AssetTable = () => {
     };
 
     const deleteApi = () => {
-        console.log("current id", currentId);
         request("delete", `/asset/delete/${currentId}`, successHandlerDelete, errorHandlers, {});
         setOpenDelete(false);
     };    
@@ -273,6 +276,13 @@ const AssetTable = () => {
             }
         },
         {
+            title: "Price",
+            field: "price",
+            render: (rowData) => (
+                <div>{rowData.price}đ</div>
+            )
+        },
+        {
             title: "Location",
             field: "location",
             render: (rowData) => {
@@ -377,6 +387,16 @@ const AssetTable = () => {
                             onChange={(e) => setDescription(e.target.value)}
                             value={description}
                         />
+                        <TextField
+                            label="Asset Price"
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            name='price'
+                            placeholder='Asset price'
+                            onChange={(e) => setAssetPrice(e.target.value)}
+                            value={assetPrice}
+                        />
                         <FormControl sx={{ minWidth: 255, marginTop: "20px" }}>
                             <InputLabel id="demo-simple-select-label">Type</InputLabel>
                             <Select
@@ -429,7 +449,6 @@ const AssetTable = () => {
                                 value={vendorName}
                                 label="Vendor"
                                 onChange={(e) => setVendorName(e.target.value)}
-                                // renderValue={() => data.vendor_name}
                             >
                                 {vendors.map((vendor) => (
                                     <MenuItem key={vendor.id} value={vendor.name}>{vendor.name}</MenuItem>

@@ -23,7 +23,7 @@ export default function PieActiveArc() {
 
   const getAllRequests = async () => {
     await request("get", "/request/get-all", (res) => {
-      setData(res.data);
+      setData(res.data.data);
     });
   };
 

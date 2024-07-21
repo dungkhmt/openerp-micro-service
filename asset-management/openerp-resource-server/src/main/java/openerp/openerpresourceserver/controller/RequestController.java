@@ -10,7 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor(onConstructor_ = @Autowired)
@@ -23,9 +25,12 @@ public class RequestController {
     public ResponseEntity<?> getAllRequests(Principal principal){
         List<Request> requests = requestService.getAllRequests();
         String userId = principal.getName();
+        Map<String, Object> response = new HashMap<>();
+        response.put("user", userId);
+        response.put("data", requests);
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(requests);
+            .body(response);
     }
 
     @GetMapping("/id/{Id}")

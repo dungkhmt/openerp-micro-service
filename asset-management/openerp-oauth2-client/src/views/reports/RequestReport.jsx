@@ -19,7 +19,7 @@ const RequestReport = () => {
 
   const getAllTotalRequests = async() => {
     await request("get", "/request/get-all", (res) => {
-      setAllRequests(res.data);
+      setAllRequests(res.data.data);
     });
   };
 

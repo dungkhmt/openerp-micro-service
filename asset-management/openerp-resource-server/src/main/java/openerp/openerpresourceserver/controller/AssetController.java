@@ -95,10 +95,10 @@ public class AssetController {
             .body(asset);
     }
 
-    @PutMapping("/revoke/{Id}/{userId}")
-    public ResponseEntity<?> revokeAsset(@PathVariable Integer Id, @PathVariable String userId, Principal principal){
+    @PutMapping("/revoke/{Id}")
+    public ResponseEntity<?> revokeAsset(@PathVariable Integer Id, Principal principal){
         String admin_id = principal.getName();
-        Asset asset = assetService.revokeAsset(Id, userId, admin_id);
+        Asset asset = assetService.revokeAsset(Id, admin_id);
         assetLogService.createNewAssetLog(asset.getId(), admin_id, "revoke");
         return ResponseEntity
             .status(HttpStatus.OK)
