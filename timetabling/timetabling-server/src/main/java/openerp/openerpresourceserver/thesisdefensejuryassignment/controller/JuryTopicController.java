@@ -31,9 +31,9 @@ public class JuryTopicController {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<JuryTopic> getJuryTopicById(@PathVariable int id) {
-        JuryTopic res = juryTopicService.getById(id);
+    @GetMapping("/{thesisDefensePlanId}")
+    public ResponseEntity<List<JuryTopic>> getJuryTopicById(@PathVariable String thesisDefensePlanId) {
+        List<JuryTopic> res = juryTopicService.getAllByThesisDefensePlanId(thesisDefensePlanId);
         if (res == null){
             return new ResponseEntity<>(res, HttpStatus.BAD_REQUEST);
         }

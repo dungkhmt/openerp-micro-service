@@ -12,6 +12,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { request } from "api";
 import { successNoti, errorNoti } from "utils/notification";
 import useAssignTeacherThesis from "hooks/useAssignTeacherThesis";
+// Màn chỉnh sửa phân công giáo viên và đồ án vào hội đồng
 export const EditTeacherAndThesisToDefenseJury = () => {
     const { id, juryId } = useParams();
     const history = useHistory();
@@ -94,7 +95,7 @@ export const EditTeacherAndThesisToDefenseJury = () => {
                 defenseJuryId: juryId,
                 defenseJuryTeacherRole: assignedTeacher?.map((item) => ({
                     teacherName: item?.id,
-                    roleId: item?.role,
+                    roleId: item?.role ? item?.role : "",
                 })),
                 thesisIdList: assignedThesis,
             }

@@ -3,7 +3,6 @@ import { useKeycloak } from "@react-keycloak/web";
 import PrimaryButton from "components/button/PrimaryButton";
 import { useHistory, useParams } from "react-router-dom";
 import KeywordChip from "components/common/KeywordChip";
-// import { makeStyles } from "@material-ui/core/styles";
 import { makeStyles } from "@mui/styles";
 import { Verified, PendingActions } from '@mui/icons-material';
 import { Chip } from "@mui/material";
@@ -23,6 +22,8 @@ const useStyles = makeStyles((theme) => ({
         fontSize: "1rem",
     },
 }));
+
+// - Theo dõi hội đồng được phân công của chủ tịch
 export default function PresidentAssignedDefenseJury() {
     const classes = useStyles();
     const params = useParams();
@@ -35,6 +36,11 @@ export default function PresidentAssignedDefenseJury() {
             title: "Ngày",
             field: "defenseDate",
             render: (rowData) => rowData.defenseDate.split("T")[0],
+        },
+        {
+            title: "Ca bảo vệ",
+            field: "defenseSession",
+            render: (rowData) => rowData?.defenseSession?.map(({ name }) => name)?.join(" & ")
         },
         {
             title: "Phân ban", field: "juryTopic",
@@ -91,7 +97,7 @@ export default function PresidentAssignedDefenseJury() {
         },
     ];
     const { loading, data } = useFetch(`thesis-defense-plan/get-assigned-for-teacher/${keycloak?.tokenParsed?.email}/${id}/president`);
-    const defenseJuries = data?.defenseJuries?.map((item) => ({
+    const defenseJuries = data?.map((item) => ({
         ...item,
         juryTopic: item?.juryTopic?.name,
         keywords: item?.juryTopic?.academicKeywordList?.map((item) => item.keyword),

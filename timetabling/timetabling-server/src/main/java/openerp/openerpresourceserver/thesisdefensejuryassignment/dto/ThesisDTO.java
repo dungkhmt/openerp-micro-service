@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.thesisdefensejuryassignment.dto;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.AcademicKeyword;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +24,17 @@ public class ThesisDTO {
     private String juryTopicName;
 
     private String secondJuryTopicName;
+    private String studentName;
+
+    public String getStudentName() {
+        return studentName;
+    }
+
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
+    }
+
+    private List<AcademicKeyword> academicKeywordList;
 
     public String getDefenseJuryName() {
         return defenseJuryName;
@@ -103,5 +115,13 @@ public class ThesisDTO {
 
     public void setSecondJuryTopicName(String secondJuryTopicName) {
         this.secondJuryTopicName = secondJuryTopicName;
+    }
+
+    public List<AcademicKeyword> getAcademicKeywordList() {
+        return academicKeywordList;
+    }
+
+    public void setAcademicKeywordList(List<AcademicKeyword> academicKeywordList) {
+        this.academicKeywordList = academicKeywordList;
     }
 }

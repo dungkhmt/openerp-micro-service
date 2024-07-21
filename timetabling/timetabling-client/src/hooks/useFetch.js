@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
 import { request } from "api";
+/**
+ * Custom hook để lấy các dữ liệu cho các trang tĩnh
+ * @Input: API endpoint
+ *
+ */
 export function useFetch(url, method = "GET") {
   const [data, setData] = useState();
   const [loading, setLoading] = useState(true);

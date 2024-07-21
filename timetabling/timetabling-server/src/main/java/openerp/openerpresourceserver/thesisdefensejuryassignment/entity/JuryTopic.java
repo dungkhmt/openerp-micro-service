@@ -31,14 +31,23 @@ public class JuryTopic {
     )
     private List<AcademicKeyword> academicKeywordList;
 
-//    @OneToMany(mappedBy = "juryTopic")
-//    @JsonIgnore
-//    private List<DefenseJury> defenseJuryList;
+    @ManyToOne
+    @JoinColumn(name = "thesis_defense_plan_id", nullable = false, referencedColumnName = "id")
+    @JsonIgnore
+    private ThesisDefensePlan thesisDefensePlan;
+
+    @ManyToOne
+    @JoinColumn(name = "monitor_teacher_id", nullable = false, referencedColumnName = "id")
+    private Teacher teacher;
+
+    @OneToMany(mappedBy = "planTopic")
+    private List<DefenseJury> defenseJuryList;
 
 
-    public JuryTopic(String name, List<AcademicKeyword> academicKeywordList) {
+    public JuryTopic(String name, List<AcademicKeyword> academicKeywordList, Teacher teacher) {
         this.name = name;
         this.academicKeywordList = academicKeywordList;
+        this.teacher = teacher;
     }
 
     public int getId() {
@@ -65,11 +74,27 @@ public class JuryTopic {
         this.academicKeywordList = academicKeywordList;
     }
 
-//    public List<DefenseJury> getDefenseJury() {
-//        return defenseJuryList;
-//    }
-//
-//    public void setDefenseJury(List<DefenseJury> defenseJury) {
-//        this.defenseJuryList = defenseJury;
-//    }
+    public ThesisDefensePlan getThesisDefensePlan() {
+        return thesisDefensePlan;
+    }
+
+    public void setThesisDefensePlan(ThesisDefensePlan thesisDefensePlan) {
+        this.thesisDefensePlan = thesisDefensePlan;
+    }
+
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
+    }
+
+    public List<DefenseJury> getDefenseJuryList() {
+        return defenseJuryList;
+    }
+
+    public void setDefenseJuryList(List<DefenseJury> defenseJury) {
+        this.defenseJuryList = defenseJury;
+    }
 }

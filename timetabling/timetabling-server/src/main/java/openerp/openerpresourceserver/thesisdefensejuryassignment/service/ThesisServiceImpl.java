@@ -108,7 +108,6 @@ public class ThesisServiceImpl implements ThesisService{
 
     @Override
     public Thesis getById(String id) {
-
         return thesisRepo.findById(UUID.fromString(id)).orElse(null);
     }
 
@@ -155,5 +154,4 @@ public class ThesisServiceImpl implements ThesisService{
         }
         return thesisDTO;
     }
-
 }

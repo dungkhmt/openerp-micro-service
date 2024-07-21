@@ -8,6 +8,7 @@ import { Select, Card, MenuItem, FormControl, InputLabel } from '@mui/material';
 import PrimaryButton from 'components/button/PrimaryButton';
 import { useHistory, Link } from "react-router-dom";
 import useQuery from 'hooks/useQuery';
+// - Trang theo dõi đồ án đang hướng dẫn
 const SuperviseThesisList = () => {
     const [currentThesisDefensePlan, setCurrentThesisDefensePlan] = useState("");
     const { keycloak } = useKeycloak();

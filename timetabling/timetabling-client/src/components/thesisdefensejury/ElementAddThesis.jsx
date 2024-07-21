@@ -2,6 +2,10 @@ import React from "react";
 import { StandardTable } from "erp-hust/lib/StandardTable";
 import KeywordChip from "components/common/KeywordChip";
 import { Checkbox } from "@mui/material";
+/**
+ * Component để chọn đồ án trong hội đồng
+ * 
+ */
 export default function ElementAddThesis({ availableThesisList, assignedThesis, handleSelectThesis }) {
     const columns = [
         {
@@ -20,7 +24,7 @@ export default function ElementAddThesis({ availableThesisList, assignedThesis, 
         {
             title: "Phân ban",
             field: "juryTopic",
-            render: (rowData) => rowData?.secondaryJuryTopic ? `(1)${rowData?.juryTopic?.name} (2)${rowData?.secondaryJuryTopic?.name}` : `${rowData?.juryTopic?.name}`,
+            render: (rowData) => rowData?.secondaryJuryTopicName ? `(1)${rowData?.juryTopicName} (2)${rowData?.secondaryJuryTopicName}` : `${rowData?.juryTopicName}`,
         },
         {
             title: "Keyword",
@@ -37,7 +41,7 @@ export default function ElementAddThesis({ availableThesisList, assignedThesis, 
         {
             title: "Giáo viên",
             field: "supervisor",
-            render: (rowData) => rowData?.supervisor?.teacherName,
+            render: (rowData) => rowData?.supervisor,
         },
     ];
     return (
