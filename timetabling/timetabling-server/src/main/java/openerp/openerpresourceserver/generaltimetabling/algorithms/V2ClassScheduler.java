@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.generaltimetabling.algorithms;
 
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.generaltimetabling.exception.InvalidClassStudentQuantityException;
+import openerp.openerpresourceserver.generaltimetabling.exception.InvalidFieldException;
 import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
 import openerp.openerpresourceserver.generaltimetabling.helper.MassExtractor;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
@@ -9,7 +10,6 @@ import openerp.openerpresourceserver.generaltimetabling.model.entity.general.Gen
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 @Log4j2
@@ -34,66 +34,81 @@ public class V2ClassScheduler {
             log.info("Chưa chọn lớp!");
             return null;
         }
+        classes.sort(Comparator.comparing(GeneralClass::hasNonNullTimeSlot).reversed());
         List<int[]> conflict = new ArrayList<int[]>();
         int[] durations = classes.stream().filter(c -> c.getMass() != null).mapToInt(c -> MassExtractor.extract(c.getMass())).toArray();
-//        int[] durations = new int[n];
-//        for(int i = 0; i < classes.size(); i++){
-//            durations[i] = classes.get(i).getDuration();
-//        }
-
         int[] splitDurations = new int[150];
+        int[] days = {0, 2, 4, 1, 3};
         int periodIdx = 0;
         HashMap<Integer, Integer> scheduleMap = new HashMap<>();
 
-        for (int i = 0; i < durations.length; i++) {
-            int classDuration = durations[i];
-            if (classDuration % 2 == 0) {
-                //If this class have durations length is even, split to [n/2 - 1 ] + 2 periods
-                while (classDuration > 0) {
-                    classDuration = classDuration - MIN_EVEN_PERIOD;
-                    splitDurations[periodIdx] = MIN_EVEN_PERIOD;
-                    scheduleMap.put(periodIdx, i);
-                    periodIdx += 1;
-
-                }
-
-            } else {
-                //If this class have durations length is odd, split to [n/2 - 1] + 3 periods
-                while (classDuration > 1) {
-                    if (classDuration == MIN_ODD_PERIOD) {
-                        splitDurations[periodIdx] = MIN_ODD_PERIOD;
-                        scheduleMap.put(periodIdx, i);
-                    } else {
-                        splitDurations[periodIdx] = MIN_EVEN_PERIOD;
-                        scheduleMap.put(periodIdx, i);
+        /*Init split durations map*/
+        for (int i = 0; i < classes.size(); i++) {
+            GeneralClass c = classes.get(i);
+            if (c.getTimeSlots().size() > 1) {
+                for (RoomReservation rr: c.getTimeSlots()) {
+                    if (!rr.isTimeSlotNotNull()) {
+                        throw new InvalidFieldException("Lớp " + c.getClassCode() + " có nhiều 2 hơn ca học và có lịch trống!");
                     }
-                    classDuration = classDuration - MIN_EVEN_PERIOD;
-                    periodIdx += 1;
+                }
+            }
 
+            if (c.getTimeSlots() != null && !c.getTimeSlots().isEmpty()) {
+                for (int j = 0; j < c.getTimeSlots().size(); j++) {
+                    // If the timeslot is not null then split
+                    if (c.getTimeSlots().get(j).isTimeSlotNotNull()) {
+                        splitDurations[periodIdx] = c.getTimeSlots().get(j).getEndTime()-c.getTimeSlots().get(j).getStartTime()+1;
+                        scheduleMap.put(periodIdx, i);
+                        periodIdx += 1;
+                    } else {
+                        int classDuration = durations[i];
+                        if (classDuration % 2 == 0) {
+                            //If this class have durations length is even, split to [n/2] sessions 2 periods
+                            while (classDuration > 0) {
+                                classDuration = classDuration - MIN_EVEN_PERIOD;
+                                splitDurations[periodIdx] = MIN_EVEN_PERIOD;
+                                scheduleMap.put(periodIdx, i);
+                                periodIdx += 1;
+
+                            }
+                        } else {
+                            //If this class have durations length is odd, split to [n/2 - 1] sessions 2 periods + 1 sessions 3 periods
+                            while (classDuration > 1) {
+                                if (classDuration == MIN_ODD_PERIOD) {
+                                    splitDurations[periodIdx] = MIN_ODD_PERIOD;
+                                    scheduleMap.put(periodIdx, i);
+                                } else {
+                                    splitDurations[periodIdx] = MIN_EVEN_PERIOD;
+                                    scheduleMap.put(periodIdx, i);
+                                }
+                                classDuration = classDuration - MIN_EVEN_PERIOD;
+                                periodIdx += 1;
+
+                            }
+                        }
+                    }
                 }
             }
         }
 
-        int totalPeriods = periodIdx;
 
 
-//        ArrayList[] domains = new ArrayList[n];
+        int totalSessions = periodIdx;
 
-        ArrayList[] domains = new ArrayList[totalPeriods];
 
-//        for (int i = 0; i < n; i++) {
-        int classScheduleIdx = 0;
+        ArrayList[] domains = new ArrayList[totalSessions];
+        int classPeriodIdx = 0;
 
-        for (int i = 0; i < totalPeriods; i++) {
+        for (int i = 0; i < totalSessions; i++) {
             domains[i] = new ArrayList<>();
         }
 
         for (int i = 0; i < n; i++) {
             GeneralClass c = classes.get(i);
             boolean fixedTimeSlot = false;
+
             if (c.getTimeSlots() != null && c.getTimeSlots().size() > 0) {
                 for (int j = 0; j < c.getTimeSlots().size(); j++) {
-//                  THIS IS START MODIFY
                     RoomReservation rr = c.getTimeSlots().get(j);
                     int start = -1;
                     int end = -1;
@@ -113,53 +128,34 @@ public class V2ClassScheduler {
                         else KIP = 1;
                     }
                     if (start > 0 && end > 0 && day > 0) {
-                        fixedTimeSlot = true;
                         int s = 12 * day + 6 * KIP + start;
-                        domains[classScheduleIdx].add(s);// time-slot is assigned in advance
-                        classScheduleIdx += 1;
-                    }
-
-//                  END MODIFY
-                }
-
-            }
-
-            if (!fixedTimeSlot) {// the class is not assigned time-slot yet
-                int KIP = classes.get(scheduleMap.get(classScheduleIdx)).getCrew() == "S" ? 0 : 1;
-                for (int j = 0;  classScheduleIdx < totalPeriods && scheduleMap.get(classScheduleIdx) == i; j++) {
-                    for (int day = 0; day < 5; day++) {
-                        for (int start = 1; start <= 6 - splitDurations[classScheduleIdx] + 1; start++) {
-                            int s = 12 * day + 6 * KIP + start;
-                            domains[classScheduleIdx].add(s);
+                        domains[classPeriodIdx].add(s);// time-slot is assigned in advance
+                        classPeriodIdx += 1;
+                    } else {
+                        int fKIP = classes.get(scheduleMap.get(classPeriodIdx)).getCrew() == "S" ? 0 : 1;
+                        while (classPeriodIdx < totalSessions && scheduleMap.get(classPeriodIdx) == i){
+                            for (int fday : days) {
+                                for (int fstart = 1; fstart <= 6 - splitDurations[classPeriodIdx] + 1; fstart++) {
+                                    int s = 12 * fday + 6 * fKIP + fstart;
+                                    domains[classPeriodIdx].add(s);
+                                }
+                            }
+                            classPeriodIdx += 1;
                         }
                     }
-                    classScheduleIdx += 1;
                 }
+
             }
+
         }
 
-        for (int i = 0; i < totalPeriods; i++) {
-            for (int j = i + 1; j < totalPeriods; j++) {
-//                GeneralClass ci = classes.get(i);
-//                GeneralClass cj = classes.get(j);
-//                if (ci.getRefClassId().equals(cj.getRefClassId())) {
-//                    if (ci.getClassCode().equals(cj.getClassCode())) {// same classCode means 2 segments of the same class
-//                        conflict.add(new int[]{i, j});
-//                    } else {// different classCode, then add conflict is parent-child classes
-//                        if (ci.getParentClassId().equals(cj.getId()) ||
-//                                cj.getParentClassId().equals(ci.getId())) {
-//                            conflict.add(new int[]{i, j});
-//                        }
-//                    }
-//
-//                } else {
-//                    conflict.add(new int[]{i, j});
-//                }
+        for (int i = 0; i < totalSessions; i++) {
+            for (int j = i + 1; j < totalSessions; j++) {
                 conflict.add(new int[]{i, j});
             }
         }
 
-        ClassTimeScheduleBacktrackingSolver solver = new ClassTimeScheduleBacktrackingSolver(totalPeriods, splitDurations, domains, conflict, timeLimit);
+        ClassTimeScheduleBacktrackingSolver solver = new ClassTimeScheduleBacktrackingSolver(totalSessions, splitDurations, domains, conflict, timeLimit);
         solver.solve();
         if (!solver.hasSolution()) {
             log.error("NO SOLUTION");
@@ -173,18 +169,14 @@ public class V2ClassScheduler {
                 gClass.getTimeSlots().clear();
             }
 
-            for (int i = 0; i < totalPeriods; i++) {
+            for (int i = 0; i < totalSessions; i++) {
                 int day = solution[i] / 12;
                 int t1 = solution[i] - day * 12;
                 int K = t1 / 6; // kip
                 int tietBD = t1 - 6 * K;
                 GeneralClass gClass = classes.get(scheduleMap.get(i));
-//                gClass.setStartTime(tietBD);
-//                gClass.setEndTime(tietBD + gClass.getDuration() - 1);
-//                gClass.setWeekday(day + 2);
 
                 RoomReservation newRoomReservation = new RoomReservation(gClass.getCrew(), tietBD, tietBD + splitDurations[i] - 1, day + 2, null);
-//                RoomReservation newRoomReservation = new RoomReservation(gClass.getCrew(),tietBD, tietBD + gClass.getDuration() - 1, day + 2, null);
 
                 newRoomReservation.setGeneralClass(gClass);
                 gClass.getTimeSlots().add(newRoomReservation);
@@ -204,7 +196,7 @@ public class V2ClassScheduler {
             }
         }
 
-        HashMap<Integer,Integer> scheduleMap = new HashMap<>();
+        HashMap<Integer, Integer> scheduleMap = new HashMap<>();
         int scheduleIdx = 0;
         for (int i = 0; i < classes.size(); i++) {
             for (int j = 0; j < classes.get(i).getTimeSlots().size(); j++) {
@@ -214,7 +206,7 @@ public class V2ClassScheduler {
         }
 
         int numPeriods = scheduleIdx;
-
+        int numClasses = classes.size();
         /*Initial data*/
         int[] roomCapacities = rooms.stream().mapToInt(room -> Math.toIntExact(room.getQuantityMax())).toArray();
         Arrays.sort(roomCapacities);
@@ -224,7 +216,7 @@ public class V2ClassScheduler {
                 .flatMap(generalClass -> generalClass.getTimeSlots().stream())
                 .toList();
 
-        int[] studentQuantities = roomReservations.stream().mapToInt(rr-> {
+        int[] studentQuantities = roomReservations.stream().mapToInt(rr -> {
             if (rr.getGeneralClass().getQuantityMax() == null)
                 throw new InvalidClassStudentQuantityException(rr.getGeneralClass().getClassCode() + " đang không có số học sinh tối đa!");
             return rr.getGeneralClass().getQuantityMax();
@@ -233,7 +225,6 @@ public class V2ClassScheduler {
         int numRooms = rooms.size();
 
         List<Integer>[] assignRoomsArray = new List[numPeriods];
-
 
 
         for (int i = 0; i < numPeriods; i++) {
@@ -363,7 +354,7 @@ public class V2ClassScheduler {
 
 
         /*Call the classroom solver*/
-        ClassRoomScheduleBacktrackingSolver solver = new ClassRoomScheduleBacktrackingSolver(numPeriods, numRooms, conflict, roomCapacities, assignRoomsArray, timeLimit * 1000);
+        ClassRoomScheduleBacktrackingSolver solver = new ClassRoomScheduleBacktrackingSolver(numPeriods, numRooms, numClasses, scheduleMap, conflict, roomCapacities, assignRoomsArray, timeLimit * 1000);
         solver.solve();
         solver.printSolution();
         roomReservations.forEach(rr -> {

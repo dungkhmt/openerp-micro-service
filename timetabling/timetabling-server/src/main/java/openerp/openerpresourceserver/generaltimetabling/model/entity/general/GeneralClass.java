@@ -110,6 +110,10 @@ public class GeneralClass {
         return W;
     }
 
+    public boolean hasNonNullTimeSlot() {
+        return timeSlots.stream().anyMatch(RoomReservation::isTimeSlotNotNull);
+    }
+
     public void setInfo(GeneralClass generalClass) {
         this.moduleCode = generalClass.moduleCode;
         this.moduleName = generalClass.moduleName;
