@@ -136,6 +136,14 @@ public class ExamClassAccountController {
         boolean res = examClassService.updateStatusExamClass(m.getExamClassId(),m.getStatus());
         return ResponseEntity.ok().body(res);
     }
+
+    @Secured("ROLE_ADMIN")
+    @PostMapping("/clear-account-exam-class")
+    public ResponseEntity<?> clearAccountExamClass(Principal principal, @RequestBody ModelClearAccountInput m){
+        boolean res = examClassService.clearAccountExamClass(m.getExamClassId());
+        return ResponseEntity.ok().body(res);
+    }
+
     @Secured("ROLE_ADMIN")
     @GetMapping("/get-exam-class-detail/{examClassId}")
     public ResponseEntity<?> getExamClassDetail(Principal principal, @PathVariable UUID examClassId){

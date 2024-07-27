@@ -162,6 +162,24 @@ function ExamClassDetail() {
     setStatus(event.target.value);
   };
 
+  function clearAccount(){
+    let body = {
+      examClassId: examClassId
+      
+    };
+
+    request(
+      "post",
+      "/clear-account-exam-class",
+      (res) => {
+        console.log("Clear accounts of Exam Class = ", res.data);
+        getExamClassDetail();
+        //history.push("/exam-class/list");
+      },
+      {},
+      body
+    );
+  }
   function resetPassword() {
     //for(i = 0; i < mapUserLogins.length; i++){
     // resetPasswordOfUser(mapUserLogins[i].randomUserLoginId,mapUserLogins[i].password);
@@ -350,6 +368,10 @@ function ExamClassDetail() {
           </Button>
           <Button variant="contained" color="primary" onClick={resetPassword}>
             RESET PASSWORD KEY CLOAK
+          </Button>
+
+          <Button variant="contained" color="primary" onClick={clearAccount}>
+            CLEAR
           </Button>
 
           <Button color="primary" variant="contained" component="label">
