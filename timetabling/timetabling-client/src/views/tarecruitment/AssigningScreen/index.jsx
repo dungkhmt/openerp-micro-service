@@ -18,7 +18,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
-import { errorNoti } from "utils/notification";
+import { errorNoti, successNoti, warningNoti } from "utils/notification";
 import { DataGrid } from "@mui/x-data-grid";
 import styles from "./index.style";
 import { applicationUrl, semesterUrl } from "../apiURL";
@@ -130,10 +130,26 @@ const AssigningScreen = () => {
 
   const handleAutoAssign = () => {
     setIsLoading(true);
+    warningNoti("Đang sắp xếp, vui lòng đợi", 5000);
     request("get", `${applicationUrl.autoAssignClass}/${semester}`, (res) => {
       handleFetchData();
+      successNoti("Sắp xếp tự động thành công", 5000);
       setIsLoading(false);
     });
+  };
+
+  const handleOldAutoAssign = () => {
+    setIsLoading(true);
+    warningNoti("Đang sắp xếp, vui lòng đợi", 5000);
+    request(
+      "get",
+      `${applicationUrl.oldAutoAssignClass}/${semester}`,
+      (res) => {
+        handleFetchData();
+        successNoti("Sắp xếp tự động thành công", 5000);
+        setIsLoading(false);
+      }
+    );
   };
 
   const handleChangeStatusFilter = (e) => {
@@ -342,6 +358,14 @@ const AssigningScreen = () => {
               onClick={handleAutoAssign}
             >
               Sắp xếp tự động
+            </Button>
+
+            <Button
+              style={styles.autoButton}
+              variant="outlined"
+              onClick={handleOldAutoAssign}
+            >
+              Sắp xếp tự động (cũ)
             </Button>
           </div>
 

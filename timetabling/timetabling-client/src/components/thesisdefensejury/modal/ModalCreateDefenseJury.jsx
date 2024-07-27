@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { boxChildComponent, boxComponentStyle } from "../constant";
 import {
     Modal,
@@ -41,35 +41,21 @@ const styles = {
         justifyContent: "end",
     },
 };
-// const juryType = [
-//     {
-//         id: 1,
-//         name: "AIoT"
-//     },
-//     {
-//         id: 2,
-//         name: "An toàn không gian số"
-//     },
-//     {
-//         id: 3,
-//         name: "Blockchain và ứng dụng"
-//     },
-//     {
-//         id: 4,
-//         name: "eCommerce & Logistic"
-//     },
-//     {
-//         id: 5,
-//         name: "EdTech"
-//     }
-// ]
+
+/**
+ * Modal to create new defense jury
+ * 
+ */
+
 function CreateDefenseJury({
     open,
     handleClose,
     handleToggle,
     thesisPlanName,
+    juryTopic,
 }) {
-    const [keyword, setKeyword] = useState([]);
+    const [defenseSession, setDefenseSession] = useState([]);
+
     const {
         register,
         handleSubmit,
@@ -80,21 +66,23 @@ function CreateDefenseJury({
             maxThesis: "",
             defenseDate: "",
             defenseRoomId: 0,
-            defenseSessionId: 0,
             juryTopicId: 0,
         },
     });
     const handleFormSubmit = (data) => {
         data.thesisPlanName = thesisPlanName;
+        data.juryTopicId = juryTopic?.id;
         if (data?.defenseRoomId === 0) {
             return errorNoti("Bạn cần chọn phòng tổ chức hội đồng", true)
-        }
-        if (data?.defenseSessionId === 0) {
-            return errorNoti("Bạn cần chọn buổi tổ chức hội đồng", true)
         }
         if (data?.juryTopicId === 0) {
             return errorNoti("Bạn cần chọn phân ban của hội đồng", true)
         }
+        if (defenseSession.length === 0) {
+            return errorNoti("Bạn cần chọn buổi tổ chức hội đồng", true)
+        }
+        data.defenseSessionId = defenseSession;
+        console.log(data);
         request(
             "post",
             "/defense-jury/save",
@@ -122,13 +110,12 @@ function CreateDefenseJury({
         ).then();
     };
     const { data: roomList } = useFetch("/defense-room/get-all");
-    const { data: juryType } = useFetch("/jury-topic/get-all");
     const { data: sessionList } = useFetch("/defense-session/get-all");
     const handleChange = (event) => {
         const {
             target: { value },
         } = event;
-        setKeyword(
+        setDefenseSession(
             // On autofill we get a stringified value.
             typeof value === "string" ? value.split(",") : value
         );
@@ -145,9 +132,10 @@ function CreateDefenseJury({
                 <form onSubmit={handleSubmit(handleFormSubmit)}>
                     <Box sx={boxComponentStyle}>
                         <Typography variant="h4" mb={4} component={"h4"}>
-                            Thêm mới Hội Đồng
+                            Thêm mới Hội Đồng cho phân ban {juryTopic?.name}
                         </Typography>
                         <Box mb={3}>
+                            {/* Input defense jury name */}
                             <TextField
                                 {...register("name", { required: true })}
                                 fullWidth={true}
@@ -156,6 +144,7 @@ function CreateDefenseJury({
                                 variant="outlined"
                                 margin="normal"
                             />
+                            {/* Input defense jury's maximum thesis number */}
                             <TextField
                                 fullWidth={true}
                                 label="Số lượng đồ án tối đa"
@@ -163,16 +152,13 @@ function CreateDefenseJury({
                                 {...register("maxThesis", { required: true })}
                                 variant="outlined"
                                 margin="normal"
-                            // onBlur={(e) => handleInputValidationThesis(e)}
-                            // {...register("name", { required: "Thiếu tên luận văn!" })}
-                            // error={!!errors?.name}
-                            // helperText={errors?.name?.message}
                             />
                         </Box>
                         <Box sx={boxChildComponent} mb={3}>
                             <Grid container spacing={2}>
                                 <Grid item={true} xs={6} spacing={2} p={2}>
                                     <span>Ngày bảo vệ</span>
+                                    {/* Input defense jury's date */}
                                     <TextField
                                         id="input-with-icon-grid"
                                         {...register("defenseDate", { required: true })}
@@ -185,6 +171,7 @@ function CreateDefenseJury({
                                 </Grid>
                                 <Grid item={true} xs={6} spacing={2} p={2}>
                                     <span>Phòng tổ chức</span>
+                                    {/* Select defense jury room */}
                                     <FormControl fullWidth margin="normal">
                                         <InputLabel id="defense-room-id">Chọn phòng</InputLabel>
                                         <Select
@@ -203,6 +190,7 @@ function CreateDefenseJury({
                                     </FormControl>
                                 </Grid>
                                 <Grid item={true} xs={6} spacing={2} p={2}>
+                                    {/* Select defense jury's session */}
                                     <span>Thời gian tổ chức</span>
                                     <FormControl fullWidth margin="normal">
                                         <InputLabel id="defense-session-label">
@@ -210,40 +198,23 @@ function CreateDefenseJury({
                                         </InputLabel>
                                         <Select
                                             MenuProps={MenuProps}
+                                            labelId="defense-session-label"
                                             label="defense-session"
                                             name="defenseSessionId"
+                                            multiple
+                                            value={defenseSession}
+                                            onChange={handleChange}
                                             input={<OutlinedInput label="Tag" />}
-                                            {...register("defenseSessionId", { required: true })}
+                                            renderValue={(selected) => selected.map((item) => sessionList?.find((session) => session?.id === item)?.name).join(', ')}
                                         >
                                             {sessionList?.map((item) => (
                                                 <MenuItem key={item?.id} value={item?.id}>
-                                                    {item?.name}
+                                                    <Checkbox checked={defenseSession.indexOf(item?.id) !== -1} />
+                                                    <ListItemText primary={item?.name} />
                                                 </MenuItem>
                                             ))}
                                         </Select>
                                     </FormControl>
-                                </Grid>
-                                <Grid item={true} xs={6} spacing={2} p={2}>
-                                    <span>Phân ban của hội đồng</span>
-                                    <FormControl fullWidth margin="normal">
-                                        <InputLabel id="defense-jury-topic-label">
-                                            Chọn phân ban
-                                        </InputLabel>
-                                        <Select
-                                            MenuProps={MenuProps}
-                                            label="jury-topic"
-                                            name="juryTopicId"
-                                            input={<OutlinedInput label="Tag" />}
-                                            {...register("juryTopicId", { required: true })}
-                                        >
-                                            {juryType?.map((item) => (
-                                                <MenuItem key={item?.id} value={item?.id} >
-                                                    {item?.name}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-
                                 </Grid>
                             </Grid>
                         </Box>

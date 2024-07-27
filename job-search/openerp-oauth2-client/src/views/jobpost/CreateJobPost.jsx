@@ -239,7 +239,7 @@ const CreateJobPost = () => {
                     <Grid container justifyContent="center" > {/* Add Grid container for centering */}
                         <Grid item >
                             <Button sx={{ backgroundColor: 'green', color: 'white' }} variant="contained" onClick={handleSubmit}>
-                                Submit CV
+                                Create Job Post
                             </Button>
                         </Grid>
                     </Grid>

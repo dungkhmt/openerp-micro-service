@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Button, Grid } from "@mui/material";
 import { useParams, useHistory } from "react-router-dom";
 import { boxChildComponent, boxComponentStyle } from "components/thesisdefensejury/constant";
 import ElementAddTeacher from "components/thesisdefensejury/ElementAddTeacher";
@@ -9,10 +9,12 @@ import KeywordChip from "components/common/KeywordChip";
 import AssignTeacherThesisButton from "components/common/AssignTeacherThesisButton";
 import { a11yProps, AntTab, AntTabs, TabPanel } from "components/tab";
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { request } from "api";
 import { successNoti, errorNoti } from "utils/notification";
 import useAssignTeacherThesis from "hooks/useAssignTeacherThesis";
 import PrimaryButton from "components/button/PrimaryButton";
+// Màn phân công giáo viên và đồ án
 function AssignTeacherAndThesisToDefenseJury() {
   const { id, juryId } = useParams();
   const history = useHistory();
@@ -25,23 +27,23 @@ function AssignTeacherAndThesisToDefenseJury() {
   const [activeTab, setActiveTab] = useState(0);
   const sortThesisInJuryTopicInFront = (thesisList) => {
     function compare(a, b) {
-      if (a?.juryTopic?.id === defenseJury?.juryTopic.id) {
+      if (a?.juryTopicName === defenseJury?.juryTopic?.name) {
         return -1;
-      } else if (b?.juryTopic?.id === defenseJury?.juryTopic?.id) {
+      } else if (b?.juryTopicName === defenseJury?.juryTopic?.name) {
         return 1;
       }
-      return a?.juryTopic?.id - b?.juryTopic?.id;
+      return a?.juryTopicName?.localeCompare(b?.juryTopicName);
     }
     thesisList?.sort(compare)
     return thesisList;
   }
-  const sortedThesisList = sortThesisInJuryTopicInFront(availableThesisList)
+  const sortedThesisList = sortThesisInJuryTopicInFront(availableThesisList);
   const handleChangeTab = (event, tabIndex) => {
     setActiveTab(tabIndex);
   };
   const tabsLabel = [
-    "Danh sách giáo viên",
     "Danh sách đồ án",
+    "Danh sách giáo viên",
   ];
   const { assignedTeacher, assignedThesis, handleAssignRole, handleSelectTeacher, handleSelectThesis, clearAssignedTeacher, clearAssignedThesis, handleSelectTeacherList } = useAssignTeacherThesis();
   console.log(assignedTeacher);
@@ -89,9 +91,11 @@ function AssignTeacherAndThesisToDefenseJury() {
       }
     ).then();
   };
+
+  // Tính năng gợi ý giáo viên phù hợp hội đồng
   const handleAssignTeacherAuto = (e) => {
     setLoading(true);
-    request("GET", `/defense-jury/assign-automatically/${id}/${juryId}`, (res) => {
+    request("POST", `/defense-jury/assign-automatically/${id}/${juryId}`, (res) => {
       console.log(res.data);
       handleSelectTeacherList(res.data);
       setLoading(false)
@@ -101,7 +105,11 @@ function AssignTeacherAndThesisToDefenseJury() {
         console.log(e?.message, true);
         errorNoti(errorMessage, true);
       },
-    }).then()
+    },
+      {
+        thesisIdList: assignedThesis
+      }
+    ).then()
   }
   useEffect(() => {
     if (availableThesisList && teacherList && defenseJury) {
@@ -132,21 +140,34 @@ function AssignTeacherAndThesisToDefenseJury() {
             ))}
           </AntTabs>
           <TabPanel value={activeTab} index={0}>
+            <ElementAddThesis availableThesisList={sortedThesisList} handleSelectThesis={handleSelectThesis} assignedThesis={assignedThesis} />
+            <Box display={"flex"} flexDirection={"row-reverse"} sx={{ width: "100%" }}>
+              <Button type="text" sx={{ color: 'blue' }} endIcon={<ArrowForwardIcon />} onClick={(e) => { setActiveTab((prevActiveTab) => prevActiveTab + 1) }}>
+                Lựa chọn giáo viên
+              </Button>
+            </Box>
+          </TabPanel>
+          <TabPanel value={activeTab} index={1}>
             <Box display={"flex"} flexDirection={"row-reverse"} sx={{ width: "100%" }}>
               <PrimaryButton onClick={handleAssignTeacherAuto}>Gợi ý giáo viên</PrimaryButton>
             </Box>
             <Box sx={{ ...boxChildComponent, margin: "8px 0px 8px 0px" }}>
               <ElementAddTeacher loading={loading} teacherList={teacherList} assignedTeacher={assignedTeacher} handleAssignRole={handleAssignRole} handleSelectTeacher={handleSelectTeacher} />
             </Box>
-            <Box display={"flex"} flexDirection={"row-reverse"} sx={{ width: "100%" }}>
-              <Button type="text" sx={{ color: 'blue' }} endIcon={<ArrowForwardIcon />} onClick={(e) => { setActiveTab((prevActiveTab) => prevActiveTab + 1) }}>
-                Lựa chọn đồ án
-              </Button>
-            </Box>
-          </TabPanel>
-          <TabPanel value={activeTab} index={1}>
-            <ElementAddThesis availableThesisList={sortedThesisList} handleSelectThesis={handleSelectThesis} assignedThesis={assignedThesis} />
-            <AssignTeacherThesisButton onClick={onAssignTeacherAndThesis} >Tạo hội đồng</AssignTeacherThesisButton>
+            <Grid
+              container
+              justifyContent="space-between"
+              sx={{ marginTop: "16px", width: '100%' }}
+            >
+              <Grid item xs={3.2}>
+                <Button type="text" sx={{ color: 'blue' }} endIcon={<ArrowBackIcon />} onClick={(e) => { setActiveTab((prevActiveTab) => prevActiveTab - 1) }}>
+                  Lựa chọn đồ án
+                </Button>
+              </Grid>
+              <Grid justifyContent="right" item xs={"auto"}>
+                <AssignTeacherThesisButton onClick={onAssignTeacherAndThesis} >Tạo hội đồng</AssignTeacherThesisButton>
+              </Grid>
+            </Grid>
           </TabPanel>
         </form>
       </Box>

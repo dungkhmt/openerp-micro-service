@@ -169,6 +169,12 @@ public class ApplicationController {
         return ResponseEntity.ok().body("Success");
     }
 
+    @GetMapping("/old-auto-assign-class/{semester}")
+    public ResponseEntity<?> oldAutoAssignClass(@PathVariable String semester) {
+        applicationService.oldAutoAssignApplication(semester);
+        return ResponseEntity.ok().body("Success");
+    }
+
     @GetMapping("/get-assign-list-file/{semester}")
     public ResponseEntity<?> getAssignListFile(@PathVariable String semester) {
         try {

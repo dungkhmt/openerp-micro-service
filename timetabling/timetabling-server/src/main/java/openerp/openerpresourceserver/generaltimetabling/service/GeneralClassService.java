@@ -29,8 +29,6 @@ public interface GeneralClassService {
     List<GeneralClass> autoSchedule(String semester, String groupName, int timeLimit);
     List<GeneralClass> autoScheduleRoom(String semester, String groupName, int timeLimit);
 
-    InputStream exportExcel(String semester);
-
     List<GeneralClass> v2UpdateClassSchedule(String semester, List<V2UpdateClassScheduleRequest> request);
 
     GeneralClass deleteClassById(Long generalClassId);

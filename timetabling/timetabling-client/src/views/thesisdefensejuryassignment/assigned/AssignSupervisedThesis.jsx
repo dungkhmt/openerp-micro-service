@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useFetch } from 'hooks/useFetch'
 import { useParams, useHistory } from "react-router-dom";
 import KeywordChip from 'components/common/KeywordChip';
@@ -12,6 +12,7 @@ import {
     OutlinedInput,
     Typography, Box,
 } from "@mui/material";
+import FormHelperText from '@mui/material/FormHelperText';
 import PrimaryButton from 'components/button/PrimaryButton';
 import { request } from 'api';
 const ITEM_HEIGHT = 48;
@@ -25,13 +26,24 @@ const MenuProps = {
         },
     },
 };
-
+// - Phân ban cho đồ án đang hướng dẫn
 const AssignSupervisedThesis = () => {
     const { register, handleSubmit, formState: { errors } } = useForm({
         defaultValues: {
             juryTopicId: 0,
+            secondJuryTopicId: 0,
         }
     });
+    const [error, setError] = useState(false);
+    const [data, setData] = useState({
+        juryTopicId: '',
+        secondJuryTopicId: '',
+    })
+    useEffect(() => {
+        if (data.juryTopicId !== '') {
+            setError(false)
+        }
+    }, [data.juryTopicId]);
     const profile = {
         backgroundColor: "white",
         borderRadius: "6px",
@@ -56,7 +68,11 @@ const AssignSupervisedThesis = () => {
     const history = useHistory();
     const { data: thesis } = useFetch(`/thesis/${id}`);
     const { data: juryType } = useFetch("/jury-topic/get-all");
-    const onSubmit = (data) => {
+    const onSubmit = (e) => {
+        e.preventDefault();
+        if (data?.juryTopicId === '') {
+            return setError(true);
+        }
         request("POST", '/thesis/assign',
             (res) => {
                 if (res.data) {
@@ -74,7 +90,8 @@ const AssignSupervisedThesis = () => {
             },
             {
                 thesisId: id,
-                juryTopicId: data?.juryTopicId
+                juryTopicId: data?.juryTopicId,
+                secondJuryTopicId: data?.secondJuryTopicId !== '' ? data?.secondJuryTopicId : 0,
             }
         ).then()
     }
@@ -99,14 +116,18 @@ const AssignSupervisedThesis = () => {
                         <Typography sx={{ fontWeight: '500' }}>{thesis?.studentId}</Typography>
                     </Box>
 
-                    <form onSubmit={handleSubmit(onSubmit)} style={{ width: '50%' }}>
-                        <div>Phân ban</div>
-                        <FormControl fullWidth margin="normal">
-                            <InputLabel id="defense-room-id">Chọn phân ban</InputLabel>
+                    <form onSubmit={onSubmit} style={{ width: '50%' }}>
+                        <div>Lựa chọn phân ban thứ nhất</div>
+                        <FormControl fullWidth margin="normal" error={error}>
+                            <InputLabel id="topicId">Chọn phân ban</InputLabel>
                             <Select
+                                labelId="topicId"
                                 MenuProps={MenuProps}
                                 name="juryTopicId"
-                                {...register("juryTopicId")}
+                                value={data.juryTopicId}
+                                onChange={(e) => {
+                                    setData((prevData) => ({ ...prevData, juryTopicId: e.target.value }))
+                                }}
                                 label="topic"
                                 input={<OutlinedInput label="Tag" />}
                             >
@@ -116,7 +137,29 @@ const AssignSupervisedThesis = () => {
                                     </MenuItem>
                                 ))}
                             </Select>
+                            {error && <FormHelperText>Cần chọn phân ban</FormHelperText>}
                         </FormControl>
+                        <Box sx={{ marginTop: 3 }}>Lựa chọn phân ban thứ hai</Box>
+                        <FormControl fullWidth margin="normal">
+                            <InputLabel id="secondJuryTopicId">Chọn phân ban</InputLabel>
+                            <Select
+
+                                labelId="secondJuryTopicId"
+                                MenuProps={MenuProps}
+                                name="secondJuryTopicId"
+                                value={data.secondJuryTopicId}
+                                onChange={(e) => setData((prevData) => ({ ...prevData, secondJuryTopicId: e.target.value }))}
+                                label="second-topic"
+                                input={<OutlinedInput label="Tag" />}
+                            >
+                                {juryType?.map((item) => (
+                                    <MenuItem key={item?.id} value={item?.id} >
+                                        {item?.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
                         <Box sx={{ marginTop: 2, marginBottom: 2 }}>
                             <PrimaryButton type="submit">Lưu phân ban cho đồ án</PrimaryButton>
                         </Box>

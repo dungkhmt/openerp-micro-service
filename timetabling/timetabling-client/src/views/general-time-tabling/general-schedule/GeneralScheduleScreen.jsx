@@ -97,7 +97,7 @@ const GeneralScheduleScreen = () => {
         toast.success("Tự động xếp thời khóa biểu thành công!");
       },
       (error) => {
-        if (error.response.status == 410) {
+        if (error.response.status == 410 || error.response.status == 420) {
           toast.error(error.response.data);
           setAutoSaveLoading(false);
         } else {

@@ -199,13 +199,13 @@ const CvTemplate1 = (props) => {
             <ul>
               {!!props.gender && (
                 <li className="d-flex align-items justify-content-start">
-                  <div style={{ fontWeight: 700, marginLeft: 400}}>Gender:</div>
+                  <div style={{ fontWeight: 700, marginLeft: 200}}>Gender:</div>
                   <div className="ms-2">{props.gender}</div>
                 </li>
               )}
               {!!props.mobilePhone && (
                 <li className="d-flex align-items-center justify-content-start mt-3">
-                  <div style={{ fontWeight: 700, marginLeft: 400 }}>Phone Number:</div>
+                  <div style={{ fontWeight: 700, marginLeft: 200 }}>Phone:</div>
                   <div className="ms-2">{props.mobilePhone}</div>
                 </li>
               )}

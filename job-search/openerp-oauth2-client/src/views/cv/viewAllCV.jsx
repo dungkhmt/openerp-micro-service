@@ -11,7 +11,7 @@ import {
     Row,
 } from "react-bootstrap";
 import { Card, CardContent, CardActions } from '@mui/material';
-import CVCard from "components/CVCard";
+import CVCard from "components/resume_card/CVCard";
 const ViewAllCV = () => {
     
     const [allCV, setAllCV] = useState([])

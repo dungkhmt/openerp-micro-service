@@ -5,10 +5,11 @@ import GeneralGroupTable from "./components/GeneralGroupTable";
 import { useClasses } from "../hooks/useClasses";
 import AddCreatedGroupDialogue from "./components/AddCreatedGroupDialogue";
 import AddNewGroupDialogue from "./components/AddNewGroupDialogue";
+import { useClassesNoSchedule } from "../hooks/useClassesNoSchedule";
 
 const GeneralGroupScreen = () => {
   const [selectedSemester, setSelectedSemester] = useState(null);
-  const { loading, error, classes, setClasses } = useClasses(
+  const { loading, error, classes, setClasses } = useClassesNoSchedule(
     null,
     selectedSemester
   );

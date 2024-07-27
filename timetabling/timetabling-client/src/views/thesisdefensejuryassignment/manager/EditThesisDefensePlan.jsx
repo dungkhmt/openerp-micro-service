@@ -13,6 +13,7 @@ import { useForm } from 'react-hook-form';
 import PrimaryButton from 'components/button/PrimaryButton';
 import ModalLoading from 'components/common/ModalLoading';
 import { successNoti, errorNoti } from 'utils/notification';
+// Màn hình chỉnh sửa đợt BVĐA
 export const EditThesisDefensePlan = () => {
     const { id } = useParams();
     const history = useHistory();

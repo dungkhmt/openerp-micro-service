@@ -38,6 +38,8 @@ public interface ApplicationService {
 
     void autoAssignApplication(String semester);
 
+    void oldAutoAssignApplication(String semester);
+
     byte[] generateExcelFile(String semester) throws IOException;
 
     PaginationDTO<Application> getTABySemester(String semester, String search, int page, int limit);

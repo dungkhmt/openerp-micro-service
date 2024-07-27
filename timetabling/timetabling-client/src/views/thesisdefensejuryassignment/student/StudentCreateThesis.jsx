@@ -33,34 +33,12 @@ const MenuProps = {
     },
   },
 };
-
-const modalStyle = {
-  paper: {
-    boxSizing: "border-box",
-    position: "absolute",
-    width: "55%",
-    maxHeight: 1000,
-    // border: '2px solid #000',
-    borderRadius: "5px",
-    boxShadow:
-      "0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%)",
-    backgroundColor: "white",
-    zIndex: 999,
-    left: "60%",
-    top: "90%",
-    transform: "translate(-50% , -50%)",
-    padding: "20px 40px",
-  },
-};
-
+// Màn sinh viên thêm đồ án mới 
 function StudentCreateThesis(props) {
   const { keycloak } = useKeycloak();
   const [searchProgramText, setSearchProgramText] = useState("");
   const [searchTeacherText, setSearchTeacherText] = useState("");
   const [searchThesisPlanText, setSearchThesisPlanText] = useState("");
-  //
-  // const [showSubmitSuccess, setShowSubmitSuccess] = React.useState(false);
-  // const [openLoading, setOpenLoading] = React.useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
       thesisName: '',
@@ -88,13 +66,10 @@ function StudentCreateThesis(props) {
     text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
 
   const handleFormSubmit = (data) => {
-    // event.preventDefault();
-    // setOpenLoading(true);
     let body = {
       thesisKeyword: keyword,
       ...data
     };
-    // setTimeout(() => setOpenAlert(true), 3000);
     request(
       "post",
       "/thesis/save",
@@ -103,8 +78,6 @@ function StudentCreateThesis(props) {
       },
       {
         onError: (e) => {
-          // setShowSubmitSuccess(false);
-          // setOpenLoading(false);
           errorNoti('Thêm đồ án mới thất bại', true);
         },
       },

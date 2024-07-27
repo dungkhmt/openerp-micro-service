@@ -4,11 +4,13 @@ import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 @Log4j2
 @Getter
 public class ClassRoomScheduleBacktrackingSolver {
-    int n;// number of classes
+    int n;// number of sessions
+    int p; // number of classes
     int m;// number of rooms
     boolean[][] conflict; // conflict[i][j] = true: class i and j are scheduled at overlap time-slot
     // -> must be assigned to different rooms
@@ -20,15 +22,20 @@ public class ClassRoomScheduleBacktrackingSolver {
     int[] y;// y[k] is the number of classes assigned to room k
     int load;// load = sum_{k in rooms} y[k]*c[k]
     int[] sol;// store best solution found
+    HashMap<Integer,Integer> scheduleMap; // mapping from session to class idx
+    int[] roomAssigns; // rA[k] = i: class k is assign room i
+
 
     int f;
     int f_best;
     double timeLimit; // in milli seconds
     double t0;// start time-point
-    public ClassRoomScheduleBacktrackingSolver(int n, int m, boolean[][] conflict, int[] c, List[] D, int timeLimit) {
+    public ClassRoomScheduleBacktrackingSolver(int n, int m, int p, HashMap<Integer, Integer> scheduleMap, boolean[][] conflict, int[] c, List[] D, int timeLimit) {
         this.n = n;
         this.m = m;
+        this.p = p;
         this.conflict = conflict;
+        this.scheduleMap = scheduleMap;
         this.c = c;
         this.D = D;
         this.timeLimit = timeLimit;
@@ -40,7 +47,7 @@ public class ClassRoomScheduleBacktrackingSolver {
 
     private boolean check(int v, int k){
         for(int i = 0; i < k; i++){
-            if(conflict[i][k] && x[i] == v) return false;
+            if((conflict[i][k] && x[i] == v) && ( roomAssigns[scheduleMap.get(k)] != -1 && roomAssigns[scheduleMap.get(k)] != v)) return false;
         }
         return true;
     }
@@ -49,13 +56,33 @@ public class ClassRoomScheduleBacktrackingSolver {
             f_best = load;
             for(int i = 0; i < n; i++) sol[i] = x[i];
             log.info("update best " + f_best);
+            for (int i = 0; i < p; i++) {
+                log.info("class " + i + " use room " + roomAssigns[i]);
+            }
         }
     }
     private void Try(int k){// try values of x[k]
         double t = System.currentTimeMillis() - t0;
         if(t > timeLimit) return;
-        for(int v: D[k]){
-            if(check(v,k)){
+        if (roomAssigns[scheduleMap.get(k)] == -1) {
+            for(int v: D[k]){
+                if(check(v,k)){
+                    x[k] = v;
+                    roomAssigns[scheduleMap.get(k)] = v;
+                    y[v]++;
+                    load += c[v]; // room v is used one more time
+                    if(k == n-1) solution();
+                    else{
+                        Try(k+1);
+                    }
+                    roomAssigns[scheduleMap.get(k)] = -1;
+                    load -= c[v];
+                    y[v]--;
+                }
+            }
+        } else {
+            int v = roomAssigns[scheduleMap.get(k)];
+            if (check(v,k)) {
                 x[k] = v;
                 y[v]++;
                 load += c[v]; // room v is used one more time
@@ -63,6 +90,7 @@ public class ClassRoomScheduleBacktrackingSolver {
                 else{
                     Try(k+1);
                 }
+                roomAssigns[scheduleMap.get(k)] = -1;
                 load -= c[v];
                 y[v]--;
             }
@@ -72,6 +100,10 @@ public class ClassRoomScheduleBacktrackingSolver {
         x = new int[n];
         y = new int[m];
         sol = new int[n];
+        roomAssigns = new int [p];
+        for (int i = 0; i < p; i++) {
+            roomAssigns[i] = -1;
+        }
         load = 0;
         f_best = 10000000;
         t0 = System.currentTimeMillis();
@@ -85,6 +117,7 @@ public class ClassRoomScheduleBacktrackingSolver {
         for(int i = 0; i < n; i++) log.info("x[" + i + "] = " + x[i]);
         for(int r = 0; r < m; r++) y[r] = 0;
         for(int i = 0; i < n; i++) y[x[i]]++;
+
         for(int r = 0; r < m; r++){
             String C = "";
             for(int i = 0; i < n; i++) if(x[i] == r) C = C + i + ",";
@@ -113,9 +146,11 @@ public class ClassRoomScheduleBacktrackingSolver {
         for(int[] p: C){
             conflict[p[0]][p[1]] = true;
         }
+        HashMap<Integer, Integer> scheduleMap = new HashMap<>();
+
         ClassRoomScheduleBacktrackingSolver app =
-                new ClassRoomScheduleBacktrackingSolver(n,m,conflict,c,D, 2000);
-        app.setTimeLimit(2000);// time limit 2 seconds
+                new ClassRoomScheduleBacktrackingSolver(n,m, n, scheduleMap, conflict,c,D, 2000);
+
         app.solve();
         app.printSolution();
     }

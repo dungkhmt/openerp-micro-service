@@ -1,5 +1,6 @@
 import AirportShuttleIcon from "@mui/icons-material/AirportShuttle";
 import ApartmentSharpIcon from "@mui/icons-material/ApartmentSharp";
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import AttachMoneySharpIcon from "@mui/icons-material/AttachMoneySharp";
 import BlurOnIcon from "@mui/icons-material/BlurOn";
@@ -9,14 +10,18 @@ import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import FastfoodIcon from "@mui/icons-material/Fastfood";
 import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
+import HomeIcon from '@mui/icons-material/Home';
 import HomeSharpIcon from "@mui/icons-material/HomeSharp";
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import LocalGroceryStoreIcon from "@mui/icons-material/LocalGroceryStore";
 import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import MonitorIcon from '@mui/icons-material/Monitor';
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import PeopleIcon from "@mui/icons-material/People";
 import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
 import PersonIcon from "@mui/icons-material/Person";
+import SettingsIcon from '@mui/icons-material/Settings';
 import StarBorder from "@mui/icons-material/StarBorder";
 import StoreMallDirectorySharpIcon from "@mui/icons-material/StoreMallDirectorySharp";
 import TeachingIcon from "assets/icons/mathematics.svg";
@@ -41,6 +46,7 @@ import {
   ThesisDefensePlanStudent,
 } from "./menuconfig/Thesis_defense_plan_managenment";
 import { Schedule } from "@mui/icons-material/";
+import { AssetManagementAsset } from "./menuconfig/assetManagement";
 
 export const MENUS = [];
 
@@ -57,6 +63,7 @@ MENUS.push(computerLabTimeTabling);
 MENUS.push(taRecruitment);
 MENUS.push(ThesisDefensePlanManagement);
 MENUS.push(ThesisDefensePlanStudent);
+MENUS.push(AssetManagementAsset);
 
 export const menuIconMap = new Map();
 
@@ -91,4 +98,9 @@ menuIconMap.set("AssignmentOutlinedIcon", <AssignmentOutlinedIcon />);
 menuIconMap.set("ManageAccountsIcon", <ManageAccountsIcon />);
 menuIconMap.set("CiEdit", <CiEdit />);
 menuIconMap.set("Schedule", <Schedule />);
+menuIconMap.set("LibraryBookIcon", <LibraryBooksIcon/>);
+menuIconMap.set("MonitorIcon", <MonitorIcon/>);
+menuIconMap.set("HomeIcon", <HomeIcon/>);
+menuIconMap.set("SettingsIcon", <SettingsIcon/>);
+menuIconMap.set("AssessmentIcon", <AssessmentIcon/>);
 export const mapPathMenu = buildMapPathMenu(MENUS);

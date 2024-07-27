@@ -37,7 +37,12 @@ const ROLES = [
         role: "Commissioner",
         name: "Ủy viên",
     },
-];
+]; // Các role của giáo viên hội đồng
+
+/**
+ * Component các giáo viên được chọn
+ * 
+ */
 export default function AssignTeacherListItem({ assignedTeacher, handleSelectTeacher, handleAssignRole }) {
     const [role, setRole] = useState("");
     const handleChange = (e) => {
@@ -62,6 +67,7 @@ export default function AssignTeacherListItem({ assignedTeacher, handleSelectTea
                 <FormControl sx={{ width: MenuProps.PaperProps.style.width }} required>
                     <InputLabel id={`role-${assignedTeacher?.id}`}>Role</InputLabel>
                     <Select
+                        labelId={`role-${assignedTeacher?.id}`}
                         MenuProps={MenuProps}
                         label="Role"
                         name={`${assignedTeacher?.id}`}
