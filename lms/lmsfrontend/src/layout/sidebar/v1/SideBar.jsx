@@ -132,11 +132,12 @@ export default function SideBar(props) {
           justifyContent="center"
           margin="auto"
         >
+        {/*
           <Typography className={classes.signInText}>
             Hệ thống đang tạm thời dừng dịch vụ để bảo trì. Chúc các bạn có kỳ nghỉ hè vui vẻ và bổ ích và hẹn gặp lại trong học kỳ tới. 
           </Typography>
+        */}  
           
-          {/*
           <Typography className={classes.signInText}>
             {t("loginSubtext")}
           </Typography>
@@ -146,7 +147,7 @@ export default function SideBar(props) {
           >
             {t("login")}
           </Button>
-          */}
+          
         </Box>
       )}
       {/* </div> */}
