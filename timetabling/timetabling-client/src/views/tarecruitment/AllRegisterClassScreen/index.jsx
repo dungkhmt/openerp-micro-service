@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { request } from "api";
 import { Button, TextField, Paper, Typography } from "@mui/material";
 import { useHistory } from "react-router-dom";
-import { SEMESTER } from "../config/localize";
 import { DataGrid } from "@mui/x-data-grid";
 import styles from "./index.style";
 import { classCallUrl, semesterUrl } from "../apiURL";
@@ -17,7 +16,7 @@ const AllRegisterClassScreen = () => {
   const [classes, setClasses] = useState([]);
   const [registeredClass, setRegisteredClass] = useState([]);
 
-  const [semester, setSemester] = useState(SEMESTER);
+  const [semester, setSemester] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
@@ -41,7 +40,9 @@ const AllRegisterClassScreen = () => {
           ...DEFAULT_PAGINATION_MODEL,
           page: 0,
         });
-        handleFetchData();
+        if (semester !== "") {
+          handleFetchData();
+        }
       }, 1000);
 
       return () => clearTimeout(timer);
@@ -55,12 +56,16 @@ const AllRegisterClassScreen = () => {
   }, [search, debouncedSearch]);
 
   useEffect(() => {
-    handleFetchData();
+    if (semester !== "") {
+      handleFetchData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paginationModel, semester]);
 
   useEffect(() => {
-    fetchRegisteredData();
+    if (semester !== "") {
+      fetchRegisteredData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [semester]);
 
