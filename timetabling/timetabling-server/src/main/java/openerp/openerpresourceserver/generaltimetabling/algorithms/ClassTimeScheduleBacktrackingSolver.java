@@ -3,10 +3,12 @@ package openerp.openerpresourceserver.generaltimetabling.algorithms;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 @Log4j2
 public class ClassTimeScheduleBacktrackingSolver {
-    private int n;// number of classes
+    private int n;// number of sessions
+    private int p; //number of classes
     private int[] durations;
     private List<Integer>[] domains;
     private boolean[][] conflicts;
@@ -15,6 +17,8 @@ public class ClassTimeScheduleBacktrackingSolver {
     private boolean found;
     private double timeLimit;// time limit in seconds
     private double t_start;
+    private HashMap<Integer, Integer> scheduleMap; // session to class map
+    private int[] dayPeriods; // store the remain periods of a day(default is 6)
     public
     ClassTimeScheduleBacktrackingSolver(int n, int[] durations, List<Integer>[] domains, List<int[]> C, double timeLimit) {
         this.n = n;
@@ -51,10 +55,9 @@ public class ClassTimeScheduleBacktrackingSolver {
     private void Try(int k){
         double t= System.currentTimeMillis() - t_start;
         log.info("time = " + t + " -> Try(" + k + "/" + n + ") domain = " + domains[k].size());
-
         if(t > timeLimit) return;
-        //if (System.currentTimeMillis() - t0 > timeLimit) return;
         if(found) return;
+
         for(int v : domains[k]){
             if(check(v,k)){
                 x[k] = v;
@@ -65,6 +68,8 @@ public class ClassTimeScheduleBacktrackingSolver {
             }
         }
     }
+
+
     public void solve(){
         //this.timeLimit = timeLimit;
         log.info("solve...timeLimit = " + timeLimit);

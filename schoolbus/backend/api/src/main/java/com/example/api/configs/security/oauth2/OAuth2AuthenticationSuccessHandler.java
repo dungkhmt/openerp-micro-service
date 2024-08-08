@@ -59,8 +59,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         Account account = customUserDetails.toAccount();
         String token = JwtUtil.generateAccessToken(account);
         String refreshToken = JwtUtil.generateRefreshToken(account);
-        CookieUtils.addCookie(response,"token",token,36000);
-        CookieUtils.addCookie(response,"refreshToken",refreshToken,36000);
+        CookieUtils.addCookie(response,"token",token,9999999);
+        CookieUtils.addCookie(response,"refreshToken",refreshToken,9999999);
 
         return UriComponentsBuilder
             .fromUriString(targetUrl)

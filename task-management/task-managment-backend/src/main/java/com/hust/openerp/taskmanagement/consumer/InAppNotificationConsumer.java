@@ -14,13 +14,11 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.hust.openerp.taskmanagement.dto.NotificationMessage;
 import com.nimbusds.jose.shaded.gson.Gson;
 
-@Component
 public class InAppNotificationConsumer {
     private static final Logger log = LoggerFactory.getLogger(InAppNotificationConsumer.class);
 

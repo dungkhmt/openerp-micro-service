@@ -2,7 +2,8 @@ package com.example.shared.enumeration;
 
 public enum UserRole {
     ADMIN("admin"),
-    CLIENT("client");
+    CLIENT("client"),
+    EMPLOYEE("employee");
 
     private final String role;
 

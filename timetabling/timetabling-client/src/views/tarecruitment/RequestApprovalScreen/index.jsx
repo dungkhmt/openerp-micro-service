@@ -18,9 +18,8 @@ import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { DataGrid } from "@mui/x-data-grid";
 import { request } from "api";
-import { SEMESTER } from "../config/localize";
 import { applicationUrl, semesterUrl } from "../apiURL";
-import { successNoti } from "utils/notification";
+import { errorNoti, successNoti } from "utils/notification";
 import styles from "./index.style";
 
 const DEFAULT_PAGINATION_MODEL = {
@@ -35,7 +34,7 @@ const RequestApprovalScreen = () => {
   const [rowSelect, setRowSelect] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
-  const [semester, setSemester] = useState(SEMESTER);
+  const [semester, setSemester] = useState("");
 
   const [paginationModel, setPaginationModel] = useState(
     DEFAULT_PAGINATION_MODEL
@@ -54,7 +53,9 @@ const RequestApprovalScreen = () => {
   }, []);
 
   useEffect(() => {
-    handleFetchData();
+    if (semester !== "") {
+      handleFetchData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paginationModel, semester, debouncedSearch, statusFilter]);
 
@@ -126,7 +127,10 @@ const RequestApprovalScreen = () => {
         );
         setOriginalApplications(updatedOriginalApplications);
       },
-      {},
+      (res) => {
+        console.log(res);
+        errorNoti(res.response.data, 5000);
+      },
       updatedApplication
     );
   };

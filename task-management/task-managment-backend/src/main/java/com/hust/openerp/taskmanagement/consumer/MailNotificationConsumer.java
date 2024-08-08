@@ -5,8 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.hust.openerp.taskmanagement.dto.NotificationMessage;
 import com.hust.openerp.taskmanagement.dto.rabbitmq.MailChannel;
@@ -15,18 +13,17 @@ import com.hust.openerp.taskmanagement.service.MailService;
 import jakarta.mail.MessagingException;
 import lombok.Setter;
 
-@Component
 public class MailNotificationConsumer {
     private static final Logger log = LoggerFactory.getLogger(MailNotificationConsumer.class);
 
     private MessageConverter messageConverter;
 
-    @Autowired
     @Setter
     private MailService mailService;
 
-    public MailNotificationConsumer(MessageConverter messageConverter) {
+    public MailNotificationConsumer(MessageConverter messageConverter, MailService mailService) {
         this.messageConverter = messageConverter;
+        this.mailService = mailService;
     }
 
     @RabbitListener(queues = "#{queueEmail.name}")

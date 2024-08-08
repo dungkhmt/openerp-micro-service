@@ -9,6 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.generaltimetabling.exception.*;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.*;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.ResetScheduleRequest;
+import openerp.openerpresourceserver.generaltimetabling.service.ExcelService;
 import openerp.openerpresourceserver.generaltimetabling.service.GeneralClassService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -24,7 +25,7 @@ import openerp.openerpresourceserver.generaltimetabling.model.entity.general.Gen
 @Log4j2
 public class GeneralClassController {
     private GeneralClassService gService;
-
+    private ExcelService excelService;
     @ExceptionHandler(ConflictScheduleException.class)
     public ResponseEntity resolveScheduleConflict(ConflictScheduleException e) {
         return ResponseEntity.status(410).body(e.getCustomMessage());
@@ -103,7 +104,7 @@ public class GeneralClassController {
     public ResponseEntity requestExportExcel(@RequestParam("semester") String semester) {
         log.info("Controler API -> requestExportExcel start...");
         String filename = String.format("TKB_{}.xlsx", semester);
-        InputStreamResource file = new InputStreamResource(gService.exportExcel(semester));
+        InputStreamResource file = new InputStreamResource(excelService.exportGeneralExcel(semester));
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
                 .contentType(

@@ -1,15 +1,22 @@
 import DateFnsUtils from "@date-io/date-fns";
-import {Card, CardActions, CardContent, MenuItem, TextField, Typography,} from "@material-ui/core/";
-import Button from "@material-ui/core/Button";
-import {makeStyles} from "@material-ui/core/styles";
-import {MuiPickersUtilsProvider} from "@material-ui/pickers";
-import {convertToRaw, EditorState} from "draft-js";
+import {
+  Card,
+  CardActions,
+  CardContent,
+  MenuItem,
+  TextField,
+  Typography,
+} from "@mui/material";
+import Button from "@mui/material/Button";
+import { makeStyles } from "@material-ui/core/styles";
+import { MuiPickersUtilsProvider } from "@material-ui/pickers";
+import { convertToRaw, EditorState } from "draft-js";
 import draftToHtml from "draftjs-to-html";
-import {useEffect, useState} from "react";
-import {Editor} from "react-draft-wysiwyg";
-import {useParams} from "react-router";
-import {useHistory} from "react-router-dom";
-import {request} from "../../../api";
+import { useEffect, useState } from "react";
+import { Editor } from "react-draft-wysiwyg";
+import { useParams } from "react-router";
+import { useHistory } from "react-router-dom";
+import { request } from "../../../api";
 import AlertDialog from "../../common/AlertDialog";
 
 let reDirect = null;
@@ -17,9 +24,9 @@ const useStyles = makeStyles((theme) => ({
   root: {
     padding: theme.spacing(4),
     "& .MuiTextField-root": {
-      margin: theme.spacing(1),
-      width: "100%",
-      minWidth: 120,
+      marginBottom: theme.spacing(1),
+      // width: "100px",
+      width: 120,
     },
   },
   formControl: {
@@ -114,7 +121,7 @@ function CreateQuizChoiceAnswerOfCourse() {
       <Card>
         <CardContent>
           <Typography variant="h5" component="h2">
-            Tạo bài tập
+            Tạo đáp án
           </Typography>
           <form className={classes.root} noValidate autoComplete="off">
             <div>
@@ -150,13 +157,17 @@ function CreateQuizChoiceAnswerOfCourse() {
         <CardActions>
           <Button
             variant="contained"
-            color="primary"
+            color="success"
             style={{ marginLeft: "45px" }}
             onClick={handleSubmit}
           >
             Lưu
           </Button>
-          <Button variant="contained" onClick={() => history.push("")}>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => history.push("")}
+          >
             Hủy
           </Button>
         </CardActions>

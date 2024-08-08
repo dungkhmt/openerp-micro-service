@@ -22,8 +22,8 @@ public class CorsConfig {
     ) {
         final var config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(allowedOrigins);
-//        config.setAllowedOriginPatterns(Collections.singletonList("*"));
+//        config.setAllowedOrigins(allowedOrigins); //todo: tieptd
+        config.setAllowedOriginPatterns(Collections.singletonList("*"));
         config.setAllowedHeaders(Collections.singletonList("*"));
         config.setAllowedMethods(Collections.singletonList("*"));
 

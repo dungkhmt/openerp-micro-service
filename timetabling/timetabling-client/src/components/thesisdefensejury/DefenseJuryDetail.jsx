@@ -9,6 +9,11 @@ import { Box, Typography, Grid } from "@mui/material";
 import { StandardTable } from "erp-hust/lib/StandardTable";
 import PrimaryButton from "components/button/PrimaryButton";
 import ModalLoading from "components/common/ModalLoading";
+/**
+ * Component hiển thị thông tin hội đồng bảo vệ
+ * 
+ */
+
 function DefenseJuryDetail(props) {
   const { juryId } = useParams();
   const history = useHistory();
@@ -48,8 +53,8 @@ function DefenseJuryDetail(props) {
     keywords: item?.academicKeywordList.map((item) => item?.keyword),
     studentName: item?.studentName,
     thesisName: item?.thesisName,
-    supervisor: item?.supervisor.teacherName,
-    scheduledReviewer: item?.scheduledReviewer ? item?.scheduledReviewer?.teacherName : ''
+    supervisor: item?.supervisor,
+    scheduledReviewer: item?.scheduledReviewer ? item?.scheduledReviewer : ''
   }));
   return (
     <>
@@ -65,24 +70,13 @@ function DefenseJuryDetail(props) {
           </Box>
           <Box sx={{ marginRight: 5, display: 'flex' }}>
             Ca tổ chức :
-            <Typography variant="body1" sx={{ marginLeft: 5, fontWeight: 'bold', fontFamily: 'Roboto Condensed', color: 'black' }}> {defenseJury?.defenseSession?.name}</Typography>
+            <Typography variant="body1" sx={{ marginLeft: 5, fontWeight: 'bold', fontFamily: 'Roboto Condensed', color: 'black' }}> {defenseJury?.defenseSession?.map(({ name }) => name)?.join(" & ")}</Typography>
           </Box>
           <Box sx={{ marginRight: 5, display: 'flex' }}>
             Phân ban :
             <Typography variant="body1" sx={{ marginLeft: 5, fontWeight: 'bold', fontFamily: 'Roboto Condensed', color: 'black' }}> {defenseJury?.juryTopic?.name}</Typography>
           </Box>
         </Box>
-
-        {/* <div className="defense-jury-info">
-          Ngày tổ chức: {defenseJury?.defenseDate?.split("T")[0]}
-        </div>
-        <div className="defense-jury-info">
-          Ca tổ chức: {defenseJury?.defenseSession?.name}
-        </div>
-        <div className="defense-jury-info">
-          Phân ban: {defenseJury?.juryTopic?.name}
-        </div> */}
-
         {defenseJury?.juryTopic?.academicKeywordList.map(({ keyword, description }) => (
           <KeywordChip key={keyword} keyword={description} />
         ))}
@@ -95,7 +89,7 @@ function DefenseJuryDetail(props) {
               sx={{ marginTop: "16px" }}
             >
               {defenseJuryTeacherRoles?.map((item) => (
-                <Grid item xs={2.75}>
+                <Grid item xs={3.2} key={item?.id}>
                   <InfoCard
                     icon={UsersIcon}
                     iconColor="#000"

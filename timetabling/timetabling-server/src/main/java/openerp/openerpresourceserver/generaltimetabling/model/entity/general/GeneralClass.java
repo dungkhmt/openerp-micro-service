@@ -109,4 +109,20 @@ public class GeneralClass {
         }
         return W;
     }
+
+    public boolean hasNonNullTimeSlot() {
+        return timeSlots.stream().anyMatch(RoomReservation::isTimeSlotNotNull);
+    }
+
+    public void setInfo(GeneralClass generalClass) {
+        this.moduleCode = generalClass.moduleCode;
+        this.moduleName = generalClass.moduleName;
+          this.quantityMax = generalClass.quantityMax;
+         this.classType = generalClass.classType;
+        this.studyClass = generalClass.studyClass;
+         this.mass = generalClass.mass;
+         this.crew = generalClass.crew;
+         this.openBatch = generalClass.openBatch;
+         this.course = generalClass.course;
+    }
 }

@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.thesisdefensejuryassignment.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.TeacherSupervisedThesisDTO;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.models.AssignJuryTopicToThesisIM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.ThesisDTO;
@@ -107,16 +108,19 @@ public class ThesisServiceImpl implements ThesisService{
 
     @Override
     public Thesis getById(String id) {
-
         return thesisRepo.findById(UUID.fromString(id)).orElse(null);
     }
 
     @Override
-    public String assignJuryTopicToThesis(String thesisId, int juryTopicId) {
+    public String assignJuryTopicToThesis(String thesisId, AssignJuryTopicToThesisIM assignJuryTopicToThesisIM) {
         Thesis thesis = thesisRepo.findById(UUID.fromString(thesisId)).orElse(null);
-        JuryTopic juryTopic = juryTopicRepo.findById(juryTopicId).orElse(null);
+        JuryTopic juryTopic = juryTopicRepo.findById(assignJuryTopicToThesisIM.getJuryTopicId()).orElse(null);
         if (thesis == null) return "ERROR";
         thesis.setJuryTopic(juryTopic);
+        if (assignJuryTopicToThesisIM.getSecondJuryTopicId() != 0){
+            JuryTopic secondJuryTopic = juryTopicRepo.findById(assignJuryTopicToThesisIM.getSecondJuryTopicId()).orElse(null);
+            thesis.setSecondaryJuryTopic(secondJuryTopic);
+        }
         Thesis savedThesis = thesisRepo.save(thesis);
         return "Phân ban cho đồ án " + savedThesis.getThesisName() + " thành công";
     }
@@ -134,6 +138,12 @@ public class ThesisServiceImpl implements ThesisService{
         else {
             thesisDTO.setJuryTopicName(null);
         }
+        if (thesis.getSecondaryJuryTopic() != null){
+            thesisDTO.setSecondJuryTopicName(thesis.getSecondaryJuryTopic().getName());
+        }
+        else {
+            thesisDTO.setSecondJuryTopicName(null);
+        }
         if (thesis.getDefenseJury() != null){
             thesisDTO.setDefenseJuryId(thesis.getDefenseJury().getId());
             thesisDTO.setDefenseJuryName(thesis.getDefenseJury().getName());
@@ -144,5 +154,4 @@ public class ThesisServiceImpl implements ThesisService{
         }
         return thesisDTO;
     }
-
 }

@@ -14,7 +14,9 @@ export const useClasses = (group, semester) => {
     setLoading(true);
     request(
       "get",
-      `/general-classes/?semester=${semester?.semester}&groupName=${group?.groupName || ""}`,
+      `/general-classes/?semester=${semester?.semester}&groupName=${
+        group?.groupName || ""
+      }`,
       (res) => {
         let generalClasses = [];
         res?.data?.forEach((classObj) => {
@@ -26,6 +28,7 @@ export const useClasses = (group, semester) => {
                 classCode: classObj.classCode,
                 roomReservationId: timeSlot.id,
                 id: classObj.id + `-${index + 1}`,
+                crew: classObj.crew,
               })
             );
             delete cloneObj.timeSlots;
@@ -38,7 +41,7 @@ export const useClasses = (group, semester) => {
         setController(new AbortController());
       },
       (error) => {
-        if(axios.isCancel(error)) {
+        if (axios.isCancel(error)) {
           setController(new AbortController());
           setLoading(false);
           return console.log(error);

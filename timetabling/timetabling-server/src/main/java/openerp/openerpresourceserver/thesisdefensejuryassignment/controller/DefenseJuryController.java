@@ -2,6 +2,8 @@ package openerp.openerpresourceserver.thesisdefensejuryassignment.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.DefenseJuryDTO;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.ThesisDTO;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.DefenseJury;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.Teacher;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.Thesis;
@@ -9,6 +11,7 @@ import openerp.openerpresourceserver.thesisdefensejuryassignment.models.*;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.service.DefenseJuryServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +25,7 @@ import java.util.UUID;
 @Log4j2
 
 public class DefenseJuryController {
+    @Autowired
     private DefenseJuryServiceImpl juryService;
 
 
@@ -58,10 +62,10 @@ public class DefenseJuryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DefenseJury> getDefenseJuryById(@PathVariable String id) {
+    public ResponseEntity<DefenseJuryDTO> getDefenseJuryById(@PathVariable String id) {
         logger.info("Jury id: " + id);
         System.out.println(id);
-        DefenseJury res = juryService.getDefenseJuryByID(UUID.fromString(id));
+        DefenseJuryDTO res = juryService.getDefenseJuryByID(UUID.fromString(id));
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
@@ -77,7 +81,7 @@ public class DefenseJuryController {
 
 
     @GetMapping("/thesis/get-all-available/{thesisDefensePlanId}")
-    public ResponseEntity<List<Thesis>> getAllAvailableThesis(@PathVariable String thesisDefensePlanId) {
+    public ResponseEntity<List<ThesisDTO>> getAllAvailableThesis(@PathVariable String thesisDefensePlanId) {
         System.out.println("Get available thesis: " + thesisDefensePlanId);
         return new ResponseEntity<>(juryService.getAllAvailableThesiss(thesisDefensePlanId), HttpStatus.OK);
     }
@@ -108,12 +112,12 @@ public class DefenseJuryController {
         return new ResponseEntity<>(defenseJury, HttpStatus.CREATED);
     }
 
-    @PostMapping("/assign-automatically")
-    public ResponseEntity<String> assignTeacherAndThesisAutomatically(
-            @RequestBody AssignTeacherToDefenseJuryAutomaticallyIM teacherListAndDefensePlan
+    @PostMapping("/assign-automatically/{thesisDefensePlanId}/{defenseJuryId}")
+    public ResponseEntity<List<Teacher>> assignTeacherAutomatically(
+            @PathVariable String thesisDefensePlanId, @PathVariable String defenseJuryId, @RequestBody AssignTeacherToDefenseJuryAutomaticallyIM thesis
     ) {
-        String message = juryService.assignTeacherAndThesisAutomatically(teacherListAndDefensePlan);
-        return new ResponseEntity<>(message, HttpStatus.CREATED);
+        List<Teacher> teacherIdList = juryService.assignTeacherAutomatically(thesisDefensePlanId, defenseJuryId, thesis);
+        return new ResponseEntity<>(teacherIdList, HttpStatus.CREATED);
     }
 
     @PostMapping("/reassign")

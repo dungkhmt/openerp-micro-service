@@ -4,6 +4,7 @@ import com.example.api.configs.security.CustomUserDetails;
 import com.example.api.services.auth.dto.SignUpInput;
 import com.example.shared.db.entities.Account;
 import com.example.shared.db.repo.AccountRepository;
+import com.example.shared.enumeration.UserRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,16 +27,20 @@ public class AuthService implements UserDetailsService {
         return CustomUserDetails.fromAccount(account);
     }
 
-    public UserDetails signUp(SignUpInput input) {
+    public Account signUp(SignUpInput input) {
         if (accountRepository.findByUsername(input.getUsername()).isPresent()) {
             throw new IllegalArgumentException("Username already exists");
         }
-        String encryptedPassword = new BCryptPasswordEncoder().encode(input.getPassword());
+        String encryptedPassword = encodePassword(input.getPassword());
         Account account = Account.builder()
                 .username(input.getUsername())
                 .password(encryptedPassword)
-                .role(input.getRole())
+                .role(input.getRole() == null ? UserRole.CLIENT : input.getRole())
                 .build();
-        return CustomUserDetails.fromAccount(accountRepository.save(account));
+        return accountRepository.save(account);
+    }
+
+    public String encodePassword(String password) {
+        return new BCryptPasswordEncoder().encode(password);
     }
 }

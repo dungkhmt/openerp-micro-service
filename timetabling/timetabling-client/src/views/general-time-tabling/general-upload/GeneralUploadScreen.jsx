@@ -8,11 +8,12 @@ import { useClasses } from "../hooks/useClasses";
 import { toast } from "react-toastify";
 import { request } from "api";
 import { FacebookCircularProgress } from "components/common/progressBar/CustomizedCircularProgress";
+import { useClassesNoSchedule } from "../hooks/useClassesNoSchedule";
 
 const GeneralUploadScreen = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedSemester, setSelectedSemester] = useState(null);
-  const { loading, error, classes, setClasses } = useClasses(
+  const { loading, error, classes, setClasses } = useClassesNoSchedule(
     null,
     selectedSemester
   );
@@ -58,6 +59,7 @@ const GeneralUploadScreen = () => {
                     ...timeSlot,
                     classCode: classObj.classCode,
                     id: classObj.id + `-${index + 1}`,
+                    crew:classObj.crew
                   })
                 );
                 delete cloneObj.timeSlots;
@@ -84,7 +86,7 @@ const GeneralUploadScreen = () => {
   return (
     <LoadingProvider>
       <div className="flex flex-col gap-2">
-        <div className="flex flex-col gap-2 items-end">
+        <div className="flex flex-row gap-2 justify-between">
           <GeneralSemesterAutoComplete
             selectedSemester={selectedSemester}
             setSelectedSemester={setSelectedSemester}
@@ -112,7 +114,7 @@ const GeneralUploadScreen = () => {
             </div>
           </div>
         </div>
-        <GeneralUploadTable classes={classes} dataLoading={loading} />
+        <GeneralUploadTable setClasses={setClasses} classes={classes} dataLoading={loading} />
       </div>
     </LoadingProvider>
   );

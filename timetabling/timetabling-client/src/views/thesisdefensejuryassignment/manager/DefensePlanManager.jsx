@@ -4,23 +4,27 @@ import { request } from "api";
 import PrimaryButton from "components/button/PrimaryButton";
 import { StandardTable } from "erp-hust/lib/StandardTable";
 import CreateDefenseJury from "components/thesisdefensejury/modal/ModalCreateDefenseJury";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, FormControl, Select, MenuItem, InputLabel } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import Chip from "@mui/material/Chip";
 import ModalLoading from "components/common/ModalLoading";
 import ModalDeleteItem from "components/thesisdefensejury/modal/ModalDeleteItem";
 import { successNoti } from "utils/notification";
+import useQuery from "hooks/useQuery";
+// Màn quản lý các hội đồng bảo vệ
 export default function DefensePlanManager() {
   const deletedJuryId = useRef("");
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const history = useHistory();
   const [defenseJuries, setDefenseJuries] = useState([]);
-  const [thesisDefensePlan, setThesisDefensePlan] = useState({});
+  const [juryTopicList, setJuryTopicList] = useState([]);
+  const [currentJuryTopic, setCurrentJuryTopic] = useState({});
   const [open, setOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [toggle, setToggle] = useState(false);
+  let query = useQuery();
+  const juryTopic = query?.get('juryTopic');
   const columns = [
     { title: "Tên hội đồng", field: "name" },
     {
@@ -31,20 +35,14 @@ export default function DefensePlanManager() {
     {
       title: "Ca bảo vệ",
       field: "defenseSession",
-      render: (rowData) => rowData?.defenseSession?.name,
+      render: (rowData) => rowData?.defenseJurySessionList?.map(({ defenseSession }) => defenseSession?.name)?.join(" & "),
     },
 
     {
       title: "Phòng", field: "defenseRoom", render: (rowData) => rowData?.defenseRoom?.name,
     },
     {
-      title: "Phân ban", field: "juryTopic",
-    },
-    {
-      title: "Keywords",
-      field: "keywords",
-      render: (rowData) =>
-        rowData.keywords.map((item) => <Chip key={item} label={item} />),
+      title: "Số đồ án tối da", field: "maxThesis",
     },
     {
       title: "",
@@ -57,24 +55,31 @@ export default function DefensePlanManager() {
             <EditIcon />
           </IconButton>
           <IconButton aria-label="Chỉnh sửa" sx={{ marginRight: 2 }} onClick={() => {
+            console.log(rowData?.id)
             deletedJuryId.current = rowData.id;
             setDeleteModalOpen((prevDeleteModalOpen) => !prevDeleteModalOpen)
           }}>
             <DeleteIcon />
           </IconButton>
-          <PrimaryButton
-            onClick={() => {
-              history.push(`/thesis/thesis_defense_plan/${id}/defense_jury/${rowData.id}?isassigned=${rowData?.defenseJuryTeacherRoles?.length > 0 ? "True" : "False"}`);
-            }}
-            variant="contained"
-            color="error"
-            sx={{ float: "right" }}
-          >
-            Xem hội đồng
-          </PrimaryButton>
         </Box>
       ),
     },
+    {
+      title: "",
+      sorting: false,
+      render: (rowData) => (
+        <PrimaryButton
+          onClick={() => {
+            history.push(`/thesis/thesis_defense_plan/${id}/defense_jury/${rowData?.id}?isassigned=${rowData?.assigned ? "True" : "False"}`);
+          }}
+          variant="contained"
+          color="error"
+          sx={{ float: "right" }}
+        >
+          Xem hội đồng
+        </PrimaryButton>
+      )
+    }
   ];
 
   const handleClose = () => {
@@ -86,6 +91,10 @@ export default function DefensePlanManager() {
   const handleToggle = () => {
     setToggle(!toggle);
   };
+  const handleChange = (e) => {
+    const currentTopic = e?.target?.value;
+    history?.push(`?juryTopic=${currentTopic}`)
+  }
   const handleDelete = () => {
     request("DELETE",
       `/defense-jury/delete/${deletedJuryId.current}`, (res) => {
@@ -99,35 +108,46 @@ export default function DefensePlanManager() {
         console.log(e)
       })
   }
-  async function getPlanById() {
+  useEffect(() => {
     setLoading(true);
     request(
-      // token,
-      // history,
       "GET",
-      `/thesis-defense-plan/${id}`,
+      `/jury-topic/${id}`,
       (res) => {
-        const data = res.data?.defenseJuries;
-        setThesisDefensePlan(res.data);
-        setDefenseJuries(
-          data?.reverse()?.map((item) => ({
-            ...item,
-            juryTopic: item?.juryTopic?.name,
-            keywords: item?.juryTopic?.academicKeywordList.map((item) => item.keyword),
-          }))
-        );
+        const data = res.data;
+        console.log(data);
+        setJuryTopicList(data);
+        if (juryTopic) {
+          const topic = parseInt(juryTopic);
+          setCurrentJuryTopic(data?.find((item) => item?.id === topic))
+          setDefenseJuries(data?.find((item) => item?.id === topic)?.defenseJuryList)
+        }
         setLoading(false)
       }
     );
-  }
 
-  useEffect(() => {
-    getPlanById();
-  }, [toggle]);
+  }, [toggle, juryTopic]);
+
   return (
     <div>
       {loading && <ModalLoading />}
       <Box sx={{ width: "100%" }}>
+        <FormControl sx={{ width: '30%' }}>
+          <InputLabel id="thesisDefensePlan">Chọn phân ban</InputLabel>
+          <Select
+            labelId="thesisDefensePlan"
+            id="thesisDefensePlanSelect"
+            value={juryTopic}
+            label="thesisDefensePlan"
+            onChange={handleChange}
+          >
+            {juryTopicList?.map(({ id, name }) =>
+              <MenuItem key={id} value={id} selected={id === juryTopic}>
+                {name}
+              </MenuItem>
+            )}
+          </Select>
+        </FormControl>
         <PrimaryButton
           onClick={() => {
             handleModalOpen();
@@ -138,10 +158,6 @@ export default function DefensePlanManager() {
         >
           Tạo hội đồng mới
         </PrimaryButton>
-        <PrimaryButton onClick={() => { history.push('assign-automatically') }} sx={{ float: "right", marginRight: "16px" }}>
-          Phân chia hội đồng tự động
-        </PrimaryButton>
-
       </Box>
 
       <StandardTable
@@ -163,6 +179,7 @@ export default function DefensePlanManager() {
               handleClose={handleClose}
               handleToggle={handleToggle}
               thesisPlanName={id}
+              juryTopic={currentJuryTopic}
             />
           </div>
         </div>

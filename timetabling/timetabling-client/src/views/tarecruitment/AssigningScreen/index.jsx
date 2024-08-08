@@ -1,7 +1,6 @@
 import { request } from "api";
 import { useState, useEffect, useMemo } from "react";
 import useDebounce from "../config/debounce";
-import { SEMESTER } from "../config/localize";
 import {
   Button,
   Chip,
@@ -18,7 +17,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
-import { errorNoti } from "utils/notification";
+import { errorNoti, successNoti, warningNoti } from "utils/notification";
 import { DataGrid } from "@mui/x-data-grid";
 import styles from "./index.style";
 import { applicationUrl, semesterUrl } from "../apiURL";
@@ -31,7 +30,7 @@ const DEFAULT_PAGINATION_MODEL = {
 const AssigningScreen = () => {
   const [applications, setApplications] = useState([]);
   const [originalApplications, setOriginalApplications] = useState([]);
-  const [semester, setSemester] = useState(SEMESTER);
+  const [semester, setSemester] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
@@ -55,7 +54,9 @@ const AssigningScreen = () => {
   }, []);
 
   useEffect(() => {
-    handleFetchData();
+    if (semester !== "") {
+      handleFetchData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paginationModel, semester, debouncedSearch, statusFilter]);
 
@@ -130,10 +131,29 @@ const AssigningScreen = () => {
 
   const handleAutoAssign = () => {
     setIsLoading(true);
+    warningNoti("Đang sắp xếp, vui lòng đợi", 5000);
     request("get", `${applicationUrl.autoAssignClass}/${semester}`, (res) => {
       handleFetchData();
+      successNoti("Sắp xếp tự động thành công", 5000);
       setIsLoading(false);
     });
+  };
+
+  const handleOldAutoAssign = () => {
+    setIsLoading(true);
+    warningNoti("Đang sắp xếp, vui lòng đợi", 5000);
+    request(
+      "get",
+      `${applicationUrl.oldAutoAssignClass}/${semester}`,
+      (res) => {
+        handleFetchData();
+        successNoti("Sắp xếp tự động thành công", 5000);
+      },
+      (e) => {
+        errorNoti("Có lỗi xảy ra trong quá trình sắp xếp tự động", 5000);
+      }
+    );
+    setIsLoading(false);
   };
 
   const handleChangeStatusFilter = (e) => {
@@ -342,6 +362,14 @@ const AssigningScreen = () => {
               onClick={handleAutoAssign}
             >
               Sắp xếp tự động
+            </Button>
+
+            <Button
+              style={styles.autoButton}
+              variant="outlined"
+              onClick={handleOldAutoAssign}
+            >
+              Sắp xếp tự động (cũ)
             </Button>
           </div>
 

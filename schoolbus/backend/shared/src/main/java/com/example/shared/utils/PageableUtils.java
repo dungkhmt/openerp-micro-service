@@ -35,6 +35,31 @@ public class PageableUtils {
         return PageRequest.of(page, size, Sort.by(snakeToCamel(sort)).ascending());
     }
 
+    public static Pageable generateForNativeQuery(Integer page, Integer size, String reqSort, String defaultSort){
+        if (page == null) {
+            page = 0;
+        }
+        if (size == null || size == 0) {
+            size = 20;
+        }
+
+        var sort = defaultSort;
+        if (reqSort != null) {
+            sort = reqSort;
+        }
+
+        if (sort == null || sort.isBlank()) {
+            return PageRequest.of(page, size);
+        }
+
+        sort = sort.split(",")[0];
+
+        if (sort.charAt(0) == '-') {
+            return PageRequest.of(page, size, Sort.by(camelToSnake(sort.substring(1))).descending());
+        }
+        return PageRequest.of(page, size, Sort.by(camelToSnake(sort)).ascending());
+    }
+
     static String snakeToCamel(String str)
     {
         // Convert to StringBuilder
@@ -54,6 +79,32 @@ public class PageableUtils {
                         String.valueOf(
                                 Character.toUpperCase(
                                         builder.charAt(i))));
+            }
+        }
+
+        // Return in String type
+        return builder.toString();
+    }
+
+    static String camelToSnake(String str)
+    {
+        // Convert to StringBuilder
+        StringBuilder builder = new StringBuilder(str);
+
+        // Traverse the string character by
+        // character and remove underscore
+        // and capitalize next letter
+        for (int i = 0; i < builder.length(); i++) {
+
+            // Check char is underscore
+            if (Character.isUpperCase(builder.charAt(i))) {
+
+                builder.replace(
+                        i, i + 1,
+                        String.valueOf(
+                                Character.toLowerCase(
+                                        builder.charAt(i))));
+                builder.insert(i, "_");
             }
         }
 

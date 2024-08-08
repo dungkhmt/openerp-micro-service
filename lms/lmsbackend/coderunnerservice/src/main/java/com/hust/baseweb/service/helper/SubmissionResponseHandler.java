@@ -154,7 +154,8 @@ public class SubmissionResponseHandler {
             totalStatus = ContestSubmissionEntity.SUBMISSION_STATUS_WAIT_FOR_CUSTOM_EVALUATION;
         } else if (nbTestCasePass == 0) {
             totalStatus = ContestSubmissionEntity.SUBMISSION_STATUS_FAILED;
-        } else if (nbTestCasePass > 0 && nbTestCasePass < testCaseEntityList.size()) {
+        //} else if (nbTestCasePass > 0 && nbTestCasePass < testCaseEntityList.size()) {
+        } else if (nbTestCasePass > 0 && nbTestCasePass < nbTestCaseGraded) {
             totalStatus = ContestSubmissionEntity.SUBMISSION_STATUS_PARTIAL;
         } else {
             message = "Successful";

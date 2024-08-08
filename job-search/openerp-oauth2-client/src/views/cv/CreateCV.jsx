@@ -498,7 +498,7 @@ const CreateNewCvForm = () => {
 
             {/* cv template */}
             {showCVDemo && (
-                <div className="w-100">
+                <div className="w-100" >
                     <CvTemplate1
                         name={userInfoForm.userName}
                         gender={userInfoForm.gender}
@@ -510,7 +510,7 @@ const CreateNewCvForm = () => {
                         linkedInLink={userInfoForm.linkedInLink}
                         gitHubLink={userInfoForm.githubLink}
                         education={educations}
-                        skill={skills}
+                        skillDescription={skills}
                         workingExperience={experiences}
                         handleBackToEditButton={() => setShowCVDemo(false)}
                         handleSaveCVButton={() => createNewCv()}

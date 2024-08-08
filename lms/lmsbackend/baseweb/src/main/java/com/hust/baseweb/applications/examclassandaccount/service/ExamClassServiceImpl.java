@@ -64,6 +64,16 @@ public class ExamClassServiceImpl implements ExamClassService{
     }
 
     @Override
+    public boolean clearAccountExamClass(UUID examClassId) {
+        List<ExamClassUserloginMap> L = examClassUserloginMapRepo.findByExamClassId(examClassId);
+        for(ExamClassUserloginMap e: L){
+            examClassUserloginMapRepo.delete(e);
+            log.info("clearAccountExamClass, remove " + e.getId() + "," + e.getRealUserLoginId());
+        }
+        return L != null && L.size() > 0;
+    }
+
+    @Override
     public ModelRepsonseExamClassDetail getExamClassDetail(UUID examClassId) {
         ExamClass ec = examClassRepo.findById(examClassId).orElse(null);
         if(ec == null)

@@ -189,6 +189,7 @@ export default function ClassroomAutoCompleteCell({
       onChange={handleAutocompleteChangeV2}
       renderInput={(params) => (
         <TextField
+        variant='standard'
           sx={{ width: 200 }}
           {...params}
           InputProps={{

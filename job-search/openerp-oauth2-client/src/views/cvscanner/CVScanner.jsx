@@ -102,9 +102,9 @@ const ButtonScore = styled.button`
   margin-right: 4rem;
 `;
 const Container = styled.div``;
+const apiUrl = process.env.REACT_APP_CANDIDATE_FINDING_HOST;
 
 function CVScanner() {
-
     const [isLoading, setIsLoading] = useState(false);
     const [isFetch, setIsFetch] = useState(false);
     const [data, setData] = useState([]);
@@ -130,7 +130,7 @@ function CVScanner() {
 
             setIsLoading(true);
             const res = await axios.post(
-                "https://cv-search-engine.onrender.com/api/find-candidate",
+                `${apiUrl}/api/find-candidate`,
                 information,
                 {
                     headers: {
