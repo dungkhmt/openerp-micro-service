@@ -38,7 +38,7 @@ public class DeliveryTripServiceImplVD implements DeliveryTripService {
     private BayService bayService;
     private com.hust.wmsbackend.management.service.service2.ProductService productService;
     private com.hust.wmsbackend.management.service.service2.DeliveryManagementService deliveryManagementService;
-    private SaleOrderService saleOrderService;
+    private com.hust.wmsbackend.management.service.service2.SaleOrderService saleOrderService;
 
     @Override
     @Transactional
@@ -112,7 +112,6 @@ public class DeliveryTripServiceImplVD implements DeliveryTripService {
             updateItemAdder.setQuantity(newQuantity);
             updateAssignedOrderItems.add(updateItemAdder);
         }
-        // TODO: Calculate distance here
 
         deliveryTripRepository.save(trip);
         deliveryTripItemRepository.saveAll(items);
@@ -267,17 +266,12 @@ public class DeliveryTripServiceImplVD implements DeliveryTripService {
         return new DeliveryTripDTO(trip);
     }
 
-    @Override
-    public DeliveryTripDTO estimateDistance(String deliveryTripId) {
-        return null;
-        // TODO: code
-    }
 
     @Override
     public List<DeliveryTripDTO> getTodayDeliveryTrip(Principal principal) {
         List<DeliveryTrip> trips = deliveryTripRepository.findTodayDeliveryTripsByPerson(principal.getName(),
             Arrays.asList(DeliveryTripStatus.CREATED.getCode(), DeliveryTripStatus.DELIVERING.getCode()));
-        return trips.stream().map(trip -> getById(trip.getDeliveryTripId())).collect(Collectors.toList());
+        return trips.stream().map(trip -> new DeliveryTripDTO(trip)).collect(Collectors.toList());
     }
 
     @Override
@@ -293,45 +287,9 @@ public class DeliveryTripServiceImplVD implements DeliveryTripService {
                 throw new RuntimeException("Có sản phẩm chưa được giao");
             }
         }
-//        List<InventoryItem> updateInventoryItems = new ArrayList<>();
-//        List<ProductWarehouse> updateProductWarehouses = new ArrayList<>();
         List<AssignedOrderItem> updateAssignedOrderItems = new ArrayList<>();
         for (DeliveryTripItem item : items) {
             if (item.getStatus() == DeliveryTripItemStatus.FAIL) {
-                // Note: Logic cũ (trước khi thảo luận với thầy)
-                // nếu delivery item trip này giao thất bại
-                // thì cần cập nhật lại quantity của hàng hóa trong kho, với luồng logic là:
-                // cập nhật lại giá trị của inventory item và product warehouse
-                // từ item -> lấy được assignedOrderItemId -> lấy được AssignedOrderItem -> lấy được inventoryItemId
-                // lấy được InventoryItem -> update quantity
-                // từ InventoryItem -> lấy được productId, warehouseId -> update quantity
-
-                // update inventory item
-//                UUID assignedOrderItemId = item.getAssignedOrderItemId();
-//                Optional<AssignedOrderItem> assignedOrderItemOpt = assignedOrderItemRepository.findById(assignedOrderItemId);
-//                if (!assignedOrderItemOpt.isPresent()) {
-//                    throw new RuntimeException(String.format("Assigned order item with id %s is not exist", assignedOrderItemId));
-//                }
-//                Optional<InventoryItem> inventoryItemOpt = inventoryItemRepository.findById(assignedOrderItemOpt.get().getInventoryItemId());
-//                if (!inventoryItemOpt.isPresent()) {
-//                    throw new RuntimeException(String.format("Inventory item with id %s is not exist", assignedOrderItemOpt.get().getInventoryItemId()));
-//                }
-//                InventoryItem inventoryItem = inventoryItemOpt.get();
-//                BigDecimal newInventoryItemQuantity = inventoryItem.getQuantityOnHandTotal().add(item.getQuantity());
-//                inventoryItem.setQuantityOnHandTotal(newInventoryItemQuantity);
-//                updateInventoryItems.add(inventoryItem);
-
-                // update product warehouse
-//                Optional<ProductWarehouse> productWarehouseOpt = productWarehouseRepository.findProductWarehouseByWarehouseIdAndProductId(
-//                    inventoryItem.getWarehouseId(), inventoryItem.getProductId());
-//                if (!productWarehouseOpt.isPresent()) {
-//                    throw new RuntimeException(String.format("Product warehouse with warehouse id %s and product id %s is not exist",
-//                        inventoryItem.getWarehouseId(), inventoryItem.getProductId()));
-//                }
-//                ProductWarehouse productWarehouse = productWarehouseOpt.get();
-//                BigDecimal newProductWarehouseQuantity = productWarehouse.getQuantityOnHand().add(item.getQuantity());
-//                productWarehouse.setQuantityOnHand(newProductWarehouseQuantity);
-//                updateProductWarehouses.add(productWarehouse);
 
                 // Logic mới sau khi thảo luận với thầy
                 // Các delivery_trip_item fail sẽ cập nhật lại quantity của assigned_order_item tương ứng

@@ -2,6 +2,7 @@ package com.hust.wmsbackend.management.service.service2.serviceImplement;
 
 import com.hust.wmsbackend.management.cache.RedisCacheService;
 import com.hust.wmsbackend.management.entity.*;
+import com.hust.wmsbackend.management.model.model2.response.ProductNoImg;
 import com.hust.wmsbackend.management.model.request.ProductPriceRequest;
 import com.hust.wmsbackend.management.model.request.ProductRequest;
 import com.hust.wmsbackend.management.model.response.ProductDetailQuantityResponse;
@@ -128,7 +129,6 @@ public class ProductServiceImplVD implements ProductService {
     @Transactional
     public List<ProductGeneralResponse> getAllProductGeneral() {
         List<Product> products = getAllProductInCacheElseDatabase();
-        log.info("danh sach hang hoa: " + products);
         Map<String, BigDecimal> productOnHandQuantityMap = new HashMap<>();
         for (Product product : products) {
             String productId = product.getProductId().toString();
@@ -179,6 +179,20 @@ public class ProductServiceImplVD implements ProductService {
                     .build());
         }
         return response;
+    }
+
+    @Override
+    public List<ProductGeneralResponse> getListProductNoImage() {
+        List<ProductNoImg> resDTO = productRepository.findListProductWithoutImage();
+        List<ProductGeneralResponse> res = new ArrayList<>();
+        for(ProductNoImg p : resDTO) {
+            res.add(ProductGeneralResponse.builder()
+                    .productId(p.getProductId().toString())
+                    .name(p.getName())
+                    .code(p.getCode())
+                    .build());
+        }
+        return res;
     }
 
     @Override

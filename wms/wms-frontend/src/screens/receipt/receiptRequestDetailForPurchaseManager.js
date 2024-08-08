@@ -91,7 +91,7 @@ const ReceiptRequestDetailForPurchaseManager = ( props ) => {
     async function fetchData() {
       await request(
         "get",
-        API_PATH_2.PRODUCT_WITHOUT_IMAGE,
+        API_PATH_2.LIST_PRODUCT_NO_IMG,
         (res) => {
           setProductList(res.data);
         }

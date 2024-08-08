@@ -1,6 +1,7 @@
 package com.hust.wmsbackend.management.service.service2;
 
 import com.hust.wmsbackend.management.entity.Product;
+import com.hust.wmsbackend.management.model.model2.response.ProductNoImg;
 import com.hust.wmsbackend.management.model.request.ProductPriceRequest;
 import com.hust.wmsbackend.management.model.request.ProductRequest;
 import com.hust.wmsbackend.management.model.response.ProductDetailResponse;
@@ -19,6 +20,8 @@ public interface ProductService {
         List<ProductGeneralResponse> getAllProductGeneral();
 
         List<ProductGeneralResponse> getAllProductGeneralWithoutImage();
+
+        List<ProductGeneralResponse> getListProductNoImage();
 
         List<ProductGeneralResponse> getAllProductForSale();
 

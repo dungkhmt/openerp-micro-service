@@ -1,6 +1,7 @@
 package com.hust.wmsbackend.management.repository.repo2;
 
 import com.hust.wmsbackend.management.entity.Product;
+import com.hust.wmsbackend.management.model.model2.response.ProductNoImg;
 import com.hust.wmsbackend.management.model.response.ProductDetailQuantityResponse;
 import com.hust.wmsbackend.management.model.response.ProductReportResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -68,4 +69,9 @@ public interface ProductV2Repository2 extends JpaRepository<Product, UUID> {
 
     @Query("SELECT p.productId, p.name FROM Product p")
     List<Object[]> findProductIdAndName();
+
+    @Query("select new com.hust.wmsbackend.management.model.model2.response.ProductNoImg" +
+            "(p.productId, p.name, p.code, p.categoryId) " +
+            "from Product p ")
+    List<ProductNoImg> findListProductWithoutImage();
 }

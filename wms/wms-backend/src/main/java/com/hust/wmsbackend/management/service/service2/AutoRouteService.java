@@ -11,5 +11,5 @@ public interface AutoRouteService {
 
     AutoRouteResponse getPath(String deliveryTripId);
 
-    AutoRouteResponse autoRoute2(DeliveryTripDTO request);
+    AutoRouteResponse autoRoute2(DeliveryTripDTO request, Principal principal);
 }

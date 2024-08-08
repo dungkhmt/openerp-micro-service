@@ -9,8 +9,9 @@ import com.hust.wmsbackend.management.entity.enumentity.PaymentType;
 import com.hust.wmsbackend.management.model.model2.request.SaleOrderRequest2;
 import com.hust.wmsbackend.management.repository.repo2.CustomerAddressRepository2;
 import com.hust.wmsbackend.management.repository.DeliveryTripItemRepository;
-import com.hust.wmsbackend.management.repository.SaleOrderHeaderRepository;
 import com.hust.wmsbackend.management.repository.SaleOrderItemRepository;
+import com.hust.wmsbackend.management.repository.repo2.DeliveryTripItemRepository2;
+import com.hust.wmsbackend.management.repository.repo2.SaleOrderHeaderRepository2;
 import com.hust.wmsbackend.management.service.service2.ProductService;
 import com.hust.wmsbackend.management.service.service2.SaleOrderService;
 import lombok.AllArgsConstructor;
@@ -28,10 +29,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SaleOrderServiceImplVD implements SaleOrderService {
 
-    private SaleOrderHeaderRepository saleOrderHeaderRepository;
+    private SaleOrderHeaderRepository2 saleOrderHeaderRepository;
     private SaleOrderItemRepository saleOrderItemRepository;
     private CustomerAddressRepository2 customerAddressRepository;
-    private DeliveryTripItemRepository deliveryTripItemRepository;
+    private DeliveryTripItemRepository2 deliveryTripItemRepository;
     private ProductService productService;
 
     @Override

@@ -15,8 +15,6 @@ public interface DeliveryTripService {
 
     DeliveryTripDTO deleteById(String tripId);
 
-    DeliveryTripDTO estimateDistance(String deliveryTripId);
-
     List<DeliveryTripDTO> getTodayDeliveryTrip(Principal principal);
 
     boolean complete(String deliveryTripId);

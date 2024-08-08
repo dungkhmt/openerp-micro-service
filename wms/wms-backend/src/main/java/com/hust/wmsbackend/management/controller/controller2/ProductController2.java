@@ -3,6 +3,7 @@ package com.hust.wmsbackend.management.controller.controller2;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hust.wmsbackend.management.entity.ProductCategory;
 import com.hust.wmsbackend.management.entity.Product;
+import com.hust.wmsbackend.management.model.model2.response.ProductNoImg;
 import com.hust.wmsbackend.management.model.request.ProductPriceRequest;
 import com.hust.wmsbackend.management.model.request.ProductRequest;
 import com.hust.wmsbackend.management.model.response.ProductDetailResponse;
@@ -42,6 +43,12 @@ public class ProductController2 {
     public ResponseEntity<List<ProductGeneralResponse>> getProductGeneralWithoutImage() {
         log.info("Start get product with out images");
         return ResponseEntity.ok(productService.getAllProductGeneralWithoutImage());
+    }
+
+    @GetMapping("/list-no-img")
+    public ResponseEntity<List<ProductGeneralResponse>> getListProductWithoutImage() {
+        log.info("Start list product no images");
+        return ResponseEntity.ok(productService.getListProductNoImage());
     }
 
     @PutMapping()

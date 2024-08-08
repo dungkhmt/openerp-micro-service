@@ -105,7 +105,7 @@ public class OrderServiceImplVD implements OrderService {
         }
 
 
-        List<DeliveryTripItem> deliveryTripItems = deliveryTripItemRepository.getDeliveryTripItemByUserLoginId(saleOrderHeader.getUserLoginId());
+        List<DeliveryTripItem> deliveryTripItems = deliveryTripItemRepository.getDeliveryTripItemByUserLoginIdAndOrderId(saleOrderHeader.getUserLoginId(), orderId);
         List<OrderDetailResponse.OrderHistoryResponse> successProductHistory = new ArrayList<>();
         List<OrderDetailResponse.OrderHistoryResponse> failProductHistory = new ArrayList<>();
         BigDecimal totalSuccessOrderCost = BigDecimal.ZERO;

@@ -62,7 +62,7 @@
 import { request } from "api";
 import StandardTable from "components/StandardTable";
 import { Fragment, useEffect, useState } from "react"
-import { API_PATH } from "screens/apiPaths";
+import { API_PATH, API_PATH_2 } from "screens/apiPaths";
 import { useRouteMatch } from "react-router-dom";
 import LoadingScreen from "components/common/loading/loading";
 import withScreenSecurity from "components/common/withScreenSecurity";
@@ -81,7 +81,7 @@ const TodayDeliveryTrip = () => {
     async function fetchData() {
       await request(
         "get",
-        API_PATH.DELIVERY_PERSON_TODAY,
+        API_PATH_2.DELIVERY_PERSON_TODAY,
         (res) => {
           setTripTableData(res.data);
         }

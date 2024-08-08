@@ -3,6 +3,8 @@ package com.hust.wmsbackend.management.service.service2.serviceImplement;
 import com.hust.wmsbackend.management.model.response.*;
 import com.hust.wmsbackend.management.repository.DeliveryTripItemRepository;
 import com.hust.wmsbackend.management.repository.ProductV2Repository;
+import com.hust.wmsbackend.management.repository.repo2.DeliveryTripItemRepository2;
+import com.hust.wmsbackend.management.repository.repo2.ProductV2Repository2;
 import com.hust.wmsbackend.management.service.service2.ProductService;
 import com.hust.wmsbackend.management.service.service2.ReportService;
 import lombok.AllArgsConstructor;
@@ -18,8 +20,8 @@ import java.util.*;
 @Slf4j
 public class ReportServiceImplVD implements ReportService {
 
-    private DeliveryTripItemRepository deliveryTripItemRepository;
-    private ProductV2Repository productRepository;
+    private DeliveryTripItemRepository2 deliveryTripItemRepository;
+    private ProductV2Repository2 productRepository;
 
     private ProductService productService;
 
@@ -76,9 +78,9 @@ public class ReportServiceImplVD implements ReportService {
 
     @Override
     public Map<String, List<ProductDiffHistory>>  genProductDiffReport() {
-        List<ProductV2Repository.ProductDiffHistoryInterface> historyInterfaces = productRepository.getProductsDiffHistoryData();
+        List<ProductV2Repository2.ProductDiffHistoryInterface> historyInterfaces = productRepository.getProductsDiffHistoryData();
         Map<String, List<ProductDiffHistory>> response = new HashMap<>();
-        for (ProductV2Repository.ProductDiffHistoryInterface history : historyInterfaces) {
+        for (ProductV2Repository2.ProductDiffHistoryInterface history : historyInterfaces) {
             String productId = history.getProductId();
             List<ProductDiffHistory> histories;
             if (response.containsKey(productId)) {

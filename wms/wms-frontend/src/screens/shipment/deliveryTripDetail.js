@@ -874,6 +874,7 @@ const DeliveryTripDetail = (props) => {
                     successNoti("Lưu thông tin chuyến giao hàng thành công");
                     console.log(res.data);
                     setRawCreatedItemsTableData(createdItemsTableData);
+                    setDeliveryItemsTableData(res.data.items);
                 }
             },
             {

@@ -71,6 +71,8 @@ const ProductsReport = () => {
             border: '2px solid #000',
             boxShadow: 24,
             p: 4,
+            overflow: 'auto', 
+            maxWidth: '100%', 
           }}>
             <StandardTable
               title="Lịch sử sản phẩm"

@@ -9,6 +9,7 @@ import com.hust.wmsbackend.management.service.*;
 import com.hust.wmsbackend.management.service.service2.AssignedOrderItemService;
 import com.hust.wmsbackend.management.service.service2.ShipmentService;
 import com.hust.wmsbackend.management.service.service2.DeliveryTripService;
+import com.hust.wmsbackend.management.service.service2.DeliveryTripItemService;
 import com.hust.wmsbackend.management.service.service2.AutoRouteService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -83,11 +84,6 @@ public class ShipmentController2 {
         return ResponseEntity.ok(deliveryTripService.getTodayDeliveryTrip(principal));
     }
 
-    @GetMapping("/delivery-trip/est-dist/{tripId}")
-    public ResponseEntity<DeliveryTripDTO> estimateDistanceForTrip(@PathVariable String tripId) {
-        return ResponseEntity.ok(deliveryTripService.estimateDistance(tripId));
-    }
-
     @GetMapping("/delivery-trip/{tripId}")
     public ResponseEntity<DeliveryTripDTO> getDeliveryTripById(@PathVariable String tripId) {
         return ResponseEntity.ok(deliveryTripService.getById(tripId));
@@ -135,9 +131,9 @@ public class ShipmentController2 {
 //    }
 
     @PutMapping("/auto-route")
-    public ResponseEntity<AutoRouteResponse> autoRoute(@RequestBody DeliveryTripDTO request) {
+    public ResponseEntity<AutoRouteResponse> autoRoute(@RequestBody DeliveryTripDTO request, Principal principal) {
         log.info("Start auto route 1");
-        return ResponseEntity.ok(autoRouteService.autoRoute2(request));
+        return ResponseEntity.ok(autoRouteService.autoRoute2(request, principal));
     }
 
     @GetMapping("/auto-route/{deliveryTripId}")

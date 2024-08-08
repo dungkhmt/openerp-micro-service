@@ -6,6 +6,10 @@ import com.hust.wmsbackend.management.entity.*;
 import com.hust.wmsbackend.management.model.DeliveryTripDTO;
 import com.hust.wmsbackend.management.model.response.AutoRouteResponse;
 import com.hust.wmsbackend.management.repository.*;
+import com.hust.wmsbackend.management.repository.repo2.CustomerAddressRepository2;
+import com.hust.wmsbackend.management.repository.repo2.DeliveryTripItemRepository2;
+import com.hust.wmsbackend.management.repository.repo2.SaleOrderHeaderRepository2;
+import com.hust.wmsbackend.management.repository.repo2.WarehouseRepository2;
 import com.hust.wmsbackend.management.service.service2.AutoRouteService;
 import com.hust.wmsbackend.management.auto.algorithms.DistanceCalculator2;
 import com.hust.wmsbackend.management.service.NotificationsService;
@@ -33,17 +37,17 @@ public class AutoRouteServiceImplVD implements AutoRouteService {
     private DeliveryRouteService deliveryRouteService;
     // repository
     @Autowired
-    private WarehouseRepository warehouseRepository;
+    private WarehouseRepository2 warehouseRepository;
     @Autowired
     private AssignedOrderItemRepository assignedOrderItemRepository;
     @Autowired
-    private SaleOrderHeaderRepository saleOrderHeaderRepository;
+    private SaleOrderHeaderRepository2 saleOrderHeaderRepository;
     @Autowired
-    private CustomerAddressRepository customerAddressRepository;
+    private CustomerAddressRepository2 customerAddressRepository;
     @Autowired
     private DeliveryTripPathRepository deliveryTripPathRepository;
     @Autowired
-    private DeliveryTripItemRepository deliveryTripItemRepository;
+    private DeliveryTripItemRepository2 deliveryTripItemRepository;
     @Autowired
     private DeliveryTripRepository deliveryTripRepository;
     @Autowired
@@ -235,6 +239,7 @@ public class AutoRouteServiceImplVD implements AutoRouteService {
                 .build();
             customers.add(adder);
         }
+
         return AutoRouteResponse.builder().deliveryTripId(deliveryTripId).points(points)
             .customers(customers).warehouse(warehouseMarker).build();
     }
@@ -342,7 +347,7 @@ public class AutoRouteServiceImplVD implements AutoRouteService {
     }
     @Override
     @Transactional
-    public AutoRouteResponse autoRoute2(DeliveryTripDTO request) {
+    public AutoRouteResponse autoRoute2(DeliveryTripDTO request, Principal principal) {
         log.info("Start auto route");
 
         List<DeliveryTripDTO.DeliveryTripItemDTO> items = request.getItems();
@@ -475,6 +480,12 @@ public class AutoRouteServiceImplVD implements AutoRouteService {
                     .build();
             customers.add(adder);
         }
+
+        notificationsService.create("AUTO_ROUTE", principal.getName(),
+                String.format("Tìm hành trình tối ưu cho chuyến giao hàng %s thành công", deliveryTripId),
+                String.format("/delivery-manager/delivery-trips/%s", deliveryTripId));
+        log.info("Done auto route");
+
         return AutoRouteResponse.builder().deliveryTripId(deliveryTripId).points(points)
                 .customers(customers).warehouse(warehouseMarker).build();
     }
