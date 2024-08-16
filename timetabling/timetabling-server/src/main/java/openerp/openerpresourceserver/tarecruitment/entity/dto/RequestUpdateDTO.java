@@ -22,4 +22,5 @@ public class RequestUpdateDTO {
     private String englishScore;
 
     private String note;
+
 }
