@@ -6,6 +6,8 @@ import { styles } from "./index.style";
 import DeleteDialog from "../components/DeleteDialog";
 import UpdateApplicationDialog from "./UpdateApplicationDialog";
 import { applicationUrl } from "../apiURL";
+import {controller} from "react-hook-form";
+
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -138,7 +140,7 @@ const ApplicationResultScreen = () => {
         <Button
           variant="outlined"
           color="success"
-          onClick={() => handleOpenUpdateDialog(rowData)}
+          onClick={() => navigate(`/update-application/${rowData.id}`)}
           disabled={rowData.applicationStatus !== "PENDING"}
         >
           Sửa

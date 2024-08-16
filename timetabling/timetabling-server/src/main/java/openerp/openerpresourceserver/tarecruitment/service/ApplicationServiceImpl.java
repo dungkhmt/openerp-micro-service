@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.tarecruitment.service;
 
+import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.User;
@@ -10,6 +11,8 @@ import openerp.openerpresourceserver.tarecruitment.entity.dto.ChartDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.dto.PaginationDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.Application;
 import openerp.openerpresourceserver.tarecruitment.entity.ClassCall;
+import openerp.openerpresourceserver.tarecruitment.entity.dto.RequestUpdateDTO;
+import openerp.openerpresourceserver.tarecruitment.mapper.MapperUtils;
 import openerp.openerpresourceserver.tarecruitment.repo.ApplicationRepo;
 import openerp.openerpresourceserver.tarecruitment.repo.ClassCallRepo;
 import org.apache.poi.ss.usermodel.Row;
@@ -508,5 +511,18 @@ public class ApplicationServiceImpl implements ApplicationService{
             chart.add(data);
         }
         return chart;
+    }
+
+    @Override
+    public Boolean UpdateApplicationInfo(int id, RequestUpdateDTO requestUpdateDTO) {
+
+        Optional <Application> application = applicationRepo.findById(id);
+        if(application.isPresent()) {
+            Application app = application.get();
+            MapperUtils.map(requestUpdateDTO, app);
+            applicationRepo.save(app);
+        }else{throw new NoSuchElementException("App khong ton tai ");
+        }
+        return null;
     }
 }

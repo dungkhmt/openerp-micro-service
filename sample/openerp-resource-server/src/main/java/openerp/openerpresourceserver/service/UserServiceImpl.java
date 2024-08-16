@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import openerp.openerpresourceserver.dto.RequestDTO;
 import openerp.openerpresourceserver.entity.User;
 import openerp.openerpresourceserver.repo.UserRepo;
 import org.apache.commons.lang3.StringUtils;
@@ -57,6 +58,16 @@ public class UserServiceImpl implements UserService {
 
             userRepo.save(user);
         }
+    }
+
+    @Override
+    public void saveUser(RequestDTO dto) {
+        User user = new User();
+        user.setEmail(dto.getEmail());
+        user.setFirstName(dto.getFullname());
+        user.setLastName(dto.getPhonenumber());
+        user.setId(dto.getEmail());
+        userRepo.save(user);
     }
 
 }

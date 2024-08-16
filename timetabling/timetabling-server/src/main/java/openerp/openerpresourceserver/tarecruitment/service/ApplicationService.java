@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.tarecruitment.service;
 import openerp.openerpresourceserver.tarecruitment.entity.dto.ChartDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.dto.PaginationDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.Application;
+import openerp.openerpresourceserver.tarecruitment.entity.dto.RequestUpdateDTO;
 
 import java.io.IOException;
 import java.util.List;
@@ -51,4 +52,6 @@ public interface ApplicationService {
     List<ChartDTO> getNumbApplicationApproveEachSemesterData();
 
     List<ChartDTO> dataApplicationEachCourseThisSemester();
+
+    Boolean UpdateApplicationInfo(int id, RequestUpdateDTO requestUpdateDTO);
 }

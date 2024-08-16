@@ -1,9 +1,11 @@
 package openerp.openerpresourceserver.tarecruitment.controller;
 
+import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.tarecruitment.entity.dto.ChartDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.dto.PaginationDTO;
 import openerp.openerpresourceserver.tarecruitment.entity.Application;
+import openerp.openerpresourceserver.tarecruitment.entity.dto.RequestUpdateDTO;
 import openerp.openerpresourceserver.tarecruitment.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -220,4 +222,20 @@ public class ApplicationController {
         List<ChartDTO> chart = applicationService.dataApplicationEachCourseThisSemester();
         return ResponseEntity.ok().body(chart);
     }
+
+
+    @PutMapping("/update-application-info")
+    @ApiOperation(value = "Lock employee API", notes = "Lock employee API")
+    public ResponseEntity<String> uodate(
+            @RequestParam(name = "appid", required = true) int appid,
+            @RequestBody RequestUpdateDTO requestUpdateDTO) {
+        if (applicationService.UpdateApplicationInfo(appid,requestUpdateDTO)) {
+            return ResponseEntity.ok().body("thanh cong");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("that bai");
+        }
+    }
+
+
+
 }
