@@ -125,6 +125,8 @@ public class ContestService {
             //.languagesAllowed(contestEntity.getListLanguagesAllowed())
             .languagesAllowed(contestEntity.getLanguagesAllowed())
             .listLanguagesAllowed(contestEntity.getListLanguagesAllowed())
+            .contestType(contestEntity.getContestType())
+            .listContestTypes(ContestEntity.getListContestTypes())
             .build();
     }
 

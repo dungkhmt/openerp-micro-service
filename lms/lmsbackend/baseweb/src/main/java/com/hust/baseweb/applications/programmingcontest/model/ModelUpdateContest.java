@@ -26,4 +26,5 @@ public class ModelUpdateContest {
     private String sendConfirmEmailUponSubmission;
     private String participantViewSubmissionMode;
     private List<String> languagesAllowed;
+    private String contestType;
 }

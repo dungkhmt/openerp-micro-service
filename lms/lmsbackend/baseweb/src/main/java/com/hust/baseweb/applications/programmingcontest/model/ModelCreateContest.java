@@ -21,4 +21,5 @@ public class ModelCreateContest {
     private int maxSourceCodeLength;
     private int minTimeBetweenTwoSubmissions;
     private String judgeMode;
+    private String contestType;
 }

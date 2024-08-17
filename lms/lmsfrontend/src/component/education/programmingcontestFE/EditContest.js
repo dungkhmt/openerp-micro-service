@@ -41,8 +41,10 @@ function EditContest() {
     evaluateBothPublicPrivateTestcase: [],
     participantViewSubmissionMode: [],
     supportedLanguage: [],
+    contestType:[]
   });
 
+  const [contestType, setContestType] = useState("");
   const [status, setStatus] = useState("");
   const [submissionActionType, setSubmissionActionType] = useState("");
   const [maxNumberSubmission, setMaxNumberSubmission] = useState(10);
@@ -81,6 +83,7 @@ function EditContest() {
       judgeMode: judgeMode,
       participantViewSubmissionMode: participantViewSubmissionMode,
       languagesAllowed: allowedLanguages,
+      contestType: contestType
     };
 
     request(
@@ -108,6 +111,11 @@ function EditContest() {
           label: status,
           value: status,
         })),
+        contestType: data.listContestTypes.map((atype) => ({
+          label: atype,
+          value: atype,
+        })),
+        
         submissionActionType: data.listSubmissionActionTypes.map((type) => ({
           label: type,
           value: type,
@@ -150,6 +158,7 @@ function EditContest() {
       setProblemDescriptionViewType(data.problemDescriptionViewType);
       setMinTimeBetweenTwoSubmissions(data.minTimeBetweenTwoSubmissions);
       setJudgeMode(data.judgeMode);
+      setContestType(data.contestType);
       setEvaluateBothPublicPrivateTestcase(
         data.evaluateBothPublicPrivateTestcase
       );
@@ -205,6 +214,18 @@ function EditContest() {
                       setStatus(event.target.value);
                     }}
                   />,
+                  <StyledSelect
+                    fullWidth
+                    id="contestType"
+                    key={"contestType"}
+                    label="Contest Type"
+                    value={contestType}
+                    options={options.contestType}
+                    onChange={(event) => {
+                      setContestType(event.target.value);
+                    }}
+                  />,
+                  
                   <StyledSelect
                     fullWidth
                     id="problemDescriptionViewType"

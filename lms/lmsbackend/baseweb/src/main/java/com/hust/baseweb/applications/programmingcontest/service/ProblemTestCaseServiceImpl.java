@@ -574,6 +574,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                        .evaluateBothPublicPrivateTestcase(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES)
                                                        .sendConfirmEmailUponSubmission(ContestEntity.SEND_CONFIRM_EMAIL_UPON_SUBMISSION_NO)
                                                        .createdAt(new Date())
+                                                        //.contestType(modelCreateContest.getContestType())
+                                                        .contestType(ContestEntity.CONTEST_TYPE_TRAINING_NO_EVALUATION)
                                                        .build();
 
 /*
@@ -762,6 +764,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                    .languagesAllowed(String.join(
                                                        ",",
                                                        modelUpdateContest.getLanguagesAllowed()))
+                                                    .contestType(modelUpdateContest.getContestType())
                                                    .build();
         return contestService.updateContestWithCache(contestEntity);
 
