@@ -22,6 +22,14 @@ const styles = {
     fontSize: 16,
     height: "65vh",
   },
+  dropdown: {
+    width: "10%",
+    margin: "0.5%",
+  },
+  selection: {
+    maxHeight: 148,
+    overflowY: "scroll",
+  },
 };
 
 export default styles;

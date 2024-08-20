@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { request } from "api";
-import { Button, TextField, Paper, Typography } from "@mui/material";
+import { Button, TextField, Paper, Typography ,FormControl,InputLabel,MenuItem,Select,} from "@mui/material";
 import { useHistory } from "react-router-dom";
 import { SEMESTER } from "../config/localize";
 import { DataGrid } from "@mui/x-data-grid";
@@ -28,9 +28,15 @@ const AllRegisterClassScreen = () => {
     DEFAULT_PAGINATION_MODEL
   );
 
+  const [allSemester, setAllSemester] = useState([]);
+
+
   useEffect(() => {
     request("get", semesterUrl.getCurrentSemester, (res) => {
       setSemester(res.data);
+    });
+    request("get", semesterUrl.getAllSemester, (res) => {
+      setAllSemester(res.data);
     });
   }, []);
 
@@ -94,6 +100,9 @@ const AllRegisterClassScreen = () => {
       classId: klass.id,
     });
   };
+  const handleChangeSemester = (event) => {
+    setSemester(event.target.value);
+  };
 
   const actionCell = (params) => {
     const rowData = params.row;
@@ -153,6 +162,25 @@ const AllRegisterClassScreen = () => {
         <Typography variant="h4" style={styles.title}>
           Danh sách lớp học
         </Typography>
+          <FormControl style={styles.dropdown} fullWidth size="small">
+            <InputLabel id="semester-label">Học kì</InputLabel>
+            <Select
+              labelId="semester-label"
+              id="semester-select"
+              value={semester}
+              name="day"
+              label="Học kì"
+              onChange={handleChangeSemester}
+              MenuProps={{ PaperProps: { sx: styles.selection } }}
+            >
+              {allSemester.map((semester, index) => (
+                <MenuItem key={index} value={semester}>
+                  {semester}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
 
         <TextField
           style={styles.searchBox}

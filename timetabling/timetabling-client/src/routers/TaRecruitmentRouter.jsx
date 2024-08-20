@@ -70,7 +70,7 @@ export default function StudentRouter() {
         <Route 
         component={UpdateApplicationPage}
         exact
-        path={`${path}/student/result/:id/edit`} 
+        path={`${path}/student/result/:applicationId/edit`} 
         />
 
       </Switch>
