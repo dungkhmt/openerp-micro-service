@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import { useForm } from "react-hook-form"; 
 import { successNoti, warningNoti } from "utils/notification";
 import {
@@ -13,8 +13,8 @@ import { request } from "api";
 import { applicationUrl } from "../apiURL";
 
 const UpdateApplicationPage = () => {
+  const history = useHistory();
   const { applicationId } = useParams(); 
-  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -54,7 +54,7 @@ const UpdateApplicationPage = () => {
       `${applicationUrl.updateApplication}/${applicationId}`, 
       (res) => {
         successNoti("Cập nhật ứng tuyển thành công!", 5000);
-        navigate("/student/result");
+        history.push("/ta-recruitment/student/result/");
       },
       {},
       data
@@ -179,7 +179,7 @@ const UpdateApplicationPage = () => {
           <Button
             color="error"
             variant="contained"
-            onClick={() => navigate("/applications")}
+            onClick={() => history.push("/ta-recruitment/student/result/")}
           >
             Quay lại
           </Button>
