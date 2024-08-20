@@ -46,7 +46,7 @@ export default function Home() {
               <InfoCard
                 icon={CodeBracket}
                 iconColor="#0d2d80"
-                mainTitle="800+"
+                mainTitle="1200+"
                 subTitle="Coding Problems"
               />
             }
@@ -91,7 +91,7 @@ export default function Home() {
               <InfoCard
                 icon={CommandLine}
                 iconColor="#b5ba0d"
-                mainTitle="500,000+"
+                mainTitle="600,000+"
                 subTitle="Code Submissions"
               />
             }

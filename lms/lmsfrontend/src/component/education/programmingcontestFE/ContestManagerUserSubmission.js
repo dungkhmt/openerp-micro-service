@@ -1,7 +1,7 @@
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { LoadingButton } from "@mui/lab";
-import { Box, IconButton, Tooltip } from "@mui/material";
+import { Box, IconButton, Tooltip, LinearProgress } from "@mui/material";
 import { pdf } from "@react-pdf/renderer";
 import { request } from "api";
 import HustModal from "component/common/HustModal";
@@ -20,6 +20,7 @@ import SubmissionOfParticipantPDFDocument from "./template/SubmissionOfParticipa
 export default function ContestManagerUserSubmission(props) {
   const contestId = props.contestId;
 
+  const [loading, setLoading] = useState(true);
   const [contestSubmissions, setContestSubmissions] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -52,6 +53,7 @@ export default function ContestManagerUserSubmission(props) {
   }
 
   function getSubmission() {
+    setLoading(true);
     request(
       "get",
       "/teacher/contests/" + contestId + "/submissions",
@@ -62,7 +64,7 @@ export default function ContestManagerUserSubmission(props) {
       { onError: (error) => errorNoti("An error happened", 3000) },
       null,
       { params: filterParams }
-    ).then();
+    ).then(() => setLoading(false));
   }
 
   function handleRejudgeAll() {
@@ -226,6 +228,7 @@ export default function ContestManagerUserSubmission(props) {
 
   return (
     <Box sx={{ marginTop: "12px" }}>
+      {loading && <LinearProgress />}
       <StandardTable
         title={"Contest Submissions"}
         columns={generateColumns()}
