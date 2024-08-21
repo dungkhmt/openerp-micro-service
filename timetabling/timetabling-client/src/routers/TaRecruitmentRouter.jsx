@@ -10,6 +10,7 @@ import RegisterClassScreen from "views/tarecruitment/RegisterClassScreen";
 import RequestApprovalScreen from "views/tarecruitment/RequestApprovalScreen";
 import TAAssistListScreen from "views/tarecruitment/TAAssistListScreen";
 import UpdateApplicationPage from "views/tarecruitment/ApplicationResultScreen/UpdateApplicationPage";
+import ApplicationDetailPage from "views/tarecruitment/ApplicationResultScreen/DetailApplicationPage";
 
 export default function StudentRouter() {
   let { path } = useRouteMatch();
@@ -71,6 +72,11 @@ export default function StudentRouter() {
         component={UpdateApplicationPage}
         exact
         path={`${path}/student/result/:applicationId/edit`} 
+        />
+        <Route 
+        component={ApplicationDetailPage}
+        exact
+        path={`${path}/student/result/:applicationId`} 
         />
 
       </Switch>

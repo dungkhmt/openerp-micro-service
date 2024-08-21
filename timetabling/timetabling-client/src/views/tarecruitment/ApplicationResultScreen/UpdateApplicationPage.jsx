@@ -54,7 +54,7 @@ const UpdateApplicationPage = () => {
       `${applicationUrl.updateApplication}/${applicationId}`, 
       (res) => {
         successNoti("Cập nhật ứng tuyển thành công!", 5000);
-        history.push("/ta-recruitment/student/result/");
+        history.push(`/ta-recruitment/student/result/${applicationId}`);
       },
       {},
       data
@@ -63,7 +63,7 @@ const UpdateApplicationPage = () => {
 
   return (
     <Paper elevation={3} sx={{ padding: 3 }}>
-      <Typography variant="h5" fontWeight="bold">
+      <Typography variant="h5" fontWeight="bold"  style={updateStyles.title}>
         Chỉnh sửa thông tin 
       </Typography>
 
@@ -171,7 +171,7 @@ const UpdateApplicationPage = () => {
         <div style={updateStyles.buttonGroup}>
           <Button
             variant="contained"
-            color="success"
+            style={{ backgroundColor: "#0099FF", color: "white" }}
             type="submit"
           >
             Sửa
@@ -179,7 +179,8 @@ const UpdateApplicationPage = () => {
           <Button
             color="error"
             variant="contained"
-            onClick={() => history.push("/ta-recruitment/student/result/")}
+             
+            onClick={() => history.push(`/ta-recruitment/student/result/${applicationId}`)}
           >
             Quay lại
           </Button>

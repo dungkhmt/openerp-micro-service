@@ -7,7 +7,7 @@ import DeleteDialog from "../components/DeleteDialog";
 import UpdateApplicationDialog from "./UpdateApplicationDialog";
 import { applicationUrl } from "../apiURL";
 import { useHistory } from "react-router-dom"; // Updated import
-import EditIcon from '@mui/icons-material/Edit';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 
 
@@ -141,20 +141,15 @@ const ApplicationResultScreen = () => {
     return (
       <div>
         <Box display={'flex'}>
-          <IconButton aria-label="Chỉnh sửa" sx={{ marginRight: 2 }} onClick={() => {
-            history.push(`/ta-recruitment/student/result/${rowData.id}/edit`);
-          }}>
-            <EditIcon />
-          </IconButton>
           <Button
           variant="outlined"
-          color="error"
-          style={styles.rightButton}
-          onClick={() => handleOpenDialog(rowData)}
-          disabled={rowData.applicationStatus !== "PENDING"}
-        >
-          Xóa
-        </Button>
+            onClick={() => {
+              history.push(`/ta-recruitment/student/result/${rowData.id}`);
+            }}
+          >
+            Xem chi tiết
+          </Button>
+         
         </Box>
         
       </div>
@@ -162,6 +157,12 @@ const ApplicationResultScreen = () => {
   };
 
   const dataGridColumns = [
+    {
+      field: "id",
+      headerName: "Mã đơn xin",
+      align: "center",
+      headerAlign: "center",
+    },
     {
       field: "classId",
       headerName: "Mã lớp",

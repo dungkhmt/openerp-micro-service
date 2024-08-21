@@ -158,30 +158,32 @@ const AllRegisterClassScreen = () => {
 
   return (
     <Paper elevation={3}>
-      <div style={styles.tableToolBar}>
-        <Typography variant="h4" style={styles.title}>
-          Danh sách lớp học
-        </Typography>
-          <FormControl style={styles.dropdown} fullWidth size="small">
-            <InputLabel id="semester-label">Học kì</InputLabel>
-            <Select
-              labelId="semester-label"
-              id="semester-select"
-              value={semester}
-              name="day"
-              label="Học kì"
-              onChange={handleChangeSemester}
-              MenuProps={{ PaperProps: { sx: styles.selection } }}
-            >
-              {allSemester.map((semester, index) => (
-                <MenuItem key={index} value={semester}>
-                  {semester}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-
+    <div style={styles.tableToolBar}>
+      <Typography variant="h4" style={styles.title}>
+        Danh sách lớp học
+      </Typography>
+  
+      {/* Container chứa dropdown và search box */}
+      <div style={styles.filterContainer}>
+        <FormControl style={styles.dropdown} size="small">
+          <InputLabel id="semester-label">Học kì</InputLabel>
+          <Select
+            labelId="semester-label"
+            id="semester-select"
+            value={semester}
+            name="day"
+            label="Học kì"
+            onChange={handleChangeSemester}
+            MenuProps={{ PaperProps: { sx: styles.selection } }}
+          >
+            {allSemester.map((semester, index) => (
+              <MenuItem key={index} value={semester}>
+                {semester}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+  
         <TextField
           style={styles.searchBox}
           variant="outlined"
@@ -191,23 +193,25 @@ const AllRegisterClassScreen = () => {
           placeholder="Tìm kiếm"
         />
       </div>
-
-      <DataGrid
-        loading={isLoading}
-        rowHeight={60}
-        sx={styles.table}
-        rows={dataGridRows}
-        columns={dataGridColumns}
-        rowCount={totalElements}
-        pagination
-        paginationMode="server"
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
-        pageSizeOptions={[10, 20, 50]}
-        checkboxSelection={false}
-        disableRowSelectionOnClick
-      />
-    </Paper>
+    </div>
+  
+    <DataGrid
+      loading={isLoading}
+      rowHeight={60}
+      sx={styles.table}
+      rows={dataGridRows}
+      columns={dataGridColumns}
+      rowCount={totalElements}
+      pagination
+      paginationMode="server"
+      paginationModel={paginationModel}
+      onPaginationModelChange={setPaginationModel}
+      pageSizeOptions={[10, 20, 50]}
+      checkboxSelection={false}
+      disableRowSelectionOnClick
+    />
+  </Paper>
+  
   );
 };
 
