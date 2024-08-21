@@ -1,16 +1,15 @@
 package openerp.openerpresourceserver.controller;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.dto.RequestDTO;
 import openerp.openerpresourceserver.entity.User;
+import openerp.openerpresourceserver.repo.UserRepo;
 import openerp.openerpresourceserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -47,5 +46,11 @@ public class UserController {
     public ResponseEntity<?> getAllUsers() {
         List<User> users = userService.getAllUsers();
         return ResponseEntity.ok().body(users);
+    }
+
+    @PostMapping("/save")
+    public ResponseEntity<?> saveUser(@RequestBody RequestDTO dto) {
+        userService.saveUser(dto);
+        return ResponseEntity.ok(dto);
     }
 }

@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.service;
 
+import openerp.openerpresourceserver.dto.RequestDTO;
 import openerp.openerpresourceserver.entity.User;
 
 import java.util.List;
@@ -11,5 +12,7 @@ public interface UserService {
     User getUserById(String id);
 
     void synchronizeUser(String userId, String email, String firstName, String lastName);
+
+    void saveUser(RequestDTO dto);
 
 }
