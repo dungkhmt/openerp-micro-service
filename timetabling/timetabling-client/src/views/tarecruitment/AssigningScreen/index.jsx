@@ -1,6 +1,7 @@
 import { request } from "api";
 import { useState, useEffect, useMemo } from "react";
 import useDebounce from "../config/debounce";
+import { SEMESTER } from "../config/localize";
 import {
   Button,
   Chip,
@@ -30,7 +31,7 @@ const DEFAULT_PAGINATION_MODEL = {
 const AssigningScreen = () => {
   const [applications, setApplications] = useState([]);
   const [originalApplications, setOriginalApplications] = useState([]);
-  const [semester, setSemester] = useState("");
+  const [semester, setSemester] = useState(SEMESTER);
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
@@ -54,9 +55,7 @@ const AssigningScreen = () => {
   }, []);
 
   useEffect(() => {
-    if (semester !== "") {
-      handleFetchData();
-    }
+    handleFetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paginationModel, semester, debouncedSearch, statusFilter]);
 
