@@ -35,7 +35,6 @@ const styles = {
     maxHeight: 148,
     overflowY: "scroll",
   },
-  
 };
 
 export default styles;

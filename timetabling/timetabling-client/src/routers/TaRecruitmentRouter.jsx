@@ -68,17 +68,16 @@ export default function StudentRouter() {
           exact
           path={`${path}/teacher/ta-assist-list`}
         ></Route>
-        <Route 
-        component={UpdateApplicationPage}
-        exact
-        path={`${path}/student/result/:applicationId/edit`} 
+        <Route
+          component={UpdateApplicationPage}
+          exact
+          path={`${path}/student/result/:applicationId/edit`}
         />
-        <Route 
-        component={ApplicationDetailPage}
-        exact
-        path={`${path}/student/result/:applicationId`} 
+        <Route
+          component={ApplicationDetailPage}
+          exact
+          path={`${path}/student/result/:applicationId`}
         />
-
       </Switch>
     </div>
   );

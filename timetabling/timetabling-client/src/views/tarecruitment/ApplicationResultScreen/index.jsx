@@ -1,4 +1,11 @@
-import { Button, Chip, Paper, Typography, Box, IconButton } from "@mui/material";
+import {
+  Button,
+  Chip,
+  Paper,
+  Typography,
+  Box,
+  IconButton,
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { request } from "api";
 import { useEffect, useState } from "react";
@@ -7,9 +14,7 @@ import DeleteDialog from "../components/DeleteDialog";
 import UpdateApplicationDialog from "./UpdateApplicationDialog";
 import { applicationUrl } from "../apiURL";
 import { useHistory } from "react-router-dom"; // Updated import
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-
-
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -51,14 +56,14 @@ const ApplicationResultScreen = () => {
     );
   };
 
-   const handleCloseUpdateDialog = () => {
-     setOpenUpdateDialog(false);
-   };
+  const handleCloseUpdateDialog = () => {
+    setOpenUpdateDialog(false);
+  };
 
-    const handleOpenUpdateDialog = (application) => {
-     setUpdateId(application.id);
-     setOpenUpdateDialog(true);
-   };
+  const handleOpenUpdateDialog = (application) => {
+    setUpdateId(application.id);
+    setOpenUpdateDialog(true);
+  };
 
   const handleCloseDialog = () => {
     setOpenDeleteDialog(false);
@@ -140,18 +145,16 @@ const ApplicationResultScreen = () => {
 
     return (
       <div>
-        <Box display={'flex'}>
+        <Box display={"flex"}>
           <Button
-          variant="outlined"
+            variant="outlined"
             onClick={() => {
               history.push(`/ta-recruitment/student/result/${rowData.id}`);
             }}
           >
             Xem chi tiết
           </Button>
-         
         </Box>
-        
       </div>
     );
   };
@@ -228,7 +231,7 @@ const ApplicationResultScreen = () => {
           <Typography variant="h4" style={styles.title}>
             Kết quả tuyển dụng
           </Typography>
-          
+
           <Button
             color="error"
             variant="outlined"

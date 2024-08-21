@@ -1,20 +1,15 @@
 import { useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { useForm } from "react-hook-form"; 
+import { useForm } from "react-hook-form";
 import { successNoti, warningNoti } from "utils/notification";
-import {
-  Button,
-  Typography,
-  TextField,
-  Paper,
-} from "@mui/material";
+import { Button, Typography, TextField, Paper } from "@mui/material";
 import { updateStyles } from "./index.style";
 import { request } from "api";
 import { applicationUrl } from "../apiURL";
 
 const UpdateApplicationPage = () => {
   const history = useHistory();
-  const { applicationId } = useParams(); 
+  const { applicationId } = useParams();
   const {
     register,
     handleSubmit,
@@ -48,10 +43,10 @@ const UpdateApplicationPage = () => {
       warningNoti("CPA không thể lớn hơn 4.0", 5000);
       return;
     }
-    
+
     request(
       "put",
-      `${applicationUrl.updateApplication}/${applicationId}`, 
+      `${applicationUrl.updateApplication}/${applicationId}`,
       (res) => {
         successNoti("Cập nhật ứng tuyển thành công!", 5000);
         history.push(`/ta-recruitment/student/result/${applicationId}`);
@@ -63,8 +58,8 @@ const UpdateApplicationPage = () => {
 
   return (
     <Paper elevation={3} sx={{ padding: 3 }}>
-      <Typography variant="h5" fontWeight="bold"  style={updateStyles.title}>
-        Chỉnh sửa thông tin 
+      <Typography variant="h5" fontWeight="bold" style={updateStyles.title}>
+        Chỉnh sửa thông tin
       </Typography>
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -179,8 +174,9 @@ const UpdateApplicationPage = () => {
           <Button
             color="error"
             variant="contained"
-             
-            onClick={() => history.push(`/ta-recruitment/student/result/${applicationId}`)}
+            onClick={() =>
+              history.push(`/ta-recruitment/student/result/${applicationId}`)
+            }
           >
             Quay lại
           </Button>

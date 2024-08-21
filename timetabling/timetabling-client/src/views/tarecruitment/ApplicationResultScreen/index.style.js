@@ -39,9 +39,9 @@ export const updateStyles = {
   },
   buttonGroup: {
     display: "flex",
-    gap: "10px", 
+    gap: "10px",
   },
   title: {
-    marginBottom: 16, 
+    marginBottom: 16,
   },
 };
