@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { request } from "api";
-import { Button, TextField, Paper, Typography } from "@mui/material";
+import { Button, TextField, Paper, Typography ,FormControl,InputLabel,MenuItem,Select,} from "@mui/material";
 import { useHistory } from "react-router-dom";
+import { SEMESTER } from "../config/localize";
 import { DataGrid } from "@mui/x-data-grid";
 import styles from "./index.style";
 import { classCallUrl, semesterUrl } from "../apiURL";
@@ -16,7 +17,7 @@ const AllRegisterClassScreen = () => {
   const [classes, setClasses] = useState([]);
   const [registeredClass, setRegisteredClass] = useState([]);
 
-  const [semester, setSemester] = useState("");
+  const [semester, setSemester] = useState(SEMESTER);
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
@@ -27,9 +28,15 @@ const AllRegisterClassScreen = () => {
     DEFAULT_PAGINATION_MODEL
   );
 
+  const [allSemester, setAllSemester] = useState([]);
+
+
   useEffect(() => {
     request("get", semesterUrl.getCurrentSemester, (res) => {
       setSemester(res.data);
+    });
+    request("get", semesterUrl.getAllSemester, (res) => {
+      setAllSemester(res.data);
     });
   }, []);
 
@@ -40,9 +47,7 @@ const AllRegisterClassScreen = () => {
           ...DEFAULT_PAGINATION_MODEL,
           page: 0,
         });
-        if (semester !== "") {
-          handleFetchData();
-        }
+        handleFetchData();
       }, 1000);
 
       return () => clearTimeout(timer);
@@ -56,16 +61,12 @@ const AllRegisterClassScreen = () => {
   }, [search, debouncedSearch]);
 
   useEffect(() => {
-    if (semester !== "") {
-      handleFetchData();
-    }
+    handleFetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paginationModel, semester]);
 
   useEffect(() => {
-    if (semester !== "") {
-      fetchRegisteredData();
-    }
+    fetchRegisteredData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [semester]);
 
@@ -98,6 +99,9 @@ const AllRegisterClassScreen = () => {
     history.push("/ta-recruitment/student/class-register/", {
       classId: klass.id,
     });
+  };
+  const handleChangeSemester = (event) => {
+    setSemester(event.target.value);
   };
 
   const actionCell = (params) => {
@@ -154,11 +158,32 @@ const AllRegisterClassScreen = () => {
 
   return (
     <Paper elevation={3}>
-      <div style={styles.tableToolBar}>
-        <Typography variant="h4" style={styles.title}>
-          Danh sách lớp học
-        </Typography>
-
+    <div style={styles.tableToolBar}>
+      <Typography variant="h4" style={styles.title}>
+        Danh sách lớp học
+      </Typography>
+  
+      {/* Container chứa dropdown và search box */}
+      <div style={styles.filterContainer}>
+        <FormControl style={styles.dropdown} size="small">
+          <InputLabel id="semester-label">Học kì</InputLabel>
+          <Select
+            labelId="semester-label"
+            id="semester-select"
+            value={semester}
+            name="day"
+            label="Học kì"
+            onChange={handleChangeSemester}
+            MenuProps={{ PaperProps: { sx: styles.selection } }}
+          >
+            {allSemester.map((semester, index) => (
+              <MenuItem key={index} value={semester}>
+                {semester}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+  
         <TextField
           style={styles.searchBox}
           variant="outlined"
@@ -168,23 +193,25 @@ const AllRegisterClassScreen = () => {
           placeholder="Tìm kiếm"
         />
       </div>
-
-      <DataGrid
-        loading={isLoading}
-        rowHeight={60}
-        sx={styles.table}
-        rows={dataGridRows}
-        columns={dataGridColumns}
-        rowCount={totalElements}
-        pagination
-        paginationMode="server"
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
-        pageSizeOptions={[10, 20, 50]}
-        checkboxSelection={false}
-        disableRowSelectionOnClick
-      />
-    </Paper>
+    </div>
+  
+    <DataGrid
+      loading={isLoading}
+      rowHeight={60}
+      sx={styles.table}
+      rows={dataGridRows}
+      columns={dataGridColumns}
+      rowCount={totalElements}
+      pagination
+      paginationMode="server"
+      paginationModel={paginationModel}
+      onPaginationModelChange={setPaginationModel}
+      pageSizeOptions={[10, 20, 50]}
+      checkboxSelection={false}
+      disableRowSelectionOnClick
+    />
+  </Paper>
+  
   );
 };
 

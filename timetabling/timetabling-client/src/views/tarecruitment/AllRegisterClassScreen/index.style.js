@@ -22,6 +22,19 @@ const styles = {
     fontSize: 16,
     height: "65vh",
   },
+  dropdown: {
+    width: "10%",
+    margin: "0.5%",
+  },
+  selection: {
+    display: "flex",
+    width: "20%",
+    marginLeft: "auto",
+    marginBottom: "1em",
+    marginRight: "1em",
+    maxHeight: 148,
+    overflowY: "scroll",
+  },
 };
 
 export default styles;

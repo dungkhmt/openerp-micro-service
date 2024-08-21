@@ -1,4 +1,11 @@
-import { Button, Chip, Paper, Typography } from "@mui/material";
+import {
+  Button,
+  Chip,
+  Paper,
+  Typography,
+  Box,
+  IconButton,
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { request } from "api";
 import { useEffect, useState } from "react";
@@ -6,6 +13,8 @@ import { styles } from "./index.style";
 import DeleteDialog from "../components/DeleteDialog";
 import UpdateApplicationDialog from "./UpdateApplicationDialog";
 import { applicationUrl } from "../apiURL";
+import { useHistory } from "react-router-dom"; // Updated import
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -25,6 +34,7 @@ const ApplicationResultScreen = () => {
   const [paginationModel, setPaginationModel] = useState(
     DEFAULT_PAGINATION_MODEL
   );
+  const history = useHistory();
 
   const [rowSelect, setRowSelect] = useState([]);
 
@@ -135,28 +145,27 @@ const ApplicationResultScreen = () => {
 
     return (
       <div>
-        <Button
-          variant="outlined"
-          color="success"
-          onClick={() => handleOpenUpdateDialog(rowData)}
-          disabled={rowData.applicationStatus !== "PENDING"}
-        >
-          Sửa
-        </Button>
-        <Button
-          variant="outlined"
-          color="error"
-          style={styles.rightButton}
-          onClick={() => handleOpenDialog(rowData)}
-          disabled={rowData.applicationStatus !== "PENDING"}
-        >
-          Xóa
-        </Button>
+        <Box display={"flex"}>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              history.push(`/ta-recruitment/student/result/${rowData.id}`);
+            }}
+          >
+            Xem chi tiết
+          </Button>
+        </Box>
       </div>
     );
   };
 
   const dataGridColumns = [
+    {
+      field: "id",
+      headerName: "Mã đơn xin",
+      align: "center",
+      headerAlign: "center",
+    },
     {
       field: "classId",
       headerName: "Mã lớp",
@@ -222,6 +231,7 @@ const ApplicationResultScreen = () => {
           <Typography variant="h4" style={styles.title}>
             Kết quả tuyển dụng
           </Typography>
+
           <Button
             color="error"
             variant="outlined"
