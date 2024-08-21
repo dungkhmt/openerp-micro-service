@@ -13,6 +13,7 @@ import {
   Button,
 } from "@mui/material";
 import { styles } from "./index.style";
+import { SEMESTER } from "../config/localize";
 import DeleteDialog from "../components/DeleteDialog";
 import ApplicatorDialog from "./ApplicatorDialog";
 import { DataGrid } from "@mui/x-data-grid";
@@ -26,7 +27,7 @@ const DEFAULT_PAGINATION_MODEL = {
 
 const AllClassScreen = () => {
   const [classes, setClasses] = useState([]);
-  const [semester, setSemester] = useState("");
+  const [semester, setSemester] = useState(SEMESTER);
   const [allSemester, setAllSemester] = useState([]);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [deleteId, setDeleteId] = useState("");
@@ -59,9 +60,7 @@ const AllClassScreen = () => {
   }, []);
 
   useEffect(() => {
-    if (semester !== "") {
-      handleFetchData();
-    }
+    handleFetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paginationModel, semester, debouncedSearch]);
 

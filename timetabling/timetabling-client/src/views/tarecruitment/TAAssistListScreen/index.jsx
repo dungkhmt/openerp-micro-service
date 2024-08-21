@@ -9,6 +9,7 @@ import {
   TextField,
   IconButton,
 } from "@mui/material";
+import { SEMESTER } from "../config/localize";
 import { styles } from "./index.style";
 import { DataGrid } from "@mui/x-data-grid";
 import { useMemo, useEffect, useState } from "react";
@@ -27,7 +28,7 @@ const DEFAULT_PAGINATION_MODEL = {
 
 const TAAssistListScreen = () => {
   const [ta, setTa] = useState([]);
-  const [semester, setSemester] = useState("");
+  const [semester, setSemester] = useState(SEMESTER);
   const [allSemester, setAllSemester] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
@@ -50,9 +51,7 @@ const TAAssistListScreen = () => {
   }, []);
 
   useEffect(() => {
-    if (semester !== "") {
-      handleFetchData();
-    }
+    handleFetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [semester, paginationModel, debouncedSearch]);
 
@@ -87,14 +86,14 @@ const TAAssistListScreen = () => {
   const handleDownloadFile = () => {
     request(
       "get",
-      `${applicationUrl.getAssignListFile}/${semester}`,
+      `${applicationUrl.getAssignListFile}/${SEMESTER}`,
       (res) => {
         const url = window.URL.createObjectURL(new Blob([res.data]));
         const link = document.createElement("a");
         link.href = url;
         link.setAttribute(
           "download",
-          `Danh-sách-trợ-giảng-học-kì-${semester}.xlsx`
+          `Danh-sách-trợ-giảng-học-kì-${SEMESTER}.xlsx`
         );
         document.body.appendChild(link);
         link.click();
