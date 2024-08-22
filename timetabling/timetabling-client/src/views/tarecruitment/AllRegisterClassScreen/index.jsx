@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { request } from "api";
-import { Button, TextField, Paper, Typography } from "@mui/material";
+import { Button, TextField, Paper, Typography, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { useHistory } from "react-router-dom";
 import { DataGrid } from "@mui/x-data-grid";
 import styles from "./index.style";
@@ -17,6 +17,7 @@ const AllRegisterClassScreen = () => {
   const [registeredClass, setRegisteredClass] = useState([]);
 
   const [semester, setSemester] = useState("");
+  const [allSemesters, setAllSemesters] = useState([]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
@@ -28,10 +29,14 @@ const AllRegisterClassScreen = () => {
   );
 
   useEffect(() => {
+    request("get", semesterUrl.getAllSemester, (res) => {
+      setAllSemesters(res.data);
+    });
     request("get", semesterUrl.getCurrentSemester, (res) => {
       setSemester(res.data);
     });
   }, []);
+
 
   const debouncedSearch = useCallback(
     (search) => {
@@ -117,6 +122,10 @@ const AllRegisterClassScreen = () => {
     );
   };
 
+  const handleSemesterChange = (e) => {
+    setSemester(e.target.value);
+  }
+
   const dataGridColumns = [
     {
       field: "id",
@@ -136,6 +145,11 @@ const AllRegisterClassScreen = () => {
       flex: 1,
     },
     {
+      field: "semester",
+      headerName: "Kỳ học", 
+      flex: 1,
+    },
+    {
       headerName: "Hành động",
       flex: 1,
       align: "center",
@@ -149,6 +163,7 @@ const AllRegisterClassScreen = () => {
     subjectId: klass.subjectId,
     subjectName: klass.subjectName,
     day: `Thứ ${klass.day}, tiết ${klass.startPeriod} - ${klass.endPeriod}`,
+    semester: klass.semester,
     actions: { rowData: klass },
   }));
 
@@ -159,14 +174,33 @@ const AllRegisterClassScreen = () => {
           Danh sách lớp học
         </Typography>
 
-        <TextField
-          style={styles.searchBox}
-          variant="outlined"
-          name="search"
-          value={search}
-          onChange={handleSearch}
-          placeholder="Tìm kiếm"
-        />
+        <div style={styles.selectSearchBar}>
+          <FormControl style={styles.selectBox}>
+            <InputLabel id="select-label">Kỳ học</InputLabel>
+            <Select
+              labelId="select-label"
+              id="select-semester"
+              value={semester}
+              label="semester"
+              onChange={handleSemesterChange}
+            >
+              {
+                  allSemesters.map((sem) => (
+                    <MenuItem value={sem}>{sem}</MenuItem>
+                  ))
+              }
+            </Select>
+          </FormControl>
+
+          <TextField
+            style={styles.searchBox}
+            variant="outlined"
+            name="search"
+            value={search}
+            onChange={handleSearch}
+            placeholder="Tìm kiếm"
+          />
+        </div>
       </div>
 
       <DataGrid

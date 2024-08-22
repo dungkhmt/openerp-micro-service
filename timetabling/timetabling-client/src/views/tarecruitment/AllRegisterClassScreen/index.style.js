@@ -3,11 +3,10 @@ const styles = {
     width: "130px",
   },
   searchBox: {
-    display: "flex",
     width: "20%",
-    marginLeft: "auto",
     marginBottom: "1em",
     marginRight: "1em",
+    paddingLeft: "1em",
   },
   tableToolBar: {
     marginLeft: "2em",
@@ -22,6 +21,15 @@ const styles = {
     fontSize: 16,
     height: "65vh",
   },
+
+  selectSearchBar: {
+    display: "flex",
+    justifyContent: "flex-end",
+  },
+
+  selectBox: {
+    width: "20%",
+  }
 };
 
 export default styles;
