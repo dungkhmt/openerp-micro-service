@@ -3,10 +3,11 @@ const styles = {
     width: "130px",
   },
   searchBox: {
+    display: "flex",
     width: "20%",
+    marginLeft: "auto",
     marginBottom: "1em",
     marginRight: "1em",
-    paddingLeft: "1em",
   },
   tableToolBar: {
     marginLeft: "2em",
@@ -26,11 +27,6 @@ const styles = {
     margin: "0.5%",
   },
   selection: {
-    display: "flex",
-    width: "20%",
-    marginLeft: "auto",
-    marginBottom: "1em",
-    marginRight: "1em",
     maxHeight: 148,
     overflowY: "scroll",
   },

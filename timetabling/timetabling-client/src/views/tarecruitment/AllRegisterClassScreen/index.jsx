@@ -26,7 +26,6 @@ const AllRegisterClassScreen = () => {
   const [registeredClass, setRegisteredClass] = useState([]);
 
   const [semester, setSemester] = useState("");
-  const [allSemesters, setAllSemesters] = useState([]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
@@ -40,9 +39,6 @@ const AllRegisterClassScreen = () => {
   const [allSemester, setAllSemester] = useState([]);
 
   useEffect(() => {
-    request("get", semesterUrl.getAllSemester, (res) => {
-      setAllSemesters(res.data);
-    });
     request("get", semesterUrl.getCurrentSemester, (res) => {
       setSemester(res.data);
     });
@@ -50,7 +46,6 @@ const AllRegisterClassScreen = () => {
       setAllSemester(res.data);
     });
   }, []);
-
 
   const debouncedSearch = useCallback(
     (search) => {
@@ -72,6 +67,7 @@ const AllRegisterClassScreen = () => {
     if (semester !== "") {
       return debouncedSearch(search);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, debouncedSearch]);
 
   useEffect(() => {
@@ -139,10 +135,6 @@ const AllRegisterClassScreen = () => {
     );
   };
 
-  const handleSemesterChange = (e) => {
-    setSemester(e.target.value);
-  }
-
   const dataGridColumns = [
     {
       field: "id",
@@ -162,11 +154,6 @@ const AllRegisterClassScreen = () => {
       flex: 1,
     },
     {
-      field: "semester",
-      headerName: "Kỳ học", 
-      flex: 1,
-    },
-    {
       headerName: "Hành động",
       flex: 1,
       align: "center",
@@ -180,7 +167,6 @@ const AllRegisterClassScreen = () => {
     subjectId: klass.subjectId,
     subjectName: klass.subjectName,
     day: `Thứ ${klass.day}, tiết ${klass.startPeriod} - ${klass.endPeriod}`,
-    semester: klass.semester,
     actions: { rowData: klass },
   }));
 
@@ -192,7 +178,7 @@ const AllRegisterClassScreen = () => {
         </Typography>
 
         <div style={styles.searchArea}>
-          <FormControl style={styles.dropdown} size="small">
+          <FormControl style={styles.dropdown} fullWidth size="small">
             <InputLabel id="semester-label">Học kì</InputLabel>
             <Select
               labelId="semester-label"
