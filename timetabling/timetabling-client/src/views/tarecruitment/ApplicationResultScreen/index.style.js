@@ -37,4 +37,11 @@ export const updateStyles = {
     textAlign: "center",
     marginTop: "1%",
   },
+  buttonGroup: {
+    display: "flex",
+    gap: "10px",
+  },
+  title: {
+    marginBottom: 16,
+  },
 };

@@ -1,6 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { request } from "api";
-import { Button, TextField, Paper, Typography, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import {
+  Button,
+  TextField,
+  Paper,
+  Typography,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+} from "@mui/material";
 import { useHistory } from "react-router-dom";
 import { DataGrid } from "@mui/x-data-grid";
 import styles from "./index.style";
@@ -28,12 +37,17 @@ const AllRegisterClassScreen = () => {
     DEFAULT_PAGINATION_MODEL
   );
 
+  const [allSemester, setAllSemester] = useState([]);
+
   useEffect(() => {
     request("get", semesterUrl.getAllSemester, (res) => {
       setAllSemesters(res.data);
     });
     request("get", semesterUrl.getCurrentSemester, (res) => {
       setSemester(res.data);
+    });
+    request("get", semesterUrl.getAllSemester, (res) => {
+      setAllSemester(res.data);
     });
   }, []);
 
@@ -45,9 +59,7 @@ const AllRegisterClassScreen = () => {
           ...DEFAULT_PAGINATION_MODEL,
           page: 0,
         });
-        if (semester !== "") {
-          handleFetchData();
-        }
+        handleFetchData();
       }, 1000);
 
       return () => clearTimeout(timer);
@@ -57,7 +69,9 @@ const AllRegisterClassScreen = () => {
   );
 
   useEffect(() => {
-    return debouncedSearch(search);
+    if (semester !== "") {
+      return debouncedSearch(search);
+    }
   }, [search, debouncedSearch]);
 
   useEffect(() => {
@@ -103,6 +117,9 @@ const AllRegisterClassScreen = () => {
     history.push("/ta-recruitment/student/class-register/", {
       classId: klass.id,
     });
+  };
+  const handleChangeSemester = (event) => {
+    setSemester(event.target.value);
   };
 
   const actionCell = (params) => {
@@ -174,21 +191,23 @@ const AllRegisterClassScreen = () => {
           Danh sách lớp học
         </Typography>
 
-        <div style={styles.selectSearchBar}>
-          <FormControl style={styles.selectBox}>
-            <InputLabel id="select-label">Kỳ học</InputLabel>
+        <div style={styles.searchArea}>
+          <FormControl style={styles.dropdown} size="small">
+            <InputLabel id="semester-label">Học kì</InputLabel>
             <Select
-              labelId="select-label"
-              id="select-semester"
+              labelId="semester-label"
+              id="semester-select"
               value={semester}
-              label="semester"
-              onChange={handleSemesterChange}
+              name="day"
+              label="Học kì"
+              onChange={handleChangeSemester}
+              MenuProps={{ PaperProps: { sx: styles.selection } }}
             >
-              {
-                  allSemesters.map((sem) => (
-                    <MenuItem value={sem}>{sem}</MenuItem>
-                  ))
-              }
+              {allSemester.map((semester, index) => (
+                <MenuItem key={index} value={semester}>
+                  {semester}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
 
