@@ -11,7 +11,7 @@ import {
     Row,
 } from "react-bootstrap";
 import { Card, CardContent, CardActions } from '@mui/material';
-import ExperienceCard from "components/ExperienceCard";
+import ExperienceCard from "components/resume_card/ExperienceCard";
 
 const UserExperience = () => {
 

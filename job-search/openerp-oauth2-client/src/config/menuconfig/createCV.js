@@ -24,6 +24,13 @@ export const createCV = {
         text: "View all applicant",
         child: [],
       },
+      {
+        id: "MENU_CREATE_CV.VIEW_ALL_CV",
+        path: "/view-jobs-posts",
+        isPublic: true,
+        text: "View all Jobs now !",
+        child: [],
+      },
     ],
   };
   

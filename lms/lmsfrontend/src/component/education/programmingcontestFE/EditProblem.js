@@ -11,7 +11,7 @@ import {
   Grid,
   InputAdornment,
   InputLabel,
-  ListItemText,
+  ListItemText, ListSubheader,
   MenuItem,
   OutlinedInput,
   Select,
@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import { request } from "api";
 import withScreenSecurity from "component/withScreenSecurity";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
@@ -493,20 +493,16 @@ function EditProblem() {
                 </Box>
               )}
             >
-              <Button
-                sx={{ marginLeft: "20px" }}
-                startIcon={<AddCircleIcon />}
-                onClick={() => setOpenModalAddNewTag(true)}
-              >
-                {t("common:addNew")}
-              </Button>
-              <ModelAddNewTag
-                isOpen={openModalAddNewTag}
-                handleSuccess={() => {
-                  getAllTags(handleGetTagsSuccess);
-                }}
-                handleClose={() => setOpenModalAddNewTag(false)}
-              />
+              <ListSubheader>
+                <Button
+                  sx={{marginLeft: "20px"}}
+                  startIcon={<AddCircleIcon/>}
+                  onClick={() => setOpenModalAddNewTag(true)}
+                >
+                  {t("common:addNew")}
+                </Button>
+              </ListSubheader>
+
               {tags.map((tag) => (
                 <MenuItem key={tag.tagId} value={tag}>
                   <Checkbox
@@ -667,6 +663,14 @@ function EditProblem() {
           {t("save", { ns: "common" })}
         </LoadingButton>
       </Box>
+
+      <ModelAddNewTag
+        isOpen={openModalAddNewTag}
+        handleSuccess={() => {
+          getAllTags(handleGetTagsSuccess);
+        }}
+        handleClose={() => setOpenModalAddNewTag(false)}
+      />
     </HustContainerCard>
   );
 }

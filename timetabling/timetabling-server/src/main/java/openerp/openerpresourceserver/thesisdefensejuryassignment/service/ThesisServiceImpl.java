@@ -2,6 +2,8 @@ package openerp.openerpresourceserver.thesisdefensejuryassignment.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.TeacherSupervisedThesisDTO;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.models.AssignJuryTopicToThesisIM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.ThesisDTO;
@@ -10,10 +12,8 @@ import openerp.openerpresourceserver.thesisdefensejuryassignment.models.ThesisMo
 import openerp.openerpresourceserver.thesisdefensejuryassignment.repo.*;
 
 import javax.xml.crypto.Data;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+
 @Log4j2
 @AllArgsConstructor
 @Service
@@ -32,6 +32,9 @@ public class ThesisServiceImpl implements ThesisService{
 
     @Autowired
     private ThesisRepo thesisRepo;
+
+    @Autowired
+    private JuryTopicRepo juryTopicRepo;
     @Override
     public Thesis createNewThesis(ThesisModel thesisModel) {
         ThesisDefensePlan thesisDefensePlan = thesisDefensePlanRepo.findById(thesisModel.getThesisDefensePlanId()).orElse(null);
@@ -77,6 +80,51 @@ public class ThesisServiceImpl implements ThesisService{
         }
         return thesisDTOList;
     }
+
+    @Override
+    public List<TeacherSupervisedThesisDTO> getAllThesisSupervisedByTeacher(String teacherId) {
+        List<Thesis> foundThesisList = thesisRepo.findBySupervisorId(teacherId);
+        List<TeacherSupervisedThesisDTO> results = new LinkedList<>();
+        HashMap<String, List<Thesis>> planMappingThesis = new HashMap<>();
+        for (Thesis thesis : foundThesisList){
+            String thesisDefensePlanName = thesis.getThesisDefensePlan().getName();
+            if (!planMappingThesis.containsKey(thesisDefensePlanName)){
+                List<Thesis> thesisList = new LinkedList<>();
+                thesisList.add(thesis);
+                planMappingThesis.put(thesisDefensePlanName, thesisList);
+            }
+            else {
+                planMappingThesis.get(thesisDefensePlanName).add(thesis);
+            }
+        }
+        for (Map.Entry<String, List<Thesis>> item : planMappingThesis.entrySet()){
+            String thesisDefensePlan = item.getKey();
+            List<Thesis> thesisList = item.getValue();
+            TeacherSupervisedThesisDTO supervisedThesis = new TeacherSupervisedThesisDTO(thesisDefensePlan, thesisList);
+            results.add(supervisedThesis);
+        }
+        return results;
+    }
+
+    @Override
+    public Thesis getById(String id) {
+        return thesisRepo.findById(UUID.fromString(id)).orElse(null);
+    }
+
+    @Override
+    public String assignJuryTopicToThesis(String thesisId, AssignJuryTopicToThesisIM assignJuryTopicToThesisIM) {
+        Thesis thesis = thesisRepo.findById(UUID.fromString(thesisId)).orElse(null);
+        JuryTopic juryTopic = juryTopicRepo.findById(assignJuryTopicToThesisIM.getJuryTopicId()).orElse(null);
+        if (thesis == null) return "ERROR";
+        thesis.setJuryTopic(juryTopic);
+        if (assignJuryTopicToThesisIM.getSecondJuryTopicId() != 0){
+            JuryTopic secondJuryTopic = juryTopicRepo.findById(assignJuryTopicToThesisIM.getSecondJuryTopicId()).orElse(null);
+            thesis.setSecondaryJuryTopic(secondJuryTopic);
+        }
+        Thesis savedThesis = thesisRepo.save(thesis);
+        return "Phân ban cho đồ án " + savedThesis.getThesisName() + " thành công";
+    }
+
     private static ThesisDTO getThesisDTO(Thesis thesis) {
         ThesisDTO thesisDTO = new ThesisDTO();
         thesisDTO.setId(thesis.getId());
@@ -84,6 +132,18 @@ public class ThesisServiceImpl implements ThesisService{
         thesisDTO.setThesisAbstract(thesis.getThesisAbstract());
         thesisDTO.setSupervisor(thesis.getSupervisor().getTeacherName());
         thesisDTO.setThesisDefensePlanId(thesis.getThesisDefensePlan().getId());
+        if (thesis.getJuryTopic() != null){
+            thesisDTO.setJuryTopicName(thesis.getJuryTopic().getName());
+        }
+        else {
+            thesisDTO.setJuryTopicName(null);
+        }
+        if (thesis.getSecondaryJuryTopic() != null){
+            thesisDTO.setSecondJuryTopicName(thesis.getSecondaryJuryTopic().getName());
+        }
+        else {
+            thesisDTO.setSecondJuryTopicName(null);
+        }
         if (thesis.getDefenseJury() != null){
             thesisDTO.setDefenseJuryId(thesis.getDefenseJury().getId());
             thesisDTO.setDefenseJuryName(thesis.getDefenseJury().getName());
@@ -94,5 +154,4 @@ public class ThesisServiceImpl implements ThesisService{
         }
         return thesisDTO;
     }
-
 }

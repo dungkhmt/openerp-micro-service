@@ -74,7 +74,17 @@ const DeliveryPersonTripDetail = ( props ) => {
       `${API_PATH.DELIVERY_TRIP_START}/${tripId}`,
       (res) => {
         successNoti("Bắt đầu giao hàng thành công");
-        window.location.reload();
+        setTripInfo((prevTripInfo) => ({
+          ...prevTripInfo,
+          deliveryTripStatusCode: "DELIVERING",
+          deliveryTripStatus: "Đang giao"
+        }));
+        setDeliveryItemsTableData((prevItems) =>
+          prevItems.map((item) => ({
+              ...item,
+              statusCode: 'Đang giao',
+          }))
+        );
       },
       {
         500: () => errorNoti("Có lỗi xảy ra, vui lòng thử lại sau")
@@ -96,7 +106,7 @@ const DeliveryPersonTripDetail = ( props ) => {
     )
   }
 
-  const doneItemsButtonHandle = (selectedItemIds) => {
+  const successItemsButtonHandle = (selectedItemIds) => {
     // const selectedItemIds = deliveryItemsTableData
     //   .filter((item) => item.tableData.checked == true)
     //   .map((obj) => obj.deliveryTripItemId);
@@ -379,7 +389,7 @@ const DeliveryPersonTripDetail = ( props ) => {
         actions={tripInfo?.deliveryTripStatusCode == 'DELIVERING' && [
           {
             tooltip: "Giao thành công",
-            iconOnClickHandle: doneItemsButtonHandle
+            iconOnClickHandle: successItemsButtonHandle
           },
           {
             tooltip: "Giao thất bại",

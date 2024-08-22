@@ -12,6 +12,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { request } from "api";
 import { successNoti, errorNoti } from "utils/notification";
 import useAssignTeacherThesis from "hooks/useAssignTeacherThesis";
+// Màn chỉnh sửa phân công giáo viên và đồ án vào hội đồng
 export const EditTeacherAndThesisToDefenseJury = () => {
     const { id, juryId } = useParams();
     const history = useHistory();
@@ -37,14 +38,28 @@ export const EditTeacherAndThesisToDefenseJury = () => {
     );
     const { data: defenseJury, error } = useFetch(`/defense-jury/${juryId}`);
     const { loading, data: teacherList } = useFetch("/defense-jury/teachers");
+
     useEffect(() => {
         let isFetched = false;
+        const sortThesisInJuryTopicInFront = (thesisList) => {
+            function compare(a, b) {
+                if (a?.juryTopic?.id === defenseJury?.juryTopic.id) {
+                    return -1;
+                } else if (b?.juryTopic?.id === defenseJury?.juryTopic?.id) {
+                    return 1;
+                }
+                return a?.juryTopic?.id - b?.juryTopic?.id;
+            }
+            thesisList?.sort(compare)
+            return thesisList;
+        }
         if (defenseJury && availableThesisList) {
+            const sortedAvailableThesisList = sortThesisInJuryTopicInFront(availableThesisList)
             const assignedTeacherList = defenseJury?.defenseJuryTeacherRoles?.map((item) =>
                 ({ ...item?.teacher, role: item?.role?.id })
             )
             const assignedThesisList = defenseJury?.thesisList?.map((item) => item?.id);
-            setThesisList((prev) => [...prev, ...defenseJury?.thesisList, ...availableThesisList]);
+            setThesisList((prev) => [...prev, ...defenseJury?.thesisList, ...sortedAvailableThesisList]);
             setAssignedTeacher(assignedTeacherList);
             setAssignedThesis(assignedThesisList)
         }
@@ -58,6 +73,9 @@ export const EditTeacherAndThesisToDefenseJury = () => {
         }
         if (assignedThesis.length === 0) {
             return errorNoti("Bạn hãy lựa chọn đồ án vào hội đồng", true);
+        }
+        if (assignedThesis?.length > defenseJury?.maxThesis) {
+            return errorNoti(`Hội đồng chỉ có tối đa ${defenseJury?.maxThesis} đồ án`, true);
         }
         request(
             "post",
@@ -77,7 +95,7 @@ export const EditTeacherAndThesisToDefenseJury = () => {
                 defenseJuryId: juryId,
                 defenseJuryTeacherRole: assignedTeacher?.map((item) => ({
                     teacherName: item?.id,
-                    roleId: item?.role,
+                    roleId: item?.role ? item?.role : "",
                 })),
                 thesisIdList: assignedThesis,
             }
@@ -92,8 +110,8 @@ export const EditTeacherAndThesisToDefenseJury = () => {
             <div className="defense-jury-info">
                 Ngày tổ chức: {defenseJury?.defenseDate?.split("T")[0]}
             </div>
-            {defenseJury?.academicKeywordList.map(({ keyword, description }) => (
-                <KeywordChip key={keyword} keyword={description} />
+            {defenseJury?.juryTopic?.academicKeywordList?.map(({ keyword, description }) => (
+                <KeywordChip key={keyword} keyword={keyword} />
             ))}
 
             <form>
@@ -102,7 +120,7 @@ export const EditTeacherAndThesisToDefenseJury = () => {
                     aria-label="student-view-class-detail-tabs"
                     scrollButtons="auto"
                     variant="scrollable">
-                    {tabsLabel.map((label, idx) => (
+                    {tabsLabel?.map((label, idx) => (
                         <AntTab key={label} label={label} {...a11yProps(idx)} />
                     ))}
                 </AntTabs>

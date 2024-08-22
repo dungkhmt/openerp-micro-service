@@ -58,6 +58,7 @@ import TeacherCreateCourse from "component/education/course/TeacherCreateCourse"
 import TeacherViewInteractiveQuiz from "views/Education/ClassManagement/Teacher/TeacherViewInteractiveQuiz";
 import StudentViewInteractiveQuizList from "views/Education/ClassManagement/Student/StudentViewInteractiveQuizList";
 import LearningSessionStudentViewQuizTestList from "views/Education/ClassManagement/Student/LearningSessionStudentViewQuizTestList";
+import CreateTagOfCourse from "component/education/course/CreateTagOfCourse";
 
 export default function EduRoute() {
   let { path } = useRouteMatch();
@@ -97,6 +98,12 @@ export default function EduRoute() {
         <Route
           component={CreateTopicOfCourse}
           path={`${path}/course/detail/topic/create/:courseId`}
+          exact
+        />
+
+        <Route
+          component={CreateTagOfCourse}
+          path={`${path}/course/detail/tag/create/:courseId`}
           exact
         />
 

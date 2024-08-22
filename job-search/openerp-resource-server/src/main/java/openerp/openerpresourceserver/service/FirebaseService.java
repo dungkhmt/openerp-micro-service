@@ -26,7 +26,7 @@ public class FirebaseService {
     public String uploadFile(MultipartFile multipartFile) throws IOException {
         String objectName = generateFileName(multipartFile);
 
-        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("C:\\Users\\ADMIN\\Desktop\\openerp-micro-service\\job-search\\openerp-resource-server\\datn-firebase.json"));
+        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("datn-firebase.json"));
         File file = convertMultiPartToFile(multipartFile);
         Path filePath = file.toPath();
 

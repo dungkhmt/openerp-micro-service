@@ -13,4 +13,6 @@ public interface AcademicWeekRepo extends JpaRepository<AcademicWeek, Long> {
     List<AcademicWeek> findAllBySemester(String semester);
 
     void deleteBySemester(String semester);
+
+    boolean findBySemester(String semester);
 }

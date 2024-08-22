@@ -13,6 +13,7 @@ const GeneralPlanClassOpenScreen = () => {
   const [isOpenDialog, setOpenDialog] = useState(false);
   const [isImportLoading, setImportLoading] = useState(false);
 
+
   useEffect(() => {
     if (selectedSemester) {
       request(
@@ -47,8 +48,12 @@ const GeneralPlanClassOpenScreen = () => {
           setPlanClasses(res?.data);
         },
         (err) => {
+          if(err.response.status === 410) {
+            toast.error(err.response.data);
+          } else {
+            toast.error("Có lỗi khi upload file!");
+          }
           setImportLoading(false);
-          toast.success("Có lỗi khi upload file!");
           console.log(err);
         },
         formData,
@@ -66,19 +71,16 @@ const GeneralPlanClassOpenScreen = () => {
           selectedSemester={selectedSemester}
           setSelectedSemester={setSelectedSemester}
         />
-        <div className="flex flex-col justify-end gap-2">
-          {/* <div className="flex flex-row gap-2">
-            <Button
-              color="error"
+        <div className="flex flex-col justify-end gap-2 ">
+          <div className="flex flex-row gap-2">
+            {/* <Button
+              color="primary"
               disabled={selectedSemester === null}
               variant="contained"
             >
-              Xóa kế hoạch mở lớp
-            </Button>
-            <Button disabled={selectedSemester === null} variant="contained">
-              Lưu thay đổi
-            </Button>
-          </div> */}
+              Thêm lớp kế hoạch mới
+            </Button> */}
+          </div>
           <div className="flex flex-row gap-2 justify-end">
             <InputFileUpload
               isUploading={isImportLoading}
@@ -95,6 +97,7 @@ const GeneralPlanClassOpenScreen = () => {
         isOpenDialog={isOpenDialog}
         semester={selectedSemester?.semester}
         classes={planClasses}
+        setClasses={setPlanClasses}
       />
     </div>
   );

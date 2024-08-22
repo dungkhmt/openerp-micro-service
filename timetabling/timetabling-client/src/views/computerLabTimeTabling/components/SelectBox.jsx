@@ -21,7 +21,7 @@ export default function BasicSelect({items, label, value, onChange, disabled}) {
           {items?.map((item, index) => {
             const {id, ...rest} = item;
             return (
-                <MenuItem key={item.id} value={item.id}>{rest[Object.keys(rest)[0]]}</MenuItem>   
+                <MenuItem key={index} value={id}>{rest[Object.keys(rest)[0]]}</MenuItem>   
             )
             })}
         </Select>

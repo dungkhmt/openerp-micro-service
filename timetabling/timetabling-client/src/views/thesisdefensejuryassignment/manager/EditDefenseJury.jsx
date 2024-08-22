@@ -30,26 +30,29 @@ const MenuProps = {
         },
     },
 };
+
+// Màn chỉnh sửa hội đồng bảo vệ
 export const EditDefenseJury = () => {
     const [defenseJury, setDefenseJury] = useState({});
     const { juryId } = useParams();
     const history = useHistory();
     const [loading, setLoading] = useState(false);
     const { data: roomList } = useFetch("/defense-room/get-all");
-    const { data: keywordList } = useFetch("/academic_keywords/get-all");
     const { data: sessionList } = useFetch("/defense-session/get-all");
     // const prevKeywordList = defenseJury?.academicKeywordList?.map((item) => item?.keyword);
     const [keyword, setKeyword] = useState([]);
-    const [defenseSessionId, setDefenseSessionId] = useState(0);
+    const [defenseSession, setDefenseSession] = useState([]);
     const [defenseRoomId, setDefenseRoomId] = useState(0);
+    const [juryTopicId, setJuryTopicId] = useState(0);
     const handleChange = (event) => {
         const {
             target: { value },
         } = event;
-        setKeyword(
+        setDefenseSession(
             // On autofill we get a stringified value.
             typeof value === "string" ? value.split(",") : value
         );
+
     };
     const {
         register,
@@ -61,25 +64,28 @@ export const EditDefenseJury = () => {
             id: juryId,
             name: defenseJury?.name,
             maxThesis: defenseJury?.maxThesis,
-            defenseDate: defenseJury?.defenseDate?.split("T")[0],
+            defenseDate: defenseJury?.defenseDate,
             defenseRoomId: 1,
-            defenseSessionId: 1,
-            academicKeywordList: [],
         },
     });
 
     const handleFormSubmit = data => {
-        data.academicKeywordList = [...keyword];
         data.defenseRoomId = defenseRoomId;
-        data.defenseSessionId = defenseSessionId;
+        data.defenseSessionId = defenseSession;
         data.maxThesis = parseInt(data.maxThesis);
         request(
             "POST",
             "/defense-jury/update",
             (res) => {
                 if (res.data) {
-                    successNoti("cập nhật hội đồng thành công", true)
-                    return history.goBack();
+                    const message = res.data;
+                    if (message.toUpperCase() === "SUCCESS") {
+                        successNoti("cập nhật hội đồng thành công", true)
+                        return history.goBack();
+                    }
+                    else {
+                        return errorNoti(message, true);
+                    }
                 }
             },
             {
@@ -91,9 +97,10 @@ export const EditDefenseJury = () => {
         ).then();
     }
     useEffect(() => {
-        setLoading(false);
+        setLoading(true);
         request('GET', `/defense-jury/${juryId}`, (res) => {
             setDefenseJury(res.data)
+            console.log(res.data);
             reset({
                 id: juryId,
                 name: res.data?.name,
@@ -101,9 +108,7 @@ export const EditDefenseJury = () => {
                 defenseDate: res.data?.defenseDate?.split("T")[0],
             })
             setDefenseRoomId(res.data.defenseRoom?.id)
-            setDefenseSessionId(res.data.defenseSession?.id)
-            const prevKeyword = res.data?.academicKeywordList?.map((item) => item?.keyword);
-            setKeyword(prevKeyword)
+            setDefenseSession(res.data.defenseSession?.map(({ id }) => id))
             setLoading(false);
         })
     }, [])
@@ -114,17 +119,17 @@ export const EditDefenseJury = () => {
                     Cập nhật Hội Đồng
                 </Typography>
                 <Box mb={3}>
+                    <div>Tên hội đồng</div>
                     <TextField
                         {...register("name", { required: true })}
                         fullWidth={true}
                         id="input-with-icon-grid"
-                        label="Tên hội đồng"
                         variant="outlined"
                         margin="normal"
                     />
+                    <div>Số lượng đồ án tối đa</div>
                     <TextField
                         fullWidth={true}
-                        label="Số lượng đồ án tối đa"
                         name="maxThesis"
                         {...register("maxThesis", { required: true })}
                         variant="outlined"
@@ -174,42 +179,19 @@ export const EditDefenseJury = () => {
                                 </InputLabel>
                                 <Select
                                     MenuProps={MenuProps}
+                                    labelId="defense-session-label"
                                     label="defense-session"
                                     name="defenseSessionId"
+                                    multiple
                                     input={<OutlinedInput label="Tag" />}
-                                    value={defenseSessionId}
-                                    onChange={(e) => setDefenseSessionId(e.target.value)}
+                                    value={defenseSession}
+                                    renderValue={(selected) => selected.map((item) => sessionList?.find((session) => session?.id === item)?.name).join(', ')}
+                                    onChange={handleChange}
                                 >
                                     {sessionList?.map((item) => (
-                                        <MenuItem key={item?.id} value={item?.id} selected={defenseJury?.defenseSession?.id === item?.id}>
-                                            {item?.name}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item={true} xs={6} spacing={2} p={2}>
-                            <span>Keyword hội đồng</span>
-                            <FormControl fullWidth margin="normal">
-                                <InputLabel id="demo-multiple-name-label">
-                                    Keyword
-                                </InputLabel>
-                                <Select
-                                    multiple
-                                    MenuProps={MenuProps}
-                                    value={keyword}
-                                    name="academicKeywordList"
-                                    label="Keyword"
-                                    input={<OutlinedInput label="Tag" />}
-                                    onChange={handleChange}
-                                    renderValue={(selected) => selected?.join(", ")}
-                                >
-                                    {keywordList?.map((item) => (
-                                        <MenuItem key={item?.id} value={item?.keyword}>
-                                            <Checkbox
-                                                checked={keyword?.indexOf(item?.keyword) > -1}
-                                            />
-                                            <ListItemText primary={item?.keyword} />
+                                        <MenuItem key={item?.id} value={item?.id}>
+                                            <Checkbox checked={defenseSession.indexOf(item?.id) !== -1} />
+                                            <ListItemText primary={item?.name} />
                                         </MenuItem>
                                     ))}
                                 </Select>

@@ -26,6 +26,8 @@ public class AssetType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    private String user_id;
+
     @Column(nullable = false)
     private String name;
 
@@ -34,6 +36,8 @@ public class AssetType {
 
     @Column(nullable = false, unique = true)
     private String code_prefix;
+
+    private Integer num_assets;
 
     @CreatedDate
     private Date since;

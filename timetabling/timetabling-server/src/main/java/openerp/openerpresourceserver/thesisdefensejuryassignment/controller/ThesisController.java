@@ -2,7 +2,9 @@ package openerp.openerpresourceserver.thesisdefensejuryassignment.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.TeacherSupervisedThesisDTO;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.ThesisDTO;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.models.AssignJuryTopicToThesisIM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,4 +52,30 @@ public class ThesisController {
         }
         return new ResponseEntity<>(thesisList, HttpStatus.OK);
     }
+
+    @GetMapping("/get-all-by-supervisor")
+    public ResponseEntity<List<TeacherSupervisedThesisDTO>> getAllThesisSupervisedByTeacher(@RequestParam(name = "teacher") String teacherId) {
+        System.out.println(teacherId);
+        List<TeacherSupervisedThesisDTO> thesisList = thesisService.getAllThesisSupervisedByTeacher(teacherId);
+        if (thesisList == null) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(thesisList, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Thesis> getThesisById(@PathVariable String id) {
+        Thesis thesisList = thesisService.getById(id);
+        return new ResponseEntity<>(thesisList, HttpStatus.OK);
+    }
+
+    @PostMapping("/assign")
+    public ResponseEntity<String> assignJuryTopicToThesis(@RequestBody AssignJuryTopicToThesisIM assignJuryTopicToThesisIM) {
+        String message = thesisService.assignJuryTopicToThesis(assignJuryTopicToThesisIM.getThesisId(), assignJuryTopicToThesisIM);
+        if (message.equals("ERROR")) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
 }

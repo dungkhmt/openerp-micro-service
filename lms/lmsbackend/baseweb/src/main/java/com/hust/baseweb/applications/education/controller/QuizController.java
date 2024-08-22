@@ -150,31 +150,32 @@ public class QuizController {
 
     @GetMapping("/get-questions-of-course-by-tags")
     public ResponseEntity<?> getListQuestionByTags(Principal principal, @RequestParam("tags") List<String> tags, @RequestParam("courseId") String courseId) {
-        List<UUID> tagIds = quizTagRepo.findAllTagIdByCourseIdAndTagName(courseId, tags);
-        List<UUID> questionIds = quizQuestionTagService.getListQuizQuestionByTagIds(tagIds);
+        // List<UUID> tagIds = quizTagRepo.findAllTagIdByCourseIdAndTagName(courseId, tags);
+        // List<UUID> questionIds = quizQuestionTagService.getListQuizQuestionByTagIds(tagIds);
         
-        List<QuizQuestion> quizQuestions = quizQuestionService.findAllQuizQuestionsByQuestionIdsIn(questionIds);
-        //List<QuizQuestion> quizQuestions = quizQuestionService.findAll();
-        List<QuizQuestionDetailModel> quizQuestionDetailModels = new ArrayList<>();
-        for (QuizQuestion quizQuestion : quizQuestions) {
-            QuizQuestionDetailModel quizQuestionDetailModel = quizQuestionService.findQuizDetail(quizQuestion.getQuestionId());
-            quizQuestionDetailModels.add(quizQuestionDetailModel);
-        }
-        Collections.sort(quizQuestionDetailModels, new Comparator<QuizQuestionDetailModel>() {
-            @Override
-            public int compare(QuizQuestionDetailModel o1, QuizQuestionDetailModel o2) {
-                String topic1 = o1.getQuizCourseTopic().getQuizCourseTopicId();
-                String topic2 = o2.getQuizCourseTopic().getQuizCourseTopicId();
-                String level1 = o1.getLevelId();
-                String level2 = o2.getLevelId();
-                int c1 = topic1.compareTo(topic2);
-                if (c1 == 0) {
-                    return level1.compareTo(level2);
-                } else {
-                    return c1;
-                }
-            }
-        });
+        // List<QuizQuestion> quizQuestions = quizQuestionService.findAllQuizQuestionsByQuestionIdsIn(questionIds);
+        // //List<QuizQuestion> quizQuestions = quizQuestionService.findAll();
+        // List<QuizQuestionDetailModel> quizQuestionDetailModels = new ArrayList<>();
+        // for (QuizQuestion quizQuestion : quizQuestions) {
+        //     QuizQuestionDetailModel quizQuestionDetailModel = quizQuestionService.findQuizDetail(quizQuestion.getQuestionId());
+        //     quizQuestionDetailModels.add(quizQuestionDetailModel);
+        // }
+        // Collections.sort(quizQuestionDetailModels, new Comparator<QuizQuestionDetailModel>() {
+        //     @Override
+        //     public int compare(QuizQuestionDetailModel o1, QuizQuestionDetailModel o2) {
+        //         String topic1 = o1.getQuizCourseTopic().getQuizCourseTopicId();
+        //         String topic2 = o2.getQuizCourseTopic().getQuizCourseTopicId();
+        //         String level1 = o1.getLevelId();
+        //         String level2 = o2.getLevelId();
+        //         int c1 = topic1.compareTo(topic2);
+        //         if (c1 == 0) {
+        //             return level1.compareTo(level2);
+        //         } else {
+        //             return c1;
+        //         }
+        //     }
+        // });
+        List<QuizQuestionDetailModel> quizQuestionDetailModels = quizQuestionTagService.getListQuizQuestionByTagsAndCourseId(tags, courseId);
         return ResponseEntity.ok().body(quizQuestionDetailModels);
     }
 
@@ -244,8 +245,8 @@ public class QuizController {
     @GetMapping("/get-quiz-course-topics-of-course/{courseId}")
     public ResponseEntity<?> getQuizCourseTopicsOfCourse(Principal principal, @PathVariable String courseId) {
         log.info("getQuizCourseTopicsOfCourse, courseId = " + courseId);
-        //List<QuizCourseTopic> quizCourseTopics = quizCourseTopicService.findByEduCourse_Id(courseId);
-        List<QuizCourseTopicDetailOM> quizCourseTopics = quizCourseTopicService.findTopicByCourseId(courseId);
+        List<QuizCourseTopic> quizCourseTopics = quizCourseTopicService.findByEduCourse_Id(courseId);
+        // List<QuizCourseTopicDetailOM> quizCourseTopics = quizCourseTopicService.findTopicByCourseId(courseId);
         return ResponseEntity.ok().body(quizCourseTopics);
     }
 

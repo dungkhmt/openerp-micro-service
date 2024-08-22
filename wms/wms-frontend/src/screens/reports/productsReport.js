@@ -3,7 +3,7 @@ import { request } from "api";
 import StandardTable from "components/StandardTable"
 import { Fragment } from "react";
 import { useEffect, useState } from "react"
-import { API_PATH } from "screens/apiPaths";
+import { API_PATH, API_PATH_2 } from "screens/apiPaths";
 import { convertToVNDFormat } from "screens/utils/utils";
 
 const ProductsReport = () => {
@@ -16,7 +16,7 @@ const ProductsReport = () => {
   useEffect(() => {
     request(
       'get',
-      API_PATH.PRODUCTS_REPORT,
+      API_PATH_2.PRODUCTS_REPORT,
       (res) => {
         var tableData = res?.data;
         for (var i = 0; i < tableData.length; i++) {
@@ -71,6 +71,8 @@ const ProductsReport = () => {
             border: '2px solid #000',
             boxShadow: 24,
             p: 4,
+            overflow: 'auto', 
+            maxWidth: '100%', 
           }}>
             <StandardTable
               title="Lịch sử sản phẩm"

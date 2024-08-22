@@ -66,7 +66,15 @@ public class ContestEntity implements Serializable {
     public static final String PROG_LANGUAGES_JAVA = "JAVA";
     public static final String PROG_LANGUAGES_PYTHON3 = "PYTHON3";
 
+    public static final String CONTEST_TYPE_REAL_TEST_WITH_EVALUATION = "REAL_TEST_WITH_EVALUATION";
+    public static final String CONTEST_TYPE_TRAINING_NO_EVALUATION = "TRAINING_NO_EVALUATION";
 
+    public static List<String> getListContestTypes(){
+        List<String> L = new ArrayList();
+        L.add(CONTEST_TYPE_REAL_TEST_WITH_EVALUATION);
+        L.add(CONTEST_TYPE_TRAINING_NO_EVALUATION);
+        return L;
+    }
     public static List<String> getListParticipantViewSubmissionModes() {
         List<String> L = new ArrayList();
         L.add(PARTICIPANT_VIEW_SUBMISSION_MODE_ENABLED);
@@ -244,5 +252,8 @@ public class ContestEntity implements Serializable {
 
     @Column(name = "languages_allowed")
     private String languagesAllowed;
+
+    @Column(name = "contest_type")
+    private String contestType;
 
 }

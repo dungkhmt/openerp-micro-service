@@ -3,7 +3,7 @@ import ThesisDefensePlans from "views/thesisdefensejuryassignment/manager/Thesis
 import DefensePlanManager from "views/thesisdefensejuryassignment/manager/DefensePlanManager";
 import DefenseJuryDetail from "components/thesisdefensejury/DefenseJuryDetail";
 import AssignTeacherAndThesisToDefenseJury from "views/thesisdefensejuryassignment/manager/AssignTeacherAndThesisToDefenseJury";
-import AssignTeacherAndThesisAutomatically from "views/thesisdefensejuryassignment/manager/AssignTeacherAndThesisAutomatically";
+// import AssignTeacherAndThesisAutomatically from "views/thesisdefensejuryassignment/manager/AssignTeacherAndThesisAutomatically";
 import AssignedThesisDefensePlan from "views/thesisdefensejuryassignment/assigned/AssignedThesisDefensePlan";
 import AssignedDefenseJury from "views/thesisdefensejuryassignment/assigned/AssignedDefenseJury";
 import PresidentAssignedThesisDefensePlan from "views/thesisdefensejuryassignment/assigned/PresidentAssignedThesisDefensePlan";
@@ -15,6 +15,9 @@ import { EditThesisDefensePlan } from "views/thesisdefensejuryassignment/manager
 import { EditDefenseJury } from "views/thesisdefensejuryassignment/manager/EditDefenseJury";
 import { EditTeacherAndThesisToDefenseJury } from "views/thesisdefensejuryassignment/manager/EditTeacherAndThesisToDefenseJury";
 import { ManagerDefenseJuryDetail } from "views/thesisdefensejuryassignment/manager/ManagerDefenseJuryDetail";
+import SuperviseThesisList from "views/thesisdefensejuryassignment/assigned/SuperviseThesisList";
+import AssignSupervisedThesis from "views/thesisdefensejuryassignment/assigned/AssignSupervisedThesis";
+import JuryTopicList from "views/thesisdefensejuryassignment/manager/JuryTopicList";
 const ThesisDefensePlanAssignmentRouter = () => {
     let { path } = useRouteMatch();
     return (
@@ -55,17 +58,22 @@ const ThesisDefensePlanAssignmentRouter = () => {
                     component={EditTeacherAndThesisToDefenseJury}
                     exact
                 />
-                <Route
+                {/*<Route
                     path={`${path}/thesis_defense_plan/:id/assign-automatically`}
                     component={AssignTeacherAndThesisAutomatically}
                     exact
+                />*/}
+                <Route
+                    path={`${path}/topic`}
+                    component={JuryTopicList}
+                    exact
                 />
+
                 <Route
                     path={`${path}/teacher/assigned`}
                     exact
-                >
-                    <AssignedThesisDefensePlan />
-                </Route>
+                    component={AssignedThesisDefensePlan}
+                />
                 <Route
                     path={`${path}/teacher/assigned/:id`}
                     component={AssignedDefenseJury}
@@ -75,6 +83,16 @@ const ThesisDefensePlanAssignmentRouter = () => {
                     path={`${path}/teacher/assigned/:id/defense_jury/:juryId`}
                     component={DefenseJuryDetail}
                     exact
+                />
+                <Route
+                    path={`${path}/teacher/superviser`}
+                    component={SuperviseThesisList}
+                    exact
+                />
+                <Route
+                    path={`${path}/teacher/superviser/assign/:id`}
+                    exact
+                    component={AssignSupervisedThesis}
                 />
                 <Route
                     path={`${path}/teacher/president`}

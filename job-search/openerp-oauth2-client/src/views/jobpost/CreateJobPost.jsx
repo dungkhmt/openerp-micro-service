@@ -12,6 +12,9 @@ import {
 import { request } from "../../api"
 import { CircularProgress, Snackbar } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
+import Swal from "sweetalert2";
+import './styles.css';
+import { Select, MenuItem, Checkbox, ListItemText, InputLabel } from '@mui/material';
 
 const CreateJobPost = () => {
     const [loading, setLoading] = useState(false);
@@ -20,7 +23,7 @@ const CreateJobPost = () => {
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
     const [requirements, setRequirements] = useState("")
-    const [location, setLocation] = useState("")
+    const [locations, setLocations] = useState("")
     const [salary, setSalary] = useState(0)
     const [jobPostForm, setJobPostForm] = useState({
     })
@@ -41,19 +44,142 @@ const CreateJobPost = () => {
     }
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
         setLoading(true);
-        await sleep(2000);
-        jobPostForm.salary = Number(jobPostForm.salary)
+        console.log(selectedrequirements)
+        // Simulate a delay with setTimeout
+
+        jobPostForm.salary = Number(jobPostForm.salary);
+        jobPostForm.user = user
+        jobPostForm.requirements = selectedrequirements.join(", ")
         console.log(jobPostForm)
-        request("post", "/job-post", (res) => {
-            return 0;
-        }, (res) => {
-            return 0;
-        }, jobPostForm).then();
-        setLoading(false);
-        setOpenSnackbar(true);
-        await sleep(1500);
+        // Use SweetAlert2 for confirmation before submitting
+        Swal.fire({
+            title: 'Uploading...',
+            text: 'Please wait while the file is being uploaded.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        try {
+            const res = await request("post", "/job-post", null, null, jobPostForm)
+            // Show a success Swal if the form is submitted
+            Swal.fire({
+                title: 'Submitted!',
+                text: 'Your information has been submitted.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+        } catch (error) {
+            console.error(error);
+            // Show an error Swal if there's an issue with the upload or form submission
+            Swal.fire({
+                title: 'Error!',
+                text: 'There was an issue with the upload or submission.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    };
+
+    const requirement = [
+        "Agile",
+        "Android",
+        "Angular",
+        "AngularJS",
+        "ASP.NET",
+        "Automation Test",
+        "AWS",
+        "Azure",
+        "Blockchain",
+        "Bridge Engineer",
+        "Business Analyst",
+        "Business Intelligence",
+        "C#",
+        "C++",
+        "C language",
+        "Cloud",
+        "Cocos",
+        "Crystal",
+        "CSS",
+        "Dart",
+        "Data Analyst",
+        "Database",
+        "Designer",
+        "DevOps",
+        "DevSecOps",
+        "Django",
+        "Embedded",
+        "Embedded C",
+        "English",
+        "ERP",
+        "Flutter",
+        "Games",
+        "Golang",
+        "HTML5",
+        "iOS",
+        "IT Support",
+        "J2EE",
+        "Japanese",
+        "Java",
+        "JavaScript",
+        "JQuery",
+        "JSON",
+        "Kotlin",
+        "Laravel",
+        "Linux",
+        "Magento",
+        "Manager",
+        "MongoDB",
+        "MVC",
+        "MySQL",
+        ".NET",
+        "Networking",
+        "NodeJS",
+        "NoSQL",
+        "Objective C",
+        "OOP",
+        "Oracle",
+        "PHP",
+        "PostgreSql",
+        "Presale",
+        "Product Designer",
+        "Product Manager",
+        "Product Owner",
+        "Project Manager",
+        "Python",
+        "QA QC",
+        "ReactJS",
+        "React Native",
+        "Ruby",
+        "Ruby on Rails",
+        "Salesforce",
+        "SAP",
+        "Scala",
+        "Scrum",
+        "Security",
+        "Sharepoint",
+        "Software Architect",
+        "Solidity",
+        "Solution Architect",
+        "Spring",
+        "SQL",
+        "Swift",
+        "System Admin",
+        "System Engineer",
+        "Team Leader",
+        "Tester",
+        "TypeScript",
+        "UI-UX",
+        "Unity",
+        "VueJS",
+        "Wordpress",
+        "Xamarin"
+    ];
+    const [selectedrequirements, setSelectedrequirements] = useState([]);
+    const handleRequirementsChange = (event) => {
+        setSelectedrequirements(event.target.value);
     };
 
     return (
@@ -79,13 +205,28 @@ const CreateJobPost = () => {
                         <Typography variant="h4">Requirements</Typography>
                     </Grid>
                     <Grid item xs={11}>
-                        <TextField fullWidth label="requirements" value={jobPostForm.requirements} variant="outlined" name="requirements" multiline rows={4} onChange={handleInputChange} />
+                    <InputLabel id="multi-select-label">Select required skill</InputLabel>
+                        <Select
+                            labelId="multi-select-label"
+                            multiple
+                            value={selectedrequirements}
+                            onChange={handleRequirementsChange}
+                            renderValue={(selected) => selected.join(', ')}
+                            fullWidth
+                        >
+                            {requirement.map((option) => (
+                                <MenuItem key={option} value={option}>
+                                    <Checkbox checked={selectedrequirements.indexOf(option) > -1} />
+                                    <ListItemText primary={option} />
+                                </MenuItem>
+                            ))}
+                        </Select>
                     </Grid>
                     <Grid item xs={12}>
                         <Typography variant="h4">Location</Typography>
                     </Grid>
                     <Grid item xs={11}>
-                        <TextField fullWidth label="location" value={jobPostForm.locations} variant="outlined" name="location" onChange={handleInputChange} />
+                        <TextField fullWidth label="locations" value={jobPostForm.locations} variant="outlined" name="locations" onChange={handleInputChange} />
                     </Grid>
                     <Grid item xs={12}>
                         <Typography variant="h4">Salary</Typography>
@@ -98,22 +239,22 @@ const CreateJobPost = () => {
                     <Grid container justifyContent="center" > {/* Add Grid container for centering */}
                         <Grid item >
                             <Button sx={{ backgroundColor: 'green', color: 'white' }} variant="contained" onClick={handleSubmit}>
-                                Submit CV
+                                Create Job Post
                             </Button>
                         </Grid>
                     </Grid>
-                    <Snackbar
+                    {/* <Snackbar
                         open={openSnackbar}
                         autoHideDuration={3000} // Duration in milliseconds
                         onClose={() => setOpenSnackbar(false)}
                         message="Form submitted successfully!"
-                    />
-                    <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+                    /> */}
+                    {/* <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
                         <CircularProgress color="inherit" />
                         <div>
                             Please wait a few seconds...
                         </div>
-                    </Backdrop>
+                    </Backdrop> */}
                 </Grid>
             </Grid>
         </>

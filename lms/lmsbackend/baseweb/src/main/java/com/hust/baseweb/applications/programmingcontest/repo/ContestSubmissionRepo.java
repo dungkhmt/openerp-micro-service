@@ -1,6 +1,7 @@
 package com.hust.baseweb.applications.programmingcontest.repo;
 
 import com.hust.baseweb.applications.admin.dataadmin.education.model.ProgrammingContestSubmissionOM;
+import com.hust.baseweb.applications.education.entity.LogUserLoginCourseChapterMaterial;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
 import com.hust.baseweb.applications.programmingcontest.model.ModelProblemMaxSubmissionPoint;
 import com.hust.baseweb.applications.programmingcontest.model.ModelSubmissionInfoRanking;
@@ -88,6 +89,11 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmissionEn
            nativeQuery = true
     )
     List<ContestSubmissionEntity> findAllByContestIdAndStatus(@Param("cid") String cid, @Param("status") String status);
+    List<ContestSubmissionEntity> findAllByStatus(@Param("status") String status);
+
+    @Query(value = "select * from contest_submission_new where status = ?3 order by created_stamp desc offset ?1 limit ?2",
+           nativeQuery = true)
+    List<ContestSubmissionEntity> getPageContestSubmission(int offset, int limit, String status);
 
     List<ContestSubmissionEntity> findAllByContestId(String contestId);
 
@@ -95,6 +101,9 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmissionEn
 
     @Query(value = "select count(*) from contest_submission_new", nativeQuery = true)
     int countTotal();
+
+    @Query(value = "select count(*) from contest_submission_new where status = 'Accept'", nativeQuery = true)
+    int countTotalAccept();
 
     @Query(
         nativeQuery = true,

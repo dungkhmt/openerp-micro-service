@@ -1,7 +1,15 @@
-import { Box, CardContent, Grid, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  CardContent,
+  Grid,
+  Tooltip,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import PropTypes from "prop-types";
 import { forwardRef } from "react";
 import ReactApexcharts from "react-apexcharts";
+import { useSelector } from "react-redux";
 import { DashboardCard } from "../../../../components/card/DashboardCard";
 
 const TaskInprogressStatistic = forwardRef(function TaskInprogressStatistic(
@@ -9,6 +17,7 @@ const TaskInprogressStatistic = forwardRef(function TaskInprogressStatistic(
   ref
 ) {
   const theme = useTheme();
+  const { inprogress } = useSelector((state) => state.statistic);
 
   const chartOptions = {
     stroke: { lineCap: "round" },
@@ -27,7 +36,7 @@ const TaskInprogressStatistic = forwardRef(function TaskInprogressStatistic(
         horizontal: 10,
       },
     },
-    colors: ["#7367f0"],
+    colors: ["#1986C2"],
     plotOptions: {
       radialBar: {
         inverseOrder: true,
@@ -85,9 +94,9 @@ const TaskInprogressStatistic = forwardRef(function TaskInprogressStatistic(
       title="Đang thực hiện"
     >
       <CardContent>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Grid container spacing={0}>
-            <Grid item sx={6} md={6} lg={5} xl={4}>
+        <Grid container spacing={0}>
+          <Grid item sx={6} md={6} lg={5} xl={4}>
+            <Tooltip title="Chi tiết">
               <Box
                 sx={{
                   display: "flex",
@@ -103,22 +112,26 @@ const TaskInprogressStatistic = forwardRef(function TaskInprogressStatistic(
                   flex: 1,
                 }}
               >
-                <Typography variant="h3">8</Typography>
+                <Typography variant="h3">{inprogress.count}</Typography>
                 <Typography variant="subtitle2" sx={{ fontSize: "0.7rem" }}>
                   nhiệm vụ
                 </Typography>
               </Box>
-            </Grid>
-            <Grid item xs={6} md={6} lg={7} xl={8} sx={{ mt: 2 }}>
-              <ReactApexcharts
-                type="radialBar"
-                height={120}
-                options={chartOptions}
-                series={[80]}
-              />
-            </Grid>
+            </Tooltip>
           </Grid>
-        </Box>
+          <Grid item xs={6} md={6} lg={7} xl={8} sx={{ mt: 2 }}>
+            <Tooltip title={`${inprogress.percentage}%`}>
+              <div style={{ minWidth: "120px" }}>
+                <ReactApexcharts
+                  type="radialBar"
+                  height={120}
+                  options={chartOptions}
+                  series={[inprogress.percentage]}
+                />
+              </div>
+            </Tooltip>
+          </Grid>
+        </Grid>
       </CardContent>
       {children}
     </DashboardCard>

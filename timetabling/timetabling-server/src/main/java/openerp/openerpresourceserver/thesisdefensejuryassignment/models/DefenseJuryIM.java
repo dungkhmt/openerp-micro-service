@@ -16,16 +16,13 @@ import java.util.List;
 public class DefenseJuryIM {
 
     private String name;
-    //    private String program_name;
     private int maxThesis;
-    private String thesisPlanName;
     private Date defenseDate;
 
     private int defenseRoomId;
 
-    private int defenseSessionId;
-
-    private List<String> academicKeywordList;
+    private List<Integer> defenseSessionId;
+    private int juryTopicId;
 
     public String getName() {
         return name;
@@ -34,29 +31,12 @@ public class DefenseJuryIM {
     public void setName(String name) {
         this.name = name;
     }
-
-//    public String getUserLoginID() {
-//        return userLoginID;
-//    }
-//
-//    public void setUserLoginID(String userLoginID) {
-//        this.userLoginID = userLoginID;
-//    }
-
     public int getMaxThesis() {
         return maxThesis;
     }
 
     public void setMaxThesis(int maxThesis) {
         this.maxThesis = maxThesis;
-    }
-
-    public String getThesisPlanName() {
-        return thesisPlanName;
-    }
-
-    public void setThesisPlanName(String thesisPlanName) {
-        this.thesisPlanName = thesisPlanName;
     }
 
     public Date getDefenseDate() {
@@ -67,14 +47,6 @@ public class DefenseJuryIM {
         this.defenseDate = defenseDate;
     }
 
-    public List<String> getAcademicKeywordList() {
-        return academicKeywordList;
-    }
-
-    public void setAcademicKeywordList(List<String> academicKeywordList) {
-        this.academicKeywordList = academicKeywordList;
-    }
-
     public int getDefenseRoomId() {
         return defenseRoomId;
     }
@@ -83,11 +55,19 @@ public class DefenseJuryIM {
         this.defenseRoomId = defenseRoomId;
     }
 
-    public int getDefenseSessionId() {
+    public List<Integer> getDefenseSessionId() {
         return defenseSessionId;
     }
 
-    public void setDefenseSessionId(int defenseSessionId) {
+    public void setDefenseSessionId(List<Integer> defenseSessionId) {
         this.defenseSessionId = defenseSessionId;
+    }
+
+    public int getJuryTopicId() {
+        return juryTopicId;
+    }
+
+    public void setJuryTopicId(int juryTopicId) {
+        this.juryTopicId = juryTopicId;
     }
 }

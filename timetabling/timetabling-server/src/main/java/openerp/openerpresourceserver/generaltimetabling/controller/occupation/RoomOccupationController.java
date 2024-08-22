@@ -2,18 +2,15 @@ package openerp.openerpresourceserver.generaltimetabling.controller.occupation;
 
 import java.util.List;
 
-import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekExtractor;
-import openerp.openerpresourceserver.generaltimetabling.model.dto.RoomOccupationDto;
+import openerp.openerpresourceserver.generaltimetabling.model.GetEmptyRoomsRequest;
+import openerp.openerpresourceserver.generaltimetabling.service.ExcelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 import openerp.openerpresourceserver.generaltimetabling.service.RoomOccupationService;
@@ -22,6 +19,8 @@ import openerp.openerpresourceserver.generaltimetabling.service.RoomOccupationSe
 @RestController
 @RequestMapping("/room-occupation")
 public class RoomOccupationController {
+    @Autowired
+    private ExcelService excelService;
 
     @Autowired
     private RoomOccupationService roomOccupationService;
@@ -36,16 +35,10 @@ public class RoomOccupationController {
         }
     }
 
-
-    @GetMapping("/")
-    public ResponseEntity<List<RoomOccupation>> requestGetRoomOccupationsBySemesterAndWeekIndex(@RequestParam("semester")String semester, @RequestParam("weekIndex") int weekIndex) {
-        return ResponseEntity.ok(roomOccupationService.getRoomOccupationsBySemesterAndWeekIndex(semester, weekIndex));
-    }
-
     @PostMapping("/export")
-    public ResponseEntity exportExcel (@RequestParam("semester") String semester, @RequestParam("week") int week) {
-        String filename = "Room_Occupation.xlsx";
-        InputStreamResource file = new InputStreamResource(roomOccupationService.exportExcel(semester, week));
+    public ResponseEntity<Resource> exportExcel (@RequestParam("semester") String semester, @RequestParam("week") int week) {
+        String filename = String.format("room_occupations_S{}_W{}.xlsx", semester, week);
+        InputStreamResource file = new InputStreamResource(excelService.exportRoomOccupationExcel(semester, week));
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
                 .contentType(
@@ -53,4 +46,26 @@ public class RoomOccupationController {
                 .body(file);
     }
 
+    @GetMapping("/")
+    public ResponseEntity<List<RoomOccupation>> requestGetRoomOccupationsBySemesterAndWeekIndex(@RequestParam("semester")String semester, @RequestParam("weekIndex") int weekIndex) {
+        return ResponseEntity.ok(roomOccupationService.getRoomOccupationsBySemesterAndWeekIndex(semester, weekIndex));
+    }
+
+
+
+
+
+    @PostMapping("/empty-room")
+    public ResponseEntity requestGetEmptyRooms(
+            @RequestParam("semester") String semester,
+            @RequestBody GetEmptyRoomsRequest request) {
+        return ResponseEntity.ok(roomOccupationService.getRoomsNotOccupiedBySemesterAndWeekDayCrewStartAndEndSLot(
+                semester,
+                request.getCrew(),
+                request.getWeek(),
+                request.getWeekDay(),
+                request.getStartTime(),
+                request.getEndTime()
+        ));
+    }
 }

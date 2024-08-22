@@ -24,6 +24,7 @@ export function ContestManagerDetail(props) {
     maxSourceCodeLength: 50000,
     minTimeBetweenTwoSubmissions: 0,
     participantViewSubmissionMode: "",
+    contestType:""
   });
 
   const [loading, setLoading] = useState(true);
@@ -48,6 +49,7 @@ export function ContestManagerDetail(props) {
           maxSourceCodeLength: data.maxSourceCodeLength,
           participantViewSubmissionMode: data.participantViewSubmissionMode,
           languagesAllowed: data.languagesAllowed,
+          contestType: data.contestType
         }));
       });
     };
@@ -77,6 +79,7 @@ export function ContestManagerDetail(props) {
         {[
           ["Name", contestDetail.name],
           ["Status", contestDetail.statusId],
+          ["Type", contestDetail.contestType],
           [
             "View problem description",
             contestDetail.problemDescriptionViewType,
@@ -110,7 +113,7 @@ export function ContestManagerDetail(props) {
           ],
           ["Action on submission", contestDetail.submissionActionType],
           [
-            "Evaluate private testcases",
+            "Evaluate both public and private testcases",
             contestDetail.evaluateBothPublicPrivateTestcase,
           ],
           [

@@ -1,0 +1,9 @@
+.swal2-container {
+    z-index: 1500 !important; /* Ensure this number is higher than the Dialog's z-index */
+  }
+
+.w-100 {
+  max-width: 1000px; /* Set your desired max width */
+  margin: 0 auto; /* Center the container */
+
+}

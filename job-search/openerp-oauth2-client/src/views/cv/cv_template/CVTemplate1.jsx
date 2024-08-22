@@ -25,7 +25,7 @@ const CvTemplate1 = (props) => {
               return (
                 <div>
                   <h3 style={{ fontWeight: 700, fontSize: "25px" }}>
-                    {id + 1}.{uWE.position}
+                    {id + 1}.{uWE.workingPosition}
                   </h3>
                   <h6
                     className="text-dark font-weight-bold"
@@ -37,15 +37,15 @@ const CvTemplate1 = (props) => {
                     className="text-dark font-weight-bold"
                     style={{ fontWeight: 700 }}
                   >
-                    {uWE.startingDate && formatDateToMMYYYY(uWE.startingDate)}
-                    {uWE.startingDate && uWE.endingDate ? "-" : ""}
-                    {uWE.endingDate && formatDateToMMYYYY(uWE.endingDate)}
+                    {uWE.startingTime && formatDateToMMYYYY(uWE.startingTime)}
+                    {uWE.startingTime && uWE.endingTime ? "-" : ""}
+                    {uWE.endingTime && formatDateToMMYYYY(uWE.endingTime)}
                   </p>
                   <p
                     className="text-dark font-weight-normal"
                     style={{ whiteSpace: "pre-line" }}
                   >
-                    {parse(uWE.description || "")}
+                    {parse(uWE.responsibility || "")}
                   </p>
                 </div>
               );
@@ -89,11 +89,11 @@ const CvTemplate1 = (props) => {
                     className="text-dark font-weight-bold"
                     style={{ fontWeight: 700 }}
                   >
-                    {education.startingDate &&
-                      formatDateToMMYYYY(education.startingDate)}
-                    {education.startingDate && education.endingDate ? "-" : ""}
-                    {education.endingDate &&
-                      formatDateToMMYYYY(education.endingDate)}
+                    {education.startingTime &&
+                      formatDateToMMYYYY(education.startingTime)}
+                    {education.startingTime && education.endingTime ? "-" : ""}
+                    {education.endingTime &&
+                      formatDateToMMYYYY(education.endingTime)}
                   </p>
                   <p
                     className="text-dark font-weight-normal"
@@ -114,7 +114,7 @@ const CvTemplate1 = (props) => {
     <div className="mt-4 mb-2">
       <main id="fileToPrint" className="resume-section">
         <Row className="w-100" style={{ marginLeft: 0 }}>
-          <Col sm={12} md={6} className="py-4 px-4">
+          <Col sm={12} md={12} className="py-4 px-4">
             <h1
               className="text-center font-weight-bold"
               style={{ fontWeight: "700", fontSize: "30px" }}
@@ -129,7 +129,7 @@ const CvTemplate1 = (props) => {
                   <a href={props.linkedInLink} className="ms-2 text-dark">
                     {
                       props.linkedInLink.split("/")[
-                        props.linkedInLink.split("/").length - 2
+                      props.linkedInLink.split("/").length - 2
                       ]
                     }
                   </a>
@@ -141,7 +141,7 @@ const CvTemplate1 = (props) => {
                   <a href={props.facebookLink} className="ms-2 text-dark">
                     {
                       props.facebookLink.split("/")[
-                        props.facebookLink.split("/").length - 1
+                      props.facebookLink.split("/").length - 1
                       ]
                     }
                   </a>
@@ -153,7 +153,7 @@ const CvTemplate1 = (props) => {
                   <a href={props.gitHubLink} className="ms-2 text-dark">
                     {
                       props.gitHubLink.split("/")[
-                        props.gitHubLink.split("/").length - 1
+                      props.gitHubLink.split("/").length - 1
                       ]
                     }
                   </a>
@@ -199,13 +199,13 @@ const CvTemplate1 = (props) => {
             <ul>
               {!!props.gender && (
                 <li className="d-flex align-items justify-content-start">
-                  <div style={{ fontWeight: 700 }}>Gender:</div>
+                  <div style={{ fontWeight: 700, marginLeft: 200}}>Gender:</div>
                   <div className="ms-2">{props.gender}</div>
                 </li>
               )}
               {!!props.mobilePhone && (
                 <li className="d-flex align-items-center justify-content-start mt-3">
-                  <div style={{ fontWeight: 700 }}>Phone Number:</div>
+                  <div style={{ fontWeight: 700, marginLeft: 200 }}>Phone:</div>
                   <div className="ms-2">{props.mobilePhone}</div>
                 </li>
               )}
@@ -229,9 +229,22 @@ const CvTemplate1 = (props) => {
             >
               Skills Info
             </h1>
-            <div className="py-3" style={{ whiteSpace: "pre-line" }}>
-              {parse(props.skillDescription)}
-            </div>
+            <Col className="py-4 mx-5">
+            {props.skillDescription.map((skill, id) => (
+              <>
+                <h3
+                  className="text-dark font-weight-bold"
+                  style={{ fontWeight: 700, fontSize: "25px" }}
+                >
+                  {id + 1}.{skill.skillName}
+                </h3>
+                <div className="py-3" style={{ whiteSpace: "pre-line" }}>
+                  {" score: " + skill.score}
+                </div>
+              </>
+            )
+            )}
+            </Col>
           </Row>
         )}
       </main>

@@ -4,7 +4,6 @@ import StandardTable from "../../../components/table/StandardTable";
 import { request } from "api";
 import { formatDecimal } from "../../../utils/number";
 import withScreenSecurity from "../../../components/common/withScreenSecurity";
-// import { Tooltip } from "@mui/material";
 import { Link } from "react-router-dom";
 
 function StudentListScreen() {
@@ -63,7 +62,7 @@ function StudentListScreen() {
         minWidth: "128px",
       },
       render: (rowData) =>
-        formatDecimal(rowData?.firstSubmissionAccuracyRate, 1) + "%",
+        formatDecimal(rowData?.firstSubmissionAccuracyRate * 100, 1) + "%",
     },
     {
       title: "Average Submissions To Success",
@@ -81,6 +80,22 @@ function StudentListScreen() {
         minWidth: "128px",
       },
       render: (rowData) => formatDecimal(rowData?.averageSubmissionPerDay, 2),
+    },
+    {
+      title: "First Submission Date",
+      field: "firstSubmissionDate",
+      cellStyle: {
+        minWidth: "128px",
+      },
+      render: (rowData) => rowData?.firstSubmissionDate,
+    },
+    {
+      title: "Last Submission Date",
+      field: "lastSubmissionDate",
+      cellStyle: {
+        minWidth: "128px",
+      },
+      render: (rowData) => rowData?.firstSubmissionDate,
     },
   ];
   return (

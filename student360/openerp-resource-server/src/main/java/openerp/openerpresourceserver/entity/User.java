@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
@@ -19,7 +20,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Entity
 @Table(name = "user_login")
-public class User {
+public class User implements Serializable {
 
     @Id
     @Column(name = "user_login_id", updatable = false, nullable = false)
@@ -30,8 +31,6 @@ public class User {
     private String firstName;
 
     private String lastName;
-
-//    private String affiliations;
 
     @CreatedDate
     @Column(name = "created_stamp")
@@ -55,5 +54,4 @@ public class User {
         // Trả về chuỗi tên đầy đủ
         return fullNameBuilder.toString();
     }
-
 }

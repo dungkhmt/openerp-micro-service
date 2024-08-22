@@ -5,15 +5,26 @@ import PrimaryButton from "components/button/PrimaryButton";
 import { useHistory } from "react-router-dom";
 import ModalLoading from "components/common/ModalLoading";
 import { Box } from "@mui/material";
+// Màn sinh viên theo dõi đồ án được phân công
 export default function StudentAssignedDefenseJury() {
     const { keycloak } = useKeycloak();
     const history = useHistory();
     const studentEmail = keycloak.tokenParsed?.email;
     const { loading, data: thesis } = useFetch(`/thesis/get-all?student-email=${studentEmail}`);
+    console.log(thesis)
     const columns = [
-        { title: "Tên đợt bảo vệ", field: "thesisName" },
-        { title: 'Mô tả đồ án', field: 'thesisAbstract' },
+        { title: "Tên đồ án", field: "thesisName" },
         { title: "Giáo viên hướng dẫn", field: "supervisor" },
+        { title: "Đợt bảo vệ đồ án", field: "thesisDefensePlanId" },
+        {
+            title: "Phân ban",
+            field: "juryTopicName",
+            render: (rowData) => rowData?.juryTopicName ?
+                rowData?.secondJuryTopicName
+                    ? `(1)${rowData?.juryTopicName} (2)${rowData?.secondJuryTopicName}`
+                    : `${rowData?.juryTopicName}`
+                : "Đang chờ phân công",
+        },
         {
             title: "Hội đồng được phân công",
             field: "defenseJuryName",

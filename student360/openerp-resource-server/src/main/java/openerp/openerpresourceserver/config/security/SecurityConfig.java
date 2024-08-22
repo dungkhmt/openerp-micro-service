@@ -29,8 +29,6 @@ public class SecurityConfig {
         // Enable OAuth2 with custom authorities mapping
         http.oauth2ResourceServer().jwt().jwtAuthenticationConverter(jwtAuthenticationConverter());
 
-//        // Enable anonymous
-//        http.anonymous();
 
         // State-less session (state in access-token only)
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -38,30 +36,25 @@ public class SecurityConfig {
         // Disable CSRF because of state-less session-management
         http.csrf().disable();
 
-//        // Return 401 (unauthorized) instead of 302 (redirect to login) when authorization is missing or invalid
-//        http.exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
-//            response.addHeader(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"Restricted Content\"");
-//            response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
-//        });
-//
-//        // If SSL enabled, disable http (https only)
-//        if (serverProperties.getSsl() != null && serverProperties.getSsl().isEnabled()) {
-//            http.requiresChannel().anyRequest().requiresSecure();
-//        }
-
         // Route security
         http
                 .authorizeHttpRequests()
-                .anyRequest().authenticated()
-                .and()
+                    .requestMatchers("/student-statistics/student-performance/**")
+                    .hasAnyRole("TEACHER", "STUDENT")
+                    .requestMatchers("/student-statistics/details/**")
+                    .hasAnyRole("TEACHER", "STUDENT")
+                    .requestMatchers("/student-statistics/student-contest-statistic/**")
+                    .hasAnyRole("TEACHER", "STUDENT")
+                    .requestMatchers("/get-all")
+                    .hasAnyRole("TEACHER")
+                    .anyRequest().authenticated()
+                    .and()
                 .requestCache()
-                .requestCache(new NullRequestCache()) // Not cache request because of having frontend
-                .and()
-                .httpBasic()
-                .disable()
+                    .requestCache(new NullRequestCache()) // Not cache request because of having frontend
+                    .and()
+                .httpBasic().disable()
                 .headers()
-                .frameOptions()
-                .disable();
+                    .frameOptions().disable();
 
         return http.build();
     }

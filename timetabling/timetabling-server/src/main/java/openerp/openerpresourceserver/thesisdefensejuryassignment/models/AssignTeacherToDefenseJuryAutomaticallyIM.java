@@ -5,27 +5,17 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 public class AssignTeacherToDefenseJuryAutomaticallyIM {
-    String thesisDefensePlanId;
-    List<DefenseJuryTeacherRoleIM> defenseJuryTeacherRole;
+    private List<String> thesisIdList;
 
-    public AssignTeacherToDefenseJuryAutomaticallyIM(String thesisDefensePlanId, List<DefenseJuryTeacherRoleIM> defenseJuryTeacherRole) {
-        this.thesisDefensePlanId = thesisDefensePlanId;
-        this.defenseJuryTeacherRole = defenseJuryTeacherRole;
+    public AssignTeacherToDefenseJuryAutomaticallyIM(String thesisDefensePlanId, String defenseJuryId, List<String> thesisIdList) {
+        this.thesisIdList = thesisIdList;
     }
 
-    public String getThesisDefensePlanId() {
-        return thesisDefensePlanId;
+    public List<String> getThesisIdList() {
+        return thesisIdList;
     }
 
-    public void setThesisDefensePlanId(String thesisDefensePlanId) {
-        this.thesisDefensePlanId = thesisDefensePlanId;
-    }
-
-    public List<DefenseJuryTeacherRoleIM> getDefenseJuryTeacherRole() {
-        return defenseJuryTeacherRole;
-    }
-
-    public void setDefenseJuryTeacherRole(List<DefenseJuryTeacherRoleIM> defenseJuryTeacherRole) {
-        this.defenseJuryTeacherRole = defenseJuryTeacherRole;
+    public void setThesisIdList(List<String> thesisIdList) {
+        this.thesisIdList = thesisIdList;
     }
 }

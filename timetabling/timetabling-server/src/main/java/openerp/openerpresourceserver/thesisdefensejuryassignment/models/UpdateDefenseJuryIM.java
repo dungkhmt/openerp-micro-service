@@ -14,17 +14,27 @@ public class UpdateDefenseJuryIM {
     private String name;
     private Date defenseDate;
     private int defenseRoomId;
-    private int defenseSessionId;
+    private List<Integer> defenseSessionId;
     private int maxThesis;
-    private List<String> academicKeywordList;
 
-    public List<String> getAcademicKeywordList() {
-        return academicKeywordList;
-    }
+//    private int juryTopicId;
+//
+//    public int getJuryTopicId() {
+//        return juryTopicId;
+//    }
+//
+//    public void setJuryTopicId(int juryTopicId) {
+//        this.juryTopicId = juryTopicId;
+//    }
+    //    private List<String> academicKeywordList;
 
-    public void setAcademicKeywordList(List<String> academicKeywordList) {
-        this.academicKeywordList = academicKeywordList;
-    }
+//    public List<String> getAcademicKeywordList() {
+//        return academicKeywordList;
+//    }
+//
+//    public void setAcademicKeywordList(List<String> academicKeywordList) {
+//        this.academicKeywordList = academicKeywordList;
+//    }
 
     public String getId() {
         return id;
@@ -58,11 +68,11 @@ public class UpdateDefenseJuryIM {
         this.defenseRoomId = defenseRoomId;
     }
 
-    public int getDefenseSessionId() {
+    public List<Integer> getDefenseSessionId() {
         return defenseSessionId;
     }
 
-    public void setDefenseSessionId(int defenseSessionId) {
+    public void setDefenseSessionId(List<Integer> defenseSessionId) {
         this.defenseSessionId = defenseSessionId;
     }
 

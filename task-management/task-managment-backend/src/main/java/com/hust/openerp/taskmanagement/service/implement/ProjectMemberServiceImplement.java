@@ -1,5 +1,13 @@
 package com.hust.openerp.taskmanagement.service.implement;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.hust.openerp.taskmanagement.entity.Project;
 import com.hust.openerp.taskmanagement.entity.ProjectMember;
 import com.hust.openerp.taskmanagement.entity.User;
@@ -7,16 +15,11 @@ import com.hust.openerp.taskmanagement.exception.ApiException;
 import com.hust.openerp.taskmanagement.exception.ErrorCode;
 import com.hust.openerp.taskmanagement.repository.ProjectMemberRepository;
 import com.hust.openerp.taskmanagement.repository.ProjectRepository;
-import com.hust.openerp.taskmanagement.service.MailService;
 import com.hust.openerp.taskmanagement.service.NotificationService;
 import com.hust.openerp.taskmanagement.service.ProjectMemberService;
 import com.hust.openerp.taskmanagement.service.UserService;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.UUID;
+import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -26,11 +29,9 @@ public class ProjectMemberServiceImplement implements ProjectMemberService {
 
     private final ProjectRepository projectRepository;
 
-    private final MailService mailService;
-
     private final UserService userService;
 
-    private final NotificationService notificationsService;
+    private final NotificationService notificationService;
 
     @Override
     public List<ProjectMember> getMembersOfProject(UUID projectId, String userId) {
@@ -65,31 +66,40 @@ public class ProjectMemberServiceImplement implements ProjectMemberService {
 
         ProjectMember projectMember = ProjectMember.builder().projectId(projectId)
                 .userId(memberId).roleId(projectMemberForm.getRoleId()).build();
-        return projectMemberRepository.save(projectMember);
+        var projectMemberRes = projectMemberRepository.save(projectMember);
 
-        // try {
-        // notificationsService.sendNotification(
-        // "admin",
-        // memberId,
-        // "Bạn được thêm vào dự án " + project.getName(),
-        // "/project/" + projectId + "/tasks");
+        Project project = projectRepository.findById(projectId).orElseThrow();
 
-        // // send mail to anounce user to join project
-        // String emailUser = member.getEmail();
-        // mailService.sendSimpleMail(
-        // new String[] { emailUser },
-        // "OPEN ERP - Thông báo bạn đã được thêm vào dự án mới",
-        // "Bạn đã được thêm dự án " +
-        // project.getName() +
-        // ". Đây là email tự động, bạn không trả lời lại email này!",
-        // "OpenERP");
+        try {
+            notificationService.createInAppNotification(
+                    adderId,
+                    memberId,
+                    "Bạn được thêm vào dự án " + project.getName(),
+                    "/project/" + projectId);
 
-        // } catch (Exception e) {
-        // e.printStackTrace();
-        // // TODO: handle exception
-        // }
+            String emailUser = member.getEmail();
+            User adder = userService.findById(adderId);
+            if (emailUser != null) {
+                Map<String, Object> model = new HashMap<>();
+                User creator = project.getCreator();
+                model.put("projectName", project.getName());
+                model.put("memberFirstName", member.getFirstName());
+                model.put("memberLastName", member.getLastName());
+                model.put("projectManager",
+                        creator == null ? ""
+                                : project.getCreator().getFirstName() + " " + project.getCreator().getLastName());
+                // mailService.sendUsingTemplate(new String[] { emailUser }, null, null,
+                // "Bạn được thêm vào dự án " + project.getName(), "new-member", model);
+                notificationService.createMailNotification(adder.getEmail(), emailUser,
+                        "Bạn được thêm vào dự án " + project.getName(), "new-member", model);
+            }
 
-        // return projectMemberRes;
+        } catch (Exception e) {
+            e.printStackTrace();
+            // TODO: handle exception
+        }
+
+        return projectMemberRes;
     }
 
     @Override

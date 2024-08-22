@@ -50,6 +50,7 @@ public class AutoRouteServiceImpl implements AutoRouteService {
     @Override
     @Transactional
     public void route(Principal principal, String token, DeliveryTripDTO request) {
+        log.info("Start auto route");
         // map request to auto route service input
         List<DeliveryTripDTO.DeliveryTripItemDTO> items = request.getItems();
         if (items.size() < 1) {

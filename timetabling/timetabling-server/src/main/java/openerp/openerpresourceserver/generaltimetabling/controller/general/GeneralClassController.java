@@ -6,11 +6,10 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import openerp.openerpresourceserver.generaltimetabling.exception.ConflictScheduleException;
-import openerp.openerpresourceserver.generaltimetabling.exception.InvalidClassStudentQuantityException;
-import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
+import openerp.openerpresourceserver.generaltimetabling.exception.*;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.*;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.ResetScheduleRequest;
+import openerp.openerpresourceserver.generaltimetabling.service.ExcelService;
 import openerp.openerpresourceserver.generaltimetabling.service.GeneralClassService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -26,11 +25,22 @@ import openerp.openerpresourceserver.generaltimetabling.model.entity.general.Gen
 @Log4j2
 public class GeneralClassController {
     private GeneralClassService gService;
-
+    private ExcelService excelService;
     @ExceptionHandler(ConflictScheduleException.class)
     public ResponseEntity resolveScheduleConflict(ConflictScheduleException e) {
         return ResponseEntity.status(410).body(e.getCustomMessage());
     }
+
+    @ExceptionHandler(InvalidFieldException.class)
+    public ResponseEntity resolveInvalidFieldException(InvalidFieldException e) {
+        return ResponseEntity.status(420).body(e.getErrorMessage());
+    }
+
+    @ExceptionHandler(MinimumTimeSlotPerClassException.class)
+    public ResponseEntity resolveMiniumTimeSlotException(MinimumTimeSlotPerClassException e) {
+        return ResponseEntity.status(410).body(e.getErrorMessage());
+    }
+
     @ExceptionHandler(InvalidClassStudentQuantityException.class)
     public ResponseEntity resolveScheduleConflict(InvalidClassStudentQuantityException e) {
         return ResponseEntity.status(410).body(e.getCustomMessage());
@@ -80,7 +90,7 @@ public class GeneralClassController {
     }
 
     @PostMapping("/update-classes-group")
-    public ResponseEntity updateClassesGroup(@RequestBody UpdateClassesToNewGroupRequest request) {
+    public ResponseEntity requestUpdateClassesGroup(@RequestBody UpdateClassesToNewGroupRequest request) {
         try{
             if(request.getPriorityBuilding() == null) return ResponseEntity.ok(gService.addClassesToCreatedGroup(request.getIds(), request.getGroupName()));
             return ResponseEntity.ok(gService.addClassesToNewGroup(request.getIds(),request.getGroupName(),request.getPriorityBuilding()));
@@ -89,17 +99,12 @@ public class GeneralClassController {
         }
     }
 
-    @DeleteMapping("/")
-    public ResponseEntity deleteClassesBySemester(@RequestParam("semester") String semester) {
-        gService.deleteClassesBySemester(semester);
-        return ResponseEntity.ok("ok");
-    }
 
     @PostMapping("/export-excel")
     public ResponseEntity requestExportExcel(@RequestParam("semester") String semester) {
         log.info("Controler API -> requestExportExcel start...");
         String filename = String.format("TKB_{}.xlsx", semester);
-        InputStreamResource file = new InputStreamResource(gService.exportExcel(semester));
+        InputStreamResource file = new InputStreamResource(excelService.exportGeneralExcel(semester));
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
                 .contentType(
@@ -120,7 +125,7 @@ public class GeneralClassController {
             @RequestParam("groupName") String groupName,
             @RequestParam("timeLimit") int timeLimit) {
         log.info("Controler API -> requestAutoScheduleTime...");
-        return ResponseEntity.ok(gService.autoSchedule(semester, groupName, timeLimit));
+        return ResponseEntity.ok(gService.autoSchedule(semester, groupName, timeLimit*1000));
     }
 
     @PostMapping("/auto-schedule-room")
@@ -131,4 +136,31 @@ public class GeneralClassController {
         log.info("Controler API -> requestAutoScheduleRoom...");
         return ResponseEntity.ok(gService.autoScheduleRoom(semester, groupName, timeLimit));
     }
+
+    @DeleteMapping("/")
+    public ResponseEntity<GeneralClass> requestDeleteClass(@RequestParam("generalClassId") Long generalClassId) {
+        return ResponseEntity.ok(gService.deleteClassById(generalClassId));
+    }
+
+    @PostMapping("/{generalClassId}/room-reservations/")
+    public ResponseEntity<GeneralClass> requestAddRoomReservation(@PathVariable("generalClassId")Long generalClassId) {
+        return ResponseEntity.ok(gService.addRoomReservation(generalClassId));
+    }
+
+    @DeleteMapping("/delete-by-semester")
+    public ResponseEntity<String> requestDeleteClassesBySemester(@RequestParam("semester")String semester) {
+        gService.deleteClassesBySemester(semester);
+        return ResponseEntity.ok("Xóa lớp thành công");
+    }
+
+    @DeleteMapping("/{generalClassId}/room-reservations/{roomReservationId}")
+    public ResponseEntity<String> requestDeleteRoomReservation(
+            @PathVariable("generalClassId") Long generalClassId,
+            @PathVariable("roomReservationId") Long roomReservationId
+    ) {
+        gService.deleteRoomReservation(generalClassId, roomReservationId);
+        return ResponseEntity.ok("Xóa lớp thành công");
+    }
+
+
 }

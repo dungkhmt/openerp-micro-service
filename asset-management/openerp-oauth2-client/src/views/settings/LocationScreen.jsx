@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from "react";
 import {request} from "../../api";
 import { errorNoti, successNoti } from "utils/notification";
+import { Link as RouterLink } from "react-router-dom";
+import { Link } from "@mui/material";
 import {StandardTable} from "erp-hust/lib/StandardTable";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
@@ -15,22 +16,12 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
 
 export const LocationScreen = () => {
     const INITIAL_STATE = {
         name: "",
         description: "",
         address: ""
-    };
-
-    const [age, setAge] = React.useState('');
-
-    const handleChange = (event) => {
-        setAge(event.target.value);
     };
 
     const [locations, setLocations] = useState([]);
@@ -50,15 +41,7 @@ export const LocationScreen = () => {
     const successHandler = (res) => {
         const msg = title === "CREATE NEW LOCATION" ? "CREATE SUCCESSFULLY" : "EDIT SUCCESSFULLY";
         successNoti(msg, 3000);
-        const locationIndex = locations.findIndex(location => location.id === res.data.id);
-
-        if (locationIndex !== -1) {
-            const updatedLocations = [...locations];
-            updatedLocations[locationIndex] = res.data;
-            setLocations(updatedLocations);
-        } else {
-            setLocations(prevLocations => [...prevLocations, res.data]);
-        }
+        window.location.reload();
     };
 
     const successHandlerDelete = () => {
@@ -143,18 +126,13 @@ export const LocationScreen = () => {
         {
             title: "Name",
             field: "name",
-        },
-        {
-            title: "Image",
-            field: "image",
             render: (rowData) => (
-                <img
-                    src="https://vcdn-vnexpress.vnecdn.net/2022/05/10/DHBKHN-7506-1652177227.jpg"
-                    alt="Dai hoc Bach khoa Ha Noi"
-                    fit="contain"
-                    width={70}
-                    height={70}
-                />
+                <Link
+                    component={RouterLink}
+                    to={`/location/${rowData["id"]}`}
+                >
+                    {rowData["name"]}
+                </Link>
             )
         },
         {
@@ -164,13 +142,6 @@ export const LocationScreen = () => {
         {
             title: "Description",
             field: "description",
-        },
-        {
-            title: "Status",
-            sorting: true,
-            render: (rowData) => (
-                <Switch {...label} defaultChecked />
-            )
         },
         {
             title: "Edit",
@@ -269,21 +240,7 @@ export const LocationScreen = () => {
                             placeholder='Location address'
                             onChange={handleInputChange}
                             value={data.address}
-                        />     
-                        <FormControl fullWidth>
-                            <InputLabel id="demo-simple-select-label">Age</InputLabel>
-                            <Select
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                value={age}
-                                label="Age"
-                                onChange={handleChange}
-                            >
-                                <MenuItem value={10}>Ten</MenuItem>
-                                <MenuItem value={20}>Twenty</MenuItem>
-                                <MenuItem value={30}>Thirty</MenuItem>
-                            </Select>
-                        </FormControl>       
+                        />           
                         <div style={{display: "flex", justifyContent: "space-between", marginTop: "20px"}}>
                             <Button
                                 variant="outlined"

@@ -10,6 +10,7 @@ import com.hust.baseweb.applications.examclassandaccount.service.ExamClassServic
 import com.hust.baseweb.applications.examclassandaccount.service.ExamClassUserloginMapService;
 import lombok.extern.log4j.Log4j2;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -97,15 +98,27 @@ public class ExamClassAccountController {
                 }
                 if(columns > 1) {
                     Cell c = row.getCell(1);
-                    studentCode = c.getStringCellValue();
-                    log.info("Student Code = " + c.getStringCellValue());
+                    if(c!=null) {
+                        if (c.getCellType()!=null && c.getCellType().equals(CellType.NUMERIC)) {
+                            studentCode = c.getNumericCellValue() + "";
+                        } else {
+                            studentCode = c.getStringCellValue();
+                        }
+                    }
+                    log.info("Student Code = " + studentCode);
                 }
                 String fullName = "";
                 if(columns > 2) {
                     Cell c = row.getCell(2);
-                    fullName = c.getStringCellValue();
-                    log.info("fullName = " + c.getStringCellValue());
+                    if(c != null) {
+                        if (c.getCellType() != null && c.getCellType().equals(CellType.NUMERIC)) {
+                            fullName = c.getNumericCellValue() + "";
+                        } else {
+                            fullName = c.getStringCellValue();
+                        }
+                    }
                 }
+                log.info("fullName = " + fullName);
                 UserLoginModel u = new UserLoginModel(userLoginId,studentCode,fullName);
                 users.add(u);
 
@@ -123,6 +136,14 @@ public class ExamClassAccountController {
         boolean res = examClassService.updateStatusExamClass(m.getExamClassId(),m.getStatus());
         return ResponseEntity.ok().body(res);
     }
+
+    @Secured("ROLE_ADMIN")
+    @PostMapping("/clear-account-exam-class")
+    public ResponseEntity<?> clearAccountExamClass(Principal principal, @RequestBody ModelClearAccountInput m){
+        boolean res = examClassService.clearAccountExamClass(m.getExamClassId());
+        return ResponseEntity.ok().body(res);
+    }
+
     @Secured("ROLE_ADMIN")
     @GetMapping("/get-exam-class-detail/{examClassId}")
     public ResponseEntity<?> getExamClassDetail(Principal principal, @PathVariable UUID examClassId){

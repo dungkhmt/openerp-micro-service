@@ -17,8 +17,7 @@ public class VendorServiceImpl implements VendorService{
 
     @Override
     public List<Vendor> getAllVendors() {
-        List<Vendor> vendors = vendorRepo.findAll();
-        return vendors;
+        return vendorRepo.getAllByLastUpdate();
     }
 
     @Override
@@ -37,6 +36,7 @@ public class VendorServiceImpl implements VendorService{
         savedVendor.setDescription(vendor.getDescription());
         savedVendor.setImage(vendor.getImage());
         savedVendor.setUrl(vendor.getUrl());
+        savedVendor.setNum_assets(0);
 
         Date currentDate = new Date();
         savedVendor.setSince(currentDate);

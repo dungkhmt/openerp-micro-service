@@ -23,7 +23,12 @@ public class CorsConfig {
     ) {
         final var config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(allowedOrigins);
+//        config.setAllowedOrigins(allowedOrigins);
+        if (allowedOrigins.contains("*")) {
+            config.addAllowedOriginPattern("*");
+        } else {
+            config.setAllowedOrigins(allowedOrigins);
+        }
         config.setAllowedHeaders(Collections.singletonList("*"));
         config.setAllowedMethods(Collections.singletonList("*"));
 

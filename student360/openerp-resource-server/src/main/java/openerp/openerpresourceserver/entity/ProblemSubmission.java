@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
@@ -20,7 +21,7 @@ import java.util.Date;
 @Entity
 @Table(name = "problem_submission_new")
 
-public class ProblemSubmission {
+public class ProblemSubmission implements Serializable {
     @Id
     @Column(name = "problem_submission_id", updatable = false, nullable = false)
     private String id;

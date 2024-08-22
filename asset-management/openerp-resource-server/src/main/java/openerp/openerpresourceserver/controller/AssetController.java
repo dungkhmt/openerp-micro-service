@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.controller;
 
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.entity.Asset;
+import openerp.openerpresourceserver.service.AssetLogService;
 import openerp.openerpresourceserver.service.AssetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import java.util.List;
 @RequestMapping("/asset")
 public class AssetController {
     private AssetService assetService;
+    private AssetLogService assetLogService;
 
     @GetMapping("/get-all")
     public ResponseEntity<?> getAllAssets(){
@@ -23,6 +25,14 @@ public class AssetController {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(assets);
+    }
+
+    @GetMapping("/id/{Id}")
+    public ResponseEntity<?> getById(@PathVariable Integer Id){
+        Asset asset = assetService.getById(Id);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(asset);
     }
 
     @GetMapping("/get-all-available")
@@ -44,6 +54,7 @@ public class AssetController {
     @PostMapping("/add-new")
     public ResponseEntity<?> addNewAsset(@RequestBody Asset asset){
         Asset newAsset = assetService.addNewAsset(asset);
+        assetLogService.createNewAssetLog(newAsset.getId(), newAsset.getAdmin_id(), "create");
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(newAsset);
@@ -52,14 +63,16 @@ public class AssetController {
     @PutMapping("/edit/{Id}")
     public ResponseEntity<?> editAsset(@PathVariable Integer Id, @RequestBody Asset asset){
         Asset foundAsset = assetService.editAsset(Id, asset);
+        assetLogService.createNewAssetLog(foundAsset.getId(), foundAsset.getAdmin_id(), "edit");
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(foundAsset);
     }
 
     @DeleteMapping("/delete/{Id}")
-    public ResponseEntity<?> deleteAsset(@PathVariable Integer Id){
+    public ResponseEntity<?> deleteAsset(@PathVariable Integer Id, Principal principal){
         assetService.deleteAsset(Id);
+//        assetLogService.createNewAssetLog(Id, principal.getName(), "delete");
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -76,6 +89,7 @@ public class AssetController {
     public ResponseEntity<?> assignAsset(@PathVariable Integer Id, @PathVariable String userId, Principal principal){
         String admin_id = principal.getName();
         Asset asset = assetService.assignAsset(Id, userId, admin_id);
+        assetLogService.createNewAssetLog(asset.getId(), admin_id, "assign");
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(asset);
@@ -85,8 +99,71 @@ public class AssetController {
     public ResponseEntity<?> revokeAsset(@PathVariable Integer Id, @PathVariable String userId, Principal principal){
         String admin_id = principal.getName();
         Asset asset = assetService.revokeAsset(Id, userId, admin_id);
+        assetLogService.createNewAssetLog(asset.getId(), admin_id, "revoke");
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(asset);
+    }
+
+    @PutMapping("/repair/{Id}/{isRepair}")
+    public ResponseEntity<?> repairAsset(@PathVariable Integer Id, @PathVariable Boolean isRepair, Principal principal){
+        String admin_id = principal.getName();
+        Asset asset = assetService.repairAsset(Id, admin_id, isRepair);
+        assetLogService.createNewAssetLog(asset.getId(), admin_id, "repair");
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(asset);
+    }
+
+    @PutMapping("/deprecated/{Id}")
+    public ResponseEntity<?> deprecatedAsset(@PathVariable Integer Id, Principal principal){
+        String admin_id = principal.getName();
+        Asset asset = assetService.deprecatedAsset(Id, admin_id);
+        assetLogService.createNewAssetLog(asset.getId(), admin_id, "deprecated");
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(asset);
+    }
+
+    @GetMapping("/top-admin-users")
+    public ResponseEntity<?> getTopAdminUsers(){
+        List<String> users = assetService.getTopAdminUsers();
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(users);
+    }
+
+    @GetMapping("/get-by-admin/{userId}")
+    public ResponseEntity<?> getByAdminUser(@PathVariable String userId){
+        List<Asset> assets = assetService.getByAdminUser(userId);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(assets);
+    }
+
+    @GetMapping("/assign-to-me")
+    public ResponseEntity<?> getAssignToMe(Principal principal){
+        String userId = principal.getName();
+        List<Asset> assets = assetService.getAssignToMe(userId);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(assets);
+    }
+
+    @GetMapping("/manage-by-me")
+    public ResponseEntity<?> getManageByMe(Principal principal){
+        String userId = principal.getName();
+        List<Asset> assets = assetService.getManageByMe(userId);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(assets);
+    }
+
+    @GetMapping("/get-by-type/{typeId}")
+    public ResponseEntity<?> getByTypes(@PathVariable Integer typeId){
+        List<Asset> assets = assetService.getByTypes(typeId);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(assets);
     }
 }

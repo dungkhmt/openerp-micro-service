@@ -1,33 +1,48 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import { request } from "api";
 import PrimaryButton from "components/button/PrimaryButton";
 import { StandardTable } from "erp-hust/lib/StandardTable";
 import CreateDefenseJury from "components/thesisdefensejury/modal/ModalCreateDefenseJury";
-import { Box, IconButton } from "@mui/material";
+import { Box, IconButton, FormControl, Select, MenuItem, InputLabel } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import Chip from "@mui/material/Chip";
 import ModalLoading from "components/common/ModalLoading";
+import ModalDeleteItem from "components/thesisdefensejury/modal/ModalDeleteItem";
+import { successNoti } from "utils/notification";
+import useQuery from "hooks/useQuery";
+// Màn quản lý các hội đồng bảo vệ
 export default function DefensePlanManager() {
+  const deletedJuryId = useRef("");
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const history = useHistory();
   const [defenseJuries, setDefenseJuries] = useState([]);
+  const [juryTopicList, setJuryTopicList] = useState([]);
+  const [currentJuryTopic, setCurrentJuryTopic] = useState({});
   const [open, setOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [toggle, setToggle] = useState(false);
+  let query = useQuery();
+  const juryTopic = query?.get('juryTopic');
   const columns = [
     { title: "Tên hội đồng", field: "name" },
     {
       title: "Ngày",
       field: "defenseDate",
-      render: (rowData) => rowData.defenseDate.split("T")[0],
+      render: (rowData) => rowData?.defenseDate,
     },
-    { title: "Số luận án tối đa", field: "maxThesis" },
     {
-      title: "Keywords",
-      field: "keywords",
-      render: (rowData) =>
-        rowData.keywords.map((item) => <Chip key={item} label={item} />),
+      title: "Ca bảo vệ",
+      field: "defenseSession",
+      render: (rowData) => rowData?.defenseJurySessionList?.map(({ defenseSession }) => defenseSession?.name)?.join(" & "),
+    },
+
+    {
+      title: "Phòng", field: "defenseRoom", render: (rowData) => rowData?.defenseRoom?.name,
+    },
+    {
+      title: "Số đồ án tối da", field: "maxThesis",
     },
     {
       title: "",
@@ -39,19 +54,32 @@ export default function DefensePlanManager() {
           }}>
             <EditIcon />
           </IconButton>
-          <PrimaryButton
-            onClick={() => {
-              history.push(`/thesis/thesis_defense_plan/${id}/defense_jury/${rowData.id}`);
-            }}
-            variant="contained"
-            color="error"
-            sx={{ float: "right" }}
-          >
-            Xem hội đồng
-          </PrimaryButton>
+          <IconButton aria-label="Chỉnh sửa" sx={{ marginRight: 2 }} onClick={() => {
+            console.log(rowData?.id)
+            deletedJuryId.current = rowData.id;
+            setDeleteModalOpen((prevDeleteModalOpen) => !prevDeleteModalOpen)
+          }}>
+            <DeleteIcon />
+          </IconButton>
         </Box>
       ),
     },
+    {
+      title: "",
+      sorting: false,
+      render: (rowData) => (
+        <PrimaryButton
+          onClick={() => {
+            history.push(`/thesis/thesis_defense_plan/${id}/defense_jury/${rowData?.id}?isassigned=${rowData?.assigned ? "True" : "False"}`);
+          }}
+          variant="contained"
+          color="error"
+          sx={{ float: "right" }}
+        >
+          Xem hội đồng
+        </PrimaryButton>
+      )
+    }
   ];
 
   const handleClose = () => {
@@ -63,34 +91,63 @@ export default function DefensePlanManager() {
   const handleToggle = () => {
     setToggle(!toggle);
   };
-
-  async function getPlanById() {
+  const handleChange = (e) => {
+    const currentTopic = e?.target?.value;
+    history?.push(`?juryTopic=${currentTopic}`)
+  }
+  const handleDelete = () => {
+    request("DELETE",
+      `/defense-jury/delete/${deletedJuryId.current}`, (res) => {
+        if (res?.data) {
+          successNoti(res?.data, true);
+          setDeleteModalOpen((prevDeleteModalOpen) => !prevDeleteModalOpen)
+          setToggle((prevToggle) => !prevToggle)
+          deletedJuryId.current = ""
+        }
+      }, (e) => {
+        console.log(e)
+      })
+  }
+  useEffect(() => {
     setLoading(true);
     request(
-      // token,
-      // history,
       "GET",
-      `/thesis-defense-plan/${id}`,
+      `/jury-topic/${id}`,
       (res) => {
-        const data = res.data.defenseJuries;
-        setDefenseJuries(
-          data.map((item) => ({
-            ...item,
-            keywords: item?.academicKeywordList.map((item) => item.keyword),
-          }))
-        );
+        const data = res.data;
+        console.log(data);
+        setJuryTopicList(data);
+        if (juryTopic) {
+          const topic = parseInt(juryTopic);
+          setCurrentJuryTopic(data?.find((item) => item?.id === topic))
+          setDefenseJuries(data?.find((item) => item?.id === topic)?.defenseJuryList)
+        }
         setLoading(false)
       }
     );
-  }
 
-  useEffect(() => {
-    getPlanById();
-  }, [toggle]);
+  }, [toggle, juryTopic]);
+
   return (
     <div>
       {loading && <ModalLoading />}
       <Box sx={{ width: "100%" }}>
+        <FormControl sx={{ width: '30%' }}>
+          <InputLabel id="thesisDefensePlan">Chọn phân ban</InputLabel>
+          <Select
+            labelId="thesisDefensePlan"
+            id="thesisDefensePlanSelect"
+            value={juryTopic}
+            label="thesisDefensePlan"
+            onChange={handleChange}
+          >
+            {juryTopicList?.map(({ id, name }) =>
+              <MenuItem key={id} value={id} selected={id === juryTopic}>
+                {name}
+              </MenuItem>
+            )}
+          </Select>
+        </FormControl>
         <PrimaryButton
           onClick={() => {
             handleModalOpen();
@@ -101,11 +158,8 @@ export default function DefensePlanManager() {
         >
           Tạo hội đồng mới
         </PrimaryButton>
-        <PrimaryButton onClick={() => { history.push('assign-automatically') }} sx={{ float: "right", marginRight: "16px" }}>
-          Phân chia hội đồng tự động
-        </PrimaryButton>
-
       </Box>
+
       <StandardTable
         title={"Danh sách hội đồng bảo vệ"}
         data={defenseJuries}
@@ -125,10 +179,19 @@ export default function DefensePlanManager() {
               handleClose={handleClose}
               handleToggle={handleToggle}
               thesisPlanName={id}
+              juryTopic={currentJuryTopic}
             />
           </div>
         </div>
       )}
+      {deleteModalOpen &&
+        <ModalDeleteItem
+          handleClose={() => setDeleteModalOpen((prevDeleteModalOpen) => !prevDeleteModalOpen)}
+          open={deleteModalOpen}
+          title={"Xóa hội đồng"}
+          content={`Bạn có muốn xóa hội đồng này không ?`}
+          handleDelete={handleDelete}
+        />}
     </div>
   );
 }

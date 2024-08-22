@@ -22,6 +22,8 @@ public class Location {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    private String user_id;
+
     private String name;
 
     private String address;
@@ -30,6 +32,8 @@ public class Location {
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    private Integer num_assets;
 
     @CreatedDate
     private Date since;

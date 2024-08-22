@@ -5,6 +5,7 @@ import { StandardTable } from "erp-hust/lib/StandardTable";
 import { useKeycloak } from "@react-keycloak/web";
 import KeywordChip from "components/common/KeywordChip";
 import { useFetch } from "hooks/useFetch";
+// - Theo dõi hội đồng được phân công
 export default function AssignedDefenseJury() {
   const { id } = useParams();
   const history = useHistory();
@@ -16,14 +17,22 @@ export default function AssignedDefenseJury() {
     {
       title: "Ngày",
       field: "defenseDate",
-      render: (rowData) => rowData.defenseDate.split("T")[0],
+      render: (rowData) => rowData?.defenseDate?.split("T")[0],
+    },
+    {
+      title: "Ca bảo vệ",
+      field: "defenseSession",
+      render: (rowData) => rowData?.defenseSession?.map(({ name }) => name)?.join(" & ")
     },
     { title: "Số luận án tối đa", field: "maxThesis" },
+    {
+      title: "Phân ban", field: "juryTopic",
+    },
     {
       title: "Keywords",
       field: "keywords",
       render: (rowData) =>
-        rowData.keywords.map((item) => <KeywordChip keyword={item} />),
+        rowData?.keywords?.map((item) => <KeywordChip keyword={item} />),
     },
     {
       title: "",
@@ -46,11 +55,13 @@ export default function AssignedDefenseJury() {
   const { data: data } = useFetch(
     `/thesis-defense-plan/get-assigned-for-teacher/${keycloak?.tokenParsed?.email}/${id}`
   );
+  console.log(data);
   const defenseJuries =
     data &&
-    data?.defenseJuries?.map((item) => ({
+    data?.map((item) => ({
       ...item,
-      keywords: item?.academicKeywordList.map((item) => item.keyword),
+      juryTopic: item?.juryTopic?.name,
+      keywords: item?.juryTopic?.academicKeywordList?.map((item) => item.keyword),
     }));
   return (
     <StandardTable

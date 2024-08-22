@@ -3,24 +3,29 @@ package openerp.openerpresourceserver.generaltimetabling.algorithms;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 @Log4j2
 public class ClassTimeScheduleBacktrackingSolver {
-    private int n;// number of classes
+    private int n;// number of sessions
+    private int p; //number of classes
     private int[] durations;
     private List<Integer>[] domains;
     private boolean[][] conflicts;
     private int[] x;// x[i] is the time-slot for class i
     private int[] sol;
     private boolean found;
-    double timeLimit; // in milli seconds
-    double t0;// start time-point
-    public ClassTimeScheduleBacktrackingSolver(int n, int[] durations, List<Integer>[] domains, List<int[]> C, double timeLimit) {
+    private double timeLimit;// time limit in seconds
+    private double t_start;
+    private HashMap<Integer, Integer> scheduleMap; // session to class map
+    private int[] dayPeriods; // store the remain periods of a day(default is 6)
+    public
+    ClassTimeScheduleBacktrackingSolver(int n, int[] durations, List<Integer>[] domains, List<int[]> C, double timeLimit) {
         this.n = n;
         this.durations = durations;
         this.domains = domains;
         this.timeLimit = timeLimit;
-        t0 = System.currentTimeMillis();
+        t_start = System.currentTimeMillis();
         this.conflicts = new boolean[n][n];
         for(int i = 0;i < n; i++)
             for(int j = 0; j < n; j++)
@@ -48,8 +53,11 @@ public class ClassTimeScheduleBacktrackingSolver {
 
     }
     private void Try(int k){
-        if (System.currentTimeMillis() - t0 > timeLimit) return;
+        double t= System.currentTimeMillis() - t_start;
+        log.info("time = " + t + " -> Try(" + k + "/" + n + ") domain = " + domains[k].size());
+        if(t > timeLimit) return;
         if(found) return;
+
         for(int v : domains[k]){
             if(check(v,k)){
                 x[k] = v;
@@ -60,10 +68,15 @@ public class ClassTimeScheduleBacktrackingSolver {
             }
         }
     }
+
+
     public void solve(){
+        //this.timeLimit = timeLimit;
+        log.info("solve...timeLimit = " + timeLimit);
         found = false;
         x = new int[n];
         sol = new int[n];
+        t_start = System.currentTimeMillis();
         Try(0);
     }
     public int[] getSolution(){

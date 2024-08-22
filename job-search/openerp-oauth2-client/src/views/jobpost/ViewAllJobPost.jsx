@@ -11,7 +11,7 @@ import {
     Row,
 } from "react-bootstrap";
 import { Card, CardContent, CardActions } from '@mui/material';
-import JobCard from "components/JobCard";
+import JobCard from "components/job/JobCard";
 const ViewAllJobPost = () => {
 
     const [title, setTitle] = useState("Thực tập sinh dot net")
@@ -25,13 +25,16 @@ const ViewAllJobPost = () => {
     useEffect(() => {
         request("get", "/user/get-user-data", (res) => {
             setUser(res.data)
+            request("get", `/job-post/user/${res.data.id}`, (res) => {
+                setAllJobPostForm(res.data)
+            }).then();
           }).then();
     }, [])
-    useEffect(() => {
-        request("get", "/job-post", (res) => {
-            setAllJobPostForm(res.data)
-        }).then();
-    }, [])
+    // useEffect(() => {
+    //     request("get", "/job-post", (res) => {
+    //         setAllJobPostForm(res.data)
+    //     }).then();
+    // }, [])
 
     function goToUrl(url) {
         window.location.href = url;
@@ -40,8 +43,8 @@ const ViewAllJobPost = () => {
     return (
         <>
         <Grid container spacing={4} style={{backgroundColor:  "#F7F7FF"}} display="flex" justifyContent="center" paddingTop={"50px"}>
-        {allJobPostForm.map((jobPost, index) => (
-            <Grid item xs={5} style={{ boxShadow: '1px 1px 1px 1px rgba(0.5,0.5,0.5,0.5)', margin: '20px', borderRadius: '20px', backgroundColor: "white"}} onClick={() => goToUrl(`/view-job-post/${jobPost.id}`)}>
+        {allJobPostForm.reverse().map((jobPost, index) => (
+            <Grid item xs={5} style={{ boxShadow: '1px 1px 1px 1px rgba(0.5,0.5,0.5,0.5)', margin: '20px', borderRadius: '20px', backgroundColor: "white"}} onClick={() => goToUrl(`/view-job-posts/user/${jobPost.id}`)}>
             <JobCard job={jobPost}></JobCard>
             </Grid>
             // <Card  sx={{ minWidth: 275 }}>

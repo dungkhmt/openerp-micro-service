@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
@@ -19,9 +20,8 @@ import java.util.Date;
 @AllArgsConstructor
 @Entity
 @Table(name = "submission_hourly_summary")
-public class SubmissionHourlySummary {
+public class SubmissionHourlySummary implements Serializable {
     @Id
-    @Column(name = "submission_hourly_summary_id", updatable = false, nullable = false)
     private String id;
 
     private String userSubmissionId;
@@ -33,12 +33,4 @@ public class SubmissionHourlySummary {
     private int submissionCount;
 
     private int submissionPassCount;
-
-    @CreatedDate
-    @Column(name = "created_stamp")
-    private Date createdDate;
-
-    @LastModifiedDate
-    @Column(name = "last_updated_stamp")
-    private Date lastModifiedDate;
 }

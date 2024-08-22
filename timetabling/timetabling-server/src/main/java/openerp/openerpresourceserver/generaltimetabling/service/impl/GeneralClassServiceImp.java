@@ -5,9 +5,10 @@ import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.generaltimetabling.algorithms.V2ClassScheduler;
 import openerp.openerpresourceserver.generaltimetabling.exception.ConflictScheduleException;
+import openerp.openerpresourceserver.generaltimetabling.exception.InvalidFieldException;
+import openerp.openerpresourceserver.generaltimetabling.exception.MinimumTimeSlotPerClassException;
 import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
 import openerp.openerpresourceserver.generaltimetabling.helper.ClassTimeComparator;
-import openerp.openerpresourceserver.generaltimetabling.helper.GeneralExcelHelper;
 import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekExtractor;
 import openerp.openerpresourceserver.generaltimetabling.mapper.RoomOccupationMapper;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.UpdateGeneralClassRequest;
@@ -23,9 +24,7 @@ import openerp.openerpresourceserver.generaltimetabling.service.GeneralClassServ
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.InputStream;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * GeneralClassOpenedServiceImp
@@ -46,7 +45,6 @@ public class GeneralClassServiceImp implements GeneralClassService {
 
     private ClassroomRepo classroomRepo;
 
-    private GeneralExcelHelper excelHelper;
 
 
     @Override
@@ -165,19 +163,20 @@ public class GeneralClassServiceImp implements GeneralClassService {
         return gClassOpened;
     }
 
+    @Transactional
     @Override
     public GeneralClass updateGeneralClass(UpdateGeneralClassRequest request) {
-        GeneralClass gClassOpened = gcoRepo.findById(Long.parseLong(request.getGeneralClassId())).orElse(null);
-        switch (request.getField()) {
-            case "studyClass":
-                gClassOpened.setStudyClass(request.getValue());
-                gcoRepo.save(gClassOpened);
-                break;
-            case "groupName":
-                gClassOpened.setGroupName(request.getValue());
-                gcoRepo.save(gClassOpened);
+        GeneralClass gClass = gcoRepo.findById(request.getGeneralClass().getId()).orElseThrow(()->new NotFoundException("Không tìm thấy lớp!"));
+        if(!gClass.getCrew().equals(request.getGeneralClass().getCrew())) {
+            List<RoomOccupation> roomOccupationList = roomOccupationRepo.findAllBySemesterAndClassCodeAndCrew(
+                    gClass.getSemester(),
+                    gClass.getClassCode(),
+                    gClass.getCrew());
+            roomOccupationList.forEach(ro->{ro.setCrew(request.getGeneralClass().getCrew());});
+            roomOccupationRepo.saveAll(roomOccupationList);
         }
-        return gClassOpened;
+        gClass.setInfo(request.getGeneralClass());
+        return gcoRepo.save(gClass);
     }
 
     @Override
@@ -288,28 +287,9 @@ public class GeneralClassServiceImp implements GeneralClassService {
         /*Save the scheduled timeslot of the classes*/
         gcoRepo.saveAll(autoScheduleClasses);
         roomOccupationRepo.deleteAllByClassCodeIn(foundClasses.stream().map(GeneralClass::getClassCode).toList());
-        /*Get the roomOccupations from scheduled classes and save them*/
-        List<RoomOccupation> newRoomOccupationList = autoScheduleClasses.stream().map(RoomOccupationMapper::mapFromGeneralClass).flatMap(List::stream).toList();
-        roomOccupationRepo.saveAll(newRoomOccupationList);
         return autoScheduleClasses;
     }
 
-    @Override
-    public InputStream exportExcel(String semester) {
-        List<GeneralClass> classes = gcoRepo.findAllBySemester(semester)
-                .stream()
-                .filter(c -> c.getClassCode() != null && !c.getClassCode().isEmpty())
-                .collect(Collectors.toCollection(ArrayList::new));
-        classes.sort((a, b) -> {
-            Comparable fieldValueA = a.getClassCode();
-            Comparable fieldValueB = b.getClassCode();
-            return fieldValueA.compareTo(fieldValueB);
-        });
-        if (classes.isEmpty()) throw new NotFoundException("Kỳ học không có bất kỳ lớp học nào!");
-        return excelHelper.convertGeneralClassToExcel(classes);
-    }
-
-    @Transactional
     @Override
     public List<GeneralClass> v2UpdateClassSchedule(String semester, List<V2UpdateClassScheduleRequest> request) {
         /*Find reference*/
@@ -328,9 +308,9 @@ public class GeneralClassServiceImp implements GeneralClassService {
         /*Set info*/
         request.forEach(updateRequest -> {
             RoomReservation updateRoomReservation = roomReservationMap.get(updateRequest.getRoomReservationId());
-            if (updateRoomReservation.isTimeSlotNotNull()) {
 
-            }
+            if ((updateRequest.getStartTime() != null && updateRequest.getEndTime() != null ) && updateRequest.getStartTime() > updateRequest.getEndTime()) throw new InvalidFieldException("Tiết BĐ không thể lớn hơn tiết KT");
+
             List<RoomOccupation> foundRoomOccupations = roomOccupationRepo.findAllBySemesterAndClassCodeAndDayIndexAndStartPeriodAndEndPeriodAndClassRoom(semester,
                     updateRoomReservation.getGeneralClass().getClassCode(),
                     updateRoomReservation.getWeekday(),
@@ -384,16 +364,73 @@ public class GeneralClassServiceImp implements GeneralClassService {
             }
             roomOccupations.addAll(foundRoomOccupations);
         });
-        /*Check conflict*/
-        for (RoomReservation roomReservation : roomReservationMap.values()) {
-            if (roomReservation.isScheduleNotNull()) {
-                ClassTimeComparator.isClassConflict(roomReservation, roomReservation.getGeneralClass(), classes);
+
+        var isConflict = false;
+        var conflictMsg = "";
+        try {
+            /*Check conflict*/
+            for (RoomReservation roomReservation : roomReservationMap.values()) {
+                if (roomReservation.isScheduleNotNull()) {
+                    ClassTimeComparator.isClassConflict(roomReservation, roomReservation.getGeneralClass(), classes);
+                }
             }
+        } catch (ConflictScheduleException e) {
+            isConflict = true;
+            conflictMsg = e.getCustomMessage();
         }
+
         /* Persist room reservation and room occupation */
         roomReservationRepo.saveAll(roomReservationMap.values());
         roomOccupationRepo.saveAll(roomOccupations);
+        if(isConflict) throw new ConflictScheduleException(conflictMsg);
         return roomReservationMap.values().stream().map(RoomReservation::getGeneralClass).toList();
+    }
 
+    @Transactional
+    @Override
+    public GeneralClass deleteClassById(Long generalClassId) {
+        GeneralClass foundClass = gcoRepo.findById(generalClassId).orElse(null);
+        if (foundClass == null) throw new NotFoundException("Không tìm thấy lớp kế hoạch!");
+        gcoRepo.deleteById(generalClassId);
+        return foundClass;
+    }
+
+    @Override
+    public GeneralClass addRoomReservation(Long generalClassId) {
+        GeneralClass foundGeneralClass = gcoRepo.findById(generalClassId).orElse(null);
+        if (foundGeneralClass == null) throw new NotFoundException("Không tìm thấy lớp!");
+        RoomReservation newRoomReservation = new RoomReservation();
+        foundGeneralClass.addTimeSlot(newRoomReservation);
+        newRoomReservation.setGeneralClass(foundGeneralClass);
+        gcoRepo.save(foundGeneralClass);
+        return foundGeneralClass;
+    }
+
+    @Transactional
+    @Override
+    public void deleteRoomReservation(Long generalClassId, Long roomReservationId) {
+        GeneralClass foundGeneralClass = gcoRepo.findById(generalClassId)
+                .orElseThrow(()->new NotFoundException("Không tìm thấy lớp!"));
+        RoomReservation foundRoomReservation= roomReservationRepo.findById(roomReservationId)
+                .orElseThrow(()->new NotFoundException("Không tìm thấy ca học!"));
+        if (!foundGeneralClass.getTimeSlots().contains(foundRoomReservation)) {
+            throw new NotFoundException("Lớp không tồn tại ca học!");
+        }
+        if(foundGeneralClass.getTimeSlots().size() == 1) throw new MinimumTimeSlotPerClassException("Lớp cần tối thiểu 1 ca học!");
+
+        if (foundRoomReservation.isScheduleNotNull()) {
+            List<RoomOccupation> foundRoomOccupations =  roomOccupationRepo.findAllBySemesterAndClassCodeAndDayIndexAndStartPeriodAndEndPeriodAndClassRoom(
+                    foundRoomReservation.getGeneralClass().getSemester(),
+                    foundGeneralClass.getClassCode(),
+                    foundRoomReservation.getWeekday(),
+                    foundRoomReservation.getStartTime(),
+                    foundRoomReservation.getEndTime(),
+                    foundRoomReservation.getRoom()
+            );
+            roomOccupationRepo.deleteAllById(foundRoomOccupations.stream().map(RoomOccupation::getId).toList());
+        }
+        foundGeneralClass.getTimeSlots().remove(foundRoomReservation);
+        foundRoomReservation.setGeneralClass(null);
+        gcoRepo.save(foundGeneralClass);
     }
 }

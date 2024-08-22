@@ -22,7 +22,7 @@ public class AcademicKeywordController {
     private AcademicKeywordServiceImpl academicKeywordService;
 
     @GetMapping("/get-all")
-    public ResponseEntity<List<AcademicKeyword>> getThesis() {
+    public ResponseEntity<List<AcademicKeyword>> getAllAcademicKeyword() {
         List<AcademicKeyword> res = academicKeywordService.getAllAcademicKeywords();
         return new ResponseEntity<>(res, HttpStatus.OK);
     }

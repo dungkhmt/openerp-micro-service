@@ -5,7 +5,7 @@ import { useFetch } from "hooks/useFetch";
 import PrimaryButton from "components/button/PrimaryButton";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import ModalLoading from "components/common/ModalLoading";
-
+// - Theo dõi đợt bảo vệ được phân công của chủ tịch
 export default function PresidentAssignedThesisDefensePlan() {
     const { keycloak } = useKeycloak();
     const history = useHistory();

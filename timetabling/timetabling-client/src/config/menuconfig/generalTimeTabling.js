@@ -1,7 +1,7 @@
 export const generalTimeTabling = {
   id: "MENU_GENERAL_TIME_TABLING",
   icon: "AnalyticsIcon",
-  text: "Quản lý lịch học (Đại trà)",
+  text: "Thời khóa biểu",
   child: [
     {
       id: "MENU_GENERAL_TIME_TABLING.UPLOAD_SCREEN",
@@ -36,6 +36,13 @@ export const generalTimeTabling = {
       path: "/general-time-tabling/room-occupation",
       isPublic: true,
       text: "Xem tình trạng phòng học",
+      child: [],
+    },
+    {
+      id: "MENU_GENERAL_TIME_TABLING.FIND_EMPTY_ROOM",
+      path: "/general-time-tabling/find-empty-room",
+      isPublic: true,
+      text: "Tìm phòng học trống",
       child: [],
     },
   ],

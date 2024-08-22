@@ -10,7 +10,7 @@ import {
   InputAdornment,
   InputLabel,
   Link,
-  ListItemText,
+  ListItemText, ListSubheader,
   MenuItem,
   OutlinedInput,
   Select,
@@ -390,20 +390,16 @@ function CreateProblem() {
                 </Box>
               )}
             >
-              <Button
-                sx={{marginLeft: "20px"}}
-                startIcon={<AddCircleIcon/>}
-                onClick={() => setOpenModalAddNewTag(true)}
-              >
-                {t("common:addNew")}
-              </Button>
-              <ModelAddNewTag
-                isOpen={openModalAddNewTag}
-                handleSuccess={() => {
-                  getAllTags(handleGetTagsSuccess)
-                }}
-                handleClose={() => setOpenModalAddNewTag(false)}
-              />
+              <ListSubheader>
+                <Button
+                  sx={{marginLeft: "20px"}}
+                  startIcon={<AddCircleIcon/>}
+                  onClick={() => setOpenModalAddNewTag(true)}
+                >
+                  {t("common:addNew")}
+                </Button>
+              </ListSubheader>
+
               {tags.map((tag) => (
                 <MenuItem key={tag.tagId} value={tag}>
                   <Checkbox checked={selectedTags.indexOf(tag) > -1}/>
@@ -540,6 +536,14 @@ function CreateProblem() {
           {t("save", {ns: "common"})}
         </LoadingButton>
       </Box>
+
+      <ModelAddNewTag
+        isOpen={openModalAddNewTag}
+        handleSuccess={() => {
+          getAllTags(handleGetTagsSuccess)
+        }}
+        handleClose={() => setOpenModalAddNewTag(false)}
+      />
     </HustContainerCard>
   );
 }

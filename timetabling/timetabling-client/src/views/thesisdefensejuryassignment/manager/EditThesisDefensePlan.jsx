@@ -13,6 +13,7 @@ import { useForm } from 'react-hook-form';
 import PrimaryButton from 'components/button/PrimaryButton';
 import ModalLoading from 'components/common/ModalLoading';
 import { successNoti, errorNoti } from 'utils/notification';
+// Màn hình chỉnh sửa đợt BVĐA
 export const EditThesisDefensePlan = () => {
     const { id } = useParams();
     const history = useHistory();
@@ -34,6 +35,12 @@ export const EditThesisDefensePlan = () => {
     });
 
     const handleFormSubmit = data => {
+        const start = new Date(data?.startDate);
+        const end = new Date(data?.endDate);
+        if (end.getTime() <= start.getTime()) {
+            return errorNoti("Ngày kết thúc phải diễn ra sau ngày bắt đầu", true)
+        }
+
         request(
             "POST",
             "/thesis-defense-plan/edit?id=" + id,

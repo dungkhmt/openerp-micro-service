@@ -87,6 +87,7 @@ const categoryTitle = {
   dashboard: "Dashboard",
   task: "Công việc",
   project: "Dự án",
+  other: "Khác",
 };
 
 const Autocomplete = styled(MuiAutocomplete)(({ theme }) => ({
@@ -282,7 +283,7 @@ const DefaultSuggestions = ({ setOpenDialog }) => {
   }, [recent]);
 
   return (
-    <Grid container spacing={6} sx={{ ml: 0 }}>
+    <Grid container spacing={4} sx={{ ml: 0 }}>
       {suggestions.map((item, index) => (
         <Grid item xs={12} sm={6} key={index}>
           <Typography
@@ -306,10 +307,20 @@ const DefaultSuggestions = ({ setOpenDialog }) => {
                     color: "text.primary",
                     textDecoration: "none",
                     "&:hover > *": { color: "primary.main" },
+                    maxWidth: "100%",
                   }}
                 >
                   <Icon icon={suggestionItem.icon} fontSize={20} />
-                  <Typography variant="body2" sx={{ color: "text.primary" }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "text.primary",
+                      flex: 1,
+                      "&:first-letter": {
+                        textTransform: "uppercase",
+                      },
+                    }}
+                  >
                     {suggestionItem.suggestion}
                   </Typography>
                 </Box>
@@ -385,10 +396,18 @@ const AutocompleteComponent = ({ hidden }) => {
       }
     };
 
-    if (searchDebounce.length) {
+    if (searchDebounce !== "") {
       fetchSearchData();
     }
   }, [searchDebounce]);
+
+  useEffect(() => {
+    if (searchValue.length === 0) {
+      setOptions(searchData);
+    } else {
+      setLoading(true);
+    }
+  }, [searchValue]);
 
   // Handle click event on a list item in search result
   const handleOptionClick = (obj) => {
@@ -494,9 +513,18 @@ const AutocompleteComponent = ({ hidden }) => {
                 }
                 loading={loading}
                 loadingText={
-                  <CircularProgress size={24} sx={{ color: "primary.main" }} />
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", my: 20 }}
+                  >
+                    <CircularProgress
+                      size={24}
+                      sx={{ color: "primary.main" }}
+                    />
+                  </Box>
                 }
-                getOptionLabel={(option) => option.title || ""}
+                getOptionLabel={(option) =>
+                  `${option.title}-${option.id}` || ""
+                }
                 groupBy={(option) =>
                   searchValue.length ? categoryTitle[option.category] : ""
                 }
@@ -573,7 +601,7 @@ const AutocompleteComponent = ({ hidden }) => {
                   return searchValue.length ? (
                     <ListItem
                       {...props}
-                      key={option.title}
+                      key={option.id}
                       className={`suggestion ${props.className}`}
                       onClick={() => handleOptionClick(option)}
                       secondaryAction={
@@ -623,7 +651,7 @@ const AutocompleteComponent = ({ hidden }) => {
                   alignItems: "center",
                   justifyContent: "center",
                   borderTop: `1px solid ${theme.palette.divider}`,
-                  height: fullScreenDialog ? "calc(100vh - 69px)" : "70%",
+                  height: fullScreenDialog ? "calc(100vh - 69px)" : "100%",
                 }}
               >
                 <DefaultSuggestions setOpenDialog={setOpenDialog} />

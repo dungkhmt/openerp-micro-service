@@ -1,4 +1,5 @@
 import { Route, Switch, useRouteMatch } from "react-router";
+import EmptyRoomFindingScreen from "views/general-time-tabling/empty-room-find/EmptyRoomFindingScreen";
 import GeneralGroupScreen from "views/general-time-tabling/general-group-select/GeneralGroupScreen";
 import GeneralPlanClassOpenScreen from "views/general-time-tabling/general-plan-class-open/GeneralPlanClassOpenScreen";
 import GeneralScheduleScreen from "views/general-time-tabling/general-schedule/GeneralScheduleScreen";
@@ -34,6 +35,11 @@ export default function GeneralTimeTablingRouter() {
           component={RoomOccupationScreen}
           exact
           path={`${path}/room-occupation`}
+        ></Route>
+        <Route
+          component={EmptyRoomFindingScreen}
+          exact
+          path={`${path}/find-empty-room`}
         ></Route>
       </Switch>
     </div>

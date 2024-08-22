@@ -14,5 +14,7 @@ public interface ExamClassService {
 
     public boolean updateStatusExamClass(UUID examClassId, String status);
 
+    public boolean clearAccountExamClass(UUID examClassId);
+
     public ModelRepsonseExamClassDetail getExamClassDetail(UUID examClassId);
 }

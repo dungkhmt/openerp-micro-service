@@ -19,7 +19,7 @@ const MenuProps = {
         },
     },
 };
-
+// - Trang chủ tịch phân công gv phản biện từng đồ án
 export default function PresidentAssignJuryDefense() {
     const { id, juryId } = useParams();
     const { data: defenseJury } = useFetch(`/defense-jury/${juryId}`);
@@ -36,7 +36,7 @@ export default function PresidentAssignJuryDefense() {
         {
             title: "Giáo viên",
             field: "supervisor",
-            render: (rowData) => rowData?.supervisor?.teacherName,
+            render: (rowData) => rowData?.supervisor,
         },
         {
             title: "Keyword",
@@ -89,7 +89,7 @@ export default function PresidentAssignJuryDefense() {
                 <div className="defense-jury-info">
                     Ngày tổ chức: {defenseJury?.defenseDate?.split("T")[0]}
                 </div>
-                {defenseJury?.academicKeywordList.map(({ keyword, description }) => (
+                {defenseJury?.academicKeywordList?.map(({ keyword, description }) => (
                     <KeywordChip key={keyword} keyword={description} />
                 ))}
                 <form onSubmit={handleSubmit(onAssignTeacherAndThesis)}>

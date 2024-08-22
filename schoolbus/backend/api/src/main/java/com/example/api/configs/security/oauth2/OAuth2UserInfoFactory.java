@@ -1,14 +1,13 @@
 package com.example.api.configs.security.oauth2;
 
-import static com.example.shared.enumeration.AuthProvider.google;
-
+import com.example.shared.enumeration.AuthProvider;
 import com.example.shared.exception.OAuth2AuthenticationProcessingException;
 import java.util.Map;
 
 public class OAuth2UserInfoFactory {
 
     public static OAuth2UserInfo getOAuth2UserInfo(String registrationId, Map<String, Object> attributes) throws OAuth2AuthenticationProcessingException {
-        if(registrationId.equalsIgnoreCase(google.toString())){
+        if(registrationId.equalsIgnoreCase(AuthProvider.GOOGLE.getValue())){
             return new GoogleOAuth2UserInfo(attributes);
         }
         else{

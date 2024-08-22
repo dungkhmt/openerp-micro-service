@@ -29,7 +29,7 @@ public class AssetTypeController {
     public ResponseEntity<?> getTypeById(@PathVariable Integer Id){
         Optional<AssetType> assetType = assetTypeService.getTypeById(Id);
         return ResponseEntity
-            .status(HttpStatus.FOUND)
+            .status(HttpStatus.OK)
             .body(assetType);
     }
 
@@ -53,5 +53,13 @@ public class AssetTypeController {
     public ResponseEntity<?> deleteType(@PathVariable Integer Id){
         assetTypeService.deleteType(Id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/get-top-types")
+    public ResponseEntity<?> getTopTypes(){
+        List<Integer> topTypes = assetTypeService.getTopTypes();
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(topTypes);
     }
 }

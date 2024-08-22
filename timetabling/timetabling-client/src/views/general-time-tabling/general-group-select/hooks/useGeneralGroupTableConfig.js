@@ -43,12 +43,6 @@ export const useGroupTableConfig = () => {
       width: 100,
     },
     {
-      headerName: "SL thực",
-      field: "quantity",
-      editable: true,
-      width: 100,
-    },
-    {
       headerName: "SL MAX",
       field: "quantityMax",
       editable: true,
@@ -59,53 +53,6 @@ export const useGroupTableConfig = () => {
       field: "classType",
       editable: true,
       width: 100,
-    },
-
-    {
-      headerName: "Thời lượng",
-      field: "mass",
-      editable: true,
-      width: 100,
-    },
-    {
-      headerName: "Trạng thái",
-      field: "state",
-      editable: true,
-      width: 100,
-    },
-    {
-      headerName: "Kíp",
-      field: "crew",
-      editable: true,
-      width: 100,
-    },
-    {
-      headerName: "Đợt",
-      field: "openBatch",
-      editable: true,
-      width: 100,
-    },
-    {
-      headerName: "Khóa",
-      field: "course",
-      editable: true,
-      width: 100,
-    },
-    {
-      headerName: "Tiết BĐ",
-      field: "startTime",
-      width: 80,
-      editable: true,
-    },
-    {
-      headerName: "Ngày",
-      field: "weekday",
-      width: 80,
-    },
-    {
-      headerName: "Phòng học",
-      field: "room",
-      width: 120,
     },
   ];
 };

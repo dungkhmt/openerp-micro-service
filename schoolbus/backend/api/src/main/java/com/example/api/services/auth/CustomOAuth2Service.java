@@ -47,7 +47,7 @@ public class CustomOAuth2Service extends DefaultOAuth2UserService implements Ser
         Account user;
         if(userOptional.isPresent()){
             user = userOptional.get();
-            user.setProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
+            user.setProvider(AuthProvider.fromValue(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
         }else{
             user = signUpNewUser(oAuth2UserRequest,oAuth2UserInfo);
         }
@@ -57,7 +57,7 @@ public class CustomOAuth2Service extends DefaultOAuth2UserService implements Ser
     private Account signUpNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo){
 
         Account account = Account.builder()
-            .provider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))
+            .provider(AuthProvider.fromValue(oAuth2UserRequest.getClientRegistration().getRegistrationId()))
             .username(oAuth2UserInfo.getEmail())
             .role(UserRole.CLIENT)
             .build();

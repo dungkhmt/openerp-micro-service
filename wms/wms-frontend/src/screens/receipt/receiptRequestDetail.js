@@ -297,6 +297,11 @@ import LoadingScreen from "components/common/loading/loading";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchProductList } from "redux/actions/actions";
+import {
+    ProductDropDown,
+    WarehouseDropDown,
+    BayDropDownWithSelectedPrdAndWh,
+} from "components/table/DropDown";
 
 const ReceiptRequestDetail = (props) => {
     const history = useHistory();
@@ -306,6 +311,7 @@ const ReceiptRequestDetail = (props) => {
     const [productTableData, setProductTableData] = useState([]);
     const [selectedProductId, setSelectedProductId] = useState(null);
     const [selectedWarehouseId, setSelectedWarehouseId] = useState(null);
+    const [selectedProductName, setSelectedProductName] = useState(null);
 
     const [newQuantity, setNewQuantity] = useState(0);
 
@@ -316,10 +322,19 @@ const ReceiptRequestDetail = (props) => {
     // Data fetched from server
     const [warehouseList, setWarehouseList] = useState([]);
     const [isLoading, setLoading] = useState(true);
+    const [productList, setProductList] = useState([]);
 
-    const ProductDropDown = ({ productList, setSelectedProduct }) => {
+    const handleSelectProduct = (e) => {
+        setSelectedProductId(e.target.value);
+        setSelectedProductName(productList.find(product => product.productId == e.target.value).name);
+    };
+
+    const ProductDropDown = ({ productList, setSelectedProduct, setSelectedProductName }) => {
         return (
-            <Select onChange={(e) => setSelectedProduct(e.target.value)}>
+            <Select 
+                onChange={handleSelectProduct}
+                value={selectedProductName}
+            >
                 {productList.length > 0 &&
                     productList.map((product) => (
                         <MenuItem value={product.productId}>
@@ -332,7 +347,7 @@ const ReceiptRequestDetail = (props) => {
 
     const WarehouseDropDown = ({ warehouseList, setSelectedWarehouseId }) => {
         return (
-            <Select onChange={(e) => setSelectedWarehouseId(e.target.value)}>
+            <Select onChange={(e) =>  setSelectedWarehouseId(e.target.value)}>
                 {warehouseList.length > 0 &&
                     warehouseList.map((warehouse) => (
                         <MenuItem value={warehouse.warehouseId}>
@@ -369,36 +384,41 @@ const ReceiptRequestDetail = (props) => {
     const dispatch = useDispatch();
     const productState = useSelector((state) => state.productState);
 
-    useEffect(() => {
-        if (!productState.productList) {
-            dispatch(fetchProductList());
-        }
+    useEffect(() => {            
         async function fetchData() {
-            await request("get", API_PATH.WAREHOUSE, (res) => {
-                setWarehouseList(res.data);
-            });
-
-            if (!isCreateForm) {
+              await request(
+                "get",
+                API_PATH_2.LIST_PRODUCT_NO_IMG,
+                (res) => {
+                  setProductList(res.data);
+                }
+              );
+        
+              await request(
+                "get",
+                API_PATH_2.WAREHOUSE,
+                (res) => {
+                  setWarehouseList(res.data);
+                }
+              )
+        
+              if (!isCreateForm) {
                 await request(
-                    "get",
-                    API_PATH.SALE_MANAGEMENT_RECEIPT_REQUEST + "/" + receiptId,
-                    (res) => {
-                        setReceiptInfo(res.data);
-                        setProductTableData(res.data?.items);
-                    }
-                );
+                  "get",
+                  API_PATH_2.SALE_MANAGEMENT_RECEIPT_REQUEST + "/" + receiptId,
+                  (res) => {
+                    setReceiptInfo(res.data);
+                    setProductTableData(res.data?.items);
+                  }
+                )
+              }
+        
+              setLoading(false)
             }
+        
+            fetchData();
+          }, []);
 
-            setLoading(false);
-        }
-
-        fetchData();
-    }, [dispatch, productState.productList]);
-    if (productState.loading || !productState.productList) {
-        return <div>Loading...</div>;
-    }
-    const productList = productState.productList;
-    console.log("isCreating:", isCreateForm);
     return isLoading ? (
         <LoadingScreen />
     ) : (
@@ -493,6 +513,7 @@ const ReceiptRequestDetail = (props) => {
                                                 setSelectedProduct={
                                                     setSelectedProductId
                                                 }
+                                                setSelectedProductName = {setSelectedProductName}
                                                 productList={productList}
                                             />
                                         ),

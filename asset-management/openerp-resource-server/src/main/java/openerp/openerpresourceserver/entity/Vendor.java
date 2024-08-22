@@ -22,6 +22,8 @@ public class Vendor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    private String user_id;
+
     private String name;
 
     private String phone;
@@ -36,6 +38,8 @@ public class Vendor {
 
     @Column(columnDefinition = "TEXT")
     private  String description;
+
+    private Integer num_assets;
 
     @CreatedDate
     private Date since;

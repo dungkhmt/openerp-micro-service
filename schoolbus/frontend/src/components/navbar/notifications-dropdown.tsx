@@ -18,7 +18,7 @@ export const NotificationsDropdown = () => {
         </NavbarItem>
       </DropdownTrigger>
       <DropdownMenu className="w-80" aria-label="Avatar Actions">
-        <DropdownSection title="Notificacions">
+        <DropdownSection title="Thông báo">
           <DropdownItem
             classNames={{
               base: "py-2",

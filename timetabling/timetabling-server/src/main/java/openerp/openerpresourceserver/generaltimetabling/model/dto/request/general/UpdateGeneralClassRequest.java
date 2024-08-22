@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
 
 
 @Data
@@ -14,12 +15,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateGeneralClassRequest {
-    @NotNull
-    private String field;
-
-    @NotNull
-    private String generalClassId;
-
-    @NotNull
-    private String value;
+    private GeneralClass generalClass;
 }

@@ -4,8 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.UUID;
+
+import com.hust.baseweb.applications.education.quiztest.entity.InteractiveQuizAnswer;
+
+import java.util.*;
 
 @Getter
 @Setter
@@ -29,6 +31,12 @@ public class QuizQuestion {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_topic_id", referencedColumnName = "quiz_course_topic_id")
     private QuizCourseTopic quizCourseTopic;
+
+    // @OneToMany(fetch = FetchType.LAZY)
+    // private List<InteractiveQuizAnswer> interactiveQuizAnswers;
+
+    // @OneToMany(fetch = FetchType.LAZY)
+    // private List<QuizChoiceAnswer> quizChoiceAnswers;
 
     //@ManyToOne(fetch = FetchType.LAZY)
     //@JoinColumn(name = "created_by_user_login_id", referencedColumnName = "user_login_id")

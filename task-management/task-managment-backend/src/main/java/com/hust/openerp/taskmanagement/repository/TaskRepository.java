@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.hust.openerp.taskmanagement.dto.SearchTaskDTO;
+import com.hust.openerp.taskmanagement.dto.TaskStatisticByStatusDTO;
 import com.hust.openerp.taskmanagement.entity.Task;
 
 @Repository
@@ -53,4 +55,49 @@ public interface TaskRepository extends JpaRepository<Task, UUID>, JpaSpecificat
                 )
             """)
     List<SearchTaskDTO> search(String userId, String keyword);
+
+    @Query("""
+            Select
+                count(t.id) as totalCount,
+                count(case when t.statusId = :status
+                           and t.lastUpdatedStamp between :startDate and :endDate
+                           then 1 end) as count
+            from Task t
+            where t.projectId = :projectId
+            """)
+    TaskStatistic getCountAndTotalCountByStatus(UUID projectId, Date startDate, Date endDate, String status);
+
+    @Query("""
+            Select count(t.id) as totalCount, count(case when t.createdStamp between :startDate and :endDate then 1 end) as count
+            from Task t
+            where t.projectId = :projectId
+            """)
+    TaskStatistic getCountAndTotalCountOfAllStatus(UUID projectId, Date startDate, Date endDate);
+
+    @Query("""
+            Select new com.hust.openerp.taskmanagement.dto.TaskStatisticByStatusDTO(
+                si.statusId,
+                count(t.statusId)
+            ) from Task t
+            right join TaskStatus si on t.statusId = si.statusId and (
+                        ( t.projectId = :projectId and
+                          t.lastUpdatedStamp between :startDate and :endDate )
+                        or t.projectId is null
+                    )
+            where si.type = 'BACKLOG_STATUS'
+            group by si.statusId
+            """)
+    List<TaskStatisticByStatusDTO> getTaskStatisticWorkloadByStatus(UUID projectId, Date startDate, Date endDate);
+
+    @Query(value = """
+            select * from task_management_task t
+            where t.assignee_id is not null
+            and t.due_date between CURRENT_DATE AND DATE_TRUNC('day', CURRENT_DATE + INTERVAL '?1 days') + INTERVAL '1 day' - INTERVAL '1 second'""", nativeQuery = true)
+    List<Task> getTasksDueDateIntervalDay(Integer intervalDay);
+
+    public static interface TaskStatistic {
+        Long getTotalCount();
+
+        Long getCount();
+    }
 }

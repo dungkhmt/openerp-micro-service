@@ -33,13 +33,11 @@ import { AssetOperaion } from "./menuconfig/AssetOperation";
 import { GeneralManagement } from "./menuconfig/General";
 import { SettingsManagement } from "./menuconfig/SettingsManagement";
 import { ReportsManagement } from "./menuconfig/ReportsManagement";
-import { user } from "./menuconfig/user";
 
 export const MENUS = [];
 
 MENUS.push(GeneralManagement);
 MENUS.push(SettingsManagement);
-MENUS.push(user);
 MENUS.push(AssetManagement);
 MENUS.push(AssetOperaion);
 MENUS.push(ReportsManagement);

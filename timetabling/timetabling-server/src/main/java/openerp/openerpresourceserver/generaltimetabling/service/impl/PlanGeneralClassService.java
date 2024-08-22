@@ -2,11 +2,16 @@ package openerp.openerpresourceserver.generaltimetabling.service.impl;
 
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.generaltimetabling.exception.InvalidFieldException;
+import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
+import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekExtractor;
+import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekValidator;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.MakeGeneralClassRequest;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.AcademicWeek;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.PlanGeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
-import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
+import openerp.openerpresourceserver.generaltimetabling.repo.AcademicWeekRepo;
 import openerp.openerpresourceserver.generaltimetabling.repo.GeneralClassRepository;
 import openerp.openerpresourceserver.generaltimetabling.repo.PlanGeneralClassRepository;
 import org.springframework.stereotype.Service;
@@ -14,13 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
 public class PlanGeneralClassService {
     private GeneralClassRepository generalClassRepository;
     private PlanGeneralClassRepository planGeneralClassRepository;
+    private AcademicWeekRepo academicWeekRepo;
     public GeneralClass makeClass(MakeGeneralClassRequest request) {
         GeneralClass newClass = new GeneralClass();
 
@@ -29,6 +35,33 @@ public class PlanGeneralClassService {
         newClass.setModuleCode(request.getModuleCode());
         newClass.setModuleName(request.getModuleName());
         newClass.setMass(request.getMass());
+        newClass.setCrew(request.getCrew());
+        newClass.setQuantityMax(request.getQuantityMax());
+        if (request.getClassType() != null && !request.getClassType().isEmpty()) {
+            newClass.setClassType(request.getClassType());
+        } else {
+            newClass.setClassType("LT+BT");
+        }
+
+
+        if(request.getWeekType().equals("Chẵn")) {
+            List<Integer> weekIntList = LearningWeekExtractor.extractArray(request.getLearningWeeks()).stream().filter(num->num%2==0).toList();
+            String weekListString = weekIntList.stream().map(num -> num + "-" + num)
+                    .collect(Collectors.joining(","));
+            newClass.setLearningWeeks(weekListString);
+        } else if(request.getWeekType().equals("Lẻ")) {
+            List<Integer> weekIntList = LearningWeekExtractor.extractArray(request.getLearningWeeks()).stream().filter(num->num%2!=0).toList();
+            String weekListString = weekIntList.stream().map(num -> num + "-" + num)
+                    .collect(Collectors.joining(","));
+            newClass.setLearningWeeks(weekListString);
+        } else if(request.getWeekType().equals("Chẵn+Lẻ")) {
+            newClass.setLearningWeeks(request.getLearningWeeks());
+        }
+
+        Long nextId = planGeneralClassRepository.getNextReferenceValue();
+        newClass.setParentClassId(nextId);
+        newClass.setClassCode(nextId.toString());
+
         List<RoomReservation> roomReservations = new ArrayList<>();
         RoomReservation roomReservation =  new RoomReservation();
         roomReservation.setGeneralClass(newClass);
@@ -52,11 +85,53 @@ public class PlanGeneralClassService {
         return generalClassRepository.findClassesByRefClassIdAndSemester(planClassId, semester);
     }
 
+    @Transactional
     public GeneralClass updateGeneralClass(GeneralClass generalClass) {
         GeneralClass updateGeneralClass = generalClassRepository.findById(generalClass.getId()).orElse(null);
+        if (updateGeneralClass == null) throw new NotFoundException("Không tìm thấy lớp kế hoạch!");
+        List<AcademicWeek> foundWeeks = academicWeekRepo.findAllBySemester(updateGeneralClass.getSemester());
+        if (foundWeeks.isEmpty()) {
+            throw new NotFoundException("Không tìm thấy tuần học trong học kỳ");
+        }
+        if (updateGeneralClass.getLearningWeeks() != null && !LearningWeekValidator.validate(updateGeneralClass.getLearningWeeks(), foundWeeks)){
+            throw new InvalidFieldException("Tuần học không phù hợp với danh sách tuần học");
+        }
         updateGeneralClass.setParentClassId(generalClass.getParentClassId());
         updateGeneralClass.setQuantityMax(generalClass.getQuantityMax());
         updateGeneralClass.setClassType(generalClass.getClassType());
+        updateGeneralClass.setCrew(generalClass.getCrew());
+        updateGeneralClass.setDuration(generalClass.getDuration());
+        updateGeneralClass.setLearningWeeks(generalClass.getLearningWeeks());
+        updateGeneralClass.setClassCode(generalClass.getClassCode());
         return generalClassRepository.save(updateGeneralClass);
+    }
+
+    @Transactional
+    public PlanGeneralClass updatePlanClass(PlanGeneralClass planClass) {
+        PlanGeneralClass planGeneralClass = planGeneralClassRepository.findById(planClass.getId()).orElse(null);
+        if (planGeneralClass == null) throw new NotFoundException("Không tìm thấy lớp kế hoạch!");
+        List<AcademicWeek> foundWeeks = academicWeekRepo.findAllBySemester(planClass.getSemester());
+        if (foundWeeks.isEmpty()) {
+            throw new NotFoundException("Không tìm thấy tuần học trong học kỳ");
+        }
+        if (planGeneralClass.getLearningWeeks() != null && !LearningWeekValidator.validate(planClass.getLearningWeeks(), foundWeeks)){
+            throw new InvalidFieldException("Tuần học không phù hợp với danh sách tuần học");
+        }
+        planGeneralClass.setLearningWeeks(planClass.getLearningWeeks());
+        planGeneralClass.setCrew(planClass.getCrew());
+        planGeneralClass.setLectureMaxQuantity(planClass.getLectureMaxQuantity());
+        planGeneralClass.setExerciseMaxQuantity(planClass.getExerciseMaxQuantity());
+        planGeneralClass.setLectureExerciseMaxQuantity(planClass.getLectureExerciseMaxQuantity());
+        planGeneralClass.setQuantityMax(planClass.getQuantityMax());
+        planGeneralClass.setClassType(planClass.getClassType());
+        return planGeneralClassRepository.save(planGeneralClass);
+    }
+
+    @Transactional
+    public PlanGeneralClass deleteClassById(Long planClassId) {
+        PlanGeneralClass foundClass = planGeneralClassRepository.findById(planClassId).orElse(null);
+        if (foundClass == null) throw new NotFoundException("Không tìm thấy lớp kế hoạch!");
+        planGeneralClassRepository.deleteById(planClassId);
+        return foundClass;
     }
 }

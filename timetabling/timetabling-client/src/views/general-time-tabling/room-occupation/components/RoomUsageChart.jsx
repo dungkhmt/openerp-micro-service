@@ -3,16 +3,8 @@ import { Chart } from "react-google-charts";
 import { useRoomOccupations } from "../hooks/useRoomOccupations";
 import { FacebookCircularProgress } from "components/common/progressBar/CustomizedCircularProgress";
 
-const RoomUsageChart = ({ semester, selectedWeek, startDate }) => {
-  const { loading, error, data } = useRoomOccupations(
-    semester,
-    startDate,
-    selectedWeek
-  );
-  console.log(semester);
-  console.log(startDate);
-  console.log(data);
-  console.log(selectedWeek);
+const RoomUsageChart = ({ semester, selectedWeek, startDate, data }) => {
+  
   const [roomData, setRoomData] = useState([
     [
       { type: "string", id: "Room" },

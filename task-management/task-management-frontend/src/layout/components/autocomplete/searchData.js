@@ -34,4 +34,11 @@ export const searchData = [
     suggestion: "Dashboard",
     category: "dashboard",
   },
+  {
+    id: 6,
+    url: "/dashboard",
+    icon: "material-symbols:dashboard-outline",
+    title: "Dashboard",
+    category: "other",
+  },
 ];

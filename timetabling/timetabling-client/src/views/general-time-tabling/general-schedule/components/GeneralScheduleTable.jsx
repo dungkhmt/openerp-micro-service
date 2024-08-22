@@ -39,7 +39,11 @@ const GeneralScheduleTable = ({
         columns={useGeneralTableColumns(setClasses, setLoading, semester, saveRequests, setSaveRequests)}
         rows={classes}
         pageSize={10}
+        sortingOrder={'asc'}
         initialState={{
+          sorting: {
+            sortModel: [{ field: 'classCode', sort: 'asc' }],
+          },
           filter: {
             filterModel: {
               items: [],

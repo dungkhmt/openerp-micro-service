@@ -9,29 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface SubmissionHourlySummaryRepo extends JpaRepository<SubmissionHourlySummary, String> {
 
-    @Modifying
-    @Transactional
-    @Query(value = "DELETE FROM submission_hourly_summary", nativeQuery = true)
-    void deleteAllData();
-    @Modifying
-    @Transactional
-    @Query(value =
-                    "INSERT INTO submission_hourly_summary (submission_date, hour_of_day, submission_count, submission_pass_count, user_submission_id) " +
-                    "SELECT " +
-                    "    date_trunc('day', created_stamp) AS submission_date, " +
-                    "    EXTRACT(hour FROM created_stamp) AS hour_of_day, " +
-                    "    COUNT(*) AS submission_count, " +
-                    "    SUM(CASE WHEN point > 0 THEN 1 ELSE 0 END) AS submission_pass_count," +
-                    "    user_submission_id " +
-                    "FROM " +
-                    "    contest_submission_new " +
-                    "GROUP BY " +
-                    "    submission_date, " +
-                    "    hour_of_day, " +
-                    "    user_submission_id", nativeQuery = true)
-
-    void updateSummaryData();
-
     @Query(value = "WITH subquery AS ( " +
             "    SELECT " +
             "        user_submission_id, " +
@@ -98,7 +75,8 @@ public interface SubmissionHourlySummaryRepo extends JpaRepository<SubmissionHou
             "LEFT JOIN  " +
             "    subquery sm ON cm.user_submission_id = sm.user_submission_id AND cm.max_total_submissions = sm.total_submissions " +
             "LEFT JOIN  " +
-            "    subquery pm ON cm.user_submission_id = pm.user_submission_id AND cm.max_total_pass_submissions = pm.total_pass_submissions ", nativeQuery = true)
+            "    subquery pm ON cm.user_submission_id = pm.user_submission_id AND cm.max_total_pass_submissions = pm.total_pass_submissions " +
+            "LIMIT 1 ", nativeQuery = true)
     Object findMaxTotalSubmissionsByUserId(@Param("userId") String userId);
 
     @Query(value =
@@ -111,7 +89,7 @@ public interface SubmissionHourlySummaryRepo extends JpaRepository<SubmissionHou
                     "FROM " +
                     "    submission_hourly_summary  " +
                     "WHERE  " +
-                    "    user_submission_id = :userId " + // Thêm dấu cách sau :userId
+                    "    user_submission_id = :userId " +
                     "GROUP BY " +
                     "    user_submission_id", nativeQuery = true)
     Object findStartEndTimeSubmittedByUserId(@Param("userId") String userId);
@@ -139,7 +117,7 @@ public interface SubmissionHourlySummaryRepo extends JpaRepository<SubmissionHou
                     "FROM AllHours " +
                     "LEFT JOIN submission_hourly_summary shs " +
                     "       ON AllHours.hour_of_day = shs.hour_of_day " +
-                    "       AND shs.user_submission_id = 'admin' " +
+                    "       AND shs.user_submission_id = :userId " +
                     "GROUP BY AllHours.hour_of_day " +
                     "ORDER BY AllHours.hour_of_day ", nativeQuery = true)
     Object[] submissionHourlySummariesByHourByUserID(@Param("userId") String userId);

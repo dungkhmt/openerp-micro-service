@@ -2,30 +2,47 @@ package openerp.openerpresourceserver.thesisdefensejuryassignment.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.DefenseJuryDTO;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.JuryTopicDTO;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.dto.ThesisDefensePlanDTO;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.DefenseJurySession;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.models.ThesisDefensePlanIM;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.repo.DefenseJuryRepo;
+import openerp.openerpresourceserver.thesisdefensejuryassignment.repo.JuryTopicRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.DefenseJury;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.entity.ThesisDefensePlan;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.models.UpdateThesisDefensePlanIM;
 import openerp.openerpresourceserver.thesisdefensejuryassignment.repo.ThesisDefensePlanRepo;
 
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Log4j2
 @AllArgsConstructor
 @Service
 
 public class ThesisDefensePlanServiceImpl implements ThesisDefensePlanService {
-
-
+    @Autowired
     private ThesisDefensePlanRepo graduationTermRepo;
+    @Autowired
+    private DefenseJuryRepo defenseJuryRepo;
+
+
+    @Autowired
+    private JuryTopicRepo juryTopicRepo;
+
 
     @Override
-    public List<ThesisDefensePlan> getAllThesisDefensePlan() {
-
-        return graduationTermRepo.findAll();
+    public List<ThesisDefensePlanDTO> getAllThesisDefensePlan() {
+        List <ThesisDefensePlan> thesisDefensePlanList = graduationTermRepo.findAll();
+        Collections.reverse(thesisDefensePlanList);
+        List<ThesisDefensePlanDTO> thesisDefensePlanDTOList = new LinkedList<>();
+        for (ThesisDefensePlan thesisDefensePlan: thesisDefensePlanList){
+            ThesisDefensePlanDTO thesisDefensePlanDTO = new ThesisDefensePlanDTO(thesisDefensePlan.getId(),thesisDefensePlan.getName(),thesisDefensePlan.getDescription(), thesisDefensePlan.getSemester(),thesisDefensePlan.getStartDate(), thesisDefensePlan.getEndDate());
+            thesisDefensePlanDTOList.add(thesisDefensePlanDTO);
+        }
+        return  thesisDefensePlanDTOList;
     }
 
     @Override
@@ -40,73 +57,69 @@ public class ThesisDefensePlanServiceImpl implements ThesisDefensePlanService {
         );
         return graduationTermRepo.save(thesisDefensePlan);
     }
-
     @Override
     public ThesisDefensePlan getThesisDefensePlanById(String id) {
         ThesisDefensePlan foundDefensePlan = graduationTermRepo.findById(id).orElse(null);
         return foundDefensePlan;
     }
-
     @Override
     public List<ThesisDefensePlan> getAllThesisDefensePlanAssignedForTeacherWithId(String teacherId) {
         List<ThesisDefensePlan> thesisDefensePlanList = graduationTermRepo.findAll();
-        //        List<DefenseJury> filteredList = defenseJuryList.stream()
-//                .filter(defenseJury -> defenseJury.getDefenseJuryTeacherRoles().stream()
-//                        .anyMatch(role -> role.getTeacher().getId().equals(teacherIdToFilter)))
-//                .collect(Collectors.toList());
-
         return thesisDefensePlanList.stream().filter(
                         thesisDefensePlan -> thesisDefensePlan
-                                .getDefenseJuries()
+                                .getPlanTopicList()
                                 .stream()
-                                .anyMatch(
-                                        defenseJury -> defenseJury
-                                                .getDefenseJuryTeacherRoles()
-                                                .stream()
-                                                .anyMatch(defenseJuryTeacherRole -> defenseJuryTeacherRole
-                                                        .getTeacher()
-                                                        .getId()
-                                                        .equals(teacherId))))
+                                .anyMatch(planTopic -> planTopic.getDefenseJuryList()
+                                        .stream()
+                                        .anyMatch(
+                                                defenseJury -> defenseJury
+                                                        .getDefenseJuryTeacherRoles()
+                                                        .stream()
+                                                        .anyMatch(defenseJuryTeacherRole -> defenseJuryTeacherRole
+                                                                .getTeacher()
+                                                                .getId()
+                                                                .equals(teacherId))))
+                )
                 .toList();
     }
-
     @Override
-    public ThesisDefensePlan getThesisDefensePlanAssignedForTeacherWithTeacherId(String teacherId, String thesisDefensePlanId) {
-        ThesisDefensePlan thesisDefensePlan = graduationTermRepo.findById(thesisDefensePlanId).orElse(null);
-        List<DefenseJury> defenseJuryList = thesisDefensePlan.getDefenseJuries();
-        thesisDefensePlan.setDefenseJuries(
-                defenseJuryList
-                        .stream()
-                        .filter(defenseJury -> defenseJury
-                                .getDefenseJuryTeacherRoles()
-                                .stream()
-                                .anyMatch(defenseJuryTeacherRole -> defenseJuryTeacherRole
-                                        .getTeacher()
-                                        .getId()
-                                        .equals(teacherId)))
-                        .toList()
-        );
-        return thesisDefensePlan;
+    public List<DefenseJuryDTO> getThesisDefensePlanAssignedForTeacherWithTeacherId(String teacherId, String thesisDefensePlanId) {
+        List<DefenseJury> defenseJuryList = defenseJuryRepo.findByPlanTopicThesisDefensePlanIdAndDefenseJuryTeacherRolesTeacherId(thesisDefensePlanId, teacherId);
+        List<DefenseJuryDTO> defenseJuryDTOList = new ArrayList<>();
+        for (DefenseJury defenseJury: defenseJuryList){
+            DefenseJuryDTO defenseJuryDTO = new DefenseJuryDTO();
+            defenseJuryDTO.setId(defenseJury.getId().toString());
+            defenseJuryDTO.setName(defenseJury.getName());
+            defenseJuryDTO.setMaxThesis(defenseJury.getMaxThesis());
+            defenseJuryDTO.setDefenseDate(defenseJury.getDefenseDate());
+            defenseJuryDTO.setDefenseRoom(defenseJury.getDefenseRoom());
+            defenseJuryDTO.setDefenseSession(defenseJury.getDefenseJurySessionList().stream().map(DefenseJurySession::getDefenseSession).toList());
+            JuryTopicDTO juryTopicDTO = new JuryTopicDTO(defenseJury.getPlanTopic().getName(), defenseJury.getPlanTopic().getAcademicKeywordList());
+            defenseJuryDTO.setJuryTopicDTO(juryTopicDTO);
+            defenseJuryDTOList.add(defenseJuryDTO);
+        }
+        return defenseJuryDTOList;
     }
 
     @Override
-    public ThesisDefensePlan getThesisDefensePlanWithTeacherRoleAsPresidentAndTeacherIdById(String teacherId, String thesisDefensePlanId) {
+    public List<DefenseJuryDTO> getThesisDefensePlanWithTeacherRoleAsPresidentAndTeacherIdById(String teacherId, String thesisDefensePlanId) {
         int PRESIDENT_ROLE = 2;
-        ThesisDefensePlan thesisDefensePlan = graduationTermRepo.findById(thesisDefensePlanId).orElse(null);
-        List<DefenseJury> defenseJuryList = thesisDefensePlan.getDefenseJuries();
-        thesisDefensePlan.setDefenseJuries(
-                defenseJuryList
-                        .stream()
-                        .filter(defenseJury -> defenseJury
-                                .getDefenseJuryTeacherRoles()
-                                .stream()
-                                .anyMatch(defenseJuryTeacherRole -> defenseJuryTeacherRole
-                                        .getTeacher()
-                                        .getId()
-                                        .equals(teacherId) && defenseJuryTeacherRole.getRole().getId() == PRESIDENT_ROLE))
-                        .toList()
-        );
-        return thesisDefensePlan;
+        List<DefenseJury> defenseJuryList = defenseJuryRepo.findByPlanTopicThesisDefensePlanIdAndDefenseJuryTeacherRolesTeacherIdAndDefenseJuryTeacherRolesRoleId(thesisDefensePlanId,teacherId,PRESIDENT_ROLE);
+        List<DefenseJuryDTO> defenseJuryDTOList = new ArrayList<>();
+        for (DefenseJury defenseJury: defenseJuryList){
+            DefenseJuryDTO defenseJuryDTO = new DefenseJuryDTO();
+            defenseJuryDTO.setId(defenseJury.getId().toString());
+            defenseJuryDTO.setName(defenseJury.getName());
+            defenseJuryDTO.setMaxThesis(defenseJury.getMaxThesis());
+            defenseJuryDTO.setDefenseDate(defenseJury.getDefenseDate());
+            defenseJuryDTO.setDefenseRoom(defenseJury.getDefenseRoom());
+            defenseJuryDTO.setDefenseSession(defenseJury.getDefenseJurySessionList().stream().map(DefenseJurySession::getDefenseSession).toList());
+            defenseJuryDTO.setAssigned(defenseJury.isAssigned());
+            JuryTopicDTO juryTopicDTO = new JuryTopicDTO(defenseJury.getPlanTopic().getName(), defenseJury.getPlanTopic().getAcademicKeywordList());
+            defenseJuryDTO.setJuryTopicDTO(juryTopicDTO);
+            defenseJuryDTOList.add(defenseJuryDTO);
+        }
+        return defenseJuryDTOList;
     }
 
     @Override
@@ -114,8 +127,10 @@ public class ThesisDefensePlanServiceImpl implements ThesisDefensePlanService {
         int PRESIDENT_ROLE = 2;
         List<ThesisDefensePlan> thesisDefensePlanList = graduationTermRepo.findAll();
         return thesisDefensePlanList.stream().filter(
-                        thesisDefensePlan -> thesisDefensePlan
-                                .getDefenseJuries()
+                thesisDefensePlan -> thesisDefensePlan
+                        .getPlanTopicList()
+                        .stream()
+                        .anyMatch(defensePlanTopic -> defensePlanTopic.getDefenseJuryList()
                                 .stream()
                                 .anyMatch(
                                         defenseJury -> defenseJury
@@ -124,9 +139,9 @@ public class ThesisDefensePlanServiceImpl implements ThesisDefensePlanService {
                                                 .anyMatch(defenseJuryTeacherRole -> defenseJuryTeacherRole
                                                         .getTeacher()
                                                         .getId()
-                                                        .equals(teacherId) && defenseJuryTeacherRole.getRole().getId() == PRESIDENT_ROLE)))
-                .toList();
-
+                                                        .equals(teacherId) && defenseJuryTeacherRole.getRole().getId() == PRESIDENT_ROLE))
+                        )
+        ).toList();
     }
 
     @Override

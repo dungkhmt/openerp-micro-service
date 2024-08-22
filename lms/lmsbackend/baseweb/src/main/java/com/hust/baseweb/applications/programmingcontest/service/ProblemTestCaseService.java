@@ -57,7 +57,7 @@ public interface ProblemTestCaseService {
     ModelGetContestDetailResponse getContestDetailByContestIdAndTeacher(String contestId, String userName);
 
 
-    List<SubmissionDetailByTestcaseOM> getSubmissionDetailByTestcase(UUID submissionId);
+    List<SubmissionDetailByTestcaseOM> getSubmissionDetailByTestcase(UUID submissionId, UUID testcaseId);
 
     ContestSubmissionEntity teacherDisableSubmission(String userId, UUID submissionId);
 
@@ -272,6 +272,7 @@ public interface ProblemTestCaseService {
     List<ProblemEntity> getOwnerProblems(String ownerId);
 
     List<ProblemEntity> getSharedProblems(String userId);
+    List<ProblemEntity> getPublicProblems(String userId);
 
     List<ProblemEntity> getAllProblems(String userId);
 

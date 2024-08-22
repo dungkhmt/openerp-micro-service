@@ -11,6 +11,8 @@ import {
   YAxis,
 } from "recharts";
 import ChartTitle from "./ChartTitle";
+import ChartTooltip from "./ChartTooltip";
+import ChartSkeleton from "./ChartSkeleton";
 
 const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.grey[100],
@@ -32,7 +34,7 @@ const DoubleLineChart = ({
   let chartData = [];
 
   if (!data) {
-    return <div>No data available</div>;
+    return <ChartSkeleton />;
   }
 
   if (Array.isArray(data)) {
@@ -74,7 +76,7 @@ const DoubleLineChart = ({
         <Stack width="100%" height="100%" mt={3}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ left: 0, right: 30 }}>
-              <Tooltip />
+              <Tooltip content={<ChartTooltip />} />
 
               <CartesianGrid
                 vertical={false}

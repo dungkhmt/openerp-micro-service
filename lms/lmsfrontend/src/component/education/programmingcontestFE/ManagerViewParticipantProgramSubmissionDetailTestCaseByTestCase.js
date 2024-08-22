@@ -1,22 +1,22 @@
 import InfoIcon from "@mui/icons-material/Info";
 import { IconButton } from "@mui/material";
-import Box from "@mui/material/Box";
 import { request } from "api";
-import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
-import HustModal from "component/common/HustModal";
 import StandardTable from "component/table/StandardTable";
 import { useEffect, useState } from "react";
 import { localeOption } from "utils/NumberFormat";
 import { toFormattedDateTime } from "utils/dateutils";
+import { SubmissionTestCaseResultDetail } from "./SubmissionTestCaseResultDetail";
 
 export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase(
   props
 ) {
   const { submissionId } = props;
-  const [submissionTestCase, setSubmissionTestCase] = useState([]);
-  const [openModal, setOpenModal] = useState(false);
-  // const [testcaseDetailList, setTestcaseDetailList] = useState([]);
-  const [selectedTestcase, setSelectedTestcase] = useState();
+
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [testCasesResult, setTestCasesResult] = useState([]);
+  const [testCasesResultDetail, setTestCasesResultDetail] = useState({});
+  const [selectedTestCase, setSelectedTestCase] = useState();
 
   const columns = [
     {
@@ -51,21 +51,34 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
         <IconButton
           color="primary"
           onClick={() => {
-            // for (let i = 0; i < testcaseDetailList.length; i++) {
-            //   if (testcaseDetailList[i].testCaseId === rowData.testCaseId) {
-            //     testcaseDetailList[i].participantAnswer =
-            //       rowData.participantAnswer;
-            //     setSelectedTestcase(testcaseDetailList[i]);
+            const testCaseId = rowData.testCaseId;
 
-            //   }
-            // }
+            setOpen(true);
 
-            setSelectedTestcase({
-              testcase: rowData.testCase,
-              correctAns: rowData.testCaseAnswer,
-              participantAnswer: rowData.participantAnswer,
-            });
-            setOpenModal(true);
+            if (testCasesResultDetail[testCaseId]) {
+              setSelectedTestCase(testCasesResultDetail[testCaseId]);
+            } else {
+              setLoading(true);
+
+              request(
+                "get",
+                `/teacher/submissions/${submissionId}/testcases/${testCaseId}`,
+                (res) => {
+                  setLoading(false);
+                  setTestCasesResultDetail((prev) => ({
+                    ...prev,
+                    [testCaseId]: res.data[0] || {},
+                  }));
+
+                  setSelectedTestCase(res.data[0]);
+                },
+                {
+                  onError: (e) => {
+                    setLoading(false);
+                  },
+                }
+              );
+            }
           }}
         >
           <InfoIcon />
@@ -74,91 +87,28 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
     },
   ];
 
-  function getSubmissionDetailTestCaseByTestCase() {
-    request(
-      "get",
-      "/teacher/submissions/" + submissionId,
-      (res) => {
-        let L = res.data.map((c) => ({
-          ...c,
-          createdAt: toFormattedDateTime(c.createdAt),
-        }));
-        setSubmissionTestCase(L);
-      },
-      {
-        401: () => {},
-      }
-    );
+  function getTestCasesResult() {
+    request("get", "/teacher/submissions/" + submissionId, (res) => {
+      const testCases = res.data.map((tc) => ({
+        ...tc,
+        createdAt: toFormattedDateTime(tc.createdAt),
+      }));
+
+      setTestCasesResult(testCases);
+    });
   }
 
-  // function getTestcaseDetail(testcaseId) {
-  //   request(
-  //     "get",
-  //     "/testcases/" + testcaseId,
-  //     (res) => {
-  //       setTestcaseDetailList((prev) => [...prev, res.data]);
-  //     },
-  //     {
-  //       401: () => {},
-  //     }
-  //   );
-  // }
-
   useEffect(() => {
-    getSubmissionDetailTestCaseByTestCase();
+    getTestCasesResult();
   }, []);
 
-  // useEffect(() => {
-  //   var testcaseIdsList = submissionTestCase.map(
-  //     (testcase) => testcase.testCaseId
-  //   );
-  //   testcaseIdsList.forEach((id) => {
-  //     getTestcaseDetail(id);
-  //   });
-  // }, [submissionTestCase]);
-
-  const ModalPreview = ({ testcase }) => {
-    return (
-      <HustModal
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-        isNotShowCloseButton
-        showCloseBtnTitle={false}
-        maxWidthPaper={800}
-      >
-        <HustCopyCodeBlock title="Input" text={testcase?.testcase} mb={2} />
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            width: "100%",
-            justifyContent: "space-between",
-            marginTop: "14px",
-          }}
-        >
-          <Box width="48%">
-            <HustCopyCodeBlock
-              title="Correct output"
-              text={testcase?.correctAns}
-            />
-          </Box>
-          <Box width="48%">
-            <HustCopyCodeBlock
-              title="User output"
-              text={testcase?.participantAnswer}
-            />
-          </Box>
-        </Box>
-      </HustModal>
-    );
-  };
-
   return (
-    <div>
+    <>
       <StandardTable
         columns={columns}
-        data={submissionTestCase}
+        data={testCasesResult}
         hideCommandBar
+        hideToolBar
         options={{
           selection: false,
           pageSize: 5,
@@ -166,7 +116,12 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
           sorting: true,
         }}
       />
-      <ModalPreview testcase={selectedTestcase} />
-    </div>
+      <SubmissionTestCaseResultDetail
+        open={open}
+        loading={loading}
+        data={selectedTestCase}
+        handleClose={() => setOpen(false)}
+      />
+    </>
   );
 }

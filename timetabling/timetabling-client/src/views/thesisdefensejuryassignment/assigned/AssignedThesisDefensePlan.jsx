@@ -5,6 +5,7 @@ import PrimaryButton from "components/button/PrimaryButton";
 import { useKeycloak } from "@react-keycloak/web";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { useFetch } from "hooks/useFetch";
+//- Theo dõi đợt bảo vệ được phân công
 export default function AssignedThesisDefensePlan() {
   const { keycloak } = useKeycloak();
   const history = useHistory();

@@ -1,5 +1,6 @@
 package com.hust.baseweb.service.helper;
 
+import com.hust.baseweb.applications.programmingcontest.entity.ContestEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionTestCaseEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
@@ -33,6 +34,7 @@ public class SubmissionResponseHandler {
 
     @Transactional
     public void processSubmissionResponseV2(
+            ContestEntity contest,
             List<TestCaseEntity> testCaseEntityList,
             List<String> listSubmissionResponse,
             ContestSubmissionEntity submission,
@@ -42,7 +44,7 @@ public class SubmissionResponseHandler {
         int runtime = 0;
         long score = 0;
         int nbTestCasePass = 0;
-
+        int nbTestCaseGraded = 0;
         String totalStatus;
         String message = "";
         boolean compileError = false;
@@ -91,11 +93,25 @@ public class SubmissionResponseHandler {
                 e.printStackTrace();
                 throw new Exception("error from StringHandler");
             }
-
+            boolean usedPointToGrade = true;
+            if(contest.getEvaluateBothPublicPrivateTestcase()
+                    .equals(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES)){
+                // keep usedPointToGrade = true
+            }else{
+                if(testCaseEntity.getIsPublic().equals(TestCaseEntity.PUBLIC_YES)){
+                    usedPointToGrade = false;// public testcase is not accounted/graded
+                }else{
+                    // keep usedPointToGrade = true for private testcase
+                }
+            }
+            String usedToGrade = ContestSubmissionTestCaseEntity.USED_TO_GRADE_NO;
             runtime = runtime + problemSubmission.getRuntime().intValue();
-            score = score + problemSubmission.getScore();
-            nbTestCasePass += problemSubmission.getNbTestCasePass();
-
+            if(usedPointToGrade) {
+                score = score + problemSubmission.getScore();
+                nbTestCasePass += problemSubmission.getNbTestCasePass();
+                nbTestCaseGraded += 1;
+                usedToGrade = ContestSubmissionTestCaseEntity.USED_TO_GRADE_YES;
+            }
             List<String> output = problemSubmission.getParticipantAns();
             String participantAns = output != null && !output.isEmpty() ? output.get(0) : "";
 
@@ -110,6 +126,7 @@ public class SubmissionResponseHandler {
                     .participantSolutionOtput(StringHandler.removeNullCharacter(participantAns))
                     .runtime(problemSubmission.getRuntime())
                     .createdStamp(submission.getCreatedAt())
+                    .usedToGrade(usedToGrade)
                     .build();
 
             long startTime = System.nanoTime();
@@ -137,7 +154,8 @@ public class SubmissionResponseHandler {
             totalStatus = ContestSubmissionEntity.SUBMISSION_STATUS_WAIT_FOR_CUSTOM_EVALUATION;
         } else if (nbTestCasePass == 0) {
             totalStatus = ContestSubmissionEntity.SUBMISSION_STATUS_FAILED;
-        } else if (nbTestCasePass > 0 && nbTestCasePass < testCaseEntityList.size()) {
+        //} else if (nbTestCasePass > 0 && nbTestCasePass < testCaseEntityList.size()) {
+        } else if (nbTestCasePass > 0 && nbTestCasePass < nbTestCaseGraded) {
             totalStatus = ContestSubmissionEntity.SUBMISSION_STATUS_PARTIAL;
         } else {
             message = "Successful";
@@ -146,7 +164,8 @@ public class SubmissionResponseHandler {
 
         submission.setStatus(totalStatus);
         submission.setPoint(score);
-        submission.setTestCasePass(nbTestCasePass + " / " + testCaseEntityList.size());
+        //submission.setTestCasePass(nbTestCasePass + " / " + testCaseEntityList.size());
+        submission.setTestCasePass(nbTestCasePass + " / " + nbTestCaseGraded);
         submission.setSourceCode(submission.getSourceCode());
         submission.setSourceCodeLanguage(submission.getSourceCodeLanguage());
         submission.setRuntime((long) runtime);
@@ -200,7 +219,12 @@ public class SubmissionResponseHandler {
                                         + response;
                     }
 
-                    totalPoint += point;
+                    if(submissionTestcase.getUsedToGrade()
+                            .equals(ContestSubmissionTestCaseEntity.USED_TO_GRADE_YES)) {
+                        totalPoint += point;
+                    }else{
+                        // do not account test-case to the final grade of the submission
+                    }
                 }
 
                 submissionTestcase.setPoint(point);

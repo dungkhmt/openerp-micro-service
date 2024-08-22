@@ -18,8 +18,11 @@ import { useHookstate } from '@hookstate/core';
 import fetchUserState from "state/userState";
 import { CircularProgress, Snackbar } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
+import Swal from "sweetalert2";
+import './styles.css';
 
 const EducatonDetail = ({ Education,  open, onClose }) => {
+
     const [loading, setLoading] = useState(false);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [education, setEducation] = useState(Education)
@@ -39,26 +42,69 @@ const EducatonDetail = ({ Education,  open, onClose }) => {
         return new Promise(resolve => setTimeout(resolve, milliseconds));
     }
 
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault()
+    //     setLoading(true);
+    //     await sleep(2000);
+    //     let submitToServerForm = {...Education, ...education}
+    //     submitToServerForm.user = user
+    //     console.log(submitToServerForm)
+    //     console.log(user)
+    //     request("post", `/education`, (res) => {
+    //         console.log(res.data);
+    //     }, (err) => {
+    //         console.log(err);
+    //     }, submitToServerForm).then();
+    //     setLoading(false);
+    //     setOpenSnackbar(true);
+    //     await sleep(1500);
+    //     handleClose()
+    // }
     const handleSubmit = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
         setLoading(true);
-        await sleep(2000);
-        let submitToServerForm = {...Education, ...education}
-        submitToServerForm.user = user
-
-        console.log(submitToServerForm)
-        console.log(user)
-        request("post", `/education`, (res) => {
-            console.log(res.data);
-        }, (err) => {
-            console.log(err);
-        }, submitToServerForm).then();
+    
+        // Replace the sleep function with a more conventional setTimeout
+        // await sleep(2000); // Not recommended
+    
+        let submitToServerForm = {...Education, ...education};
+        submitToServerForm.user = user;
+    
+        // Here you can replace console.log with SweetAlert2
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, submit it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                request("post", `/education`, (res) => {
+                    Swal.fire(
+                        'Submitted!',
+                        'Your information has been submitted.',
+                        'success'
+                    );
+                    handleClose();
+                }, (err) => {
+                    return {"onError" : (e) => { Swal.fire(
+                        'Failed!',
+                        'There was a problem submitting your information.',
+                        'error'
+                    );
+                    handleClose();
+                }
+                }
+                }, submitToServerForm).then();
+            }
+        });
+    
         setLoading(false);
-        setOpenSnackbar(true);
-        await sleep(1500);
-        handleClose()
+        // setOpenSnackbar(true);
+        
     }
-
     const handleInputChange = (event) => {
         setEducation({
             ...education,
@@ -112,12 +158,12 @@ const EducatonDetail = ({ Education,  open, onClose }) => {
                             <TextField fullWidth label="Ending time" value={education.endingTime} variant="outlined" name="endingTime" onChange={handleInputChange} />
                         </Grid>
 
-                        <Snackbar
+                        {/* <Snackbar
                             open={openSnackbar}
                             autoHideDuration={3000} // Duration in milliseconds
                             onClose={() => setOpenSnackbar(false)}
                             message="Form submitted successfully!"
-                        />
+                        /> */}
 
                         {/* This button should submit the form */}
                         <Box display="flex" justifyContent="center" paddingTop={'50px'}>
@@ -125,12 +171,12 @@ const EducatonDetail = ({ Education,  open, onClose }) => {
                                 {'Submit'}
                             </Button>
                         </Box>
-                        <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+                        {/* <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
                             <CircularProgress color="inherit" />
                             <div>
                                 Please wait a few seconds...
                             </div>
-                        </Backdrop>
+                        </Backdrop> */}
                     </Grid>
                 </form>
             </Dialog>

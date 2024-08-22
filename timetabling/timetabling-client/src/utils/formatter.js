@@ -61,9 +61,16 @@ const time_By_Slot = [
   {id: 11, time: "16h00"},
   {id: 12, time: "16h50"},
 ]
-export { time_By_Slot, convertToSchedule, datetimeForFN, weeks_Of_Semester, days_Of_Week, periods_Of_Day, slots_Of_Period , submission_status};
 
 const submission_status = [
   {id: 0, name: "Chờ xử lý"},
   {id: 1, name: "Hoàn thành"},
 ]
+
+const time_limit_input = [
+  {id: -1, name: "Không giới hạn"},
+  {id: 30, name: "30 giây"},
+  {id: 60, name: "60 giây"},
+  {id: 90, name: "90 giây"},
+]
+export { time_limit_input, time_By_Slot, convertToSchedule, datetimeForFN, weeks_Of_Semester, days_Of_Week, periods_Of_Day, slots_Of_Period , submission_status};

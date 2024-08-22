@@ -46,6 +46,9 @@ public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripIt
     @Query("select dti from DeliveryTripItem dti join SaleOrderHeader soh on soh.orderId = dti.orderId where soh.userLoginId = ?1 and dti.isDeleted = false ")
     List<DeliveryTripItem> getDeliveryTripItemByUserLoginId(String userLoginId);
 
+    @Query("select dti from DeliveryTripItem dti join SaleOrderHeader soh on soh.orderId = dti.orderId where soh.orderId = ?2 and soh.userLoginId = ?1 and dti.isDeleted = false")
+    List<DeliveryTripItem> getDeliveryTripItemByUserLoginIdAndOrderId(String userLoginId, UUID orderId);
+
     @Query("select new com.hust.wmsbackend.management.model.response.ReportDataPoint " +
             "(to_char(date_trunc('month', ws.expectedDeliveryStamp), 'yyyy- MM- dd') , sum(wdti.quantity * wsoi.priceUnit)) " +
             "from DeliveryTripItem wdti " +
