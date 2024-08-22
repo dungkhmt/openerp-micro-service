@@ -1,8 +1,16 @@
 import { useState, useEffect, useCallback } from "react";
 import { request } from "api";
-import { Button, TextField, Paper, Typography ,FormControl,InputLabel,MenuItem,Select,} from "@mui/material";
+import {
+  Button,
+  TextField,
+  Paper,
+  Typography,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+} from "@mui/material";
 import { useHistory } from "react-router-dom";
-import { SEMESTER } from "../config/localize";
 import { DataGrid } from "@mui/x-data-grid";
 import styles from "./index.style";
 import { classCallUrl, semesterUrl } from "../apiURL";
@@ -17,7 +25,7 @@ const AllRegisterClassScreen = () => {
   const [classes, setClasses] = useState([]);
   const [registeredClass, setRegisteredClass] = useState([]);
 
-  const [semester, setSemester] = useState(SEMESTER);
+  const [semester, setSemester] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
@@ -29,7 +37,6 @@ const AllRegisterClassScreen = () => {
   );
 
   const [allSemester, setAllSemester] = useState([]);
-
 
   useEffect(() => {
     request("get", semesterUrl.getCurrentSemester, (res) => {
@@ -57,16 +64,22 @@ const AllRegisterClassScreen = () => {
   );
 
   useEffect(() => {
-    return debouncedSearch(search);
+    if (semester !== "") {
+      return debouncedSearch(search);
+    }
   }, [search, debouncedSearch]);
 
   useEffect(() => {
-    handleFetchData();
+    if (semester !== "") {
+      handleFetchData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paginationModel, semester]);
 
   useEffect(() => {
-    fetchRegisteredData();
+    if (semester !== "") {
+      fetchRegisteredData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [semester]);
 
@@ -158,60 +171,58 @@ const AllRegisterClassScreen = () => {
 
   return (
     <Paper elevation={3}>
-    <div style={styles.tableToolBar}>
-      <Typography variant="h4" style={styles.title}>
-        Danh sách lớp học
-      </Typography>
-  
-      {/* Container chứa dropdown và search box */}
-      <div style={styles.filterContainer}>
-        <FormControl style={styles.dropdown} size="small">
-          <InputLabel id="semester-label">Học kì</InputLabel>
-          <Select
-            labelId="semester-label"
-            id="semester-select"
-            value={semester}
-            name="day"
-            label="Học kì"
-            onChange={handleChangeSemester}
-            MenuProps={{ PaperProps: { sx: styles.selection } }}
-          >
-            {allSemester.map((semester, index) => (
-              <MenuItem key={index} value={semester}>
-                {semester}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-  
-        <TextField
-          style={styles.searchBox}
-          variant="outlined"
-          name="search"
-          value={search}
-          onChange={handleSearch}
-          placeholder="Tìm kiếm"
-        />
+      <div style={styles.tableToolBar}>
+        <Typography variant="h4" style={styles.title}>
+          Danh sách lớp học
+        </Typography>
+
+        <div style={styles.searchArea}>
+          <FormControl style={styles.dropdown} size="small">
+            <InputLabel id="semester-label">Học kì</InputLabel>
+            <Select
+              labelId="semester-label"
+              id="semester-select"
+              value={semester}
+              name="day"
+              label="Học kì"
+              onChange={handleChangeSemester}
+              MenuProps={{ PaperProps: { sx: styles.selection } }}
+            >
+              {allSemester.map((semester, index) => (
+                <MenuItem key={index} value={semester}>
+                  {semester}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <TextField
+            style={styles.searchBox}
+            variant="outlined"
+            name="search"
+            value={search}
+            onChange={handleSearch}
+            placeholder="Tìm kiếm"
+          />
+        </div>
       </div>
-    </div>
-  
-    <DataGrid
-      loading={isLoading}
-      rowHeight={60}
-      sx={styles.table}
-      rows={dataGridRows}
-      columns={dataGridColumns}
-      rowCount={totalElements}
-      pagination
-      paginationMode="server"
-      paginationModel={paginationModel}
-      onPaginationModelChange={setPaginationModel}
-      pageSizeOptions={[10, 20, 50]}
-      checkboxSelection={false}
-      disableRowSelectionOnClick
-    />
-  </Paper>
-  
+
+      <DataGrid
+        loading={isLoading}
+        rowHeight={60}
+        sx={styles.table}
+        rows={dataGridRows}
+        columns={dataGridColumns}
+        rowCount={totalElements}
+        pagination
+        paginationMode="server"
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
+        pageSizeOptions={[10, 20, 50]}
+        checkboxSelection={false}
+        disableRowSelectionOnClick
+      />
+    </Paper>
   );
 };
 

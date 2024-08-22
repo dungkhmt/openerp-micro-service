@@ -35,6 +35,11 @@ const styles = {
     maxHeight: 148,
     overflowY: "scroll",
   },
+  searchArea: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "flex-end",
+  },
 };
 
 export default styles;
