@@ -3,7 +3,7 @@ import ThesisDefensePlans from "views/thesisdefensejuryassignment/manager/Thesis
 import DefensePlanManager from "views/thesisdefensejuryassignment/manager/DefensePlanManager";
 import DefenseJuryDetail from "components/thesisdefensejury/DefenseJuryDetail";
 import AssignTeacherAndThesisToDefenseJury from "views/thesisdefensejuryassignment/manager/AssignTeacherAndThesisToDefenseJury";
-import AssignTeacherAndThesisAutomatically from "views/thesisdefensejuryassignment/manager/AssignTeacherAndThesisAutomatically";
+// import AssignTeacherAndThesisAutomatically from "views/thesisdefensejuryassignment/manager/AssignTeacherAndThesisAutomatically";
 import AssignedThesisDefensePlan from "views/thesisdefensejuryassignment/assigned/AssignedThesisDefensePlan";
 import AssignedDefenseJury from "views/thesisdefensejuryassignment/assigned/AssignedDefenseJury";
 import PresidentAssignedThesisDefensePlan from "views/thesisdefensejuryassignment/assigned/PresidentAssignedThesisDefensePlan";
@@ -58,11 +58,11 @@ const ThesisDefensePlanAssignmentRouter = () => {
                     component={EditTeacherAndThesisToDefenseJury}
                     exact
                 />
-                <Route
+                {/*<Route
                     path={`${path}/thesis_defense_plan/:id/assign-automatically`}
                     component={AssignTeacherAndThesisAutomatically}
                     exact
-                />
+                />*/}
                 <Route
                     path={`${path}/topic`}
                     component={JuryTopicList}

@@ -1,6 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { request } from "api";
-import { Button, TextField, Paper, Typography } from "@mui/material";
+import {
+  Button,
+  TextField,
+  Paper,
+  Typography,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+} from "@mui/material";
 import { useHistory } from "react-router-dom";
 import { DataGrid } from "@mui/x-data-grid";
 import styles from "./index.style";
@@ -27,9 +36,14 @@ const AllRegisterClassScreen = () => {
     DEFAULT_PAGINATION_MODEL
   );
 
+  const [allSemester, setAllSemester] = useState([]);
+
   useEffect(() => {
     request("get", semesterUrl.getCurrentSemester, (res) => {
       setSemester(res.data);
+    });
+    request("get", semesterUrl.getAllSemester, (res) => {
+      setAllSemester(res.data);
     });
   }, []);
 
@@ -40,9 +54,7 @@ const AllRegisterClassScreen = () => {
           ...DEFAULT_PAGINATION_MODEL,
           page: 0,
         });
-        if (semester !== "") {
-          handleFetchData();
-        }
+        handleFetchData();
       }, 1000);
 
       return () => clearTimeout(timer);
@@ -52,7 +64,10 @@ const AllRegisterClassScreen = () => {
   );
 
   useEffect(() => {
-    return debouncedSearch(search);
+    if (semester !== "") {
+      return debouncedSearch(search);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, debouncedSearch]);
 
   useEffect(() => {
@@ -98,6 +113,9 @@ const AllRegisterClassScreen = () => {
     history.push("/ta-recruitment/student/class-register/", {
       classId: klass.id,
     });
+  };
+  const handleChangeSemester = (event) => {
+    setSemester(event.target.value);
   };
 
   const actionCell = (params) => {
@@ -159,14 +177,35 @@ const AllRegisterClassScreen = () => {
           Danh sách lớp học
         </Typography>
 
-        <TextField
-          style={styles.searchBox}
-          variant="outlined"
-          name="search"
-          value={search}
-          onChange={handleSearch}
-          placeholder="Tìm kiếm"
-        />
+        <div style={styles.searchArea}>
+          <FormControl style={styles.dropdown} fullWidth size="small">
+            <InputLabel id="semester-label">Học kì</InputLabel>
+            <Select
+              labelId="semester-label"
+              id="semester-select"
+              value={semester}
+              name="day"
+              label="Học kì"
+              onChange={handleChangeSemester}
+              MenuProps={{ PaperProps: { sx: styles.selection } }}
+            >
+              {allSemester.map((semester, index) => (
+                <MenuItem key={index} value={semester}>
+                  {semester}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <TextField
+            style={styles.searchBox}
+            variant="outlined"
+            name="search"
+            value={search}
+            onChange={handleSearch}
+            placeholder="Tìm kiếm"
+          />
+        </div>
       </div>
 
       <DataGrid
