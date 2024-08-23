@@ -15,4 +15,6 @@ public class RequestTrainingProgCourse {
     private Long credit;
 
     List<String> prerequisites ;
+
+    private String status;
 }

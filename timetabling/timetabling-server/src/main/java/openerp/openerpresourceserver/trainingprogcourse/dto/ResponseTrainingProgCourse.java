@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.trainingprogcourse.dto;
 
-import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class TrainingProgCourseDTO {
+public class ResponseTrainingProgCourse {
     private String id;
 
     private String courseName;

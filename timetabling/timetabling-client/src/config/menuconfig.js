@@ -47,6 +47,7 @@ import {
 } from "./menuconfig/Thesis_defense_plan_managenment";
 import { Schedule } from "@mui/icons-material/";
 import { AssetManagementAsset } from "./menuconfig/assetManagement";
+import {TrainingFrogCourse} from "./menuconfig/trainingprogcourse";
 
 export const MENUS = [];
 
@@ -64,6 +65,8 @@ MENUS.push(taRecruitment);
 MENUS.push(ThesisDefensePlanManagement);
 MENUS.push(ThesisDefensePlanStudent);
 MENUS.push(AssetManagementAsset);
+MENUS.push(TrainingFrogCourse);
+
 
 export const menuIconMap = new Map();
 
