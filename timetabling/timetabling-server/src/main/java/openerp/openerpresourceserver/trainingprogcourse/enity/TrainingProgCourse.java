@@ -32,7 +32,7 @@ public class TrainingProgCourse {
     @Column(name = "last_updated")
     private Date lastUpdated;
 
-    @OneToMany(mappedBy = "course")
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<TrainingProgPrerequisite> prerequisites;
 
 
