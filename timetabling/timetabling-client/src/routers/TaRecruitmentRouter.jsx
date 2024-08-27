@@ -14,6 +14,8 @@ import ApplicationDetailPage from "views/tarecruitment/ApplicationResultScreen/D
 
 export default function StudentRouter() {
   let { path } = useRouteMatch();
+  console.log("Current path:", path);
+
   return (
     <div>
       <Switch>
