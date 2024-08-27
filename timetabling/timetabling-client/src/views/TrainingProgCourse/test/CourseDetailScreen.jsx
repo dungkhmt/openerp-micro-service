@@ -43,14 +43,14 @@ const CourseInfoPage = () => {
   return (
     <div style={{ padding: '20px' }}>
       <Typography variant="h4" gutterBottom>
-        Thông tin Khóa học
+        Thông tin học phần
       </Typography>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>ID</TableCell>
-              <TableCell>Tên khóa học</TableCell>
+              <TableCell>Tên học phần</TableCell>
               <TableCell>Tín chỉ</TableCell>
               <TableCell>Trạng thái</TableCell>
               <TableCell>Ngày tạo</TableCell>
