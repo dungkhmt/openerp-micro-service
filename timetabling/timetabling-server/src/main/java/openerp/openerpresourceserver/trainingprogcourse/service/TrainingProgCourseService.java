@@ -14,4 +14,6 @@ public interface TrainingProgCourseService {
     List<ResponseTrainingProgCourse> getAll();
 
     ResponseTrainingProgCourse getDetail(String id);
+
+    void delete(String id);
 }

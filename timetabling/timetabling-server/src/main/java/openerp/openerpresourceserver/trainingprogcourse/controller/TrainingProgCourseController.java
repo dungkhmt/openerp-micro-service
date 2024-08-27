@@ -34,7 +34,7 @@ public class TrainingProgCourseController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<String> updateCourse(@PathVariable String id, @RequestBody RequestTrainingProgCourse request) {
         try {
             trainingProgCourseService.update(id, request);
@@ -57,6 +57,18 @@ public class TrainingProgCourseController {
             return new ResponseEntity<>(courseDetail, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteCourse(@PathVariable String id) {
+        try {
+            trainingProgCourseService.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

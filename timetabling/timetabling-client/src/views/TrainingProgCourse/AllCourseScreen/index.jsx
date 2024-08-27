@@ -125,11 +125,11 @@ const AllCourseScreen = () => {
       <DataGrid
         rows={filteredCourses}
         columns={dataGridColumns}
-        pageSize={10}
         checkboxSelection
         disableRowSelectionOnClick
         loading={isLoading}
-        style={styles.table} // Áp dụng style cho DataGrid
+        pagination={false}
+        style={styles.table} 
       />
     </Paper>
   );
