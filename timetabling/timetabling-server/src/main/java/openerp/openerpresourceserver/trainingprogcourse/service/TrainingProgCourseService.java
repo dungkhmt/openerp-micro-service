@@ -15,5 +15,5 @@ public interface TrainingProgCourseService {
 
     ResponseTrainingProgCourse getDetail(String id);
 
-    void delete(String id);
+   /// void delete(String id);
 }
