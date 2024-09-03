@@ -39,6 +39,9 @@ public class ClassCall {
     @Column(name = "end_period")
     private int endPeriod;
 
+    @Column(name = "number_slots")
+    private int numberSlots; // so tiet
+
     @Column(name = "note")
     private String note;
 }
