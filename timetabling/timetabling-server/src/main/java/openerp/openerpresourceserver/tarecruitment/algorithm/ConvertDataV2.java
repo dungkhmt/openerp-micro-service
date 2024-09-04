@@ -24,6 +24,8 @@ public class ConvertDataV2 {
 
     int [][] conflict;
 
+    int[] durations; // number of session slots
+
     int userSize;
     int classSize;
 
@@ -36,6 +38,8 @@ public class ConvertDataV2 {
 
         userSize = userIdList.size();
         classSize = classCallList.size();
+        durations = new int[classSize];
+
 
         // user pair
         userIndex = new String[userSize];
@@ -47,6 +51,7 @@ public class ConvertDataV2 {
         classIdIndex = new int[classSize];
         for(int i = 0; i < classSize; i++) {
             classIdIndex[i] = classCallList.get(i).getId();
+            durations[i] = classCallList.get(i).getNumberSlots();
         }
 
         // set up request array
@@ -101,22 +106,29 @@ public class ConvertDataV2 {
                     int class2StartPeriod = classCallList.get(i).getStartPeriod();
                     int class2EndPeriod = classCallList.get(j).getEndPeriod();
 
-                    if (class1StartPeriod < class2EndPeriod && class1EndPeriod > class2StartPeriod) {
-                        conflict[i][j] = 1;
-                        conflict[j][i] = 1;
+                    //if (class1StartPeriod < class2EndPeriod && class1EndPeriod > class2StartPeriod) {
+                    //    conflict[i][j] = 1;
+                    //    conflict[j][i] = 1;
+                    //}
+                    boolean disjoint = class1EndPeriod < class2StartPeriod
+                            || class2EndPeriod < class1StartPeriod;
+                    if(!disjoint){
+                        conflict[i][j] = 1; conflict[j][i] = 1;
                     }
                 }
             }
         }
 
-        orToolsTaRecruitment = new OrToolsTaRecruitment(classSize, userSize, request, conflict);
+        orToolsTaRecruitment = new OrToolsTaRecruitment(classSize, userSize, request, conflict, durations);
 
     }
 
     public List<Application> solvingProblem() {
 
         int[][] resultIndex;
-        resultIndex = orToolsTaRecruitment.solving();
+        //resultIndex = orToolsTaRecruitment.solving();
+        resultIndex = orToolsTaRecruitment.newSolve();
+
 
         log.info("REQUEST ARRAY");
         for(int i = 0; i < userSize; i++) {
