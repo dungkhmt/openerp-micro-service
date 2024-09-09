@@ -17,3 +17,13 @@ export const courseUrl = {
     deleteCourse : "/training_prog_course/delete",
     updateCourse : "/training_prog_course/update",
   };
+
+  export const programUrl = {
+    getAllPrograms: "/training_prog_program/getall",
+    createProgram: "/training_prog_program/create",
+    getProgramDetail: "/training_prog_program/detail",
+    deleteProgram : "/training_prog_program/delete",
+    updateProgram : "/training_prog_program/update",
+    origin: "/training_prog_program",
+
+  };

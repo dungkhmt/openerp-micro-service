@@ -4,6 +4,9 @@ import AllCourseScreen from "views/TrainingProgCourse/AllCourseScreen";
 import AddCourseScreen from "views/TrainingProgCourse/AllCourseScreen/AddCourseScreen";
 import CourseDetailPage from "views/TrainingProgCourse/AllCourseScreen/CourseDetail";
 import UpdateCoursePage from "views/TrainingProgCourse/AllCourseScreen/UpdateCourse";
+import AllProgramScreen from "views/TrainingProgCourse/AllProgramScreen";
+import AddProgramScreen from "views/TrainingProgCourse/AllProgramScreen/AddProgramScreen";
+import ProgramDetailPage from "views/TrainingProgCourse/AllProgramScreen/ProgramScreenDetail";
 export default function StudentRouter() {
   let {path } = useRouteMatch();
   return (
@@ -38,6 +41,29 @@ export default function StudentRouter() {
           exact
         ></Route>
 
+        <Route
+          component={AllProgramScreen}
+          path={`${path}/teacher/program`}
+          exact
+        ></Route>
+
+        <Route
+          component={AddProgramScreen}
+          path={`${path}/teacher/program/create`}
+          exact
+        ></Route>
+
+        <Route
+          component={ProgramDetailPage}
+          path={`${path}/teacher/program/:programId`}
+          exact
+        ></Route>
+        
+        <Route
+          component={UpdateCoursePage}
+          path={`${path}/teacher/program/:programId/edit`}
+          exact
+        ></Route>
       </Switch>
     </div>
   );
