@@ -24,6 +24,8 @@ export const courseUrl = {
     getProgramDetail: "/training_prog_program/detail",
     deleteProgram : "/training_prog_program/delete",
     updateProgram : "/training_prog_program/update",
-    origin: "/training_prog_program",
-
+    addCoursesToProgram: "/training_prog_program/add-courses",
+    getAllCourseId: "/training_prog_program/get-all-courseid",
+    getAvailableCourse: "/training_prog_program/get-available-course",
+    origin: "/training_prog_program/",
   };
