@@ -9,7 +9,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import { useHistory } from "react-router-dom";
 import { request } from "api";
 import { courseUrl } from "../apiURL";
-import { styles } from './index.style'; // Import styles từ index.style
+import { styles } from './index.style';
 
 const AllCourseScreen = () => {
   const history = useHistory();
@@ -22,8 +22,8 @@ const AllCourseScreen = () => {
       setIsLoading(true);
       try {
         const response = await request("get",`${courseUrl.getAllCourse}`);
-        setCourses(response.data); 
-      } catch (error) {
+        setCourses(response.data);
+       } catch (error) {
         console.error("Error fetching courses:", error);
       } finally {
         setIsLoading(false);
@@ -38,7 +38,8 @@ const AllCourseScreen = () => {
   };
 
   const filteredCourses = courses.filter((course) =>
-    course.courseName.toLowerCase().includes(search.toLowerCase())
+    course.courseName.toLowerCase().includes(search.toLowerCase()) ||
+    course.id.toString().toLowerCase().includes(search.toLowerCase())
   );
 
   const handleNavigateCreateCourse = () => {
@@ -102,7 +103,7 @@ const AllCourseScreen = () => {
             onClick={handleNavigateCreateCourse}
             style={styles.actionButton}
           >
-            Thêm khóa học
+            Thêm học phần
           </Button>
           <Button
            color="error"
@@ -116,7 +117,7 @@ const AllCourseScreen = () => {
             variant="outlined"
             value={search}
             onChange={handleSearch}
-            placeholder="Tìm kiếm học phần"
+            placeholder="Tìm kiếm học phần hoặc mã học phần"
             style={styles.searchBox}
           />
         </div>
@@ -128,9 +129,10 @@ const AllCourseScreen = () => {
         checkboxSelection
         disableRowSelectionOnClick
         loading={isLoading}
+        hideFooter
         pagination={false}
-        style={styles.table} 
-      />
+        style={styles.table}
+       />
     </Paper>
   );
 };

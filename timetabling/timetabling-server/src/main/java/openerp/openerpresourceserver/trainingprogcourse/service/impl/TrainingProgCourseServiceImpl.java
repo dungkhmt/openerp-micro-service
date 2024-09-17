@@ -154,24 +154,24 @@ public class TrainingProgCourseServiceImpl implements TrainingProgCourseService 
         return response;
     }
 
-    @Override
-    @Transactional
-    public void delete(String id) {
-        Optional<TrainingProgCourse> course = trainingProgCourseRepo.findById(id);
-
-        if (!course.isPresent()) {
-            throw new IllegalArgumentException("Course with ID " + id + " does not exist.");
-        }
-
-        course.get().setStatus("inactive");// hoac enum
-        trainingProgCourseRepo.save(course.get());
-
-        // Xoa hoc phan tien quyet
-        //course.get().getPrerequisites().clear();
-
-        // Xoa hoc phan
-        //trainingProgCourseRepo.delete(course);
-    }
+//    @Override
+//    @Transactional
+//    public void delete(String id) {
+//        Optional<TrainingProgCourse> course = trainingProgCourseRepo.findById(id);
+//
+//        if (!course.isPresent()) {
+//            throw new IllegalArgumentException("Course with ID " + id + " does not exist.");
+//        }
+//
+//        course.get().setStatus("inactive");// hoac enum
+//        trainingProgCourseRepo.save(course.get());
+//
+//        // Xoa hoc phan tien quyet
+//        //course.get().getPrerequisites().clear();
+//
+//        // Xoa hoc phan
+//        //trainingProgCourseRepo.delete(course);
+//    }
 
 
     @Override

@@ -4,55 +4,61 @@ import { Button, Typography, Paper, TextField, Autocomplete, Checkbox } from "@m
 import { CheckBoxOutlineBlank, CheckBox as CheckedIcon } from "@mui/icons-material";
 import { updateStyles } from "./index.style";
 import { request } from "api";
-import { courseUrl } from "../apiURL";
+import { programUrl, courseUrl } from "../apiURL";
 import { successNoti, warningNoti, errorNoti } from "utils/notification";
 
-const AddCourseScreen = () => {
+const AddProgramScreen = () => {
   const history = useHistory();
   const [id, setId] = useState("");
-  const [courseName, setCourseName] = useState("");
-  const [credit, setCredit] = useState("");
-  const [prerequisite, setPrerequisites] = useState([]); // Updated state for selected prerequisites
-  const [availableCourses, setAvailableCourses] = useState([]); // State for available courses
+  const [name, setName] = useState("");
+  const [courses, setCourses] = useState([]);
+  const [selectedCourses, setSelectedCourses] = useState([]);
 
   useEffect(() => {
-    request("get", `${courseUrl.getAllCourse}`, (res) => {
-      setAvailableCourses(res.data); // Assumes res.data contains the list of available courses
-    });
+    const fetchCourses = async () => {
+      try {
+        const response = await request("get", `${courseUrl.getAllCourse}`);
+        setCourses(response.data);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      }
+    };
+
+    fetchCourses();
   }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!id || !courseName || !credit) {
+    if (!id || !name) {
       warningNoti("Vui lòng điền đầy đủ thông tin", 5000);
       return;
     }
 
-    const prerequisitesArray = prerequisite.map((course) => course.id);
+    const courseIds = selectedCourses.map((course) => course.id);
 
-    const newCourse = {
-      id,
-      courseName,
-      credit: Number(credit),
-      status: "active",
-      prerequisites: prerequisitesArray, 
+    const newProgram = {
+        id,
+        name,
+        createStamp: new Date(), 
+        lastUpdated: new Date(), 
+        courses: courseIds,
     };
 
     try {
       await request(
         "post",
-        `${courseUrl.createCourse}`,
+        `${programUrl.createProgram}`,
         (res) => {
-          successNoti("Khóa học đã được thêm thành công!", 5000);
+          successNoti("Chương trình đã được thêm thành công!", 5000);
           history.push("/training_course/teacher/course");
         },
         (error) => {
           console.log(error);
-          const errorMessage = error?.response?.data?.message || "Có lỗi xảy ra khi thêm khóa học";
+          const errorMessage = error?.response?.data?.message || "Có lỗi xảy ra khi thêm chương trình";
           errorNoti(errorMessage, 5000);
         },
-        newCourse
+        newProgram
       );
     } catch (error) {
       console.log(error);
@@ -66,57 +72,44 @@ const AddCourseScreen = () => {
   return (
     <Paper elevation={3} sx={{ padding: 3 }}>
       <Typography variant="h5" fontWeight="bold" style={updateStyles.title}>
-        Thêm Mới Học Phần
+        Thêm Mới Chương Trình
       </Typography>
 
       <form onSubmit={handleSubmit}>
         <div style={updateStyles.textFieldContainer}>
-          <Typography variant="h6">Mã học phần</Typography>
+          <Typography variant="h6">Mã chương trình</Typography>
           <TextField
             value={id}
             onChange={(e) => setId(e.target.value)}
             variant="outlined"
             style={updateStyles.textField}
-            placeholder="Nhập mã môn học"
+            placeholder="Nhập mã chương trình"
             required
           />
         </div>
 
         <div style={updateStyles.textFieldContainer}>
-          <Typography variant="h6">Tên học phần</Typography>
+          <Typography variant="h6">Tên chương trình</Typography>
           <TextField
-            value={courseName}
-            onChange={(e) => setCourseName(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             variant="outlined"
             style={updateStyles.textField}
-            placeholder="Nhập tên học phần"
+            placeholder="Nhập tên chương trình"
             required
           />
         </div>
 
         <div style={updateStyles.textFieldContainer}>
-          <Typography variant="h6">Số tín chỉ</Typography>
-          <TextField
-            type="number"
-            value={credit}
-            onChange={(e) => setCredit(e.target.value)}
-            variant="outlined"
-            style={updateStyles.textField}
-            placeholder="Nhập số tín chỉ"
-            required
-          />
-        </div>
-
-        <div style={updateStyles.textFieldContainer}>
-          <Typography variant="h6">Học phần tiên quyết</Typography>
+          <Typography variant="h6">Học phần trong chương trình</Typography>
           <Autocomplete
             multiple
-            options={availableCourses}
+            options={courses}
             disableCloseOnSelect
             getOptionLabel={(option) => `${option.id} : ${option.courseName}`}
-            value={prerequisite}
+            value={selectedCourses}
             onChange={(event, newValue) => {
-              setPrerequisites(newValue);
+              setSelectedCourses(newValue);
             }}
             renderOption={(props, option, { selected }) => (
               <li {...props}>
@@ -133,7 +126,7 @@ const AddCourseScreen = () => {
               <TextField
                 {...params}
                 variant="outlined"
-                placeholder="Chọn học phần tiên quyết"
+                placeholder="Chọn học phần trong chương trình"
                 style={updateStyles.textField}
               />
             )}
@@ -161,4 +154,4 @@ const AddCourseScreen = () => {
   );
 };
 
-export default AddCourseScreen;
+export default AddProgramScreen;

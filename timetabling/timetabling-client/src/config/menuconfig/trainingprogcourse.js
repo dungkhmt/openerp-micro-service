@@ -19,5 +19,12 @@ export const TrainingFrogCourse = {
       text: "Danh mục học phần",
       child: [],
     },
+    {
+      id: "MENU_TRAINING_PROGRAM",
+      path: `${prefix}/teacher/program`,
+      isPublic: true,
+      text: "Danh mục quản lý chương trình",
+      child: [],
+    },
   ],
 };

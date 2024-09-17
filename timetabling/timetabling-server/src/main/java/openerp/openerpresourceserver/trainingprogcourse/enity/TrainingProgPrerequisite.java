@@ -31,5 +31,4 @@ public class TrainingProgPrerequisite {
     private Date lastUpdated;
 
 
-
 }

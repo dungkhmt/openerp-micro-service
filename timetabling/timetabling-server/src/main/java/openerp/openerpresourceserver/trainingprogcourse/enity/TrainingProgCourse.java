@@ -35,5 +35,4 @@ public class TrainingProgCourse {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<TrainingProgPrerequisite> prerequisites;
 
-
 }
