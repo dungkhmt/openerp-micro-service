@@ -29,6 +29,9 @@ export const styles = {
     marginLeft: "1em",
     marginTop: "0.7em",
   },
+  leftActionButton: {
+    marginRight: "1em",
+  },
   rightActionButton: {
     marginLeft: "1em",
   },

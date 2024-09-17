@@ -11,6 +11,13 @@ export const scheduleInformation = {
       child: [],
     },
     {
+      id: "MENU_SCHEDULE_INFORMATION.COURSE",
+      path: "/schedule-information/course",
+      isPublic: true,
+      text: "Môn học",
+      child: [],
+    },
+    {
       id: "MENU_SCHEDULE_INFORMATION.CLASSROOM",
       path: "/schedule-information/classroom",
       isPublic: true,

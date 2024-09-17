@@ -14,7 +14,6 @@ import java.util.List;
 
 @Configuration
 public class CorsConfig {
-
     @Bean
     @SuppressWarnings("unchecked")
     public FilterRegistrationBean<CorsFilter> corsFilterRegistrationBean(

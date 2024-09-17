@@ -10,15 +10,16 @@ import {
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import styles from "./index.style";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useHistory, useLocation } from "react-router-dom";
 import { request } from "api";
 import { successNoti, warningNoti } from "utils/notification";
 import { classCallUrl } from "../apiURL";
 
 const ClassInformationScreen = () => {
+  const location = useLocation();
   const history = useHistory();
   const { id } = useParams();
-  const [isEdited, setIsEdited] = useState(false);
+  const [isEdited, setIsEdited] = useState(location.state?.isEdited || false);
   const [formData, setFormData] = useState({
     id: "",
     day: "",

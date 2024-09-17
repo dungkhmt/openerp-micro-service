@@ -142,6 +142,12 @@ const AllClassScreen = () => {
     setOpenApplicatorDialog(true);
   };
 
+  const handleOpenEditClassScreen = (classData) => {
+    history.push(`/ta-recruitment/teacher/class-information/${classData.id}`, {
+      isEdited: true,
+    });
+  }
+
   const handleSearch = useMemo(
     () => (e) => {
       setSearch(e.target.value);
@@ -162,6 +168,13 @@ const AllClassScreen = () => {
 
     return (
       <div>
+        <Button
+          variant="outlined"
+          onClick={() => handleOpenEditClassScreen(rowData)}
+          style={styles.leftActionButton}
+        >
+          Sửa
+        </Button>
         <Button
           variant="outlined"
           onClick={() => handleOpenApplicatorDialog(rowData)}

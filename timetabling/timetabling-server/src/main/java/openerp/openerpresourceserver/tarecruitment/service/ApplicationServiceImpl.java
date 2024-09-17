@@ -338,6 +338,7 @@ public class ApplicationServiceImpl implements ApplicationService{
         ConvertDataV2 convertDataV2 = new ConvertDataV2(applications, userApplies, classCalls);
         List<Application> assignApplication = convertDataV2.solvingProblem();
 
+
         for(Application application : assignApplication) {
             log.info("User " + application.getUser().getId() + " got assign to class id: " + application.getClassCall().getId());
         }
