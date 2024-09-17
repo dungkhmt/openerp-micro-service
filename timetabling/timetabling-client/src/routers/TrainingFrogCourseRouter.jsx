@@ -7,6 +7,7 @@ import UpdateCoursePage from "views/TrainingProgCourse/AllCourseScreen/UpdateCou
 import AllProgramScreen from "views/TrainingProgCourse/AllProgramScreen";
 import AddProgramScreen from "views/TrainingProgCourse/AllProgramScreen/AddProgramScreen";
 import ProgramDetailPage from "views/TrainingProgCourse/AllProgramScreen/ProgramScreenDetail";
+import UpdateProgramPage from "views/TrainingProgCourse/AllProgramScreen/UpdateProgramScreenDetail";
 export default function StudentRouter() {
   let {path } = useRouteMatch();
   return (
@@ -58,10 +59,9 @@ export default function StudentRouter() {
           path={`${path}/teacher/program/:programId`}
           exact
         ></Route>
-        
-        <Route
-          component={UpdateCoursePage}
-          path={`${path}/teacher/program/:programId/edit`}
+         <Route
+          component={UpdateProgramPage}
+          path={`${path}/teacher/program/edit/:programId`}
           exact
         ></Route>
       </Switch>

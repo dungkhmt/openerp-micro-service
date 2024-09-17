@@ -16,7 +16,7 @@ public class TrainingProgCourseDetail {
 
     private UUID idSchedule;
 
-    private String id;
+    private String Id;
 
     private String courseName;
 

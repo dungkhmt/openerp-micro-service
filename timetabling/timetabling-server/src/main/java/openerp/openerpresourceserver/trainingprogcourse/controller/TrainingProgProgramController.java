@@ -4,7 +4,9 @@ package openerp.openerpresourceserver.trainingprogcourse.controller;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.trainingprogcourse.config.CustomException;
 import openerp.openerpresourceserver.trainingprogcourse.dto.PaginationDTO;
+import openerp.openerpresourceserver.trainingprogcourse.dto.ResponseTrainingProgCourse;
 import openerp.openerpresourceserver.trainingprogcourse.dto.ResponseTrainingProgProgramDTO;
 import openerp.openerpresourceserver.trainingprogcourse.dto.TrainingProgProgramInfo;
 import openerp.openerpresourceserver.trainingprogcourse.dto.request.RequestTrainingProgProgramDTO;
@@ -56,7 +58,13 @@ public class TrainingProgProgramController {
         return ResponseEntity.ok(programDTO);
     }
 
-    @PostMapping("/{programId}/add-courses")
+    @GetMapping("/get-available-course/{id}")
+    public ResponseEntity<List<ResponseTrainingProgCourse>> getAvailableCourse(@PathVariable String id) {
+        List<ResponseTrainingProgCourse> courses = trainingProgProgramService.getAvailableCourse(id);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+    }
+
+    @PostMapping("/add-courses/{programId}")
     public ResponseEntity<String> addCoursesToProgram(
             @PathVariable String programId,
             @RequestBody List<String> courseIds) {
@@ -64,19 +72,19 @@ public class TrainingProgProgramController {
         return ResponseEntity.ok("Courses added to program successfully!");
     }
 
-    @PutMapping("/{programId}/update-semesters")
+    @PutMapping("/update")
     public ResponseEntity<String> updateSemesters(
-            @PathVariable("programId") String programId,
             @RequestBody @Valid List<TrainingProgScheduleUpdateRequest> scheduleUpdates) {
 
-
         try {
-            trainingProgProgramService.update(programId, scheduleUpdates);
-            return ResponseEntity.ok("Update successful");
+            trainingProgProgramService.update(scheduleUpdates);
+            return ResponseEntity.ok("Cập nhật học kỳ thành công");
+        } catch (CustomException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("An error occurred");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi");
         }
     }
 

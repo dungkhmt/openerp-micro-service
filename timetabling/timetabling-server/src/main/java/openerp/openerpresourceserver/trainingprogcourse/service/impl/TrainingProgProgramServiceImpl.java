@@ -2,11 +2,10 @@ package openerp.openerpresourceserver.trainingprogcourse.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.User;
+import openerp.openerpresourceserver.generaltimetabling.repo.ScheduleRepo;
 import openerp.openerpresourceserver.generaltimetabling.repo.UserRepo;
-import openerp.openerpresourceserver.trainingprogcourse.dto.PaginationDTO;
-import openerp.openerpresourceserver.trainingprogcourse.dto.ResponseTrainingProgProgramDTO;
-import openerp.openerpresourceserver.trainingprogcourse.dto.TrainingProgCourseDetail;
-import openerp.openerpresourceserver.trainingprogcourse.dto.TrainingProgProgramInfo;
+import openerp.openerpresourceserver.trainingprogcourse.config.CustomException;
+import openerp.openerpresourceserver.trainingprogcourse.dto.*;
 import openerp.openerpresourceserver.trainingprogcourse.dto.request.RequestTrainingProgProgramDTO;
 import openerp.openerpresourceserver.trainingprogcourse.dto.request.TrainingProgScheduleUpdateRequest;
 import openerp.openerpresourceserver.trainingprogcourse.enity.TrainingProgCourse;
@@ -37,13 +36,15 @@ public class TrainingProgProgramServiceImpl implements TrainingProgProgramServic
     private final TrainingProgSemesterRepo trainingProgSemesterRepo;
     private final TrainingProgCourseRepo trainingProgCourseRepo;
     private final UserRepo userRepo;
+    private final TrainingProgCourseServiceImpl trainingProgCourseServiceImpl;
 
-    public TrainingProgProgramServiceImpl(TrainingProgProgramRepo trainingProgProgramRepo, TrainingProgScheduleRepo trainingProgScheduleRepo, TrainingProgSemesterRepo trainingProgSemesterRepo, TrainingProgCourseRepo trainingProgCourseRepo, UserRepo userRepo) {
+    public TrainingProgProgramServiceImpl(TrainingProgProgramRepo trainingProgProgramRepo, TrainingProgScheduleRepo trainingProgScheduleRepo, TrainingProgSemesterRepo trainingProgSemesterRepo, TrainingProgCourseRepo trainingProgCourseRepo, UserRepo userRepo, ScheduleRepo scheduleRepo, TrainingProgCourseServiceImpl trainingProgCourseServiceImpl) {
         this.trainingProgProgramRepo = trainingProgProgramRepo;
         this.trainingProgScheduleRepo = trainingProgScheduleRepo;
         this.trainingProgSemesterRepo = trainingProgSemesterRepo;
         this.trainingProgCourseRepo = trainingProgCourseRepo;
         this.userRepo = userRepo;
+        this.trainingProgCourseServiceImpl = trainingProgCourseServiceImpl;
     }
 
     @Transactional
@@ -83,36 +84,30 @@ public class TrainingProgProgramServiceImpl implements TrainingProgProgramServic
         program.setSchedules(schedules);
 
         // Lưu TrainingProgProgram vào database
-        trainingProgProgramRepo.save(program); // Điều này sẽ tự động lưu các TrainingProgSchedule do cascade
+        trainingProgProgramRepo.save(program);
     }
-
 
 
     @Override
     @Transactional
-    public void update(String programId, List<TrainingProgScheduleUpdateRequest> scheduleUpdates) {
-        Optional<TrainingProgProgram> optionalProgram = trainingProgProgramRepo.findById(programId);
-        if (optionalProgram.isEmpty()) {
-            throw new EntityNotFoundException("Program not found with id: " + programId);
-        }
+    public void update(List<TrainingProgScheduleUpdateRequest> scheduleUpdates) throws CustomException {
+        for (TrainingProgScheduleUpdateRequest scheduleUpdate : scheduleUpdates) {
+            Optional<TrainingProgSchedule> trainingProgScheduleOptional = trainingProgScheduleRepo.findByProgramIdAndCourseId(scheduleUpdate.getProgramId(), scheduleUpdate.getCourseId());
 
-        TrainingProgProgram program = optionalProgram.get();
-
-        for (TrainingProgScheduleUpdateRequest updateRequest : scheduleUpdates) {
-            Optional<TrainingProgSchedule> optionalSchedule = trainingProgScheduleRepo.findById(updateRequest.getId());
-            if (optionalSchedule.isEmpty()) {
-                throw new EntityNotFoundException("Schedule not found with id: " + updateRequest.getId());
+            if (trainingProgScheduleOptional.isEmpty()) {
+                throw new CustomException("Không tìm thấy lịch học cho chương trình và môn học với ID: " + scheduleUpdate.getCourseId());
             }
 
-            TrainingProgSchedule schedule = optionalSchedule.get();
+            TrainingProgSchedule trainingProgSchedule = trainingProgScheduleOptional.get();
+            Optional<TrainingProgSemester> trainingProgSemester = trainingProgSemesterRepo.findById(scheduleUpdate.getSemesterId());
 
-            Optional<TrainingProgSemester> optionalSemester = trainingProgSemesterRepo.findById(updateRequest.getSemesterId());
-            if (optionalSemester.isEmpty()) {
-                throw new EntityNotFoundException("Semester not found with id: " + updateRequest.getSemesterId());
+            if (trainingProgSemester.isPresent()) {
+                trainingProgSchedule.setSemester(trainingProgSemester.get());
+            } else {
+                throw new CustomException("Không tìm thấy  cho chương trình và môn học với ID: " + scheduleUpdate.getCourseId());
             }
 
-            schedule.setSemester(optionalSemester.get());
-            trainingProgScheduleRepo.save(schedule);
+            trainingProgScheduleRepo.save(trainingProgSchedule);
         }
     }
 
@@ -170,7 +165,8 @@ public class TrainingProgProgramServiceImpl implements TrainingProgProgramServic
                     dto.setId(course.getId());
                     dto.setCourseName(course.getCourseName());
                     dto.setCredit(course.getCredit());
-                    dto.setSemester(schedule.getSemester().getId());
+                    if(schedule.getSemester() != null){
+                    dto.setSemester(schedule.getSemester().getId());}
                     List<String> prerequisiteId = course.getPrerequisites().stream()
                             .map(prerequisite -> prerequisite.getPrerequisiteCourse().getId())
                             .collect(Collectors.toList());
@@ -197,11 +193,20 @@ public class TrainingProgProgramServiceImpl implements TrainingProgProgramServic
         TrainingProgProgram program = optionalProgram.get();
         Optional<User> existUser = userRepo.findById("dungpq");
 
+        // Lấy danh sách các môn học đã có trong chương trình
+        List<String> existingCourseIds = program.getSchedules().stream()
+                .map(schedule -> schedule.getCourse().getId())
+                .collect(Collectors.toList());
 
         List<TrainingProgSchedule> newSchedules = new ArrayList<>();
 
         for (String courseId : courseIds) {
-            // Tìm môn học dựa
+            // Kiểm tra xem môn học đã có trong chương trình chưa
+            if (existingCourseIds.contains(courseId)) {
+                continue;
+            }
+
+            // Tìm môn học dựa trên courseId
             Optional<TrainingProgCourse> optionalCourse = trainingProgCourseRepo.findById(courseId);
             if (optionalCourse.isEmpty()) {
                 throw new EntityNotFoundException("Course not found with id: " + courseId);
@@ -220,12 +225,57 @@ public class TrainingProgProgramServiceImpl implements TrainingProgProgramServic
             newSchedules.add(schedule);
         }
 
-        trainingProgScheduleRepo.saveAll(newSchedules);
+        // Lưu các schedule mới vào database nếu có
+        if (!newSchedules.isEmpty()) {
+            trainingProgScheduleRepo.saveAll(newSchedules);
+            program.getSchedules().addAll(newSchedules);
+            trainingProgProgramRepo.save(program);
+        }
+    }
 
-        program.getSchedules().addAll(newSchedules);
 
-        trainingProgProgramRepo.save(program);
+    @Override
+    public List<String> getListCourseProgram(String programId) {
+        List<String> courseIds = new ArrayList<>();
 
+        // kiem tra chuong trinh co ton tai
+        Optional<TrainingProgProgram> trainingProgProgramOptional = trainingProgProgramRepo.findById(programId);
+        if (trainingProgProgramOptional.isPresent()) {
+
+            TrainingProgProgram trainingProgProgram = trainingProgProgramOptional.get();
+            courseIds = trainingProgProgram.getSchedules().stream().map(schedule -> schedule.getCourse().getId())
+                    .collect(Collectors.toList());
+
+
+        } else {
+            throw new EntityNotFoundException("Course not found with id: " + programId);
+        }
+
+        return courseIds;
+
+    }
+
+    @Override
+    public List<ResponseTrainingProgCourse> getAvailableCourse(String programId) {
+        List<ResponseTrainingProgCourse> allCourses = trainingProgCourseServiceImpl.getAll();
+
+        Optional<TrainingProgProgram> optionalProgram = trainingProgProgramRepo.findById(programId);
+        if (optionalProgram.isEmpty()) {
+            throw new EntityNotFoundException("Program not found with id: " + programId);
+        }
+
+        TrainingProgProgram program = optionalProgram.get();
+
+        List<String> programCourseIds = program.getSchedules().stream()
+                .map(schedule -> schedule.getCourse().getId())
+                .toList();
+
+        // 3. Lọc ra các môn học không có trong chương trình
+        List<ResponseTrainingProgCourse> availableCourses = allCourses.stream()
+                .filter(course -> !programCourseIds.contains(course.getId())) // Lọc những môn học chưa có trong chương trình
+                .collect(Collectors.toList());
+
+        return availableCourses;
     }
 
 

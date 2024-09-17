@@ -40,8 +40,8 @@ const AddProgramScreen = () => {
     const newProgram = {
         id,
         name,
-        createStamp: new Date(), // Nếu cần thiết
-        lastUpdated: new Date(), // Nếu cần thiết
+        createStamp: new Date(), 
+        lastUpdated: new Date(), 
         courses: courseIds,
     };
 
