@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Projects</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 16px;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      tr:nth-child(even) {
+        background-color: #f2f2f2;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>All projects page</h2>
+    <table>
+      <tr>
+        <th>Project ID</th>
+        <th>Project Name</th>
+        <th>Project Code</th>
+        <th>Project Description</th>
+        <th>Project Create Time</th>
+      </tr>
+      <tr th:each="project : ${projects}">
+        <td th:text="${project.id}"></td>
+        <td th:text="${project.name}"></td>
+        <td th:text="${project.code}"></td>
+        <td th:text="${project.description}"></td>
+        <td th:text="${project.createdStamp}"></td>
+      </tr>
+    </table>
+  </body>
+</html>

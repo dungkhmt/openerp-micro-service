@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Demo get Projects</title>
+    <meta charset="UTF-8" />
+    <!-- css -->
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
+    <link th:href="@{/css/main.css}" rel="stylesheet" />
+    <link th:href="@{/css/home.css}" rel="stylesheet" />
+
+    <!-- js -->
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 16px;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Enter your client id and client secret</h2>
+    <form th:action="@{/all-projects}" th:object="${credential}" method="post">
+      <label for="client_id">Client ID <span>*</span></label>
+      <input
+        type="text"
+        id="client_id"
+        th:field="*{clientId}"
+        placeholder="client_id"
+        oninput="checkForm()"
+      />
+      <label for="client_secret">Client Secret <span>*</span></label>
+      <input
+        type="text"
+        id="client_secret"
+        th:field="*{clientSecret}"
+        placeholder="client_secret"
+        oninput="checkForm()"
+      />
+      <br />
+
+      <!-- show error -->
+      <div
+        class="error"
+        style="margin-top: 16px"
+        th:if="${error != null}"
+        th:text="${error}"
+      ></div>
+      <input type="submit" value="Submit" id="submit_button" disabled />
+      <input type="button" value="Clear" onclick="clearForm()" />
+    </form>
+    <script>
+      function clearForm() {
+        document.getElementById("client_id").value = "";
+        document.getElementById("client_secret").value = "";
+        checkForm();
+      }
+
+      function checkForm() {
+        const clientId = document.getElementById("client_id").value;
+        const clientSecret = document.getElementById("client_secret").value;
+        const submitButton = document.getElementById("submit_button");
+
+        if (clientId && clientSecret) {
+          submitButton.disabled = false;
+        } else {
+          submitButton.disabled = true;
+        }
+      }
+
+      checkForm();
+    </script>
+  </body>
+</html>
