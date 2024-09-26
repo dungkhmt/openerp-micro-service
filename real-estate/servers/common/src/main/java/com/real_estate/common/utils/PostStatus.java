@@ -1,0 +1,19 @@
+package com.real_estate.common.utils;
+
+public enum PostStatus {
+	CLOSED("CLOSED"),
+	OPENING("OPENING"),
+	DONE("DONE");
+
+	private final String text;
+
+	PostStatus(final String text) {
+		this.text = text;
+	}
+
+	@Override
+	public String toString() {
+		return text;
+	}
+
+}
