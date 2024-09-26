@@ -1,0 +1,35 @@
+name: scm Image CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "scm/wms_backend/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        name: Check out code
+      - name: Create file appication.yml
+        uses: timheuer/base64-to-file@v1.1
+        with:
+          fileName: "application.yml"
+          fileDir: "./scm/wms_backend/src/main/resources/"
+          encodedString: ${{ secrets.SCM_B64_SECRET }}
+      - name: Build & push Docker image
+        uses: mr-smithers-excellent/docker-build-push@v5
+        with:
+          image: leanhtuan/scm
+          directory: "scm/wms_backend/"
+          registry: docker.io
+          dockerfile: "scm/wms_backend/Dockerfile"
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          addLatest: true
+      - name: Remove config file
+        uses: JesseTG/rm@v1.0.2
+        with:
+          path: "./scm/wms_backend/src/main/resources/application.yml"

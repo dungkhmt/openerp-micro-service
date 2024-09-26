@@ -1,0 +1,15 @@
+{
+  "title": "Đăng ký lớp học - Học kỳ ",
+  "columns": {
+    "classCode": "Mã lớp",
+    "courseId": "Mã học phần",
+    "name": "Tên học phần",
+    "classType": "Loại lớp",
+    "departmentId": "Khoa/Viện",
+    "join": "Tham gia"
+  },
+  "registerNoti": {
+    "success": "Đăng ký thành công. Vui lòng chờ giảng viên phê duyệt.",
+    "error": "Đã có lỗi xảy ra trong quá trình tải dữ liệu. Thử lại"
+  }
+}

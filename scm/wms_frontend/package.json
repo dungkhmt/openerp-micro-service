@@ -1,0 +1,83 @@
+{
+  "name": "openerp-oauth2-client",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
+    "@hookform/resolvers": "^3.1.0",
+    "@hookstate/core": "^3.0.8",
+    "@mui/icons-material": "5.11.16",
+    "@mui/lab": "5.0.0-alpha.127",
+    "@mui/material": "5.11.15",
+    "@mui/styles": "5.12.0",
+    "@mui/x-data-grid": "6.5.0",
+    "@mui/x-date-pickers": "6.2.1",
+    "@react-keycloak/web": "^3.4.0",
+    "@tanstack/react-query": "^4.29.3",
+    "@tanstack/react-query-devtools": "^4.29.3",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^0.27.2",
+    "date-fns": "^2.29.3",
+    "dayjs": "^1.11.9",
+    "event-source-polyfill": "^1.0.24",
+    "framer-motion": "^2.9.5",
+    "highcharts": "^11.1.0",
+    "highcharts-react-official": "^3.2.0",
+    "keycloak-js": "^21.0.2",
+    "leaflet": "^1.9.3",
+    "leaflet-routing-machine": "^3.2.12",
+    "moment": "^2.29.3",
+    "overlayscrollbars": "^1.13.1",
+    "overlayscrollbars-react": "^0.2.3",
+    "query-string": "^8.1.0",
+    "randomcolor": "^0.6.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-draggable": "^4.4.5",
+    "react-error-boundary": "^4.0.4",
+    "react-google-maps": "^9.4.5",
+    "react-hook-form": "^7.43.9",
+    "react-icons": "^4.8.0",
+    "react-infinite-scroll-component": "^4.1.0",
+    "react-leaflet": "^4.2.1",
+    "react-leaflet-arrowheads": "^1.1.0",
+    "react-router-dom": "^5.3.0",
+    "react-scripts": "5.0.1",
+    "react-toastify": "^6.2.0",
+    "react-use": "^17.4.0",
+    "simplebar-react": "^2.3.6",
+    "sonarqube-scanner": "^3.0.1",
+    "web-vitals": "^2.1.4",
+    "yup": "^1.1.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "react-devtools": "^4.27.7"
+  }
+}

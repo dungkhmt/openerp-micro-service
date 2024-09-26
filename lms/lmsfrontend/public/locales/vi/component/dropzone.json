@@ -1,0 +1,8 @@
+{
+  "title": "File đính kèm",
+  "dropzoneText": "Kéo thả tệp vào đây hoặc nhấn để chọn tệp",
+  "previewText": "Danh sách tệp tải lên:",
+  "getFileAddedMessage": "Tệp {{fileName}} tải lên thành công",
+  "getFileRemovedMessage": "Tệp {{fileName}} đã loại bỏ",
+  "getFileLimitExceedMessage": "Vượt quá số lượng tệp tối đa cho phép. Chỉ được phép tải lên tối đa {{filesLimit}} tệp"
+}

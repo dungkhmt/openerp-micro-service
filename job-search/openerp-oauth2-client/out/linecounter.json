@@ -1,0 +1,1365 @@
+{
+    "extension": "linecounter",
+    "version": "0.2.7",
+    "workspace": "c:\\Users\\ADMIN\\Desktop\\DATN\\openerp-micro-service\\job-search\\openerp-oauth2-client",
+    "linecount": [
+        {
+            "version": "0.2.7",
+            "counttime": "2024-06-19 20:56:10",
+            "filesum": 209,
+            "codesum": 39069,
+            "commentsum": 763,
+            "blanksum": 999,
+            "statistics": {
+                ".json": {
+                    "code": 25610,
+                    "comment": 0,
+                    "blank": 50
+                },
+                "": {
+                    "code": 43,
+                    "comment": 1,
+                    "blank": 8
+                },
+                ".conf": {
+                    "code": 31,
+                    "comment": 0,
+                    "blank": 13
+                },
+                ".txt": {
+                    "code": 3,
+                    "comment": 1,
+                    "blank": 0
+                },
+                ".js": {
+                    "code": 4472,
+                    "comment": 119,
+                    "blank": 124
+                },
+                ".svg": {
+                    "code": 8,
+                    "comment": 0,
+                    "blank": 0
+                },
+                ".jsx": {
+                    "code": 8355,
+                    "comment": 600,
+                    "blank": 716
+                },
+                ".css": {
+                    "code": 506,
+                    "comment": 15,
+                    "blank": 73
+                },
+                ".md": {
+                    "code": 21,
+                    "comment": 4,
+                    "blank": 15
+                },
+                ".html": {
+                    "code": 20,
+                    "comment": 23,
+                    "blank": 0
+                }
+            },
+            "filelist": [
+                {
+                    "blank": 7,
+                    "code": 30,
+                    "comment": 1,
+                    "filename": ".gitignore"
+                },
+                {
+                    "blank": 13,
+                    "code": 31,
+                    "comment": 0,
+                    "filename": "default.conf"
+                },
+                {
+                    "blank": 1,
+                    "code": 13,
+                    "comment": 0,
+                    "filename": "Dockerfile"
+                },
+                {
+                    "blank": 0,
+                    "code": 6,
+                    "comment": 0,
+                    "filename": "jsconfig.json"
+                },
+                {
+                    "blank": 47,
+                    "code": 25507,
+                    "comment": 0,
+                    "filename": "package-lock.json"
+                },
+                {
+                    "blank": 3,
+                    "code": 72,
+                    "comment": 0,
+                    "filename": "package.json"
+                },
+                {
+                    "filename": "public\\favicon.ico",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 0,
+                    "code": 20,
+                    "comment": 23,
+                    "filename": "public\\index.html"
+                },
+                {
+                    "filename": "public\\logo192.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "public\\logo512.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 0,
+                    "code": 25,
+                    "comment": 0,
+                    "filename": "public\\manifest.json"
+                },
+                {
+                    "filename": "public\\mbti\\enfj.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "public\\mbti\\enfp.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "public\\mbti\\entj.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "public\\mbti\\entp.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "public\\mbti\\esfj.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "public\\mbti\\esfp.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "public\\mbti\\estj.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "public\\mbti\\estp.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "public\\mbti\\infj.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "public\\mbti\\infp.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "public\\mbti\\intj.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "public\\mbti\\intp.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "public\\mbti\\isfj.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "public\\mbti\\isfp.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "public\\mbti\\istj.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "public\\mbti\\istp.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 0,
+                    "code": 3,
+                    "comment": 1,
+                    "filename": "public\\robots.txt"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "public\\static\\images\\undraw_page_not_found_su7k.svg"
+                },
+                {
+                    "blank": 15,
+                    "code": 21,
+                    "comment": 4,
+                    "filename": "README.md"
+                },
+                {
+                    "blank": 11,
+                    "code": 79,
+                    "comment": 39,
+                    "filename": "src\\api.js"
+                },
+                {
+                    "blank": 9,
+                    "code": 117,
+                    "comment": 9,
+                    "filename": "src\\App.js"
+                },
+                {
+                    "blank": 1,
+                    "code": 7,
+                    "comment": 0,
+                    "filename": "src\\App.test.js"
+                },
+                {
+                    "blank": 61,
+                    "code": 435,
+                    "comment": 15,
+                    "filename": "src\\assets\\css\\material-dashboard-react.css"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "src\\assets\\icons\\logo.svg"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "src\\assets\\icons\\mathematics.svg"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "src\\assets\\icons\\undraw_happy_announcement_ac67.svg"
+                },
+                {
+                    "filename": "src\\assets\\img\\cover.jpeg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\assets\\img\\sidebar-1.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\assets\\img\\sidebar-2.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\assets\\img\\sidebar-2.webp",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\assets\\img\\sidebar-3.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\assets\\img\\sidebar-4.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 19,
+                    "code": 257,
+                    "comment": 26,
+                    "filename": "src\\assets\\jss\\material-dashboard-react.js"
+                },
+                {
+                    "blank": 10,
+                    "code": 122,
+                    "comment": 3,
+                    "filename": "src\\components\\ApplicantCard.jsx"
+                },
+                {
+                    "blank": 3,
+                    "code": 17,
+                    "comment": 0,
+                    "filename": "src\\components\\button\\PrimaryButton.jsx"
+                },
+                {
+                    "blank": 2,
+                    "code": 10,
+                    "comment": 0,
+                    "filename": "src\\components\\button\\TertiaryButton.jsx"
+                },
+                {
+                    "blank": 2,
+                    "code": 22,
+                    "comment": 0,
+                    "filename": "src\\components\\common\\NotAuthorized.jsx"
+                },
+                {
+                    "blank": 1,
+                    "code": 38,
+                    "comment": 1,
+                    "filename": "src\\components\\common\\progressBar\\CustomizedCircularProgress.jsx"
+                },
+                {
+                    "blank": 5,
+                    "code": 49,
+                    "comment": 12,
+                    "filename": "src\\components\\common\\withScreenSecurity.js"
+                },
+                {
+                    "blank": 4,
+                    "code": 50,
+                    "comment": 15,
+                    "filename": "src\\components\\CompanyCard.jsx"
+                },
+                {
+                    "blank": 4,
+                    "code": 50,
+                    "comment": 15,
+                    "filename": "src\\components\\CompanyProfile.jsx"
+                },
+                {
+                    "blank": 5,
+                    "code": 55,
+                    "comment": 0,
+                    "filename": "src\\components\\CVCard.jsx"
+                },
+                {
+                    "blank": 8,
+                    "code": 128,
+                    "comment": 0,
+                    "filename": "src\\components\\dialog\\CustomizedDialogs.jsx"
+                },
+                {
+                    "blank": 5,
+                    "code": 36,
+                    "comment": 1,
+                    "filename": "src\\components\\dialog\\ErrorDialog.jsx"
+                },
+                {
+                    "blank": 7,
+                    "code": 68,
+                    "comment": 0,
+                    "filename": "src\\components\\EducationCard.jsx"
+                },
+                {
+                    "blank": 5,
+                    "code": 65,
+                    "comment": 0,
+                    "filename": "src\\components\\ExperienceCard.jsx"
+                },
+                {
+                    "blank": 3,
+                    "code": 104,
+                    "comment": 0,
+                    "filename": "src\\components\\findjob\\DetailScore.jsx"
+                },
+                {
+                    "blank": 4,
+                    "code": 26,
+                    "comment": 0,
+                    "filename": "src\\components\\findjob\\Header.jsx"
+                },
+                {
+                    "blank": 8,
+                    "code": 122,
+                    "comment": 0,
+                    "filename": "src\\components\\findjob\\Item.jsx"
+                },
+                {
+                    "blank": 29,
+                    "code": 390,
+                    "comment": 9,
+                    "filename": "src\\components\\findjob\\Main.jsx"
+                },
+                {
+                    "blank": 7,
+                    "code": 71,
+                    "comment": 3,
+                    "filename": "src\\components\\JobCard.jsx"
+                },
+                {
+                    "blank": 5,
+                    "code": 49,
+                    "comment": 20,
+                    "filename": "src\\components\\JobDescription.jsx"
+                },
+                {
+                    "blank": 2,
+                    "code": 50,
+                    "comment": 9,
+                    "filename": "src\\components\\JobTitleCard.jsx"
+                },
+                {
+                    "blank": 2,
+                    "code": 32,
+                    "comment": 0,
+                    "filename": "src\\components\\layout\\main-layout.jsx"
+                },
+                {
+                    "blank": 2,
+                    "code": 18,
+                    "comment": 0,
+                    "filename": "src\\components\\ProtectedScreen.jsx"
+                },
+                {
+                    "blank": 4,
+                    "code": 62,
+                    "comment": 0,
+                    "filename": "src\\components\\SkillCard.jsx"
+                },
+                {
+                    "blank": 0,
+                    "code": 3,
+                    "comment": 0,
+                    "filename": "src\\components\\styles.css"
+                },
+                {
+                    "blank": 4,
+                    "code": 18,
+                    "comment": 28,
+                    "filename": "src\\components\\tab\\AntScrollButton.jsx"
+                },
+                {
+                    "blank": 3,
+                    "code": 42,
+                    "comment": 38,
+                    "filename": "src\\components\\tab\\AntTab.jsx"
+                },
+                {
+                    "blank": 2,
+                    "code": 15,
+                    "comment": 13,
+                    "filename": "src\\components\\tab\\AntTabs.jsx"
+                },
+                {
+                    "blank": 1,
+                    "code": 6,
+                    "comment": 0,
+                    "filename": "src\\components\\tab\\index.js"
+                },
+                {
+                    "blank": 1,
+                    "code": 36,
+                    "comment": 0,
+                    "filename": "src\\components\\tab\\StyledTab.jsx"
+                },
+                {
+                    "blank": 1,
+                    "code": 25,
+                    "comment": 0,
+                    "filename": "src\\components\\tab\\StyledTabs.jsx"
+                },
+                {
+                    "blank": 3,
+                    "code": 21,
+                    "comment": 0,
+                    "filename": "src\\components\\tab\\TabPanel.jsx"
+                },
+                {
+                    "blank": 2,
+                    "code": 33,
+                    "comment": 0,
+                    "filename": "src\\components\\test\\test-answer-option.jsx"
+                },
+                {
+                    "blank": 5,
+                    "code": 45,
+                    "comment": 0,
+                    "filename": "src\\components\\test\\test-display.jsx"
+                },
+                {
+                    "blank": 2,
+                    "code": 50,
+                    "comment": 0,
+                    "filename": "src\\components\\test\\test-instructions.jsx"
+                },
+                {
+                    "blank": 3,
+                    "code": 28,
+                    "comment": 0,
+                    "filename": "src\\components\\test\\test-menu.jsx"
+                },
+                {
+                    "blank": 4,
+                    "code": 16,
+                    "comment": 0,
+                    "filename": "src\\components\\test\\test-progress.jsx"
+                },
+                {
+                    "blank": 19,
+                    "code": 143,
+                    "comment": 0,
+                    "filename": "src\\components\\test\\test-question.jsx"
+                },
+                {
+                    "blank": 7,
+                    "code": 87,
+                    "comment": 0,
+                    "filename": "src\\components\\test\\test-result-stats.jsx"
+                },
+                {
+                    "blank": 7,
+                    "code": 62,
+                    "comment": 0,
+                    "filename": "src\\components\\test\\test-result-table-of-content.jsx"
+                },
+                {
+                    "blank": 8,
+                    "code": 479,
+                    "comment": 1,
+                    "filename": "src\\components\\test\\test-result.jsx"
+                },
+                {
+                    "blank": 5,
+                    "code": 30,
+                    "comment": 0,
+                    "filename": "src\\components\\test\\test-timer.jsx"
+                },
+                {
+                    "blank": 10,
+                    "code": 82,
+                    "comment": 3,
+                    "filename": "src\\components\\UserApplicantCard.jsx"
+                },
+                {
+                    "blank": 20,
+                    "code": 138,
+                    "comment": 33,
+                    "filename": "src\\components\\userinfoDetails\\EducationDetails.jsx"
+                },
+                {
+                    "blank": 17,
+                    "code": 131,
+                    "comment": 11,
+                    "filename": "src\\components\\userinfoDetails\\ExperienceDetals.jsx"
+                },
+                {
+                    "blank": 17,
+                    "code": 120,
+                    "comment": 11,
+                    "filename": "src\\components\\userinfoDetails\\SkillDetails.jsx"
+                },
+                {
+                    "blank": 0,
+                    "code": 3,
+                    "comment": 0,
+                    "filename": "src\\components\\userinfoDetails\\styles.css"
+                },
+                {
+                    "blank": 2,
+                    "code": 13,
+                    "comment": 0,
+                    "filename": "src\\config\\constant.js"
+                },
+                {
+                    "blank": 3,
+                    "code": 10,
+                    "comment": 2,
+                    "filename": "src\\config\\keycloak.js"
+                },
+                {
+                    "blank": 3,
+                    "code": 84,
+                    "comment": 1,
+                    "filename": "src\\config\\menuconfig.js"
+                },
+                {
+                    "blank": 0,
+                    "code": 14,
+                    "comment": 0,
+                    "filename": "src\\config\\menuconfig\\analyseCV.js"
+                },
+                {
+                    "blank": 0,
+                    "code": 14,
+                    "comment": 0,
+                    "filename": "src\\config\\menuconfig\\company.js"
+                },
+                {
+                    "blank": 0,
+                    "code": 35,
+                    "comment": 0,
+                    "filename": "src\\config\\menuconfig\\createCV.js"
+                },
+                {
+                    "blank": 0,
+                    "code": 14,
+                    "comment": 0,
+                    "filename": "src\\config\\menuconfig\\demo.js"
+                },
+                {
+                    "blank": 0,
+                    "code": 14,
+                    "comment": 0,
+                    "filename": "src\\config\\menuconfig\\FindingJob.js"
+                },
+                {
+                    "blank": 0,
+                    "code": 14,
+                    "comment": 0,
+                    "filename": "src\\config\\menuconfig\\general.js"
+                },
+                {
+                    "blank": 1,
+                    "code": 28,
+                    "comment": 0,
+                    "filename": "src\\config\\menuconfig\\jobPost.js"
+                },
+                {
+                    "blank": 0,
+                    "code": 14,
+                    "comment": 0,
+                    "filename": "src\\config\\menuconfig\\mbtiTest.js"
+                },
+                {
+                    "blank": 0,
+                    "code": 14,
+                    "comment": 0,
+                    "filename": "src\\config\\menuconfig\\scanCV.js"
+                },
+                {
+                    "blank": 0,
+                    "code": 21,
+                    "comment": 0,
+                    "filename": "src\\config\\menuconfig\\student.js"
+                },
+                {
+                    "blank": 0,
+                    "code": 21,
+                    "comment": 0,
+                    "filename": "src\\config\\menuconfig\\teacher.js"
+                },
+                {
+                    "blank": 1,
+                    "code": 18,
+                    "comment": 8,
+                    "filename": "src\\config\\menuconfig\\user.js"
+                },
+                {
+                    "blank": 0,
+                    "code": 28,
+                    "comment": 0,
+                    "filename": "src\\config\\menuconfig\\userInfomation.js"
+                },
+                {
+                    "blank": 1,
+                    "code": 2590,
+                    "comment": 0,
+                    "filename": "src\\data\\personality-class-groups.js"
+                },
+                {
+                    "blank": 2,
+                    "code": 34,
+                    "comment": 0,
+                    "filename": "src\\data\\personality-classes.js"
+                },
+                {
+                    "blank": 2,
+                    "code": 590,
+                    "comment": 0,
+                    "filename": "src\\data\\personality-test.js"
+                },
+                {
+                    "blank": 1,
+                    "code": 3,
+                    "comment": 0,
+                    "filename": "src\\history.js"
+                },
+                {
+                    "blank": 7,
+                    "code": 24,
+                    "comment": 0,
+                    "filename": "src\\hooks\\use-headings-observer.jsx"
+                },
+                {
+                    "blank": 12,
+                    "code": 53,
+                    "comment": 0,
+                    "filename": "src\\index.css"
+                },
+                {
+                    "blank": 4,
+                    "code": 18,
+                    "comment": 6,
+                    "filename": "src\\index.js"
+                },
+                {
+                    "blank": 11,
+                    "code": 58,
+                    "comment": 6,
+                    "filename": "src\\layout\\account\\AccountButton.jsx"
+                },
+                {
+                    "blank": 18,
+                    "code": 218,
+                    "comment": 10,
+                    "filename": "src\\layout\\account\\AccountMenu.jsx"
+                },
+                {
+                    "blank": 18,
+                    "code": 324,
+                    "comment": 10,
+                    "filename": "src\\layout\\account\\FeedbackDialog.jsx"
+                },
+                {
+                    "blank": 3,
+                    "code": 36,
+                    "comment": 0,
+                    "filename": "src\\layout\\account\\RejectFeedbackDialog.jsx"
+                },
+                {
+                    "blank": 0,
+                    "code": 2,
+                    "comment": 0,
+                    "filename": "src\\layout\\index.js"
+                },
+                {
+                    "blank": 11,
+                    "code": 126,
+                    "comment": 7,
+                    "filename": "src\\layout\\Layout.jsx"
+                },
+                {
+                    "blank": 19,
+                    "code": 261,
+                    "comment": 7,
+                    "filename": "src\\layout\\notification\\ActionsWithNotificationButton.jsx"
+                },
+                {
+                    "blank": 21,
+                    "code": 224,
+                    "comment": 7,
+                    "filename": "src\\layout\\notification\\Notification.jsx"
+                },
+                {
+                    "blank": 42,
+                    "code": 228,
+                    "comment": 25,
+                    "filename": "src\\layout\\notification\\NotificationButton.jsx"
+                },
+                {
+                    "blank": 13,
+                    "code": 176,
+                    "comment": 11,
+                    "filename": "src\\layout\\notification\\NotificationMenu.jsx"
+                },
+                {
+                    "blank": 1,
+                    "code": 58,
+                    "comment": 0,
+                    "filename": "src\\layout\\notification\\NotificationReadIcon.jsx"
+                },
+                {
+                    "blank": 1,
+                    "code": 38,
+                    "comment": 0,
+                    "filename": "src\\layout\\notification\\NotificationTitle.jsx"
+                },
+                {
+                    "blank": 20,
+                    "code": 197,
+                    "comment": 14,
+                    "filename": "src\\layout\\sidebar\\GroupMenuItem.jsx"
+                },
+                {
+                    "blank": 4,
+                    "code": 30,
+                    "comment": 4,
+                    "filename": "src\\layout\\sidebar\\ListItemLink.jsx"
+                },
+                {
+                    "blank": 12,
+                    "code": 124,
+                    "comment": 0,
+                    "filename": "src\\layout\\sidebar\\MenuItem.jsx"
+                },
+                {
+                    "blank": 9,
+                    "code": 133,
+                    "comment": 15,
+                    "filename": "src\\layout\\sidebar\\SideBar.jsx"
+                },
+                {
+                    "blank": 12,
+                    "code": 83,
+                    "comment": 0,
+                    "filename": "src\\lib\\personality-test.js"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "src\\logo.svg"
+                },
+                {
+                    "filename": "src\\public\\favicon.ico",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\public\\images\\mbti\\enfj.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\public\\images\\mbti\\enfp.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\public\\images\\mbti\\entj.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\public\\images\\mbti\\entp.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\public\\images\\mbti\\esfj.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\public\\images\\mbti\\esfp.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\public\\images\\mbti\\estj.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\public\\images\\mbti\\estp.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\public\\images\\mbti\\infj.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\public\\images\\mbti\\infp.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\public\\images\\mbti\\intj.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\public\\images\\mbti\\intp.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\public\\images\\mbti\\isfj.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\public\\images\\mbti\\isfp.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\public\\images\\mbti\\istj.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "src\\public\\images\\mbti\\istp.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "src\\public\\next.svg"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "src\\public\\thirteen.svg"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "src\\public\\vercel.svg"
+                },
+                {
+                    "blank": 1,
+                    "code": 12,
+                    "comment": 0,
+                    "filename": "src\\reportWebVitals.js"
+                },
+                {
+                    "blank": 4,
+                    "code": 35,
+                    "comment": 1,
+                    "filename": "src\\Router.js"
+                },
+                {
+                    "blank": 7,
+                    "code": 91,
+                    "comment": 7,
+                    "filename": "src\\routers\\MainAppRouter.jsx"
+                },
+                {
+                    "blank": 3,
+                    "code": 20,
+                    "comment": 10,
+                    "filename": "src\\routers\\PrivateRoute.jsx"
+                },
+                {
+                    "blank": 1,
+                    "code": 16,
+                    "comment": 0,
+                    "filename": "src\\routers\\TeacherRouter.jsx"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 4,
+                    "filename": "src\\setupTests.js"
+                },
+                {
+                    "blank": 4,
+                    "code": 33,
+                    "comment": 7,
+                    "filename": "src\\state\\MenuState.js"
+                },
+                {
+                    "blank": 2,
+                    "code": 10,
+                    "comment": 0,
+                    "filename": "src\\state\\NotificationState.js"
+                },
+                {
+                    "blank": 2,
+                    "code": 7,
+                    "comment": 1,
+                    "filename": "src\\state\\RouteState.js"
+                },
+                {
+                    "blank": 3,
+                    "code": 14,
+                    "comment": 3,
+                    "filename": "src\\state\\userState.js"
+                },
+                {
+                    "blank": 2,
+                    "code": 9,
+                    "comment": 0,
+                    "filename": "src\\store\\use-user-test-answers.js"
+                },
+                {
+                    "blank": 2,
+                    "code": 22,
+                    "comment": 0,
+                    "filename": "src\\theme\\index.js"
+                },
+                {
+                    "blank": 2,
+                    "code": 20,
+                    "comment": 0,
+                    "filename": "src\\utils\\ConvertHTMLToFile\\convertHtmlElementToPdfFile.js"
+                },
+                {
+                    "blank": 0,
+                    "code": 3,
+                    "comment": 0,
+                    "filename": "src\\utils\\ConvertHTMLToFile\\convertMMtoPixel.js"
+                },
+                {
+                    "blank": 0,
+                    "code": 3,
+                    "comment": 0,
+                    "filename": "src\\utils\\ConvertHTMLToFile\\convertPixelToMM.js"
+                },
+                {
+                    "blank": 2,
+                    "code": 9,
+                    "comment": 0,
+                    "filename": "src\\utils\\ConvertHTMLToFile\\convertUSD.js"
+                },
+                {
+                    "blank": 0,
+                    "code": 6,
+                    "comment": 0,
+                    "filename": "src\\utils\\ConvertHTMLToFile\\formatDateToMMYYYY.js"
+                },
+                {
+                    "blank": 2,
+                    "code": 5,
+                    "comment": 0,
+                    "filename": "src\\utils\\ConvertHTMLToFile\\validateImageFile.js"
+                },
+                {
+                    "blank": 0,
+                    "code": 6,
+                    "comment": 0,
+                    "filename": "src\\utils\\formatDateToMMYYYY.js"
+                },
+                {
+                    "blank": 10,
+                    "code": 29,
+                    "comment": 0,
+                    "filename": "src\\utils\\MenuUtils.js"
+                },
+                {
+                    "blank": 0,
+                    "code": 11,
+                    "comment": 0,
+                    "filename": "src\\utils\\notification\\index.js"
+                },
+                {
+                    "blank": 14,
+                    "code": 161,
+                    "comment": 3,
+                    "filename": "src\\utils\\notification\\Notification.jsx"
+                },
+                {
+                    "blank": 0,
+                    "code": 6,
+                    "comment": 0,
+                    "filename": "src\\utils\\utils\\formatDateToMMYYYY.js"
+                },
+                {
+                    "blank": 10,
+                    "code": 29,
+                    "comment": 0,
+                    "filename": "src\\utils\\utils\\MenuUtils.js"
+                },
+                {
+                    "blank": 0,
+                    "code": 11,
+                    "comment": 0,
+                    "filename": "src\\utils\\utils\\notification\\index.js"
+                },
+                {
+                    "blank": 14,
+                    "code": 161,
+                    "comment": 3,
+                    "filename": "src\\utils\\utils\\notification\\Notification.jsx"
+                },
+                {
+                    "blank": 2,
+                    "code": 14,
+                    "comment": 0,
+                    "filename": "src\\views\\AnalyseCV.jsx"
+                },
+                {
+                    "blank": 8,
+                    "code": 150,
+                    "comment": 1,
+                    "filename": "src\\views\\Company.jsx"
+                },
+                {
+                    "blank": 30,
+                    "code": 446,
+                    "comment": 50,
+                    "filename": "src\\views\\cv\\CreateCV.jsx"
+                },
+                {
+                    "blank": 0,
+                    "code": 6,
+                    "comment": 0,
+                    "filename": "src\\views\\cv\\cv_template\\CvTemplate1.css"
+                },
+                {
+                    "blank": 4,
+                    "code": 260,
+                    "comment": 0,
+                    "filename": "src\\views\\cv\\cv_template\\CVTemplate1.jsx"
+                },
+                {
+                    "blank": 0,
+                    "code": 3,
+                    "comment": 0,
+                    "filename": "src\\views\\cv\\styles.css"
+                },
+                {
+                    "blank": 8,
+                    "code": 50,
+                    "comment": 24,
+                    "filename": "src\\views\\cv\\ViewAllApplicantStatus.jsx"
+                },
+                {
+                    "blank": 6,
+                    "code": 46,
+                    "comment": 43,
+                    "filename": "src\\views\\cv\\viewAllCV.jsx"
+                },
+                {
+                    "blank": 20,
+                    "code": 202,
+                    "comment": 4,
+                    "filename": "src\\views\\cvscanner\\CVScanner.jsx"
+                },
+                {
+                    "blank": 8,
+                    "code": 73,
+                    "comment": 1,
+                    "filename": "src\\views\\DemoScreen.jsx"
+                },
+                {
+                    "blank": 3,
+                    "code": 40,
+                    "comment": 7,
+                    "filename": "src\\views\\errors\\NotFound.jsx"
+                },
+                {
+                    "blank": 3,
+                    "code": 12,
+                    "comment": 0,
+                    "filename": "src\\views\\FindJob.jsx"
+                },
+                {
+                    "blank": 13,
+                    "code": 141,
+                    "comment": 3,
+                    "filename": "src\\views\\jobpost\\ApplyJobPost.jsx"
+                },
+                {
+                    "blank": 10,
+                    "code": 242,
+                    "comment": 14,
+                    "filename": "src\\views\\jobpost\\CreateJobPost.jsx"
+                },
+                {
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0,
+                    "filename": "src\\views\\jobpost\\JobPostApplicantCard.jsx"
+                },
+                {
+                    "blank": 0,
+                    "code": 3,
+                    "comment": 0,
+                    "filename": "src\\views\\jobpost\\styles.css"
+                },
+                {
+                    "blank": 7,
+                    "code": 60,
+                    "comment": 19,
+                    "filename": "src\\views\\jobpost\\ViewAllApplicant.jsx"
+                },
+                {
+                    "blank": 8,
+                    "code": 59,
+                    "comment": 19,
+                    "filename": "src\\views\\jobpost\\ViewAllApplicant2.jsx"
+                },
+                {
+                    "blank": 6,
+                    "code": 49,
+                    "comment": 19,
+                    "filename": "src\\views\\jobpost\\ViewAllJobPost.jsx"
+                },
+                {
+                    "blank": 6,
+                    "code": 50,
+                    "comment": 19,
+                    "filename": "src\\views\\jobpost\\ViewAllJobPost2.jsx"
+                },
+                {
+                    "blank": 9,
+                    "code": 92,
+                    "comment": 0,
+                    "filename": "src\\views\\jobpost\\ViewAllJobPostApplicant.jsx"
+                },
+                {
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0,
+                    "filename": "src\\views\\jobpost\\ViewJobPostApplication.jsx"
+                },
+                {
+                    "blank": 11,
+                    "code": 70,
+                    "comment": 24,
+                    "filename": "src\\views\\jobpost\\ViewJobPostDetail.jsx"
+                },
+                {
+                    "blank": 2,
+                    "code": 60,
+                    "comment": 0,
+                    "filename": "src\\views\\mbti-page\\HomePage.jsx"
+                },
+                {
+                    "blank": 6,
+                    "code": 39,
+                    "comment": 0,
+                    "filename": "src\\views\\mbti-page\\test\\result\\history\\index.jsx"
+                },
+                {
+                    "blank": 4,
+                    "code": 57,
+                    "comment": 0,
+                    "filename": "src\\views\\mbti-page\\test\\result\\testResultId.jsx"
+                },
+                {
+                    "blank": 2,
+                    "code": 9,
+                    "comment": 0,
+                    "filename": "src\\views\\mbti-page\\test\\TestPage.jsx"
+                },
+                {
+                    "blank": 7,
+                    "code": 45,
+                    "comment": 0,
+                    "filename": "src\\views\\personalInfo\\UserEducation.jsx"
+                },
+                {
+                    "blank": 6,
+                    "code": 45,
+                    "comment": 0,
+                    "filename": "src\\views\\personalInfo\\UserExperience.jsx"
+                },
+                {
+                    "blank": 5,
+                    "code": 45,
+                    "comment": 0,
+                    "filename": "src\\views\\personalInfo\\UserSkill.jsx"
+                },
+                {
+                    "blank": 8,
+                    "code": 89,
+                    "comment": 0,
+                    "filename": "src\\views\\skill\\Skill.jsx"
+                },
+                {
+                    "blank": 3,
+                    "code": 20,
+                    "comment": 0,
+                    "filename": "src\\views\\UserInfoForm.jsx"
+                }
+            ]
+        }
+    ]
+}

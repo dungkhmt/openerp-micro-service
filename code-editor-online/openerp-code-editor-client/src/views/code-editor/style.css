@@ -1,0 +1,22 @@
+.splitter-layout {
+  width: 99% !important;
+}
+.my-button {
+  text-transform: 5 !important;
+}
+.ace-multi-cursor {
+  position: absolute;
+  pointer-events: auto;
+}
+.remote-cursor:hover .ace-multi-cursor-tooltip {
+  opacity:1;
+  /* visibility: visible; */
+}
+.ace-multi-cursor:hover ~ .ace-multi-cursor-tooltip {
+  opacity:1 !important;
+  /* visibility: visible; */
+}
+.ace-multi-cursor-tooltip {
+  opacity: 0;
+  pointer-events: auto;
+}

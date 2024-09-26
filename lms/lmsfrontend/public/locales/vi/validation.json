@@ -1,0 +1,10 @@
+{
+    "missingField": "{{fieldName}} không được bỏ trống",
+    "numberBetween": "{{fieldName}} phải nằm trong khoảng {{min}} và {{max}}",
+    "numberMustGreaterThan": "{{fieldName}} phải lớn hơn {{min}}",
+    "numberMustNotGreaterThan": "{{fieldName}} không được nhỏ hơn {{min}}",
+    "numberMustSmallerThan": "{{fieldName}} phải nhỏ hơn {{min}}",
+    "numberMustNotSmallerThan": "{{fieldName}} không được lớn hơn {{min}}",
+    "fieldLength": "{{fieldName}} chỉ cho phép tối đa {{min}} ký tự",
+    "wrongFormat": "{{fieldName}} không đúng định dạng"
+}

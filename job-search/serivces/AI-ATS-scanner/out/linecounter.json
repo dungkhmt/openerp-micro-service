@@ -1,0 +1,3009 @@
+{
+    "extension": "linecounter",
+    "version": "0.2.7",
+    "workspace": "c:\\Users\\ADMIN\\Desktop\\DATN\\openerp-micro-service\\job-search\\serivces\\AI-ATS-scanner",
+    "linecount": [
+        {
+            "version": "0.2.7",
+            "counttime": "2024-06-24 16:03:18",
+            "filesum": 483,
+            "codesum": 842872,
+            "commentsum": 8363,
+            "blanksum": 13245,
+            "statistics": {
+                ".txt": {
+                    "code": 301,
+                    "comment": 0,
+                    "blank": 12
+                },
+                ".py": {
+                    "code": 94,
+                    "comment": 6,
+                    "blank": 34
+                },
+                "": {
+                    "code": 813302,
+                    "comment": 0,
+                    "blank": 8679
+                },
+                ".md": {
+                    "code": 2,
+                    "comment": 0,
+                    "blank": 0
+                },
+                ".pc": {
+                    "code": 33,
+                    "comment": 0,
+                    "blank": 9
+                },
+                ".in": {
+                    "code": 5,
+                    "comment": 0,
+                    "blank": 3
+                },
+                ".adobe": {
+                    "code": 28,
+                    "comment": 0,
+                    "blank": 5
+                },
+                ".gpl2": {
+                    "code": 130,
+                    "comment": 0,
+                    "blank": 26
+                },
+                ".1": {
+                    "code": 259,
+                    "comment": 0,
+                    "blank": 1
+                },
+                ".h": {
+                    "code": 28718,
+                    "comment": 8357,
+                    "blank": 4476
+                }
+            },
+            "filelist": [
+                {
+                    "blank": 25,
+                    "code": 57,
+                    "comment": 2,
+                    "filename": "app.py"
+                },
+                {
+                    "blank": 7,
+                    "code": 18,
+                    "comment": 0,
+                    "filename": "Dockerfile"
+                },
+                {
+                    "blank": 9,
+                    "code": 37,
+                    "comment": 4,
+                    "filename": "helper_func.py"
+                },
+                {
+                    "blank": 0,
+                    "code": 2,
+                    "comment": 0,
+                    "filename": "Readme.md"
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\cairo.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\charset.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\deflate.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\expat.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\fontconfig-1.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\freetype.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\iconv.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\jpeg8.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\lcms2.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\Lerc.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\libcrypto-3-x64.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\libcurl.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\libexpat.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\liblzma.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\libpng16.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\libssh2.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\libtiff.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\libzstd.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\openjp2.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\pdfattach.exe",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\pdfdetach.exe",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\pdffonts.exe",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\pdfimages.exe",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\pdfinfo.exe",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\pdfseparate.exe",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\pdftocairo.exe",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\pdftohtml.exe",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\pdftoppm.exe",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\pdftops.exe",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\pdftotext.exe",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\pdfunite.exe",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\pixman-1-0.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\poppler-cpp.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\poppler-glib.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\poppler.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\tiff.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\zlib.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\zstd.dll",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\bin\\zstd.exe",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 342,
+                    "code": 1193,
+                    "comment": 501,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Annot.h"
+                },
+                {
+                    "blank": 13,
+                    "code": 30,
+                    "comment": 25,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\AnnotStampImageHelper.h"
+                },
+                {
+                    "blank": 19,
+                    "code": 35,
+                    "comment": 42,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Array.h"
+                },
+                {
+                    "blank": 7,
+                    "code": 38,
+                    "comment": 9,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\BBoxOutputDev.h"
+                },
+                {
+                    "blank": 36,
+                    "code": 67,
+                    "comment": 48,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\CachedFile.h"
+                },
+                {
+                    "blank": 31,
+                    "code": 73,
+                    "comment": 39,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\CairoFontEngine.h"
+                },
+                {
+                    "blank": 83,
+                    "code": 344,
+                    "comment": 121,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\CairoOutputDev.h"
+                },
+                {
+                    "blank": 8,
+                    "code": 15,
+                    "comment": 37,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\CairoRescaleBox.h"
+                },
+                {
+                    "blank": 58,
+                    "code": 182,
+                    "comment": 108,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Catalog.h"
+                },
+                {
+                    "blank": 21,
+                    "code": 105,
+                    "comment": 24,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\CertificateInfo.h"
+                },
+                {
+                    "blank": 30,
+                    "code": 62,
+                    "comment": 56,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\CharCodeToUnicode.h"
+                },
+                {
+                    "blank": 5,
+                    "code": 6,
+                    "comment": 13,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\CharTypes.h"
+                },
+                {
+                    "blank": 26,
+                    "code": 56,
+                    "comment": 49,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\CMap.h"
+                },
+                {
+                    "blank": 11,
+                    "code": 41,
+                    "comment": 19,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\cpp\\poppler-destination.h"
+                },
+                {
+                    "blank": 26,
+                    "code": 93,
+                    "comment": 22,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\cpp\\poppler-document.h"
+                },
+                {
+                    "blank": 11,
+                    "code": 28,
+                    "comment": 18,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\cpp\\poppler-embedded-file.h"
+                },
+                {
+                    "blank": 11,
+                    "code": 37,
+                    "comment": 20,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\cpp\\poppler-font-private.h"
+                },
+                {
+                    "blank": 17,
+                    "code": 59,
+                    "comment": 19,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\cpp\\poppler-font.h"
+                },
+                {
+                    "blank": 27,
+                    "code": 84,
+                    "comment": 27,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\cpp\\poppler-global.h"
+                },
+                {
+                    "blank": 15,
+                    "code": 41,
+                    "comment": 18,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\cpp\\poppler-image.h"
+                },
+                {
+                    "blank": 17,
+                    "code": 42,
+                    "comment": 18,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\cpp\\poppler-page-renderer.h"
+                },
+                {
+                    "blank": 15,
+                    "code": 53,
+                    "comment": 18,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\cpp\\poppler-page-transition.h"
+                },
+                {
+                    "blank": 32,
+                    "code": 82,
+                    "comment": 113,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\cpp\\poppler-page.h"
+                },
+                {
+                    "blank": 16,
+                    "code": 33,
+                    "comment": 17,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\cpp\\poppler-rectangle.h"
+                },
+                {
+                    "blank": 18,
+                    "code": 37,
+                    "comment": 17,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\cpp\\poppler-toc.h"
+                },
+                {
+                    "blank": 7,
+                    "code": 15,
+                    "comment": 17,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\cpp\\poppler-version.h"
+                },
+                {
+                    "blank": 8,
+                    "code": 32,
+                    "comment": 2,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\cpp\\poppler_cpp_export.h"
+                },
+                {
+                    "blank": 8,
+                    "code": 18,
+                    "comment": 11,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\CurlCachedFile.h"
+                },
+                {
+                    "blank": 6,
+                    "code": 10,
+                    "comment": 16,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\CurlPDFDocBuilder.h"
+                },
+                {
+                    "blank": 7,
+                    "code": 9,
+                    "comment": 28,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\DateInfo.h"
+                },
+                {
+                    "blank": 19,
+                    "code": 81,
+                    "comment": 51,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Decrypt.h"
+                },
+                {
+                    "blank": 25,
+                    "code": 53,
+                    "comment": 56,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Dict.h"
+                },
+                {
+                    "blank": 8,
+                    "code": 22,
+                    "comment": 37,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Error.h"
+                },
+                {
+                    "blank": 15,
+                    "code": 17,
+                    "comment": 34,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\ErrorCodes.h"
+                },
+                {
+                    "blank": 7,
+                    "code": 12,
+                    "comment": 17,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\FDPDFDocBuilder.h"
+                },
+                {
+                    "blank": 8,
+                    "code": 15,
+                    "comment": 11,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\FILECacheLoader.h"
+                },
+                {
+                    "blank": 17,
+                    "code": 54,
+                    "comment": 17,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\FileSpec.h"
+                },
+                {
+                    "blank": 12,
+                    "code": 26,
+                    "comment": 28,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\fofi\\FoFiBase.h"
+                },
+                {
+                    "blank": 7,
+                    "code": 9,
+                    "comment": 27,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\fofi\\FoFiEncodings.h"
+                },
+                {
+                    "blank": 6,
+                    "code": 23,
+                    "comment": 33,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\fofi\\FoFiIdentifier.h"
+                },
+                {
+                    "blank": 32,
+                    "code": 67,
+                    "comment": 91,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\fofi\\FoFiTrueType.h"
+                },
+                {
+                    "blank": 14,
+                    "code": 22,
+                    "comment": 29,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\fofi\\FoFiType1.h"
+                },
+                {
+                    "blank": 36,
+                    "code": 165,
+                    "comment": 82,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\fofi\\FoFiType1C.h"
+                },
+                {
+                    "blank": 3,
+                    "code": 10,
+                    "comment": 7,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\FontEncodingTables.h"
+                },
+                {
+                    "blank": 15,
+                    "code": 66,
+                    "comment": 28,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\FontInfo.h"
+                },
+                {
+                    "blank": 165,
+                    "code": 456,
+                    "comment": 168,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Form.h"
+                },
+                {
+                    "blank": 44,
+                    "code": 155,
+                    "comment": 63,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Function.h"
+                },
+                {
+                    "blank": 56,
+                    "code": 254,
+                    "comment": 94,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Gfx.h"
+                },
+                {
+                    "blank": 89,
+                    "code": 255,
+                    "comment": 175,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\GfxFont.h"
+                },
+                {
+                    "blank": 307,
+                    "code": 1151,
+                    "comment": 390,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\GfxState.h"
+                },
+                {
+                    "blank": 7,
+                    "code": 60,
+                    "comment": 38,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\GfxState_helpers.h"
+                },
+                {
+                    "blank": 42,
+                    "code": 181,
+                    "comment": 231,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\glib\\poppler-action.h"
+                },
+                {
+                    "blank": 40,
+                    "code": 297,
+                    "comment": 31,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\glib\\poppler-annot.h"
+                },
+                {
+                    "blank": 14,
+                    "code": 50,
+                    "comment": 59,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\glib\\poppler-attachment.h"
+                },
+                {
+                    "blank": 6,
+                    "code": 8,
+                    "comment": 18,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\glib\\poppler-date.h"
+                },
+                {
+                    "blank": 33,
+                    "code": 334,
+                    "comment": 179,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\glib\\poppler-document.h"
+                },
+                {
+                    "blank": 16,
+                    "code": 169,
+                    "comment": 9,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\glib\\poppler-enums.h"
+                },
+                {
+                    "blank": 8,
+                    "code": 11,
+                    "comment": 69,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\glib\\poppler-features.h"
+                },
+                {
+                    "blank": 23,
+                    "code": 283,
+                    "comment": 78,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\glib\\poppler-form-field.h"
+                },
+                {
+                    "blank": 8,
+                    "code": 24,
+                    "comment": 18,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\glib\\poppler-layer.h"
+                },
+                {
+                    "blank": 8,
+                    "code": 32,
+                    "comment": 2,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\glib\\poppler-macros.h"
+                },
+                {
+                    "blank": 9,
+                    "code": 33,
+                    "comment": 38,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\glib\\poppler-media.h"
+                },
+                {
+                    "blank": 8,
+                    "code": 41,
+                    "comment": 32,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\glib\\poppler-movie.h"
+                },
+                {
+                    "blank": 40,
+                    "code": 248,
+                    "comment": 136,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\glib\\poppler-page.h"
+                },
+                {
+                    "blank": 32,
+                    "code": 323,
+                    "comment": 70,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\glib\\poppler-structure-element.h"
+                },
+                {
+                    "blank": 19,
+                    "code": 134,
+                    "comment": 110,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\glib\\poppler.h"
+                },
+                {
+                    "blank": 47,
+                    "code": 143,
+                    "comment": 73,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\GlobalParams.h"
+                },
+                {
+                    "blank": 16,
+                    "code": 45,
+                    "comment": 40,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\goo\\gdir.h"
+                },
+                {
+                    "blank": 24,
+                    "code": 82,
+                    "comment": 51,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\goo\\gfile.h"
+                },
+                {
+                    "blank": 38,
+                    "code": 127,
+                    "comment": 39,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\goo\\gmem.h"
+                },
+                {
+                    "blank": 15,
+                    "code": 88,
+                    "comment": 14,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\goo\\GooCheckedOps.h"
+                },
+                {
+                    "blank": 3,
+                    "code": 10,
+                    "comment": 9,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\goo\\GooLikely.h"
+                },
+                {
+                    "blank": 35,
+                    "code": 138,
+                    "comment": 87,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\goo\\GooString.h"
+                },
+                {
+                    "blank": 9,
+                    "code": 31,
+                    "comment": 19,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\goo\\GooTimer.h"
+                },
+                {
+                    "blank": 4,
+                    "code": 5,
+                    "comment": 12,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\goo\\grandom.h"
+                },
+                {
+                    "blank": 7,
+                    "code": 12,
+                    "comment": 26,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\goo\\gstrtod.h"
+                },
+                {
+                    "blank": 8,
+                    "code": 18,
+                    "comment": 13,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\goo\\ImgWriter.h"
+                },
+                {
+                    "blank": 14,
+                    "code": 35,
+                    "comment": 20,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\goo\\JpegWriter.h"
+                },
+                {
+                    "blank": 15,
+                    "code": 33,
+                    "comment": 20,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\goo\\PNGWriter.h"
+                },
+                {
+                    "blank": 16,
+                    "code": 35,
+                    "comment": 19,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\goo\\TiffWriter.h"
+                },
+                {
+                    "blank": 15,
+                    "code": 61,
+                    "comment": 14,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Hints.h"
+                },
+                {
+                    "blank": 24,
+                    "code": 67,
+                    "comment": 42,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\JArithmeticDecoder.h"
+                },
+                {
+                    "blank": 11,
+                    "code": 92,
+                    "comment": 27,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\JBIG2Stream.h"
+                },
+                {
+                    "blank": 10,
+                    "code": 30,
+                    "comment": 14,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\JPEG2000Stream.h"
+                },
+                {
+                    "blank": 12,
+                    "code": 31,
+                    "comment": 22,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\JSInfo.h"
+                },
+                {
+                    "blank": 23,
+                    "code": 44,
+                    "comment": 52,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Lexer.h"
+                },
+                {
+                    "blank": 7,
+                    "code": 23,
+                    "comment": 13,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Linearization.h"
+                },
+                {
+                    "blank": 121,
+                    "code": 314,
+                    "comment": 163,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Link.h"
+                },
+                {
+                    "blank": 6,
+                    "code": 10,
+                    "comment": 16,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\LocalPDFDocBuilder.h"
+                },
+                {
+                    "blank": 25,
+                    "code": 94,
+                    "comment": 13,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\MarkedContentOutputDev.h"
+                },
+                {
+                    "blank": 28,
+                    "code": 70,
+                    "comment": 40,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Movie.h"
+                },
+                {
+                    "blank": 11,
+                    "code": 20,
+                    "comment": 21,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\NameToCharCode.h"
+                },
+                {
+                    "blank": 6,
+                    "code": 4274,
+                    "comment": 24,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\NameToUnicodeTable.h"
+                },
+                {
+                    "blank": 82,
+                    "code": 551,
+                    "comment": 105,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Object.h"
+                },
+                {
+                    "blank": 30,
+                    "code": 69,
+                    "comment": 20,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\OptionalContent.h"
+                },
+                {
+                    "blank": 17,
+                    "code": 76,
+                    "comment": 32,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Outline.h"
+                },
+                {
+                    "blank": 62,
+                    "code": 202,
+                    "comment": 121,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\OutputDev.h"
+                },
+                {
+                    "blank": 46,
+                    "code": 158,
+                    "comment": 90,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Page.h"
+                },
+                {
+                    "blank": 18,
+                    "code": 52,
+                    "comment": 43,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\PageTransition.h"
+                },
+                {
+                    "blank": 14,
+                    "code": 28,
+                    "comment": 38,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Parser.h"
+                },
+                {
+                    "blank": 70,
+                    "code": 239,
+                    "comment": 118,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\PDFDoc.h"
+                },
+                {
+                    "blank": 10,
+                    "code": 16,
+                    "comment": 21,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\PDFDocBuilder.h"
+                },
+                {
+                    "blank": 8,
+                    "code": 13,
+                    "comment": 22,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\PDFDocEncoding.h"
+                },
+                {
+                    "blank": 12,
+                    "code": 20,
+                    "comment": 26,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\PDFDocFactory.h"
+                },
+                {
+                    "blank": 25,
+                    "code": 61,
+                    "comment": 65,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\poppler-config.h"
+                },
+                {
+                    "blank": 8,
+                    "code": 32,
+                    "comment": 2,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\poppler_private_export.h"
+                },
+                {
+                    "blank": 13,
+                    "code": 38,
+                    "comment": 14,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\PopplerCache.h"
+                },
+                {
+                    "blank": 30,
+                    "code": 56,
+                    "comment": 63,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\PreScanOutputDev.h"
+                },
+                {
+                    "blank": 6,
+                    "code": 17,
+                    "comment": 16,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\ProfileData.h"
+                },
+                {
+                    "blank": 70,
+                    "code": 384,
+                    "comment": 181,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\PSOutputDev.h"
+                },
+                {
+                    "blank": 8,
+                    "code": 17,
+                    "comment": 22,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\PSTokenizer.h"
+                },
+                {
+                    "blank": 39,
+                    "code": 87,
+                    "comment": 54,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Rendition.h"
+                },
+                {
+                    "blank": 23,
+                    "code": 61,
+                    "comment": 47,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\SecurityHandler.h"
+                },
+                {
+                    "blank": 15,
+                    "code": 44,
+                    "comment": 29,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Sound.h"
+                },
+                {
+                    "blank": 45,
+                    "code": 185,
+                    "comment": 107,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\Splash.h"
+                },
+                {
+                    "blank": 20,
+                    "code": 67,
+                    "comment": 48,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\SplashBitmap.h"
+                },
+                {
+                    "blank": 26,
+                    "code": 57,
+                    "comment": 48,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\SplashClip.h"
+                },
+                {
+                    "blank": 16,
+                    "code": 15,
+                    "comment": 30,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\SplashErrorCodes.h"
+                },
+                {
+                    "blank": 21,
+                    "code": 51,
+                    "comment": 54,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\SplashFont.h"
+                },
+                {
+                    "blank": 15,
+                    "code": 35,
+                    "comment": 39,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\SplashFontEngine.h"
+                },
+                {
+                    "blank": 23,
+                    "code": 46,
+                    "comment": 29,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\SplashFontFile.h"
+                },
+                {
+                    "blank": 6,
+                    "code": 13,
+                    "comment": 21,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\SplashFontFileID.h"
+                },
+                {
+                    "blank": 14,
+                    "code": 27,
+                    "comment": 30,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\SplashFTFont.h"
+                },
+                {
+                    "blank": 13,
+                    "code": 32,
+                    "comment": 27,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\SplashFTFontEngine.h"
+                },
+                {
+                    "blank": 12,
+                    "code": 26,
+                    "comment": 26,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\SplashFTFontFile.h"
+                },
+                {
+                    "blank": 4,
+                    "code": 10,
+                    "comment": 13,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\SplashGlyphBitmap.h"
+                },
+                {
+                    "blank": 41,
+                    "code": 133,
+                    "comment": 44,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\SplashMath.h"
+                },
+                {
+                    "blank": 30,
+                    "code": 56,
+                    "comment": 57,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\SplashPath.h"
+                },
+                {
+                    "blank": 31,
+                    "code": 43,
+                    "comment": 33,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\SplashPattern.h"
+                },
+                {
+                    "blank": 14,
+                    "code": 45,
+                    "comment": 35,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\SplashScreen.h"
+                },
+                {
+                    "blank": 25,
+                    "code": 68,
+                    "comment": 39,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\SplashState.h"
+                },
+                {
+                    "blank": 31,
+                    "code": 157,
+                    "comment": 70,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\SplashTypes.h"
+                },
+                {
+                    "blank": 19,
+                    "code": 41,
+                    "comment": 43,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\SplashXPath.h"
+                },
+                {
+                    "blank": 29,
+                    "code": 68,
+                    "comment": 43,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\splash\\SplashXPathScanner.h"
+                },
+                {
+                    "blank": 90,
+                    "code": 250,
+                    "comment": 86,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\SplashOutputDev.h"
+                },
+                {
+                    "blank": 15,
+                    "code": 282,
+                    "comment": 272,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Stream-CCITT.h"
+                },
+                {
+                    "blank": 235,
+                    "code": 1055,
+                    "comment": 345,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\Stream.h"
+                },
+                {
+                    "blank": 64,
+                    "code": 293,
+                    "comment": 64,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\StructElement.h"
+                },
+                {
+                    "blank": 15,
+                    "code": 60,
+                    "comment": 14,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\StructTreeRoot.h"
+                },
+                {
+                    "blank": 191,
+                    "code": 495,
+                    "comment": 337,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\TextOutputDev.h"
+                },
+                {
+                    "blank": 3,
+                    "code": 974,
+                    "comment": 6,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\UnicodeCClassTables.h"
+                },
+                {
+                    "blank": 5,
+                    "code": 317,
+                    "comment": 6,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\UnicodeCompTables.h"
+                },
+                {
+                    "blank": 4,
+                    "code": 7176,
+                    "comment": 1,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\UnicodeDecompTables.h"
+                },
+                {
+                    "blank": 28,
+                    "code": 60,
+                    "comment": 50,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\UnicodeMap.h"
+                },
+                {
+                    "blank": 6,
+                    "code": 6,
+                    "comment": 23,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\UnicodeMapFuncs.h"
+                },
+                {
+                    "blank": 5,
+                    "code": 59,
+                    "comment": 20,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\UnicodeMapTables.h"
+                },
+                {
+                    "blank": 12,
+                    "code": 13,
+                    "comment": 24,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\UnicodeTypeTable.h"
+                },
+                {
+                    "blank": 21,
+                    "code": 35,
+                    "comment": 76,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\UTF.h"
+                },
+                {
+                    "blank": 10,
+                    "code": 63,
+                    "comment": 14,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\ViewerPreferences.h"
+                },
+                {
+                    "blank": 52,
+                    "code": 191,
+                    "comment": 123,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\include\\poppler\\XRef.h"
+                },
+                {
+                    "blank": 2,
+                    "code": 10,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\lib\\pkgconfig\\poppler-cpp.pc"
+                },
+                {
+                    "blank": 2,
+                    "code": 10,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\lib\\pkgconfig\\poppler-glib.pc"
+                },
+                {
+                    "blank": 2,
+                    "code": 8,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\lib\\pkgconfig\\poppler.pc"
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\lib\\poppler-cpp.lib",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\lib\\poppler-glib.lib",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\lib\\poppler.lib",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\share\\man\\man1\\pdfattach.1"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\share\\man\\man1\\pdfdetach.1"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\share\\man\\man1\\pdffonts.1"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\share\\man\\man1\\pdfimages.1"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\share\\man\\man1\\pdfinfo.1"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\share\\man\\man1\\pdfseparate.1"
+                },
+                {
+                    "blank": 1,
+                    "code": 247,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\share\\man\\man1\\pdftocairo.1"
+                },
+                {
+                    "blank": 0,
+                    "code": 2,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\share\\man\\man1\\pdftohtml.1"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\share\\man\\man1\\pdftoppm.1"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\share\\man\\man1\\pdftops.1"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\share\\man\\man1\\pdftotext.1"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\Library\\share\\man\\man1\\pdfunite.1"
+                },
+                {
+                    "blank": 0,
+                    "code": 19156,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cidToUnicode\\Adobe-CNS1"
+                },
+                {
+                    "blank": 0,
+                    "code": 30284,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cidToUnicode\\Adobe-GB1"
+                },
+                {
+                    "blank": 0,
+                    "code": 23058,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cidToUnicode\\Adobe-Japan1"
+                },
+                {
+                    "blank": 0,
+                    "code": 18352,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cidToUnicode\\Adobe-Korea1"
+                },
+                {
+                    "blank": 12,
+                    "code": 297,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\CMakeLists.txt"
+                },
+                {
+                    "blank": 11,
+                    "code": 123,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\Adobe-CNS1-0"
+                },
+                {
+                    "blank": 11,
+                    "code": 134,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\Adobe-CNS1-1"
+                },
+                {
+                    "blank": 11,
+                    "code": 135,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\Adobe-CNS1-2"
+                },
+                {
+                    "blank": 11,
+                    "code": 140,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\Adobe-CNS1-3"
+                },
+                {
+                    "blank": 11,
+                    "code": 141,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\Adobe-CNS1-4"
+                },
+                {
+                    "blank": 11,
+                    "code": 141,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\Adobe-CNS1-5"
+                },
+                {
+                    "blank": 11,
+                    "code": 141,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\Adobe-CNS1-6"
+                },
+                {
+                    "blank": 10,
+                    "code": 140,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\Adobe-CNS1-7"
+                },
+                {
+                    "blank": 13,
+                    "code": 371,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\Adobe-CNS1-B5pc"
+                },
+                {
+                    "blank": 13,
+                    "code": 390,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\Adobe-CNS1-ETen-B5"
+                },
+                {
+                    "blank": 16,
+                    "code": 92,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\Adobe-CNS1-H-CID"
+                },
+                {
+                    "blank": 16,
+                    "code": 394,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\Adobe-CNS1-H-Host"
+                },
+                {
+                    "blank": 14,
+                    "code": 372,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\Adobe-CNS1-H-Mac"
+                },
+                {
+                    "blank": 189,
+                    "code": 18114,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\Adobe-CNS1-UCS2"
+                },
+                {
+                    "blank": 13,
+                    "code": 318,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\B5-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 78,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\B5-V"
+                },
+                {
+                    "blank": 13,
+                    "code": 322,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\B5pc-H"
+                },
+                {
+                    "blank": 6,
+                    "code": 62,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\B5pc-UCS2"
+                },
+                {
+                    "blank": 135,
+                    "code": 13016,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\B5pc-UCS2C"
+                },
+                {
+                    "blank": 10,
+                    "code": 78,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\B5pc-V"
+                },
+                {
+                    "blank": 14,
+                    "code": 474,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\CNS-EUC-H"
+                },
+                {
+                    "blank": 15,
+                    "code": 521,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\CNS-EUC-V"
+                },
+                {
+                    "blank": 11,
+                    "code": 224,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\CNS1-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 78,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\CNS1-V"
+                },
+                {
+                    "blank": 10,
+                    "code": 148,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\CNS2-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 64,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\CNS2-V"
+                },
+                {
+                    "blank": 13,
+                    "code": 328,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\ETen-B5-H"
+                },
+                {
+                    "blank": 137,
+                    "code": 13191,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\ETen-B5-UCS2"
+                },
+                {
+                    "blank": 10,
+                    "code": 79,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\ETen-B5-V"
+                },
+                {
+                    "blank": 11,
+                    "code": 66,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\ETenms-B5-H"
+                },
+                {
+                    "blank": 12,
+                    "code": 85,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\ETenms-B5-V"
+                },
+                {
+                    "blank": 24,
+                    "code": 1302,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\ETHK-B5-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 78,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\ETHK-B5-V"
+                },
+                {
+                    "blank": 21,
+                    "code": 1111,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\HKdla-B5-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 77,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\HKdla-B5-V"
+                },
+                {
+                    "blank": 20,
+                    "code": 994,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\HKdlb-B5-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 77,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\HKdlb-B5-V"
+                },
+                {
+                    "blank": 16,
+                    "code": 631,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\HKgccs-B5-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 77,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\HKgccs-B5-V"
+                },
+                {
+                    "blank": 16,
+                    "code": 621,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\HKm314-B5-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 77,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\HKm314-B5-V"
+                },
+                {
+                    "blank": 17,
+                    "code": 770,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\HKm471-B5-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 77,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\HKm471-B5-V"
+                },
+                {
+                    "blank": 24,
+                    "code": 1305,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\HKscs-B5-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 78,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\HKscs-B5-V"
+                },
+                {
+                    "blank": 136,
+                    "code": 13030,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\UCS2-B5pc"
+                },
+                {
+                    "blank": 142,
+                    "code": 13691,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\UCS2-ETen-B5"
+                },
+                {
+                    "blank": 175,
+                    "code": 16815,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\UniCNS-UCS2-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 78,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\UniCNS-UCS2-V"
+                },
+                {
+                    "blank": 197,
+                    "code": 18949,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\UniCNS-UTF16-H"
+                },
+                {
+                    "blank": 12,
+                    "code": 80,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\UniCNS-UTF16-V"
+                },
+                {
+                    "blank": 197,
+                    "code": 18947,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\UniCNS-UTF32-H"
+                },
+                {
+                    "blank": 12,
+                    "code": 80,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\UniCNS-UTF32-V"
+                },
+                {
+                    "blank": 198,
+                    "code": 19011,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\UniCNS-UTF8-H"
+                },
+                {
+                    "blank": 12,
+                    "code": 80,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-CNS1\\UniCNS-UTF8-V"
+                },
+                {
+                    "blank": 11,
+                    "code": 98,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\Adobe-GB1-0"
+                },
+                {
+                    "blank": 11,
+                    "code": 106,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\Adobe-GB1-1"
+                },
+                {
+                    "blank": 11,
+                    "code": 154,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\Adobe-GB1-2"
+                },
+                {
+                    "blank": 11,
+                    "code": 154,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\Adobe-GB1-3"
+                },
+                {
+                    "blank": 13,
+                    "code": 182,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\Adobe-GB1-4"
+                },
+                {
+                    "blank": 13,
+                    "code": 187,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\Adobe-GB1-5"
+                },
+                {
+                    "blank": 54,
+                    "code": 4295,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\Adobe-GB1-GBK-EUC"
+                },
+                {
+                    "blank": 13,
+                    "code": 200,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\Adobe-GB1-GBpc-EUC"
+                },
+                {
+                    "blank": 16,
+                    "code": 96,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\Adobe-GB1-H-CID"
+                },
+                {
+                    "blank": 56,
+                    "code": 4321,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\Adobe-GB1-H-Host"
+                },
+                {
+                    "blank": 13,
+                    "code": 200,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\Adobe-GB1-H-Mac"
+                },
+                {
+                    "blank": 149,
+                    "code": 14119,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\Adobe-GB1-UCS2"
+                },
+                {
+                    "blank": 11,
+                    "code": 160,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GB-EUC-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 86,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GB-EUC-V"
+                },
+                {
+                    "blank": 10,
+                    "code": 154,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GB-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 86,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GB-V"
+                },
+                {
+                    "blank": 51,
+                    "code": 4220,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GBK-EUC-H"
+                },
+                {
+                    "blank": 113,
+                    "code": 10682,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GBK-EUC-UCS2"
+                },
+                {
+                    "blank": 10,
+                    "code": 85,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GBK-EUC-V"
+                },
+                {
+                    "blank": 63,
+                    "code": 5260,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GBK2K-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 106,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GBK2K-V"
+                },
+                {
+                    "blank": 51,
+                    "code": 4219,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GBKp-EUC-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 85,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GBKp-EUC-V"
+                },
+                {
+                    "blank": 11,
+                    "code": 162,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GBpc-EUC-H"
+                },
+                {
+                    "blank": 8,
+                    "code": 65,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GBpc-EUC-UCS2"
+                },
+                {
+                    "blank": 74,
+                    "code": 6778,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GBpc-EUC-UCS2C"
+                },
+                {
+                    "blank": 10,
+                    "code": 86,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GBpc-EUC-V"
+                },
+                {
+                    "blank": 33,
+                    "code": 2397,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GBT-EUC-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 86,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GBT-EUC-V"
+                },
+                {
+                    "blank": 32,
+                    "code": 2391,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GBT-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 86,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GBT-V"
+                },
+                {
+                    "blank": 33,
+                    "code": 2399,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GBTpc-EUC-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 86,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\GBTpc-EUC-V"
+                },
+                {
+                    "blank": 117,
+                    "code": 11152,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\UCS2-GBK-EUC"
+                },
+                {
+                    "blank": 96,
+                    "code": 9018,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\UCS2-GBpc-EUC"
+                },
+                {
+                    "blank": 149,
+                    "code": 14170,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\UniGB-UCS2-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 89,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\UniGB-UCS2-V"
+                },
+                {
+                    "blank": 151,
+                    "code": 14232,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\UniGB-UTF16-H"
+                },
+                {
+                    "blank": 12,
+                    "code": 90,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\UniGB-UTF16-V"
+                },
+                {
+                    "blank": 151,
+                    "code": 14230,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\UniGB-UTF32-H"
+                },
+                {
+                    "blank": 12,
+                    "code": 90,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\UniGB-UTF32-V"
+                },
+                {
+                    "blank": 153,
+                    "code": 14433,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\UniGB-UTF8-H"
+                },
+                {
+                    "blank": 12,
+                    "code": 90,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-GB1\\UniGB-UTF8-V"
+                },
+                {
+                    "blank": 17,
+                    "code": 707,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\78-EUC-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 92,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\78-EUC-V"
+                },
+                {
+                    "blank": 16,
+                    "code": 700,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\78-H"
+                },
+                {
+                    "blank": 17,
+                    "code": 709,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\78-RKSJ-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 92,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\78-RKSJ-V"
+                },
+                {
+                    "blank": 10,
+                    "code": 92,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\78-V"
+                },
+                {
+                    "blank": 18,
+                    "code": 798,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\78ms-RKSJ-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 143,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\78ms-RKSJ-V"
+                },
+                {
+                    "blank": 13,
+                    "code": 299,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\83pv-RKSJ-H"
+                },
+                {
+                    "blank": 12,
+                    "code": 245,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\90ms-RKSJ-H"
+                },
+                {
+                    "blank": 80,
+                    "code": 7343,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\90ms-RKSJ-UCS2"
+                },
+                {
+                    "blank": 10,
+                    "code": 144,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\90ms-RKSJ-V"
+                },
+                {
+                    "blank": 12,
+                    "code": 243,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\90msp-RKSJ-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 143,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\90msp-RKSJ-V"
+                },
+                {
+                    "blank": 13,
+                    "code": 340,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\90pv-RKSJ-H"
+                },
+                {
+                    "blank": 8,
+                    "code": 82,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\90pv-RKSJ-UCS2"
+                },
+                {
+                    "blank": 74,
+                    "code": 6716,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\90pv-RKSJ-UCS2C"
+                },
+                {
+                    "blank": 10,
+                    "code": 117,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\90pv-RKSJ-V"
+                },
+                {
+                    "blank": 16,
+                    "code": 709,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Add-H"
+                },
+                {
+                    "blank": 17,
+                    "code": 719,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Add-RKSJ-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 123,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Add-RKSJ-V"
+                },
+                {
+                    "blank": 10,
+                    "code": 123,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Add-V"
+                },
+                {
+                    "blank": 11,
+                    "code": 100,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Adobe-Japan1-0"
+                },
+                {
+                    "blank": 11,
+                    "code": 100,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Adobe-Japan1-1"
+                },
+                {
+                    "blank": 11,
+                    "code": 102,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Adobe-Japan1-2"
+                },
+                {
+                    "blank": 11,
+                    "code": 103,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Adobe-Japan1-3"
+                },
+                {
+                    "blank": 11,
+                    "code": 127,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Adobe-Japan1-4"
+                },
+                {
+                    "blank": 11,
+                    "code": 146,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Adobe-Japan1-5"
+                },
+                {
+                    "blank": 11,
+                    "code": 157,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Adobe-Japan1-6"
+                },
+                {
+                    "blank": 10,
+                    "code": 156,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Adobe-Japan1-7"
+                },
+                {
+                    "blank": 11,
+                    "code": 296,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Adobe-Japan1-90ms-RKSJ"
+                },
+                {
+                    "blank": 12,
+                    "code": 393,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Adobe-Japan1-90pv-RKSJ"
+                },
+                {
+                    "blank": 18,
+                    "code": 109,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Adobe-Japan1-H-CID"
+                },
+                {
+                    "blank": 16,
+                    "code": 311,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Adobe-Japan1-H-Host"
+                },
+                {
+                    "blank": 13,
+                    "code": 256,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Adobe-Japan1-H-Mac"
+                },
+                {
+                    "blank": 28,
+                    "code": 1051,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Adobe-Japan1-PS-H"
+                },
+                {
+                    "blank": 18,
+                    "code": 604,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Adobe-Japan1-PS-V"
+                },
+                {
+                    "blank": 196,
+                    "code": 18964,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Adobe-Japan1-UCS2"
+                },
+                {
+                    "blank": 12,
+                    "code": 193,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\EUC-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 93,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\EUC-V"
+                },
+                {
+                    "blank": 16,
+                    "code": 739,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Ext-H"
+                },
+                {
+                    "blank": 17,
+                    "code": 749,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Ext-RKSJ-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 105,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Ext-RKSJ-V"
+                },
+                {
+                    "blank": 10,
+                    "code": 105,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Ext-V"
+                },
+                {
+                    "blank": 12,
+                    "code": 186,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\H"
+                },
+                {
+                    "blank": 10,
+                    "code": 76,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Hankaku"
+                },
+                {
+                    "blank": 10,
+                    "code": 74,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Hiragana"
+                },
+                {
+                    "blank": 10,
+                    "code": 150,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Hojo-EUC-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 64,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Hojo-EUC-V"
+                },
+                {
+                    "blank": 10,
+                    "code": 150,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Hojo-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 64,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Hojo-V"
+                },
+                {
+                    "blank": 10,
+                    "code": 68,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Katakana"
+                },
+                {
+                    "blank": 17,
+                    "code": 838,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\NWP-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 113,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\NWP-V"
+                },
+                {
+                    "blank": 12,
+                    "code": 196,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\RKSJ-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 93,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\RKSJ-V"
+                },
+                {
+                    "blank": 10,
+                    "code": 67,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\Roman"
+                },
+                {
+                    "blank": 78,
+                    "code": 7116,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UCS2-90ms-RKSJ"
+                },
+                {
+                    "blank": 74,
+                    "code": 6787,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UCS2-90pv-RKSJ"
+                },
+                {
+                    "blank": 52,
+                    "code": 4382,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniHojo-UCS2-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 63,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniHojo-UCS2-V"
+                },
+                {
+                    "blank": 55,
+                    "code": 4411,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniHojo-UTF16-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 63,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniHojo-UTF16-V"
+                },
+                {
+                    "blank": 54,
+                    "code": 4406,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniHojo-UTF32-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 63,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniHojo-UTF32-V"
+                },
+                {
+                    "blank": 55,
+                    "code": 4434,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniHojo-UTF8-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 63,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniHojo-UTF8-V"
+                },
+                {
+                    "blank": 96,
+                    "code": 8772,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJIS-UCS2-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 69,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJIS-UCS2-HW-H"
+                },
+                {
+                    "blank": 11,
+                    "code": 266,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJIS-UCS2-HW-V"
+                },
+                {
+                    "blank": 11,
+                    "code": 262,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJIS-UCS2-V"
+                },
+                {
+                    "blank": 152,
+                    "code": 14331,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJIS-UTF16-H"
+                },
+                {
+                    "blank": 13,
+                    "code": 292,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJIS-UTF16-V"
+                },
+                {
+                    "blank": 152,
+                    "code": 14329,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJIS-UTF32-H"
+                },
+                {
+                    "blank": 13,
+                    "code": 292,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJIS-UTF32-V"
+                },
+                {
+                    "blank": 152,
+                    "code": 14359,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJIS-UTF8-H"
+                },
+                {
+                    "blank": 13,
+                    "code": 293,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJIS-UTF8-V"
+                },
+                {
+                    "blank": 152,
+                    "code": 14334,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJIS2004-UTF16-H"
+                },
+                {
+                    "blank": 13,
+                    "code": 292,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJIS2004-UTF16-V"
+                },
+                {
+                    "blank": 152,
+                    "code": 14332,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJIS2004-UTF32-H"
+                },
+                {
+                    "blank": 13,
+                    "code": 292,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJIS2004-UTF32-V"
+                },
+                {
+                    "blank": 152,
+                    "code": 14362,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJIS2004-UTF8-H"
+                },
+                {
+                    "blank": 13,
+                    "code": 293,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJIS2004-UTF8-V"
+                },
+                {
+                    "blank": 12,
+                    "code": 273,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJISPro-UCS2-HW-V"
+                },
+                {
+                    "blank": 11,
+                    "code": 267,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJISPro-UCS2-V"
+                },
+                {
+                    "blank": 12,
+                    "code": 270,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJISPro-UTF8-V"
+                },
+                {
+                    "blank": 152,
+                    "code": 14323,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJISX0213-UTF32-H"
+                },
+                {
+                    "blank": 13,
+                    "code": 288,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJISX0213-UTF32-V"
+                },
+                {
+                    "blank": 152,
+                    "code": 14326,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJISX02132004-UTF32-H"
+                },
+                {
+                    "blank": 13,
+                    "code": 288,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\UniJISX02132004-UTF32-V"
+                },
+                {
+                    "blank": 10,
+                    "code": 93,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\V"
+                },
+                {
+                    "blank": 10,
+                    "code": 93,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan1\\WP-Symbol"
+                },
+                {
+                    "blank": 11,
+                    "code": 91,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Japan2\\Adobe-Japan2-0"
+                },
+                {
+                    "blank": 11,
+                    "code": 103,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\Adobe-Korea1-0"
+                },
+                {
+                    "blank": 11,
+                    "code": 138,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\Adobe-Korea1-1"
+                },
+                {
+                    "blank": 11,
+                    "code": 138,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\Adobe-Korea1-2"
+                },
+                {
+                    "blank": 13,
+                    "code": 80,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\Adobe-Korea1-H-CID"
+                },
+                {
+                    "blank": 15,
+                    "code": 739,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\Adobe-Korea1-H-Host"
+                },
+                {
+                    "blank": 17,
+                    "code": 524,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\Adobe-Korea1-H-Mac"
+                },
+                {
+                    "blank": 12,
+                    "code": 731,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\Adobe-Korea1-KSCms-UHC"
+                },
+                {
+                    "blank": 13,
+                    "code": 532,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\Adobe-Korea1-KSCpc-EUC"
+                },
+                {
+                    "blank": 101,
+                    "code": 9164,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\Adobe-Korea1-UCS2"
+                },
+                {
+                    "blank": 15,
+                    "code": 545,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\KSC-EUC-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 82,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\KSC-EUC-V"
+                },
+                {
+                    "blank": 14,
+                    "code": 540,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\KSC-H"
+                },
+                {
+                    "blank": 52,
+                    "code": 4291,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\KSC-Johab-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 82,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\KSC-Johab-V"
+                },
+                {
+                    "blank": 10,
+                    "code": 82,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\KSC-V"
+                },
+                {
+                    "blank": 17,
+                    "code": 757,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\KSCms-UHC-H"
+                },
+                {
+                    "blank": 17,
+                    "code": 756,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\KSCms-UHC-HW-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 81,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\KSCms-UHC-HW-V"
+                },
+                {
+                    "blank": 93,
+                    "code": 8684,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\KSCms-UHC-UCS2"
+                },
+                {
+                    "blank": 10,
+                    "code": 82,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\KSCms-UHC-V"
+                },
+                {
+                    "blank": 16,
+                    "code": 590,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\KSCpc-EUC-H"
+                },
+                {
+                    "blank": 8,
+                    "code": 610,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\KSCpc-EUC-UCS2"
+                },
+                {
+                    "blank": 78,
+                    "code": 7176,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\KSCpc-EUC-UCS2C"
+                },
+                {
+                    "blank": 10,
+                    "code": 82,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\KSCpc-EUC-V"
+                },
+                {
+                    "blank": 96,
+                    "code": 8990,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\UCS2-KSCms-UHC"
+                },
+                {
+                    "blank": 77,
+                    "code": 7015,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\UCS2-KSCpc-EUC"
+                },
+                {
+                    "blank": 94,
+                    "code": 8629,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\UniKS-UCS2-H"
+                },
+                {
+                    "blank": 10,
+                    "code": 83,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\UniKS-UCS2-V"
+                },
+                {
+                    "blank": 97,
+                    "code": 8796,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\UniKS-UTF16-H"
+                },
+                {
+                    "blank": 12,
+                    "code": 85,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\UniKS-UTF16-V"
+                },
+                {
+                    "blank": 97,
+                    "code": 8794,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\UniKS-UTF32-H"
+                },
+                {
+                    "blank": 12,
+                    "code": 85,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\UniKS-UTF32-V"
+                },
+                {
+                    "blank": 99,
+                    "code": 8890,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\UniKS-UTF8-H"
+                },
+                {
+                    "blank": 12,
+                    "code": 85,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-Korea1\\UniKS-UTF8-V"
+                },
+                {
+                    "blank": 10,
+                    "code": 77,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-KR\\Adobe-KR-0"
+                },
+                {
+                    "blank": 10,
+                    "code": 84,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-KR\\Adobe-KR-1"
+                },
+                {
+                    "blank": 10,
+                    "code": 110,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-KR\\Adobe-KR-2"
+                },
+                {
+                    "blank": 10,
+                    "code": 111,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-KR\\Adobe-KR-3"
+                },
+                {
+                    "blank": 10,
+                    "code": 112,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-KR\\Adobe-KR-4"
+                },
+                {
+                    "blank": 10,
+                    "code": 113,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-KR\\Adobe-KR-5"
+                },
+                {
+                    "blank": 10,
+                    "code": 121,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-KR\\Adobe-KR-6"
+                },
+                {
+                    "blank": 10,
+                    "code": 139,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-KR\\Adobe-KR-7"
+                },
+                {
+                    "blank": 10,
+                    "code": 153,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-KR\\Adobe-KR-8"
+                },
+                {
+                    "blank": 10,
+                    "code": 155,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-KR\\Adobe-KR-9"
+                },
+                {
+                    "blank": 130,
+                    "code": 12306,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-KR\\Adobe-KR-UCS2"
+                },
+                {
+                    "blank": 133,
+                    "code": 12462,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-KR\\UniAKR-UTF16-H"
+                },
+                {
+                    "blank": 132,
+                    "code": 12457,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-KR\\UniAKR-UTF32-H"
+                },
+                {
+                    "blank": 133,
+                    "code": 12554,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\cMap\\Adobe-KR\\UniAKR-UTF8-H"
+                },
+                {
+                    "blank": 5,
+                    "code": 24,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\COPYING"
+                },
+                {
+                    "blank": 5,
+                    "code": 28,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\COPYING.adobe"
+                },
+                {
+                    "blank": 26,
+                    "code": 130,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\COPYING.gpl2"
+                },
+                {
+                    "blank": 13,
+                    "code": 320,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\Makefile"
+                },
+                {
+                    "blank": 0,
+                    "code": 58,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\nameToUnicode\\Bulgarian"
+                },
+                {
+                    "blank": 0,
+                    "code": 11,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\nameToUnicode\\Greek"
+                },
+                {
+                    "blank": 0,
+                    "code": 116,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\nameToUnicode\\Thai"
+                },
+                {
+                    "blank": 3,
+                    "code": 5,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\poppler-data.pc"
+                },
+                {
+                    "blank": 3,
+                    "code": 5,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\poppler-data.pc.in"
+                },
+                {
+                    "blank": 5,
+                    "code": 18,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\README"
+                },
+                {
+                    "blank": 0,
+                    "code": 13058,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\unicodeMap\\Big5"
+                },
+                {
+                    "blank": 0,
+                    "code": 13117,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\unicodeMap\\Big5ascii"
+                },
+                {
+                    "blank": 0,
+                    "code": 6653,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\unicodeMap\\EUC-CN"
+                },
+                {
+                    "blank": 0,
+                    "code": 6535,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\unicodeMap\\EUC-JP"
+                },
+                {
+                    "blank": 0,
+                    "code": 10501,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\unicodeMap\\GBK"
+                },
+                {
+                    "blank": 0,
+                    "code": 6573,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\unicodeMap\\ISO-2022-CN"
+                },
+                {
+                    "blank": 0,
+                    "code": 6472,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\unicodeMap\\ISO-2022-JP"
+                },
+                {
+                    "blank": 0,
+                    "code": 6499,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\unicodeMap\\ISO-2022-KR"
+                },
+                {
+                    "blank": 0,
+                    "code": 40,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\unicodeMap\\ISO-8859-6"
+                },
+                {
+                    "blank": 0,
+                    "code": 63,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\unicodeMap\\ISO-8859-7"
+                },
+                {
+                    "blank": 0,
+                    "code": 63,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\unicodeMap\\ISO-8859-8"
+                },
+                {
+                    "blank": 0,
+                    "code": 67,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\unicodeMap\\ISO-8859-9"
+                },
+                {
+                    "blank": 0,
+                    "code": 100,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\unicodeMap\\KOI8-R"
+                },
+                {
+                    "blank": 0,
+                    "code": 132,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\unicodeMap\\Latin2"
+                },
+                {
+                    "blank": 0,
+                    "code": 6478,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\unicodeMap\\Shift-JIS"
+                },
+                {
+                    "blank": 0,
+                    "code": 47,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\unicodeMap\\TIS-620"
+                },
+                {
+                    "blank": 0,
+                    "code": 66,
+                    "comment": 0,
+                    "filename": "Release-24.02.0-0\\poppler-24.02.0\\share\\poppler\\unicodeMap\\Windows-1255"
+                },
+                {
+                    "blank": 0,
+                    "code": 4,
+                    "comment": 0,
+                    "filename": "requirements.txt"
+                }
+            ]
+        }
+    ]
+}

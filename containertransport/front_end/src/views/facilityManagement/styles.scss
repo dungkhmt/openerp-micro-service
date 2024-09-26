@@ -1,0 +1,224 @@
+.fullScreen {
+    background-color: rgb(246, 246, 246);
+    min-height: calc(100vh - 64px);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding: 16px 24px 0px 24px;
+    .MuiContainer-root {
+        padding: 0;
+    }
+
+    // margin-top: 20px;
+}
+
+.container {
+    width: 100%;
+    .divider {
+        margin-top: 8px;
+        margin-bottom: 48px;
+    }
+}
+
+.headerScreen {
+    padding: 25px 16px 20px 16px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: rgb(246, 246, 246);
+
+    .MuiButtonBase-root {
+        min-width: 70px;
+        line-height: 1.5;
+    }
+
+    .title {
+        .MuiTypography-root {
+            font-size: 24px;
+            font-weight: 700;
+        }
+    }
+    .btn-add {
+        .btn-headerScreen {
+            display: flex;
+            align-items: center;
+    
+            .material-icons {
+                height: auto;
+                display: flex;
+                margin-right: 4px;
+            }
+        }
+    }
+}
+
+// .modal {
+//     position: absolute;
+//     margin-top: 10%;
+//     margin-left: 35%;
+//     min-width: 700px;
+//     height: auto;
+//     background-color: white;
+//     padding: 32px;
+
+//     .header-modal {
+//         font-weight: 800;
+
+//         .header-modal-text {
+//             font-weight: 650;
+//         }
+//     }
+
+//     .body-modal {
+//         display: flex;
+//         flex-direction: column;
+//         align-items: center;
+
+//         .body-modal-item {
+//             width: 90%;
+//             display: flex;
+//             align-items: center;
+//             justify-content: space-between;
+//             margin-bottom: 24px;
+
+//             .body-modal-item-text {
+//                 font-weight: 600;
+//             }
+//         }
+
+//         .body-modal-item-input {
+//             .MuiOutlinedInput-root {
+//                 height: 40px;
+//                 width: 300px;
+//             }
+
+//             .MuiFormLabel-root {
+//                 font-size: 12px;
+//             }
+//         }
+//     }
+
+//     .footer-modal {
+//         display: flex;
+//         justify-content: flex-end;
+//         margin-top: 32px;
+
+//         .btn-modal {
+//             display: flex;
+//             justify-content: space-between;
+//             width: 25%;
+//             margin-right: 32px;
+//         }
+//     }
+// }
+
+.bodyContent {
+    background-color: white;
+}
+
+.facility-info {
+    background-color: white;
+    padding: 16px 32px;
+    margin-bottom: 32px;
+
+    .facility-info-item {
+        display: flex;
+
+        .facility-info-item-text {
+            width: 25%;
+            margin-bottom: 16px;
+
+            .MuiTypography-root {
+                font-weight: 550;
+            }
+        }
+    }
+}
+
+.header-detail {
+    .headerScreen-go-back {
+        display: flex;
+        align-items: center;
+    }
+
+    .headerScreen-detail-info {
+        padding: 25px 16px 20px 16px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        background-color: rgb(246, 246, 246);
+
+        .MuiButtonBase-root {
+            min-width: 70px;
+            line-height: 1.5;
+        }
+
+        .title-header {
+            .MuiTypography-root {
+                font-size: 24px;
+                font-weight: 700;
+            }
+        }
+
+        .btn-header {
+            display: flex;
+            align-items: center;
+
+            .header-create-shipment-btn-cancel {
+                margin-right: 32px;
+            }
+
+            .MuiButtonBase-root {
+                text-transform: none;
+            }
+        }
+    }
+}
+
+.contentModalFacility {
+    .contentModal-item {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 32px;
+        margin-bottom: 32px;
+        align-items: center;
+
+        .contentModal-item-text {
+            width: 40%;
+
+            .MuiTypography-root {
+                font-weight: 600;
+            }
+        }
+
+        .contentModal-item-input {
+            width: 60%;
+            // display: flex;
+
+            .MuiOutlinedInput-root {
+                min-height: 40px;
+                width: 100%;
+            }
+            .MuiFormControl-root {
+                min-width: 100%;
+            }
+            // .MuiInputLabel-root {
+            //     top: -10px;
+            //     // transform: translate(14px, 16px) scale(0.85);
+            // }
+        }
+    }
+}
+.list-place {
+
+}
+.icon-view-screen {
+    .MuiSvgIcon-root {
+        color: #747474;
+    }
+}
+.icon-view-screen:hover {
+    .MuiSvgIcon-root {
+        color: #c82a2a;
+    }
+}

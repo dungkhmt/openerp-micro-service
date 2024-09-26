@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <conversionRule conversionWord="colorize" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+
+    <appender name="OPEN_TELEMETRY" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
+        <captureExperimentalAttributes>true</captureExperimentalAttributes>
+        <captureKeyValuePairAttributes>true</captureKeyValuePairAttributes>
+    </appender>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%yellow(%d{yyyy-MM-dd HH:mm:ss.SSS}) level=%colorize(%-5p){TRACE=34, DEBUG=34, INFO=32, WARN=33, ERROR=31, FATAL=31} host=%magenta(${hostName}) thread=%blue(%t) [traceID=%magenta(%X{traceId:-}), spanID=%magenta(%X{spanId:-})] %cyan(%-40.40logger{39}) : %msg%n%ex</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="OPEN_TELEMETRY"/>
+    </root>
+</configuration>

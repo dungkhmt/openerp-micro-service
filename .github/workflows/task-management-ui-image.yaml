@@ -1,0 +1,30 @@
+name: task-management-ui Image CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "task-management/task-management-frontend/**"
+
+env:
+  NODE_OPTIONS: "--max-old-space-size=4096"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        name: Check out code
+      - name: Build & push Docker image
+        uses: mr-smithers-excellent/docker-build-push@v6
+        with:
+          image: leanhtuan/task-management-ui
+          directory: "task-management/task-management-frontend/"
+          registry: docker.io
+          dockerfile: "task-management/task-management-frontend/Dockerfile"
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          addLatest: true
+#        addTimestamp: true

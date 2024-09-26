@@ -1,0 +1,1 @@
+This module aims to manage the assets of organization

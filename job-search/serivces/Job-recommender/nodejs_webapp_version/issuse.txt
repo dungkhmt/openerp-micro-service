@@ -1,0 +1,10 @@
+Vấn đề xử lí dữ liệu:
+một, tiếng anh/ việt lẫn lộn
+hai, range lương lẫn lộn tiếng anh với tiếng việt
+ba, một số thuộc tính đặt giá trị không trực tiếp, ví dụ lương thỏa thuận
+bốn, chưa có biện pháp so sánh hai thuộc tính khác kiểu string
+năm, có thể thay thế các phương pháp khác để tính độ tương đồng giữa hai chuỗi ngoài độ đo cosine
+
+Về mặt kỹ thuật backend:
+một, API rõ ràng chưa tối ưu, nhập nhằng async await
+hai, chưa cache dữ liệu từ người dùng

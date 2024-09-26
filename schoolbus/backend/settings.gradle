@@ -1,0 +1,6 @@
+rootProject.name = 'school-bus-system'
+
+include 'api'
+include 'consumer'
+include 'migration'
+include 'shared'

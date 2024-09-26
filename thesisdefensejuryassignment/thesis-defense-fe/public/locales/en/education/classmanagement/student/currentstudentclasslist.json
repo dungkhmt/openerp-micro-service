@@ -1,0 +1,16 @@
+{
+  "title": "Class List",
+  "columns": {
+    "classCode": "Class Code",
+    "courseId": "Course Code",
+    "name": "Course Name",
+    "classType": "Course Type",
+    "semester": "Semester",
+    "status": "Status"
+  },
+  "classStatus": {
+    "approved": "Approved",
+    "pendingApproval": "Waiting for approval"
+  },
+  "notiWhenClickingNonApprovedClass": "Please wait for the teacher's approval to view details of class "
+}

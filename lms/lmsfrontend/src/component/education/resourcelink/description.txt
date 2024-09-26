@@ -1,0 +1,1 @@
+this module aims to manage useful resource links for learning

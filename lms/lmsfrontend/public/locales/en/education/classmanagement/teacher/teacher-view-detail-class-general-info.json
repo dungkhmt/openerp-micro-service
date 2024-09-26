@@ -1,0 +1,10 @@
+{
+  "title": "Class Information",
+  "edit": "Edit",
+  "classDetail": {
+    "code": "Class Code",
+    "courseId": "Course Code",
+    "name": "Course Name",
+    "classType": "Class Type"
+  }
+}

@@ -1,0 +1,56 @@
+export const category = {
+  id: "MENU_SCM_CATEGORY",
+  icon: "CategoryIcon",
+  text: "Category",
+  child: [
+    {
+      id: "MENU_SCM_CATEGORY.PRODUCT",
+      path: "/category/product",
+      isPublic: false,
+      text: "Product",
+      child: [],
+    },
+    {
+      id: "MENU_SCM_CATEGORY.CUSTOMER",
+      path: "/category/customer",
+      isPublic: false,
+      text: "Customer",
+      child: [],
+    },
+    {
+      id: "MENU_SCM_CATEGORY.PRODUCT_UNIT",
+      path: "/category/unit-product",
+      isPublic: false,
+      text: "Product Unit",
+      child: [],
+    },
+    {
+      id: "MENU_SCM_CATEGORY.PRODUCT_CATEGORY",
+      path: "/category/category-product",
+      isPublic: false,
+      text: "Product Category",
+      child: [],
+    },
+    {
+      id: "MENU_SCM_CATEGORY.DISTRIBUTING_CHANNEL",
+      path: "/category/distributing-channel",
+      isPublic: false,
+      text: "Distribution Channel",
+      child: [],
+    },
+    {
+      id: "MENU_SCM_CATEGORY.CUSTOMER_TYPE",
+      path: "/category/type-customer",
+      isPublic: false,
+      text: "Customer Type",
+      child: [],
+    },
+    {
+      id: "MENU_SCM_CATEGORY.CONTRACT_TYPE",
+      path: "/category/type-contract",
+      isPublic: false,
+      text: "Contract Type",
+      child: [],
+    },
+  ],
+};

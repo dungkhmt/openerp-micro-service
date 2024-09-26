@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Configuration">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Appenders">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Console">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="PatternLayout">
+                      <xs:complexType>
+                        <xs:attribute name="pattern" use="required" />
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="name" use="required" />
+                  <xs:attribute name="target" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="RollingFile">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="PatternLayout">
+                      <xs:complexType>
+                        <xs:attribute name="pattern" use="required" />
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Policies">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="TimeBasedTriggeringPolicy" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="name" use="required" />
+                  <xs:attribute name="fileName" use="required" />
+                  <xs:attribute name="filePattern" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Loggers">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Root">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="AppenderRef" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:attribute name="ref" use="required" />
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="level" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="status" use="required" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

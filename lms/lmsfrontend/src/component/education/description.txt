@@ -1,0 +1,207 @@
+* Định dạng nội dung tệp excel:
+    - Chung:
+        + Header: (CẦN CÓ) dòng đầu tiên của bảng được mặc định là Header, 
+          nếu không có Header và dòng đầu tiên là dữ liệu thì dòng dữ liệu đầu tiên sẽ được xem là header và
+          không được lưu.
+        + Không được chứa ô (nhóm ô) dữ liệu nào nằm ngoài bảng dữ liệu, nếu không ô dữ liệu đó.
+          cũng sẽ được tính vào phạm vi, dẫn đến sai định dạng nội dung.
+        + Không yêu cầu bảng dữ liệu có đường viền hay được định dạng, trang trí.
+        + Không sử dụng hợp nhất (merge cell) hai hay nhiều ô trong bảng, vì khi đó các ô được hợp nhất sẽ được
+          tính như 1 ô thông thường, dẫn tới thiếu ô dữ liệu theo kích thước bảng, do đó sai định dạng nội dung.
+        + Vị trí của các cột được yêu cầu cần được đảm bảo đúng thứ tự và kiểu dữ liệu, có thể thêm một lượng
+          tuỳ ý các cột khác (ghi chú,...) nhưng các cột không được yêu cầu này sẽ bị loại bỏ khi xử lý.
+        + Các cột yêu cầu được lấy theo thứ tự liên tiếp từ trái sang phải.
+    - Môn học:
+            + Tên sheet: "courses"
+            + Số cột: 3 (chính xác)
+
+downloadFile.js
+import { saveAs } from "file-saver";
+
+/**
+ * Download a file using `filename` specified in `content-disposition` header
+ * @param {string} url             - URL to request
+ * @param {Object} [fetchProps]    - Optional addtional props to pass to `fetch`
+ * @example
+ *     await downloadFile('https://example.com/myfile', { credentials: 'include' })
+ */
+export async function downloadFile(url, fetchProps) {
+  try {
+    const response = await fetch(url, fetchProps);
+
+    if (!response.ok) {
+      throw new Error(response);
+    }
+
+    console.log(response);
+    // Extract filename from header
+    // const filename = response.headers
+    //   .get("Content-Disposition")
+    //   .split(";")
+    //   .find((n) => n.includes("filename="))
+    //   .replace("filename=", "")
+    //   .trim();
+    const blob = await response.blob();
+
+    // Download the file
+    saveAs(blob, "download.zip");
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+const onClickDownloadButton = () => {
+    // setIsDownloading(true);
+
+    // let studentIds = selectedSubmissions.map(
+    //   (submission) => submission.studentId
+    // );
+
+    // downloadFile(
+    //   "http://localhost:8080/api/edu/assignment/717729ee-fe55-11ea-8b6c-0862665303f9/submission/files",
+    //   {
+    //     method: "POST",
+    //     headers: {
+    //       "content-type": "application/json",
+    //       "X-Auth-Token": token,
+    //     },
+    //     body: JSON.stringify({ studentIds: studentIds }),
+    //   }
+    // );
+  };
+
+Apr2
+const onClickDownloadButton = () => {
+    setIsDownloading(true);
+
+    let studentIds = selectedSubmissions.map(
+      (submission) => submission.studentId
+    );
+
+    // const fileStream = streamSaver.createWriteStream("download.zip");
+
+    // authPost(
+    //   dispatch,
+    //   token,
+    //   "/edu/assignment/717729ee-fe55-11ea-8b6c-0862665303f9/submission/files",
+    //   { studentIds: studentIds }
+    // ).then((res) => {
+    //   const readableStream = res.body;
+
+    //   // more optimized
+    //   if (window.WritableStream && readableStream.pipeTo) {
+    //     return readableStream
+    //       .pipeTo(fileStream)
+    //       .then(() => console.log("done writing"));
+    //   }
+
+    //   const writer = fileStream.getWriter();
+
+    //   const reader = res.body.getReader();
+    //   const pump = () =>
+    //     reader
+    //       .read()
+    //       .then((res) =>
+    //         res.done ? writer.close() : writer.write(res.value).then(pump)
+    //       );
+
+    //   pump();
+    // });
+
+    const strategy = new ByteLengthQueuingStrategy({
+      highWaterMark: 32 * 1024,
+    });
+    const fileStream = streamSaver.createWriteStream("download.zip", strategy);
+
+    authPost(
+      dispatch,
+      token,
+      "/edu/assignment/717729ee-fe55-11ea-8b6c-0862665303f9/submission/files",
+      { studentIds: studentIds }
+    )
+      .then(async (res) => {
+        //If the WritableStream is not available (Firefox, Safari), take it from the ponyfill
+        if (!window.WritableStream) {
+          streamSaver.WritableStream = WritableStream;
+          window.WritableStream = WritableStream;
+        }
+
+        const readableStream = res.body;
+
+        // More optimized
+        if (readableStream.pipeTo) {
+          await readableStream.pipeTo(fileStream);
+          return console.log("done writing");
+        }
+
+        const writer = fileStream.getWriter();
+
+        const reader = res.body.getReader();
+        const pump = () =>
+          reader
+            .read()
+            .then((res) =>
+              res.done ? writer.close() : writer.write(res.value).then(pump)
+            );
+
+        pump();
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
+Apr3
+const onClickDownloadButton = () => {
+    setIsDownloading(true);
+
+    let studentIds = selectedSubmissions.map(
+      (submission) => submission.studentId
+    );
+
+    axios
+      .post(
+        "http://localhost:8080/api/edu/assignment/717729ee-fe55-11ea-8b6c-0862665303f9/submission/files",
+        { studentIds: studentIds },
+        {
+          headers: {
+            "content-type": "application/json",
+            "X-Auth-Token": token,
+          },
+          responseType: "arraybuffer",
+        }
+      )
+      .then((res) => {
+        setIsDownloading(false);
+        saveFile(params.assignmentId, res.data);
+      })
+      .catch((e) => {
+        setIsDownloading(false);
+        // Thong bao loi
+        console.log(e);
+      });
+  };
+
+  const saveFile = (fileName, data) => {
+    let blob = new Blob([data], { type: "application/zip" });
+
+    //IE11 support
+    if (window.navigator.msSaveOrOpenBlob) {
+      window.navigator.msSaveBlob(blob, fileName);
+    } else {
+      let link = window.document.createElement("a");
+
+      link.href = window.URL.createObjectURL(blob);
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // other browsers
+      // Second approach but cannot specify saved name!
+      // let file = new File([data], fileName, { type: "application/zip" });
+      // let exportUrl = URL.createObjectURL(file);
+      // window.location.assign(exportUrl);
+      // URL.revokeObjectURL(exportUrl);
+    }
+  };
+            

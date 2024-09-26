@@ -1,0 +1,21 @@
+{
+  "ID": "ID",
+  "problem": "Bài tập",
+  "problemId": "Mã bài tập",
+  "level": "Mức độ",
+  "submitted": "Đã nộp",
+  "accepted": "Đã hoàn thành",
+  "maxPoint": "Điểm đạt được",
+  "tags": "Nhãn",
+  "problemList": {
+    "title": "Bài tập"
+  },
+  "submissionList": {
+    "title": "Bài nộp",
+    "status": "Trạng thái",
+    "language": "Ngôn ngữ",
+    "point": "Điểm",
+    "at": "Thời gian",
+    "numTestCases": "Số test case"
+  }
+}

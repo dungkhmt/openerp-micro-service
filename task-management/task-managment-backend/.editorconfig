@@ -1,0 +1,8 @@
+[*.java]
+ident_line = ^package
+indent_size = 4
+indent_char = space
+
+[*.md]
+indent_size = 2
+indent_char = space

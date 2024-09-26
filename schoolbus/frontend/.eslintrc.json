@@ -1,0 +1,17 @@
+{
+  "extends": "next/core-web-vitals",
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "paths": [
+          "."
+        ],
+        "alias": {
+          "@/*": [
+            "./*"
+          ]
+        }
+      }
+    }
+  }
+}

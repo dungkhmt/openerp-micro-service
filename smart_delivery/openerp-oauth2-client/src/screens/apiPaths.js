@@ -1,0 +1,13 @@
+export const API_PATH = {
+    HUB: "/smdeli/hubmanager/hub",
+    HUB_DETAIL: "/smdeli/hubmanager/hub",
+    CREATE_HUB: "/smdeli/hubmanager/hub/add",
+    UPDATE_HUB: "/smdeli/hubmanager/hub/update",
+    DELETE_HUB: "/smdeli/hubmanager/hub/delete",
+    PRODUCT_WAREHOUSE: "/smdeli/hubmanager/warehouse/product",
+    PRODUCT: "/smdeli/hubmanager/product",
+    PRODUCT_WITHOUT_IMAGE: "/smdeli/hubmanager/product/without-image",
+    PRODUCT_CATEGORY: "/smdeli/hubmanager/product/category",
+    PRODUCT_PRICE: "/smdeli/hubmanager/product/price-config",
+    RECEIPT: "/smdeli/hubmanager/receipt",
+}

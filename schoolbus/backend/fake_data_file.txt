@@ -1,0 +1,195 @@
+-- insert fake account
+INSERT INTO public.tieptd_194185_account (created_at, password, provider, provider_id, role, updated_at, username)
+VALUES
+    ('2024-04-23 10:00:00', 'password1', 'GOOGLE', 'google_id_1', 'user', '2024-04-23 10:00:00', 'user1'),
+    ('2024-04-23 10:01:00', 'password2', 'GOOGLE', 'google_id_2', 'user', '2024-04-23 10:01:00', 'user2'),
+    ('2024-04-23 10:02:00', 'password3', 'GOOGLE', 'google_id_3', 'admin', '2024-04-23 10:02:00', 'admin1'),
+    ('2024-04-23 10:03:00', 'password4', 'GOOGLE', 'google_id_4', 'user', '2024-04-23 10:03:00', 'user3'),
+    ('2024-04-23 10:04:00', 'password5', 'GOOGLE', 'google_id_5', 'user', '2024-04-23 10:04:00', 'user4'),
+    ('2024-04-23 10:05:00', 'password6', 'GOOGLE', 'google_id_6', 'user', '2024-04-23 10:05:00', 'user5'),
+    ('2024-04-23 10:06:00', 'password7', 'GOOGLE', 'google_id_7', 'user', '2024-04-23 10:06:00', 'user6'),
+    ('2024-04-23 10:07:00', 'password8', 'GOOGLE', 'google_id_8', 'user', '2024-04-23 10:07:00', 'user7'),
+    ('2024-04-23 10:08:00', 'password9', 'GOOGLE', 'google_id_9', 'user', '2024-04-23 10:08:00', 'user8'),
+    ('2024-04-23 10:09:00', 'password10', 'GOOGLE', 'google_id_10', 'user', '2024-04-23 10:09:00', 'user9'),
+    ('2024-04-23 10:10:00', 'password11', 'GOOGLE', 'google_id_11', 'user', '2024-04-23 10:10:00', 'user10'),
+    ('2024-04-23 10:11:00', 'password12', 'GOOGLE', 'google_id_12', 'user', '2024-04-23 10:11:00', 'user11'),
+    ('2024-04-23 10:12:00', 'password13', 'GOOGLE', 'google_id_13', 'user', '2024-04-23 10:12:00', 'user12'),
+    ('2024-04-23 10:13:00', 'password14', 'GOOGLE', 'google_id_14', 'user', '2024-04-23 10:13:00', 'user13'),
+    ('2024-04-23 10:14:00', 'password15', 'GOOGLE', 'google_id_15', 'user', '2024-04-23 10:14:00', 'user14'),
+    ('2024-04-23 10:15:00', 'password16', 'GOOGLE', 'google_id_16', 'user', '2024-04-23 10:15:00', 'user15'),
+    ('2024-04-23 10:16:00', 'password17', 'GOOGLE', 'google_id_17', 'user', '2024-04-23 10:16:00', 'user16'),
+    ('2024-04-23 10:17:00', 'password18', 'GOOGLE', 'google_id_18', 'user', '2024-04-23 10:17:00', 'user17'),
+    ('2024-04-23 10:18:00', 'password19', 'GOOGLE', 'google_id_19', 'user', '2024-04-23 10:18:00', 'user18'),
+    ('2024-04-23 10:19:00', 'password20', 'GOOGLE', 'google_id_20', 'user', '2024-04-23 10:19:00', 'user19');
+
+INSERT INTO public.tieptd_194185_account (created_at, password, provider, provider_id, role, updated_at, username)
+VALUES
+    ('2024-04-23 10:20:00', 'mật khẩu1', 'GOOGLE', 'google_id_21', 'user', '2024-04-23 10:20:00', 'người_dùng1'),
+    ('2024-04-23 10:21:00', 'mật khẩu2', 'GOOGLE', 'google_id_22', 'user', '2024-04-23 10:21:00', 'người_dùng2'),
+    ('2024-04-23 10:22:00', 'mật khẩu3', 'GOOGLE', 'google_id_23', 'admin', '2024-04-23 10:22:00', 'quản_trị1'),
+    ('2024-04-23 10:23:00', 'mật khẩu4', 'GOOGLE', 'google_id_24', 'user', '2024-04-23 10:23:00', 'người_dùng3'),
+    ('2024-04-23 10:24:00', 'mật khẩu5', 'GOOGLE', 'google_id_25', 'user', '2024-04-23 10:24:00', 'người_dùng4'),
+    ('2024-04-23 10:25:00', 'mật khẩu6', 'GOOGLE', 'google_id_26', 'user', '2024-04-23 10:25:00', 'người_dùng5'),
+    ('2024-04-23 10:26:00', 'mật khẩu7', 'GOOGLE', 'google_id_27', 'user', '2024-04-23 10:26:00', 'người_dùng6'),
+    ('2024-04-23 10:27:00', 'mật khẩu8', 'GOOGLE', 'google_id_28', 'user', '2024-04-23 10:27:00', 'người_dùng7'),
+    ('2024-04-23 10:28:00', 'mật khẩu9', 'GOOGLE', 'google_id_29', 'user', '2024-04-23 10:28:00', 'người_dùng8'),
+    ('2024-04-23 10:29:00', 'mật khẩu10', 'GOOGLE', 'google_id_30', 'user', '2024-04-23 10:29:00', 'người_dùng9'),
+    ('2024-04-23 10:30:00', 'mật khẩu11', 'GOOGLE', 'google_id_31', 'user', '2024-04-23 10:30:00', 'người_dùng10'),
+    ('2024-04-23 10:31:00', 'mật khẩu12', 'GOOGLE', 'google_id_32', 'user', '2024-04-23 10:31:00', 'người_dùng11'),
+    ('2024-04-23 10:32:00', 'mật khẩu13', 'GOOGLE', 'google_id_33', 'user', '2024-04-23 10:32:00', 'người_dùng12'),
+    ('2024-04-23 10:33:00', 'mật khẩu14', 'GOOGLE', 'google_id_34', 'user', '2024-04-23 10:33:00', 'người_dùng13'),
+    ('2024-04-23 10:34:00', 'mật khẩu15', 'GOOGLE', 'google_id_35', 'user', '2024-04-23 10:34:00', 'người_dùng14'),
+    ('2024-04-23 10:35:00', 'mật khẩu16', 'GOOGLE', 'google_id_36', 'user', '2024-04-23 10:35:00', 'người_dùng15'),
+    ('2024-04-23 10:36:00', 'mật khẩu17', 'GOOGLE', 'google_id_37', 'user', '2024-04-23 10:36:00', 'người_dùng16'),
+    ('2024-04-23 10:37:00', 'mật khẩu18', 'GOOGLE', 'google_id_38', 'user', '2024-04-23 10:37:00', 'người_dùng17'),
+    ('2024-04-23 10:38:00', 'mật khẩu19', 'GOOGLE', 'google_id_39', 'user', '2024-04-23 10:38:00', 'người_dùng18'),
+    ('2024-04-23 10:39:00', 'mật khẩu20', 'GOOGLE', 'google_id_40', 'user', '2024-04-23 10:39:00', 'người_dùng19');
+
+
+-- Chèn dữ liệu cho 40 phụ huynh
+INSERT INTO public.tieptd_194185_parent (avatar, created_at, dob, name, phone_number, updated_at, account_id)
+SELECT
+    'parent_avatar_' || p.id,
+    NOW() - INTERVAL '10 years' * (RANDOM() * 60),
+    NOW() - INTERVAL '40 years' * (RANDOM() * 20),
+    'Parent_' || p.id,
+    '090123456' || LPAD(p.id::TEXT, 2, '0'),
+    NOW(),
+    p.id
+FROM
+    public.tieptd_194185_account p
+WHERE
+    p.id BETWEEN 8 AND 47;
+
+-- Chèn dữ liệu cho học sinh
+INSERT INTO public.tieptd_194185_student (avatar, created_at, dob, name, phone_number, student_class, updated_at, parent_id)
+SELECT
+    'student_avatar_' || s.id,
+    NOW() - INTERVAL '5 years' * (RANDOM() * 20),
+    NOW() - INTERVAL '15 years' * (RANDOM() * 20),
+    'Student_' || s.id,
+    '091123456' || LPAD(s.id::TEXT, 2, '0'),
+    'Class ' || (s.id % 10 + 1)::TEXT,
+    NOW(),
+    (SELECT id FROM public.tieptd_194185_parent ORDER BY RANDOM() LIMIT 1)
+FROM
+    generate_series(1, 140) AS s(id);
+
+-- random học sinh cho các phụ huynh
+UPDATE public.tieptd_194185_student
+SET parent_id = floor(random() * (41 - 2 + 1) + 2)::int
+WHERE id BETWEEN 3 AND 142;
+
+-- UPDATE WRONT ROLE ACCOUNT
+UPDATE tieptd_194185_account
+SET role = 'CLIENT'
+WHERE role IN ('user', 'admin');
+
+-- insert request registration
+INSERT INTO tieptd_194185_request_registration(student_id, parent_id, status, address, longitude, latitude)
+SELECT
+    s.id,
+    s.parent_id,
+    'PENDING',
+    'GENERATED FAKE ADDRESS',
+    (random() * (105.87346536141857 - 105.52825604797042) + 105.52825604797042)::float,
+    (random() * (21.186353704692372 - 20.96401621449411) + 20.96401621449411)::float
+FROM
+    tieptd_194185_student s;
+
+-- insert fake account employee
+INSERT INTO public.tieptd_194185_account (created_at, password, provider, provider_id, role, updated_at, username)
+VALUES
+    ('2024-04-23 10:00:00', 'password1', 'GOOGLE', 'google_id_1', 'CLIENT', '2024-04-23 10:00:00', 'nhan_vien_1'),
+    ('2024-04-23 10:01:00', 'password2', 'GOOGLE', 'google_id_2', 'CLIENT', '2024-04-23 10:01:00', 'nhan_vien_2'),
+    ('2024-04-23 10:02:00', 'password3', 'GOOGLE', 'google_id_3', 'CLIENT', '2024-04-23 10:02:00', 'nhan_vien_3'),
+    ('2024-04-23 10:03:00', 'password4', 'GOOGLE', 'google_id_4', 'CLIENT', '2024-04-23 10:03:00', 'nhan_vien_4'),
+    ('2024-04-23 10:04:00', 'password5', 'GOOGLE', 'google_id_5', 'CLIENT', '2024-04-23 10:04:00', 'nhan_vien_5'),
+    ('2024-04-23 10:05:00', 'password6', 'GOOGLE', 'google_id_6', 'CLIENT', '2024-04-23 10:05:00', 'nhan_vien_6'),
+    ('2024-04-23 10:06:00', 'password7', 'GOOGLE', 'google_id_7', 'CLIENT', '2024-04-23 10:06:00', 'nhan_vien_7'),
+    ('2024-04-23 10:07:00', 'password8', 'GOOGLE', 'google_id_8', 'CLIENT', '2024-04-23 10:07:00', 'nhan_vien_8'),
+    ('2024-04-23 10:08:00', 'password9', 'GOOGLE', 'google_id_9', 'CLIENT', '2024-04-23 10:08:00', 'nhan_vien_9'),
+    ('2024-04-23 10:09:00', 'password10', 'GOOGLE', 'google_id_10', 'CLIENT', '2024-04-23 10:09:00', 'nhan_vien_10'),
+    ('2024-04-23 10:10:00', 'password11', 'GOOGLE', 'google_id_11', 'CLIENT', '2024-04-23 10:10:00', 'nhan_vien_11'),
+    ('2024-04-23 10:11:00', 'password12', 'GOOGLE', 'google_id_12', 'CLIENT', '2024-04-23 10:11:00', 'nhan_vien_12'),
+    ('2024-04-23 10:12:00', 'password13', 'GOOGLE', 'google_id_13', 'CLIENT', '2024-04-23 10:12:00', 'nhan_vien_13'),
+    ('2024-04-23 10:13:00', 'password14', 'GOOGLE', 'google_id_14', 'CLIENT', '2024-04-23 10:13:00', 'nhan_vien_14'),
+    ('2024-04-23 10:14:00', 'password15', 'GOOGLE', 'google_id_15', 'CLIENT', '2024-04-23 10:14:00', 'nhan_vien_15'),
+    ('2024-04-23 10:15:00', 'password16', 'GOOGLE', 'google_id_16', 'CLIENT', '2024-04-23 10:15:00', 'nhan_vien_16'),
+    ('2024-04-23 10:16:00', 'password17', 'GOOGLE', 'google_id_17', 'CLIENT', '2024-04-23 10:16:00', 'nhan_vien_17'),
+    ('2024-04-23 10:17:00', 'password18', 'GOOGLE', 'google_id_18', 'CLIENT', '2024-04-23 10:17:00', 'nhan_vien_18'),
+    ('2024-04-23 10:18:00', 'password19', 'GOOGLE', 'google_id_19', 'CLIENT', '2024-04-23 10:18:00', 'nhan_vien_19'),
+    ('2024-04-23 10:19:00', 'password20', 'GOOGLE', 'google_id_20', 'CLIENT', '2024-04-23 10:19:00', 'nhan_vien_20'),
+    ('2024-04-23 10:20:00', 'mật khẩu1', 'GOOGLE', 'google_id_21', 'CLIENT', '2024-04-23 10:20:00', 'nhan_vien_21'),
+    ('2024-04-23 10:21:00', 'mật khẩu2', 'GOOGLE', 'google_id_22', 'CLIENT', '2024-04-23 10:21:00', 'nhan_vien_22'),
+    ('2024-04-23 10:22:00', 'mật khẩu3', 'GOOGLE', 'google_id_23', 'CLIENT', '2024-04-23 10:22:00', 'nhan_vien_23'),
+    ('2024-04-23 10:23:00', 'mật khẩu4', 'GOOGLE', 'google_id_24', 'CLIENT', '2024-04-23 10:23:00', 'nhan_vien_24'),
+    ('2024-04-23 10:24:00', 'mật khẩu5', 'GOOGLE', 'google_id_25', 'CLIENT', '2024-04-23 10:24:00', 'nhan_vien_25'),
+    ('2024-04-23 10:25:00', 'mật khẩu6', 'GOOGLE', 'google_id_26', 'CLIENT', '2024-04-23 10:25:00', 'nhan_vien_26'),
+    ('2024-04-23 10:26:00', 'mật khẩu7', 'GOOGLE', 'google_id_27', 'CLIENT', '2024-04-23 10:26:00', 'nhan_vien_27'),
+    ('2024-04-23 10:27:00', 'mật khẩu8', 'GOOGLE', 'google_id_28', 'CLIENT', '2024-04-23 10:27:00', 'nhan_vien_28'),
+    ('2024-04-23 10:28:00', 'mật khẩu9', 'GOOGLE', 'google_id_29', 'CLIENT', '2024-04-23 10:28:00', 'nhan_vien_29'),
+    ('2024-04-23 10:29:00', 'mật khẩu10', 'GOOGLE', 'google_id_30', 'CLIENT', '2024-04-23 10:29:00', 'nhan_vien_30'),
+    ('2024-04-23 10:30:00', 'mật khẩu11', 'GOOGLE', 'google_id_31', 'CLIENT', '2024-04-23 10:30:00', 'nhan_vien_31'),
+    ('2024-04-23 10:31:00', 'mật khẩu12', 'GOOGLE', 'google_id_32', 'CLIENT', '2024-04-23 10:31:00', 'nhan_vien_32'),
+    ('2024-04-23 10:32:00', 'mật khẩu13', 'GOOGLE', 'google_id_33', 'CLIENT', '2024-04-23 10:32:00', 'nhan_vien_33'),
+    ('2024-04-23 10:33:00', 'mật khẩu14', 'GOOGLE', 'google_id_34', 'CLIENT', '2024-04-23 10:33:00', 'nhan_vien_34'),
+    ('2024-04-23 10:34:00', 'mật khẩu15', 'GOOGLE', 'google_id_35', 'CLIENT', '2024-04-23 10:34:00', 'nhan_vien_35'),
+    ('2024-04-23 10:35:00', 'mật khẩu16', 'GOOGLE', 'google_id_36', 'CLIENT', '2024-04-23 10:35:00', 'nhan_vien_36'),
+    ('2024-04-23 10:36:00', 'mật khẩu17', 'GOOGLE', 'google_id_37', 'CLIENT', '2024-04-23 10:36:00', 'nhan_vien_37'),
+    ('2024-04-23 10:37:00', 'mật khẩu18', 'GOOGLE', 'google_id_38', 'CLIENT', '2024-04-23 10:37:00', 'nhan_vien_38'),
+    ('2024-04-23 10:38:00', 'mật khẩu19', 'GOOGLE', 'google_id_39', 'CLIENT', '2024-04-23 10:38:00', 'nhan_vien_39'),
+    ('2024-04-23 10:39:00', 'mật khẩu20', 'GOOGLE', 'google_id_40', 'CLIENT', '2024-04-23 10:39:00', 'nhan_vien_40');
+
+-- insert driver employee
+
+INSERT INTO public.tieptd_194185_employee (avatar, created_at, dob, name, phone_number, updated_at, account_id, bus_id, role)
+SELECT
+    'avatar_url',
+    NOW(),
+    TIMESTAMP '1980-01-01' + random() * (TIMESTAMP '2000-01-01' - TIMESTAMP '1980-01-01'),
+    CONCAT('Driver_', a.id),
+    '+123456789',
+    NOW(),
+    a.id,
+    NULL,
+    'DRIVER'
+FROM
+    public.tieptd_194185_account a
+WHERE
+    a.id BETWEEN 48 AND 67;
+
+-- insert driver_mate employee
+
+INSERT INTO public.tieptd_194185_employee (avatar, created_at, dob, name, phone_number, updated_at, account_id, bus_id, role)
+SELECT
+    'avatar_url',
+    NOW(),
+    TIMESTAMP '1980-01-01' + random() * (TIMESTAMP '2000-01-01' - TIMESTAMP '1980-01-01'),
+    CONCAT('Driver_Mate_', id),
+    '+123456789',
+    NOW(),
+    id,
+    NULL,
+    'DRIVER_MATE'
+FROM
+    public.tieptd_194185_account
+WHERE
+    id BETWEEN 68 AND 87;
+
+-- insert bus
+INSERT INTO public.tieptd_194185_bus (created_at, driver_id, driver_mate_id, number_plate, seat_number, status, updated_at, current_latitude, current_longitude)
+SELECT
+    NOW(),
+    (SELECT id FROM public.tieptd_194185_employee WHERE role = 'DRIVER' ORDER BY RANDOM() LIMIT 1),
+    (SELECT id FROM public.tieptd_194185_employee WHERE role = 'DRIVER_MATE' ORDER BY RANDOM() LIMIT 1),
+    CONCAT('Xe_bus_', a.id),
+    32,
+    'AVAILABLE',
+    NOW(),
+    NULL,
+    NULL
+FROM
+    public.tieptd_194185_employee a
+WHERE
+    a.role IN ('DRIVER', 'DRIVER_MATE');

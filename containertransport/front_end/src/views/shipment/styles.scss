@@ -1,0 +1,516 @@
+.fullScreen {
+    background-color: rgb(246, 246, 246);
+    min-height: calc(100vh - 64px);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding: 16px 24px 0px 24px;
+    .MuiContainer-root {
+        padding: 0;
+    }
+
+    // margin-top: 20px;
+}
+
+.container {
+    width: 100%;
+    .btn-add {
+        .btn-header {
+            display: flex;
+            align-items: center;
+            float: right;
+            margin-bottom: 16px;
+            .material-icons {
+                height: auto;
+                display: flex;
+                margin-right: 4px;
+            }
+        }
+    }
+    .divider {
+        margin-top: 8px;
+        margin-bottom: 48px;
+    }
+    .title {
+        .MuiTypography-root {
+            font-size: 18px;
+            font-weight: 650;
+            margin-bottom: 16px;
+        }
+        margin-left: 16px;
+    }
+    .trips-mana {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 16px;
+    }
+    .trips-btn {
+        display: flex;
+        .auto-create-trips {
+            margin-right: 16px;
+            .btn-header {
+                display: flex;
+                align-items: center;
+                float: right;
+                margin-bottom: 16px;
+                .material-icons {
+                    height: auto;
+                    display: flex;
+                    margin-right: 4px;
+                }
+            }
+        }
+    }
+}
+.toast {
+    position: absolute;
+    z-index: 10000;
+    top: 64px;
+    right: 32px;
+}
+.headerScreen-trip-detail {
+    .headerScreen-trip-detail-go-back {
+        display: flex;
+    }
+
+    .headerScreen-trip-detail-info {
+        padding: 25px 16px 20px 16px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        background-color: rgb(246, 246, 246);
+
+        .MuiButtonBase-root {
+            min-width: 70px;
+            line-height: 1.5;
+        }
+
+        .title-header {
+            .MuiTypography-root {
+                font-size: 24px;
+                font-weight: 700;
+            }
+        }
+        .btn-header {
+            display: flex;
+            align-items: center;
+            .header-create-shipment-btn-cancel {
+                margin-right: 32px;
+            }
+            .MuiButtonBase-root {
+                text-transform: none;
+            }
+        }
+    }
+}
+.btn-not-upcase-text {
+    .MuiButtonBase-root {
+        text-transform: none;
+    }
+}
+
+.headerScreen {
+    padding: 25px 16px 20px 16px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: rgb(246, 246, 246);
+    .btn-header {
+        .header-create-shipment-btn-cancel {
+            margin-right: 32px;
+        }
+    }
+    .MuiButtonBase-root {
+        min-width: 70px;
+        line-height: 1.5;
+    }
+
+    .title {
+        .MuiTypography-root {
+            font-size: 24px;
+            font-weight: 700;
+        }
+    }
+}
+
+.modal {
+    position: absolute;
+    margin-top: 10%;
+    margin-left: 35%;
+    min-width: 700px;
+    height: auto;
+    background-color: white;
+    padding: 32px;
+
+    .header-modal {
+        font-weight: 800;
+
+        .header-modal-text {
+            font-weight: 650;
+        }
+    }
+
+    .body-modal {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .body-modal-item {
+            width: 90%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+
+            .body-modal-item-text {
+                font-weight: 600;
+            }
+        }
+
+        .body-modal-item-input {
+            .MuiOutlinedInput-root {
+                height: 40px;
+                width: 300px;
+            }
+
+            .MuiFormLabel-root {
+                font-size: 12px;
+            }
+        }
+    }
+
+    .footer-modal {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 32px;
+
+        .btn-modal {
+            display: flex;
+            justify-content: space-between;
+            width: 25%;
+            margin-right: 32px;
+        }
+    }
+}
+
+.contentModalShipment {
+    .contentModal-item {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 32px;
+        margin-bottom: 32px;
+        align-items: center;
+
+        .contentModal-item-text {
+            width: 40%;
+
+            .MuiTypography-root {
+                font-weight: 600;
+            }
+        }
+
+        .contentModal-item-input {
+            width: 60%;
+            display: flex;
+            .textarea {
+                height: fit-content !important;
+            }
+            .MuiOutlinedInput-root {
+                min-height: 40px;
+                width: 100%;
+            }
+
+            .MuiFormLabel-root {
+                font-size: 12px;
+            }
+
+            .MuiFormControl-root {
+                min-width: 100%;
+                height: 40px;
+            }
+
+            .MuiStack-root {
+                width: 100%;
+                overflow: hidden;
+                padding-top: 12px;
+            }
+
+            .MuiAutocomplete-root {
+                width: 100%;
+                padding-top: 0px;
+            }
+
+            .MuiChip-root {
+                height: 25px;
+                margin-top: -4px;
+            }
+        }
+    }
+}
+
+.bodyContent {
+    background-color: white;
+}
+
+.trip-create {
+    
+
+    .header-trip-detail {
+        display: flex;
+        justify-content: space-between;
+        margin: 32px 0px;
+
+        .header-trip-detail-text {
+            font-weight: 700;
+        }
+
+        .MuiTypography-root {
+            font-size: 22px;
+        }
+
+        .header-trip-detail-btn {
+            .header-trip-detail-btn-cancel {
+                margin-right: 32px;
+            }
+        }
+    }
+
+    .divider-trip-detail {
+        // margin-left: 32px;
+    }
+}
+.content-trip-v2 {
+    margin-top: 32px;
+    .content-truck-and-orders-v2 {
+        .header-info {
+            margin-bottom: 16px;
+            .MuiTypography-root {
+                font-weight: 700;
+                font-size: 20px;
+            }
+        }
+        .truck-order {
+            display: flex;
+            margin-bottom: 48px;
+            background-color: white;
+            padding: 16px 32px 48px 32px;
+            .chose-truck-v2 {
+                margin: 0px 0px 16px 0px;
+                width: 30%;
+                
+                .truck-select-info {
+                    margin-top: 32px;
+                    .truck-info-item {
+                        display: flex;
+                        .truck-info-item-title {
+                            min-width: 40%;
+                            
+                            .MuiTypography-root {
+                                font-weight: 600;
+                                line-height: 2rem;
+                            }
+                        }
+                    }
+                }
+            }
+    
+            .chose-orders-v2 {
+                margin: 0px 0px 16px 64px;
+                width: 70%;
+                .table-order {
+                    padding: 0px 20px 16px 0px;
+                }
+                .chose-orders-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+            }
+        }
+    }
+    .order-arrangement-v2 {
+        margin-bottom: 32px;
+        min-width: 30%;
+        background-color: white;
+        padding: 16px 32px 16px 32px;
+        .facility-arrangment-v2 {
+            .facility-arrangment-head {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 16px;
+                .facility-arrangment-head-title {
+                    .MuiTypography-root {
+                        font-weight: 700;
+                        font-size: 20px;
+                    }
+                }
+
+                .header-trip-detail-btn-save {
+                    margin-top: 16px;
+                    margin-bottom: 8px;
+                }
+            }
+            .table-trip-items {
+                margin-bottom: 32px;
+            }
+        }
+
+        .item-facility {
+            // width: 50%;
+            // margin-top: 16px;
+            // border: 1px solid #e5e5e5;
+        }
+    }
+    .map-order-v2 {
+        
+        .leaflet-container {
+            height: 100vh !important;
+        }
+    }
+}
+
+.content-trip {
+    display: flex;
+    margin-top: 32px;
+
+    .content-truck-and-orders {
+        min-width: 20%;
+
+        .chose-truck {
+            margin: 0px 0px 16px 32px;
+
+            .MuiTypography-root {
+                font-weight: 700;
+            }
+
+            .chose-truck-text {
+                margin-bottom: 16px;
+            }
+        }
+
+        .chose-orders {
+            margin: 32px 0px 16px 32px;
+
+            .chose-orders-header {
+                .MuiTypography-root {
+                    font-weight: 700;
+                }
+
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+    }
+
+    .order-arrangement {
+        margin-left: 32px;
+        min-width: 30%;
+
+        .facility-arrangment {
+            .facility-arrangment-text {
+                .MuiTypography-root {
+                    font-weight: 700;
+                }
+                .header-trip-detail-btn-save {
+                    margin-top: 16px;
+                    margin-bottom: 8px;
+                }
+            }
+        }
+
+        .item-facility {
+            // width: 50%;
+            margin-top: 16px;
+            border: 1px solid #e5e5e5;
+        }
+    }
+
+    .map-order {
+        width: 48%;
+    }
+}
+.item-facility {
+    width: 350px;
+    margin-top: 32px;
+    border: 1px solid #e5e5e5;
+    .trips-item-input {
+        margin-top: 16px;
+        width: fit-content;
+    }
+    .item-facility-line{
+        display: flex;
+        justify-content: space-between;
+        .MuiSvgIcon-root {
+            color: rgb(141, 141, 141);
+        }
+    }
+}
+.trip-detail {
+    padding: 8px 32px;
+    background-color: rgb(246, 246, 246);
+    .header-trip-detail {
+        .headerScreen-trip-detail-go-back {
+            display: flex;
+        }
+        .header-trip-detail-text {
+            margin-top: 16px;
+            font-weight: 700;
+            margin-left: 40px;
+            font-size: 22px;
+        }
+        
+    }
+}
+.shipment-detail {
+    background-color: white;
+    padding: 16px 32px;
+    margin-bottom: 32px;
+    .shipment-detail-item {
+        display: flex;
+
+        .shipment-detail-item-text {
+            width: 20%;
+            margin-bottom: 16px;
+            .MuiTypography-root {
+                font-weight: 550;
+            }
+        }
+    }
+}
+.loading {
+    text-align: center;
+    margin: auto;
+}
+.icon-view-screen {
+    .MuiSvgIcon-root {
+        color: #747474;
+    }
+}
+.icon-view-screen:hover {
+    .MuiSvgIcon-root {
+        color: #c82a2a;
+    }
+}
+.leaflet-div-icon {
+    border-radius: 50%;
+    z-index: 1;
+    margin-top: -10px !important;
+    margin-left: -5px !important;
+    background-color: #f78b00;
+    .number {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+}
+.leaflet-popup-content-wrapper {
+    overflow: auto;
+    .leaflet-popup-content {
+        min-width: max-content;
+    }
+}

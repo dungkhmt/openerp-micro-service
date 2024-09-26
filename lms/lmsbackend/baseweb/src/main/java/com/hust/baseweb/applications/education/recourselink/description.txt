@@ -1,0 +1,1 @@
+this module aims at managing external recourse links that are useful for education, learning, for example, youtude, stackoverflow,..
