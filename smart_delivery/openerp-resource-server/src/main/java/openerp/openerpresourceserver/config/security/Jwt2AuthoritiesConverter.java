@@ -31,18 +31,29 @@ public class Jwt2AuthoritiesConverter implements Converter<Jwt, Collection<Grant
         final var resourceAccess = (Map<String, Object>) jwt
                 .getClaims()
                 .getOrDefault("resource_access", Collections.emptyMap());
+        System.out.println(resourceAccess);
 
-        // We assume here you have "openerp-ui-dev" client configured with "client roles" mapper in Keycloak
-        final var publicClientAccess = (Map<String, Object>) resourceAccess
-                .getOrDefault("openerp-ui-dev", Collections.emptyMap());
-        final var publicClientRoles = (Collection<String>) publicClientAccess.getOrDefault(
-                "roles",
-                Collections.emptyList());
+        // Retrieve roles from the "sample" client
+        final var sampleClientAccess = (Map<String, Object>) resourceAccess
+                .getOrDefault("sample", Collections.emptyMap());
+        final var sampleClientRoles = (Collection<String>) sampleClientAccess.getOrDefault("roles", Collections.emptyList());
 
+        // Retrieve roles from the "smart_delivery" client
+        final var smartDeliveryClientAccess = (Map<String, Object>) resourceAccess
+                .getOrDefault("smart_delivery", Collections.emptyMap());
+        final var smartDeliveryClientRoles = (Collection<String>) smartDeliveryClientAccess.getOrDefault("roles", Collections.emptyList());
+
+        System.out.println(Stream
+                .concat(
+                        realmRoles.stream(),
+                        Stream.concat(sampleClientRoles.stream(), smartDeliveryClientRoles.stream()))
+                .map(roleName -> "ROLE_" + roleName)
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList()));
         return Stream
                 .concat(
                         realmRoles.stream(),
-                        publicClientRoles.stream())
+                        Stream.concat(sampleClientRoles.stream(), smartDeliveryClientRoles.stream()))
                 .map(roleName -> "ROLE_" + roleName)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
