@@ -23,6 +23,7 @@ public class HubController {
         this.hubService = hubService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/hub")
     public ResponseEntity<List<HubGeneral>> getAllHubGeneral(){
         return ResponseEntity.ok(hubService.getAllHubGeneral());
