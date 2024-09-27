@@ -10,7 +10,7 @@ function DemoScreen() {
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
-        request("get", "/user/get-all", (res) => {
+        request("get", "/smdeli/hubmanager/hub", (res) => {
             setUsers(res.data);
         }).then();
     }, [])

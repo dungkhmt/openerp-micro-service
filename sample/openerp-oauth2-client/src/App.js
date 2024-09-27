@@ -102,6 +102,9 @@ function App() {
     };
   }, []);
 
+  console.log("acessToken", keycloak.token)
+
+
   return (
     <ReactKeycloakProvider
       authClient={keycloak}

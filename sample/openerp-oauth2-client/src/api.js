@@ -40,6 +40,7 @@ export async function request(
   config
 ) {
   try {
+
     const res = await axiosInstance.request({
       method: method.toLowerCase(),
       url: url,
@@ -50,7 +51,6 @@ export async function request(
         ...config?.headers,
       },
     });
-
     if (isFunction(successHandler)) {
       successHandler(res);
     }

@@ -17,7 +17,7 @@
     "erp-hust": "^0.0.21",
     "event-source-polyfill": "^1.0.24",
     "framer-motion": "^2.9.5",
-    "keycloak-js": "^21.0.2",
+    "keycloak-js": "^25.0.0",
     "overlayscrollbars": "^1.13.1",
     "overlayscrollbars-react": "^0.2.3",
     "randomcolor": "^0.6.2",
