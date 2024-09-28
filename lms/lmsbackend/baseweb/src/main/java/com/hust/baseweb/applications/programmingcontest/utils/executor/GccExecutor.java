@@ -14,7 +14,7 @@ public class GccExecutor {
     private static final String BUILD_COMMAND_C = "gcc -std=c17 -w -o main main.c -lm";
     private static final String BUILD_COMMAND_CPP_11 = "g++ -std=c++11 -w -o main main.cpp";
     private static final String BUILD_COMMAND_CPP_14 = "g++ -std=c++14 -w -o main main.cpp";
-    private static final String BUILD_COMMAND_CPP_17 = "g++ -std=c++17 -Wall -DONLINE_JUDGE -O2 -lm -fmax-errors=5 -march=native -s -Wl,-z,stack-size=268435456 -o main main.cpp";
+    private static final String BUILD_COMMAND_CPP_17 = "g++ -std=c++17 -w -DONLINE_JUDGE -O2 -lm -fmax-errors=5 -march=native -s -Wl,-z,stack-size=268435456 -o main main.cpp";
 
     private String getBuildCmd(ComputerLanguage.Languages language) {
         switch (language) {
