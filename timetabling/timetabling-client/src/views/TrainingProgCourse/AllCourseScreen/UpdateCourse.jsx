@@ -1,66 +1,88 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { successNoti, warningNoti } from "utils/notification";
-import { Button, Typography, TextField, Paper } from "@mui/material";
+import { Button, Typography, TextField, Paper, Autocomplete, Checkbox } from "@mui/material";
+import { CheckBoxOutlineBlank, CheckBox as CheckedIcon } from "@mui/icons-material";
 import { updateStyles } from "./index.style";
 import { request } from "api";
 import { courseUrl } from "../apiURL";
+import { successNoti, warningNoti, errorNoti } from "utils/notification";
 
 const UpdateCoursePage = () => {
   const history = useHistory();
   const { courseId } = useParams();
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm();
+  const [id, setId] = useState("");
+  const [courseName, setCourseName] = useState("");
+  const [credit, setCredit] = useState("");
+  const [prerequisite, setPrerequisites] = useState([]); // State for selected prerequisites
+  const [availableCourses, setAvailableCourses] = useState([]); // State for available courses
 
   useEffect(() => {
+    // Fetch course details for updating
     if (courseId) {
       request(
         "get",
         `${courseUrl.getCourseDetail}/${courseId}`,
         (res) => {
           const { id, courseName, credit, prerequisites } = res.data;
-
-          setValue("id", id);
-          setValue("courseName", courseName);
-          setValue("credit", credit);
-          setValue("prerequisites", prerequisites.join(", ")); // Chuyển đổi mảng thành chuỗi để hiển thị
+          setId(id);
+          setCourseName(courseName);
+          setCredit(credit);
+          setPrerequisites(prerequisites.map((p) => ({ id: p, courseName: "" }))); // Assuming prerequisites are just IDs
+        },
+        (error) => {
+          console.error("Error fetching course details:", error);
+          errorNoti("Không thể tải thông tin khóa học", 5000);
         }
       );
     }
-  }, [courseId, setValue]);
 
-  const onSubmit = (data) => {
-    if (!data.id || !data.courseName || !data.credit) {
+    // Fetch available courses for prerequisites selection
+    request("get", `${courseUrl.getAllCourse}`, (res) => {
+      setAvailableCourses(res.data);
+    });
+  }, [courseId]);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!id || !courseName || !credit) {
       warningNoti("Vui lòng điền đầy đủ thông tin", 5000);
       return;
     }
 
-    const prerequisitesArray = data.prerequisites
-      .split(',')
-      .map(prerequisite => prerequisite.trim())
-      .filter(prerequisite => prerequisite.length > 0);
+    const prerequisitesArray = prerequisite.map((course) => course.id);
 
     const updatedCourse = {
-      ...data,
-      prerequisites: prerequisitesArray, // Chuyển đổi chuỗi thành mảng trước khi gửi lên server
+      id,
+      courseName,
+      credit: Number(credit),
+      status: "active",
+      prerequisites: prerequisitesArray,
     };
 
-    request(
-      "put",
-      `${courseUrl.updateCourse}/${courseId}`,
-      (res) => {
-        successNoti("Cập nhật khóa học thành công!", 5000);
-        history.push(`/training_course/teacher/course/${courseId}`);
-      },
-      {},
-      updatedCourse
-    );
+    try {
+      await request(
+        "put",
+        `${courseUrl.updateCourse}/${courseId}`,
+        (res) => {
+          successNoti("Cập nhật khóa học thành công!", 5000);
+          history.push(`/training_course/teacher/course/${courseId}`);
+        },
+        (error) => {
+          console.error("Error updating course:", error);
+          const errorMessage = error?.response?.data?.message || "Có lỗi xảy ra khi cập nhật khóa học";
+          errorNoti(errorMessage, 5000);
+        },
+        updatedCourse
+      );
+    } catch (error) {
+      console.error("Error during request:", error);
+      errorNoti("Có lỗi xảy ra khi gửi yêu cầu", 5000);
+    }
   };
+
+  const icon = <CheckBoxOutlineBlank fontSize="small" />;
+  const checkedIcon = <CheckedIcon fontSize="small" />;
 
   return (
     <Paper elevation={3} sx={{ padding: 3 }}>
@@ -68,16 +90,15 @@ const UpdateCoursePage = () => {
         Chỉnh sửa thông tin khóa học
       </Typography>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit}>
         <div style={updateStyles.textFieldContainer}>
           <Typography variant="h6">Mã học phần</Typography>
           <TextField
-            {...register("id", { required: "Mã học phần là bắt buộc" })}
+            value={id}
+            onChange={(e) => setId(e.target.value)}
             variant="outlined"
             style={updateStyles.textField}
             placeholder="Nhập mã môn học"
-            error={!!errors.id}
-            helperText={errors.id ? errors.id.message : ""}
             disabled
           />
         </div>
@@ -85,38 +106,58 @@ const UpdateCoursePage = () => {
         <div style={updateStyles.textFieldContainer}>
           <Typography variant="h6">Tên học phần</Typography>
           <TextField
-            {...register("courseName", { required: "Tên học phần là bắt buộc" })}
+            value={courseName}
+            onChange={(e) => setCourseName(e.target.value)}
             variant="outlined"
             style={updateStyles.textField}
             placeholder="Nhập tên học phần"
-            error={!!errors.courseName}
-            helperText={errors.courseName ? errors.courseName.message : ""}
+            required
           />
         </div>
 
         <div style={updateStyles.textFieldContainer}>
           <Typography variant="h6">Số tín chỉ</Typography>
           <TextField
-            {...register("credit", {
-              required: "Số tín chỉ là bắt buộc",
-              validate: value => value > 0 || "Số tín chỉ phải lớn hơn 0",
-            })}
+            type="number"
+            value={credit}
+            onChange={(e) => setCredit(e.target.value)}
             variant="outlined"
             style={updateStyles.textField}
             placeholder="Nhập số tín chỉ"
-            type="number"
-            error={!!errors.credit}
-            helperText={errors.credit ? errors.credit.message : ""}
+            required
           />
         </div>
 
         <div style={updateStyles.textFieldContainer}>
           <Typography variant="h6">Học phần tiên quyết</Typography>
-          <TextField
-            {...register("prerequisites")}
-            variant="outlined"
-            style={updateStyles.textField}
-            placeholder="Nhập các học phần tiên quyết, ngăn cách bởi dấu phẩy"
+          <Autocomplete
+            multiple
+            options={availableCourses}
+            disableCloseOnSelect
+            getOptionLabel={(option) => `${option.id} : ${option.courseName}`}
+            value={prerequisite}
+            onChange={(event, newValue) => {
+              setPrerequisites(newValue);
+            }}
+            renderOption={(props, option, { selected }) => (
+              <li {...props}>
+                <Checkbox
+                  icon={icon}
+                  checkedIcon={checkedIcon}
+                  style={{ marginRight: 8 }}
+                  checked={selected}
+                />
+                {`${option.id} : ${option.courseName}`}
+              </li>
+            )}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="outlined"
+                placeholder="Chọn học phần tiên quyết"
+                style={updateStyles.textField}
+              />
+            )}
           />
         </div>
 

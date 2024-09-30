@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import { Button, Typography, Paper, TextField } from "@mui/material";
+import { Button, Typography, Paper, TextField, Autocomplete, Checkbox } from "@mui/material";
+import { CheckBoxOutlineBlank, CheckBox as CheckedIcon } from "@mui/icons-material";
 import { updateStyles } from "./index.style";
 import { request } from "api";
 import { courseUrl } from "../apiURL";
@@ -11,7 +12,14 @@ const AddCourseScreen = () => {
   const [id, setId] = useState("");
   const [courseName, setCourseName] = useState("");
   const [credit, setCredit] = useState("");
-  const [prerequisite, setPrerequisites] = useState(""); 
+  const [prerequisite, setPrerequisites] = useState([]); // Updated state for selected prerequisites
+  const [availableCourses, setAvailableCourses] = useState([]); // State for available courses
+
+  useEffect(() => {
+    request("get", `${courseUrl.getAllCourse}`, (res) => {
+      setAvailableCourses(res.data); // Assumes res.data contains the list of available courses
+    });
+  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -19,25 +27,22 @@ const AddCourseScreen = () => {
     if (!id || !courseName || !credit) {
       warningNoti("Vui lòng điền đầy đủ thông tin", 5000);
       return;
-    } 
+    }
 
-    const prerequisitesArray = prerequisite
-      .split(',')
-      .map(prerequisite => prerequisite.trim())
-      .filter(prerequisite => prerequisite.length > 0); 
-  
+    const prerequisitesArray = prerequisite.map((course) => course.id);
+
     const newCourse = {
       id,
       courseName,
       credit: Number(credit),
-      status: "active", 
+      status: "active",
       prerequisites: prerequisitesArray, 
     };
-  
+
     try {
       await request(
-        "post", 
-        `${courseUrl.createCourse}`, 
+        "post",
+        `${courseUrl.createCourse}`,
         (res) => {
           successNoti("Khóa học đã được thêm thành công!", 5000);
           history.push("/training_course/teacher/course");
@@ -54,6 +59,9 @@ const AddCourseScreen = () => {
       errorNoti("Có lỗi xảy ra khi gửi yêu cầu", 5000);
     }
   };
+
+  const icon = <CheckBoxOutlineBlank fontSize="small" />;
+  const checkedIcon = <CheckedIcon fontSize="small" />;
 
   return (
     <Paper elevation={3} sx={{ padding: 3 }}>
@@ -101,12 +109,34 @@ const AddCourseScreen = () => {
 
         <div style={updateStyles.textFieldContainer}>
           <Typography variant="h6">Học phần tiên quyết</Typography>
-          <TextField
+          <Autocomplete
+            multiple
+            options={availableCourses}
+            disableCloseOnSelect
+            getOptionLabel={(option) => `${option.id} : ${option.courseName}`}
             value={prerequisite}
-            onChange={(e) => setPrerequisites(e.target.value)}
-            variant="outlined"
-            placeholder="Nhập các học phần tiên quyết, ngăn cách bởi dấu phẩy"
-            style={updateStyles.textField}
+            onChange={(event, newValue) => {
+              setPrerequisites(newValue);
+            }}
+            renderOption={(props, option, { selected }) => (
+              <li {...props}>
+                <Checkbox
+                  icon={icon}
+                  checkedIcon={checkedIcon}
+                  style={{ marginRight: 8 }}
+                  checked={selected}
+                />
+                {`${option.id} : ${option.courseName}`}
+              </li>
+            )}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="outlined"
+                placeholder="Chọn học phần tiên quyết"
+                style={updateStyles.textField}
+              />
+            )}
           />
         </div>
 
