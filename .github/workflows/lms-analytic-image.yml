@@ -23,9 +23,11 @@ jobs:
         uses: mr-smithers-excellent/docker-build-push@v5
         with:
           image: leanhtuan/lms-analytic
-          directory: "student360/openerp-resource-server/"
+          #directory: "student360/openerp-resource-server/"
+          directory: "lmsanalytic/openerp-resource-server/"
           registry: docker.io
-          dockerfile: "student360/openerp-resource-server/Dockerfile"
+          #dockerfile: "student360/openerp-resource-server/Dockerfile"
+          dockerfile: "lmsanalytic/openerp-resource-server/Dockerfile"
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           addLatest: true
