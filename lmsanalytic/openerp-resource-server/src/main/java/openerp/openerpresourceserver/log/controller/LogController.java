@@ -19,7 +19,8 @@ public class LogController {
 
     @PostMapping("/log/create-log")
     public ResponseEntity<?> createLog(Principal principal, @RequestBody LmsLogModelCreate I){
-        LmsLog log = lmsLogService.save(I);
-        return ResponseEntity.ok().body(log);
+        LmsLog alog = lmsLogService.save(I);
+        
+        return ResponseEntity.ok().body(alog);
     }
 }
