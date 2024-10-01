@@ -2533,6 +2533,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
                     //if(score <= 0.0001) continue;
                     if (score <= I.getThreshold() * 0.01) {
+                        /*
                         log.info("checkSimilarity, consider problem " +
                                  problemId +
                                  " listSubmissions = " +
@@ -2546,9 +2547,10 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                  score +
                                  " threshold = " +
                                  I.getThreshold());
-
+                        */
                         continue;
                     }
+                    /*
                     log.info("checkSimilarity, consider problem " +
                              problemId +
                              " listSubmissions = " +
@@ -2562,7 +2564,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                              score +
                              " threshold = " +
                              I.getThreshold());
-
+                    */
 
                     CodeSimilarityElement e = new CodeSimilarityElement();
                     e.setScore(score);
