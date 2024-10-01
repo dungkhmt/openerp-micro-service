@@ -2,6 +2,9 @@ package openerp.openerpresourceserver.controller;
 
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.entity.User;
+import openerp.openerpresourceserver.log.entity.LmsLog;
+import openerp.openerpresourceserver.log.model.LmsLogModelCreate;
+import openerp.openerpresourceserver.log.service.LmsLogService;
 import openerp.openerpresourceserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -19,6 +23,7 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController {
 
+    private LmsLogService lmsLogService;
     private UserService userService;
 
     /**
@@ -44,8 +49,14 @@ public class UserController {
     }
 
     @GetMapping("/get-all")
-    public ResponseEntity<?> getAllUsers() {
+    public ResponseEntity<?> getAllUsers(Principal principal) {
         List<User> users = userService.getAllUsers();
+        LmsLogModelCreate log = new LmsLogModelCreate();
+        log.setUserId(principal.getName());
+        log.setActionType(LmsLog.ACTION_TYPE_GET_ALL_USERS);
+        log.setDescription("Get all users of the system");
+        lmsLogService.save(log);
+
         return ResponseEntity.ok().body(users);
     }
 }

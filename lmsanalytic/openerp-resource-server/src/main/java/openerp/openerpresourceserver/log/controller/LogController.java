@@ -1,0 +1,25 @@
+package openerp.openerpresourceserver.log.controller;
+
+import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.log.entity.LmsLog;
+import openerp.openerpresourceserver.log.model.LmsLogModelCreate;
+import openerp.openerpresourceserver.log.service.LmsLogService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.security.Principal;
+
+@RestController
+@AllArgsConstructor(onConstructor_ = @Autowired)
+public class LogController {
+    private LmsLogService lmsLogService;
+
+    @PostMapping("/log/create-log")
+    public ResponseEntity<?> createLog(Principal principal, @RequestBody LmsLogModelCreate I){
+        LmsLog log = lmsLogService.save(I);
+        return ResponseEntity.ok().body(log);
+    }
+}
