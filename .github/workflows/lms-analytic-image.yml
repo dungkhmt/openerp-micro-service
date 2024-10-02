@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "student360/openerp-resource-server/**"
+      - "lmsanalytic/openerp-resource-server/**"
 
 jobs:
   build:
