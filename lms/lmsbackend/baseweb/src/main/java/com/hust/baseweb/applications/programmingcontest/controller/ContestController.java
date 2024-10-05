@@ -26,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -258,17 +259,21 @@ public class ContestController {
         return ResponseEntity.status(200).body(resp);
     }
 
+    @Async
+    public void logGetMyContest(String userId){
+        LmsLogModelCreate log = new LmsLogModelCreate();
+        log.setUserId(userId);
+        log.setActionType("GET_MY_CONTESTS");
+        log.setDescription("an user get his contests");
+        apiService.callLogAPI("https://analytics.soict.ai",log);
+    }
     @Secured("ROLE_TEACHER")
     @GetMapping("/contests")
     public ResponseEntity<?> getManagedContestOfTeacher(Principal principal) {
         List<ModelGetContestResponse> resp = problemTestCaseService
             .getManagedContestOfTeacher(principal.getName());
 
-        LmsLogModelCreate log = new LmsLogModelCreate();
-        log.setUserId(principal.getName());
-        log.setActionType("GET_MY_CONTESTS");
-        log.setDescription("an user get his contests");
-        apiService.callLogAPI("https://analytics.soict.ai",log);
+        logGetMyContest(principal.getName());
 
         return ResponseEntity.status(200).body(resp);
     }
