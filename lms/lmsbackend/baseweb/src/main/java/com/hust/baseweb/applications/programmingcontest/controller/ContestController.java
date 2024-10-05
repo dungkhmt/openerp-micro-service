@@ -1,6 +1,8 @@
 package com.hust.baseweb.applications.programmingcontest.controller;
 
 import com.google.gson.Gson;
+import com.hust.baseweb.applications.programmingcontest.callexternalapi.model.LmsLogModelCreate;
+import com.hust.baseweb.applications.programmingcontest.callexternalapi.service.ApiService;
 import com.hust.baseweb.applications.programmingcontest.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.*;
 import com.hust.baseweb.applications.programmingcontest.exception.MiniLeetCodeException;
@@ -46,6 +48,8 @@ public class ContestController {
     ContestProblemRepo contestProblemRepo;
     UserService userService;
     ContestService contestService;
+
+    ApiService apiService;
 
     @Secured("ROLE_TEACHER")
     @PostMapping("/contests")
@@ -259,6 +263,13 @@ public class ContestController {
     public ResponseEntity<?> getManagedContestOfTeacher(Principal principal) {
         List<ModelGetContestResponse> resp = problemTestCaseService
             .getManagedContestOfTeacher(principal.getName());
+
+        LmsLogModelCreate log = new LmsLogModelCreate();
+        log.setUserId(principal.getName());
+        log.setActionType("GET_MY_CONTESTS");
+        log.setDescription("an user get his contests");
+        apiService.callLogAPI("https://analytics.soict.ai",log);
+
         return ResponseEntity.status(200).body(resp);
     }
 

@@ -14,22 +14,28 @@ const GeneralPlanClassOpenScreen = () => {
   const [isImportLoading, setImportLoading] = useState(false);
 
 
+  function getPlanClass(){
+    //setImportLoading(true);
+    request(
+      "get",
+      `/plan-general-classes/?semester=${selectedSemester.semester}`,
+      (res) => {
+        setPlanClasses(res.data);
+        //setImportLoading(false);
+        toast.success("Truy vấn kế hoạch học tập thành công!");
+      },
+      (err) => {
+        toast.error("Có lỗi khi truy vấn kế hoạch học tập");
+      },
+      null,
+      null,
+      null
+    );
+  }
   useEffect(() => {
     if (selectedSemester) {
-      request(
-        "get",
-        `/plan-general-classes/?semester=${selectedSemester.semester}`,
-        (res) => {
-          setPlanClasses(res.data);
-          toast.success("Truy vấn kế hoạch học tập thành công!");
-        },
-        (err) => {
-          toast.error("Có lỗi khi truy vấn kế hoạch học tập");
-        },
-        null,
-        null,
-        null
-      );
+
+      getPlanClass();
     }
   }, [selectedSemester]);
 
@@ -64,6 +70,33 @@ const GeneralPlanClassOpenScreen = () => {
     }
   };
 
+  function clearPlan(){
+    let body = {
+      semesterId: selectedSemester.semester
+    }
+    setImportLoading(true);
+    request(
+      "post",
+      `/plan-general-classes/clear-plan`,
+      (res) => {
+        toast.success("Upload file thành công!");
+        console.log(res?.data);
+        getPlanClass();
+        setImportLoading(false);
+      },
+      (err) => {
+        if(err.response.status === 410) {
+          toast.error(err.response.data);
+        } else {
+          toast.error("Có lỗi khi clear");
+        }
+        
+        console.log(err);
+      },
+      body,
+      
+    );
+  }
   return (
     <div>
       <div className="flex flex-row justify-between mb-4">
@@ -81,6 +114,16 @@ const GeneralPlanClassOpenScreen = () => {
               Thêm lớp kế hoạch mới
             </Button> */}
           </div>
+          <div>
+            <Button
+              color="primary"
+              disabled={selectedSemester === null}
+              variant="contained"
+              onClick={clearPlan}
+            >
+              XÓA
+            </Button> 
+          </div>
           <div className="flex flex-row gap-2 justify-end">
             <InputFileUpload
               isUploading={isImportLoading}
@@ -90,6 +133,7 @@ const GeneralPlanClassOpenScreen = () => {
               submitHandler={handleImportExcel}
             />
           </div>
+
         </div>
       </div>
       <ClassOpenPlanTable

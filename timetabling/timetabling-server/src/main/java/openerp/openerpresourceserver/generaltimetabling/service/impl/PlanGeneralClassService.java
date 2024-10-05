@@ -27,6 +27,12 @@ public class PlanGeneralClassService {
     private GeneralClassRepository generalClassRepository;
     private PlanGeneralClassRepository planGeneralClassRepository;
     private AcademicWeekRepo academicWeekRepo;
+
+    @Transactional
+    public int clearPlanClass(String semesterId){
+        planGeneralClassRepository.deleteAllBySemester(semesterId);
+        return 0;
+    }
     public GeneralClass makeClass(MakeGeneralClassRequest request) {
         GeneralClass newClass = new GeneralClass();
 
