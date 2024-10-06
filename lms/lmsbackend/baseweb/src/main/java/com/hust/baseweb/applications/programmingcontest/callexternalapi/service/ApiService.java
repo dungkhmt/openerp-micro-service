@@ -3,6 +3,7 @@ package com.hust.baseweb.applications.programmingcontest.callexternalapi.service
 import com.hust.baseweb.applications.programmingcontest.callexternalapi.config.ClientCredential;
 import com.hust.baseweb.applications.programmingcontest.callexternalapi.model.LmsLogModelCreate;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserter;
@@ -60,14 +61,16 @@ public class ApiService {
       log.debug("Get access token: " + accessToken);
 
       this.webClient.post()
-                           .uri(url)
+                           //.uri(url + "/log/create-log")
+                    //.uri("/log/create-log")
+                    .uri(url)
           .bodyValue(BodyInserters.fromValue(model))
                            .header("Authorization", "Bearer " + accessToken)
                            .retrieve()
           .toEntity(LmsLogModelCreate.class)
           .subscribe(
             responseEntity ->{
-
+                HttpStatus status = responseEntity.getStatusCode();
                 // Handle success response here
                 //HttpStatusCode status = responseEntity.getStatusCode();
                 //URI location = responseEntity.getHeaders().getLocation();
@@ -76,7 +79,8 @@ public class ApiService {
                 log.info("callLogAPI -> OK!!!");
             },
             error -> {
-                log.info("callLogAPI -> ERROR ???");
+                //HttpStatus status = responseEntity.getStatusCode();
+                log.info("callLogAPI -> ERROR ??? status = " + error.getMessage());
             }
           );
       return ResponseEntity.ok().body("OK");

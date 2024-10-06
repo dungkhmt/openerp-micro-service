@@ -15,6 +15,7 @@ import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseS
 import com.hust.baseweb.service.UserService;
 import io.lettuce.core.dynamic.annotation.Param;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -37,6 +38,7 @@ import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Log4j2
 @RestController
 @CrossOrigin
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -259,13 +261,15 @@ public class ContestController {
         return ResponseEntity.status(200).body(resp);
     }
 
-    @Async
+    //@Async
     public void logGetMyContest(String userId){
-        LmsLogModelCreate log = new LmsLogModelCreate();
-        log.setUserId(userId);
-        log.setActionType("GET_MY_CONTESTS");
-        log.setDescription("an user get his contests");
-        apiService.callLogAPI("https://analytics.soict.ai",log);
+        LmsLogModelCreate logM = new LmsLogModelCreate();
+        logM.setUserId(userId);
+        log.info("logGetMyContest, userId = " + logM.getUserId());
+
+        logM.setActionType("GET_MY_CONTESTS");
+        logM.setDescription("an user get his contests");
+        apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
     }
     @Secured("ROLE_TEACHER")
     @GetMapping("/contests")
