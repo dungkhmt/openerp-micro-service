@@ -54,7 +54,7 @@ public class ApiService {
           throw new RuntimeException("Client credential is unset");
       }
 
-      log.debug("Calling API with credential: {}, endpoint: {}", clientCredential, url);
+      log.debug("Calling API with credential: {}, endpoint: {}", clientCredential.getClientId() + "," + clientCredential.getClientSecret(), url);
       String accessToken = keycloakService.getAccessToken(clientCredential.getClientId(),
                                                           clientCredential.getClientSecret());
       log.debug("Get access token: " + accessToken);

@@ -8,10 +8,10 @@ import lombok.Getter;
 @Getter
 @Configuration
 public class KeycloakConfig {
-  //@Value("${keycloak.realm}")
-  private String realm = "LMS";
+  @Value("${keycloak.realm}")
+  private String realm;
 
-    //@Value("${keycloak.auth-server-url}")
-  private String authServerUrl = "https://erp3.soict.ai/iam";
+  @Value("${keycloak.auth-server-url}")
+  private String authServerUrl;
 
 }

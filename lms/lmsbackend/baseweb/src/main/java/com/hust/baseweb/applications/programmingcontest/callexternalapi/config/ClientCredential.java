@@ -12,10 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Configuration
 public class ClientCredential {
-  //@Value("${keycloak.credentials.client-id}")
-  private String clientId = "hustack";
-  //@Value("${keycloak.credentials.client-secret}")
-  //private String clientSecret = "zckLs48DHEXH2VXP4bWZyE9Ts0q53reZ";
-  private String clientSecret = "MBt7h6rHtROccQ0GpGeeeo4s1dHROEzu";
+  @Value("${keycloak.credentials.client-id}")
+  private String clientId;
+  @Value("${keycloak.credentials.client-secret}")
+  private String clientSecret;
 
 }
