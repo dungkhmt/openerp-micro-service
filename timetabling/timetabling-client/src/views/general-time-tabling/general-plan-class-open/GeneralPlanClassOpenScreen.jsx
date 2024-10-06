@@ -79,7 +79,7 @@ const GeneralPlanClassOpenScreen = () => {
       "post",
       `/plan-general-classes/clear-plan`,
       (res) => {
-        toast.success("Upload file thành công!");
+        toast.success("Xóa kế hoạch mở lớp thành công!");
         console.log(res?.data);
         getPlanClass();
         setImportLoading(false);
