@@ -21,8 +21,11 @@ public class LogController {
 
     @PostMapping("/log/create-log")
     public ResponseEntity<?> createLog(Principal principal, @RequestBody LmsLogModelCreate I){
+        log.info("createLog body = {}",I);
+        log.info("createLog, userId = " + I.getUserId() + " action = " + I.getActionType() + " description = " + I.getDescription());
         LmsLog alog = lmsLogService.save(I);
-        log.info("create a log");
+        log.info("createLog, userId = " + I.getUserId() + " action = " + I.getActionType() + " description = " + I.getDescription() + " save OK!!");
+
         return ResponseEntity.ok().body(alog);
     }
 }
