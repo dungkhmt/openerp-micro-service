@@ -77,7 +77,6 @@ public class ContestController {
         }
     }
 
-
     @Secured("ROLE_TEACHER")
     @PutMapping("/contests/{contestId}")
     public ResponseEntity<?> editContest(
