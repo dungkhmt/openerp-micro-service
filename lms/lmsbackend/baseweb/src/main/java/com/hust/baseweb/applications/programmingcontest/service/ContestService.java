@@ -68,6 +68,7 @@ public class ContestService {
         String contestId = contestEntity.getContestId();
         List<ModelGetProblemDetailResponse> problems = new ArrayList<>();
 
+
         // Ensure problem list is not null
         if (contestEntity.getProblems() != null) {
             contestEntity.getProblems().forEach(contestProblem -> {
