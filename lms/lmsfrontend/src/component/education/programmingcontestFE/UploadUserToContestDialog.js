@@ -25,6 +25,10 @@ export default function UploadUserToContestDialog(props) {
     setFile(event.target.files[0]);
   }
 
+  const downloadSampleFile = () => {
+    window.location.href = "/static/excels/sample-upload-user-contest.xlsx";
+  };
+
   const handleUpload = () => {
     setIsProcessing(true);
     let body = {
@@ -112,6 +116,9 @@ export default function UploadUserToContestDialog(props) {
     <HustModal
       open={isOpen}
       title={"Upload Users to Contest"}
+      onOk={handleUpload}
+      textOk="Upload"
+      textClose="Cancel"
       onClose={onClose}
       isLoading={isProcessing}
       isNotShowCloseButton={true}

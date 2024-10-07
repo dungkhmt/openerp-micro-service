@@ -1,6 +1,8 @@
 package com.hust.baseweb.applications.programmingcontest.controller;
 
 import com.google.gson.Gson;
+import com.hust.baseweb.applications.programmingcontest.callexternalapi.model.LmsLogModelCreate;
+import com.hust.baseweb.applications.programmingcontest.callexternalapi.service.ApiService;
 import com.hust.baseweb.applications.programmingcontest.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.*;
 import com.hust.baseweb.applications.programmingcontest.exception.MiniLeetCodeException;
@@ -13,6 +15,7 @@ import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseS
 import com.hust.baseweb.service.UserService;
 import io.lettuce.core.dynamic.annotation.Param;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -24,6 +27,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,7 +37,7 @@ import java.io.InputStream;
 import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
-
+@Log4j2
 @RestController
 @CrossOrigin
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -47,6 +51,7 @@ public class ContestController {
     UserService userService;
     ContestService contestService;
 
+    ApiService apiService;
     @Secured("ROLE_TEACHER")
     @PostMapping("/contests")
     public ResponseEntity<?> createContest(
@@ -258,11 +263,25 @@ public class ContestController {
         return ResponseEntity.status(200).body(resp);
     }
 
+    //@Async
+    public void logGetMyContest(String userId){
+        LmsLogModelCreate logM = new LmsLogModelCreate();
+        logM.setUserId(userId);
+        log.info("logGetMyContest, userId = " + logM.getUserId());
+
+        logM.setActionType("GET_MY_CONTESTS");
+        logM.setDescription("an user get his contests");
+        apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
+    }
+
     @Secured("ROLE_TEACHER")
     @GetMapping("/contests")
     public ResponseEntity<?> getManagedContestOfTeacher(Principal principal) {
         List<ModelGetContestResponse> resp = problemTestCaseService
             .getManagedContestOfTeacher(principal.getName());
+
+        logGetMyContest(principal.getName());
+
         return ResponseEntity.status(200).body(resp);
     }
 
