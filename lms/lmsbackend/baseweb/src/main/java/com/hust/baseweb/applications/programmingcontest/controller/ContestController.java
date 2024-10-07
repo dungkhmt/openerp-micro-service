@@ -1,8 +1,6 @@
 package com.hust.baseweb.applications.programmingcontest.controller;
 
 import com.google.gson.Gson;
-import com.hust.baseweb.applications.programmingcontest.callexternalapi.model.LmsLogModelCreate;
-import com.hust.baseweb.applications.programmingcontest.callexternalapi.service.ApiService;
 import com.hust.baseweb.applications.programmingcontest.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.*;
 import com.hust.baseweb.applications.programmingcontest.exception.MiniLeetCodeException;
@@ -15,7 +13,6 @@ import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseS
 import com.hust.baseweb.service.UserService;
 import io.lettuce.core.dynamic.annotation.Param;
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -27,7 +24,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,7 +34,6 @@ import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Log4j2
 @RestController
 @CrossOrigin
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -51,8 +46,6 @@ public class ContestController {
     ContestProblemRepo contestProblemRepo;
     UserService userService;
     ContestService contestService;
-
-    ApiService apiService;
 
     @Secured("ROLE_TEACHER")
     @PostMapping("/contests")
@@ -89,7 +82,6 @@ public class ContestController {
         log.info("edit contest modelUpdateContest {}", modelUpdateContest);
 
         problemTestCaseService.updateContest(modelUpdateContest, principal.getName(), contestId);
-
         return ResponseEntity.status(200).body(null);
     }
 
@@ -137,6 +129,7 @@ public class ContestController {
     public ResponseEntity<?> getProblemDetailInContestViewByStudent(
         @PathVariable("problemId") String problemId, @PathVariable("contestId") String contestId
     ) {
+        System.out.println("ALO");
         try {
             ContestEntity contestEntity = contestRepo.findContestByContestId(contestId);
             ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(contestId, problemId);
@@ -187,8 +180,8 @@ public class ContestController {
         ContestEntity contest = contestService.findContest(contestId);
 
         List<ProblemEntity> problems = contest.getProblems();
-        List<String> acceptedProblems = contestSubmissionRepo.findAcceptedProblemsOfUser(userId, contestId);
-        List<ModelProblemMaxSubmissionPoint> submittedProblems = contestSubmissionRepo.findSubmittedProblemsOfUser(
+        List<String> acceptedProblems = contestSubmissionRepo.findAcceptedProblemsOfUser (userId, contestId);
+        List<ModelProblemMaxSubmissionPoint> submittedProblems = contestSubmissionRepo.findSubmittedProblemsOfUser (
             userId,
             contestId);
 
@@ -224,8 +217,12 @@ public class ContestController {
                 response.setProblemCode(contestProblem.getProblemRecode());
                 response.setLevelId(problem.getLevelId());
 
-                List<String> tags = problem.getTags().stream().map(TagEntity::getName).collect(Collectors.toList());
-                response.setTags(tags);
+                if (contest.getContestShowTag() != null && contest.getContestShowTag().equals("N")) {
+                    response.setTags(new ArrayList<>());
+                } else {
+                    List<String> tags = problem.getTags().stream().map(TagEntity::getName).collect(Collectors.toList());
+                    response.setTags(tags);
+                }
 
                 if (mapProblemToMaxSubmissionPoint.containsKey(problemId)) {
                     response.setSubmitted(true);
@@ -261,24 +258,11 @@ public class ContestController {
         return ResponseEntity.status(200).body(resp);
     }
 
-    //@Async
-    public void logGetMyContest(String userId){
-        LmsLogModelCreate logM = new LmsLogModelCreate();
-        logM.setUserId(userId);
-        log.info("logGetMyContest, userId = " + logM.getUserId());
-
-        logM.setActionType("GET_MY_CONTESTS");
-        logM.setDescription("an user get his contests");
-        apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
-    }
     @Secured("ROLE_TEACHER")
     @GetMapping("/contests")
     public ResponseEntity<?> getManagedContestOfTeacher(Principal principal) {
         List<ModelGetContestResponse> resp = problemTestCaseService
             .getManagedContestOfTeacher(principal.getName());
-
-        logGetMyContest(principal.getName());
-
         return ResponseEntity.status(200).body(resp);
     }
 
