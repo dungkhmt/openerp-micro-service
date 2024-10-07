@@ -260,9 +260,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             throw new MiniLeetCodeException("permission denied", 403);
         }
 
-        if (!userId.equals(problemEntity.getUserId())
+        if (!userId.equals(problemEntity.getUserId()) && !userId.equals("admin")
             && !problemEntity.getStatusId().equals(ProblemEntity.PROBLEM_STATUS_OPEN)) {
-            throw new MiniLeetCodeException("Problem is not opened for edit", 400);
+            throw new MiniLeetCodeException("UserId = " + userId + " Problem is not opened for edit", 400);
         }
 
         List<TagEntity> tags = new ArrayList<>();
@@ -327,9 +327,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         problemEntity.setPublicProblem(modelUpdateContestProblem.getIsPublic());
         problemEntity.setAttachment(String.join(";", attachmentId));
         problemEntity.setTags(tags);
-        if (userId.equals(problemEntity.getUserId())) {
+        //if (userId.equals(problemEntity.getUserId())) {
             problemEntity.setStatusId(modelUpdateContestProblem.getStatus());
-        }
+        //}
         problemEntity.setSampleTestcase(modelUpdateContestProblem.getSampleTestCase());
         problemEntity = problemService.saveProblemWithCache(problemEntity);
         return problemEntity;
@@ -2533,6 +2533,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
                     //if(score <= 0.0001) continue;
                     if (score <= I.getThreshold() * 0.01) {
+                        /*
                         log.info("checkSimilarity, consider problem " +
                                  problemId +
                                  " listSubmissions = " +
@@ -2546,9 +2547,10 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                  score +
                                  " threshold = " +
                                  I.getThreshold());
-
+                        */
                         continue;
                     }
+                    /*
                     log.info("checkSimilarity, consider problem " +
                              problemId +
                              " listSubmissions = " +
@@ -2562,7 +2564,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                              score +
                              " threshold = " +
                              I.getThreshold());
-
+                    */
 
                     CodeSimilarityElement e = new CodeSimilarityElement();
                     e.setScore(score);

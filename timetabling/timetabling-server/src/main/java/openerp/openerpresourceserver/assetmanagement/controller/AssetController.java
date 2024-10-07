@@ -16,7 +16,9 @@ import java.util.List;
 @AllArgsConstructor(onConstructor_ = @Autowired)
 @RequestMapping("/asset")
 public class AssetController {
+    //@Autowired
     private AssetService assetService;
+    //@Autowired
     private AssetLogService assetLogService;
 
     @GetMapping("/get-all")
