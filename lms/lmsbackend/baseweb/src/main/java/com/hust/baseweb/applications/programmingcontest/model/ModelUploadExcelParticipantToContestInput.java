@@ -12,4 +12,6 @@ import lombok.Setter;
 public class ModelUploadExcelParticipantToContestInput {
 
     private String contestId;
+    private String role;
+
 }
