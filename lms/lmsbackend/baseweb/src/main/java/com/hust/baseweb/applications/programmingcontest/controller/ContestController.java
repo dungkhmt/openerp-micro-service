@@ -621,6 +621,7 @@ public class ContestController {
             inputJson, ModelUploadExcelParticipantToContestInput.class);
         List<ModelAddUserToContestResponse> uploadedUsers = new ArrayList<>();
         String contestId = modelUpload.getContestId();
+        String role = modelUpload.getRole();
         try (InputStream is = file.getInputStream()) {
             XSSFWorkbook wb = new XSSFWorkbook(is);
             XSSFSheet sheet = wb.getSheetAt(0);
@@ -637,7 +638,13 @@ public class ContestController {
                 ModelAddUserToContest m = new ModelAddUserToContest();
                 m.setContestId(contestId);
                 m.setUserId(userId);
-                m.setRole(UserRegistrationContestEntity.ROLE_PARTICIPANT);
+                if ("Manager".equalsIgnoreCase(role)) {
+                    m.setRole(UserRegistrationContestEntity.ROLE_MANAGER);
+                } else if ("Owner".equalsIgnoreCase(role)) {
+                    m.setRole(UserRegistrationContestEntity.ROLE_OWNER);
+                } else {
+                    m.setRole(UserRegistrationContestEntity.ROLE_PARTICIPANT);
+                }
                 ModelAddUserToContestResponse response = problemTestCaseService.addUserToContest(m);
                 uploadedUsers.add(response);
             }

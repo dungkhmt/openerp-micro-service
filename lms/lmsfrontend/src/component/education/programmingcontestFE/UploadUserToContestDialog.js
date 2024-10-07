@@ -1,17 +1,22 @@
 import { useRef, useState } from "react";
 import { request } from "../../../api";
 import { errorNoti } from "../../../utils/notification";
-
-import { Box, Button, Link, Stack, Typography } from "@mui/material";
+import { Box, Button, Link, Stack, Typography, Select, MenuItem, InputLabel, FormControl } from "@mui/material";
 import XLSX from "xlsx";
 import HustModal from "../../common/HustModal";
 import StandardTable from "../../table/StandardTable";
 import { InputFileUpload } from "./StudentViewProgrammingContestProblemDetailV2";
 
-export default function UploadUserToContestDialog(props) {
-  const { isOpen, onClose, contestId } = props;
-  const [isProcessing, setIsProcessing] = useState(false);
+const roles = [
+  { label: "Participant", value: "PARTICIPANT" },
+  { label: "Manager", value: "MANAGER" },
+  { label: "Owner", value: "OWNER" },
+];
 
+export default function UploadUserToContestDialog(props) {
+  const { isOpen, onClose, contestId, role } = props;
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [selectedRole, setSelectedRole] = useState(roles[0].value);
   const inputRef = useRef(null);
   const [file, setFile] = useState(null);
   const [uploadedUsers, setUploadedUsers] = useState([]);
@@ -20,14 +25,11 @@ export default function UploadUserToContestDialog(props) {
     setFile(event.target.files[0]);
   }
 
-  const downloadSampleFile = () => {
-    window.location.href = "/static/excels/sample-upload-user-contest.xlsx";
-  };
-
   const handleUpload = () => {
     setIsProcessing(true);
     let body = {
       contestId: contestId,
+      role: selectedRole,
     };
     let formData = new FormData();
     formData.append("inputJson", JSON.stringify(body));
@@ -110,13 +112,12 @@ export default function UploadUserToContestDialog(props) {
     <HustModal
       open={isOpen}
       title={"Upload Users to Contest"}
-      onOk={handleUpload}
       onClose={onClose}
-      textOk="Upload"
-      textClose="Cancel"
       isLoading={isProcessing}
+      isNotShowCloseButton={true}
       maxWidthPaper={uploadedUsers.length > 0 ? 840 : 600}
     >
+
       <Box sx={{ mb: 1 }}>
         <Stack direction="row" spacing={2} alignItems="center">
           <Stack
@@ -144,17 +145,40 @@ export default function UploadUserToContestDialog(props) {
             variant="subtitle2"
             underline="none"
             download
-            // sx={{ alignSelf: "flex-end" }}
           >
             Download template
           </Link>
         </Stack>
 
+        {/* Stack containing Role dropdown, Cancel, and Upload buttons */}
+        <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 2 }}>
+          {/* Role selection dropdown */}
+          <FormControl sx={{ minWidth: 200, flexGrow: 1 }}>
+            <InputLabel id="role-select-label">Role</InputLabel>
+            <Select
+              labelId="role-select-label"
+              value={selectedRole}
+              label="Role"
+              onChange={(e) => setSelectedRole(e.target.value)}
+            >
+              {roles.map((role) => (
+                <MenuItem key={role.value} value={role.value}>
+                  {role.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* Cancel and Upload buttons */}
+          <Button variant="outlined" onClick={onClose}>Cancel</Button>
+          <Button variant="contained" onClick={handleUpload} disabled={isProcessing}>Upload</Button>
+        </Stack>
+
+
         {uploadedUsers.length > 0 && (
           <StandardTable
             title={
-              uploadedUsers.filter((user) => user.status === "Successful")
-                .length +
+              uploadedUsers.filter((user) => user.status === "Successful").length +
               "/" +
               uploadedUsers.length +
               " Successful"
@@ -189,5 +213,6 @@ export default function UploadUserToContestDialog(props) {
         )}
       </Box>
     </HustModal>
+
   );
 }
