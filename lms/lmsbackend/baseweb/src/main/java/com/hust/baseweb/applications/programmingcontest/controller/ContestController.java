@@ -289,7 +289,10 @@ public class ContestController {
     @GetMapping("/all-contests")
     public ResponseEntity<?> getAllContest(Principal principal) {
         List<ModelGetContestResponse> resp = problemTestCaseService
-            .getAllContests(principal.getName());
+            .getAllContests(principal.getName())
+            .stream()
+            .filter(contestResponse -> !contestResponse.getStatusId().equals("DISABLED"))
+            .collect(Collectors.toList());
         return ResponseEntity.status(200).body(resp);
     }
 
@@ -410,7 +413,11 @@ public class ContestController {
 
     @GetMapping("/students/contests")
     public ResponseEntity<?> getContestRegisteredStudent(Principal principal) {
-        ModelGetContestPageResponse res = problemTestCaseService.getRegisteredContestsByUser(principal.getName());
+        ModelGetContestPageResponse res = problemTestCaseService.getRegisteredContestsByUser (principal.getName());
+        List<ModelGetContestResponse> filteredContests = res.getContests().stream()
+                                                            .filter(contest -> Arrays.asList("CREATED", "RUNNING", "COMPLETED").contains(contest.getStatusId()))
+                                                            .collect(Collectors.toList());
+        res.setContests(filteredContests);
         return ResponseEntity.ok().body(res);
     }
 
