@@ -53,21 +53,21 @@ public class NotificationController {
     ) {
         SseEmitter subscription;
         subscription = new SseEmitter(Long.MAX_VALUE);
-        Runnable callback = () -> subscriptions.remove(toUser);
 
-        subscription.onTimeout(callback); // OK
-        subscription.onCompletion(callback); // OK
+        subscription.onTimeout(() -> {
+            subscription.complete();
+            subscriptions.remove(toUser);
+        });
+        subscription.onCompletion(() -> subscriptions.remove(toUser)); // OK
         subscription.onError((ex) -> { // Must consider carefully, but currently OK
-            log.error("onError fired with exception: " + ex);
+            subscription.completeWithError(ex);
+            log.error("onError fired with exception: {}", ex);
         });
 
         // Add new subscription to user's connection list.
         if (subscriptions.containsKey(toUser)) {
             subscriptions.get(toUser).add(subscription);
-            log.info(
-                "{} RE-SUBSCRIBES --> #CURRENT CONNECTION = {}",
-                toUser,
-                subscriptions.get(toUser).size());
+            log.info("{} RE-SUBSCRIBES --> #CURRENT CONNECTION = {}", toUser, subscriptions.get(toUser).size());
         } else {
             subscriptions.put(toUser, new ArrayList<SseEmitter>() {{
                 add(subscription);
@@ -89,7 +89,7 @@ public class NotificationController {
     @Scheduled(fixedRate = 40000)
     public void sendHeartbeatSignal() {
 //        log.info("#CURRENT ACTIVE USER = {}, START SENDING HEARTBEAT EVENT", subscriptions.size());
-        long start = System.currentTimeMillis();
+//        long start = System.currentTimeMillis();
 
         subscriptions.forEach((toUser, subscription) -> {
             // Use iterator to avoid ConcurrentModificationException.
@@ -97,11 +97,13 @@ public class NotificationController {
             int size = subscription.size();
 
             while (iterator.hasNext()) {
+                SseEmitter emitter = iterator.next();
+
                 try {
-                    iterator.next().send(SseEmitter
-                                             .event()
-                                             .name(SSE_EVENT_HEARTBEAT)
-                                             .data("keep alive", MediaType.TEXT_EVENT_STREAM));
+                    emitter.send(SseEmitter
+                                     .event()
+                                     .name(SSE_EVENT_HEARTBEAT)
+                                     .data("keep alive", MediaType.TEXT_EVENT_STREAM));
 //                                      .comment(":\n\nkeep alive"));
                 } catch (Exception e) {
                     iterator.remove();
