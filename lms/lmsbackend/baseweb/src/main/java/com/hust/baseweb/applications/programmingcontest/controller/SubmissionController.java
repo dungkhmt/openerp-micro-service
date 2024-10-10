@@ -1,6 +1,8 @@
 package com.hust.baseweb.applications.programmingcontest.controller;
 
 import com.google.gson.Gson;
+import com.hust.baseweb.applications.programmingcontest.callexternalapi.model.LmsLogModelCreate;
+import com.hust.baseweb.applications.programmingcontest.callexternalapi.service.ApiService;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestProblem;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
@@ -21,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +48,7 @@ public class SubmissionController {
     ContestProblemRepo contestProblemRepo;
     UserRegistrationContestRepo userRegistrationContestRepo;
     ProblemTestCaseServiceCache cacheService;
+    ApiService apiService;
 
     @Secured("ROLE_TEACHER")
     @PostMapping("/teacher/submissions/{submissionId}/disable")
@@ -124,13 +128,37 @@ public class SubmissionController {
         return ResponseEntity.status(200).body(contestSubmission);
     }
 
+    @Async
+    public void logTeacherViewDetailSubmissionOfStudentContest(String userId, String contestId, String problemId, String studentId, UUID submissionId){
+        LmsLogModelCreate logM = new LmsLogModelCreate();
+        logM.setUserId(userId);
+        log.info("logTeacherViewDetailSubmissionOfStudentContest, userId = " + logM.getUserId());
+        logM.setParam1(contestId);
+        logM.setParam2(problemId);
+        logM.setParam3(submissionId.toString());
+        logM.setParam4(studentId);
+
+        logM.setActionType("MANAGER_VIEW_DETAIL_A_SUBMISSION_OF_STUDENT_CONTEST");
+        logM.setDescription("an user manager views detail of a submission of a student in a contest");
+        apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
+    }
+
+
     @Secured("ROLE_TEACHER")
     @GetMapping("/teacher/submissions/{submissionId}/general-info")
     public ResponseEntity<?> getContestSubmissionDetailViewedByManager(
+        Principal principal,
         @PathVariable("submissionId") UUID submissionId
     ) {
         ContestSubmissionEntity contestSubmission = problemTestCaseService.getContestSubmissionDetailForTeacher(
             submissionId);
+
+        logTeacherViewDetailSubmissionOfStudentContest(principal.getName(),
+                                                       contestSubmission.getContestId(),
+                                                       contestSubmission.getProblemId(),
+                                                       contestSubmission.getUserId(),
+                                                       contestSubmission.getContestSubmissionId());
+
         return ResponseEntity.status(200).body(contestSubmission);
     }
 
@@ -229,6 +257,22 @@ public class SubmissionController {
         return ResponseEntity.ok().body("OK");
     }
 
+    @Async
+    public void logStudentSubmitToAContest(String userId, String contestId,
+                                           ModelContestSubmitProgramViaUploadFile model){
+        LmsLogModelCreate logM = new LmsLogModelCreate();
+        logM.setUserId(userId);
+        log.info("logUpdateContest, userId = " + logM.getUserId());
+        logM.setParam1(contestId);
+        logM.setParam2(model.getProblemId());
+        logM.setParam3(model.getLanguage());
+
+        logM.setActionType("MANAGER_UPDATE_CONTEST");
+        logM.setDescription("an user update a contest");
+        apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
+    }
+
+
     @PostMapping("/submissions/file-upload")
     public ResponseEntity<?> contestSubmitProblemViaUploadFileV3(
         Principal principal,
@@ -249,6 +293,9 @@ public class SubmissionController {
         ModelContestSubmitProgramViaUploadFile model = gson.fromJson(
             inputJson,
             ModelContestSubmitProgramViaUploadFile.class);
+
+        logStudentSubmitToAContest(principal.getName(), model.getContestId(), model);
+
         ContestEntity contestEntity = contestRepo.findContestByContestId(model.getContestId());
         ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(model.getContestId(), model.getProblemId());
         List<String> languagesAllowed = contestEntity.getListLanguagesAllowedInContest();
