@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import lombok.extern.log4j.Log4j2;
+import openerp.openerpresourceserver.model.LogCreate;
 import openerp.openerpresourceserver.model.Project;
 import openerp.openerpresourceserver.service.ApiService;
 
@@ -54,5 +55,12 @@ public class WebController {
       e.printStackTrace();
       return "error500";
     }
+  }
+
+  @GetMapping("/create-log")
+  public String createLog() {
+    var body = LogCreate.builder().userId("dungpq").description("test log").build();
+    this.apiService.callPostApi("/log/create-log", Void.class, body);
+    return "forbidden";
   }
 }
