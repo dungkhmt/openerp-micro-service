@@ -49,7 +49,7 @@ public class ProblemController {
     ChatGPTService chatGPTService;
 
     ApiService apiService;
-    
+
     @Secured("ROLE_TEACHER")
     @PostMapping("/problems")
     public ResponseEntity<?> createProblem(
