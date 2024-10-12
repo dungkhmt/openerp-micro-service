@@ -42,7 +42,8 @@ function EditContest() {
     participantViewSubmissionMode: [],
     supportedLanguage: [],
     participantViewProblemsTag: [],
-    contestType: []
+    contestType: [],
+    participantViewComment: [],
   });
 
   const [contestType, setContestType] = useState("");
@@ -66,10 +67,11 @@ function EditContest() {
   const [allowedLanguages, setAllowedLanguages] = useState([]);
   const [participantViewProblemsTag, setParticipantViewProblemsTag] =
     useState("");
+  const [participantViewComment, setParticipantViewComment] =
+    useState("");
 
   const handleSubmit = () => {
-    
-    // setLoading(true);
+
     let body = {
       contestName: contestName,
       contestSolvingTime: contestTime,
@@ -88,6 +90,7 @@ function EditContest() {
       languagesAllowed: allowedLanguages,
       contestType: contestType,
       contestShowTag: participantViewProblemsTag,
+      contestShowComment: participantViewComment,
     };
 
     request(
@@ -154,6 +157,11 @@ function EditContest() {
             label: mode,
             value: mode,
           })),
+        participantViewComment:
+          data.listContestShowComments.map((mode) => ({
+            label: mode,
+            value: mode,
+          })),
       });
 
       setContestTime(data.contestTime);
@@ -178,6 +186,8 @@ function EditContest() {
           : data.languagesAllowed.split(",")
       );
       setParticipantViewProblemsTag(data.contestShowTag);
+      setParticipantViewComment(data.contestShowComment);
+
     });
   }
 
@@ -364,7 +374,19 @@ function EditContest() {
                     value={participantViewProblemsTag}
                     options={options.participantViewProblemsTag}
                     onChange={(event) => {
-                      setParticipantViewProblemsTag(event.target.value); 
+                      setParticipantViewProblemsTag(event.target.value);
+                    }}
+                  />
+                  ,
+                  <StyledSelect
+                    fullWidth
+                    id="participantViewComment"
+                    label="Participant view comment"
+                    key={"participantViewComment"}
+                    value={participantViewComment}
+                    options={options.participantViewComment}
+                    onChange={(event) => {
+                      setParticipantViewComment(event.target.value);
                     }}
                   />
                   ,

@@ -15,8 +15,9 @@ import { getStatusColor } from "./lib";
 
 export default function ContestProblemSubmissionDetail() {
   const { problemSubmissionId } = useParams();
-
+  
   const [submission, setSubmission] = useState({});
+  const [comments, setComments] = useState([]);
 
   useEffect(() => {
     request(
@@ -27,7 +28,15 @@ export default function ContestProblemSubmissionDetail() {
       },
       {}
     );
-  }, []);
+
+    const getComments = async () => {
+        const res = await request("get", `submissions/${problemSubmissionId}/comments`);
+        setComments(res.data);
+
+    };
+
+    getComments();
+  }, [problemSubmissionId]);
 
   return (
     <Stack direction="row">
@@ -88,6 +97,16 @@ export default function ContestProblemSubmissionDetail() {
               showLineNumbers
             />
           </Box>
+          <Box sx={{ mt: 4 }}>
+            <Typography variant={"h6"} sx={{ mb: 1 }}>
+              Comments
+            </Typography>
+            {comments.map((comment) => (
+              <Typography key={comment.id} variant="body2" sx={{ mb: 1 }}>
+                <strong>{comment.username}:</strong> {comment.comment}
+              </Typography>
+            ))}
+          </Box>
         </Paper>
       </Stack>
       <Box>
@@ -135,7 +154,7 @@ export default function ContestProblemSubmissionDetail() {
                   : 0
               }`,
             ],
-            ["Language", submission.sourceCodeLanguage],
+            ["Language ", submission.sourceCodeLanguage],
             [
               "Total runtime",
               `${
@@ -144,7 +163,6 @@ export default function ContestProblemSubmissionDetail() {
                   : 0
               } ms`,
             ],
-            // ["Memory usage", `${submission.memoryUsage} KB`],
             ["Submited by", submission.submittedByUserId],
             ["Submited at", displayTime(submission.createdAt)],
             ["Last modified", displayTime(submission.updateAt)],

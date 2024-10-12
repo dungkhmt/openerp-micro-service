@@ -1,6 +1,6 @@
 import InfoIcon from "@mui/icons-material/Info";
 import ReplayIcon from "@mui/icons-material/Replay";
-import { IconButton, LinearProgress } from "@mui/material";
+import { IconButton, LinearProgress, Box, Typography } from "@mui/material"; 
 import { request } from "api";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
 import HustModal from "component/common/HustModal";
@@ -18,35 +18,39 @@ const StudentViewSubmission = forwardRef((props, ref) => {
   const problemId = props?.problemId || "";
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [selectedRowData, setSelectedRowData] = useState();
   const [openModalMessage, setOpenModalMessage] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [loadingComments, setLoadingComments] = useState(false);
+
+  const getCommentsBySubmissionId = async (submissionId) => {
+    setLoadingComments(true);
+      const res = await request("get", `/submissions/${submissionId}/comments`);
+      console.log(res.data); 
+      setComments(res.data); 
+      setLoadingComments(false);
+  };
+
+  const handleCommentClick = (rowData) => {
+    setSelectedRowData(rowData);
+    setOpenModalMessage(true);
+    getCommentsBySubmissionId(rowData["contestSubmissionId"]);
+  };
 
   const getSubmissions = async () => {
-    let requestUrl = "";
-    if (problemId !== "")
-      requestUrl =
-        "/contests/users/submissions?contestid=" +
-        contestId +
-        "&problemid=" +
-        problemId;
-    else requestUrl = "/contests/" + contestId + "/users/submissions";
-
-    await request(
-      "get",
-      requestUrl,
-      (res) => {
-        setSubmissions(res.data.content);
-        setLoading(false);
-      },
-      {}
-    );
+      let requestUrl = "";
+      if (problemId !== "") {
+        requestUrl = "/contests/users/submissions?contestid=" + contestId + "&problemid=" + problemId;
+      } else {
+        requestUrl = "/contests/" + contestId + "/users/submissions";
+      }
+      const res = await request("get", requestUrl);
+      setSubmissions(res.data.content);
+      setLoading(false);
   };
 
   useEffect(() => {
-    getSubmissions().then((res) => {
-      if (res && res.data) setSubmissions(res.data.content);
-    });
+    getSubmissions();
   }, []);
 
   const columns = [
@@ -92,10 +96,7 @@ const StudentViewSubmission = forwardRef((props, ref) => {
       render: (rowData) => (
         <IconButton
           color="primary"
-          onClick={() => {
-            setSelectedRowData(rowData);
-            setOpenModalMessage(true);
-          }}
+          onClick={() => handleCommentClick(rowData)} 
         >
           <InfoIcon />
         </IconButton>
@@ -122,10 +123,10 @@ const StudentViewSubmission = forwardRef((props, ref) => {
     { title: t("submissionList.at"), field: "createAt", minWidth: "128px" },
   ];
 
-  function handleRefresh() {
+  const handleRefresh = () => {
     setLoading(true);
     getSubmissions();
-  }
+  };
 
   useImperativeHandle(ref, () => ({
     refreshSubmission() {
@@ -139,8 +140,7 @@ const StudentViewSubmission = forwardRef((props, ref) => {
 
     if (rowData) {
       if (rowData["message"]) message = rowData["message"];
-      if (rowData["contestSubmissionId"])
-        detailLink = rowData["contestSubmissionId"];
+      if (rowData["contestSubmissionId"]) detailLink = rowData["contestSubmissionId"];
     }
 
     return (
@@ -151,64 +151,41 @@ const StudentViewSubmission = forwardRef((props, ref) => {
         showCloseBtnTitle={false}
       >
         <HustCopyCodeBlock title="Response" text={message} />
-        {/* <Box paddingTop={2}>
-          <Link
-            to={{
-              pathname: `/programming-contest/contest-problem-submission-detail/${detailLink}`,
-            }}
-          >
-            View detail here
-          </Link>
-        </Box> */}
+        <Typography variant="h6" sx={{ mt: 2 }}>Comments:</Typography>
+        <Box sx={{ maxHeight: "400px", overflowY: "auto" }}>
+          {loadingComments && <LinearProgress />}
+          {comments.length > 0 ? (
+            comments.map((comment) => (
+              <Typography key={comment.id} variant="body2" sx={{ mb: 1 }}>
+                <strong>{comment.username}:</strong> {comment.comment} {/* In dam ten nguoi comment */}
+              </Typography>
+            ))
+          ) : (
+            <Typography variant="body2" sx={{ mb: 1 }}>No comments available.</Typography>
+          )}
+        </Box>
       </HustModal>
     );
   };
 
+
   return (
     <>
-      {/* <Stack direction={"row"} justifyContent={"flex-end"} sx={{ mb: 2 }}>
-        <LoadingButton
-          disabled={loading}
-          color="primary"
-          variant="contained"
-          loading={loading}
-          loadingPosition="start"
-          startIcon={<ReplayIcon />}
-          sx={{ mr: 2 }}
-          onClick={() => {
-            setLoading(true);
-            setTimeout(handleRefresh, 2000);
-          }}
-        >
-          <span style={{ textTransform: "none" }}>Refresh</span>
-        </LoadingButton>
-      </Stack> */}
-      <ModalMessage rowData={selectedRowData} />
-      {loading && <LinearProgress />}
       <StandardTable
-        // title={t("submissionList.title")}
+        // title={t("submissionList")}
         columns={columns}
         data={submissions}
-        hideCommandBar
-        options={{
-          selection: false,
-          pageSize: 5,
-          search: true,
-          sorting: true,
-        }}
+        loading={loading}
         actions={[
           {
-            disabled: loading,
-            icon: () => <ReplayIcon color={loading ? "disabled" : "primary"} />,
-            tooltip: "Refresh",
+            icon: () => <ReplayIcon />,
+            tooltip: t("Refresh"),
             isFreeAction: true,
-            onClick: (event) => {
-              setLoading(true);
-              setTimeout(handleRefresh, 1000);
-            },
+            onClick: handleRefresh,
           },
         ]}
       />
+      <ModalMessage rowData={selectedRowData} />
     </>
   );
 });
