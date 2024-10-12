@@ -72,6 +72,9 @@ public class ContestEntity implements Serializable {
     public static String CONTEST_SHOW_TAG_PROBLEMS_YES = "Y";
     public static String CONTEST_SHOW_TAG_PROBLEMS_NO = "N";
 
+    public static String CONTEST_SHOW_COMMENT_YES = "Y";
+    public static String CONTEST_SHOW_COMMENT_NO = "N";
+
     public static List<String> getListContestTypes(){
         List<String> L = new ArrayList();
         L.add(CONTEST_TYPE_REAL_TEST_WITH_EVALUATION);
@@ -81,6 +84,12 @@ public class ContestEntity implements Serializable {
     public static List<String> getListContestShowTag(){
         List<String> L = new ArrayList();
         L.add(CONTEST_SHOW_TAG_PROBLEMS_YES);
+        L.add(CONTEST_SHOW_TAG_PROBLEMS_NO);
+        return L;
+    }
+    public static List<String> getListContestShowComment(){
+        List<String> L = new ArrayList();
+        L.add(CONTEST_SHOW_COMMENT_YES);
         L.add(CONTEST_SHOW_TAG_PROBLEMS_NO);
         return L;
     }
@@ -267,4 +276,7 @@ public class ContestEntity implements Serializable {
 
     @Column(name = "contest_show_tag")
     private String contestShowTag;
+
+    @Column(name = "contest_show_comment")
+    private String contestShowComment;
 }

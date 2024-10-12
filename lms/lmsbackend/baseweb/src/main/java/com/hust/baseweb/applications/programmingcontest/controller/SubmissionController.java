@@ -1,15 +1,12 @@
 package com.hust.baseweb.applications.programmingcontest.controller;
 
 import com.google.gson.Gson;
-import com.hust.baseweb.applications.programmingcontest.entity.ContestEntity;
-import com.hust.baseweb.applications.programmingcontest.entity.ContestProblem;
-import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
-import com.hust.baseweb.applications.programmingcontest.entity.UserRegistrationContestEntity;
+import com.hust.baseweb.applications.programmingcontest.entity.*;
 import com.hust.baseweb.applications.programmingcontest.model.*;
-import com.hust.baseweb.applications.programmingcontest.repo.ContestProblemRepo;
-import com.hust.baseweb.applications.programmingcontest.repo.ContestRepo;
-import com.hust.baseweb.applications.programmingcontest.repo.ContestSubmissionRepo;
-import com.hust.baseweb.applications.programmingcontest.repo.UserRegistrationContestRepo;
+import com.hust.baseweb.applications.programmingcontest.repo.*;
+import com.hust.baseweb.applications.programmingcontest.service.ContestService;
+import com.hust.baseweb.applications.programmingcontest.service.ContestSubmissionCommentService;
+import com.hust.baseweb.applications.programmingcontest.service.ContestSubmissionService;
 import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseService;
 import com.hust.baseweb.applications.programmingcontest.service.helper.cache.ProblemTestCaseServiceCache;
 import lombok.AllArgsConstructor;
@@ -20,15 +17,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -39,12 +39,18 @@ import java.util.UUID;
 @Slf4j
 public class SubmissionController {
 
+    @Autowired
+    private ContestSubmissionService contestSubmissionService;
+    private final ContestService contestService;
+    private ContestSubmissionCommentService commentService;
+    private final ContestSubmissionCommentService contestSubmissionCommentService;
     ProblemTestCaseService problemTestCaseService;
     ContestRepo contestRepo;
     ContestSubmissionRepo contestSubmissionRepo;
     ContestProblemRepo contestProblemRepo;
     UserRegistrationContestRepo userRegistrationContestRepo;
     ProblemTestCaseServiceCache cacheService;
+    ContestSubmissionCommentRepository contestSubmissionCommentRepo;
 
     @Secured("ROLE_TEACHER")
     @PostMapping("/teacher/submissions/{submissionId}/disable")
@@ -615,4 +621,57 @@ public class SubmissionController {
         return ResponseEntity.status(200).body(page);
     }
 
+    @Secured("ROLE_TEACHER")
+    @PostMapping("/teacher/submissions/{submissionId}/comments")
+    public ResponseEntity<?> postComment(
+        @PathVariable UUID submissionId,
+        @RequestBody @Valid ModelContestSubmissionComment modelContestSubmissionComment,
+        Principal principal
+    ) throws Exception {
+        log.info("postComment for submissionId {}: {}", submissionId, modelContestSubmissionComment);
+
+        ContestSubmissionComment comment = contestSubmissionCommentService.postComment(
+            submissionId,
+            modelContestSubmissionComment,
+            principal.getName()
+        );
+
+        return ResponseEntity.status(200).body(comment);
+    }
+
+    @GetMapping("/submissions/{submissionId}/comments")
+    public ResponseEntity<List<CommentDTO>> getComments(@PathVariable UUID submissionId) {
+        ContestSubmissionEntity submission = contestSubmissionService.getSubmissionById(submissionId);
+
+        String contestId = submission.getContestId();
+
+        ContestEntity contest = contestService.findContest(contestId);
+
+        if (!"Y".equals(contest.getContestShowComment())) {
+            return ResponseEntity.ok(Collections.emptyList());
+        }
+
+        List<CommentDTO> comments = commentService.getAllCommentsBySubmissionId(submissionId);
+
+        Collections.reverse(comments);
+
+        return ResponseEntity.ok(comments);
+    }
+
+//    @Secured("ROLE_TEACHER")
+//    @PutMapping("/teacher/submissions/{submissionId}/comments/{commentId}")
+//    public ResponseEntity<?> updateComment(
+//        @PathVariable UUID submissionId,
+//        @PathVariable UUID commentId,
+//        @RequestBody ContestSubmissionComment updatedComment
+//    ) {
+//        ContestSubmissionComment existingComment = contestSubmissionCommentRepo.findById(commentId)
+//                                                                               .orElseThrow(() -> new RuntimeException("Comment not found"));
+//
+//        existingComment.setComment(updatedComment.getComment());
+//        existingComment.setLastUpdatedStamp(new Date());
+//
+//        ContestSubmissionComment savedComment = contestSubmissionCommentRepo.save(existingComment);
+//        return ResponseEntity.ok().body(savedComment);
+//    }
 }

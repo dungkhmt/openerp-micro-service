@@ -138,6 +138,8 @@ public class ContestService {
             .listContestTypes(ContestEntity.getListContestTypes())
             .contestShowTag(contestEntity.getContestShowTag())
             .listContestShowTags(contestEntity.getListContestShowTag())
+            .contestShowComment(contestEntity.getContestShowComment())
+            .listContestShowComments(contestEntity.getListContestShowComment())
             .build();
     }
 

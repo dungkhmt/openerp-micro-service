@@ -29,4 +29,5 @@ public class  ModelUpdateContest {
     private List<String> languagesAllowed;
     private String contestType;
     private String contestShowTag;
+    private String contestShowComment;
 }
