@@ -9,11 +9,11 @@ import com.hust.baseweb.applications.programmingcontest.entity.ContestProblem;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.UserRegistrationContestEntity;
 import com.hust.baseweb.applications.programmingcontest.model.*;
+import com.hust.baseweb.applications.programmingcontest.repo.*;
 import com.hust.baseweb.applications.programmingcontest.repo.ContestProblemRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.ContestRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.ContestSubmissionRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.UserRegistrationContestRepo;
-import com.hust.baseweb.applications.programmingcontest.repo.*;
 import com.hust.baseweb.applications.programmingcontest.service.ContestService;
 import com.hust.baseweb.applications.programmingcontest.service.ContestSubmissionCommentService;
 import com.hust.baseweb.applications.programmingcontest.service.ContestSubmissionService;
@@ -158,23 +158,23 @@ public class SubmissionController {
     }
 
 
-     @Secured("ROLE_TEACHER")
-     @GetMapping("/teacher/submissions/{submissionId}/general-info")
-     public ResponseEntity<?> getContestSubmissionDetailViewedByManager(
-         Principal principal,
-         @PathVariable("submissionId") UUID submissionId
-     ) {
-         ContestSubmissionEntity contestSubmission = problemTestCaseService.getContestSubmissionDetailForTeacher(
-             submissionId);
+    @Secured("ROLE_TEACHER")
+    @GetMapping("/teacher/submissions/{submissionId}/general-info")
+    public ResponseEntity<?> getContestSubmissionDetailViewedByManager(
+        Principal principal,
+        @PathVariable("submissionId") UUID submissionId
+    ) {
+        ContestSubmissionEntity contestSubmission = problemTestCaseService.getContestSubmissionDetailForTeacher(
+            submissionId);
 
-         logTeacherViewDetailSubmissionOfStudentContest(principal.getName(),
-                                                        contestSubmission.getContestId(),
-                                                        contestSubmission.getProblemId(),
-                                                        contestSubmission.getUserId(),
-                                                        contestSubmission.getContestSubmissionId());
+        logTeacherViewDetailSubmissionOfStudentContest(principal.getName(),
+                                                       contestSubmission.getContestId(),
+                                                       contestSubmission.getProblemId(),
+                                                       contestSubmission.getUserId(),
+                                                       contestSubmission.getContestSubmissionId());
 
-             return ResponseEntity.status(200).body(contestSubmission);
-     }
+        return ResponseEntity.status(200).body(contestSubmission);
+    }
 //    @Secured("ROLE_TEACHER")
 //    @GetMapping("/teacher/submissions/{submissionId}/general-info")
 //    public ResponseEntity<?> getContestSubmissionDetailViewedByManager(
