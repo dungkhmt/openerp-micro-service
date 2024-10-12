@@ -12,7 +12,9 @@ import openerp.openerpresourceserver.generaltimetabling.service.SemesterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SemesterServiceImpl implements SemesterService {
@@ -28,7 +30,9 @@ public class SemesterServiceImpl implements SemesterService {
 
     @Override
     public List<Semester> getSemester() {
-        return semesterRepo.findAll();
+        return semesterRepo.findAll().stream()
+                .sorted(Comparator.comparing(s -> s.getSemester().replace(".", "")))
+                .collect(Collectors.toList());
     }
 
     @Override
