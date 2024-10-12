@@ -1,6 +1,8 @@
 package com.hust.baseweb.applications.programmingcontest.controller;
 
 import com.hust.baseweb.applications.chatgpt.ChatGPTService;
+import com.hust.baseweb.applications.programmingcontest.callexternalapi.model.LmsLogModelCreate;
+import com.hust.baseweb.applications.programmingcontest.callexternalapi.service.ApiService;
 import com.hust.baseweb.applications.programmingcontest.entity.ProblemEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.TagEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.UserContestProblemRole;
@@ -21,6 +23,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,6 +47,8 @@ public class ProblemController {
     ProblemRepo problemRepo;
 
     ChatGPTService chatGPTService;
+
+    ApiService apiService;
 
     @Secured("ROLE_TEACHER")
     @PostMapping("/problems")
@@ -72,6 +77,20 @@ public class ProblemController {
         return ResponseEntity.status(200).body(problemStatement);
     }
 
+    @Async
+    public void logManagerGetProblemDetail(String userId, String problemId){
+        LmsLogModelCreate logM = new LmsLogModelCreate();
+        logM.setUserId(userId);
+        log.info("logManagerGetProblemDetail, userId = " + logM.getUserId());
+        logM.setParam1(problemId);
+
+
+        logM.setActionType("MANAGER_VIEW_PROBLEM_DETAIL");
+        logM.setDescription("a manager view problem detail");
+        apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
+    }
+
+
     @Secured("ROLE_TEACHER")
     @GetMapping("/teacher/problems/{problemId}")
     public ResponseEntity<?> getProblemDetailViewByTeacher(
@@ -79,6 +98,9 @@ public class ProblemController {
         Principal teacher
     ) throws Exception {
         try {
+
+            logManagerGetProblemDetail(teacher.getName(),problemId);
+
             ModelCreateContestProblemResponse problemResponse = problemTestCaseService.getContestProblemDetailByIdAndTeacher(
                 problemId,
                 teacher.getName());

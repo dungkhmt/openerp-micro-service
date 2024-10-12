@@ -23,6 +23,9 @@ import com.hust.baseweb.applications.education.report.model.courseparticipation.
 import com.hust.baseweb.applications.education.report.model.quizparticipation.StudentQuizParticipationModel;
 import com.hust.baseweb.applications.education.service.*;
 import com.hust.baseweb.applications.notifications.service.NotificationsService;
+import com.hust.baseweb.applications.programmingcontest.callexternalapi.model.LmsLogModelCreate;
+import com.hust.baseweb.applications.programmingcontest.callexternalapi.service.ApiService;
+import com.hust.baseweb.applications.programmingcontest.model.ModelUpdateContest;
 import com.hust.baseweb.config.FileSystemStorageProperties;
 import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.service.UserService;
@@ -39,6 +42,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -77,6 +81,8 @@ public class ClassController {
     private FileSystemStorageProperties properties;
     private ClassRegistrationRepo classRegistrationRepo;
     private EduClassSessionService eduClassSessionService;
+
+    ApiService apiService;
 
     @Autowired
     private MongoContentService mongoContentService;
@@ -218,9 +224,35 @@ public class ClassController {
         return ResponseEntity.ok().body(classService.getClassesOfTeacher(principal.getName()));
     }
 
+    @Async
+    public void logUserGetRegisteredClasses(String userId){
+        LmsLogModelCreate logM = new LmsLogModelCreate();
+        logM.setUserId(userId);
+        log.info("logUserGetRegisteredClasses, userId = " + logM.getUserId());
+
+
+        logM.setActionType("USER_GET_REGISTERED_CLASSES_LIST");
+        logM.setDescription("an user get list of registered classes");
+        apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
+    }
+
     @GetMapping("/list/student")
     public ResponseEntity<?> getClassesOfStudent(Principal principal) {
+        logUserGetRegisteredClasses(principal.getName());
+
         return ResponseEntity.ok().body(classService.getClassesOfStudent(principal.getName()));
+    }
+
+    @Async
+    public void logUserGetClassDetailForLearning(String userId, String courseName){
+        LmsLogModelCreate logM = new LmsLogModelCreate();
+        logM.setUserId(userId);
+        log.info("logUserGetClassDetailForLearning, userId = " + logM.getUserId());
+        logM.setParam1(courseName);
+
+        logM.setActionType("USER_GET_CLASS_DETAIL_FOR_LEARNING");
+        logM.setDescription("an user get a class detail for learning");
+        apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
     }
 
     @GetMapping("/{id}")
@@ -230,13 +262,20 @@ public class ClassController {
         boolean auth = false;
         if("APPROVED".equals(registrationStatus)) auth = true;
 
+        String courseName = "";
         if(cls!=null){
             if(cls.getTeacher()!=null){
+                if(cls.getEduCourse() != null){
+                    courseName = cls.getEduCourse().getName();
+                }
                 if(principal.getName().equals(cls.getTeacher().getUserLoginId()))
                     auth = true;
             }
         }
-        log.info("getClassDetail, FOR TESTING, registrationStatus = " + registrationStatus + " auth = " + auth);
+
+        logUserGetClassDetailForLearning(principal.getName(),courseName);
+
+        //log.info("getClassDetail, FOR TESTING, registrationStatus = " + registrationStatus + " auth = " + auth);
 
         //if (auth) {
         if (true){ 
@@ -744,6 +783,22 @@ public class ClassController {
         return ResponseEntity.ok().body(eduCourseChapterMaterial);
     }
 
+    @Async
+    public void logUserViewCourseMaterial(String userId, String courseName,
+                                          String chapterName, String materialName){
+        LmsLogModelCreate logM = new LmsLogModelCreate();
+        logM.setUserId(userId);
+        log.info("logUpdateContest, userId = " + logM.getUserId());
+        logM.setParam1(courseName);
+        logM.setParam2(chapterName);
+        logM.setParam3(materialName);
+
+        logM.setActionType("USER_VIEW_COURSE_MATERIAL_DETAIL");
+        logM.setDescription("an user views detail about a course material");
+        apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
+    }
+
+
     @GetMapping("/get-course-chapter-material-detail/{courseId}/{classId}")
     public ResponseEntity<?> getCourseChapterMaterialDetailV2(
         Principal principal, @PathVariable UUID courseId, @PathVariable UUID classId
@@ -751,8 +806,20 @@ public class ClassController {
         log.info("getCourseChapterMaterialDetail, id = " + courseId);
         String userId = principal.getName();
         logUserLoginCourseChapterMaterialService.logUserLoginMaterialV2(userId, classId, courseId);
-        log.info("getCourseChapterMaterialDetail, id = " + courseId);
+        //log.info("getCourseChapterMaterialDetail, id = " + courseId);
         EduCourseChapterMaterial eduCourseChapterMaterial = eduCourseChapterMaterialService.findById(courseId);
+        String materialName = eduCourseChapterMaterial.getEduCourseMaterialName();
+        String chapterName = "";
+        String courseName = "";
+
+        if(eduCourseChapterMaterial.getEduCourseChapter() != null){
+            chapterName = eduCourseChapterMaterial.getEduCourseChapter().getChapterName();
+            if(eduCourseChapterMaterial.getEduCourseChapter().getEduCourse() != null)
+                eduCourseChapterMaterial.getEduCourseChapter().getEduCourse().getName();
+        }
+
+        logUserViewCourseMaterial(principal.getName(),courseName,chapterName,materialName);
+
         return ResponseEntity.ok().body(eduCourseChapterMaterial);
     }
 
@@ -767,6 +834,7 @@ public class ClassController {
     @GetMapping("/get-chapter-materials-of-class/{classId}/{chapterId}")
     public ResponseEntity<?> getChapterMaterialsOfClass(Principal principal, @PathVariable UUID classId, @PathVariable UUID chapterId) {
         //List<EduCourseChapterMaterial> eduCourseChapterMaterials = eduCourseChapterMaterialService.findAll();
+
         List<EduClassMaterial> eduClassChapterMaterials = eduClassMaterialService.getMaterialByClassIdAndChapterId(
             classId, chapterId);
         return ResponseEntity.ok().body(eduClassChapterMaterials);

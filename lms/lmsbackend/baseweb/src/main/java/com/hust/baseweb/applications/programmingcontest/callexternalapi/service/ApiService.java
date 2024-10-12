@@ -50,6 +50,25 @@ public class ApiService {
         // .filter(RuntimeException.class::isInstance))
         .block();
   }
+    public <T, B> ResponseEntity<T> callPostApi(String endpoint, Class<T> responseType, B body) {
+        if (clientCredential == null) {
+            throw new RuntimeException("Client credential is unset");
+        }
+        log.debug("Calling API with credential: {}, endpoint: {}", clientCredential, endpoint);
+        String accessToken = keycloakService.getAccessToken(clientCredential.getClientId(),
+                                                            clientCredential.getClientSecret());
+        log.debug("Get access token: " + accessToken);
+        return this.webClient.post()
+                             .uri(endpoint)
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .header("Authorization", "Bearer " + accessToken)
+                             .body(BodyInserters.fromValue(body))
+                             .retrieve()
+                             .toEntity(responseType)
+                             // .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
+                             // .filter(RuntimeException.class::isInstance))
+                             .block();
+    }
 
   public ResponseEntity<?> callLogAPI(String url, LmsLogModelCreate model){
       if (clientCredential == null) {
@@ -61,6 +80,18 @@ public class ApiService {
                                                           clientCredential.getClientSecret());
       log.debug("Get access token: " + accessToken);
 
+      return this.webClient.post()
+                           .uri(url)
+                           .contentType(MediaType.APPLICATION_JSON)
+                           .header("Authorization", "Bearer " + accessToken)
+                           .body(BodyInserters.fromValue(model))
+                           .retrieve()
+                           //.toEntity(responseType)
+                           .toEntity(Void.class)
+                           // .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
+                           // .filter(RuntimeException.class::isInstance))
+                           .block();
+      /*
       this.webClient.post()
                            //.uri(url + "/log/create-log")
                     //.uri("/log/create-log")
@@ -85,7 +116,10 @@ public class ApiService {
                 log.info("callLogAPI -> ERROR ??? status = " + error.getMessage());
             }
           );
+
+
       return ResponseEntity.ok().body("OK");
+      */
   }
   public <T> ResponseEntity<T> callApi(String endpoint, ParameterizedTypeReference<T> responseType) {
     if (clientCredential == null) {

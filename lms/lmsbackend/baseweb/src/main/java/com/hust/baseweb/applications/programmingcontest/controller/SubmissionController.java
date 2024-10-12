@@ -2,6 +2,12 @@ package com.hust.baseweb.applications.programmingcontest.controller;
 
 import com.google.gson.Gson;
 import com.hust.baseweb.applications.programmingcontest.entity.*;
+import com.hust.baseweb.applications.programmingcontest.callexternalapi.model.LmsLogModelCreate;
+import com.hust.baseweb.applications.programmingcontest.callexternalapi.service.ApiService;
+import com.hust.baseweb.applications.programmingcontest.entity.ContestEntity;
+import com.hust.baseweb.applications.programmingcontest.entity.ContestProblem;
+import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
+import com.hust.baseweb.applications.programmingcontest.entity.UserRegistrationContestEntity;
 import com.hust.baseweb.applications.programmingcontest.model.*;
 import com.hust.baseweb.applications.programmingcontest.repo.*;
 import com.hust.baseweb.applications.programmingcontest.service.ContestService;
@@ -19,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -51,6 +58,7 @@ public class SubmissionController {
     UserRegistrationContestRepo userRegistrationContestRepo;
     ProblemTestCaseServiceCache cacheService;
     ContestSubmissionCommentRepository contestSubmissionCommentRepo;
+    ApiService apiService;
 
     @Secured("ROLE_TEACHER")
     @PostMapping("/teacher/submissions/{submissionId}/disable")
@@ -113,16 +121,16 @@ public class SubmissionController {
         try {
             contestSubmission = problemTestCaseService.getContestSubmissionDetailForStudent(
                 principal.getName(), submissionId);
-             if(contestSubmission != null){
-                 String contestId = contestSubmission.getContestId();
-                 if(contestId != null) {
-                     ContestEntity contest = contestRepo.findContestByContestId(contestId);
+            if(contestSubmission != null){
+                String contestId = contestSubmission.getContestId();
+                if(contestId != null) {
+                    ContestEntity contest = contestRepo.findContestByContestId(contestId);
                     if(contest.getParticipantViewSubmissionMode() != null)
-                       if(contest.getParticipantViewSubmissionMode().equals(ContestEntity.PARTICIPANT_VIEW_SUBMISSION_MODE_DISABLED)){
-                        contestSubmission.setSourceCode("HIDDEN");
-                    }
-                 }
-             }
+                        if(contest.getParticipantViewSubmissionMode().equals(ContestEntity.PARTICIPANT_VIEW_SUBMISSION_MODE_DISABLED)){
+                            contestSubmission.setSourceCode("HIDDEN");
+                        }
+                }
+            }
         } catch (AccessDeniedException e) {
             return ResponseEntity.status(403).body(e.getMessage());
         }
@@ -130,15 +138,49 @@ public class SubmissionController {
         return ResponseEntity.status(200).body(contestSubmission);
     }
 
-    @Secured("ROLE_TEACHER")
-    @GetMapping("/teacher/submissions/{submissionId}/general-info")
-    public ResponseEntity<?> getContestSubmissionDetailViewedByManager(
-        @PathVariable("submissionId") UUID submissionId
-    ) {
-        ContestSubmissionEntity contestSubmission = problemTestCaseService.getContestSubmissionDetailForTeacher(
-            submissionId);
-        return ResponseEntity.status(200).body(contestSubmission);
+    @Async
+    public void logTeacherViewDetailSubmissionOfStudentContest(String userId, String contestId, String problemId, String studentId, UUID submissionId){
+        LmsLogModelCreate logM = new LmsLogModelCreate();
+        logM.setUserId(userId);
+        log.info("logTeacherViewDetailSubmissionOfStudentContest, userId = " + logM.getUserId());
+        logM.setParam1(contestId);
+        logM.setParam2(problemId);
+        logM.setParam3(submissionId.toString());
+        logM.setParam4(studentId);
+
+        logM.setActionType("MANAGER_VIEW_DETAIL_A_SUBMISSION_OF_STUDENT_CONTEST");
+        logM.setDescription("an user manager views detail of a submission of a student in a contest");
+        apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
     }
+
+
+     @Secured("ROLE_TEACHER")
+     @GetMapping("/teacher/submissions/{submissionId}/general-info")
+     public ResponseEntity<?> getContestSubmissionDetailViewedByManager(
+         Principal principal,
+         @PathVariable("submissionId") UUID submissionId
+     ) {
+         ContestSubmissionEntity contestSubmission = problemTestCaseService.getContestSubmissionDetailForTeacher(
+             submissionId);
+
+         logTeacherViewDetailSubmissionOfStudentContest(principal.getName(),
+                                                        contestSubmission.getContestId(),
+                                                        contestSubmission.getProblemId(),
+                                                        contestSubmission.getUserId(),
+                                                        contestSubmission.getContestSubmissionId());
+
+             return ResponseEntity.status(200).body(contestSubmission);
+     }
+//    @Secured("ROLE_TEACHER")
+//    @GetMapping("/teacher/submissions/{submissionId}/general-info")
+//    public ResponseEntity<?> getContestSubmissionDetailViewedByManager(
+//        @PathVariable("submissionId") UUID submissionId
+//    ) {
+//        ContestSubmissionEntity contestSubmission = problemTestCaseService.getContestSubmissionDetailForTeacher(
+//            submissionId);
+//        return ResponseEntity.status(200).body(contestSubmission);
+//    }
+
 
     @GetMapping("/submissions/{submissionId}/contest")
     public ResponseEntity<?> getContestInfosOfASubmission(@PathVariable("submissionId") UUID submissionId) {
@@ -235,6 +277,22 @@ public class SubmissionController {
         return ResponseEntity.ok().body("OK");
     }
 
+    @Async
+    public void logStudentSubmitToAContest(String userId, String contestId,
+                                           ModelContestSubmitProgramViaUploadFile model){
+        LmsLogModelCreate logM = new LmsLogModelCreate();
+        logM.setUserId(userId);
+        log.info("logUpdateContest, userId = " + logM.getUserId());
+        logM.setParam1(contestId);
+        logM.setParam2(model.getProblemId());
+        logM.setParam3(model.getLanguage());
+
+        logM.setActionType("MANAGER_UPDATE_CONTEST");
+        logM.setDescription("an user update a contest");
+        apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
+    }
+
+
     @PostMapping("/submissions/file-upload")
     public ResponseEntity<?> contestSubmitProblemViaUploadFileV3(
         Principal principal,
@@ -255,6 +313,9 @@ public class SubmissionController {
         ModelContestSubmitProgramViaUploadFile model = gson.fromJson(
             inputJson,
             ModelContestSubmitProgramViaUploadFile.class);
+
+        logStudentSubmitToAContest(principal.getName(), model.getContestId(), model);
+
         ContestEntity contestEntity = contestRepo.findContestByContestId(model.getContestId());
         ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(model.getContestId(), model.getProblemId());
         List<String> languagesAllowed = contestEntity.getListLanguagesAllowedInContest();
@@ -381,7 +442,7 @@ public class SubmissionController {
         return ModelContestSubmissionResponse.builder()
                                              //.status("ILLEGAL LANGUAGE " + lang)
                                              .status("ILLEGAL_LANGUAGE")
-                                            .message("Illegal language " + lang)
+                                             .message("Illegal language " + lang)
                                              .testCasePass("0")
                                              .runtime(0L)
                                              .memoryUsage((float) 0)
