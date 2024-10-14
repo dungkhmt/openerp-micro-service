@@ -1,3 +1,9 @@
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import {
   Divider,
@@ -55,7 +61,7 @@ export const detail = (key, value, sx, helpText) => (
       {value}{" "}
     </Typography>
   </>
-);
+ );
 
 export const resolveLanguage = (str) => {
   if (str) {
@@ -83,11 +89,12 @@ function ContestProblemSubmissionDetailViewedByManager() {
   const { problemSubmissionId } = useParams();
 
   const [submission, setSubmission] = useState({});
-
   const [submissionSource, setSubmissionSource] = useState("");
+  const [openDialog, setOpenDialog] = useState(false);
+  const [comment, setComment] = useState('');
+  const userLoginId = "exampleUserId"; 
 
   const handleChange = (event) => {
-    // console.log(event);
     if (event.target.checked === true) {
       handleEnableSubmission();
     } else {
@@ -138,6 +145,37 @@ function ContestProblemSubmissionDetailViewedByManager() {
     );
   }
 
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  const handleSaveComment = () => {
+    const body = {
+      submissionId: problemSubmissionId,
+      userId: userLoginId,
+      comment: comment,
+      createdStamp: new Date(), 
+    };
+
+    request(
+      "post",
+      `/teacher/submissions/${problemSubmissionId}/comments`,
+      (res) => {
+        console.log("Comment saved:", res.data);
+        handleCloseDialog();
+        successNoti("Comment added successfully");
+      },
+      {},
+      body
+    ).catch((error) => {
+      console.error("Error saving comment:", error);
+    });
+  };
+
   useEffect(() => {
     request(
       "get",
@@ -148,7 +186,7 @@ function ContestProblemSubmissionDetailViewedByManager() {
       },
       {}
     );
-  }, []);
+  }, [problemSubmissionId]);
 
   return (
     <Stack direction="row">
@@ -157,7 +195,7 @@ function ContestProblemSubmissionDetailViewedByManager() {
           display: "flex",
           flexGrow: 1,
           boxShadow: 1,
-          overflowY: "scroll",
+          overflowY: "scroll ",
           borderTopLeftRadius: 8,
           borderBottomLeftRadius: 8,
           backgroundColor: "#fff",
@@ -191,63 +229,26 @@ function ContestProblemSubmissionDetailViewedByManager() {
               fontVariantLigatures: "none",
             }}
           >
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+              <Typography variant="h6">Source code</Typography>
+              <Button onClick={handleOpenDialog}>
+                Comment
+              </Button>
+            </Box>
             <HustCopyCodeBlock
-              title="Source code"
               text={submission.sourceCode}
               language={resolveLanguage(submission.sourceCodeLanguage)}
               showLineNumbers
             />
-            {/* <TextField
-            style={{
-              // width: 1.0 * window.innerWidth,
-              margin: 20,
-            }}
-            multiline
-            maxRows={100}
-            value={submissionSource}
-            onChange={(event) => {
-              setSubmissionSource(event.target.value);
-              console.log(submissionSource);
-            }}
-          ></TextField> */}
           </Box>
           {submission.status &&
             submission.status !== "Compile Error" &&
             submission.status !== "In Progress" && (
               <Box>
-                {/* <TextField
-          autoFocus
-          // required
-          select
-          id="problemId"
-          label="Problem"
-          placeholder="Problem"
-          onChange={(event) => {
-            setProblemId(event.target.value);
-          }}
-          value={problemId}
-        >
-          {listProblems.map((item) => (
-            <MenuItem key={item.problemId} value={item.problemId}>
-              {item.problemName}
-            </MenuItem>
-          ))}
-        </TextField>
-        <Button onClick={updateCode}>Update Code</Button> */}
-                {/*
-      <CodeMirror
-        height={"400px"}
-        width="100%"
-        extensions={getExtension()}
-        editable={false}
-        autoFocus={false}
-        value={submissionSource}
-      />
-      */}
                 <Typography variant={"h6"} sx={{ mb: 1 }}>
                   Test cases
                 </Typography>
-                <ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase
+                <ManagerViewParticipantProgramSubmissionDetailTestCaseBy TestCase
                   submissionId={problemSubmissionId}
                 />
               </Box>
@@ -291,7 +292,7 @@ function ContestProblemSubmissionDetailViewedByManager() {
               submission.status,
               {
                 value: {
-                  color: getStatusColor(`${submission.status}`),
+                  color: getStatusColor(submission.status),
                 },
               },
             ],
@@ -303,20 +304,16 @@ function ContestProblemSubmissionDetailViewedByManager() {
             ],
             [
               "Point",
-              `${
-                submission.point
-                  ? submission.point.toLocaleString("fr-FR", localeOption)
-                  : 0
-              }`,
+              submission.point
+                ? submission.point.toLocaleString("fr-FR", localeOption)
+                : 0,
             ],
             ["Language", submission.sourceCodeLanguage],
             [
               "Total runtime",
-              `${
-                submission.runtime
-                  ? submission.runtime.toLocaleString("fr-FR", localeOption)
-                  : 0
-              } ms`,
+              submission.runtime
+                ? submission.runtime.toLocaleString("fr-FR", localeOption)
+                : 0,
             ],
             // ["Memory usage", `${submission.memoryUsage} KB`],
             ["Submited by", submission.submittedByUserId],
@@ -344,38 +341,46 @@ function ContestProblemSubmissionDetailViewedByManager() {
                 {submission.contestId}
               </Link>,
             ],
-          ].map(([key, value, sx]) => detail(key, value, sx))}
 
-          {/* <Divider />
-          {submission.managementStatus === "ENABLED" && (
-            <Button
-              fullWidth
-              variant="outlined"
-              color="error"
-              onClick={handleDisableSubmission}
-              sx={{ marginTop: "18px" }}
+          ].map(([key, value, sx]) => detail(key, value, sx))}
+          <Dialog
+            open={openDialog}
+            onClose={handleCloseDialog}
+            fullWidth
+          >
+            <DialogTitle>Comment on Submission Code</DialogTitle>
+            <DialogContent
+              sx={{
+                width: "100%",
+                height: "80vh",
+                overflowY: "scroll",
+                
+              }}
             >
-              DISABLE THIS SUBMISSION
-            </Button>
-          )}
-          {submission.managementStatus === "DISABLED" && (
-            <>
-              <Typography
-                sx={{ color: "gray", fontSize: "14px", marginTop: "12px" }}
-              >
-                This submission is currently disabled
-              </Typography>
-              <Button
-                fullWidth
-                variant="outlined"
-                color="primary"
-                onClick={handleEnableSubmission}
-                sx={{ marginTop: "8px" }}
-              >
-                ENABLE THIS SUBMISSION
-              </Button>
-            </>
-          )} */}
+              <HustCopyCodeBlock
+                title="Source code"
+                text={submission.sourceCode}
+                language={resolveLanguage(submission.sourceCodeLanguage)}
+                showLineNumbers
+              />
+              <TextField
+                label="Comment"
+                multiline
+                rows={8} 
+                value={comment}
+                onChange={(event) => setComment(event.target.value)}
+                sx={{
+                  width: "100%",
+                  height: 300, 
+                  mt: 2, 
+                }}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseDialog}>Cancel</Button>
+              <Button onClick={handleSaveComment}>Save Comment</Button>
+            </DialogActions>
+          </Dialog>
         </Paper>
       </Box>
     </Stack>

@@ -154,23 +154,23 @@ public class SubmissionController {
     }
 
 
-     @Secured("ROLE_TEACHER")
-     @GetMapping("/teacher/submissions/{submissionId}/general-info")
-     public ResponseEntity<?> getContestSubmissionDetailViewedByManager(
-         Principal principal,
-         @PathVariable("submissionId") UUID submissionId
-     ) {
-         ContestSubmissionEntity contestSubmission = problemTestCaseService.getContestSubmissionDetailForTeacher(
-             submissionId);
+    @Secured("ROLE_TEACHER")
+    @GetMapping("/teacher/submissions/{submissionId}/general-info")
+    public ResponseEntity<?> getContestSubmissionDetailViewedByManager(
+        Principal principal,
+        @PathVariable("submissionId") UUID submissionId
+    ) {
+        ContestSubmissionEntity contestSubmission = problemTestCaseService.getContestSubmissionDetailForTeacher(
+            submissionId);
 
-         logTeacherViewDetailSubmissionOfStudentContest(principal.getName(),
-                                                        contestSubmission.getContestId(),
-                                                        contestSubmission.getProblemId(),
-                                                        contestSubmission.getUserId(),
-                                                        contestSubmission.getContestSubmissionId());
+        logTeacherViewDetailSubmissionOfStudentContest(principal.getName(),
+                                                       contestSubmission.getContestId(),
+                                                       contestSubmission.getProblemId(),
+                                                       contestSubmission.getUserId(),
+                                                       contestSubmission.getContestSubmissionId());
 
-             return ResponseEntity.status(200).body(contestSubmission);
-     }
+        return ResponseEntity.status(200).body(contestSubmission);
+    }
 //    @Secured("ROLE_TEACHER")
 //    @GetMapping("/teacher/submissions/{submissionId}/general-info")
 //    public ResponseEntity<?> getContestSubmissionDetailViewedByManager(
