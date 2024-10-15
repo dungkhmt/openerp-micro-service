@@ -59,9 +59,9 @@ public class NotificationController {
             subscriptions.remove(toUser);
         });
         subscription.onCompletion(() -> subscriptions.remove(toUser)); // OK
-        subscription.onError((ex) -> { // Must consider carefully, but currently OK
-            subscription.completeWithError(ex);
-            log.error("onError fired with exception: {}", ex);
+        subscription.onError((e) -> { // Must consider carefully, but currently OK
+            subscription.completeWithError(e);
+            log.error("onError fired with exception: {}", e.getMessage());
         });
 
         // Add new subscription to user's connection list.
