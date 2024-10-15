@@ -30,6 +30,7 @@ public class ModelGetContestDetailResponse implements Serializable {
     private String participantViewSubmissionMode;
     private String contestType;
     private String contestShowTag;
+    private String contestShowComment;
     private List<String> listStatusIds;
     private List<String> listSubmissionActionTypes;
     private List<String> listParticipantViewModes;
@@ -42,4 +43,5 @@ public class ModelGetContestDetailResponse implements Serializable {
     private List<String> listLanguagesAllowed;
     private List<String> listContestTypes;
     private List<String> listContestShowTags;
+    private List<String> listContestShowComments;
 }
