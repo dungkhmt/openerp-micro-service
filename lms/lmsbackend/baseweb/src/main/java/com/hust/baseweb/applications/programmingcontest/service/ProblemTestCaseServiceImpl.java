@@ -260,9 +260,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             throw new MiniLeetCodeException("permission denied", 403);
         }
 
-        if (!userId.equals(problemEntity.getUserId()) && !userId.equals("admin")
+        if (!userId.equals(problemEntity.getUserId())
             && !problemEntity.getStatusId().equals(ProblemEntity.PROBLEM_STATUS_OPEN)) {
-            throw new MiniLeetCodeException("UserId = " + userId + " Problem is not opened for edit", 400);
+            throw new MiniLeetCodeException("Problem is not opened for edit", 400);
         }
 
         List<TagEntity> tags = new ArrayList<>();
@@ -327,9 +327,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         problemEntity.setPublicProblem(modelUpdateContestProblem.getIsPublic());
         problemEntity.setAttachment(String.join(";", attachmentId));
         problemEntity.setTags(tags);
-        //if (userId.equals(problemEntity.getUserId())) {
+        if (userId.equals(problemEntity.getUserId())) {
             problemEntity.setStatusId(modelUpdateContestProblem.getStatus());
-        //}
+        }
         problemEntity.setSampleTestcase(modelUpdateContestProblem.getSampleTestCase());
         problemEntity = problemService.saveProblemWithCache(problemEntity);
         return problemEntity;
@@ -573,9 +573,10 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                        .participantViewResultMode(ContestEntity.CONTEST_PARTICIPANT_VIEW_TESTCASE_DETAIL_ENABLED)
                                                        .evaluateBothPublicPrivateTestcase(ContestEntity.EVALUATE_USE_BOTH_PUBLIC_PRIVATE_TESTCASE_YES)
                                                        .sendConfirmEmailUponSubmission(ContestEntity.SEND_CONFIRM_EMAIL_UPON_SUBMISSION_NO)
+                                                       .contestShowTag(ContestEntity.CONTEST_SHOW_TAG_PROBLEMS_NO)
                                                        .createdAt(new Date())
-                                                        //.contestType(modelCreateContest.getContestType())
-                                                        .contestType(ContestEntity.CONTEST_TYPE_TRAINING_NO_EVALUATION)
+                                                       //.contestType(modelCreateContest.getContestType())
+                                                       .contestType(ContestEntity.CONTEST_TYPE_TRAINING_NO_EVALUATION)
                                                        .build();
 
 /*
@@ -764,7 +765,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                    .languagesAllowed(String.join(
                                                        ",",
                                                        modelUpdateContest.getLanguagesAllowed()))
-                                                    .contestType(modelUpdateContest.getContestType())
+                                                   .contestType(modelUpdateContest.getContestType())
+                                                   .contestShowTag(modelUpdateContest.getContestShowTag())
+                                                    .contestShowComment(modelUpdateContest.getContestShowComment())
                                                    .build();
         return contestService.updateContestWithCache(contestEntity);
 
@@ -2533,7 +2536,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
                     //if(score <= 0.0001) continue;
                     if (score <= I.getThreshold() * 0.01) {
-                        /*
                         log.info("checkSimilarity, consider problem " +
                                  problemId +
                                  " listSubmissions = " +
@@ -2547,10 +2549,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                  score +
                                  " threshold = " +
                                  I.getThreshold());
-                        */
+
                         continue;
                     }
-                    /*
                     log.info("checkSimilarity, consider problem " +
                              problemId +
                              " listSubmissions = " +
@@ -2564,7 +2565,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                              score +
                              " threshold = " +
                              I.getThreshold());
-                    */
+
 
                     CodeSimilarityElement e = new CodeSimilarityElement();
                     e.setScore(score);

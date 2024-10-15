@@ -69,10 +69,28 @@ public class ContestEntity implements Serializable {
     public static final String CONTEST_TYPE_REAL_TEST_WITH_EVALUATION = "REAL_TEST_WITH_EVALUATION";
     public static final String CONTEST_TYPE_TRAINING_NO_EVALUATION = "TRAINING_NO_EVALUATION";
 
+    public static String CONTEST_SHOW_TAG_PROBLEMS_YES = "Y";
+    public static String CONTEST_SHOW_TAG_PROBLEMS_NO = "N";
+
+    public static String CONTEST_SHOW_COMMENT_YES = "Y";
+    public static String CONTEST_SHOW_COMMENT_NO = "N";
+
     public static List<String> getListContestTypes(){
         List<String> L = new ArrayList();
         L.add(CONTEST_TYPE_REAL_TEST_WITH_EVALUATION);
         L.add(CONTEST_TYPE_TRAINING_NO_EVALUATION);
+        return L;
+    }
+    public static List<String> getListContestShowTag(){
+        List<String> L = new ArrayList();
+        L.add(CONTEST_SHOW_TAG_PROBLEMS_YES);
+        L.add(CONTEST_SHOW_TAG_PROBLEMS_NO);
+        return L;
+    }
+    public static List<String> getListContestShowComment(){
+        List<String> L = new ArrayList();
+        L.add(CONTEST_SHOW_COMMENT_YES);
+        L.add(CONTEST_SHOW_TAG_PROBLEMS_NO);
         return L;
     }
     public static List<String> getListParticipantViewSubmissionModes() {
@@ -166,12 +184,12 @@ public class ContestEntity implements Serializable {
                 }
             }
         } else {// no limitation, take all languages
-         L.add(ContestEntity.PROG_LANGUAGES_C);
-         L.add(ContestEntity.PROG_LANGUAGES_CPP11);
-         L.add(ContestEntity.PROG_LANGUAGES_CPP14);
-         L.add(ContestEntity.PROG_LANGUAGES_CPP17);
-         L.add(ContestEntity.PROG_LANGUAGES_JAVA);
-         L.add(ContestEntity.PROG_LANGUAGES_PYTHON3);
+            L.add(ContestEntity.PROG_LANGUAGES_C);
+            L.add(ContestEntity.PROG_LANGUAGES_CPP11);
+            L.add(ContestEntity.PROG_LANGUAGES_CPP14);
+            L.add(ContestEntity.PROG_LANGUAGES_CPP17);
+            L.add(ContestEntity.PROG_LANGUAGES_JAVA);
+            L.add(ContestEntity.PROG_LANGUAGES_PYTHON3);
         }
         return L;
     }
@@ -256,4 +274,9 @@ public class ContestEntity implements Serializable {
     @Column(name = "contest_type")
     private String contestType;
 
+    @Column(name = "contest_show_tag")
+    private String contestShowTag;
+
+    @Column(name = "contest_show_comment")
+    private String contestShowComment;
 }
