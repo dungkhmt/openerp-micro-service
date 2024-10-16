@@ -1,11 +1,11 @@
 import { Downgraded } from "@hookstate/core";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { Collapse, Icon, List, ListItem, ListItemText } from "@mui/material";
-import { whiteColor } from "assets/jss/material-dashboard-react";
-import { menuIconMap } from "config/menuconfig";
+import { whiteColor } from "../../assets/jss/material-dashboard-react";
+import { menuIconMap } from "../../config/menuconfig.jsx";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { useMenuState } from "state/MenuState";
+import { useMenuState } from "../../state/MenuState";
 import MenuItem, { hexToRgb } from "./MenuItem";
 
 export const menuItemBaseStyle = (theme) => ({

@@ -1,5 +1,5 @@
 import PrimaryButton from "./button/PrimaryButton";
-import withScreenSecurity from "./common/withScreenSecurity";
+import withScreenSecurity from "./common/withScreenSecurity.jsx";
 
 function ProtectedScreen({ screenAuthorization }) {
   return (

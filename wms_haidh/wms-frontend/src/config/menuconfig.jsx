@@ -19,35 +19,35 @@ import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
 import PersonIcon from "@mui/icons-material/Person";
 import StarBorder from "@mui/icons-material/StarBorder";
 import StoreMallDirectorySharpIcon from "@mui/icons-material/StoreMallDirectorySharp";
-import TeachingIcon from "assets/icons/mathematics.svg";
+import PriceChangeIcon from '@mui/icons-material/PriceChange';
+import { Inventory } from "@mui/icons-material";
+import { LocalShipping } from "@mui/icons-material";
+import { Widgets } from "@mui/icons-material";
 import { CiEdit } from "react-icons/ci";
 import { GiTeacher } from "react-icons/gi";
-import { buildMapPathMenu } from "utils/MenuUtils";
+import { buildMapPathMenu } from "../utils/MenuUtils";
 import { general } from "./menuconfig/general";
-import { student } from "./menuconfig/student";
-import { teacher } from "./menuconfig/teacher";
-import { user } from "./menuconfig/user";
-import {demo} from "./menuconfig/demo";
-
+import { product } from "./menuconfig/product";
+import { receipt } from "./menuconfig/receipt";
+import { inventory } from "./menuconfig/inventory";
+import { order } from "./menuconfig/order";
+import { delivery } from "./menuconfig/delivery";
+import { customer } from "./menuconfig/customer";
 export const MENUS = [];
 
 MENUS.push(general);
-MENUS.push(user);
-MENUS.push(teacher);
-MENUS.push(student);
-MENUS.push(demo);
-
+MENUS.push(product);
+MENUS.push(receipt);
+MENUS.push(inventory);
+MENUS.push(order);
+MENUS.push(delivery);
+MENUS.push(customer);
 export const menuIconMap = new Map();
 
-menuIconMap.set(
-  "Schedule",
-  <EventNoteIcon />
-  //   <img alt="Task Schedule icon" src={TaskScheduleIcon} height={24} width={24} />
-);
-menuIconMap.set(
-  "Teaching",
-  <img alt="Teaching icon" src={TeachingIcon} height={24} width={24} />
-);
+menuIconMap.set("Schedule",<EventNoteIcon />);
+menuIconMap.set("Product",<Widgets />);
+menuIconMap.set("Inventory",<Inventory />);
+menuIconMap.set("Delivery",<LocalShipping />);
 menuIconMap.set("DashboardIcon", <DashboardRoundedIcon />);
 menuIconMap.set("GiTeacher", <GiTeacher size={24} />);
 menuIconMap.set("InboxIcon", <InboxIcon />);

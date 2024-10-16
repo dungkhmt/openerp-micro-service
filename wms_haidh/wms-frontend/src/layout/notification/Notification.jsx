@@ -8,9 +8,9 @@ import {
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { styled } from "@mui/material/styles";
-import { request } from "api";
+import { request } from "../../api";
 import React from "react";
-import { useNotificationState } from "state/NotificationState";
+import { useNotificationState } from "../../state/NotificationState";
 import ListItemLink from "../sidebar/ListItemLink";
 import NotificationReadIcon from "./NotificationReadIcon";
 

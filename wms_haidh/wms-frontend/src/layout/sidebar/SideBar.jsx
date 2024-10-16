@@ -3,13 +3,13 @@ import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import { styled } from "@mui/material/styles";
 import { useKeycloak } from "@react-keycloak/web";
-import PrimaryButton from "components/button/PrimaryButton";
-import { MENUS } from "config/menuconfig";
+import PrimaryButton from "../../components/button/PrimaryButton";
+import { MENUS } from "../../config/menuconfig.jsx";
 import PropTypes from "prop-types";
 import { useEffect } from "react";
 import SimpleBar from "simplebar-react";
 import "simplebar/dist/simplebar.min.css";
-import { fetchMenu } from "state/MenuState";
+import { fetchMenu } from "../../state/MenuState";
 import GroupMenuItem, { menuItemBaseStyle } from "./GroupMenuItem";
 import { blackColor, whiteColor } from "./MenuItem";
 
@@ -46,9 +46,6 @@ const styles = {
     width: drawerWidth,
     flexShrink: 0,
     border: "none",
-    // boxShadow: `2px 0px 1px -1px rgb(0 0 0 / 20%),
-    //   1px 0px 1px 0px rgb(0 0 0 / 14%),
-    //   1px 0px 3px 0px rgb(0 0 0 / 12%)`,
   },
   drawer: {
     width: drawerWidth,
@@ -69,17 +66,6 @@ const styles = {
     paddingTop: theme.spacing(3),
     paddingBottom: theme.spacing(6),
   }),
-
-  // sidebarWrapper: {
-  //   // width: "100%",
-  //   paddingTop: 75,
-  //   position: "relative",
-  //   height: "100vh",
-  //   zIndex: "4",
-  //   // transitionDuration: ".2s, .2s, .35s",
-  //   // transitionProperty: "top, bottom, width",
-  //   // transitionTimingFunction: "linear, linear, ease",
-  // },
 };
 
 export default function SideBar(props) {
@@ -88,6 +74,7 @@ export default function SideBar(props) {
   const { keycloak } = useKeycloak();
 
   useEffect(() => {
+    console.log(MENUS);
     if (keycloak.authenticated) fetchMenu();
   }, [keycloak.authenticated]);
 
@@ -99,10 +86,8 @@ export default function SideBar(props) {
       sx={styles.drawer}
       PaperProps={{ sx: styles.drawerPaper }}
     >
-      {/* <div className={classNames(classes.sidebarWrapper)}> */}
       <SimpleBar
         style={{
-          // marginTop: 64,
           marginBottom: 16,
           position: "relative",
           height: "100%",

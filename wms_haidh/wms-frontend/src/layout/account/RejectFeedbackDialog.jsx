@@ -1,7 +1,7 @@
 import { Typography } from "@mui/material";
-import PrimaryButton from "components/button/PrimaryButton";
-import TertiaryButton from "components/button/TertiaryButton";
-import CustomizedDialogs from "components/dialog/CustomizedDialogs";
+import PrimaryButton from "../../components/button/PrimaryButton";
+import TertiaryButton from "../../components/button/TertiaryButton";
+import CustomizedDialogs from "../../components/dialog/CustomizedDialogs";
 
 const styles = { btn: { m: 0.5, width: 148 } };
 
