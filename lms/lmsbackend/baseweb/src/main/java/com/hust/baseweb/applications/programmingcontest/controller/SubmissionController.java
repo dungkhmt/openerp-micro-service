@@ -282,15 +282,16 @@ public class SubmissionController {
                                            ModelContestSubmitProgramViaUploadFile model){
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
-        log.info("logUpdateContest, userId = " + logM.getUserId());
+        log.info("logStudentSubmitToAContest, userId = " + logM.getUserId());
         logM.setParam1(contestId);
         logM.setParam2(model.getProblemId());
         logM.setParam3(model.getLanguage());
 
-        logM.setActionType("MANAGER_UPDATE_CONTEST");
-        logM.setDescription("an user update a contest");
+        logM.setActionType("PARTICIPANT_SUBMIT_SOLUTION_CODE_TO_CONTEST");
+        logM.setDescription("a participant submit solution code to a contest");
         apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
     }
+
 
 
     @PostMapping("/submissions/file-upload")
@@ -299,6 +300,8 @@ public class SubmissionController {
         @RequestParam("inputJson") String inputJson,
         @RequestParam("file") MultipartFile file
     ) {
+
+
         return contestSubmitProblemViaUploadFileV2(principal, inputJson, file);
     }
 
