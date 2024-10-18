@@ -3,12 +3,12 @@ import { Avatar, Badge, IconButton } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { styled } from "@mui/material/styles";
 import { bearerAuth, request } from "api";
-import { config } from "config/constant";
-import keycloak from "config/keycloak";
+import { config } from "../../config/constant";
+import keycloak from "../../config/keycloak";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import randomColor from "randomcolor";
 import React from "react";
-import { useNotificationState } from "state/NotificationState";
+import { useNotificationState } from "../../state/NotificationState";
 import NotificationMenu from "./NotificationMenu";
 
 const StyledAvatar = styled(Avatar)(({ theme, isOpen }) => ({

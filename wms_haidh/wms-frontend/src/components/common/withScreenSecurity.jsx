@@ -1,5 +1,5 @@
 import { LinearProgress } from "@mui/material";
-import { request } from "api";
+import { request } from "../../api";
 import { useEffect, useState } from "react";
 import NotAuthorized from "./NotAuthorized";
 

@@ -44,10 +44,14 @@ public class InteractiveQuizQuestionServiceImpl implements InteractiveQuizQuesti
         // if (interactiveQuiz == null || !interactiveQuiz.getStatusId().equals("OPENED")) {
         //     return new ArrayList<>();
         // }
+
+        /*
+            Has Bug that cannot load object from cache, to be fixed and recover later
         List<QuizQuestionDetailModel> interactiveQuizQuestionsCache = cacheService.findInteractiveQuizQuestionInCache(interactiveQuizId.toString());
         if(interactiveQuizQuestionsCache != null){
             return interactiveQuizQuestionsCache;
         }
+         */
 
         List<InteractiveQuizQuestion> interactiveQuizQuestions = interactiveQuizQuestionRepo.findAllByInteractiveQuizId(interactiveQuizId);
             // .findAllByTestIdAndStatusId(testId, EduQuizTestQuizQuestion.STATUS_CREATED);

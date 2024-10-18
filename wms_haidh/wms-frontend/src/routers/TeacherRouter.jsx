@@ -1,4 +1,4 @@
-import ProtectedScreen from "components/ProtectedScreen";
+import ProtectedScreen from "../components/ProtectedScreen";
 import { Route, Switch, useRouteMatch } from "react-router";
 
 export default function TeacherRouter() {

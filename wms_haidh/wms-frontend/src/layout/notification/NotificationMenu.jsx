@@ -4,7 +4,7 @@ import Grow from "@mui/material/Grow";
 import MenuList from "@mui/material/MenuList";
 import Paper from "@mui/material/Paper";
 import Popper from "@mui/material/Popper";
-import { ReactComponent as EmptyNotificationIcon } from "assets/icons/undraw_happy_announcement_ac67.svg";
+import { ReactComponent as EmptyNotificationIcon } from "../../assets/icons/undraw_happy_announcement_ac67.svg";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import "overlayscrollbars/css/OverlayScrollbars.css";
 import React, { useEffect } from "react";

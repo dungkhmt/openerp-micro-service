@@ -1,6 +1,6 @@
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import { Box, Icon, Typography } from "@mui/material";
-import TertiaryButton from "components/button/TertiaryButton";
+import TertiaryButton from "../../components/button/TertiaryButton";
 import { FiCheckCircle } from "react-icons/fi";
 import { GiInfo } from "react-icons/gi";
 import { IconContext } from "react-icons/lib/cjs";
