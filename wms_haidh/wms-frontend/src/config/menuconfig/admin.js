@@ -1,6 +1,6 @@
 export const admin = {
   id: "MENU_WMSv2_ADMIN",
-  icon: "DashboardIcon",
+  icon: "AdminIcon",
   text: "Inventory Management",
   child: [
     {

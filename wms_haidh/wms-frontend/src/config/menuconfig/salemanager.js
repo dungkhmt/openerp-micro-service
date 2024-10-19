@@ -1,6 +1,6 @@
 export const salemanager = {
   id: "MENU_WMSv2_SALE_MANAGER",
-  icon: "DashboardIcon",
+  icon: "SaleManagerIcon",
   text: "Sales Management",
   child: [
     {
