@@ -3,8 +3,16 @@ import { Layout } from "../layout";
 import { drawerWidth } from "../layout/sidebar/SideBar";
 import { Suspense, useEffect } from "react";
 import { Route, Switch, useLocation } from "react-router-dom";
+import { useNotificationState } from "../state/NotificationState";
 import NotFound from "../views/errors/NotFound";
-import DemoScreen from "../views/DemoScreen";
+import PrivateRoute from "./PrivateRoute";
+import AdminRouter from "./AdminRouter";
+import SaleManagerRouter from "./SaleManagerRouter";
+import CustomerRouter from "./CustomerRouter";
+import ApproverRouter from "./ApproverRouter";
+import DeliveryManagerRouter from "./DeliveryManagerRouter";
+import DeliveryPersonRouter from "./DeliveryPersonRouter";
+import PurchaseManagerRouter from "./PurchaseManagerRouter";
 
 const styles = {
   loadingProgress: {
@@ -21,21 +29,25 @@ const styles = {
 
 function MainAppRouter(props) {
   const location = useLocation();
+  const notificationState = useNotificationState();
 
   useEffect(() => {
+    notificationState.open.set(false);
   }, [location.pathname]);
 
   return (
     <Layout>
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Switch>
-          <Route exact path="/" component={() => <h1>Welcome back !</h1>} />
-          <Route
-            exact path="/product/all" component={DemoScreen}
-          />
-          <Route
-            exact path="/inventory" component={DemoScreen}
-          />
+          <Route component={() => <></>} exact path="/" />
+          <PrivateRoute component={AdminRouter} path="/admin" />
+          <PrivateRoute component={SaleManagerRouter} path="/sale-manager" />
+          <PrivateRoute component={CustomerRouter} path="/customer" />
+          <PrivateRoute component={ApproverRouter} path="/approver" />
+          <PrivateRoute component={DeliveryManagerRouter} path="/delivery-manager" />
+          <PrivateRoute component={DeliveryPersonRouter} path="/delivery-person" />
+          <PrivateRoute component={PurchaseManagerRouter} path="/purchase-manager" />
+          {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />
         </Switch>
       </Suspense>

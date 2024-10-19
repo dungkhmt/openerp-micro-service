@@ -85,7 +85,7 @@ export default function SideBar(props) {
       open={open}
       sx={styles.drawer}
       PaperProps={{ sx: styles.drawerPaper }}
-    >
+    > {keycloak.authenticated && (
       <SimpleBar
         style={{
           marginBottom: 16,
@@ -93,7 +93,7 @@ export default function SideBar(props) {
           height: "100%",
           zIndex: "4",
           overflowX: "hidden",
-          overscrollBehaviorY: "none", // To prevent tag <main> be scrolled when menu'scrollbar reach end
+          overscrollBehaviorY: "none", 
         }}
       >
         <List component="nav">
@@ -102,6 +102,7 @@ export default function SideBar(props) {
           ))}
         </List>
       </SimpleBar>
+    )}
       {!keycloak.authenticated && open && (
         <Box
           sx={styles.signInContainer}
@@ -123,7 +124,6 @@ export default function SideBar(props) {
           </PrimaryButton>
         </Box>
       )}
-      {/* </div> */}
       {image && (
         <Background
           sx={styles.background}
