@@ -1,14 +1,28 @@
 export const customer = {
-    id: "MENU_CUSTOMER",
-    icon: "PeopleIcon",
-    text: "Customer",
-    child: [
-      {
-        id: "MENU_CUSTOMER.CUSTOMER",
-        path: "/customer",
-        isPublic: true,
-        text: "Customer management",
-        child: [],
-      },
-    ],
-  };
+  id: "MENU_WMSv2_CUSTOMER",
+  icon: "DashboardIcon",
+  text: "E-commerce",
+  child: [
+    {
+      id: "MENU_WMSv2_CUSTOMER.PRODUCTS",
+      path: "/customer/products",
+      isPublic: true,
+      text: "Shop Online",
+      child: [],
+    },
+    {
+      id: "MENU_WMSv2_CUSTOMER.CART",
+      path: "/customer/cart",
+      isPublic: true,
+      text: "Cart",
+      child: [],
+    },
+    {
+      id: "MENU_WMSv2_CUSTOMER.HISTORY",
+      path: "/customer/order_history",
+      isPublic: true,
+      text: "My Orders",
+      child: [],
+    },
+  ],
+};

@@ -106,6 +106,12 @@ public class NotificationController {
                                      .data("keep alive", MediaType.TEXT_EVENT_STREAM));
 //                                      .comment(":\n\nkeep alive"));
                 } catch (Exception e) {
+                    try {
+                        emitter.completeWithError(e);
+                        log.info("Marked SseEmitter as complete with an error");
+                    } catch (Exception completionException) {
+                        log.info("Failed to mark SseEmitter as complete on error");
+                    }
                     iterator.remove();
                     size--;
 //                    log.error("FAILED WHEN SENDING HEARTBEAT SIGNAL TO {}, MAY BE USER CLOSED A CONNECTION", toUser);
