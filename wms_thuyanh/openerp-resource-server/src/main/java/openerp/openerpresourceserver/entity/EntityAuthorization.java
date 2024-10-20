@@ -20,7 +20,7 @@ import java.util.Date;
 public class EntityAuthorization {
 
     @Id
-    private String id;
+    private String id; 
 
     // User's role
     private String roleId;
