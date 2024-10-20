@@ -1,6 +1,6 @@
 export const purchasemanager = {
   id: "MENU_WMSv2_PURCHASE_MANAGER",
-  icon: "DashboardIcon",
+  icon: "PurchaseManagerIcon",
   text: "Purchase Management",
   child: [
     {

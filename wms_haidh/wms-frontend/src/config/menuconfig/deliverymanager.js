@@ -1,6 +1,6 @@
 export const deliverymanager = {
   id: "MENU_WMSv2_DELIVERY_MANAGER",
-  icon: "DashboardIcon",
+  icon: "DeliveryManagerIcon",
   text: "Delivery Management",
   child: [
     {

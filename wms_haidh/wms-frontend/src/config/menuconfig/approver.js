@@ -1,6 +1,6 @@
 export const approver = {
   id: "MENU_WMSv2_APPROVER",
-  icon: "DashboardIcon",
+  icon: "ApproverIcon",
   text: "Business Director",
   child: [
     {

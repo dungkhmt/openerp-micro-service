@@ -21,6 +21,11 @@ import StarBorder from "@mui/icons-material/StarBorder";
 import StoreMallDirectorySharpIcon from "@mui/icons-material/StoreMallDirectorySharp";
 import { Inventory } from "@mui/icons-material";
 import { LocalShipping } from "@mui/icons-material";
+import { DeliveryDining } from "@mui/icons-material";
+import { ShoppingBag } from "@mui/icons-material";
+import { ReceiptLong } from "@mui/icons-material";
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import { Widgets } from "@mui/icons-material";
 import { CiEdit } from "react-icons/ci";
 import { GiTeacher } from "react-icons/gi";
@@ -33,7 +38,6 @@ import { approver } from "./menuconfig/approver";
 import { deliverymanager } from "./menuconfig/deliverymanager";
 import { deliveryperson } from "./menuconfig/deliveryperson";
 import { purchasemanager } from "./menuconfig/purchasemanager";
-
 export const MENUS = [];
 MENUS.push(general);
 MENUS.push(admin);
@@ -45,6 +49,17 @@ MENUS.push(deliveryperson);
 MENUS.push(customer);
 
 export const menuIconMap = new Map();
+
+menuIconMap.set("AdminIcon",<Inventory />);
+menuIconMap.set("ApproverIcon",<AssessmentIcon/>);
+menuIconMap.set("CustomerIcon",<ShoppingBag/>);
+menuIconMap.set("DeliveryManagerIcon",<LocalShipping />);
+menuIconMap.set("DeliveryPersonIcon",<DeliveryDining />);
+menuIconMap.set("DashboardIconIcon", <DashboardRoundedIcon />);
+menuIconMap.set("PurchaseManagerIcon",<ReceiptLong />);
+menuIconMap.set("SaleManagerIcon",<MonetizationOnIcon />);
+
+
 menuIconMap.set("Schedule",<EventNoteIcon />);
 menuIconMap.set("Product",<Widgets />);
 menuIconMap.set("Inventory",<Inventory />);

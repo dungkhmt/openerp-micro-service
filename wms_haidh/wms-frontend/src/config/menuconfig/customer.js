@@ -1,6 +1,6 @@
 export const customer = {
   id: "MENU_WMSv2_CUSTOMER",
-  icon: "DashboardIcon",
+  icon: "CustomerIcon",
   text: "E-commerce",
   child: [
     {
