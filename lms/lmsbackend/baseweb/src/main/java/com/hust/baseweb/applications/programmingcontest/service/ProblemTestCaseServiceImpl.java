@@ -1133,8 +1133,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                                     .runtime(0L)
                                                                     .createdAt(submitTime)
                                                                     .build();
-        //log.info("submitContestProblemTestCaseByTestCaseWithFile, save submission to DB");
+        log.info("submitContestProblemNotExecuteDueToForbiddenInstructions, save submission to DB");
         submission = contestSubmissionRepo.saveAndFlush(submission);
+
         return ModelContestSubmissionResponse.builder()
                                              .status("NO_EVALUATION_FORBIDDEN_INSTRUCTIONS")
                                              .message("Submission is not evaluated due to forbidden instructions")

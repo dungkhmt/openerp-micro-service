@@ -411,12 +411,16 @@ public class SubmissionController {
             ModelContestSubmissionResponse resp = null;
 
             if(cp != null && cp.getForbiddenInstructions() != null){
+                log.info("contestSubmitProblemViaUploadFileV2, forbidden instructions = " + cp.getForbiddenInstructions());
                 String[] fis = cp.getForbiddenInstructions().split(",");
                 boolean ok = true;
                 if(fis != null)for(String fi: fis){
                     String i = fi.trim();
+                    log.info("contestSubmitProblemViaUploadFileV2, forbidden instructions i = " + i + " source = " + source);
                     if(i != null){
                         if(!i.equals("") && i.length() > 0 && source.contains(i)){
+                            log.info("contestSubmitProblemViaUploadFileV2, has forbidden instructions i = " + i + " source = " + source);
+
                             ok = false; break;
                         }
                     }
