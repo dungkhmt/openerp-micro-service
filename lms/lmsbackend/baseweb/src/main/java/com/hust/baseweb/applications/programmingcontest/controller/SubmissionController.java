@@ -366,7 +366,10 @@ public class SubmissionController {
             cp.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_NOT_ALLOWED)) {
             ModelContestSubmissionResponse resp = buildSubmissionResponseSubmissionNotAllowed();
             return ResponseEntity.ok().body(resp);
+
+
         }
+
 
         int numOfSubmissions = contestSubmissionRepo
             .countAllByContestIdAndUserIdAndProblemId(model.getContestId(), userId, model.getProblemId());
@@ -401,9 +404,33 @@ public class SubmissionController {
                     contestEntity.getMaxSourceCodeLength());
                 return ResponseEntity.ok().body(resp);
             }
+
+
             ModelContestSubmission request = new ModelContestSubmission(model.getContestId(), model.getProblemId(),
                                                                         source, model.getLanguage());
             ModelContestSubmissionResponse resp = null;
+
+            if(cp != null && cp.getForbiddenInstructions() != null){
+                log.info("contestSubmitProblemViaUploadFileV2, forbidden instructions = " + cp.getForbiddenInstructions());
+                String[] fis = cp.getForbiddenInstructions().split(",");
+                boolean ok = true;
+                if(fis != null)for(String fi: fis){
+                    String i = fi.trim();
+                    log.info("contestSubmitProblemViaUploadFileV2, forbidden instructions i = " + i + " source = " + source);
+                    if(i != null){
+                        if(!i.equals("") && i.length() > 0 && source.contains(i)){
+                            log.info("contestSubmitProblemViaUploadFileV2, has forbidden instructions i = " + i + " source = " + source);
+
+                            ok = false; break;
+                        }
+                    }
+                }
+                if(!ok){
+                    resp = problemTestCaseService.submitContestProblemNotExecuteDueToForbiddenInstructions(request, userId, userId);
+
+                    return ResponseEntity.ok().body(resp);
+                }
+            }
             if (contestEntity.getSubmissionActionType()
                              .equals(ContestEntity.CONTEST_SUBMISSION_ACTION_TYPE_STORE_AND_EXECUTE)) {
                 if (cp != null &&

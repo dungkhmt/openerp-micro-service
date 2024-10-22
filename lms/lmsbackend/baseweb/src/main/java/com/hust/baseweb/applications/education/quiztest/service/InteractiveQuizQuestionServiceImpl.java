@@ -1,5 +1,6 @@
 package com.hust.baseweb.applications.education.quiztest.service;
 
+import com.hust.baseweb.applications.programmingcontest.callexternalapi.service.ApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import lombok.AllArgsConstructor;
@@ -36,6 +37,8 @@ public class InteractiveQuizQuestionServiceImpl implements InteractiveQuizQuesti
     private QuizQuestionRepo quizQuestionRepo;
     private QuizQuestionService quizQuestionService;
     private QuizQuestionServiceCache cacheService;
+    private ApiService apiService;
+
 
     @Override
     public List<QuizQuestionDetailModel> findAllByInteractiveQuizId(UUID interactiveQuizId){

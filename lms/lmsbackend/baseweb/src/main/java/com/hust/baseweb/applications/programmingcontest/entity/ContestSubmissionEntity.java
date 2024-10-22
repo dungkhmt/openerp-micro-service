@@ -27,6 +27,8 @@ public class ContestSubmissionEntity {
     public static final String SUBMISSION_STATUS_EVALUATION_IN_PROGRESS = "In Progress";
     public static final String SUBMISSION_STATUS_WAIT_FOR_CUSTOM_EVALUATION = "Evaluating Output";
     public static final String SUBMISSION_STATUS_CUSTOM_EVALUATED = "Evaluated";
+    public static final String SUBMISSION_STATUS_NOT_EVALUATED_FORBIDDEN_INSTRUCTIONS = "N/E Forbidden Ins.";
+
 
     public static final String LANGUAGE_CPP = "CPP";
     public static final String LANGUAGE_JAVA = "JAVA";
