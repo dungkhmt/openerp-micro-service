@@ -1,6 +1,6 @@
 import axios from "axios";
-import { config } from "config/constant";
-import keycloak from "config/keycloak";
+import { config } from "./config/constant";
+import keycloak from "./config/keycloak";
 import { infoNoti, wifiOffNotify } from "./utils/notification";
 
 export const isFunction = (func) =>

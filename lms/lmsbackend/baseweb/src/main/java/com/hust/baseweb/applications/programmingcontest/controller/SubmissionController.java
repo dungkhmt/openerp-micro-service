@@ -282,15 +282,16 @@ public class SubmissionController {
                                            ModelContestSubmitProgramViaUploadFile model){
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
-        log.info("logUpdateContest, userId = " + logM.getUserId());
+        log.info("logStudentSubmitToAContest, userId = " + logM.getUserId());
         logM.setParam1(contestId);
         logM.setParam2(model.getProblemId());
         logM.setParam3(model.getLanguage());
 
-        logM.setActionType("MANAGER_UPDATE_CONTEST");
-        logM.setDescription("an user update a contest");
+        logM.setActionType("PARTICIPANT_SUBMIT_SOLUTION_CODE_TO_CONTEST");
+        logM.setDescription("a participant submit solution code to a contest");
         apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
     }
+
 
 
     @PostMapping("/submissions/file-upload")
@@ -299,6 +300,8 @@ public class SubmissionController {
         @RequestParam("inputJson") String inputJson,
         @RequestParam("file") MultipartFile file
     ) {
+
+
         return contestSubmitProblemViaUploadFileV2(principal, inputJson, file);
     }
 
@@ -363,7 +366,10 @@ public class SubmissionController {
             cp.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_NOT_ALLOWED)) {
             ModelContestSubmissionResponse resp = buildSubmissionResponseSubmissionNotAllowed();
             return ResponseEntity.ok().body(resp);
+
+
         }
+
 
         int numOfSubmissions = contestSubmissionRepo
             .countAllByContestIdAndUserIdAndProblemId(model.getContestId(), userId, model.getProblemId());
@@ -398,9 +404,33 @@ public class SubmissionController {
                     contestEntity.getMaxSourceCodeLength());
                 return ResponseEntity.ok().body(resp);
             }
+
+
             ModelContestSubmission request = new ModelContestSubmission(model.getContestId(), model.getProblemId(),
                                                                         source, model.getLanguage());
             ModelContestSubmissionResponse resp = null;
+
+            if(cp != null && cp.getForbiddenInstructions() != null){
+                log.info("contestSubmitProblemViaUploadFileV2, forbidden instructions = " + cp.getForbiddenInstructions());
+                String[] fis = cp.getForbiddenInstructions().split(",");
+                boolean ok = true;
+                if(fis != null)for(String fi: fis){
+                    String i = fi.trim();
+                    log.info("contestSubmitProblemViaUploadFileV2, forbidden instructions i = " + i + " source = " + source);
+                    if(i != null){
+                        if(!i.equals("") && i.length() > 0 && source.contains(i)){
+                            log.info("contestSubmitProblemViaUploadFileV2, has forbidden instructions i = " + i + " source = " + source);
+
+                            ok = false; break;
+                        }
+                    }
+                }
+                if(!ok){
+                    resp = problemTestCaseService.submitContestProblemNotExecuteDueToForbiddenInstructions(request, userId, userId);
+
+                    return ResponseEntity.ok().body(resp);
+                }
+            }
             if (contestEntity.getSubmissionActionType()
                              .equals(ContestEntity.CONTEST_SUBMISSION_ACTION_TYPE_STORE_AND_EXECUTE)) {
                 if (cp != null &&

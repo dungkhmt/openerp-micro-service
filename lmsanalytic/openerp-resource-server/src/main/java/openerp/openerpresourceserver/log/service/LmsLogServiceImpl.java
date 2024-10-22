@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Log4j2
 @AllArgsConstructor(onConstructor_ = @Autowired)
@@ -30,5 +31,16 @@ public class LmsLogServiceImpl implements LmsLogService{
         log.setCreatedStamp(new Date());
         log = lmsLogRepo.save(log);
         return log;
+    }
+
+    @Override
+    public List<LmsLog> getLmsLogs() {
+        return lmsLogRepo.findAll();
+    }
+
+    @Override
+    public List<LmsLog> getAllLogs() {
+        List<LmsLog> lst = lmsLogRepo.findAll();
+        return lst;
     }
 }

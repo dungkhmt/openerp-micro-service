@@ -1,5 +1,5 @@
 import { Icon, ListItemText } from "@mui/material";
-import { menuIconMap } from "config/menuconfig";
+import { menuIconMap } from "../../config/menuconfig.jsx";
 import React from "react";
 import { menuItemBaseStyle } from "./GroupMenuItem";
 import ListItemLink from "./ListItemLink";
@@ -97,7 +97,7 @@ function MenuItem(props) {
       button
       onClick={menuItem.onClick}
       disableGutters={false}
-      to={menuItem.path ? process.env.PUBLIC_URL + menuItem.path : undefined}
+      to={menuItem.path ? "" + menuItem.path : undefined}
       sx={(theme) => ({
         ...styles.menuItem(theme),
         ...(selected ? styles[color] : styles.selected),

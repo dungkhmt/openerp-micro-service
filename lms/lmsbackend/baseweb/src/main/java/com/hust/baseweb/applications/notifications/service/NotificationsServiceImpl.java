@@ -102,12 +102,18 @@ public class NotificationsServiceImpl implements NotificationsService {
                                                          } catch (Exception ignore) {
                                                              // This is normal behavior when a client disconnects.
                                                              // onError callback will be automatically fired.
-//                                                             try {
-//                                                                 subscription.completeWithError(ignore);
-//                                                                 log.info("Marked SseEmitter as complete with an error");
-//                                                             } catch (Exception completionException) {
-//                                                                 log.info("Failed to mark SseEmitter as complete on error");
-//                                                             }
+                                                             log.info(
+                                                                 "Failed to send event because of error: {}",
+                                                                 ignore.getMessage());
+                                                             try {
+                                                                 subscription.completeWithError(ignore);
+                                                                 log.info(
+                                                                     "Marked SseEmitter as complete with an error");
+                                                             } catch (Exception completionException) {
+                                                                 log.info(
+                                                                     "Error occurred when attempting to mark SseEmitter: {}",
+                                                                     completionException.getMessage());
+                                                             }
                                                          }
                                                      }
         ));

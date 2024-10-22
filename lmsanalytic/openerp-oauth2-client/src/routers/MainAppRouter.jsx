@@ -8,6 +8,7 @@ import NotFound from "views/errors/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import TeacherRouter from "./TeacherRouter";
 import DemoScreen from "views/DemoScreen";
+import LmsLogs from "components/lmslog/logs";
 
 const styles = {
   loadingProgress: {
@@ -36,6 +37,7 @@ function MainAppRouter(props) {
         <Switch>
           <Route component={() => <></>} exact path="/" />
           <PrivateRoute component={DemoScreen} exact path="/demo" />
+          <PrivateRoute component={LmsLogs} exact path="/lmslog/logs" />
           <PrivateRoute component={TeacherRouter} path="/teacher" />
 
           {/* <Route component={error} path="*" /> */}

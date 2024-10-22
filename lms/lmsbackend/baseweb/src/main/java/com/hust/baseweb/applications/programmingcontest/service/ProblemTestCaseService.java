@@ -74,6 +74,12 @@ public interface ProblemTestCaseService {
         String submittedByUserId
     ) throws Exception;
 
+    ModelContestSubmissionResponse submitContestProblemNotExecuteDueToForbiddenInstructions(
+        ModelContestSubmission modelContestSubmission,
+        String userName,
+        String submittedByUserId
+    ) throws Exception;
+
     ModelContestSubmissionResponse submitContestProblemStoreOnlyNotExecute(
         ModelContestSubmission modelContestSubmission,
         String userName,

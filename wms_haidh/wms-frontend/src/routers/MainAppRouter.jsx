@@ -1,13 +1,18 @@
 import { LinearProgress } from "@mui/material";
-import { Layout } from "layout";
-import { drawerWidth } from "layout/sidebar/SideBar";
+import { Layout } from "../layout";
+import { drawerWidth } from "../layout/sidebar/SideBar";
 import { Suspense, useEffect } from "react";
 import { Route, Switch, useLocation } from "react-router-dom";
-import { useNotificationState } from "state/NotificationState";
-import NotFound from "views/errors/NotFound";
+import { useNotificationState } from "../state/NotificationState";
+import NotFound from "../views/errors/NotFound";
 import PrivateRoute from "./PrivateRoute";
-import TeacherRouter from "./TeacherRouter";
-import DemoScreen from "views/DemoScreen";
+import AdminRouter from "./AdminRouter";
+import SaleManagerRouter from "./SaleManagerRouter";
+import CustomerRouter from "./CustomerRouter";
+import ApproverRouter from "./ApproverRouter";
+import DeliveryManagerRouter from "./DeliveryManagerRouter";
+import DeliveryPersonRouter from "./DeliveryPersonRouter";
+import PurchaseManagerRouter from "./PurchaseManagerRouter";
 
 const styles = {
   loadingProgress: {
@@ -35,9 +40,13 @@ function MainAppRouter(props) {
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Switch>
           <Route component={() => <></>} exact path="/" />
-          <PrivateRoute component={DemoScreen} exact path="/demo" />
-          <PrivateRoute component={TeacherRouter} path="/teacher" />
-
+          <PrivateRoute component={AdminRouter} path="/admin" />
+          <PrivateRoute component={SaleManagerRouter} path="/sale-manager" />
+          <PrivateRoute component={CustomerRouter} path="/customer" />
+          <PrivateRoute component={ApproverRouter} path="/approver" />
+          <PrivateRoute component={DeliveryManagerRouter} path="/delivery-manager" />
+          <PrivateRoute component={DeliveryPersonRouter} path="/delivery-person" />
+          <PrivateRoute component={PurchaseManagerRouter} path="/purchase-manager" />
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />
         </Switch>
