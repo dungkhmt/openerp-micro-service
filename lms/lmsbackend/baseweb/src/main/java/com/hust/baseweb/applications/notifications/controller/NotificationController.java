@@ -57,11 +57,9 @@ public class NotificationController {
         subscription.onTimeout(() -> {
             log.error("onTimeout fired for connection: {}", toUser);
             subscription.complete();
-            subscriptions.remove(toUser);
         });
         subscription.onCompletion(() -> {
             log.error("onCompletion fired for connection: {}", toUser);
-            subscriptions.remove(toUser);
         }); // OK
         subscription.onError((e) -> { // Must consider carefully, but currently OK
             log.error("onError fired for connection {} with exception: {}", toUser, e.getMessage());
