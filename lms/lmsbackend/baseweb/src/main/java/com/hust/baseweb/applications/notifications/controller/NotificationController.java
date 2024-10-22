@@ -52,16 +52,20 @@ public class NotificationController {
         @CurrentSecurityContext(expression = "authentication.name") String toUser
     ) {
         SseEmitter subscription;
-        subscription = new SseEmitter(Long.MAX_VALUE);
+        subscription = new SseEmitter(600_000L);
 
         subscription.onTimeout(() -> {
+            log.error("onTimeout fired for connection: {}", toUser);
             subscription.complete();
             subscriptions.remove(toUser);
         });
-        subscription.onCompletion(() -> subscriptions.remove(toUser)); // OK
+        subscription.onCompletion(() -> {
+            log.error("onCompletion fired for connection: {}", toUser);
+            subscriptions.remove(toUser);
+        }); // OK
         subscription.onError((e) -> { // Must consider carefully, but currently OK
+            log.error("onError fired for connection {} with exception: {}", toUser, e.getMessage());
             subscription.completeWithError(e);
-            log.error("onError fired with exception: {}", e.getMessage());
         });
 
         // Add new subscription to user's connection list.
@@ -106,15 +110,18 @@ public class NotificationController {
                                      .data("keep alive", MediaType.TEXT_EVENT_STREAM));
 //                                      .comment(":\n\nkeep alive"));
                 } catch (Exception e) {
-                    try {
-                        emitter.completeWithError(e);
-                        log.info("Marked SseEmitter as complete with an error");
-                    } catch (Exception completionException) {
-                        log.info("Failed to mark SseEmitter as complete on error");
-                    }
                     iterator.remove();
                     size--;
 //                    log.error("FAILED WHEN SENDING HEARTBEAT SIGNAL TO {}, MAY BE USER CLOSED A CONNECTION", toUser);
+                    log.info("Error occurred when sending heartbeat: {}", e.getMessage());
+                    try {
+                        emitter.completeWithError(e);
+                        log.info(
+                            "Marked SseEmitter as complete with an error because of exception when sending heartbeat");
+                    } catch (Exception completionException) {
+                        log.info(
+                            "Failed to mark SseEmitter as complete on error because of exception when sending heartbeat");
+                    }
                 }
             }
 
