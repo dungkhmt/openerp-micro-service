@@ -1112,6 +1112,35 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                              .build();
     }
 
+    @Override
+    public ModelContestSubmissionResponse submitContestProblemNotExecuteDueToForbiddenInstructions(
+        ModelContestSubmission modelContestSubmission,
+        String userName,
+        String submittedByUserId
+    ) throws Exception {
+
+        Date submitTime = new Date();
+        ContestSubmissionEntity submission = ContestSubmissionEntity.builder()
+                                                                    .contestId(modelContestSubmission.getContestId())
+                                                                    .problemId(modelContestSubmission.getProblemId())
+                                                                    .sourceCode(modelContestSubmission.getSource())
+                                                                    .sourceCodeLanguage(modelContestSubmission.getLanguage())
+                                                                    .status(ContestSubmissionEntity.SUBMISSION_STATUS_NOT_EVALUATED_FORBIDDEN_INSTRUCTIONS)
+                                                                    .point(0L)
+                                                                    .problemId(modelContestSubmission.getProblemId())
+                                                                    .userId(userName)
+                                                                    .submittedByUserId(submittedByUserId)
+                                                                    .runtime(0L)
+                                                                    .createdAt(submitTime)
+                                                                    .build();
+        //log.info("submitContestProblemTestCaseByTestCaseWithFile, save submission to DB");
+        submission = contestSubmissionRepo.saveAndFlush(submission);
+        return ModelContestSubmissionResponse.builder()
+                                             .status("NO_EVALUATION_FORBIDDEN_INSTRUCTIONS")
+                                             .message("Submission is not evaluated due to forbidden instructions")
+                                             .build();
+    }
+
 
     @Override
     public ModelContestSubmissionResponse submitContestProblemStoreOnlyNotExecute(

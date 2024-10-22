@@ -366,7 +366,10 @@ public class SubmissionController {
             cp.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_NOT_ALLOWED)) {
             ModelContestSubmissionResponse resp = buildSubmissionResponseSubmissionNotAllowed();
             return ResponseEntity.ok().body(resp);
+
+
         }
+
 
         int numOfSubmissions = contestSubmissionRepo
             .countAllByContestIdAndUserIdAndProblemId(model.getContestId(), userId, model.getProblemId());
@@ -401,9 +404,27 @@ public class SubmissionController {
                     contestEntity.getMaxSourceCodeLength());
                 return ResponseEntity.ok().body(resp);
             }
+
+
             ModelContestSubmission request = new ModelContestSubmission(model.getContestId(), model.getProblemId(),
                                                                         source, model.getLanguage());
             ModelContestSubmissionResponse resp = null;
+
+            if(cp != null && cp.getForbiddenInstructions() != null){
+                String[] fis = cp.getForbiddenInstructions().split(",");
+                boolean ok = true;
+                for(String fi: fis){
+                    //fi = fi.trim();
+                    if(source.contains(fi.trim())){
+                        ok = false; break;
+                    }
+                }
+                if(!ok){
+                    resp = problemTestCaseService.submitContestProblemNotExecuteDueToForbiddenInstructions(request, userId, userId);
+
+                    return ResponseEntity.ok().body(resp);
+                }
+            }
             if (contestEntity.getSubmissionActionType()
                              .equals(ContestEntity.CONTEST_SUBMISSION_ACTION_TYPE_STORE_AND_EXECUTE)) {
                 if (cp != null &&
