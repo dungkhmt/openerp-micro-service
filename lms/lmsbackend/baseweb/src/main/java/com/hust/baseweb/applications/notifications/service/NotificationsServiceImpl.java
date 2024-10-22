@@ -100,18 +100,19 @@ public class NotificationsServiceImpl implements NotificationsService {
                                                          try {
                                                              subscription.send(event);
                                                          } catch (Exception ignore) {
-                                                             log.info(
-                                                                 "Error occurred when sending event: {}",
-                                                                 ignore.getMessage());
                                                              // This is normal behavior when a client disconnects.
                                                              // onError callback will be automatically fired.
+                                                             log.info(
+                                                                 "Failed to send event because of error: {}",
+                                                                 ignore.getMessage());
                                                              try {
                                                                  subscription.completeWithError(ignore);
                                                                  log.info(
-                                                                     "Marked SseEmitter as complete with an error because of exception when sending event");
+                                                                     "Marked SseEmitter as complete with an error");
                                                              } catch (Exception completionException) {
                                                                  log.info(
-                                                                     "Failed to mark SseEmitter as complete on error because of exception when sending event");
+                                                                     "Error occurred when attempting to mark SseEmitter: {}",
+                                                                     completionException.getMessage());
                                                              }
                                                          }
                                                      }
