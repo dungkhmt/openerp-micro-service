@@ -413,10 +413,12 @@ public class SubmissionController {
             if(cp != null && cp.getForbiddenInstructions() != null){
                 String[] fis = cp.getForbiddenInstructions().split(",");
                 boolean ok = true;
-                for(String fi: fis){
-                    //fi = fi.trim();
-                    if(source.contains(fi.trim())){
-                        ok = false; break;
+                if(fis != null)for(String fi: fis){
+                    String i = fi.trim();
+                    if(i != null){
+                        if(!i.equals("") && i.length() > 0 && source.contains(i)){
+                            ok = false; break;
+                        }
                     }
                 }
                 if(!ok){
