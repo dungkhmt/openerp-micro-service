@@ -7,12 +7,13 @@ import openerp.openerpresourceserver.log.model.LmsLogModelCreate;
 import openerp.openerpresourceserver.log.service.LmsLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Role;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -34,9 +35,17 @@ public class LogController {
     }
     //@Secured("LMS_LOG")
     @GetMapping("/log/get-logs")
-    public ResponseEntity<?> getLmsLogs(Principal principal){
+    public ResponseEntity<?> getLmsLogs(Principal principal,
+                                        @RequestParam("page") int page,
+                                        @RequestParam("size") int size,
+                                        LmsLog filter
+                                        ){
         log.info("getLmsLog user = " + principal.getName());
-        List<LmsLog> logs = lmsLogService.getAllLogs();
+        //List<LmsLog> logs = lmsLogService.getAllLogs();
+        Pageable sortedByCreatedStampDsc = PageRequest.of(page, size, Sort.by("createdStamp").descending());
+        Page<LmsLog> logs = lmsLogService.search(filter,sortedByCreatedStampDsc);
         return ResponseEntity.ok().body(logs);
     }
+
+
 }
