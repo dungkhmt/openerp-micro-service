@@ -256,7 +256,18 @@ public class SubmissionResponseHandler {
         contestSubmissionRepo.save(submission);
 
         ModelCreateContestSubmission m = new ModelCreateContestSubmission();
-
+        m.setContestSubmissionId(submission.getContestSubmissionId());
+        m.setContestId(submission.getContestId());
+        m.setProblemId(submission.getProblemId());
+        m.setParticipantUserId(submission.getUserId());
+        m.setPoint(submission.getPoint());
+        m.setTestCasePasses(submission.getTestCasePass());
+        m.setSubmissionStatus(submission.getStatus());
+        m.setMessage(submission.getMessage());
+        m.setSourceCode(submission.getSourceCode());
+        m.setSourceCodeLanguage(submission.getSourceCodeLanguage());
+        m.setSubmissionCreatedStamp(submission.getCreatedAt());
+        
         logAContestSubmission(m);
     }
 

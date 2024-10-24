@@ -36,7 +36,7 @@ public class ModelCreateContestSubmission {
     private String submittedByUserId;
     private String submittedByUserFullname;
     private String submissionStatus;
-    private int point;
+    private Long point;
     private String testCasePasses;
     private String sourceCode;
     private String sourceCodeLanguage;
