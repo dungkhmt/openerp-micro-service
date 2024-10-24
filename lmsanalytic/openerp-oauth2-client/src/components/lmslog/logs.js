@@ -6,7 +6,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { toFormattedDateTime } from "../../utils/dateutils";
 import UserFeatures from "./userfeatures";
-import DashBoard from "./dashboard";
+
 function LmsLogs() {
 
     const [logs, setLogs] = useState([]);
