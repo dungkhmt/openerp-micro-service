@@ -5,6 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { toFormattedDateTime } from "../../utils/dateutils";
+import UserFeatures from "./userfeatures";
 function LmsLogs() {
 
     const [logs, setLogs] = useState([]);
@@ -131,7 +132,10 @@ function LmsLogs() {
                     search: false,
                   }}
             />
+
+            <UserFeatures/>
         </div>
+
 
     );
 }
