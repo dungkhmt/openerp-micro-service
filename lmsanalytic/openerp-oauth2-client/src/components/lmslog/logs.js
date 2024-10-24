@@ -135,7 +135,7 @@ function LmsLogs() {
             />
 
             <UserFeatures/>
-            <DashBoard/>
+           
         </div>
 
 

@@ -1,4 +1,6 @@
 import { Line } from "react-chartjs-2";
+//import { Line } from "react-Chart.js-2";
+
 import React from "react";
 //import "./styles.css";
 
