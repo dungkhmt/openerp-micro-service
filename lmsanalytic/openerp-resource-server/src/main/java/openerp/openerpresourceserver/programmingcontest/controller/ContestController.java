@@ -35,6 +35,7 @@ public class ContestController {
     @GetMapping("/get-contest-problem-ranking")
     public ResponseEntity<?> getContestProblemRanking(Principal principal){
         List<ProgrammingContestProblemRanking> res = programmingContestProblemRankingService.findAll();
+        log.info("getContestProblemRanking, res = " + res.size());
         return ResponseEntity.ok().body(res);
     }
 }
