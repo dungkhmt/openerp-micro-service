@@ -82,7 +82,7 @@ public class ApiService {
       String accessToken = keycloakService.getAccessToken(clientCredential.getClientId(),
                                                           clientCredential.getClientSecret());
       log.debug("Get access token: " + accessToken);
-
+      /*
       return this.webClient.post()
                            .uri(url)
                            .contentType(MediaType.APPLICATION_JSON)
@@ -94,6 +94,24 @@ public class ApiService {
                            // .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
                            // .filter(RuntimeException.class::isInstance))
                            .block();
+      */
+
+      try{
+          this.webClient.post()
+                  .uri(url)
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .header("Authorization", "Bearer " + accessToken)
+                  .body(BodyInserters.fromValue(model))
+                  .retrieve()
+                  //.toEntity(responseType)
+                  .toEntity(Void.class)
+                  // .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
+                  // .filter(RuntimeException.class::isInstance))
+                  .block();
+      }catch (Exception e){
+          e.printStackTrace();
+      }
+      return ResponseEntity.ok().body("OK");
       /*
       this.webClient.post()
                            //.uri(url + "/log/create-log")
