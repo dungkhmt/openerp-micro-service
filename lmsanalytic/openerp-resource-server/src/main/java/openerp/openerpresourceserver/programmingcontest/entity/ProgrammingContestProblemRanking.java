@@ -13,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "programming_contest_ranking")
+@Table(name = "programming_contest_problem_ranking")
 @IdClass(CompositeProgrammingContestProblemRankingId.class)
 public class ProgrammingContestProblemRanking {
     @Id
