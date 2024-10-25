@@ -18,7 +18,10 @@ import java.util.Date;
 @IdClass(CompositeUserFeatureId.class)
 public class UserFeatures {
     public static final String FEATURE_NUMBER_ACTIONS = "NUMBER_ACTIONS";
-    //public static final String FEATURE_NUMBER_ACTIONS_
+    public static final String FEATURE_NUMBER_CONTEST_SUBMISSIONS = "NUMBER_CONTEST_SUBMISSIONS";
+    public static final String FEATURE_NUMBER_CONTEST_PARTICIPATIONS = "NUMBER_CONTEST_PARTICIPATIONS";
+    
+
 
     @Id
     @Column(name="user_id")

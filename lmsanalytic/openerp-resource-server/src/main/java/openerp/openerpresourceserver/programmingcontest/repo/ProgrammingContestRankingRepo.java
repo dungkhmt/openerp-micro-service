@@ -1,0 +1,9 @@
+package openerp.openerpresourceserver.programmingcontest.repo;
+
+import openerp.openerpresourceserver.programmingcontest.entity.CompositeProgrammingContestRankingId;
+import openerp.openerpresourceserver.programmingcontest.entity.ProgrammingContestRanking;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ProgrammingContestRankingRepo extends JpaRepository<ProgrammingContestRanking, CompositeProgrammingContestRankingId> {
+
+}

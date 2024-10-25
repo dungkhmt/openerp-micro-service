@@ -70,6 +70,7 @@ public class LmsLogProcessor {
             }else{
                 uf.setValue(uf.getValue() + mUser2Actions.get(userId));
                 uf = userFeaturesRepo.save(uf);
+                uf.setLastUpdatedStamp(new Date());
             }
 
         }
