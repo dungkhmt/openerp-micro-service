@@ -41,20 +41,23 @@ public class LmsContestSubmissionProcessor {
         return userId + "$" + contestId + "$" + problemId;
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 30000)
     public void process(){
-        
+        log.info("LmsContestSubmissionProcessor -> run process time = {}",new Date());
         LastTimeProcess ltp = lastTimeProcessRepo.findById(TABLE_CONTEST_SUBMISSION).orElse(null);
         List<LmsContestSubmission> logs = null;
         Date currentDate = new Date();
         if(ltp == null){
             logs = lmsContestSubmissionRepo.findAll();
+            log.info("process, last time process NULL, get number items lms_contest_submissions = " + logs.size());
             ltp = new LastTimeProcess();
             ltp.setTableName(TABLE_CONTEST_SUBMISSION);
             ltp.setLastTimeProcess(currentDate);
             ltp = lastTimeProcessRepo.save(ltp);
         }else{
             logs = lmsContestSubmissionRepo.findAllByCreatedStampBetween(ltp.getLastTimeProcess(), currentDate);
+            log.info("process, last time process = " + ltp.getLastTimeProcess() + ", get number items lms_contest_submissions = " + logs.size());
+
             ltp.setLastTimeProcess(currentDate);
             ltp = lastTimeProcessRepo.save(ltp);
         }
@@ -75,11 +78,13 @@ public class LmsContestSubmissionProcessor {
                 R.setCreatedStamp(new Date());
                 R.setLastUpdatedStamp(new Date());
                 R = programmingContestProblemRankingRepo.save(R);
+                log.info("process, save new record point = " + R.getContestId() + " to DB");
             }else{
                 if(R.getPoint() < sub.getPoint()){
                     R.setPoint(Long.valueOf(sub.getPoint()));
                     R.setLastUpdatedStamp(new Date());
                     R = programmingContestProblemRankingRepo.save(R);
+                    log.info("process update with new record point " + R.getPoint());
                 }
             }
         }
