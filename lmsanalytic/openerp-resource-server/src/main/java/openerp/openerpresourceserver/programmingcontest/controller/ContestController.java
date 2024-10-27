@@ -42,7 +42,7 @@ public class ContestController {
         log.info("getContestProblemRanking, res = " + res.size());
         return ResponseEntity.ok().body(res);
     }
-    @GetMapping("/get-contest-raking")
+    @GetMapping("/get-contest-ranking")
     public ResponseEntity<?> getContestRanking(Principal principal){
         List<ProgrammingContestRanking> res = programmingContestRankingService.findAll();
         return ResponseEntity.ok().body(res);

@@ -111,17 +111,17 @@ public class LmsContestSubmissionProcessor {
 
              */
         }
-        log.info("process, aggregate userContestChanged = " + userContestChanged.size());
+        //log.info("process, aggregate userContestChanged = " + userContestChanged.size());
 
         // update to programming_contest_ranking
         for(String k: userContestChanged){
-            log.info("process, aggregate key = " + k);
+            //log.info("process, aggregate key = " + k);
             String[] s = k.split("\\$");
             String userId = s[0];
             String contestId = s[1];
             List<ProgrammingContestProblemRanking> L = programmingContestProblemRankingRepo
                     .findByUserIdAndContestId(userId, contestId);
-            log.info("process, aggregate with userId " + userId + " contestId " + contestId + " L.sz = " + L.size());
+           // log.info("process, aggregate with userId " + userId + " contestId " + contestId + " L.sz = " + L.size());
             long point = 0;
             for(ProgrammingContestProblemRanking pcpr: L){
                 point += pcpr.getPoint();
@@ -129,7 +129,7 @@ public class LmsContestSubmissionProcessor {
 
 
             ProgrammingContestRanking pcr = programmingContestRankingRepo.findByUserIdAndContestId(userId,contestId);
-            log.info("process, aggregate with userId " + userId + " contestId " + contestId + " L.sz = " + L.size() + " point = " + point + " record pcr = {}",pcr);
+           // log.info("process, aggregate with userId " + userId + " contestId " + contestId + " L.sz = " + L.size() + " point = " + point + " record pcr = {}",pcr);
 
             if(pcr == null){
                 pcr = new ProgrammingContestRanking();
