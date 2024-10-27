@@ -115,6 +115,7 @@ public class LmsContestSubmissionProcessor {
 
         // update to programming_contest_ranking
         for(String k: userContestChanged){
+            log.info("process, aggregate key = " + k);
             String[] s = k.split("$");
             String userId = s[0]; String contestId = s[1];
             List<ProgrammingContestProblemRanking> L = programmingContestProblemRankingRepo
