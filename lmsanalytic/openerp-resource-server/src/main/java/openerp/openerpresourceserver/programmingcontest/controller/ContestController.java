@@ -3,9 +3,11 @@ package openerp.openerpresourceserver.programmingcontest.controller;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.programmingcontest.entity.ProgrammingContestProblemRanking;
+import openerp.openerpresourceserver.programmingcontest.entity.ProgrammingContestRanking;
 import openerp.openerpresourceserver.programmingcontest.model.ModelCreateContestSubmission;
 import openerp.openerpresourceserver.programmingcontest.service.LmsContestSubmissionService;
 import openerp.openerpresourceserver.programmingcontest.service.ProgrammingContestProblemRankingService;
+import openerp.openerpresourceserver.programmingcontest.service.ProgrammingContestRankingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,6 +25,8 @@ import java.util.List;
 public class ContestController {
     private LmsContestSubmissionService lmsContestSubmissionService;
     private ProgrammingContestProblemRankingService programmingContestProblemRankingService;
+    private ProgrammingContestRankingService programmingContestRankingService;
+
     @PostMapping("/create-contest-submission")
     public ResponseEntity<?> createContestSubmission(Principal principal, @RequestBody ModelCreateContestSubmission m){
         log.info("createContestSubmission, submissionId = " + m.getContestSubmissionId());
@@ -36,6 +40,11 @@ public class ContestController {
     public ResponseEntity<?> getContestProblemRanking(Principal principal){
         List<ProgrammingContestProblemRanking> res = programmingContestProblemRankingService.findAll();
         log.info("getContestProblemRanking, res = " + res.size());
+        return ResponseEntity.ok().body(res);
+    }
+    @GetMapping("/get-contest-raking")
+    public ResponseEntity<?> getContestRanking(Principal principal){
+        List<ProgrammingContestRanking> res = programmingContestRankingService.findAll();
         return ResponseEntity.ok().body(res);
     }
 }

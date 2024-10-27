@@ -7,6 +7,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { toFormattedDateTime } from "../../utils/dateutils";
 import UserFeatures from "./userfeatures";
 import ContestRanking from "./contestranking";
+import ContestProblemRanking from "./contestproblemranking";
+
 
 function LmsLogs() {
 
@@ -137,6 +139,7 @@ function LmsLogs() {
 
             <UserFeatures/>
             <ContestRanking/>      
+            <ContestProblemRanking/>
         </div>
 
 

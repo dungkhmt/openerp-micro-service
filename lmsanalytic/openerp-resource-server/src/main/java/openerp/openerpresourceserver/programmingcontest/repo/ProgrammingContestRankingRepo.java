@@ -5,5 +5,5 @@ import openerp.openerpresourceserver.programmingcontest.entity.ProgrammingContes
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProgrammingContestRankingRepo extends JpaRepository<ProgrammingContestRanking, CompositeProgrammingContestRankingId> {
-
+    ProgrammingContestRanking findByUserIdAndContestId(String userId, String contestId);
 }

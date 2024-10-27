@@ -19,17 +19,13 @@ function ContestRanking(){
             field: "contestId",
         },
         {
-            title: "Problem",
-            field: "problemId",
-        },
-        {
             title: "Point",
             field: "point",
         }
     ];
     function getData(){
        
-        request("get", "/get-contest-problem-ranking", (res) => {
+        request("get", "/get-contest-ranking", (res) => {
             setData(res.data);
            
         }).then();
