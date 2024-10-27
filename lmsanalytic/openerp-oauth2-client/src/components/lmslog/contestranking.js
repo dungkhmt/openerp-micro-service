@@ -39,7 +39,7 @@ function ContestRanking(){
     return (
         <div>
             <StandardTable
-                title="Ranking"
+                title="Contest Ranking"
                 columns={columns}
                 data={data}
                 
