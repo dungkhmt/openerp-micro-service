@@ -17,7 +17,9 @@ public class ProgrammingContestRankingServiceImpl implements  ProgrammingContest
 
     @Override
     public List<ProgrammingContestRanking> findAll() {
-        List<ProgrammingContestRanking> L = programmingContestRankingRepo.findAll();
+        //List<ProgrammingContestRanking> L = programmingContestRankingRepo.findAll();
+        List<ProgrammingContestRanking> L = programmingContestRankingRepo.findAllSorted();
+
 
         return L;
     }

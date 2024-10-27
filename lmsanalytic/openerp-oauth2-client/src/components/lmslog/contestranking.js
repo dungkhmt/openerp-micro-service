@@ -6,6 +6,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { toFormattedDateTime } from "../../utils/dateutils";
 
+
 function ContestRanking(){
 
     const [data, setData] = useState([]);
@@ -33,8 +34,24 @@ function ContestRanking(){
  
     }
     useEffect(() => {
-        getData();
-    }, [])
+        try {
+          var refreshIntervalId = setInterval(async () => {
+            getData();
+          }, 3000);
+        } catch (e) {
+          console.log("FOUND exception", e);
+        }
+    
+        return function cleanInterval() {
+          clearInterval(refreshIntervalId);
+        };
+    
+        //getResults();
+        
+      }, []);
+    //useEffect(() => {
+    //    getData();
+    //}, [])
 
     return (
         <div>

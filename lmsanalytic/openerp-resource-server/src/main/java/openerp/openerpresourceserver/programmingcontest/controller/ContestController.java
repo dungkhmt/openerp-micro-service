@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.Date;
 import java.util.List;
 
 @Log4j2
@@ -45,6 +46,7 @@ public class ContestController {
     @GetMapping("/get-contest-ranking")
     public ResponseEntity<?> getContestRanking(Principal principal){
         List<ProgrammingContestRanking> res = programmingContestRankingService.findAll();
+        log.info("getContestRanking at {}", new Date());
         return ResponseEntity.ok().body(res);
     }
 }
