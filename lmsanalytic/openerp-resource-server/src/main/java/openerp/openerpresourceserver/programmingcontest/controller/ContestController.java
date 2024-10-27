@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.programmingcontest.entity.ProgrammingContestProblemRanking;
 import openerp.openerpresourceserver.programmingcontest.entity.ProgrammingContestRanking;
+import openerp.openerpresourceserver.programmingcontest.model.ContestModelRepsonse;
 import openerp.openerpresourceserver.programmingcontest.model.ModelCreateContestSubmission;
 import openerp.openerpresourceserver.programmingcontest.service.LmsContestSubmissionService;
 import openerp.openerpresourceserver.programmingcontest.service.ProgrammingContestProblemRankingService;
@@ -11,10 +12,7 @@ import openerp.openerpresourceserver.programmingcontest.service.ProgrammingConte
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.Date;
@@ -46,7 +44,20 @@ public class ContestController {
     @GetMapping("/get-contest-ranking")
     public ResponseEntity<?> getContestRanking(Principal principal){
         List<ProgrammingContestRanking> res = programmingContestRankingService.findAll();
-        log.info("getContestRanking at {}", new Date());
+        //log.info("getContestRanking at {}", new Date());
+        return ResponseEntity.ok().body(res);
+    }
+    @GetMapping("/get-contest-ranking/{contestId}")
+    public ResponseEntity<?> getContestRankingByContestId(Principal principal, @PathVariable String contestId){
+        List<ProgrammingContestRanking> res = programmingContestRankingService
+                .findAllByContestId(contestId);
+        //log.info("getContestRanking at {}", new Date());
+        return ResponseEntity.ok().body(res);
+    }
+
+    @GetMapping("/get-contestids")
+    public ResponseEntity<?> getContestIds(Principal principal){
+        List<ContestModelRepsonse> res = programmingContestRankingService.getContestAllIds();
         return ResponseEntity.ok().body(res);
     }
 }

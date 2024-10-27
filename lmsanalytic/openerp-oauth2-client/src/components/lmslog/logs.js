@@ -138,7 +138,6 @@ function LmsLogs() {
             />
 
             <UserFeatures/>
-            <ContestRanking/>      
             <ContestProblemRanking/>
         </div>
 

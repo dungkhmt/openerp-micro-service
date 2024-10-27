@@ -12,9 +12,9 @@ export const lmslog = {
       },
       {
         id: "MENU_LMSLOG.LOGS",
-        path: "/teacher/screen-2",
+        path: "/contest/ranking",
         isPublic: false,
-        text: "Submenu 2",
+        text: "Contest Ranking",
         child: [],
       },
     ],
