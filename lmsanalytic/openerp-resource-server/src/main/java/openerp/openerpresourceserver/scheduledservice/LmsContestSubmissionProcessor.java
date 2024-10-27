@@ -116,8 +116,9 @@ public class LmsContestSubmissionProcessor {
         // update to programming_contest_ranking
         for(String k: userContestChanged){
             log.info("process, aggregate key = " + k);
-            String[] s = k.split("$");
-            String userId = s[0]; String contestId = s[1];
+            String[] s = k.split("\\$");
+            String userId = s[0];
+            String contestId = s[1];
             List<ProgrammingContestProblemRanking> L = programmingContestProblemRankingRepo
                     .findByUserIdAndContestId(userId, contestId);
             log.info("process, aggregate with userId " + userId + " contestId " + contestId + " L.sz = " + L.size());
@@ -142,5 +143,11 @@ public class LmsContestSubmissionProcessor {
                 pcr = programmingContestRankingRepo.save(pcr);
             }
         }
+    }
+    public static void main(String[] args){
+        String key = "dungpq$123456";
+        String[] s = key.split("\\$");
+        System.out.println(s[0]);
+        System.out.println(s[1]);
     }
 }
