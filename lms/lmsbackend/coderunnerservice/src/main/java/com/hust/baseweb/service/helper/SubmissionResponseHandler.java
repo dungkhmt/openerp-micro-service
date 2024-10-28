@@ -4,6 +4,8 @@ import com.hust.baseweb.applications.programmingcontest.entity.ContestEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionTestCaseEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
+import com.hust.baseweb.callexternalapi.model.ModelCreateContestSubmission;
+import com.hust.baseweb.callexternalapi.service.ApiService;
 import com.hust.baseweb.config.rabbitmq.RabbitProgrammingContestConfig;
 import com.hust.baseweb.constants.Constants;
 import com.hust.baseweb.repo.ContestSubmissionRepo;
@@ -11,9 +13,11 @@ import com.hust.baseweb.repo.ContestSubmissionTestCaseEntityRepo;
 import com.hust.baseweb.util.stringhandler.ProblemSubmission;
 import com.hust.baseweb.util.stringhandler.StringHandler;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,11 +30,14 @@ import static com.hust.baseweb.config.rabbitmq.ProblemContestRoutingKey.JUDGE_CU
 @Slf4j
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
+@Log4j2
 public class SubmissionResponseHandler {
 
     private ContestSubmissionRepo contestSubmissionRepo;
     private ContestSubmissionTestCaseEntityRepo contestSubmissionTestCaseEntityRepo;
     private RabbitTemplate rabbitTemplate;
+
+    private ApiService apiService;
 
     @Transactional
     public void processSubmissionResponseV2(
@@ -173,11 +180,36 @@ public class SubmissionResponseHandler {
         submission.setUpdateAt(new Date());
         contestSubmissionRepo.saveAndFlush(submission);
 
+        ModelCreateContestSubmission m = new ModelCreateContestSubmission();
+        m.setContestSubmissionId(submission.getContestSubmissionId());
+        m.setContestId(submission.getContestId());
+        m.setProblemId(submission.getProblemId());
+        m.setParticipantUserId(submission.getUserId());
+        m.setPoint(submission.getPoint());
+        m.setTestCasePasses(submission.getTestCasePass());
+        m.setSubmissionStatus(submission.getStatus());
+        m.setMessage(submission.getMessage());
+        m.setSourceCode(submission.getSourceCode());
+        m.setSourceCodeLanguage(submission.getSourceCodeLanguage());
+        m.setSubmissionCreatedStamp(submission.getCreatedAt());
+
+        logAContestSubmission(m);
+
         if (processing) {
             rabbitTemplate.convertAndSend(
                     RabbitProgrammingContestConfig.EXCHANGE,
                     JUDGE_CUSTOM_PROBLEM,
                     submission.getContestSubmissionId());
+        }
+    }
+
+    @Async
+    private void logAContestSubmission(ModelCreateContestSubmission m){
+        try {
+            log.info("logAContestSubmission, submissionId = " + m.getContestSubmissionId());
+            apiService.callLogContestSubmissionAPI("https://analytics.soict.ai/api/create-contest-submission", m);
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -241,6 +273,21 @@ public class SubmissionResponseHandler {
         submission.setUpdateAt(new Date());
 
         contestSubmissionRepo.save(submission);
+
+        ModelCreateContestSubmission m = new ModelCreateContestSubmission();
+        m.setContestSubmissionId(submission.getContestSubmissionId());
+        m.setContestId(submission.getContestId());
+        m.setProblemId(submission.getProblemId());
+        m.setParticipantUserId(submission.getUserId());
+        m.setPoint(submission.getPoint());
+        m.setTestCasePasses(submission.getTestCasePass());
+        m.setSubmissionStatus(submission.getStatus());
+        m.setMessage(submission.getMessage());
+        m.setSourceCode(submission.getSourceCode());
+        m.setSourceCodeLanguage(submission.getSourceCodeLanguage());
+        m.setSubmissionCreatedStamp(submission.getCreatedAt());
+
+        logAContestSubmission(m);
     }
 
 }

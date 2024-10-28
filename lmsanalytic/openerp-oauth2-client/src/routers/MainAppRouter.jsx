@@ -9,7 +9,8 @@ import PrivateRoute from "./PrivateRoute";
 import TeacherRouter from "./TeacherRouter";
 import DemoScreen from "views/DemoScreen";
 import LmsLogs from "components/lmslog/logs";
-
+import ContestListForRanking from "components/lmslog/contestrankinglist";
+import ContestRanking from "components/lmslog/contestranking";
 const styles = {
   loadingProgress: {
     position: "fixed",
@@ -38,6 +39,9 @@ function MainAppRouter(props) {
           <Route component={() => <></>} exact path="/" />
           <PrivateRoute component={DemoScreen} exact path="/demo" />
           <PrivateRoute component={LmsLogs} exact path="/lmslog/logs" />
+          <PrivateRoute component={ContestListForRanking} exact path="/contest/ranking" />
+          <PrivateRoute component={ContestRanking} exact path={`/contest/ranking/:contestId`}/>
+          
           <PrivateRoute component={TeacherRouter} path="/teacher" />
 
           {/* <Route component={error} path="*" /> */}
