@@ -8,6 +8,7 @@ import { toFormattedDateTime } from "../../utils/dateutils";
 import UserFeatures from "./userfeatures";
 import ContestRanking from "./contestranking";
 import ContestProblemRanking from "./contestproblemranking";
+import RealtimeRecentLogs from "./realtimerecentlogs";
 
 
 function LmsLogs() {
@@ -139,6 +140,7 @@ function LmsLogs() {
 
             <UserFeatures/>
             <ContestProblemRanking/>
+            <RealtimeRecentLogs/>
         </div>
 
 

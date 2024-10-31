@@ -49,6 +49,12 @@ public class LmsLogServiceImpl implements LmsLogService{
     }
 
     @Override
+    public List<LmsLog> getMostRecentLogs(int size) {
+        List<LmsLog> res = lmsLogRepo.getMostRecentLogs(size);
+        return res;
+    }
+
+    @Override
     public Page<LmsLog> search(LmsLog filter, Pageable pageable) {
         ExampleMatcher matcher = ExampleMatcher.matching()
                 .withIgnorePaths(

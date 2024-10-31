@@ -33,6 +33,12 @@ public class LogController {
 
         return ResponseEntity.ok().body(alog);
     }
+    @GetMapping("/log/get-mostrecent-logs")
+    public ResponseEntity<?> getMostRecentLogs(Principal principal){
+        List<LmsLog> res = lmsLogService.getMostRecentLogs(50);
+        log.info("getMostRecentLogs, return size = " + res.size());
+        return ResponseEntity.ok().body(res);
+    }
     //@Secured("LMS_LOG")
     @GetMapping("/log/get-logs")
     public ResponseEntity<?> getLmsLogs(Principal principal,

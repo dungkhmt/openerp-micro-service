@@ -12,6 +12,8 @@ public interface LmsLogService {
     public List<LmsLog> getLmsLogs();
 
     public List<LmsLog> getAllLogs();
+    public List<LmsLog> getMostRecentLogs(int size);
+
 
     public Page<LmsLog> search(LmsLog filter, Pageable pageable);
 }
