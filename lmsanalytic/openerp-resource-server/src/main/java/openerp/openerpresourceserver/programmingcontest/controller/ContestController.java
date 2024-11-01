@@ -28,7 +28,7 @@ public class ContestController {
 
     @PostMapping("/create-contest-submission")
     public ResponseEntity<?> createContestSubmission(Principal principal, @RequestBody ModelCreateContestSubmission m){
-        log.info("createContestSubmission, submissionId = " + m.getContestSubmissionId());
+        //log.info("createContestSubmission, submissionId = " + m.getContestSubmissionId());
 
         lmsContestSubmissionService.save(m);
 

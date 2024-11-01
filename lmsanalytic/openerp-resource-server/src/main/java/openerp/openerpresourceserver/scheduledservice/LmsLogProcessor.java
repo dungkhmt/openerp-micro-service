@@ -45,6 +45,7 @@ public class LmsLogProcessor {
             ltp.setModule(UserFeatures.FEATURE_NUMBER_ACTIONS);
             ltp.setLastTimeProcess(currentDate);
             ltp = lastTimeProcessRepo.save(ltp);
+            log.info("LmsLogProcessor::process, last_time_process = NULL, save new record");
         }else{
             logs = lmsLogRepo.findAllByCreatedStampBetween(ltp.getLastTimeProcess(), currentDate);
             ltp.setLastTimeProcess(currentDate);

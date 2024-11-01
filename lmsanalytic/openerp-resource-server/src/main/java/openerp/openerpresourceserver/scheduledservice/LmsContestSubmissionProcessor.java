@@ -64,6 +64,7 @@ public class LmsContestSubmissionProcessor {
             ltp.setModule(MODULE_CONTEST_PROBLEM_RANKING);
             ltp.setLastTimeProcess(currentDate);
             ltp = lastTimeProcessRepo.save(ltp);
+            log.info("process, last time process NULL, save new record to DB");
         }else{
             logs = lmsContestSubmissionRepo.findAllByCreatedStampBetween(ltp.getLastTimeProcess(), currentDate);
             log.info("process, last time process = " + ltp.getLastTimeProcess() + ", get number items lms_contest_submissions = " + logs.size());
