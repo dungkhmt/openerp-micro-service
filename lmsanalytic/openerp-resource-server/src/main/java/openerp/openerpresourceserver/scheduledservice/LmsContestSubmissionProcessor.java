@@ -58,7 +58,7 @@ public class LmsContestSubmissionProcessor {
         Date currentDate = new Date();
         if(ltp == null){
             logs = lmsContestSubmissionRepo.findAll();
-            //log.info("process, last time process NULL, get number items lms_contest_submissions = " + logs.size());
+            log.info("process, last time process NULL, get number items lms_contest_submissions = " + logs.size());
             ltp = new LastTimeProcess();
             ltp.setTableName(TABLE_CONTEST_SUBMISSION);
             ltp.setModule(MODULE_CONTEST_PROBLEM_RANKING);
@@ -66,7 +66,7 @@ public class LmsContestSubmissionProcessor {
             ltp = lastTimeProcessRepo.save(ltp);
         }else{
             logs = lmsContestSubmissionRepo.findAllByCreatedStampBetween(ltp.getLastTimeProcess(), currentDate);
-            //log.info("process, last time process = " + ltp.getLastTimeProcess() + ", get number items lms_contest_submissions = " + logs.size());
+            log.info("process, last time process = " + ltp.getLastTimeProcess() + ", get number items lms_contest_submissions = " + logs.size());
 
             ltp.setLastTimeProcess(currentDate);
             ltp = lastTimeProcessRepo.save(ltp);

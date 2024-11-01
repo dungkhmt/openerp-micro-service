@@ -41,6 +41,7 @@ public class LmsLogProcessor {
             logs = lmsLogRepo.findAll();
             ltp = new LastTimeProcess();
             ltp.setTableName("lms_log");
+            log.info("LmsLogProcessor::process, last_time_process = NULL, findAll gots " + logs.size());
             ltp.setModule(UserFeatures.FEATURE_NUMBER_ACTIONS);
             ltp.setLastTimeProcess(currentDate);
             ltp = lastTimeProcessRepo.save(ltp);
