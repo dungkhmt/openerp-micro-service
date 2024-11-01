@@ -32,13 +32,16 @@ public class LmsLogProcessor {
     @Scheduled(fixedRate = 60000)
     public void process(){
         //log.info("The time is now {}, number rows = {}", dateFormat.format(new Date()), lmsLogRepo.count());
-        LastTimeProcess ltp = lastTimeProcessRepo.findById("lms_log").orElse(null);
+        //LastTimeProcess ltp = lastTimeProcessRepo.findById("lms_log").orElse(null);
+        LastTimeProcess ltp = lastTimeProcessRepo.findByTableNameAndModule("lms_log",UserFeatures.FEATURE_NUMBER_ACTIONS);
+
         List<LmsLog> logs = null;
         Date currentDate = new Date();
         if(ltp == null){
             logs = lmsLogRepo.findAll();
             ltp = new LastTimeProcess();
             ltp.setTableName("lms_log");
+            ltp.setModule(UserFeatures.FEATURE_NUMBER_ACTIONS);
             ltp.setLastTimeProcess(currentDate);
             ltp = lastTimeProcessRepo.save(ltp);
         }else{

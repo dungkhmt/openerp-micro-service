@@ -31,6 +31,8 @@ public class LmsContestSubmissionProcessor {
     public static final String TABLE_PROGRAMMING_CONTEST_RANKING = "programming_contest_ranking";
     public static final String TABLE_CONTEST_SUBMISSION = "lms_contest_submission";
 
+    public static final String MODULE_CONTEST_PROBLEM_RANKING = "CONTEST_PROBLEM_RANKING";
+
     private static final Logger log = LoggerFactory.getLogger(LmsLogProcessor.class);
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
@@ -50,7 +52,8 @@ public class LmsContestSubmissionProcessor {
     @Transactional
     public void process(){
         //log.info("LmsContestSubmissionProcessor -> run process time = {}",new Date());
-        LastTimeProcess ltp = lastTimeProcessRepo.findById(TABLE_CONTEST_SUBMISSION).orElse(null);
+        //LastTimeProcess ltp = lastTimeProcessRepo.findById(TABLE_CONTEST_SUBMISSION).orElse(null);
+        LastTimeProcess ltp = lastTimeProcessRepo.findByTableNameAndModule(TABLE_CONTEST_SUBMISSION,MODULE_CONTEST_PROBLEM_RANKING);
         List<LmsContestSubmission> logs = null;
         Date currentDate = new Date();
         if(ltp == null){
@@ -58,6 +61,7 @@ public class LmsContestSubmissionProcessor {
             //log.info("process, last time process NULL, get number items lms_contest_submissions = " + logs.size());
             ltp = new LastTimeProcess();
             ltp.setTableName(TABLE_CONTEST_SUBMISSION);
+            ltp.setModule(MODULE_CONTEST_PROBLEM_RANKING);
             ltp.setLastTimeProcess(currentDate);
             ltp = lastTimeProcessRepo.save(ltp);
         }else{

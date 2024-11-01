@@ -58,8 +58,8 @@ function ContestListForRanking(){
                     filtering: true,
                     debounceInterval: 500,
                     pageSize: 20,
-                    selection: false,
-                    search: false,
+                    selection: true,
+                    search: true,
                   }}
             />
             </div>            
