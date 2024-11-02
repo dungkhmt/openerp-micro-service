@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { useGeneralTableColumns } from "./useScheduleTableConfig";
-import { DataGrid, GridToolbar  } from "@mui/x-data-grid";
-import {
-  Box,
-} from "@mui/material";
+import { useGeneralTableColumns } from "../../hooks/useScheduleTableConfig";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { Box } from "@mui/material";
 import ClassDetailDialog from "./ClassDetailDialog";
 
 const GeneralScheduleTable = ({
@@ -28,7 +26,7 @@ const GeneralScheduleTable = ({
 
   return (
     <Box style={{ height: 550, width: "100%" }}>
-      <ClassDetailDialog open={open} setOpen={setOpen} row={row}/>
+      <ClassDetailDialog open={open} setOpen={setOpen} row={row} />
       <DataGrid
         onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
         disableRowSelectionOnClick
@@ -36,24 +34,30 @@ const GeneralScheduleTable = ({
         onRowDoubleClick={handleOpenDialog}
         className="text-xs"
         loading={isDataLoading || isLoading}
-        columns={useGeneralTableColumns(setClasses, setLoading, semester, saveRequests, setSaveRequests)}
+        columns={useGeneralTableColumns(
+          setClasses,
+          setLoading,
+          semester,
+          saveRequests,
+          setSaveRequests
+        )}
         rows={classes}
         pageSize={10}
-        sortingOrder={'asc'}
+        sortingOrder={"asc"}
         initialState={{
           sorting: {
-            sortModel: [{ field: 'classCode', sort: 'asc' }],
+            sortModel: [{ field: "classCode", sort: "asc" }],
           },
           filter: {
             filterModel: {
               items: [],
-              quickFilterValues: [''],
+              quickFilterValues: [""],
             },
           },
         }}
         slots={{ toolbar: GridToolbar }}
         slotProps={{
-          toolbar: { 
+          toolbar: {
             printOptions: { disableToolbarButton: true },
             csvOptions: { disableToolbarButton: true },
             showQuickFilter: true,
