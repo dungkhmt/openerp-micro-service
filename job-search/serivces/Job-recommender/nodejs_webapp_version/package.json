@@ -20,6 +20,7 @@
     "mongoosh": "^0.0.7",
     "natural": "^6.12.0",
     "node-tfidf": "^0.0.2",
+    "nodejs-version": "file:",
     "nodemon": "^3.0.1",
     "readline": "^1.3.0"
   }
