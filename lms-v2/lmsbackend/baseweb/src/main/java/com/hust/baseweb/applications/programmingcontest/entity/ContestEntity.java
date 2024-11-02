@@ -234,7 +234,7 @@ public class ContestEntity implements Serializable {
     private Date createdAt;
 
     @Column(name = "public")
-    private Boolean public_;
+    private Boolean contestPublic;
 
     @Column(name = "started_at")
     private Date startedAt;

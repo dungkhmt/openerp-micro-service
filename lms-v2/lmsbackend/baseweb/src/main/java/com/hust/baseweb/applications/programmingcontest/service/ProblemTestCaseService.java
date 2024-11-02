@@ -292,4 +292,7 @@ public interface ProblemTestCaseService {
     ) throws Exception;
 
     List<ModelImportProblemFromContestResponse> importProblemsFromAContest(ModelImportProblemsFromAContestInput I);
+
+    ModelGetContestPageResponse getAllPublicContests();
+
 }

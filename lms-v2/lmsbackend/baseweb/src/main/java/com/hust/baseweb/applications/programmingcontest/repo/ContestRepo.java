@@ -23,4 +23,5 @@ public interface ContestRepo extends JpaRepository<ContestEntity, String> {
     )
     void switchAllContestToJudgeMode(String judgeMode);
 
+    List<ContestEntity> findByContestPublicTrue();
 }

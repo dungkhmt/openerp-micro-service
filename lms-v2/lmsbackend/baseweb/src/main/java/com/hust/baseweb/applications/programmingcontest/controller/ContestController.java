@@ -493,6 +493,12 @@ public class ContestController {
         return ResponseEntity.ok().body(res);
     }
 
+    @GetMapping("/contests/public")
+    public ResponseEntity<ModelGetContestPageResponse> getAllPublicContests() {
+        ModelGetContestPageResponse response = problemTestCaseService.getAllPublicContests();
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/students/not-registered-contests")
     public ResponseEntity<?> getContestNotRegisteredByStudentPaging(
         Pageable pageable, @Param("sortBy") String sortBy,

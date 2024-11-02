@@ -768,7 +768,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                    .contestType(modelUpdateContest.getContestType())
                                                    .contestShowTag(modelUpdateContest.getContestShowTag())
                                                    .contestShowComment(modelUpdateContest.getContestShowComment())
-            .public_(modelUpdateContest.getContestPublic())
+            .contestPublic(modelUpdateContest.getContestPublic())
                                                    .build();
         return contestService.updateContestWithCache(contestEntity);
 
@@ -3819,5 +3819,30 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             res.add(r);
         }
         return res;
+    }
+
+    @Override
+    public ModelGetContestPageResponse getAllPublicContests() {
+        List<ContestEntity> publicContestEntities = contestRepo.findByContestPublicTrue();
+
+        List<ModelGetContestResponse> publicContests = publicContestEntities.stream()
+                                                                            .map(contest -> ModelGetContestResponse.builder()
+                                                                                                                   .contestId(contest.getContestId())
+                                                                                                                   .contestName(contest.getContestName())
+                                                                                                                   .contestTime(contest.getContestSolvingTime())
+                                                                                                                   .countDown(contest.getCountDown())
+                                                                                                                   .startAt(contest.getStartedAt())
+                                                                                                                   .statusId(contest.getStatusId())
+                                                                                                                   .userId(contest.getUserId())
+                                                                                                                   .createdAt(contest.getCreatedAt())
+                                                                                                                   .build())
+                                                                            .collect(Collectors.toList());
+
+        long count = publicContests.size();
+
+        return ModelGetContestPageResponse.builder()
+                                          .contests(publicContests)
+                                          .count(count)
+                                          .build();
     }
 }

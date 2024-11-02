@@ -19,4 +19,5 @@ public class ModelGetContestResponse {
     private String roleId;
     private String registrationStatusId;
     private Date createdAt;
+    private Boolean contestPublic;
 }
