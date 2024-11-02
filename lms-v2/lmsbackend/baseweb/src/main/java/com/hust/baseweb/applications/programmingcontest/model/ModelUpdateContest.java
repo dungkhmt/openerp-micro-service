@@ -30,4 +30,5 @@ public class  ModelUpdateContest {
     private String contestType;
     private String contestShowTag;
     private String contestShowComment;
+    private Boolean contestPublic;
 }

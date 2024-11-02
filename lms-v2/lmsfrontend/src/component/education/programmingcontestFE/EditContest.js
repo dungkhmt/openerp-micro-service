@@ -29,9 +29,9 @@ function EditContest() {
 
   const [contestName, setContestName] = useState("");
   const [contestTime, setContestTime] = useState(Number(0));
-
-  const [startDate, setStartDate] = React.useState(new Date());
+  const [startDate, setStartDate] = useState(new Date());
   const [countDown, setCountDown] = useState(Number(0));
+  const [contestPublic, setContestPublic] = useState(false); 
 
   const [options, setOptions] = useState({
     status: [],
@@ -44,34 +44,25 @@ function EditContest() {
     participantViewProblemsTag: [],
     contestType: [],
     participantViewComment: [],
+    contestPublic: [], 
   });
 
   const [contestType, setContestType] = useState("");
   const [status, setStatus] = useState("");
   const [submissionActionType, setSubmissionActionType] = useState("");
   const [maxNumberSubmission, setMaxNumberSubmission] = useState(10);
-  const [participantViewResultMode, setParticipantViewResultMode] =
-    useState("");
-  const [problemDescriptionViewType, setProblemDescriptionViewType] =
-    useState("");
-  const [
-    evaluateBothPublicPrivateTestcase,
-    setEvaluateBothPublicPrivateTestcase,
-  ] = useState("");
+  const [participantViewResultMode, setParticipantViewResultMode] = useState("");
+  const [problemDescriptionViewType, setProblemDescriptionViewType] = useState("");
+  const [evaluateBothPublicPrivateTestcase, setEvaluateBothPublicPrivateTestcase] = useState("");
   const [maxSourceCodeLength, setMaxSourceCodeLength] = useState(50000);
-  const [minTimeBetweenTwoSubmissions, setMinTimeBetweenTwoSubmissions] =
-    useState(0);
+  const [minTimeBetweenTwoSubmissions, setMinTimeBetweenTwoSubmissions] = useState(0);
   const [judgeMode, setJudgeMode] = useState("");
-  const [participantViewSubmissionMode, setParticipantViewSubmissionMode] =
-    useState("");
+  const [participantViewSubmissionMode, setParticipantViewSubmissionMode] = useState("");
   const [allowedLanguages, setAllowedLanguages] = useState([]);
-  const [participantViewProblemsTag, setParticipantViewProblemsTag] =
-    useState("");
-  const [participantViewComment, setParticipantViewComment] =
-    useState("");
+  const [participantViewProblemsTag, setParticipantViewProblemsTag] = useState("");
+  const [participantViewComment, setParticipantViewComment] = useState("");
 
   const handleSubmit = () => {
-
     let body = {
       contestName: contestName,
       contestSolvingTime: contestTime,
@@ -91,6 +82,7 @@ function EditContest() {
       contestType: contestType,
       contestShowTag: participantViewProblemsTag,
       contestShowComment: participantViewComment,
+      contestPublic: contestPublic, 
     };
 
     request(
@@ -108,7 +100,7 @@ function EditContest() {
   };
 
   function getContestInfo() {
-    request("get", "/contests/" + contestId, (res) => {
+    request("get", "/contests/" + contestId , (res) => {
       setLoading(false);
 
       const data = res.data;
@@ -126,12 +118,10 @@ function EditContest() {
           label: type,
           value: type,
         })),
-        participantViewResultMode: data.listParticipantViewModes.map(
-          (mode) => ({
-            label: mode,
-            value: mode,
-          })
-        ),
+        participantViewResultMode: data.listParticipantViewModes.map((mode) => ({
+          label: mode,
+          value: mode,
+        })),
         problemDescriptionViewType: data.listProblemDescriptionViewTypes.map(
           (type) => ({
             label: type,
@@ -152,16 +142,18 @@ function EditContest() {
           label: language,
           value: language,
         })),
-        participantViewProblemsTag:
-          data.listContestShowTags.map((mode) => ({
-            label: mode,
-            value: mode,
-          })),
-        participantViewComment:
-          data.listContestShowComments.map((mode) => ({
-            label: mode,
-            value: mode,
-          })),
+        participantViewProblemsTag: data.listContestShowTags.map((mode) => ({
+          label: mode,
+          value: mode,
+        })),
+        participantViewComment: data.listContestShowComments.map((mode) => ({
+          label: mode,
+          value: mode,
+        })),
+        contestPublic: [
+          { label: "Yes", value: true },
+          { label: "No", value: false },
+        ], 
       });
 
       setContestTime(data.contestTime);
@@ -187,7 +179,7 @@ function EditContest() {
       );
       setParticipantViewProblemsTag(data.contestShowTag);
       setParticipantViewComment(data.contestShowComment);
-
+      setContestPublic(data.contestPublic); 
     });
   }
 
@@ -276,7 +268,7 @@ function EditContest() {
                   />,
                   <TextField
                     fullWidth
-                    type="number"
+                    type=" number"
                     size="small"
                     id="maxSourceCodeLength"
                     label="Source length limit"
@@ -376,8 +368,7 @@ function EditContest() {
                     onChange={(event) => {
                       setParticipantViewProblemsTag(event.target.value);
                     }}
-                  />
-                  ,
+                  />,
                   <StyledSelect
                     fullWidth
                     id="participantViewComment"
@@ -388,8 +379,17 @@ function EditContest() {
                     onChange={(event) => {
                       setParticipantViewComment(event.target.value);
                     }}
-                  />
-                  ,
+                  />,
+                  <StyledSelect
+                    fullWidth
+                    id="contestPublic"
+                    label="Contest Public"
+                    value={contestPublic}
+                    options={options.contestPublic}
+                    onChange={(event) => {
+                      setContestPublic(event.target.value);
+                    }}
+                  />,
                 ].map((input, index) => (
                   <Grid item sm={12} md={4} key={index}>
                     {input}

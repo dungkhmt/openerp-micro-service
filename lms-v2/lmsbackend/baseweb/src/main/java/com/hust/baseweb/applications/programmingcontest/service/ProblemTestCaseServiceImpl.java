@@ -767,7 +767,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                        modelUpdateContest.getLanguagesAllowed()))
                                                    .contestType(modelUpdateContest.getContestType())
                                                    .contestShowTag(modelUpdateContest.getContestShowTag())
-                                                    .contestShowComment(modelUpdateContest.getContestShowComment())
+                                                   .contestShowComment(modelUpdateContest.getContestShowComment())
+            .public_(modelUpdateContest.getContestPublic())
                                                    .build();
         return contestService.updateContestWithCache(contestEntity);
 

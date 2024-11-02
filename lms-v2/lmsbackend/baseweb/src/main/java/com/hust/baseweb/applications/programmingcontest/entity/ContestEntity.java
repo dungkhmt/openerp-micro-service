@@ -75,12 +75,22 @@ public class ContestEntity implements Serializable {
     public static String CONTEST_SHOW_COMMENT_YES = "Y";
     public static String CONTEST_SHOW_COMMENT_NO = "N";
 
+    public static Boolean CONTEST_PUBLIC_YES = true;
+    public static Boolean CONTEST_PUBLIC_NO = false;
+
     public static List<String> getListContestTypes(){
         List<String> L = new ArrayList();
         L.add(CONTEST_TYPE_REAL_TEST_WITH_EVALUATION);
         L.add(CONTEST_TYPE_TRAINING_NO_EVALUATION);
         return L;
     }
+    public static List<Boolean> getListContestPublic(){
+        List<Boolean> L = new ArrayList();
+        L.add(CONTEST_PUBLIC_YES);
+        L.add(CONTEST_PUBLIC_NO);
+        return L;
+    }
+
     public static List<String> getListContestShowTag(){
         List<String> L = new ArrayList();
         L.add(CONTEST_SHOW_TAG_PROBLEMS_YES);
@@ -223,6 +233,9 @@ public class ContestEntity implements Serializable {
     @Column(name = "created_stamp")
     private Date createdAt;
 
+    @Column(name = "public")
+    private Boolean public_;
+
     @Column(name = "started_at")
     private Date startedAt;
 
@@ -279,4 +292,5 @@ public class ContestEntity implements Serializable {
 
     @Column(name = "contest_show_comment")
     private String contestShowComment;
+
 }
