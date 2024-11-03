@@ -347,9 +347,13 @@ public class SubmissionController {
                 userId,
                 UserRegistrationContestEntity.STATUS_SUCCESSFUL,
                 UserRegistrationContestEntity.ROLE_PARTICIPANT);
-        if (userRegistrations == null || userRegistrations.isEmpty()) {
-            ModelContestSubmissionResponse resp = buildSubmissionResponseNotRegistered();
-            return ResponseEntity.ok().body(resp);
+
+        Boolean contestPublic = contestEntity.getContestPublic();
+        if (!Boolean.TRUE.equals(contestPublic) || userRegistrations == null ) {
+            if(userRegistrations.isEmpty()){
+                ModelContestSubmissionResponse resp = buildSubmissionResponseNotRegistered();
+                return ResponseEntity.ok().body(resp);
+            }
 
         }
 
@@ -614,15 +618,18 @@ public class SubmissionController {
             return ResponseEntity.ok().body(resp);
         }
 
+        boolean contestPublic = contestEntity.getContestPublic();
         List<UserRegistrationContestEntity> userRegistrations = userRegistrationContestRepo
             .findUserRegistrationContestEntityByContestIdAndUserIdAndStatusAndRoleId(
                 model.getContestId(),
                 userId,
                 UserRegistrationContestEntity.STATUS_SUCCESSFUL,
                 UserRegistrationContestEntity.ROLE_PARTICIPANT);
-        if (userRegistrations == null || userRegistrations.size() == 0) {
-            ModelContestSubmissionResponse resp = buildSubmissionResponseNotRegistered();
-            return ResponseEntity.ok().body(resp);
+        if (!Boolean.TRUE.equals(contestPublic) || userRegistrations == null ) {
+            if(userRegistrations.isEmpty()){
+                ModelContestSubmissionResponse resp = buildSubmissionResponseNotRegistered();
+                return ResponseEntity.ok().body(resp);
+            }
 
         }
 
