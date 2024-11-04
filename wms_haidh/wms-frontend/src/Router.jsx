@@ -1,12 +1,12 @@
 import { LinearProgress } from "@mui/material";
 import { Suspense } from "react";
-import { Route, Switch } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import MainAppRouter from "./routers/MainAppRouter";
 import { routeState } from "./state/RouteState";
 
 // const Register = lazy(() => import("../src/views/UserRegister/Register"));
 
-function Routes(props) {
+function Router(props) {
   return (
     <Suspense
       fallback={
@@ -20,21 +20,19 @@ function Routes(props) {
         />
       }
     >
-      <Switch>
-        {/* <Route component={Register} layout={Layout} path="/user/register" /> */}
+      <Routes>
+        {/* Uncomment and adjust this line when Register is needed */}
+        {/* <Route path="/user/register" element={<Register />} /> */}
         <Route
           path="*"
-          render={(props) => {
-            routeState.merge({
-              currentRoute: props.location.pathname,
-            });
-
-            return <MainAppRouter {...props} />;
-          }}
+          element={<MainAppRouter />}
+          // Since we're not passing props directly like before,
+          // you'll need to handle currentRoute differently
+          // if required in MainAppRouter.
         />
-      </Switch>
+      </Routes>
     </Suspense>
   );
 }
 
-export default Routes;
+export default Router;

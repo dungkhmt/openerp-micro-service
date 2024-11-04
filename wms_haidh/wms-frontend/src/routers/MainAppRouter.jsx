@@ -2,10 +2,10 @@ import { LinearProgress } from "@mui/material";
 import { Layout } from "../layout";
 import { drawerWidth } from "../layout/sidebar/SideBar";
 import { Suspense, useEffect } from "react";
-import { Route, Switch, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { useNotificationState } from "../state/NotificationState";
 import NotFound from "../views/errors/NotFound";
-import PrivateRoute from "./PrivateRoute";
+import { useKeycloak } from "@react-keycloak/web"; 
 import AdminRouter from "./AdminRouter";
 import SaleManagerRouter from "./SaleManagerRouter";
 import CustomerRouter from "./CustomerRouter";
@@ -27,29 +27,37 @@ const styles = {
   },
 };
 
-function MainAppRouter(props) {
+function MainAppRouter() {
   const location = useLocation();
   const notificationState = useNotificationState();
+  const { keycloak } = useKeycloak(); 
 
   useEffect(() => {
     notificationState.open.set(false);
   }, [location.pathname]);
 
+  const renderPrivateRoute = (Component) => {
+    if (!keycloak.authenticated) {
+      keycloak.login(); 
+      return null; 
+    }
+    return <Component />; 
+  };
+
   return (
     <Layout>
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
-        <Switch>
-          <Route component={() => <></>} exact path="/" />
-          <PrivateRoute component={AdminRouter} path="/admin" />
-          <PrivateRoute component={SaleManagerRouter} path="/sale-manager" />
-          <PrivateRoute component={CustomerRouter} path="/customer" />
-          <PrivateRoute component={ApproverRouter} path="/approver" />
-          <PrivateRoute component={DeliveryManagerRouter} path="/delivery-manager" />
-          <PrivateRoute component={DeliveryPersonRouter} path="/delivery-person" />
-          <PrivateRoute component={PurchaseManagerRouter} path="/purchase-manager" />
-          {/* <Route component={error} path="*" /> */}
-          <Route component={NotFound} />
-        </Switch>
+        <Routes>
+          <Route path="/" element={<>Welcome back !</>} />
+          <Route path="/admin/*" element={renderPrivateRoute(AdminRouter)} />
+          <Route path="/sale-manager/*" element={renderPrivateRoute(SaleManagerRouter)} />
+          <Route path="/customer/*" element={renderPrivateRoute(CustomerRouter)} />
+          <Route path="/approver/*" element={renderPrivateRoute(ApproverRouter)} />
+          <Route path="/delivery-manager/*" element={renderPrivateRoute(DeliveryManagerRouter)} />
+          <Route path="/delivery-person/*" element={renderPrivateRoute(DeliveryPersonRouter)} />
+          <Route path="/purchase-manager/*" element={renderPrivateRoute(PurchaseManagerRouter)} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </Suspense>
     </Layout>
   );
