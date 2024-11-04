@@ -9,6 +9,7 @@ import {
   FormControl,
   Select,
   MenuItem,
+  Autocomplete,
 } from "@mui/material";
 import { toast } from "react-toastify";
 import { request } from "api";
@@ -340,31 +341,20 @@ const TimeTable = ({
                 }}
               />
               <FormControl fullWidth margin="normal">
-                <InputLabel
-                  className="bg-white !p-2 !py-0 left-[-4px]"
-                  id="room-label"
-                  shrink
-                >
-                  Phòng học
-                </InputLabel>
-                <Select
-                  labelId="room-label"
-                  name="room"
+                <Autocomplete
+                  options={classrooms.map((classroom) => classroom.classroom)}
                   value={selectedClass.room || ""}
-                  onChange={handleInputChange}
-                  fullWidth
-                >
-                  {classrooms.map((classroom) => (
-                    <MenuItem
-                      key={classroom.classroom}
-                      value={classroom.classroom}
-                    >
-                      {classroom.classroom}
-                    </MenuItem>
-                  ))}
-                </Select>
+                  onChange={(event, newValue) => {
+                    handleInputChange({
+                      target: { name: "room", value: newValue },
+                    });
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Phòng học" />
+                  )}
+                  freeSolo
+                />
               </FormControl>
-
               <TextField
                 label="Tiết bắt đầu"
                 name="startTime"
