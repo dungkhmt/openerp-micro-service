@@ -86,6 +86,8 @@ public interface QuizTestService {
     public int summarizeQuizTestExecutionChoice(String testId);
 
     public int summarizeQuizTestInClass(UUID classId);
+    public int summarizeInteractiveQuizTestInClass(UUID classId);
+
     public List<ModelResponseAnalyzeDoQuizInClass> getAnalyzeDoQuizInClass(UUID classId);
 
 }

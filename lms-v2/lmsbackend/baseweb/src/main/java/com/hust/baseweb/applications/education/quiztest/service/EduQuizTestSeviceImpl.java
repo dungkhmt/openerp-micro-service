@@ -1,11 +1,13 @@
 package com.hust.baseweb.applications.education.quiztest.service;
 
 import com.hust.baseweb.applications.education.classmanagement.entity.EduClassSession;
+import com.hust.baseweb.applications.education.classmanagement.enumeration.RegistStatus;
 import com.hust.baseweb.applications.education.classmanagement.repo.EduClassSessionRepo;
 import com.hust.baseweb.applications.education.classmanagement.service.ClassService;
 import com.hust.baseweb.applications.education.entity.EduClass;
 import com.hust.baseweb.applications.education.entity.QuizChoiceAnswer;
 import com.hust.baseweb.applications.education.entity.QuizQuestion;
+import com.hust.baseweb.applications.education.model.GetStudentsOfClassOM;
 import com.hust.baseweb.applications.education.model.quiz.QuizQuestionDetailModel;
 import com.hust.baseweb.applications.education.quiztest.UserQuestionQuizExecutionOM;
 import com.hust.baseweb.applications.education.quiztest.entity.*;
@@ -68,7 +70,9 @@ public class EduQuizTestSeviceImpl implements QuizTestService {
     HistoryLogQuizGroupQuestionParticipationExecutionChoiceRepo historyLogQuizGroupQuestionParticipationExecutionChoiceRepo;
     private RabbitTemplate rabbitTemplate;
     private NotificationsService notificationsService;
-
+    private InteractiveQuizRepo interactiveQuizRepo;
+    private InteractiveQuizQuestionRepo  interactiveQuizQuestionRepo;
+    private InteractiveQuizAnswerRepo interactiveQuizAnswerRepo;
     private EduTestQuizRoleRepo eduTestQuizRoleRepo;
     private AnalyzeParticipantDoingQuizInClassRepo analyzeParticipantDoingQuizInClassRepo;
     @Transactional
@@ -1863,6 +1867,151 @@ public class EduQuizTestSeviceImpl implements QuizTestService {
             }
         }
         return userOfClass.size();
+    }
+
+    @Override
+    public int summarizeInteractiveQuizTestInClass(UUID classId) {
+        HashMap<String, Integer> mUserID2NumSelect = new HashMap();
+        HashMap<String, Integer> mUserID2NumCorrect = new HashMap();
+        HashMap<String, Integer> mUserID2NumFastestCorrect = new HashMap();
+
+        // TO BE IMPROVED
+        List<GetStudentsOfClassOM> students = classRepo.getStudentsOfClass(classId, RegistStatus.APPROVED.toString());
+        List<EduClassSession> lst = eduClassSessionRepo.findAllByClassId(classId);
+        Set<UUID> sessionIds = new HashSet();
+        for(EduClassSession s: lst) sessionIds.add(s.getSessionId());
+        List<InteractiveQuiz> quizs = interactiveQuizRepo.findAllBySessionIdIn(sessionIds);
+        Set<UUID> quizIds = new HashSet();
+        for(InteractiveQuiz Q: quizs) quizIds.add(Q.getInteractive_quiz_id());
+        List<InteractiveQuizQuestion> qqs = interactiveQuizQuestionRepo.findAllByInteractiveQuizIdIn(quizIds);
+        List<UUID> questionIds = new ArrayList();
+        for(InteractiveQuizQuestion qq: qqs) questionIds.add(qq.getQuestionId());
+        Map<UUID, List<InteractiveQuizQuestion>> mQuizId2QuizQuestions = new HashMap();
+        for(InteractiveQuizQuestion qq: qqs){
+            if(mQuizId2QuizQuestions.get(qq.getInteractiveQuizId())==null)
+                mQuizId2QuizQuestions.put(qq.getInteractiveQuizId(),new ArrayList());
+            mQuizId2QuizQuestions.get(qq.getInteractiveQuizId()).add(qq);
+        }
+        List<QuizQuestion> questions = quizQuestionRepo.findAllByQuestionIdIn(questionIds);
+        Map<UUID, Set<UUID>> mQuestionId2CorrectChoiceAns = new HashMap();
+        for(QuizQuestion qq: questions){
+            List<QuizChoiceAnswer> ans = quizChoiceAnswerRepo.findAllByQuizQuestion(qq);
+            Set<UUID> correctAns = new HashSet();
+            for(QuizChoiceAnswer a: ans)if(a.isCorrectAnswer()) correctAns.add(a.getChoiceAnswerId());
+            mQuestionId2CorrectChoiceAns.put(qq.getQuestionId(),correctAns);
+        }
+        for(InteractiveQuiz Q: quizs){
+            List<InteractiveQuizQuestion> quizQuestions = mQuizId2QuizQuestions.get(Q.getInteractive_quiz_id());
+            if(quizQuestions != null){
+                Map<String, Date> mUserID2TimeResponse = new HashMap();
+                for(InteractiveQuizQuestion qq: quizQuestions) {
+                    List<InteractiveQuizAnswer> ans = interactiveQuizAnswerRepo.findAllByInteractiveQuizIdAndQuestionId(Q.getInteractive_quiz_id(),qq.getQuestionId());
+                    Set<String> uids = new HashSet();
+                    Map<String, Set<UUID>> mUserId2ChoiceAnswers = new HashMap();
+                    for(InteractiveQuizAnswer a: ans){
+                        //uids.add(a.getUserId());
+                        if(mUserId2ChoiceAnswers.get(a.getUserId())==null)
+                            mUserId2ChoiceAnswers.put(a.getUserId(),new HashSet());
+                        mUserId2ChoiceAnswers.get(a.getUserId()).add(a.getChoiceAnswerId());
+                        if(mUserID2TimeResponse.get(a.getUserId())==null){
+                            mUserID2TimeResponse.put(a.getUserId(),a.getCreatedStamp());
+                        }
+                    }
+                    Date fastest = null; String fastestUser = null;
+                    for(String uid: mUserId2ChoiceAnswers.keySet()){
+                        Set<UUID> choiceAnswers = mUserId2ChoiceAnswers.get(uid);
+                        if (choiceAnswers != null){
+                            int b = 0;
+                            if(mUserID2NumSelect.get(uid)==null){
+                                b = 0;
+                            }else{
+                                b = mUserID2NumSelect.get(uid);
+                            }
+                            mUserID2NumSelect.put(uid,b+1);
+                            if(equalSet(choiceAnswers, mQuestionId2CorrectChoiceAns.get(qq.getQuestionId()))) {
+                                //int b = 0;
+                                if (mUserID2NumCorrect.get(uid) == null) {
+                                    b = 0;
+                                } else {
+                                    b = mUserID2NumCorrect.get(uid);
+                                }
+                                mUserID2NumCorrect.put(uid, b + 1);
+                                if(fastest == null) {
+                                    fastest = mUserID2TimeResponse.get(uid);
+                                    fastestUser = uid;
+                                }else{
+                                    Date timePoint = mUserID2TimeResponse.get(uid);
+                                    if(timePoint!=null && timePoint.before(fastest)){
+                                        fastest = timePoint;
+                                        fastestUser = uid;
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                    if(fastestUser != null){
+                        if(mUserID2NumFastestCorrect.get(fastestUser)==null){
+                            mUserID2NumFastestCorrect.put(fastestUser,1);
+                        }else{
+                            mUserID2NumFastestCorrect.put(fastestUser,mUserID2NumFastestCorrect.get(fastestUser)+1);
+                        }
+                    }
+                }
+            }
+
+        }
+
+        for(GetStudentsOfClassOM s: students){
+            String uid = s.getId();
+            int nbSelects = 0;
+            int nbCorrects = 0;
+            int nbFastests = 0;
+            if(mUserID2NumCorrect.get(uid)!=null) nbCorrects = mUserID2NumCorrect.get(uid);
+            if(mUserID2NumSelect.get(uid)!=null) nbSelects = mUserID2NumSelect.get(uid);
+            if(mUserID2NumFastestCorrect.get(uid)!=null) nbFastests = mUserID2NumFastestCorrect.get(uid);
+
+            AnalyzeParticipantDoingQuizInClass o = null;
+            List<AnalyzeParticipantDoingQuizInClass> L = analyzeParticipantDoingQuizInClassRepo
+                .findAllByClassIdAndParticipantUserloginId(classId,uid);
+            if(L != null && L.size() > 0){
+                o = L.get(0);
+            }
+            if(o == null) {// record not exists, add new one
+                o = new AnalyzeParticipantDoingQuizInClass();
+                o.setClassId(classId);
+                o.setParticipantUserloginId(uid);
+                //o.setNumberQuizTest(quizTests.size());
+                o.setNumberCorrect(nbCorrects);
+                o.setNumberParticipationSelect(nbSelects);
+                o.setNumberCorrectFastest(nbFastests);
+                o.setCreatedStamp(new Date());
+                o = analyzeParticipantDoingQuizInClassRepo.save(o);
+            }else{// do not add more, just update
+                //o.setNumberQuizTest(quizTests.size());
+                o.setNumberCorrect(nbCorrects);
+                o.setNumberParticipationSelect(nbSelects);
+                o.setNumberCorrectFastest(nbFastests);
+                o.setCreatedStamp(new Date());
+                o = analyzeParticipantDoingQuizInClassRepo.save(o);
+            }
+        }
+        /*
+        for(EduClassSession session: lst) {
+            List<InteractiveQuiz> quizs = interactiveQuizRepo.findAllBySessionId(session.getSessionId());
+            for(InteractiveQuiz quiz: quizs){
+                List<InteractiveQuizQuestion> qqs = interactiveQuizQuestionRepo.findAllByInteractiveQuizId(quiz.getInteractive_quiz_id());
+                for(InteractiveQuizQuestion qq: qqs) {
+                    QuizQuestion question = quizQuestionRepo.findById(qq.getQuestionId()).orElse(null);
+                    if(question != null) {
+                        List<InteractiveQuizAnswer> ans = interactiveQuizAnswerRepo.findAllByInteractiveQuizIdAndQuestionId(quiz.getInteractive_quiz_id(),question.getQuestionId());
+                    }
+                }
+            }
+        }
+        */
+
+        return students.size();
     }
 
     @Override
