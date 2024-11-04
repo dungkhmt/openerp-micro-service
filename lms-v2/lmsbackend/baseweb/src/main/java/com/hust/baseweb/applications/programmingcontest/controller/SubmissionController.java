@@ -442,6 +442,7 @@ public class SubmissionController {
                     cp.getSubmissionMode().equals(ContestProblem.SUBMISSION_MODE_SOLUTION_OUTPUT)) {
                     resp = problemTestCaseService.submitContestProblemStoreOnlyNotExecute(request, userId, userId);
                 } else {
+                    log.info("contestSubmitProblemViaUploadFileV2, SUBMIT NORMAL");
                     resp = problemTestCaseService.submitContestProblemTestCaseByTestCaseWithFile(
                         request,
                         userId,

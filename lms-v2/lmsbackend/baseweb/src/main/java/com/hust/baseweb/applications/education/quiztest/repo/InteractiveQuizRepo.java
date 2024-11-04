@@ -10,7 +10,9 @@ import com.hust.baseweb.applications.education.quiztest.repo.EduQuizTestRepo.Stu
 
 
 public interface InteractiveQuizRepo extends JpaRepository<InteractiveQuiz, UUID> {
+    public List<InteractiveQuiz> findAllBySessionIdIn(Set<UUID> sessionIds);
     public List<InteractiveQuiz> findAllBySessionId(@Param("session_id") UUID sessionId);
+
 
     // public interface StudentResult {
     //     String getUserId();
