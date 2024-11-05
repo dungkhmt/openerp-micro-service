@@ -16,8 +16,6 @@ export const useClassrooms = (groupName, maxAmount) => {
   );
 
   useEffect(() => {
-    if (!body.groupName) return; // Prevent making requests if groupName is empty
-
     setLoading(true);
     request(
       "post",

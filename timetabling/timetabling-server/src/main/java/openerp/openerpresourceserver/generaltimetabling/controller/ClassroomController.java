@@ -117,9 +117,14 @@ public class ClassroomController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<List<Classroom>> requestGetClassroomByBuildings(@RequestBody GetClassRoomByBuildingsRequest request) {
-        return  ResponseEntity.ok(service.getMaxQuantityClassRoomByBuildings(request.getGroupName(), request.getMaxAmount()));
+    public ResponseEntity<List<Classroom>> requestGetClassroomByBuildings(@RequestBody(required = false) GetClassRoomByBuildingsRequest request) {
+        if (request == null || (request.getGroupName() == null && request.getMaxAmount() == null)) {
+            return getAllClassroom();
+        }
+
+        return ResponseEntity.ok(service.getMaxQuantityClassRoomByBuildings(request.getGroupName(), request.getMaxAmount()));
     }
+
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<String> notFoundException(NotFoundException e) {
