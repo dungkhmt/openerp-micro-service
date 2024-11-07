@@ -224,7 +224,7 @@ const TimeTable = ({
   };
 
   return (
-    <div className="w-full h-full flex flex-col justify-start">
+    <div className="h-full flex flex-col justify-start">
       <div className="overflow-y-auto border-b-[1px]" style={{ flex: "1" }}>
         <table
           className="min-w-full border-collapse border border-gray-400"
