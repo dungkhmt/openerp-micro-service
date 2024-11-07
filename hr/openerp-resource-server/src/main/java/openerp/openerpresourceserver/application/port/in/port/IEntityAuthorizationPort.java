@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.application.port.port;
+package openerp.openerpresourceserver.application.port.in.port;
 
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.EntityAuthorization;
 

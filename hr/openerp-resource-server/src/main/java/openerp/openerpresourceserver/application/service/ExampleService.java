@@ -1,8 +1,8 @@
 package openerp.openerpresourceserver.application.service;
 
 import lombok.RequiredArgsConstructor;
-import openerp.openerpresourceserver.application.port.port.IExamplePort;
-import openerp.openerpresourceserver.application.usecase.IExampleUseCase;
+import openerp.openerpresourceserver.application.port.in.port.IExamplePort;
+import openerp.openerpresourceserver.application.usecasehandler.IExampleUseCase;
 import org.springframework.stereotype.Service;
 
 @Service

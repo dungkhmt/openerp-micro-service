@@ -2,7 +2,7 @@ package openerp.openerpresourceserver.infrastructure.input.rest.controller;
 
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.User;
-import openerp.openerpresourceserver.application.port.usecase.UserUseCase;
+import openerp.openerpresourceserver.application.port.out.UserUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.Jwt;

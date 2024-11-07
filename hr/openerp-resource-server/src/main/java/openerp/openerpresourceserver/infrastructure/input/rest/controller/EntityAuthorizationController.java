@@ -1,7 +1,7 @@
 package openerp.openerpresourceserver.infrastructure.input.rest.controller;
 
 import lombok.AllArgsConstructor;
-import openerp.openerpresourceserver.application.port.usecase.EntityAuthorizationUseCase;
+import openerp.openerpresourceserver.application.port.out.EntityAuthorizationUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;

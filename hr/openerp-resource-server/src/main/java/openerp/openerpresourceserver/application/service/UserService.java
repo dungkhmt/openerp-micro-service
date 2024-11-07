@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.User;
 import openerp.openerpresourceserver.infrastructure.output.persistence.repository.UserRepo;
-import openerp.openerpresourceserver.application.port.usecase.UserUseCase;
+import openerp.openerpresourceserver.application.port.out.UserUseCase;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,0 +1,37 @@
+package openerp.openerpresourceserver.infrastructure.output.persistence.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.Hibernate;
+
+import java.time.Instant;
+import java.util.Objects;
+
+@Getter
+@Setter
+@Embeddable
+public class StaffSalaryId implements java.io.Serializable {
+    private static final long serialVersionUID = 1749979136565079977L;
+    @Column(name = "user_id", nullable = false, length = 60)
+    private String userId;
+
+    @Column(name = "from_date", nullable = false)
+    private Instant fromDate;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        StaffSalaryId entity = (StaffSalaryId) o;
+        return Objects.equals(this.fromDate, entity.fromDate) &&
+                Objects.equals(this.userId, entity.userId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fromDate, userId);
+    }
+
+}

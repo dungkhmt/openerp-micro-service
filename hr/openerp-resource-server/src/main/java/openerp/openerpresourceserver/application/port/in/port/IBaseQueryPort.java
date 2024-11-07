@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.application.port.port;
+package openerp.openerpresourceserver.application.port.in.port;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;

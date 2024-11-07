@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.application.port.usecase;
+package openerp.openerpresourceserver.application.port.out;
 
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.User;
 

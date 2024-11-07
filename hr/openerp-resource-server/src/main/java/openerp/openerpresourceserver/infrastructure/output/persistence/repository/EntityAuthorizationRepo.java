@@ -1,7 +1,7 @@
 package openerp.openerpresourceserver.infrastructure.output.persistence.repository;
 
 
-import openerp.openerpresourceserver.application.port.port.IEntityAuthorizationPort;
+import openerp.openerpresourceserver.application.port.in.port.IEntityAuthorizationPort;
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.EntityAuthorization;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

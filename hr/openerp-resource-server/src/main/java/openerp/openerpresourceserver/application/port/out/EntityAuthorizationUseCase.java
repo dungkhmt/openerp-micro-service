@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.application.port.usecase;
+package openerp.openerpresourceserver.application.port.out;
 
 import java.util.List;
 import java.util.Set;

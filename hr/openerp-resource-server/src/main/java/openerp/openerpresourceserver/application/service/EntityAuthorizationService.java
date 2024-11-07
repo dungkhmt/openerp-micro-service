@@ -2,9 +2,9 @@ package openerp.openerpresourceserver.application.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import openerp.openerpresourceserver.application.port.port.IEntityAuthorizationPort;
+import openerp.openerpresourceserver.application.port.in.port.IEntityAuthorizationPort;
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.EntityAuthorization;
-import openerp.openerpresourceserver.application.port.usecase.EntityAuthorizationUseCase;
+import openerp.openerpresourceserver.application.port.out.EntityAuthorizationUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor(onConstructor_ = @Autowired)
 @Service
 public class EntityAuthorizationService implements EntityAuthorizationUseCase {
-
     private IEntityAuthorizationPort entityAuthorizationPort;
 
     @Override
