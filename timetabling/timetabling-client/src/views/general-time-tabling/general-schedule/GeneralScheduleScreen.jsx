@@ -215,7 +215,7 @@ const GeneralScheduleScreen = () => {
   // };
 
   return (
-    <div className="flex flex-col gap-4 w-full h-[700px]">
+    <div className="flex flex-col gap-4 h-[700px]">
       <AutoScheduleDialog
         title={"Tự động xếp lịch học"}
         open={isOpenTimeslotDialog}
@@ -328,7 +328,7 @@ const GeneralScheduleScreen = () => {
           semester={selectedSemester}
         />
 
-        <div className="flex-1 w-full h-[550px] ">
+        <div className="flex-1 h-[550px] ">
           <TimeTable
             selectedSemester={selectedSemester}
             classes={classes}
