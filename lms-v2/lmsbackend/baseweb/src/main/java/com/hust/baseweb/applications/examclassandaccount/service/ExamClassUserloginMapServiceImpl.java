@@ -5,6 +5,8 @@ import com.hust.baseweb.applications.examclassandaccount.entity.RandomGeneratedU
 import com.hust.baseweb.applications.examclassandaccount.model.UserLoginModel;
 import com.hust.baseweb.applications.examclassandaccount.repo.ExamClassUserloginMapRepo;
 import com.hust.baseweb.applications.examclassandaccount.repo.RandomGeneratedUserLoginRepo;
+import com.hust.baseweb.entity.UserLogin;
+import com.hust.baseweb.repo.UserLoginRepo;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,10 @@ public class ExamClassUserloginMapServiceImpl implements ExamClassUserloginMapSe
     private ExamClassUserloginMapRepo examClassUserloginMapRepo;
     @Autowired
     private RandomGeneratedUserLoginRepo randomGeneratedUserLoginRepo;
+
+    @Autowired
+    private UserLoginRepo userLoginRepo;
+
     @Override
     public List<ExamClassUserloginMap> getExamClassUserloginMap(UUID examClassId) {
         List<ExamClassUserloginMap> res = examClassUserloginMapRepo.findByExamClassId(examClassId);
@@ -74,6 +80,18 @@ public class ExamClassUserloginMapServiceImpl implements ExamClassUserloginMapSe
             ecum.setExamClassId(examClassId);
 
             ecum = examClassUserloginMapRepo.save(ecum);
+
+            UserLogin ul = userLoginRepo.findByUserLoginId(selectedUserLogin);
+            if(ul == null){
+                ul = new UserLogin();
+                ul.setUserLoginId(selectedUserLogin);
+                //ul.setEnabled(true);
+            }else{
+
+            }
+            ul.setEnabled(true);
+            ul.setFirstName(um.getFullName());
+            ul = userLoginRepo.save(ul);
 
             res.add(ecum);
         }
