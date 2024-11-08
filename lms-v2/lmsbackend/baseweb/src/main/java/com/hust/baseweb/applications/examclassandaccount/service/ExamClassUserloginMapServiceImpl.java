@@ -29,6 +29,7 @@ public class ExamClassUserloginMapServiceImpl implements ExamClassUserloginMapSe
     @Autowired
     private UserLoginRepo userLoginRepo;
 
+
     @Override
     public List<ExamClassUserloginMap> getExamClassUserloginMap(UUID examClassId) {
         List<ExamClassUserloginMap> res = examClassUserloginMapRepo.findByExamClassId(examClassId);
@@ -37,6 +38,13 @@ public class ExamClassUserloginMapServiceImpl implements ExamClassUserloginMapSe
 
     }
 
+    public static String genRandomPassword(int L){
+        String T = "0123456789abcdefghijklmnopqrstuvwxyz";
+        Random R = new Random();
+        String p = "";
+        for(int i = 1; i <= L; i++) p = p + T.charAt(R.nextInt(T.length()));
+        return p;
+    }
     @Override
     public List<ExamClassUserloginMap> createExamClassAccount(UUID examClassId, List<UserLoginModel> users) {
         List<RandomGeneratedUserLogin> generatedUsers = randomGeneratedUserLoginRepo.findAll();
@@ -74,8 +82,9 @@ public class ExamClassUserloginMapServiceImpl implements ExamClassUserloginMapSe
             ecum.setFullname(um.getFullName());
             ecum.setStatus(ExamClassUserloginMap.STATUS_ACTIVE);
             RandomGeneratedUserLogin ru = mUserID2User.get(selectedUserLogin);
-            String password = "";
-            if(ru != null) password = ru.getPassword();
+            //String password = "";
+            //if(ru != null) password = ru.getPassword();
+            String password = genRandomPassword(10);
             ecum.setPassword(password);
             ecum.setExamClassId(examClassId);
 
@@ -96,5 +105,9 @@ public class ExamClassUserloginMapServiceImpl implements ExamClassUserloginMapSe
             res.add(ecum);
         }
         return res;
+    }
+    public static void main(String[] args){
+        //ExamClassUserloginMapServiceImpl app = new ExamClassUserloginMapServiceImpl();
+        System.out.println(ExamClassUserloginMapServiceImpl.genRandomPassword(10));
     }
 }
