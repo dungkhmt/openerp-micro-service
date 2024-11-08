@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "hr_job_position")
-public class JobPosition extends AuditEntity{
+public class JobPositionEntity extends AuditEntity{
     @Id
     @Column(name = "position_code", nullable = false, length = 100)
     private String positionCode;

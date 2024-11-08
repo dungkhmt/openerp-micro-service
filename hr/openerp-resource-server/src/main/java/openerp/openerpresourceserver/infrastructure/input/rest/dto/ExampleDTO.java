@@ -15,4 +15,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ExampleDTO extends BaseDto<Long>{
+    public String example;
 }
