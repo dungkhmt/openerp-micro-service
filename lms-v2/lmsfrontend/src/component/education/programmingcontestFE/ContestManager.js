@@ -10,6 +10,8 @@ import ContestManagerListRegisteredParticipant from "./ContestManagerListRegiste
 import { ContestManagerManageProblem } from "./ContestManagerManageProblem";
 import ContestManagerRankingGroupNew from "./ContestManagerRankingGroupNew";
 import ContestManagerRankingNew from "./ContestManagerRankingNew";
+import ContestManagerRankingPercentageNew from "./ContestManagerRankingPercentageNew";
+
 import ContestManagerUserSubmission from "./ContestManagerUserSubmission";
 import ContestManagerUserSubmissionGroup from "./ContestManagerUserSubmissionGroup";
 import ContestResultDistribution from "./ContestResultDistribution";
@@ -84,6 +86,7 @@ function ContestManager() {
 
       <TabPanel value={selectedTab} index={5} dir={"ltr"}>
         <ContestManagerRankingNew contestId={contestId} />
+        <ContestManagerRankingPercentageNew contestId={contestId} />
         <ContestManagerRankingGroupNew contestId={contestId} />
       </TabPanel>
 

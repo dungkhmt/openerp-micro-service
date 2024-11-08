@@ -11,7 +11,6 @@ import HustContainerCard from "../../common/HustContainerCard";
 import StandardTable from "../../table/StandardTable";
 
 import { makeStyles } from "@material-ui/core/styles";
-import ContestManagerRankingPercentageNew from "./ContestManagerRankingPercentageNew";
 
 const useStyles = makeStyles({
   actions: {
@@ -19,7 +18,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function ContestManagerRankingNew(props) {
+export default function ContestManagerRankingPercentageNew(props) {
   const contestId = props.contestId;
   const classes = useStyles();
 
@@ -104,7 +103,7 @@ export default function ContestManagerRankingNew(props) {
           ...Object.fromEntries(
             record.mapProblemsToPoints.map((item) => [
               item.problemId,
-              item.point.toLocaleString("fr-FR", localeOption),
+              item.pointPercentage.toLocaleString("fr-FR", localeOption),
             ])
           ),
           userId: record.userId,
@@ -258,7 +257,6 @@ export default function ContestManagerRankingNew(props) {
           ]}
         />
       </Box>
-  
     </HustContainerCard>
   );
 }

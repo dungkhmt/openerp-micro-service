@@ -180,6 +180,15 @@ function ExamClassDetail() {
       body
     );
   }
+  const randomNumberInRange = (min, max) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  };
+  function genPass(L){
+    let r = randomNumberInRange(10000,1000000);
+    let s = r.toString();    
+    while(len(s) < L) s = '0' + s;
+    return s;
+  }
   function resetPassword() {
     //for(i = 0; i < mapUserLogins.length; i++){
     // resetPasswordOfUser(mapUserLogins[i].randomUserLoginId,mapUserLogins[i].password);
@@ -193,6 +202,7 @@ function ExamClassDetail() {
         //let userId = getUserId(userName);
         //console.log('found id = ',userId,' of username ',userName);
         //resetPasswordOfUser(mapUserLogins[idx].randomUserLoginId,mapUserLogins[idx].password);
+        
         resetPasswordOfUserName(
           mapUserLogins[idx].randomUserLoginId,
           mapUserLogins[idx].password
