@@ -80,7 +80,7 @@ public class ContestController {
         ResponseEntity<?> res = apiService.callGetContestSubmissionPageOfPeriodAPI("https://hustack.soict.ai/api/get-contest-submissions-page-date-between/",m);
 
         log.info("synchronizeContestSubmission, got {}, toString = {}",res,res.toString());
-        return ResponseEntity.ok().body("OK");
+        return ResponseEntity.ok().body(res);
     }
 }
 
