@@ -772,7 +772,7 @@ public class SubmissionController {
                                                                  ModelInputGetContestSubmissionPageOfPeriod m
     ){
         List<ContestSubmissionEntity> L = contestSubmissionRepo.findPageByCreatedAtBetween(m.getFromDate(),m.getToDate(),m.getOffset(),m.getLimit());
-        log.info("getContestSubmissionPageDateBetween, from {} to {}, Limit {} offset = {}, GOT sz = ",m.getFromDate(),m.getToDate(),m.getLimit(),m.getOffset(),L.size());
+        log.info("getContestSubmissionPageDateBetween, from {} to {}, Limit {} offset = {}, GOT sz = {}",m.getFromDate(),m.getToDate(),m.getLimit(),m.getOffset(),L.size());
         ModelResponseGetContestSubmissionPage res = new ModelResponseGetContestSubmissionPage(L);
          return ResponseEntity.ok().body(res);
     }
