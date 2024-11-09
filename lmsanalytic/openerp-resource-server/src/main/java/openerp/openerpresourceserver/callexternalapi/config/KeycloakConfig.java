@@ -8,10 +8,10 @@ import lombok.Getter;
 @Getter
 @Configuration
 public class KeycloakConfig {
-  @Value("${keycloak.realm}")
+  @Value("${keycloaklms.realm}")
   private String realm;
 
-  @Value("${keycloak.auth-server-url}")
+  @Value("${keycloaklms.auth-server-url}")
   private String authServerUrl;
 
 }
