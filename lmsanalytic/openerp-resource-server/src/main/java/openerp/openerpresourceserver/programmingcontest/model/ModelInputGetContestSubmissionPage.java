@@ -6,12 +6,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ModelResponseGetContestSubmissionPage {
-    List<ContestSubmissionEntity> submissions;
+public class ModelInputGetContestSubmissionPage {
+    private int offset;
+    private int limit;
+    private Date fromDate;
+    private Date toDate;
 }
+

@@ -1,18 +1,19 @@
 package com.hust.baseweb.applications.programmingcontest.model.externalapi;
 
-import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ModelResponseGetContestSubmissionPage {
-    private List<ContestSubmissionEntity> submissions;
+public class ModelInputGetContestSubmissionPageOfPeriod {
+    private int offset;
+    private int limit;
+    private Date fromDate;
+    private Date toDate;
 }

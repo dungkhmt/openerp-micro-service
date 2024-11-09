@@ -9,6 +9,7 @@ import com.hust.baseweb.applications.programmingcontest.entity.ContestProblem;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.UserRegistrationContestEntity;
 import com.hust.baseweb.applications.programmingcontest.model.*;
+import com.hust.baseweb.applications.programmingcontest.model.externalapi.ModelInputGetContestSubmissionPageOfPeriod;
 import com.hust.baseweb.applications.programmingcontest.model.externalapi.ModelResponseGetContestSubmissionOfPeriod;
 import com.hust.baseweb.applications.programmingcontest.model.externalapi.ModelResponseGetContestSubmissionPage;
 import com.hust.baseweb.applications.programmingcontest.repo.*;
@@ -768,10 +769,11 @@ public class SubmissionController {
 
     @PostMapping("/get-contest-submissions-page-date-between")
     public ResponseEntity<?> getContestSubmissionPageDateBetween(Principal principal, @RequestBody
-    ModelResponseGetContestSubmissionPage m
+                                                                 ModelInputGetContestSubmissionPageOfPeriod m
     ){
-        List<ContestSubmissionEntity> res = contestSubmissionRepo.findPageByCreatedAtBetween(m.getFromDate(),m.getToDate(),m.getOffset(),m.getLimit());
-        return ResponseEntity.ok().body(res);
+        List<ContestSubmissionEntity> L = contestSubmissionRepo.findPageByCreatedAtBetween(m.getFromDate(),m.getToDate(),m.getOffset(),m.getLimit());
+        ModelResponseGetContestSubmissionPage res = new ModelResponseGetContestSubmissionPage(L);
+         return ResponseEntity.ok().body(res);
     }
 
 
