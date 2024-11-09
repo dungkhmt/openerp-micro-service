@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.callexternalapi.service;
 //import com.hust.baseweb.applications.programmingcontest.callexternalapi.config.ClientCredential;
 //import com.hust.baseweb.applications.programmingcontest.callexternalapi.model.LmsLogModelCreate;
 import openerp.openerpresourceserver.callexternalapi.config.ClientCredential;
+import openerp.openerpresourceserver.programmingcontest.model.ContestSubmissionEntity;
 import openerp.openerpresourceserver.programmingcontest.model.ModelCreateContestSubmission;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,8 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import lombok.extern.log4j.Log4j2;
+
+import java.util.List;
 //import openerp.openerpresourceserver.config.ClientCredential;
 
 @Service
@@ -72,6 +75,59 @@ public class ApiService {
                              // .filter(RuntimeException.class::isInstance))
                              .block();
     }
+    public ResponseEntity<?> callGetContestSubmissionPageOfPeriodAPI(String url, List<ContestSubmissionEntity> model){
+      log.info("callGetContestSubmissionPageOfPeriodAPI START...");
+      if (clientCredential == null) {
+            throw new RuntimeException("Client credential is unset");
+        }
+
+        log.debug("Calling API with credential: {}, endpoint: {}", clientCredential.getClientId() + "," + clientCredential.getClientSecret(), url);
+        String accessToken = keycloakService.getAccessToken(clientCredential.getClientId(),
+                clientCredential.getClientSecret());
+        log.debug("Get access token: " + accessToken);
+
+        return this.webClient.post()
+                .uri(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + accessToken)
+                .body(BodyInserters.fromValue(model))
+                .retrieve()
+                //.toEntity(responseType)
+                .toEntity(Void.class)
+                // .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
+                // .filter(RuntimeException.class::isInstance))
+                .block();
+      /*
+      this.webClient.post()
+                           //.uri(url + "/log/create-log")
+                    //.uri("/log/create-log")
+                    .uri(url)
+          .accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(BodyInserters.fromValue(model))
+                           .header("Authorization", "Bearer " + accessToken)
+                           .retrieve()
+          .toEntity(LmsLogModelCreate.class)
+          .subscribe(
+            responseEntity ->{
+                HttpStatus status = responseEntity.getStatusCode();
+                // Handle success response here
+                //HttpStatusCode status = responseEntity.getStatusCode();
+                //URI location = responseEntity.getHeaders().getLocation();
+                //Employee createdEmployee = responseEntity.getBody();    // Response body
+                // handle response as necessary
+                log.info("callLogAPI -> OK!!!");
+            },
+            error -> {
+                //HttpStatus status = responseEntity.getStatusCode();
+                log.info("callLogAPI -> ERROR ??? status = " + error.getMessage());
+            }
+          );
+
+
+      return ResponseEntity.ok().body("OK");
+      */
+    }
+
 
   public ResponseEntity<?> callLogAPI(String url, ModelCreateContestSubmission model){
       if (clientCredential == null) {

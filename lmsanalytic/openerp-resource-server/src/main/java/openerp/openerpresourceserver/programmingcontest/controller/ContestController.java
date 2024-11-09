@@ -6,6 +6,7 @@ import openerp.openerpresourceserver.callexternalapi.service.ApiService;
 import openerp.openerpresourceserver.programmingcontest.entity.ProgrammingContestProblemRanking;
 import openerp.openerpresourceserver.programmingcontest.entity.ProgrammingContestRanking;
 import openerp.openerpresourceserver.programmingcontest.model.ContestModelRepsonse;
+import openerp.openerpresourceserver.programmingcontest.model.ContestSubmissionEntity;
 import openerp.openerpresourceserver.programmingcontest.model.ModelCreateContestSubmission;
 import openerp.openerpresourceserver.programmingcontest.service.LmsContestSubmissionService;
 import openerp.openerpresourceserver.programmingcontest.service.ProgrammingContestProblemRankingService;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -66,7 +68,9 @@ public class ContestController {
 
     @GetMapping("/synchronize-contest-submission")
     public ResponseEntity<?> synchronizeContestSubmission(Principal principal){
-        apiService.callLogAPI("https://hustack.soict.ai/get-contest-submissions/",null);
+        List<ContestSubmissionEntity> sub = new ArrayList<ContestSubmissionEntity>();
+        apiService.callGetContestSubmissionPageOfPeriodAPI("https://hustack.soict.ai/get-contest-submissions-page-date-between/",sub);
+        log.info("synchronizeContestSubmission, got " + sub.size());
         return ResponseEntity.ok().body("OK");
     }
 }
