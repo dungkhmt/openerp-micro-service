@@ -15,6 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -67,20 +69,45 @@ public class ContestController {
     @GetMapping("/synchronize-contest-submission")
     public ResponseEntity<?> synchronizeContestSubmission(Principal principal){
         //List<ContestSubmissionEntity> sub = new ArrayList<ContestSubmissionEntity>();
+
         ModelInputGetContestSubmissionPage m = new ModelInputGetContestSubmissionPage();
         m.setLimit(10);
         m.setOffset(0);
         Date toDate = new Date();
-        Date fromDate = new Date();
-        fromDate.setMonth(9);
-        fromDate.setYear(2024);
-        fromDate.setDate(1);
+        //Date fromDate = new Date();
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        String sFromDate = "2024-09-01 10:30:00";
+        Date fromDate = null;
+        try {
+            fromDate = formatter.parse(sFromDate);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        //fromDate.setMonth(9);
+        //fromDate.setYear(2024);
+        //fromDate.setDate(1);
         m.setFromDate(fromDate);
         m.setToDate(toDate);
         ResponseEntity<?> res = apiService.callGetContestSubmissionPageOfPeriodAPI("https://hustack.soict.ai/api/get-contest-submissions-page-date-between/",m);
-
+        //List<ContestSubmissionEntity> L = (List<ContestSubmissionEntity>)res.getBody();
+        String body = res.getBody().toString();
+        log.info("synchronizeContestSubmission, got body = " + body);
+        //for( ContestSubmissionEntity s: L){
+        //    log.info("synchronizeContestSubmission, GOT submission " + s.getContestSubmissionId() + ", user " + s.getUserId() + " contest " + s.getContestId() + " problem " + s.getProblemId());
+       // }
         log.info("synchronizeContestSubmission, got {}, toString = {}",res,res.toString());
         return ResponseEntity.ok().body(res);
+    }
+    public static void main(String[] args){
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        String sFromDate = "2024-09-01 10:30:00";
+        Date fromDate = null;
+        try {
+            fromDate = formatter.parse(sFromDate);
+            System.out.println("format date = " + fromDate.toString());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
 
