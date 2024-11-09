@@ -87,7 +87,22 @@ public class ApiService {
         String accessToken = keycloakService.getAccessToken(clientCredential.getClientId(),
                 clientCredential.getClientSecret());
         log.info("Get access token: " + accessToken);
-
+        String json = this.webClient.post()
+                .uri(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + accessToken)
+                .body(BodyInserters.fromValue(model))
+                .retrieve()
+                //.toEntity(responseType)
+                //.toEntity(Void.class)
+                //.toEntity(ModelResponseGetContestSubmissionPage.class)
+                // .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
+                // .filter(RuntimeException.class::isInstance))
+                .bodyToMono(String.class)
+                .block();
+        log.info("callGetContestSubmissionPageOfPeriodAPI, GOT JSON = " + json);
+        return ResponseEntity.ok().body(json);
+        /*
         return this.webClient.post()
                 .uri(url)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -100,6 +115,7 @@ public class ApiService {
                 // .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
                 // .filter(RuntimeException.class::isInstance))
                 .block();
+        */
       /*
       this.webClient.post()
                            //.uri(url + "/log/create-log")
