@@ -7,6 +7,7 @@ import {StandardTable} from "erp-hust/lib/StandardTable";
 //import { toFormattedDateTime } from "../../utils/dateutils";
 //import { TextField, MenuItem } from "@mui/material";
 import { Link } from "react-router-dom";
+import { Button } from "@mui/material";
 function ContestListForRanking(){
 
     const [data, setData] = useState([]);
@@ -44,10 +45,22 @@ function ContestListForRanking(){
         getContestIds();
     }, [])
 
+    function synchronizeContestSubmission(){
+        request("get", "/synchronize-contest-submission", (res) => {
+            //setContestIds(res.data);
+           alert(res.data);
+        }).then();  
+    }
     return (
 
         <div>
             <div>
+                <Button onClick={synchronizeContestSubmission}>
+                    Synchronize
+                </Button>
+            </div>
+            <div>
+
             <StandardTable
                 title="Contests"
                 columns={columnContests}

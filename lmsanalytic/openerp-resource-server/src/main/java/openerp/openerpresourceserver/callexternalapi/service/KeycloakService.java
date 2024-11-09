@@ -1,7 +1,9 @@
 package openerp.openerpresourceserver.callexternalapi.service;
 
-import com.hust.baseweb.applications.programmingcontest.callexternalapi.config.KeycloakConfig;
-import com.hust.baseweb.applications.programmingcontest.callexternalapi.utils.TokenStorage;
+//import com.hust.baseweb.applications.programmingcontest.callexternalapi.config.KeycloakConfig;
+//import com.hust.baseweb.applications.programmingcontest.callexternalapi.utils.TokenStorage;
+import openerp.openerpresourceserver.callexternalapi.config.KeycloakConfig;
+import openerp.openerpresourceserver.callexternalapi.utils.TokenStorage;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
