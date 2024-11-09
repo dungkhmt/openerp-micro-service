@@ -5,9 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.callexternalapi.service.ApiService;
 import openerp.openerpresourceserver.programmingcontest.entity.ProgrammingContestProblemRanking;
 import openerp.openerpresourceserver.programmingcontest.entity.ProgrammingContestRanking;
-import openerp.openerpresourceserver.programmingcontest.model.ContestModelRepsonse;
-import openerp.openerpresourceserver.programmingcontest.model.ContestSubmissionEntity;
-import openerp.openerpresourceserver.programmingcontest.model.ModelCreateContestSubmission;
+import openerp.openerpresourceserver.programmingcontest.model.*;
 import openerp.openerpresourceserver.programmingcontest.service.LmsContestSubmissionService;
 import openerp.openerpresourceserver.programmingcontest.service.ProgrammingContestProblemRankingService;
 import openerp.openerpresourceserver.programmingcontest.service.ProgrammingContestRankingService;
@@ -68,9 +66,20 @@ public class ContestController {
 
     @GetMapping("/synchronize-contest-submission")
     public ResponseEntity<?> synchronizeContestSubmission(Principal principal){
-        List<ContestSubmissionEntity> sub = new ArrayList<ContestSubmissionEntity>();
-        apiService.callGetContestSubmissionPageOfPeriodAPI("https://hustack.soict.ai/get-contest-submissions-page-date-between/",sub);
-        log.info("synchronizeContestSubmission, got " + sub.size());
+        //List<ContestSubmissionEntity> sub = new ArrayList<ContestSubmissionEntity>();
+        ModelInputGetContestSubmissionPage m = new ModelInputGetContestSubmissionPage();
+        m.setLimit(10);
+        m.setOffset(0);
+        Date toDate = new Date();
+        Date fromDate = new Date();
+        fromDate.setMonth(9);
+        fromDate.setYear(2024);
+        fromDate.setDate(1);
+        m.setFromDate(fromDate);
+        m.setToDate(toDate);
+        ResponseEntity<?> res = apiService.callGetContestSubmissionPageOfPeriodAPI("https://hustack.soict.ai/api/get-contest-submissions-page-date-between/",m);
+
+        log.info("synchronizeContestSubmission, got {}, toString = {}",res,res.toString());
         return ResponseEntity.ok().body("OK");
     }
 }

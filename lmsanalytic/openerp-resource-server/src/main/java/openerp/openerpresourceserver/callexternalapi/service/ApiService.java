@@ -2,6 +2,8 @@ package openerp.openerpresourceserver.callexternalapi.service;
 
 //import com.hust.baseweb.applications.programmingcontest.callexternalapi.config.ClientCredential;
 //import com.hust.baseweb.applications.programmingcontest.callexternalapi.model.LmsLogModelCreate;
+import openerp.openerpresourceserver.programmingcontest.model.ModelInputGetContestSubmissionPage;
+import openerp.openerpresourceserver.programmingcontest.model.ModelResponseGetContestSubmissionPage;
 import openerp.openerpresourceserver.callexternalapi.config.ClientCredential;
 import openerp.openerpresourceserver.programmingcontest.model.ContestSubmissionEntity;
 import openerp.openerpresourceserver.programmingcontest.model.ModelCreateContestSubmission;
@@ -75,16 +77,16 @@ public class ApiService {
                              // .filter(RuntimeException.class::isInstance))
                              .block();
     }
-    public ResponseEntity<?> callGetContestSubmissionPageOfPeriodAPI(String url, List<ContestSubmissionEntity> model){
+    public ResponseEntity<?> callGetContestSubmissionPageOfPeriodAPI(String url, ModelInputGetContestSubmissionPage model){
       log.info("callGetContestSubmissionPageOfPeriodAPI START...");
       if (clientCredential == null) {
             throw new RuntimeException("Client credential is unset");
         }
 
-        log.debug("Calling API with credential: {}, endpoint: {}", clientCredential.getClientId() + "," + clientCredential.getClientSecret(), url);
+        log.info("Calling API with credential: {}, endpoint: {}", clientCredential.getClientId() + "," + clientCredential.getClientSecret(), url);
         String accessToken = keycloakService.getAccessToken(clientCredential.getClientId(),
                 clientCredential.getClientSecret());
-        log.debug("Get access token: " + accessToken);
+        log.info("Get access token: " + accessToken);
 
         return this.webClient.post()
                 .uri(url)
@@ -93,7 +95,8 @@ public class ApiService {
                 .body(BodyInserters.fromValue(model))
                 .retrieve()
                 //.toEntity(responseType)
-                .toEntity(Void.class)
+                //.toEntity(Void.class)
+                .toEntity(ModelResponseGetContestSubmissionPage.class)
                 // .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
                 // .filter(RuntimeException.class::isInstance))
                 .block();
