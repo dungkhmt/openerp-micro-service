@@ -248,7 +248,7 @@ function ContestProblemSubmissionDetailViewedByManager() {
                 <Typography variant={"h6"} sx={{ mb: 1 }}>
                   Test cases
                 </Typography>
-                <ManagerViewParticipantProgramSubmissionDetailTestCaseBy TestCase
+                <ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase
                   submissionId={problemSubmissionId}
                 />
               </Box>
