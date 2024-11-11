@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import DateFnsUtils from "@date-io/date-fns";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import { LoadingButton } from "@mui/lab";
@@ -6,7 +7,6 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { request } from "api";
 import withScreenSecurity from "component/withScreenSecurity";
-import { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { errorNoti, successNoti } from "utils/notification";
 import HustContainerCard from "../../common/HustContainerCard";
@@ -20,14 +20,15 @@ function CreateContest(props) {
   const [startDate, setStartDate] = useState(new Date());
   const [maxNumberSubmissions, setMaxNumberSubmissions] = useState(10);
   const [maxSourceCodeLength, setMaxSourceCodeLength] = useState(50000);
-  const [minTimeBetweenTwoSubmissions, setMinTimeBetweenTwoSubmissions] =
-    useState(0);
-  
-
+  const [minTimeBetweenTwoSubmissions, setMinTimeBetweenTwoSubmissions] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const isValidContestId = () => {
     return new RegExp(/[%^/\\|.?;[\]]/g).test(contestId);
+  };
+
+  const isValidContestName = () => {
+    return new RegExp(/[%^/\\|.?;[\]]/g).test(contestName);
   };
 
   function handleSubmit() {
@@ -50,9 +51,7 @@ function CreateContest(props) {
       (res) => {
         successNoti("Contest created successfully");
         sleep(1000).then(() => {
-          history.push(
-            "/programming-contest/contest-manager/" + res.data.contestId
-          );
+          history.push("/programming-contest/contest-manager/" + res.data.contestId);
         });
       },
       {
@@ -102,6 +101,12 @@ function CreateContest(props) {
                     onChange={(event) => {
                       setContestName(event.target.value);
                     }}
+                    error={isValidContestName()}
+                    helperText={
+                      isValidContestName()
+                        ? "Contest Name must not contain special characters including %^/\\|.?;[]"
+                        : ""
+                    }
                   />
                 </Grid>
 
@@ -117,11 +122,7 @@ function CreateContest(props) {
                     }}
                     value={maxNumberSubmissions}
                     InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          per problem
-                        </InputAdornment>
-                      ),
+                      endAdornment: <InputAdornment position="end">per problem</InputAdornment>,
                     }}
                   />
                 </Grid>
@@ -137,9 +138,7 @@ function CreateContest(props) {
                     }}
                     value={maxSourceCodeLength}
                     InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">chars</InputAdornment>
-                      ),
+                      endAdornment: <InputAdornment position="end">chars</InputAdornment>,
                     }}
                   />
                 </Grid>
@@ -151,15 +150,11 @@ function CreateContest(props) {
                     id="Submission Interval"
                     label="Submission Interval"
                     onChange={(event) => {
-                      setMinTimeBetweenTwoSubmissions(
-                        Number(event.target.value)
-                      );
+                      setMinTimeBetweenTwoSubmissions(Number(event.target.value));
                     }}
                     value={minTimeBetweenTwoSubmissions}
                     InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">s</InputAdornment>
-                      ),
+                      endAdornment: <InputAdornment position="end">s</InputAdornment>,
                     }}
                   />
                 </Grid>
@@ -172,7 +167,7 @@ function CreateContest(props) {
             variant="contained"
             style={{ marginTop: "36px" }}
             onClick={handleSubmit}
-            disabled={isValidContestId() || loading}
+            disabled={isValidContestId() || isValidContestName() || loading}
           >
             Save
           </LoadingButton>

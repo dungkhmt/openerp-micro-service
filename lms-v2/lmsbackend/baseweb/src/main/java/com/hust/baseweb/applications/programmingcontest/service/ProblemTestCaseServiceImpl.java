@@ -1211,7 +1211,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         return ModelContestSubmissionResponse.builder()
                                              .status("STORED")
                                              .testCasePass(c.getTestCasePass())
-                                             .runtime(new Long(0))
+                                             //.runtime(new Long(0))
+                                             .runtime(0)
                                              .memoryUsage(c.getMemoryUsage())
                                              .problemName("")
                                              .contestSubmissionID(c.getContestSubmissionId())
@@ -1830,7 +1831,13 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             long totalPoint = 0;
             List<TestCaseEntity> TC = testCaseRepo.findAllByProblemId(problemId);
             for (TestCaseEntity tc : TC) {
-                totalPoint += tc.getTestCasePoint();
+                if(contest.getEvaluateBothPublicPrivateTestcase().equals("Y")) {
+                    totalPoint += tc.getTestCasePoint();
+                }else{
+                    if(tc.getIsPublic().equals("N")){
+                        totalPoint += tc.getTestCasePoint();
+                    }
+                }
             }
             mProblem2MaxPoint.put(problemId, totalPoint);
         }
@@ -1873,6 +1880,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 double percentage = 0;
                 if (problemPoint > 0) {
                     percentage = submission.getPoint() * 1.0 / problemPoint;
+                    System.out.println("RANKING, problem " + problemId + " problemPoint = " + problemPoint + " submission points = " + submission.getPoint());
                 }
                 mapProblem2PointPercentage.put(problemId, percentage);
             }
@@ -1894,10 +1902,12 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                     percent = mapProblem2PointPercentage.get(problemId);
                 }
                 totalPercentage = totalPercentage + percent;
+                System.out.println("RANKING, problem " + problemId + " percent = " + percent + " total percent = " + totalPercentage);
                 tmp.setPointPercentage(percent);
             }
             if (nbProblems > 0) {
                 totalPercentage = totalPercentage * 100 / nbProblems;
+                System.out.println("RANKING, nbProblem = " + nbProblems + " total percent = " + totalPercentage);
             }
 
             contestSubmission.setFullname(userService.getUserFullName(userId));

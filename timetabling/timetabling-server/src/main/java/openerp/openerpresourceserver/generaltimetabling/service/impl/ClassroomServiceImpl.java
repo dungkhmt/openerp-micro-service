@@ -125,24 +125,41 @@ public class ClassroomServiceImpl implements ClassroomService {
     }
 
     @Override
-    public List<Classroom> getMaxQuantityClassRoomByBuildings(String groupName, int maxAmount) {
+    public List<Classroom> getMaxQuantityClassRoomByBuildings(String groupName, Integer maxAmount) {
         List<Classroom> fetchedClasses = classroomRepo.findAll();
         if (fetchedClasses.isEmpty()) {
             throw new NotFoundException("Không tìm thấy lớp học!");
-        } else if (groupName == null) {
-            return fetchedClasses.stream()
-                    .filter(classRoom -> classRoom.getQuantityMax() >= maxAmount)
-                    .toList();
-        } else {
-            Group groupByBuilding =groupRepo.findByGroupName(groupName).orElse(null);
-            if (groupByBuilding == null) throw new NotFoundException("Không tìm thấy nhóm!");
-            String buildingListString = groupByBuilding.getPriorityBuilding();
-            List<String> buildingList = Arrays.stream(buildingListString.split(",")).toList();
-            if (buildingList.isEmpty()) throw new NotFoundException("Không tìm thấy phòng học!");
-            return fetchedClasses.stream()
-                    .filter(classRoom -> classRoom.getQuantityMax() >= maxAmount)
-                    .filter(classroom -> buildingList.contains(classroom.getBuilding()))
-                    .toList();
         }
+
+        if ((groupName == null || groupName.trim().isEmpty()) && (maxAmount == null || maxAmount <= 0)) {
+            return fetchedClasses;
+        }
+
+        List<Classroom> filteredClasses = (maxAmount == null || maxAmount <= 0) ?
+                fetchedClasses :
+                fetchedClasses.stream()
+                        .filter(classRoom -> classRoom.getQuantityMax() >= maxAmount)
+                        .toList();
+
+        if (groupName == null || groupName.trim().isEmpty()) {
+            return filteredClasses;
+        }
+
+        Group groupByBuilding = groupRepo.findByGroupName(groupName)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy nhóm!"));
+
+        String buildingListString = groupByBuilding.getPriorityBuilding();
+        List<String> buildingList = Arrays.stream(buildingListString.split(","))
+                .map(String::trim)
+                .filter(building -> !building.isEmpty())
+                .toList();
+
+        if (buildingList.isEmpty()) {
+            throw new NotFoundException("Không tìm thấy phòng học!");
+        }
+
+        return filteredClasses.stream()
+                .filter(classroom -> buildingList.contains(classroom.getBuilding()))
+                .toList();
     }
 }

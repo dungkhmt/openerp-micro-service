@@ -23,5 +23,5 @@ public interface ClassroomService {
 
     void clearAllClassRoomTimetable();
 
-    List<Classroom> getMaxQuantityClassRoomByBuildings(String groupName, int maxAmount);
+    List<Classroom> getMaxQuantityClassRoomByBuildings(String groupName, Integer maxAmount);
 }

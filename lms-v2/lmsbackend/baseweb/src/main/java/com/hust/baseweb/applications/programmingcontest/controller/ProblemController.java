@@ -235,7 +235,7 @@ public class ProblemController {
     }
 
     //    @Secured("ROLE_TEACHER")
-    @PostMapping(value = "/problems/{id}/export", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    @GetMapping(value = "/problems/{id}/export")
     public ResponseEntity<StreamingResponseBody> exportProblem(
         @PathVariable @NotBlank String id
     ) {
@@ -249,6 +249,7 @@ public class ProblemController {
 
         return ResponseEntity.ok().headers(headers).body(stream);
     }
+
 
     @Secured("ROLE_TEACHER")
     @GetMapping("/teacher/owned-problems")

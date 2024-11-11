@@ -942,7 +942,9 @@ public class QuizTestController {
     @PostMapping("/analyze-do-quiz-test-in-class")
     public ResponseEntity<?> analyzeDoQuizTestInClass(Principal principal, @RequestBody ModelAnalyzeDoQuizTestInClassInput I){
         log.info("analyzeDoQuizTestInClass, classId = " + I.getClassId());
-        int res = quizTestService.summarizeQuizTestInClass(I.getClassId());
+        //int res = quizTestService.summarizeQuizTestInClass(I.getClassId());
+        int res = quizTestService.summarizeInteractiveQuizTestInClass(I.getClassId());
+
 
         return ResponseEntity.ok().body(res);
     }

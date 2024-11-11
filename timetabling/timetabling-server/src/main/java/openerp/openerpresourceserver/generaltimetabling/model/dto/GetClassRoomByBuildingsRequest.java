@@ -9,5 +9,5 @@ import lombok.*;
 @Setter
 public class GetClassRoomByBuildingsRequest {
     private String groupName;
-    private int maxAmount;
+    private Integer maxAmount;
 }

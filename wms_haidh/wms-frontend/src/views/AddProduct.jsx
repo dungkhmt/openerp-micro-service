@@ -107,6 +107,7 @@ const ProductForm = () => {
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+<<<<<<< HEAD
         <IconButton color="primary" onClick={() => navigate('/admin/product')} sx={{ color: 'black' }}>
           <ArrowBackIcon />
         </IconButton>
@@ -133,6 +134,17 @@ const ProductForm = () => {
 
 
 
+=======
+        <IconButton color="primary" onClick={() => navigate('/admin/product')}>
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
+          {id ? 'Update Product' : 'Add New Product'}
+        </Typography>
+        <Button variant="contained" color="primary" sx={{ marginLeft: 'auto' }} onClick={handleSubmit}>
+          {id ? 'Update Product' : 'Save Product'}
+        </Button>
+>>>>>>> fba1c84228e054c79b53bb7d86f3bd35669fbd9d
       </Box>
 
       <Grid container spacing={2}>
@@ -160,10 +172,17 @@ const ProductForm = () => {
                 <img
                   src={image}
                   alt="Product Preview"
+<<<<<<< HEAD
                   style={{
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover'
+=======
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover' 
+>>>>>>> fba1c84228e054c79b53bb7d86f3bd35669fbd9d
                   }}
                 />
               ) : (
@@ -185,6 +204,7 @@ const ProductForm = () => {
                 color="primary"
                 component="span"
                 startIcon={<PhotoCamera />}
+<<<<<<< HEAD
                 sx={{
                   width: '100%',
                   backgroundColor: 'black',
@@ -199,6 +219,12 @@ const ProductForm = () => {
               </Button>
 
 
+=======
+                sx={{ width: '100%' }}
+              >
+                Upload Image
+              </Button>
+>>>>>>> fba1c84228e054c79b53bb7d86f3bd35669fbd9d
             </label>
           </Paper>
         </Grid>

@@ -34,28 +34,43 @@ function ListProblemV2() {
   const [sharedProblems, setSharedProblems] = useState([]);
   const [allProblems, setAllProblems] = useState([]);
   const [publicProblems, setPublicProblems] = useState([]);
-  
+
 
   const [loading, setLoading] = useState(false);
-  
+
 
 
 
   const { t } = useTranslation("education/programmingcontest/problem");
 
-  const onSingleDownload = (problem) => {
-    const form = document.createElement("form");
+  const ACCESS_TOKEN = keycloak?.token;
 
-    form.setAttribute("method", "post");
-    form.setAttribute("target", "_blank");
-    form.setAttribute(
-      "action",
-      `${BASE_URL}/problems/${problem.problemId}/export`
-    );
+  const onSingleDownload = async (problem) => {
+    try {
+      const url = `${BASE_URL}/problems/${problem.problemId}/export`;
+      console.log("Download URL:", url);
 
-    document.body.appendChild(form);
-    form.submit();
-    form.parentNode.removeChild(form);
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${ACCESS_TOKEN}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to download file");
+
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = downloadUrl;
+      a.download = `${problem.problemId}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      console.error("Download error:", error);
+    }
   };
 
   const COLUMNS = [
@@ -86,13 +101,13 @@ function ListProblemV2() {
             color: "blue",
             cursor: "",
           }}
-            
+
         >
           {rowData["problemId"]}
         </Link>
       ),
     },
-    { title: t("problemName"), field: "problemName", filtering: false},
+    { title: t("problemName"), field: "problemName", filtering: false },
     { title: t("problemList.createdBy"), field: "userId", filtering: false },
     { title: t("problemList.createdAt"), field: "createdAt", filtering: false },
     {
@@ -100,7 +115,7 @@ function ListProblemV2() {
       field: "levelId",
       filtering: true,
       lookup: { 'easy': 'easy', 'medium': 'medium', 'hard': 'hard' },
-      
+
       render: (rowData) => (
         <span style={{ color: getColorLevel(`${rowData.levelId}`) }}>
           {`${rowData.levelId}`}
@@ -108,14 +123,14 @@ function ListProblemV2() {
       ),
     },
     { title: t("problemList.status"), field: "statusId", filtering: false },
-    
+
     {
       title: "Tags",
       fields: "tags",
-      
+
       // Using standard MUI Table filtering function
       filtering: true,
-      filterComponent: (props) => <FilterbyTag {...props}/>,
+      filterComponent: (props) => <FilterbyTag {...props} />,
       customFilterAndSearch: (term, rowData) => {
         let currentTags = rowData.tags.map(x => x.name)
 
@@ -126,36 +141,36 @@ function ListProblemV2() {
         // Solution here is to check type and handle each case seperately 
 
         // Using filter by tags search 
-        if(Array.isArray(term)){
+        if (Array.isArray(term)) {
           //console.log(term,  currentTags)
-          return term.some(t=> currentTags.includes(t.name)) || term.length === 0
+          return term.some(t => currentTags.includes(t.name)) || term.length === 0
         }
         // using global table search
-        else if(typeof term === 'string'){
+        else if (typeof term === 'string') {
           //console.log(term,  currentTags)
           return currentTags.some(tg => {
             return tg.toLowerCase().includes(term.toLowerCase())
-          }) 
+          })
         }
         // other case 
-        else{ 
-          return false 
+        else {
+          return false
         }
-        
+
       }
 
       // Customize filter component 
       // filterComponent: (props) => <FilterbyTag {...props} />
-    ,
+      ,
       render: (rowData) => (
-         <Box>
+        <Box>
           {rowData?.tags.length > 0 &&
             rowData.tags.map((tag) => (
-              
+
               <Chip
                 size="small"
                 label={tag.name}
-                key = {tag.tagId}
+                key={tag.tagId}
                 sx={{
                   marginRight: "6px",
                   marginBottom: "6px",
@@ -164,7 +179,7 @@ function ListProblemV2() {
                 }}
               />
             ))}
-         </Box>
+        </Box>
       ),
     },
     {
@@ -228,7 +243,7 @@ function ListProblemV2() {
 
 
 
-  
+
   useEffect(() => {
     setLoading(true);
     getProblems("/teacher/owned-problems", (data) => {
@@ -285,7 +300,7 @@ function ListProblemV2() {
         >
           <Tab label={t("problemList.myProblems")} {...a11yProps(0)} />
           <Tab label={t("problemList.sharedProblems")} {...a11yProps(1)} />
-           {<Tab label={t("problemList.publicProblems")} {...a11yProps(2)} />}
+          {<Tab label={t("problemList.publicProblems")} {...a11yProps(2)} />}
           {/*<Tab label={t("problemList.allProblems")} {...a11yProps(2)} />*/}
         </Tabs>
       </Box>
@@ -338,22 +353,22 @@ function ListProblemV2() {
         />
       </TabPanelVertical>
       {
-      <TabPanelVertical value={value} index={2}>
-        <StandardTable
-          title="Public Problems"
-          columns={COLUMNS}
-          data={publicProblems}
-          hideCommandBar
-          key="publicProblems"
-          options={{
-            selection: false,
-            pageSize: 10,
-            search: true,
-            sorting: true,
-          }}
-          sx={{marginTop: "8px"}}
-        />
-      </TabPanelVertical>
+        <TabPanelVertical value={value} index={2}>
+          <StandardTable
+            title="Public Problems"
+            columns={COLUMNS}
+            data={publicProblems}
+            hideCommandBar
+            key="publicProblems"
+            options={{
+              selection: false,
+              pageSize: 10,
+              search: true,
+              sorting: true,
+            }}
+            sx={{ marginTop: "8px" }}
+          />
+        </TabPanelVertical>
       }
       {/*
       <TabPanelVertical value={value} index={2}>

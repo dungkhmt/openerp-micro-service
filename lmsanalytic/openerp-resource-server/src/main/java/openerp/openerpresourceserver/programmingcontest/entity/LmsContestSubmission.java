@@ -75,7 +75,7 @@ public class LmsContestSubmission {
     private String status;
 
     @Column(name="point")
-    private int point;
+    private long point;
 
     @Column(name="test_case_pass")
     private String testCasePass;
@@ -86,7 +86,7 @@ public class LmsContestSubmission {
     private String sourceCodeLanguage;
 
     @Column(name="runtime")
-    private int runTime;
+    private long runTime;
 
     @Column(name="memory_usage")
     private double memoryUsage;
