@@ -107,15 +107,32 @@ const ProductForm = () => {
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <IconButton color="primary" onClick={() => navigate('/admin/product')}>
+        <IconButton color="primary" onClick={() => navigate('/admin/product')} sx={{ color: 'black' }}>
           <ArrowBackIcon />
         </IconButton>
+
         <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
           {id ? 'Update Product' : 'Add New Product'}
         </Typography>
-        <Button variant="contained" color="primary" sx={{ marginLeft: 'auto' }} onClick={handleSubmit}>
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{
+            marginLeft: 'auto',
+            backgroundColor: 'black',
+            color: 'white',
+            '&:hover': {
+              backgroundColor: 'black', // Giữ màu đen khi hover
+              opacity: 0.75,            // Đặt độ mờ khi hover
+            }
+          }}
+          onClick={handleSubmit}
+        >
           {id ? 'Update Product' : 'Save Product'}
         </Button>
+
+
+
       </Box>
 
       <Grid container spacing={2}>
@@ -143,10 +160,10 @@ const ProductForm = () => {
                 <img
                   src={image}
                   alt="Product Preview"
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'cover' 
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
                   }}
                 />
               ) : (
@@ -168,10 +185,20 @@ const ProductForm = () => {
                 color="primary"
                 component="span"
                 startIcon={<PhotoCamera />}
-                sx={{ width: '100%' }}
+                sx={{
+                  width: '100%',
+                  backgroundColor: 'black',
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: 'black', // Giữ màu đen khi hover
+                    opacity: 0.75,            // Đặt độ mờ khi hover
+                  }
+                }}
               >
                 Upload Image
               </Button>
+
+
             </label>
           </Paper>
         </Grid>
