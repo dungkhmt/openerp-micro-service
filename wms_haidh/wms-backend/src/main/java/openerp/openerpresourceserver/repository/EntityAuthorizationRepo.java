@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.repo;
+package openerp.openerpresourceserver.repository;
 
 
 import openerp.openerpresourceserver.entity.EntityAuthorization;
