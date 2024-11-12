@@ -40,15 +40,26 @@ export async function request(
   config
 ) {
   try {
+    // Check if the data is an instance of FormData
+    // If yes, don't override the content type header, axios will set it automatically
+    const headers = {
+      authorization: bearerAuth(keycloak.token),
+      ...config?.headers,
+    };
+
+    // If data is FormData, don't manually set the content type
+    if (data instanceof FormData) {
+      delete headers["Content-Type"]; // Remove Content-Type so axios can handle it
+    } else {
+      headers["Content-Type"] = "application/json"; // Set Content-Type for JSON data
+    }
+
     const res = await axiosInstance.request({
       method: method.toLowerCase(),
       url: url,
       data: data,
       ...config,
-      headers: {
-        authorization: bearerAuth(keycloak.token),
-        ...config?.headers,
-      },
+      headers: headers,
     });
 
     if (isFunction(successHandler)) {
@@ -56,21 +67,13 @@ export async function request(
     }
     return res;
   } catch (e) {
-    // Handling work to do when encountering all kinds of errors, e.g turn off the loading icon.
+    // Handle errors
     if (isFunction(errorHandlers["onError"])) {
       errorHandlers["onError"](e);
     }
 
     if (e.response) {
-      // The request was made and the server responded with a status code that falls out of the range of 2xx.
       switch (e.response.status) {
-        // case 401:
-        //   if (isFunction(errorHandlers[401])) {
-        //     errorHandlers[401](e);
-        //   } else {
-        //     history.push({ pathname: "/login" });
-        //   }
-        //   break;
         case 403:
           if (isFunction(errorHandlers[403])) {
             errorHandlers[403](e);
@@ -84,34 +87,19 @@ export async function request(
           } else if (isFunction(errorHandlers["rest"])) {
             errorHandlers["rest"](e);
           } else {
-            // unduplicatedErrorNoti(
-            //   "response error",
-            //   "Rất tiếc! Đã có lỗi xảy ra."
-            // );
+            // Handle default error
           }
       }
     } else if (e.request) {
-      // The request was made but no response was received
-      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-      // http.ClientRequest in node.js
-      console.log(
-        "The request was made but no response was received",
-        e.request
-      );
-
+      console.log("The request was made but no response was received", e.request);
       if (isFunction(errorHandlers["noResponse"])) {
         errorHandlers["noResponse"](e);
       }
-
-      // , "Không thể kết nối tới máy chủ."
       wifiOffNotify(wifiOffNotifyToastId);
     } else {
-      // Something happened in setting up the request that triggered an Error.
-      console.log(
-        "Something happened in setting up the request that triggered an error: ",
-        e.message
-      );
+      console.log("Something happened in setting up the request: ", e.message);
     }
     console.log("Request config", e.config);
   }
 }
+

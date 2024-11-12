@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,5 +17,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 			+ "COALESCE(SUM(pw.quantityOnHand), 0) as totalQuantityOnHand " + "FROM Product p "
 			+ "LEFT JOIN ProductWarehouse pw ON p.productId = pw.productId " + "GROUP BY p.productId, p.code, p.name")
 	List<ProductInfoProjection> findProductInfoWithTotalQuantity();
+
+	Optional<Product> findByCode(String code);
 
 }
