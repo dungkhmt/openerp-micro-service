@@ -18,8 +18,10 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { useNavigate, useParams } from 'react-router-dom';
+import { request } from "../api";
 
 const ProductForm = () => {
+
   const navigate = useNavigate();
   const { id } = useParams();
   const [image, setImage] = useState(null);
@@ -33,11 +35,21 @@ const ProductForm = () => {
   const [description, setDescription] = useState('');
   const [uom, setUom] = useState('');
 
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    request("get", "/admin/product/category", (res) => {
+      setCategories(res.data);
+    }).then();
+  }, [])
+
+
+
   const mockProductData = {
     id: '1',
     image: 'https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2023/1/8/1135972/HD13.JPG',
     name: 'Tủ lạnh Samsung',
-    category: 'Tủ lạnh',
+    category: '729ab27a-ef0a-11ed-b27c-02420a000304',
     inventory: [{ warehouse: 'Warehouse A', quantity: 10 }],
     code: 'P123',
     weight: '20',
@@ -62,6 +74,10 @@ const ProductForm = () => {
       setUom(product.uom);
     }
   }, [id]);
+
+  const handleCategoryChange = (e) => {
+    setCategory(e.target.value); // Lưu categoryId khi người dùng thay đổi lựa chọn
+  };
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -89,25 +105,40 @@ const ProductForm = () => {
     setInventory(newInventory);
   };
 
-  const handleSubmit = () => {
-    console.log({
-      image,
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const productData = {
       name,
-      category,
-      inventory,
+      categoryId: category,
       code,
       weight,
       height,
       area,
       description,
-      uom,
-    });
+      uom
+    };
+
+    // Sử dụng request để gửi dữ liệu POST lên server
+    request(
+      'post', // Phương thức HTTP
+      '/admin/product/create-product', // Endpoint API
+      (res) => {
+        // Hàm xử lý kết quả thành công
+        if (res.status === 200) {
+          // Điều hướng nếu yêu cầu thành công
+          navigate('/admin/product');
+        }
+      },
+      { "onError": (e) => console.error("Error creating product:", e) }, 
+      productData // Dữ liệu cần gửi lên server
+    );
   };
 
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-<<<<<<< HEAD
         <IconButton color="primary" onClick={() => navigate('/admin/product')} sx={{ color: 'black' }}>
           <ArrowBackIcon />
         </IconButton>
@@ -134,17 +165,6 @@ const ProductForm = () => {
 
 
 
-=======
-        <IconButton color="primary" onClick={() => navigate('/admin/product')}>
-          <ArrowBackIcon />
-        </IconButton>
-        <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
-          {id ? 'Update Product' : 'Add New Product'}
-        </Typography>
-        <Button variant="contained" color="primary" sx={{ marginLeft: 'auto' }} onClick={handleSubmit}>
-          {id ? 'Update Product' : 'Save Product'}
-        </Button>
->>>>>>> fba1c84228e054c79b53bb7d86f3bd35669fbd9d
       </Box>
 
       <Grid container spacing={2}>
@@ -172,17 +192,10 @@ const ProductForm = () => {
                 <img
                   src={image}
                   alt="Product Preview"
-<<<<<<< HEAD
                   style={{
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover'
-=======
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'cover' 
->>>>>>> fba1c84228e054c79b53bb7d86f3bd35669fbd9d
                   }}
                 />
               ) : (
@@ -204,7 +217,6 @@ const ProductForm = () => {
                 color="primary"
                 component="span"
                 startIcon={<PhotoCamera />}
-<<<<<<< HEAD
                 sx={{
                   width: '100%',
                   backgroundColor: 'black',
@@ -219,12 +231,6 @@ const ProductForm = () => {
               </Button>
 
 
-=======
-                sx={{ width: '100%' }}
-              >
-                Upload Image
-              </Button>
->>>>>>> fba1c84228e054c79b53bb7d86f3bd35669fbd9d
             </label>
           </Paper>
         </Grid>
@@ -250,13 +256,14 @@ const ProductForm = () => {
                   <Select
                     labelId="product-category-label"
                     value={category}
-                    onChange={(e) => setCategory(e.target.value)}
+                    onChange={handleCategoryChange}
                     label="Product Category"
                   >
-                    <MenuItem value="Tủ lạnh">Tủ lạnh</MenuItem>
-                    <MenuItem value="Tivi">Tivi</MenuItem>
-                    <MenuItem value="Quạt điều hòa">Quạt điều hòa</MenuItem>
-                    <MenuItem value="Máy giặt">Máy giặt</MenuItem>
+                    {categories.map((cat) => (
+                      <MenuItem key={cat.categoryId} value={cat.categoryId}>
+                        {cat.name}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Grid>

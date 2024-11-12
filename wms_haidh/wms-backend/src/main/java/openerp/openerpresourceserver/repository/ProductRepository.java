@@ -12,11 +12,9 @@ import openerp.openerpresourceserver.entity.ProductInfoProjection;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, UUID> {
-	 @Query("SELECT p.productId as id, p.code as code, p.name as name, " +
-	           "SUM(pw.quantityOnHand) as totalQuantityOnHand " +
-	           "FROM Product p " +
-	           "JOIN ProductWarehouse pw ON p.productId = pw.productId " +
-	           "GROUP BY p.productId, p.code, p.name")
-	    List<ProductInfoProjection> findProductInfoWithTotalQuantity();
+	@Query("SELECT p.productId as id, p.code as code, p.name as name, "
+			+ "COALESCE(SUM(pw.quantityOnHand), 0) as totalQuantityOnHand " + "FROM Product p "
+			+ "LEFT JOIN ProductWarehouse pw ON p.productId = pw.productId " + "GROUP BY p.productId, p.code, p.name")
+	List<ProductInfoProjection> findProductInfoWithTotalQuantity();
 
 }

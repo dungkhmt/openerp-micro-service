@@ -1,19 +1,18 @@
 package openerp.openerpresourceserver.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import openerp.openerpresourceserver.entity.Product;
 import openerp.openerpresourceserver.entity.ProductInfoProjection;
-import openerp.openerpresourceserver.entity.ProductProjection;
-import openerp.openerpresourceserver.model.response.ProductGeneralResponse;
 
 public interface ProductService {
 
-//    Product createProduct(ProductRequest request);
-//
     List<ProductInfoProjection> getAllProductGeneral();
 
-    List<ProductGeneralResponse> getAllProductGeneralWithoutImage();
+	Product createProduct(Product product);
+	
+	boolean deleteProductById(UUID id);
 
 //    boolean deleteProducts(List<String> productIds);
 //

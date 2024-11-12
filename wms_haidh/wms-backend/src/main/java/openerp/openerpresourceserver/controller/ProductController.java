@@ -1,94 +1,67 @@
 package openerp.openerpresourceserver.controller;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.entity.Product;
+import openerp.openerpresourceserver.entity.ProductCategory;
 import openerp.openerpresourceserver.entity.ProductInfoProjection;
-import openerp.openerpresourceserver.entity.ProductProjection;
-import openerp.openerpresourceserver.model.response.ProductGeneralResponse;
+import openerp.openerpresourceserver.service.ProductCategoryService;
 import openerp.openerpresourceserver.service.ProductService;
 
 @RestController
 @RequestMapping("/admin/product")
 @Validated
-@Slf4j
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class ProductController {
 
     private ProductService productService;
-//    private ProductCategoryService productCategoryService;
-
-//    @PutMapping()
-//    public ResponseEntity<Product> createProduct(@RequestParam(required = false, name = "image") MultipartFile image,
-//                                                 @RequestParam("model") String model) {
-//        try {
-//            log.info("Model: " + model);
-//            log.info("Image: " + image);
-//            ObjectMapper mapper = new ObjectMapper();
-//            ProductRequest request = mapper.readValue(model, ProductRequest.class);
-//            request.setImage(image);
-//            log.info("Create product with request " + request);
-//            return ResponseEntity.ok(productService.createProduct(request));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
+    private ProductCategoryService productCategoryService;
 
     @GetMapping
     public ResponseEntity<List<ProductInfoProjection>> getProductGeneral() {
         return ResponseEntity.ok(productService.getAllProductGeneral());
     }
-
-    @GetMapping("/without-image")
-    public ResponseEntity<List<ProductGeneralResponse>> getProductGeneralWithoutImage() {
-        log.info("Start get product with out images");
-        return ResponseEntity.ok(productService.getAllProductGeneralWithoutImage());
+    
+    @PostMapping("/create-product")
+    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
+        // Tạo sản phẩm mới từ dữ liệu nhận được
+        Product savedProduct = productService.createProduct(product);
+        return ResponseEntity.ok(savedProduct);
+    }
+    
+    @PostMapping("/delete-product")
+    public ResponseEntity<String> deleteProduct(@RequestBody Map<String, Object> requestBody) {
+        try {
+            String id = (String) requestBody.get("id");
+            UUID uuid = UUID.fromString(id); // Convert the string to UUID
+            boolean isDeleted = productService.deleteProductById(uuid);
+            if (isDeleted) {
+                return ResponseEntity.ok("Product deleted successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid UUID format");
+        }
     }
 
-//    @DeleteMapping
-//    public ResponseEntity<List<String>> delete(@RequestBody List<String> productIds) {
-//        return productService.deleteProducts(productIds) ?
-//            ResponseEntity.ok(productIds) :
-//            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(productIds);
-//    }
-//
-//    @GetMapping("/{id}")
-//    public ResponseEntity<ProductDetailResponse> getByProductId(@PathVariable String id) {
-//        return ResponseEntity.ok(productService.getById(id));
-//    }
-//
-//    @GetMapping(path = "/category")
-//    public ResponseEntity<List<ProductCategory>> getAll() {
-//        return ResponseEntity.ok(productCategoryService.getAll());
-//    }
-//
-//    @PutMapping(path = "/price-config")
-//    public ResponseEntity<String> createPriceConfig(@Valid @RequestBody ProductPriceRequest request) {
-//        return productService.createProductPrice(request) ?
-//            ResponseEntity.ok("OK") :
-//            new ResponseEntity<>("FAIL", HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
-//
-//    @GetMapping(path = "/price-config")
-//    public ResponseEntity<List<ProductPriceResponse>> getAllProductPrices() {
-//        return ResponseEntity.ok(productService.getAllProductPrices());
-//    }
-//
-//    @DeleteMapping(path = "/price-config/{priceIds}")
-//    public ResponseEntity<String> deleteProductPriceById(@PathVariable String[] priceIds) {
-//        return productService.deleteProductPriceById(priceIds) ?
-//            ResponseEntity.ok("OK") :
-//            new ResponseEntity<>("FAIL", HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
+    @GetMapping(path = "/category")
+    public ResponseEntity<List<ProductCategory>> getAll() {
+        return ResponseEntity.ok(productCategoryService.getAll());
+    }
+
 }
 
