@@ -83,7 +83,6 @@ function ManagerViewProblemDetailV2() {
   const [roles, setRoles] = useState([]);
   const [sampleTestCase, setSampleTestCase] = useState(null);
 
-  // State for Clone Dialog
   const [openCloneDialog, setOpenCloneDialog] = useState(false);
   const [newProblemId, setNewProblemId] = useState("");
   const [newProblemName, setNewProblemName] = useState("");
@@ -126,11 +125,11 @@ function ManagerViewProblemDetailV2() {
   }, [problemId]);
 
   const hasSpecialCharacterProblemId = () => {
-    return !new RegExp(/^[0-9a-zA-Z_-]*$/).test(newProblemId); // Check for allowed characters
+    return !new RegExp(/^[0-9a-zA-Z_-]*$/).test(newProblemId); 
   };
 
   const hasSpecialCharacterProblemName = () => {
-    return !new RegExp(/^[0-9a-zA-Z]*$/).test(newProblemName); // Check for allowed characters
+    return !new RegExp(/^[0-9a-zA-Z ]*$/).test(newProblemName);
   };
 
   const handleCloneDialogOpen = () => {
@@ -142,31 +141,50 @@ function ManagerViewProblemDetailV2() {
     setNewProblemId("");
     setNewProblemName("");
     setErrorMessage("");
+    history.push("/programming-contest/list-problems"); // comment this line : not return to list-problems when click cancel button
   };
 
   const handleClone = () => {
     if (hasSpecialCharacterProblemId()) {
-      setErrorMessage("Problem ID can only contain letters, numbers, underscores, and hyphens.");
-      return;
+        setErrorMessage("Problem ID can only contain letters, numbers, underscores, and hyphens.");
+        return;
     }
     if (hasSpecialCharacterProblemName()) {
-      setErrorMessage("Problem Name can only contain letters and numbers.");
-      return;
+        setErrorMessage("Problem Name can only contain letters and numbers.");
+        return;
     }
 
-    request("post", "teacher/problems/clone", {
-      problemId: newProblemId,
-      problemName: newProblemName,
-    }, (res) => {
-      if (res.success) {
-        handleCloneDialogClose();
-        history.push("/programming-contest/list-problems");
-      } else {
-        // Handle error (e.g., show a notification)
-        setErrorMessage("Failed to clone the problem. Please try again.");
-      }
-    });
-  };
+    const cloneRequest = {
+        oldProblemId: problemId,
+        newProblemId: newProblemId,
+        newProblemName: newProblemName,
+    };
+
+    request(
+        "post", 
+        "/teachers/problems/clone",
+        (res) => { 
+            handleCloneDialogClose();
+            history.push("/programming-contest/list-problems");
+        },
+        {
+            onError: (error) => {
+                setErrorMessage("Failed to clone the problem. Please try again.");
+                console.error("Error cloning problem:", error);
+            },
+            400: (error) => {
+                setErrorMessage("Invalid request. Please check your input.");
+            },
+            404: (error) => {
+                setErrorMessage("Original problem not found.");
+            },
+            500: (error) => {
+              setErrorMessage("Original problem already exists.");
+          },
+        },
+        cloneRequest 
+    );
+};
 
   return (
     <HustContainerCard

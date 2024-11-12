@@ -5,6 +5,7 @@ import com.hust.baseweb.applications.programmingcontest.callexternalapi.model.Lm
 import com.hust.baseweb.applications.programmingcontest.callexternalapi.service.ApiService;
 import com.hust.baseweb.applications.programmingcontest.entity.ProblemEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.TagEntity;
+import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.UserContestProblemRole;
 import com.hust.baseweb.applications.programmingcontest.exception.MiniLeetCodeException;
 import com.hust.baseweb.applications.programmingcontest.model.*;
@@ -13,6 +14,7 @@ import com.hust.baseweb.applications.programmingcontest.model.externalapi.GetSub
 import com.hust.baseweb.applications.programmingcontest.model.externalapi.SubmissionModelResponse;
 import com.hust.baseweb.applications.programmingcontest.repo.ContestProblemRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.ProblemRepo;
+import com.hust.baseweb.applications.programmingcontest.repo.TestCaseRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.UserContestProblemRoleRepo;
 import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseService;
 import com.hust.baseweb.service.UserService;
@@ -41,6 +43,7 @@ import java.util.UUID;
 @Slf4j
 public class ProblemController {
 
+    private final TestCaseRepo testCaseRepo;
     ProblemTestCaseService problemTestCaseService;
     UserService userService;
     UserContestProblemRoleRepo userContestProblemRoleRepo;
@@ -250,6 +253,11 @@ public class ProblemController {
         return ResponseEntity.ok().headers(headers).body(stream);
     }
 
+    @PostMapping(value = "/teachers/problems/clone")
+    public ResponseEntity<?> cloneProblem(@RequestBody ModelCloneProblem cloneRequest) throws MiniLeetCodeException {
+        ProblemEntity savedProblem = problemTestCaseService.cloneProblem(cloneRequest);
+        return ResponseEntity.ok().body(savedProblem);
+    }
 
     @Secured("ROLE_TEACHER")
     @GetMapping("/teacher/owned-problems")

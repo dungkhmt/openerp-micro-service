@@ -128,11 +128,11 @@ function CreateProblem() {
     return new RegExp(/[%^/\\|.?;[\]]/g).test(problemId);
   };
   const hasSpecialCharacterProblemId = () => {
-    return !new RegExp(/^[0-9a-zA-Z_-]*$/).test(problemId);  // Kiểm tra chỉ cho phép chữ cái, số, _ và -
+    return !new RegExp(/^[0-9a-zA-Z_-]*$/).test(problemId); 
   };
 
   const hasSpecialCharacterProblemName = () => {
-    return !new RegExp(/^[0-9a-zA-Z]*$/).test(problemName);  // Kiểm tra chỉ cho phép chữ cái và số, không cho phép _ hoặc -
+    return !new RegExp(/^[0-9a-zA-Z ]*$/).test(problemName); 
   };
 
   const validateSubmit = () => {

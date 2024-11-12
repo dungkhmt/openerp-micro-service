@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -3855,4 +3856,67 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                           .count(count)
                                           .build();
     }
+
+    @Override
+    public ProblemEntity cloneProblem(ModelCloneProblem cloneRequest) throws MiniLeetCodeException {
+
+        ProblemEntity existProblem = problemRepo.findById(cloneRequest.getNewProblemId())
+                                                   .orElseThrow(() -> new MiniLeetCodeException("Original problem already exist", HttpStatus.valueOf("Original problem already exist").value()));
+        if(existProblem != null){
+            throw new MiniLeetCodeException("Original problem already exists", HttpStatus.CONFLICT.value());
+        }
+
+        ProblemEntity originalProblem = problemRepo.findById(cloneRequest.getOldProblemId())
+                                                   .orElseThrow(() -> new MiniLeetCodeException("Original problem not found", HttpStatus.NOT_FOUND.value()));
+
+        ProblemEntity newProblem = new ProblemEntity();
+        newProblem.setProblemId(cloneRequest.getNewProblemId());
+        newProblem.setProblemName(cloneRequest.getNewProblemName());
+        newProblem.setProblemDescription(originalProblem.getProblemDescription());
+        newProblem.setTimeLimitCPP(originalProblem.getTimeLimitCPP());
+        newProblem.setTimeLimitJAVA(originalProblem.getTimeLimitJAVA());
+        newProblem.setTimeLimitPYTHON(originalProblem.getTimeLimitPYTHON());
+        newProblem.setMemoryLimit(originalProblem.getMemoryLimit());
+        newProblem.setCorrectSolutionSourceCode(originalProblem.getCorrectSolutionSourceCode());
+        newProblem.setCorrectSolutionLanguage(originalProblem.getCorrectSolutionLanguage());
+        newProblem.setPublicProblem(originalProblem.isPublicProblem());
+        newProblem.setTags(originalProblem.getTags());
+        newProblem.setUserId(originalProblem.getUserId());
+        newProblem.setTimeLimit(originalProblem.getTimeLimit());
+        newProblem.setLevelId(originalProblem.getLevelId());
+        newProblem.setCategoryId(originalProblem.getCategoryId());
+        newProblem.setSolutionCheckerSourceCode(originalProblem.getSolutionCheckerSourceCode());
+        newProblem.setSolutionCheckerSourceLanguage(originalProblem.getSolutionCheckerSourceLanguage());
+        newProblem.setSolution(originalProblem.getSolution());
+        newProblem.setLevelOrder(originalProblem.getLevelOrder());
+        newProblem.setCreatedAt(originalProblem.getCreatedAt());
+        newProblem.setAttachment(originalProblem.getAttachment());
+        newProblem.setScoreEvaluationType(originalProblem.getScoreEvaluationType());
+        newProblem.setAppearances(originalProblem.getAppearances());
+        newProblem.setPreloadCode(originalProblem.getPreloadCode());
+        newProblem.setIsPreloadCode(originalProblem.getIsPreloadCode());
+        newProblem.setStatusId(originalProblem.getStatusId());
+        newProblem.setSampleTestcase(originalProblem.getSampleTestcase());
+
+        ProblemEntity savedProblem = problemRepo.save(newProblem);
+
+        List<TestCaseEntity> originalTestCases = testCaseRepo.findAllByProblemId(cloneRequest.getOldProblemId());
+
+        for (TestCaseEntity originalTestCase : originalTestCases) {
+            TestCaseEntity newTestCase = new TestCaseEntity();
+            newTestCase.setTestCasePoint(originalTestCase.getTestCasePoint());
+            newTestCase.setTestCase(originalTestCase.getTestCase());
+            newTestCase.setCorrectAnswer(originalTestCase.getCorrectAnswer());
+            newTestCase.setProblemId(cloneRequest.getNewProblemId());
+            newTestCase.setIsPublic(originalTestCase.getIsPublic());
+            newTestCase.setDescription(originalTestCase.getDescription());
+            newTestCase.setStatusId(originalTestCase.getStatusId());
+
+            testCaseRepo.save(newTestCase);
+        }
+
+        return savedProblem;
+    }
+
+
 }
