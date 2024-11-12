@@ -14,12 +14,12 @@ import {
   DropdownItem,
   Pagination,
 } from "@nextui-org/react";
-import { PlusIcon } from "./PlusIcon";
-import { VerticalDotsIcon } from "./VerticalDotsIcon";
-import { SearchIcon } from "./SearchIcon";
-// import { ChevronDownIcon } from "./ChvronDownIcon";
-import { columns, statusOptions } from "./data";
-// import { capitalize } from "./utils";
+import { PlusIcon } from "../components/icon/PlusIcon";
+import { VerticalDotsIcon } from "../components/icon/VerticalDotsIcon";
+import { SearchIcon } from "../components/icon/SearchIcon";
+// import { ChevronDownIcon } from "../components/icon/ChvronDownIcon";
+import { columns, statusOptions } from "../config/data";
+// import { capitalize } from "../utils/utils";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../api";
@@ -35,10 +35,6 @@ export default function BaseTable() {
 
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(1);
-
-  useEffect(() => {
-    console.log("Current page:", page);
-  }, [page]);
 
   useEffect(() => {
     request("get", "/admin/product", (res) => {
@@ -60,7 +56,7 @@ export default function BaseTable() {
     column: "id",
     direction: "ascending",
   });
-  
+
 
   const pages = Math.ceil(items.length / rowsPerPage);
   const hasSearchFilter = Boolean(filterValue);
@@ -183,7 +179,19 @@ export default function BaseTable() {
   };
 
   const handleDelete = (id) => {
-    setItems(prevItems => prevItems.filter(item => item.id !== id));
+    request(
+      "post", // HTTP method
+      "/admin/product/delete-product", // Endpoint for deleting product
+      (res) => {
+        if (res.status === 200) {
+          setItems(prevItems => prevItems.filter(item => item.id !== id));
+        }
+      },
+      {
+        onError: (e) => console.error("Error deleting product:", e),
+      },
+      { id }
+    );
   };
 
 

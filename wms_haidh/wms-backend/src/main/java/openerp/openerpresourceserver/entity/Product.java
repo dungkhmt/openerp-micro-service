@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
@@ -22,6 +24,7 @@ import lombok.ToString;
 @Table(name = "wms_product")
 public class Product {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID productId;
     private String code;
     private String name;
