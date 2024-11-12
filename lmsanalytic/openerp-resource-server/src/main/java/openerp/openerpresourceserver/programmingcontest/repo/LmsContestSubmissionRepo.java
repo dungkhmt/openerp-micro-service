@@ -14,5 +14,6 @@ public interface LmsContestSubmissionRepo extends JpaRepository<LmsContestSubmis
     List<LmsContestSubmission> findEarlestPage5Items();
     @Query(value = "select min(submission_created_stamp) from lms_contest_submission", nativeQuery = true)
     Date findMinSubmissionCreatedStamp();
+    List<LmsContestSubmission> findAllByUserSubmissionId(String userSubmissionId);
 }
 

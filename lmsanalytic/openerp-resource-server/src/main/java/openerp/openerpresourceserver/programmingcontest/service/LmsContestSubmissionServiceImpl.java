@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Log4j2
@@ -60,6 +61,16 @@ public class LmsContestSubmissionServiceImpl implements  LmsContestSubmissionSer
         lcs = lmsContestSubmissionRepo.save(lcs);
 
         return lcs;
+    }
+
+    @Override
+    public List<LmsContestSubmission> findAll() {
+        return lmsContestSubmissionRepo.findAll();
+    }
+
+    @Override
+    public List<LmsContestSubmission> findSubmissionsByUserSubmissionId(String userSubmissionId) {
+        return lmsContestSubmissionRepo.findAllByUserSubmissionId(userSubmissionId);
     }
 }
 
