@@ -43,6 +43,28 @@ public class ContestController {
         return ResponseEntity.ok().body("OK");
     }
 
+    @GetMapping("/get-submissions")
+    public ResponseEntity<?> getAllContestSubmissions(Principal principal){
+        List<LmsContestSubmission> submissions = lmsContestSubmissionService.findAll();
+        log.info("getAllContestSubmissions, submissions = " + submissions.size());
+        return ResponseEntity.ok().body(submissions);
+    }
+
+    @GetMapping("/get-submissions/{userId}")
+    public ResponseEntity<?> getSubmissionsByStudent(@PathVariable String userId) {
+        List<LmsContestSubmission> submissions = lmsContestSubmissionService.findSubmissionsByUserSubmissionId(userId);
+        int numberOfSubmissions = submissions.size();
+        int numberOfAcceptedSubmissions = (int) submissions.stream()
+                .filter(submission -> "Accept".equalsIgnoreCase(submission.getStatus()))
+                .count();
+        int numberOfCompileErrorSubmissions = (int) submissions.stream()
+                .filter(submission -> "Compile Error".equalsIgnoreCase(submission.getStatus()))
+                .count();
+        UserSubmissionsResponse response = new UserSubmissionsResponse(numberOfSubmissions, numberOfAcceptedSubmissions, numberOfCompileErrorSubmissions, submissions);
+        log.info("Fetched {} submissions ({} accepted and {} compile error) for userId = {}", numberOfSubmissions, numberOfAcceptedSubmissions, numberOfCompileErrorSubmissions, userId);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/get-contest-problem-ranking")
     public ResponseEntity<?> getContestProblemRanking(Principal principal){
         List<ProgrammingContestProblemRanking> res = programmingContestProblemRankingService.findAll();
