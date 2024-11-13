@@ -1,0 +1,19 @@
+{
+  "contest": "Contest",
+  "contestId": "Contest ID",
+  "contestName": "Tên Contest",
+  "contestTime": "Contest time",
+  "isPublic": "Công khai",
+  "submissionActionType": "Action for Submission",
+  "maxNumberSubmission": "Số lượt nộp bài tối đa",
+  "maxSourceCodeLength": "Độ dài source code tối đa (ký tự)",
+  "participantViewResultMode": "Chế độ xem kết quả của sinh viên",
+  "judgeMode": "Chế độ chấm",
+  "evaluateBothPublicPrivateTestcase": "Đánh giá Testcase",
+  "problemDescriptionViewType": "Hiển thị mô tả bài tập",
+  "createContest": "Tạo mới Contest",
+  "editContest": "Chỉnh sửa Contest",
+  "validateSubmit": {
+      "missingField": "Trường {{fieldName}} không được bỏ trống"
+  }
+}

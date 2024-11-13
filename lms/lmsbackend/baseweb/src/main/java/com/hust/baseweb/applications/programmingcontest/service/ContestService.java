@@ -16,9 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -68,34 +68,44 @@ public class ContestService {
         String contestId = contestEntity.getContestId();
         List<ModelGetProblemDetailResponse> problems = new ArrayList<>();
 
-        contestEntity.getProblems().forEach(contestProblem -> {
-            ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(
-                contestEntity.getContestId(),
-                contestProblem.getProblemId());
-            String submissionMode = "";
-            String problemRename = "";
-            String problemRecode = "";
-            String forbiddenInstructions = "";
-            if (cp != null) {
-                submissionMode = cp.getSubmissionMode();
-                problemRename = cp.getProblemRename();
-                problemRecode = cp.getProblemRecode();
-                forbiddenInstructions = cp.getForbiddenInstructions();
-            }
-            ModelGetProblemDetailResponse p = ModelGetProblemDetailResponse.builder()
-                                                                           .levelId(contestProblem.getLevelId())
-                                                                           .problemId(contestProblem.getProblemId())
-                                                                           .problemName(contestProblem.getProblemName())
-                                                                           .problemRename(problemRename)
-                                                                           .problemRecode(problemRecode)
-                                                                           .forbiddenInstructions(forbiddenInstructions)
-                                                                           .levelOrder(contestProblem.getLevelOrder())
-                                                                           .problemDescription(contestProblem.getProblemDescription())
-                                                                           .createdByUserId(contestProblem.getUserId())
-                                                                           .submissionMode(submissionMode)
-                                                                           .build();
-            problems.add(p);
-        });
+
+        // Ensure problem list is not null
+        if (contestEntity.getProblems() != null) {
+            contestEntity.getProblems().forEach(contestProblem -> {
+                ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(
+                    contestEntity.getContestId(),
+                    contestProblem.getProblemId());
+
+                // Initialize default values
+                String submissionMode = "";
+                String problemRename = "";
+                String problemRecode = "";
+                String forbiddenInstructions = "";
+
+                // If contest problem exists in the repository, update values
+                if (cp != null) {
+                    submissionMode = cp.getSubmissionMode();
+                    problemRename = cp.getProblemRename();
+                    problemRecode = cp.getProblemRecode();
+                    forbiddenInstructions = cp.getForbiddenInstructions();
+                }
+
+                ModelGetProblemDetailResponse p = ModelGetProblemDetailResponse.builder()
+                                                                               .levelId(contestProblem.getLevelId())
+                                                                               .problemId(contestProblem.getProblemId())
+                                                                               .problemName(contestProblem.getProblemName())
+                                                                               .problemRename(problemRename)
+                                                                               .problemRecode(problemRecode)
+                                                                               .forbiddenInstructions(forbiddenInstructions)
+                                                                               .levelOrder(contestProblem.getLevelOrder())
+                                                                               .problemDescription(contestProblem.getProblemDescription())
+                                                                               .createdByUserId(contestProblem.getUserId())
+                                                                               .submissionMode(submissionMode)
+                                                                               .build();
+
+                problems.add(p);
+            });
+        }
 
         return ModelGetContestDetailResponse
             .builder()
@@ -122,11 +132,14 @@ public class ContestService {
             .judgeMode(contestEntity.getJudgeMode())
             .participantViewSubmissionMode(contestEntity.getParticipantViewSubmissionMode())
             .listParticipantViewSubmissionModes(ContestEntity.getListParticipantViewSubmissionModes())
-            //.languagesAllowed(contestEntity.getListLanguagesAllowed())
             .languagesAllowed(contestEntity.getLanguagesAllowed())
             .listLanguagesAllowed(contestEntity.getListLanguagesAllowed())
             .contestType(contestEntity.getContestType())
             .listContestTypes(ContestEntity.getListContestTypes())
+            .contestShowTag(contestEntity.getContestShowTag())
+            .listContestShowTags(contestEntity.getListContestShowTag())
+            .contestShowComment(contestEntity.getContestShowComment())
+            .listContestShowComments(contestEntity.getListContestShowComment())
             .build();
     }
 
@@ -135,9 +148,8 @@ public class ContestService {
         contestSubmissionRepo.updateContestSubmissionStatus(submissionId, status);
     }
 
-    public String getProblemNameInContest(String contestId, String problemId){
-        ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(contestId,problemId);
-        if(cp == null) return null;
-        return cp.getProblemRename();
+    public String getProblemNameInContest(String contestId, String problemId) {
+        ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(contestId, problemId);
+        return cp != null ? cp.getProblemRename() : null;
     }
 }

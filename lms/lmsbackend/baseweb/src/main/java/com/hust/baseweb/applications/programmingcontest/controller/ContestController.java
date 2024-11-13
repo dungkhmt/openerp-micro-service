@@ -1,6 +1,8 @@
 package com.hust.baseweb.applications.programmingcontest.controller;
 
 import com.google.gson.Gson;
+import com.hust.baseweb.applications.programmingcontest.callexternalapi.model.LmsLogModelCreate;
+import com.hust.baseweb.applications.programmingcontest.callexternalapi.service.ApiService;
 import com.hust.baseweb.applications.programmingcontest.constants.Constants;
 import com.hust.baseweb.applications.programmingcontest.entity.*;
 import com.hust.baseweb.applications.programmingcontest.exception.MiniLeetCodeException;
@@ -13,6 +15,7 @@ import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseS
 import com.hust.baseweb.service.UserService;
 import io.lettuce.core.dynamic.annotation.Param;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -24,6 +27,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,7 +37,7 @@ import java.io.InputStream;
 import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
-
+@Log4j2
 @RestController
 @CrossOrigin
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -47,6 +51,7 @@ public class ContestController {
     UserService userService;
     ContestService contestService;
 
+    ApiService apiService;
     @Secured("ROLE_TEACHER")
     @PostMapping("/contests")
     public ResponseEntity<?> createContest(
@@ -72,7 +77,19 @@ public class ContestController {
         }
     }
 
+    @Async
+    public void logUpdateContest(String userId, String contestId, ModelUpdateContest modelUpdateContest){
+        LmsLogModelCreate logM = new LmsLogModelCreate();
+        logM.setUserId(userId);
+        log.info("logUpdateContest, userId = " + logM.getUserId());
+        logM.setParam1(contestId);
+        logM.setParam2(modelUpdateContest.getStatusId());
+        logM.setParam3(modelUpdateContest.getContestName());
 
+        logM.setActionType("MANAGER_UPDATE_CONTEST");
+        logM.setDescription("an user update a contest");
+        apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
+    }
     @Secured("ROLE_TEACHER")
     @PutMapping("/contests/{contestId}")
     public ResponseEntity<?> editContest(
@@ -81,8 +98,9 @@ public class ContestController {
     ) throws Exception {
         log.info("edit contest modelUpdateContest {}", modelUpdateContest);
 
-        problemTestCaseService.updateContest(modelUpdateContest, principal.getName(), contestId);
+        logUpdateContest(principal.getName(),contestId, modelUpdateContest);
 
+        problemTestCaseService.updateContest(modelUpdateContest, principal.getName(), contestId);
         return ResponseEntity.status(200).body(null);
     }
 
@@ -117,19 +135,50 @@ public class ContestController {
         return ResponseEntity.ok().body(L);
     }
 
+    @Async
+    public void logGetContestDetail(String userId, String contestId){
+        LmsLogModelCreate logM = new LmsLogModelCreate();
+        logM.setUserId(userId);
+        log.info("logGetContestDetail, userId = " + logM.getUserId());
+        logM.setParam1(contestId);
+
+        logM.setActionType("MANAGER_GET_CONTEST_DETAIL");
+        logM.setDescription("an user get detail of a contest");
+        apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
+    }
+
     @GetMapping("/contests/{contestId}")
     public ResponseEntity<?> getContestDetail(@PathVariable("contestId") String contestId, Principal principal) {
         log.info("getContestDetail constestid {}", contestId);
+
+        logGetContestDetail(principal.getName(),contestId);
+
         ModelGetContestDetailResponse response = problemTestCaseService.getContestDetailByContestIdAndTeacher(
             contestId,
             principal.getName());
         return ResponseEntity.status(200).body(response);
     }
 
+    @Async
+    public void logStudentGetProblemOfContestForSolving(String userId, String contestId, String problemId){
+        LmsLogModelCreate logM = new LmsLogModelCreate();
+        logM.setUserId(userId);
+        log.info("logStudentGetProblemOfContestForSolving, userId = " + logM.getUserId());
+        logM.setParam1(contestId);
+        logM.setParam2(problemId);
+
+        logM.setActionType("STUDENT_GET_A_PROBLEM_OF_CONTEST_FOR_SOLVING");
+        logM.setDescription("an user get a problem of a contest for solving");
+        apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
+    }
     @GetMapping("/contests/{contestId}/problems/{problemId}")
-    public ResponseEntity<?> getProblemDetailInContestViewByStudent(
+    public ResponseEntity<?> getProblemDetailInContestViewByStudent(Principal principal,
         @PathVariable("problemId") String problemId, @PathVariable("contestId") String contestId
     ) {
+
+        logStudentGetProblemOfContestForSolving(principal.getName(),contestId,problemId);
+
+        //System.out.println("ALO");
         try {
             ContestEntity contestEntity = contestRepo.findContestByContestId(contestId);
             ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(contestId, problemId);
@@ -170,18 +219,33 @@ public class ContestController {
         List<ProblemEntity> listProblem = contestEntity.getProblems();
         return ResponseEntity.status(200).body(listProblem);
     }
+    @Async
+    public void logStudentGetDetailContest(String userId, String contestId){
+        LmsLogModelCreate logM = new LmsLogModelCreate();
+        logM.setUserId(userId);
+        log.info("logStudentGetDetailContest, userId = " + logM.getUserId());
+        logM.setParam1(contestId);
 
+
+        logM.setActionType("STUDENT_GET_DETAIL_CONTEST");
+        logM.setDescription("an student get detail of a contest");
+        apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
+    }
     @GetMapping("/contests/{contestId}/problems/v2")
     public ResponseEntity<?> getListContestProblemViewedByStudentV2(
         @PathVariable("contestId") String contestId,
         Principal principal
     ) {
         String userId = principal.getName();
+
+        logStudentGetDetailContest(userId,contestId);
+
         ContestEntity contest = contestService.findContest(contestId);
 
+
         List<ProblemEntity> problems = contest.getProblems();
-        List<String> acceptedProblems = contestSubmissionRepo.findAcceptedProblemsOfUser(userId, contestId);
-        List<ModelProblemMaxSubmissionPoint> submittedProblems = contestSubmissionRepo.findSubmittedProblemsOfUser(
+        List<String> acceptedProblems = contestSubmissionRepo.findAcceptedProblemsOfUser (userId, contestId);
+        List<ModelProblemMaxSubmissionPoint> submittedProblems = contestSubmissionRepo.findSubmittedProblemsOfUser (
             userId,
             contestId);
 
@@ -217,8 +281,12 @@ public class ContestController {
                 response.setProblemCode(contestProblem.getProblemRecode());
                 response.setLevelId(problem.getLevelId());
 
-                List<String> tags = problem.getTags().stream().map(TagEntity::getName).collect(Collectors.toList());
-                response.setTags(tags);
+                if (contest.getContestShowTag() != null && contest.getContestShowTag().equals("N")) {
+                    response.setTags(new ArrayList<>());
+                } else {
+                    List<String> tags = problem.getTags().stream().map(TagEntity::getName).collect(Collectors.toList());
+                    response.setTags(tags);
+                }
 
                 if (mapProblemToMaxSubmissionPoint.containsKey(problemId)) {
                     response.setSubmitted(true);
@@ -254,11 +322,25 @@ public class ContestController {
         return ResponseEntity.status(200).body(resp);
     }
 
+    @Async
+    public void logTeacherGetMyContest(String userId){
+        LmsLogModelCreate logM = new LmsLogModelCreate();
+        logM.setUserId(userId);
+        log.info("logTeacherGetMyContest, userId = " + logM.getUserId());
+
+        logM.setActionType("TEACHER_GET_MY_CONTESTS");
+        logM.setDescription("an manager (teacher) get his contests");
+        apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
+    }
+
     @Secured("ROLE_TEACHER")
     @GetMapping("/contests")
     public ResponseEntity<?> getManagedContestOfTeacher(Principal principal) {
         List<ModelGetContestResponse> resp = problemTestCaseService
             .getManagedContestOfTeacher(principal.getName());
+
+        logTeacherGetMyContest(principal.getName());
+
         return ResponseEntity.status(200).body(resp);
     }
 
@@ -266,7 +348,10 @@ public class ContestController {
     @GetMapping("/all-contests")
     public ResponseEntity<?> getAllContest(Principal principal) {
         List<ModelGetContestResponse> resp = problemTestCaseService
-            .getAllContests(principal.getName());
+            .getAllContests(principal.getName())
+            .stream()
+            .filter(contestResponse -> !contestResponse.getStatusId().equals("DISABLED"))
+            .collect(Collectors.toList());
         return ResponseEntity.status(200).body(resp);
     }
 
@@ -385,9 +470,26 @@ public class ContestController {
         return ResponseEntity.ok().body(true);
     }
 
+    @Async
+    public void logStudentGetHisContests(String userId){
+        LmsLogModelCreate logM = new LmsLogModelCreate();
+        logM.setUserId(userId);
+        log.info("logStudentGetHisContests, userId = " + logM.getUserId());
+
+        logM.setActionType("STUDENT_GET_LIST_HIS_CONTESTS");
+        logM.setDescription("an user (participant) get list of his contests");
+        apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
+    }
+
     @GetMapping("/students/contests")
     public ResponseEntity<?> getContestRegisteredStudent(Principal principal) {
-        ModelGetContestPageResponse res = problemTestCaseService.getRegisteredContestsByUser(principal.getName());
+        logStudentGetHisContests(principal.getName());
+
+        ModelGetContestPageResponse res = problemTestCaseService.getRegisteredContestsByUser (principal.getName());
+        List<ModelGetContestResponse> filteredContests = res.getContests().stream()
+                                                            .filter(contest -> Arrays.asList("CREATED", "RUNNING", "COMPLETED").contains(contest.getStatusId()))
+                                                            .collect(Collectors.toList());
+        res.setContests(filteredContests);
         return ResponseEntity.ok().body(res);
     }
 
@@ -458,11 +560,27 @@ public class ContestController {
         return ResponseEntity.status(200).body(res);
     }
 
+    @Async
+    private void logGetRankingOfContest(String userId, String contestId){
+        LmsLogModelCreate logM = new LmsLogModelCreate();
+        logM.setUserId(userId);
+        log.info("logGetRankingOfContest, userId = " + logM.getUserId());
+        logM.setParam1(contestId);
+
+        logM.setActionType("MANAGER_GET_RANKING_OF_A_CONTEST");
+        logM.setDescription("an user get ranking of a contest");
+        apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
+    }
+
+
     @GetMapping("/contests/ranking/{contestId}")
     public ResponseEntity<?> getRankingContestNewVersion(
+        Principal principal,
         @PathVariable("contestId") String contestId,
         @RequestParam Constants.GetPointForRankingType getPointForRankingType
     ) {
+        logGetRankingOfContest(principal.getName(),contestId);
+
         List<ContestSubmissionsByUser> res = problemTestCaseService.getRankingByContestIdNew(
             contestId,
             getPointForRankingType);
@@ -509,14 +627,27 @@ public class ContestController {
         return ResponseEntity.status(200).body(page);
     }
 
+    @Async
+    private void logGetSubmissionsOfContest(String userId, String contestId){
+        LmsLogModelCreate logM = new LmsLogModelCreate();
+        logM.setUserId(userId);
+        log.info("logGetSubmissionsOfContest, userId = " + logM.getUserId());
+        logM.setParam1(contestId);
+
+        logM.setActionType("MANAGER_GET_SUBMISSIONS_OF_A_CONTEST");
+        logM.setDescription("an user get submissions of a contest");
+        apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
+    }
     @Secured("ROLE_TEACHER")
     @GetMapping("/teacher/contests/{contestId}/submissions")
-    public ResponseEntity<?> getContestSubmissionPaging(
+    public ResponseEntity<?> getContestSubmissionPaging(Principal principal,
         @PathVariable("contestId") String contestId,
         @RequestParam String search,
         @RequestParam int page,
         @RequestParam int size
     ) {
+        logGetSubmissionsOfContest(principal.getName(),contestId);
+
         Pageable pageRequest = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<ContestSubmission> res = problemTestCaseService.findContestSubmissionByContestIdPaging(
             pageRequest,
@@ -601,6 +732,7 @@ public class ContestController {
             inputJson, ModelUploadExcelParticipantToContestInput.class);
         List<ModelAddUserToContestResponse> uploadedUsers = new ArrayList<>();
         String contestId = modelUpload.getContestId();
+        String role = modelUpload.getRole();
         try (InputStream is = file.getInputStream()) {
             XSSFWorkbook wb = new XSSFWorkbook(is);
             XSSFSheet sheet = wb.getSheetAt(0);
@@ -617,7 +749,13 @@ public class ContestController {
                 ModelAddUserToContest m = new ModelAddUserToContest();
                 m.setContestId(contestId);
                 m.setUserId(userId);
-                m.setRole(UserRegistrationContestEntity.ROLE_PARTICIPANT);
+                if ("Manager".equalsIgnoreCase(role)) {
+                    m.setRole(UserRegistrationContestEntity.ROLE_MANAGER);
+                } else if ("Owner".equalsIgnoreCase(role)) {
+                    m.setRole(UserRegistrationContestEntity.ROLE_OWNER);
+                } else {
+                    m.setRole(UserRegistrationContestEntity.ROLE_PARTICIPANT);
+                }
                 ModelAddUserToContestResponse response = problemTestCaseService.addUserToContest(m);
                 uploadedUsers.add(response);
             }

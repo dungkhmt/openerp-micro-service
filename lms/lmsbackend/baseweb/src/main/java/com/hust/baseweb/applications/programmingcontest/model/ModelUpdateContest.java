@@ -1,13 +1,14 @@
 package com.hust.baseweb.applications.programmingcontest.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
 
 @Data
-public class ModelUpdateContest {
-
+public class  ModelUpdateContest {
     private String contestName;
     private long contestSolvingTime;
     private List<String> problemIds;
@@ -27,4 +28,6 @@ public class ModelUpdateContest {
     private String participantViewSubmissionMode;
     private List<String> languagesAllowed;
     private String contestType;
+    private String contestShowTag;
+    private String contestShowComment;
 }

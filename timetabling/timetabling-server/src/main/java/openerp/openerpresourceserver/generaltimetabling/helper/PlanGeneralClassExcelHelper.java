@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.generaltimetabling.helper;
 
+import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.PlanGeneralClass;
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +14,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+@Log4j2
 public class PlanGeneralClassExcelHelper {
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     static String SHEET = "Sheet1";
@@ -54,46 +56,55 @@ public class PlanGeneralClassExcelHelper {
                     double decimalNumber = Double.parseDouble(value);
                     Integer intValue = (int) decimalNumber;
                     planGeneralClass.setNumberOfClasses(intValue);
+                }else{
+                    planGeneralClass.setNumberOfClasses(0);
                 }
                 break;
-            case 5:
+            //case 5:
+            case 9:
                 planGeneralClass.setLearningWeeks(value);
                 break;
-            case 6:
+            case 10:
                 planGeneralClass.setWeekType(value);
                 break;
-            case 7:
+            case 11:
                 planGeneralClass.setCrew(value);
                 break;
-            case 8:
+            case 5:
                 if (isNumeric(value)) {
                     double decimalNumber = Double.parseDouble(value);
                     Integer intValue = (int) decimalNumber;
                     planGeneralClass.setLectureMaxQuantity(intValue);
+                }else{
+                    planGeneralClass.setNumberOfClasses(0);
                 }
                 break;
-            case 9:
+            case 6:
                 if (isNumeric(value)) {
                     double decimalNumber = Double.parseDouble(value);
                     Integer intValue = (int) decimalNumber;
                     planGeneralClass.setExerciseMaxQuantity(intValue);
+                }else{
+                    planGeneralClass.setNumberOfClasses(0);
                 }
                 break;
-            case 10:
+            case 7:
                 if (isNumeric(value)) {
                     double decimalNumber = Double.parseDouble(value);
                     Integer intValue = (int) decimalNumber;
                     planGeneralClass.setLectureExerciseMaxQuantity(intValue);
+                }else{
+                    planGeneralClass.setNumberOfClasses(0);
                 }
                 break;
-            case 11:
-                if (isNumeric(value)) {
-                    double decimalNumber = Double.parseDouble(value);
-                    Integer intValue = (int) decimalNumber;
-                    planGeneralClass.setQuantityMax(intValue);
-                }
-                break;
-            case 12:
+            //case 11:
+            //    if (isNumeric(value)) {
+            //        double decimalNumber = Double.parseDouble(value);
+            //        Integer intValue = (int) decimalNumber;
+            //        planGeneralClass.setQuantityMax(intValue);
+            //    }
+            //    break;
+            case 8:
                 planGeneralClass.setProgramName(value);
                 break;
         }
@@ -114,7 +125,12 @@ public class PlanGeneralClassExcelHelper {
 
                 PlanGeneralClass planGeneralClass = new PlanGeneralClass();
                 for (int colIndex = START_COL_TO_READ_CLASS_INFO; colIndex<=END_COL_TO_READ_CLASS_INFO ; colIndex++) {
-                    if (sheet.getRow(rowIndex).getCell(colIndex).getCellType() == Cell.CELL_TYPE_NUMERIC) {
+                    if(sheet.getRow(rowIndex).getCell(colIndex) == null) {
+                        setPlanGeneralClassInfo(
+                                colIndex,
+                                null,
+                                planGeneralClass);
+                    } else if (sheet.getRow(rowIndex).getCell(colIndex).getCellType() == Cell.CELL_TYPE_NUMERIC) {
                         setPlanGeneralClassInfo(
                                 colIndex,
                                 String.valueOf(sheet.getRow(rowIndex).getCell(colIndex).getNumericCellValue()),
@@ -128,10 +144,13 @@ public class PlanGeneralClassExcelHelper {
                 }
                 planGeneralClass.setSemester(semester);
                 planGeneralClasses.add(planGeneralClass);
+                log.info("convertExcelToPlanGeneralClasses, extract row " + rowIndex + " course " + planGeneralClass.getModuleCode() + " name " + planGeneralClass.getModuleName() + " semester " + planGeneralClass.getSemester() + " quantity " + planGeneralClass.getNumberOfClasses());
+
                 rowIndex++;
             }
         } catch (Exception e ) {
-            System.out.println(e);
+            //System.out.println(e);
+            e.printStackTrace();
         }
         return planGeneralClasses;
     }

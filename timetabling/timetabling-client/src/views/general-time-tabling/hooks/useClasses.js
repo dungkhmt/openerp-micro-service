@@ -3,7 +3,7 @@ import { request } from "api";
 import { toast } from "react-toastify";
 import axios from "axios";
 
-export const useClasses = (group, semester) => {
+export const useClasses = (group, semester, refresh) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [classes, setClasses] = useState([]);
@@ -12,6 +12,7 @@ export const useClasses = (group, semester) => {
   useEffect(() => {
     if (semester === null) return;
     setLoading(true);
+
     request(
       "get",
       `/general-classes/?semester=${semester?.semester}&groupName=${
@@ -47,7 +48,6 @@ export const useClasses = (group, semester) => {
           return console.log(error);
         }
         toast.error(error.response?.data);
-        console.error(error);
         setError(error);
         setLoading(false);
       },
@@ -55,7 +55,7 @@ export const useClasses = (group, semester) => {
       null,
       controller
     );
-  }, [semester, group]);
+  }, [semester, group, refresh]);
 
   return { loading, error, classes, setClasses, setLoading };
 };

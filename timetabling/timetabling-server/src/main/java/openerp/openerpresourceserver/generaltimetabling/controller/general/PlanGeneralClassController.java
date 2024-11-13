@@ -1,11 +1,13 @@
 package openerp.openerpresourceserver.generaltimetabling.controller.general;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.generaltimetabling.exception.InvalidFieldException;
 import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.MakeGeneralClassRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.UpdateGeneralClassRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.UpdatePlanClassRequest;
+import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.ClearPlanClassInputModel;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.PlanGeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.service.impl.PlanGeneralClassService;
@@ -14,8 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
+@Log4j2
 @RequestMapping("/plan-general-classes")
 @Controller
 @AllArgsConstructor
@@ -60,7 +64,12 @@ public class PlanGeneralClassController {
     public ResponseEntity requestUpdatePlanClass(@RequestBody UpdatePlanClassRequest request) {
         return  ResponseEntity.ok(planClassService.updatePlanClass(request.getPlanClass()));
     }
-
+    @PostMapping("/clear-plan")
+    public ResponseEntity<?> clearPlanClass(Principal principal, @RequestBody ClearPlanClassInputModel I){
+        log.info("clearPlanClass semester = " + I.getSemesterId());
+        planClassService.clearPlanClass(I.getSemesterId());
+        return ResponseEntity.ok().body("OK");
+    }
     @DeleteMapping("/")
     public ResponseEntity<PlanGeneralClass> requestDeletePlanClass(@RequestParam("planClassId") Long planClassId) {
         return ResponseEntity.ok(planClassService.deleteClassById(planClassId));

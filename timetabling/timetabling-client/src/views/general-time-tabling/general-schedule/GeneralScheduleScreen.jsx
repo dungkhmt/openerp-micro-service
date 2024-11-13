@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import GeneralScheduleTable from "./components/GeneralScheduleTable";
-import { Button} from "@mui/material";
+import { Button } from "@mui/material";
 import GeneralGroupAutoComplete from "../common-components/GeneralGroupAutoComplete";
 import GeneralSemesterAutoComplete from "../common-components/GeneralSemesterAutoComplete";
 import { request } from "api";
@@ -8,17 +8,19 @@ import { FacebookCircularProgress } from "components/common/progressBar/Customiz
 import { toast } from "react-toastify";
 import { useClasses } from "../hooks/useClasses";
 import AutoScheduleDialog from "./components/AutoScheduleDialog";
+import TimeTable from "./components/TimeTable";
 
 const GeneralScheduleScreen = () => {
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [isResetLoading, setResetLoading] = useState(false);
-  const [isSaveLoading, setSaveLoading] = useState(false);
   const [isTimeScheduleLoading, setTimeScheduleLoading] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
-  const { loading, error, classes, setClasses, setLoading } = useClasses(
+  const [refresh, setRefresh] = useState(false); // Thêm cờ refresh
+  const { loading, classes, setClasses, setLoading } = useClasses(
     selectedGroup,
-    selectedSemester
+    selectedSemester,
+    refresh
   );
   const [saveRequests, setSaveRequests] = useState([]);
   const [isAutoSaveLoading, setAutoSaveLoading] = useState(false);
@@ -27,6 +29,10 @@ const GeneralScheduleScreen = () => {
   const [isExportExecelLoading, setExportExcelLoading] = useState(false);
   const [classroomTimeLimit, setClassroomTimeLimit] = useState(5);
   const [timeSlotTimeLimit, setTimeSlotTimeLimit] = useState(5);
+
+  const handleRefreshClasses = () => {
+    setRefresh((prev) => !prev);
+  };
 
   const handleResetTimeTabling = () => {
     setResetLoading(true);
@@ -65,6 +71,7 @@ const GeneralScheduleScreen = () => {
       { ids: selectedRows }
     );
   };
+
   const handleAutoScheduleTimeSlotTimeTabling = () => {
     setAutoSaveLoading(true);
     request(
@@ -130,7 +137,6 @@ const GeneralScheduleScreen = () => {
               delete cloneObj.timeSlots;
               generalClasses.push(cloneObj);
             });
-            console.log(generalClasses);
           }
         });
         setClasses(generalClasses);
@@ -181,34 +187,35 @@ const GeneralScheduleScreen = () => {
     ).then();
   };
 
-  const handleSaveTimeTabling = () => {
-    setSaveLoading(true);
-    request(
-      "post",
-      `/general-classes/update-class-schedule-v2?semester=${selectedSemester?.semester}`,
-      (res) => {
-        setSaveLoading(false);
-        toast.success("Lưu TKB thành công!");
-        console.log(res.data);
-        setSaveRequests([]);
-      },
-      (error) => {
-        if (error.response.status === 410) {
-          toast.warn(error.response.data);
-        } else if (error.response.status === 420) {
-          toast.error(error.response.data);
-        } else {
-          toast.error("Có lỗi khi lưu TKB!");
-        }
-        setSaveLoading(false);
-        console.log(error);
-      },
-      { saveRequests: saveRequests }
-    );
-  };
+  // const handleSaveTimeTabling = () => {
+  //   setSaveLoading(true);
+  //   request(
+  //     "post",
+  //     `/general-classes/update-class-schedule-v2?semester=${selectedSemester?.semester}`,
+  //     (res) => {
+  //       setSaveLoading(false);
+  //       toast.success("Lưu TKB thành công!");
+  //       console.log(res.data);
+  //       setSaveRequests([]);
+  //       handleRefreshClasses();
+  //     },
+  //     (error) => {
+  //       if (error.response.status === 410) {
+  //         toast.warn(error.response.data);
+  //       } else if (error.response.status === 420) {
+  //         toast.error(error.response.data);
+  //       } else {
+  //         toast.error("Có lỗi khi lưu TKB!");
+  //       }
+  //       setSaveLoading(false);
+  //       console.log(error);
+  //     },
+  //     { saveRequests: saveRequests }
+  //   );
+  // };
 
   return (
-    <div className="flex flex-col gap-4 w-full h-[700px]">
+    <div className="flex flex-col gap-4 h-[700px]">
       <AutoScheduleDialog
         title={"Tự động xếp lịch học"}
         open={isOpenTimeslotDialog}
@@ -240,18 +247,20 @@ const GeneralScheduleScreen = () => {
           <div className="flex flex-row justify-end">
             <Button
               disabled={selectedSemester === null || isExportExecelLoading}
-              startIcon={isExportExecelLoading ? <FacebookCircularProgress/> : null}
+              startIcon={
+                isExportExecelLoading ? <FacebookCircularProgress /> : null
+              }
               variant="contained"
               color="success"
               onClick={handleExportTimeTabling}
-              loading = {isExportExecelLoading}
+              loading={isExportExecelLoading}
               sx={{ width: 200 }}
             >
               Tải xuống File Excel
             </Button>
           </div>
           <div className="flex flex-row gap-2 justify-end">
-            <Button
+            {/* <Button
               disabled={saveRequests.length === 0 || isSaveLoading}
               startIcon={isSaveLoading ? <FacebookCircularProgress /> : null}
               variant="contained"
@@ -260,10 +269,10 @@ const GeneralScheduleScreen = () => {
               onClick={handleSaveTimeTabling}
             >
               Lưu TKB
-            </Button>
+            </Button> */}
             <Button
               disabled={selectedRows.length === 0 || isResetLoading}
-              loading= {isResetLoading}
+              loading={isResetLoading}
               startIcon={isResetLoading ? <FacebookCircularProgress /> : null}
               variant="contained"
               color="error"
@@ -280,8 +289,7 @@ const GeneralScheduleScreen = () => {
                 isAutoSaveLoading
               }
               startIcon={
-                isAutoSaveLoading ?
-                <FacebookCircularProgress/> : null
+                isAutoSaveLoading ? <FacebookCircularProgress /> : null
               }
               variant="contained"
               color="primary"
@@ -296,7 +304,7 @@ const GeneralScheduleScreen = () => {
                 isAutoSaveLoading
               }
               startIcon={
-                isTimeScheduleLoading ? <FacebookCircularProgress/> : null
+                isTimeScheduleLoading ? <FacebookCircularProgress /> : null
               }
               variant="contained"
               color="primary"
@@ -307,17 +315,28 @@ const GeneralScheduleScreen = () => {
           </div>
         </div>
       </div>
-      <GeneralScheduleTable
-        saveRequests={saveRequests}
-        setSaveRequests={setSaveRequests}
-        isLoading={isResetLoading}
-        isDataLoading={loading}
-        classes={classes}
-        setClasses={setClasses}
-        setSelectedRows={setSelectedRows}
-        setLoading={setLoading}
-        semester={selectedSemester}
-      />
+      <div className="flex flex-row gap-4 w-full overflow-y-hidden">
+        <GeneralScheduleTable
+          saveRequests={saveRequests}
+          setSaveRequests={setSaveRequests}
+          isLoading={isResetLoading}
+          isDataLoading={loading}
+          classes={classes}
+          setClasses={setClasses}
+          setSelectedRows={setSelectedRows}
+          setLoading={setLoading}
+          semester={selectedSemester}
+        />
+
+        <div className="flex-1 h-[550px] ">
+          <TimeTable
+            selectedSemester={selectedSemester}
+            classes={classes}
+            selectedGroup={selectedGroup}
+            onSaveSuccess={handleRefreshClasses}
+          />
+        </div>
+      </div>
     </div>
   );
 };

@@ -27,6 +27,12 @@ public class PlanGeneralClassService {
     private GeneralClassRepository generalClassRepository;
     private PlanGeneralClassRepository planGeneralClassRepository;
     private AcademicWeekRepo academicWeekRepo;
+
+    @Transactional
+    public int clearPlanClass(String semesterId){
+        planGeneralClassRepository.deleteAllBySemester(semesterId);
+        return 0;
+    }
     public GeneralClass makeClass(MakeGeneralClassRequest request) {
         GeneralClass newClass = new GeneralClass();
 
@@ -37,6 +43,7 @@ public class PlanGeneralClassService {
         newClass.setMass(request.getMass());
         newClass.setCrew(request.getCrew());
         newClass.setQuantityMax(request.getQuantityMax());
+        newClass.setLearningWeeks(request.getLearningWeeks());
         if (request.getClassType() != null && !request.getClassType().isEmpty()) {
             newClass.setClassType(request.getClassType());
         } else {

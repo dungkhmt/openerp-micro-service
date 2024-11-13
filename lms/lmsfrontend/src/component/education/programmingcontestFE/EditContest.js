@@ -41,7 +41,9 @@ function EditContest() {
     evaluateBothPublicPrivateTestcase: [],
     participantViewSubmissionMode: [],
     supportedLanguage: [],
-    contestType:[]
+    participantViewProblemsTag: [],
+    contestType: [],
+    participantViewComment: [],
   });
 
   const [contestType, setContestType] = useState("");
@@ -63,9 +65,12 @@ function EditContest() {
   const [participantViewSubmissionMode, setParticipantViewSubmissionMode] =
     useState("");
   const [allowedLanguages, setAllowedLanguages] = useState([]);
+  const [participantViewProblemsTag, setParticipantViewProblemsTag] =
+    useState("");
+  const [participantViewComment, setParticipantViewComment] =
+    useState("");
 
   const handleSubmit = () => {
-    // setLoading(true);
 
     let body = {
       contestName: contestName,
@@ -83,7 +88,9 @@ function EditContest() {
       judgeMode: judgeMode,
       participantViewSubmissionMode: participantViewSubmissionMode,
       languagesAllowed: allowedLanguages,
-      contestType: contestType
+      contestType: contestType,
+      contestShowTag: participantViewProblemsTag,
+      contestShowComment: participantViewComment,
     };
 
     request(
@@ -115,7 +122,6 @@ function EditContest() {
           label: atype,
           value: atype,
         })),
-        
         submissionActionType: data.listSubmissionActionTypes.map((type) => ({
           label: type,
           value: type,
@@ -146,6 +152,16 @@ function EditContest() {
           label: language,
           value: language,
         })),
+        participantViewProblemsTag:
+          data.listContestShowTags.map((mode) => ({
+            label: mode,
+            value: mode,
+          })),
+        participantViewComment:
+          data.listContestShowComments.map((mode) => ({
+            label: mode,
+            value: mode,
+          })),
       });
 
       setContestTime(data.contestTime);
@@ -169,6 +185,9 @@ function EditContest() {
           ? []
           : data.languagesAllowed.split(",")
       );
+      setParticipantViewProblemsTag(data.contestShowTag);
+      setParticipantViewComment(data.contestShowComment);
+
     });
   }
 
@@ -218,14 +237,13 @@ function EditContest() {
                     fullWidth
                     id="contestType"
                     key={"contestType"}
-                    label="Contest Type"
+                    label=" Contest Type"
                     value={contestType}
                     options={options.contestType}
                     onChange={(event) => {
                       setContestType(event.target.value);
                     }}
                   />,
-                  
                   <StyledSelect
                     fullWidth
                     id="problemDescriptionViewType"
@@ -348,6 +366,30 @@ function EditContest() {
                       setParticipantViewSubmissionMode(event.target.value);
                     }}
                   />,
+                  <StyledSelect
+                    fullWidth
+                    id="participantViewProblemsTag"
+                    label="Participant view problems tag"
+                    key={"participantViewProblemsTag"}
+                    value={participantViewProblemsTag}
+                    options={options.participantViewProblemsTag}
+                    onChange={(event) => {
+                      setParticipantViewProblemsTag(event.target.value);
+                    }}
+                  />
+                  ,
+                  <StyledSelect
+                    fullWidth
+                    id="participantViewComment"
+                    label="Participant view comment"
+                    key={"participantViewComment"}
+                    value={participantViewComment}
+                    options={options.participantViewComment}
+                    onChange={(event) => {
+                      setParticipantViewComment(event.target.value);
+                    }}
+                  />
+                  ,
                 ].map((input, index) => (
                   <Grid item sm={12} md={4} key={index}>
                     {input}

@@ -1,0 +1,1 @@
+This module provides utilities for managing education business such as courses-eduTeacher assignment
