@@ -29,4 +29,8 @@ public interface ProblemRepo extends JpaRepository<ProblemEntity, String>, JpaSp
            + ") from ProblemEntity p")
     List<ModelProblemGeneralInfo> getAllProblemGeneralInformation();
 
+    boolean existsByProblemId(String problemId);
+
+    boolean existsByProblemName(String problemName);
+
 }

@@ -3856,18 +3856,20 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                           .count(count)
                                           .build();
     }
-
+    @Transactional
     @Override
     public ProblemEntity cloneProblem(ModelCloneProblem cloneRequest) throws MiniLeetCodeException {
 
-        ProblemEntity existProblem = problemRepo.findById(cloneRequest.getNewProblemId())
-                                                   .orElseThrow(() -> new MiniLeetCodeException("Original problem already exist", HttpStatus.valueOf("Original problem already exist").value()));
-        if(existProblem != null){
-            throw new MiniLeetCodeException("Original problem already exists", HttpStatus.CONFLICT.value());
-        }
-
         ProblemEntity originalProblem = problemRepo.findById(cloneRequest.getOldProblemId())
                                                    .orElseThrow(() -> new MiniLeetCodeException("Original problem not found", HttpStatus.NOT_FOUND.value()));
+
+        if (problemRepo.existsByProblemId(cloneRequest.getNewProblemId())) {
+            throw new MiniLeetCodeException("New problem ID already exists", HttpStatus.CONFLICT.value());
+        }
+
+        if (problemRepo.existsByProblemName(cloneRequest.getNewProblemName())) {
+            throw new MiniLeetCodeException("New problem name already exists", HttpStatus.CONFLICT.value());
+        }
 
         ProblemEntity newProblem = new ProblemEntity();
         newProblem.setProblemId(cloneRequest.getNewProblemId());
@@ -3889,25 +3891,23 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         newProblem.setSolutionCheckerSourceLanguage(originalProblem.getSolutionCheckerSourceLanguage());
         newProblem.setSolution(originalProblem.getSolution());
         newProblem.setLevelOrder(originalProblem.getLevelOrder());
-        newProblem.setCreatedAt(originalProblem.getCreatedAt());
+        newProblem.setCreatedAt(new Date()); 
         newProblem.setAttachment(originalProblem.getAttachment());
         newProblem.setScoreEvaluationType(originalProblem.getScoreEvaluationType());
-        newProblem.setAppearances(originalProblem.getAppearances());
         newProblem.setPreloadCode(originalProblem.getPreloadCode());
         newProblem.setIsPreloadCode(originalProblem.getIsPreloadCode());
         newProblem.setStatusId(originalProblem.getStatusId());
         newProblem.setSampleTestcase(originalProblem.getSampleTestcase());
 
-        ProblemEntity savedProblem = problemRepo.save(newProblem);
+        newProblem = problemRepo.save(newProblem);
 
         List<TestCaseEntity> originalTestCases = testCaseRepo.findAllByProblemId(cloneRequest.getOldProblemId());
-
         for (TestCaseEntity originalTestCase : originalTestCases) {
             TestCaseEntity newTestCase = new TestCaseEntity();
             newTestCase.setTestCasePoint(originalTestCase.getTestCasePoint());
             newTestCase.setTestCase(originalTestCase.getTestCase());
             newTestCase.setCorrectAnswer(originalTestCase.getCorrectAnswer());
-            newTestCase.setProblemId(cloneRequest.getNewProblemId());
+            newTestCase.setProblemId(newProblem.getProblemId());
             newTestCase.setIsPublic(originalTestCase.getIsPublic());
             newTestCase.setDescription(originalTestCase.getDescription());
             newTestCase.setStatusId(originalTestCase.getStatusId());
@@ -3915,8 +3915,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             testCaseRepo.save(newTestCase);
         }
 
-        return savedProblem;
-    }
-
-
+        return newProblem;
+        }
 }

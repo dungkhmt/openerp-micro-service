@@ -141,7 +141,7 @@ function ManagerViewProblemDetailV2() {
     setNewProblemId("");
     setNewProblemName("");
     setErrorMessage("");
-    history.push("/programming-contest/list-problems"); // comment this line : not return to list-problems when click cancel button
+    history.push("/programming-contest/list-problems"); // comment this line : not return to list-problems when click cancel
   };
 
   const handleClone = () => {

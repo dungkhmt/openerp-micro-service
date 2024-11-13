@@ -36,7 +36,6 @@ public class ProblemService {
         else return p.getProblemName();
     }
 
-
     public ProblemEntity saveProblem(ProblemEntity problem) {
         return problemRepo.save(problem);
     }
