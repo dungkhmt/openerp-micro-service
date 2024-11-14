@@ -13,15 +13,17 @@ import {
   Select,
   TextField,
   Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { request } from "api";
 import withScreenSecurity from "component/withScreenSecurity";
 import { useEffect, useState } from "react";
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router";
-import { useHistory } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import FileUploadZone from "utils/FileUpload/FileUploadZone";
 import { randomImageName } from "utils/FileUpload/covert";
 import { PROBLEM_ROLE, PROBLEM_STATUS } from "utils/constants";
@@ -53,13 +55,11 @@ function ManagerViewProblemDetailV2() {
     "common",
     "validation",
   ]);
-
   const { problemId } = useParams();
   const history = useHistory();
 
   const [problemName, setProblemName] = useState("");
   const [description, setDescription] = useState("");
-  // const [timeLimit, setTimeLimit] = useState(1);
   const [timeLimitCPP, setTimeLimitCPP] = useState(1);
   const [timeLimitJAVA, setTimeLimitJAVA] = useState(1);
   const [timeLimitPYTHON, setTimeLimitPYTHON] = useState(1);
@@ -83,6 +83,11 @@ function ManagerViewProblemDetailV2() {
   const [roles, setRoles] = useState([]);
   const [sampleTestCase, setSampleTestCase] = useState(null);
 
+  const [openCloneDialog, setOpenCloneDialog] = useState(false);
+  const [newProblemId, setNewProblemId] = useState("");
+  const [newProblemName, setNewProblemName] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
   useEffect(() => {
     request("get", "teacher/problems/" + problemId, (res) => {
       res = res.data;
@@ -99,7 +104,6 @@ function ManagerViewProblemDetailV2() {
 
       setProblemName(res.problemName);
       setLevelId(res.levelId);
-      // setTimeLimit(res.timeLimit);
       setTimeLimitCPP(res.timeLimitCPP);
       setTimeLimitJAVA(res.timeLimitJAVA);
       setTimeLimitPYTHON(res.timeLimitPYTHON);
@@ -120,11 +124,86 @@ function ManagerViewProblemDetailV2() {
     });
   }, [problemId]);
 
+  const hasSpecialCharacterProblemId = () => {
+    return !new RegExp(/^[0-9a-zA-Z_-]*$/).test(newProblemId); 
+  };
+
+  const hasSpecialCharacterProblemName = () => {
+    return !new RegExp(/^[0-9a-zA-Z ]*$/).test(newProblemName);
+  };
+
+  const handleCloneDialogOpen = () => {
+    setOpenCloneDialog(true);
+  };
+
+  const handleCloneDialogClose = () => {
+    setOpenCloneDialog(false);
+    setNewProblemId("");
+    setNewProblemName("");
+    setErrorMessage("");
+    history.push("/programming-contest/list-problems"); // comment this line : not return to list-problems when click cancel
+  };
+
+  const handleClone = () => {
+    if (hasSpecialCharacterProblemId()) {
+        setErrorMessage("Problem ID can only contain letters, numbers, underscores, and hyphens.");
+        return;
+    }
+    if (hasSpecialCharacterProblemName()) {
+        setErrorMessage("Problem Name can only contain letters and numbers.");
+        return;
+    }
+
+    const cloneRequest = {
+        oldProblemId: problemId,
+        newProblemId: newProblemId,
+        newProblemName: newProblemName,
+    };
+
+    request(
+        "post", 
+        "/teachers/problems/clone",
+        (res) => { 
+            handleCloneDialogClose();
+            history.push("/programming-contest/list-problems");
+        },
+        {
+            onError: (error) => {
+                setErrorMessage("Failed to clone the problem. Please try again.");
+                console.error("Error cloning problem:", error);
+            },
+            400: (error) => {
+                setErrorMessage("Invalid request. Please check your input.");
+            },
+            404: (error) => {
+                setErrorMessage("Original problem not found.");
+            },
+            500: (error) => {
+              setErrorMessage("Original problem already exists.");
+          },
+        },
+        cloneRequest 
+    );
+};
+
   return (
     <HustContainerCard
       title={"Problem Detail"}
       action={
         <>
+          <Button
+            variant="contained"
+            color="info"
+            onClick={handleCloneDialogOpen}
+            sx={{ marginRight: "8px" }}
+            disabled={
+              !roles.includes(PROBLEM_ROLE.OWNER) &&
+              (!roles.includes(PROBLEM_ROLE.EDITOR) ||
+                status !== PROBLEM_STATUS.OPEN)
+            }
+          >
+            Clone
+          </Button>
           <Button
             variant="contained"
             color="info"
@@ -158,6 +237,44 @@ function ManagerViewProblemDetailV2() {
         </>
       }
     >
+      <Dialog open={openCloneDialog} onClose={handleCloneDialogClose}>
+        <DialogTitle>{"Clone Problem"}</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="New Problem ID"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={newProblemId}
+            onChange={(e) => setNewProblemId(e.target.value)}
+            error={hasSpecialCharacterProblemId()}
+            helperText={hasSpecialCharacterProblemId() ? "Invalid characters in Problem ID." : ""}
+          />
+          <TextField
+            margin="dense"
+            label="New Problem Name"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={newProblemName}
+            onChange={(e) => setNewProblemName(e.target.value)}
+            error={hasSpecialCharacterProblemName()}
+            helperText={hasSpecialCharacterProblemName() ? "Invalid characters in Problem Name." : ""}
+          />
+          {errorMessage && <Typography color="error">{errorMessage}</Typography>}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloneDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleClone} color="primary">
+            Create
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Grid container spacing={2}>
         <Grid item xs={10}>
           <CssTextField
@@ -302,7 +419,7 @@ function ManagerViewProblemDetailV2() {
         <RichTextEditor
           toolbarHidden
           content={description}
-          onContentChange={(text) => setDescription(text)}
+          onContentChange ={(text) => setDescription(text)}
         />
         <HustCodeEditor
           title="Sample TestCase"

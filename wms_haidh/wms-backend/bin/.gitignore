@@ -32,3 +32,9 @@ build/
 ### VS Code ###
 .vscode/
 /src/main/resources/application.yml
+/.gitignore
+/.mvn/
+/mvnw
+/mvnw.cmd
+/pom.xml
+/src/

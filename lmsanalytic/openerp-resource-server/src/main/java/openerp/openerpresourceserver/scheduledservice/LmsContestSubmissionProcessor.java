@@ -48,6 +48,16 @@ public class LmsContestSubmissionProcessor {
     public static String composeKey(String userId, String contestId){
         return userId + "$" + contestId;
     }
+
+    @Scheduled(fixedRate = 6000)
+    @Transactional
+    public void processCountSubmissionsOfParticipants(){
+        Date currentDate = new Date();
+        log.info("processCountSubmissionsOfParticipants, run at time point {}",currentDate);
+        // to be completed by huyentm
+        
+
+    }
     @Scheduled(fixedRate = 30000)
     @Transactional
     public void process(){
@@ -149,6 +159,8 @@ public class LmsContestSubmissionProcessor {
             }
         }
     }
+
+
     public static void main(String[] args){
         String key = "dungpq$123456";
         String[] s = key.split("\\$");

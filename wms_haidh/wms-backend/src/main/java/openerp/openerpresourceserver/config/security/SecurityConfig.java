@@ -52,7 +52,9 @@ public class SecurityConfig {
         // Route security
         http
                 .authorizeHttpRequests()
-                .anyRequest().authenticated()
+//                .requestMatchers("/api/user/get-all").permitAll()
+//                .anyRequest().authenticated()
+                .anyRequest().permitAll()
                 .and()
                 .requestCache()
                 .requestCache(new NullRequestCache()) // Not cache request because of having frontend

@@ -7,8 +7,11 @@ import {
   InputLabel,
   Button,
   Typography,
+  Box,
+  IconButton,
 } from "@mui/material";
-import { useState } from "react";
+import ClearIcon from '@mui/icons-material/Clear';
+import { useState, useEffect } from "react";
 import { request } from "api";
 import { warningNoti, successNoti, errorNoti } from "utils/notification";
 import styles from "./index.style";
@@ -18,6 +21,12 @@ import { classCallUrl } from "../apiURL";
 const RegisterClassScreen = () => {
   const history = useHistory();
   const { semester } = useParams();
+  const [enableAddWeekButton, setEnableAddWeekButton] = useState(false);
+  const [weekData, setWeekData] = useState({
+    start: "",
+    end: "",
+  })
+  const [weeks, setWeeks] = useState([]);
   const [formData, setFormData] = useState({
     id: "",
     day: "",
@@ -27,6 +36,7 @@ const RegisterClassScreen = () => {
     subjectName: "",
     classRoom: "",
     note: "",
+    weeks: "",
     semester: semester,
   });
 
@@ -40,6 +50,11 @@ const RegisterClassScreen = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    const weeksString = weeks.map(week => `(${week.start}, ${week.end})`).join(', ');
+    setFormData((prevData) => ({
+      ...prevData,
+      weeks: weeksString
+    }))
     if (
       !formData.day ||
       !formData.startPeriod ||
@@ -48,7 +63,8 @@ const RegisterClassScreen = () => {
       !formData.subjectName ||
       !formData.classRoom ||
       !formData.semester ||
-      !formData.id
+      !formData.id ||
+      !formData.weeks
     ) {
       warningNoti("Vui lòng điền đầy đủ thông tin", 5000);
       return;
@@ -72,6 +88,51 @@ const RegisterClassScreen = () => {
     }
   };
 
+  const handleChangeWeek = (event) => {
+    const { name, value } = event.target;
+    setWeekData((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  }
+
+  useEffect(() => {
+    if (weekData.start == '' || weekData.end == '') {
+      setEnableAddWeekButton(false);
+      return;
+    }
+
+    if (weekData.start > weekData.end) {
+      setEnableAddWeekButton(false);
+      return;
+    }
+    
+    const isOverlap = weeks.some(week => {
+      if (week.start > weekData.end || weekData.start > week.end) return false;
+      return true;
+    })
+
+    if (isOverlap) {
+      setEnableAddWeekButton(false);
+      return;
+    }
+
+    setEnableAddWeekButton(true);
+  }, [weekData, weeks])
+
+  const handleRemoveWeek = (index) => {
+    const updatedWeeks = weeks.filter((_, i) => i !== index);
+    setWeeks(updatedWeeks);
+  };
+
+  const handleAddWeek = (event) => {
+    setWeeks(prevWeeks => [...prevWeeks, weekData]);
+    setWeekData({
+      start: '',
+      end: ''
+    })
+  }
+
   return (
     <Paper elevation={1} style={styles.paper}>
       <div style={styles.tableToolBar}>
@@ -82,7 +143,7 @@ const RegisterClassScreen = () => {
 
       <Paper elevation={3}>
         <div style={styles.content}>
-          <div style={styles.firstRow}>
+          <div style={styles.firstRow}> 
             <div style={styles.textFieldContainer}>
               <Typography variant="h6">Mã lớp</Typography>
               <TextField
@@ -204,6 +265,74 @@ const RegisterClassScreen = () => {
                 </Select>
               </FormControl>
             </div>
+          </div>
+
+          <div style={{...styles.textFieldContainer, width: "100%"}}>
+            <Typography variant="h6">Tuần học</Typography>
+
+            <div style={{...styles.row, width: "60%"}}>
+              <FormControl variant="standard" style={styles.weekdropdown}>
+                <InputLabel id="week-start-label">Tuần bắt đầu</InputLabel>
+                <Select
+                  labelId="week-start-label"
+                  id="week-start-select"
+                  value={weekData.start}  
+                  name="start"
+                  onChange={handleChangeWeek}
+                >
+                  {Array.from({ length: 50 }, (_, index) => index + 1).map(
+                    (week) => (
+                      <MenuItem key={week} value={week}>
+                        Tuần {week}
+                      </MenuItem>
+                    )
+                  )}
+                </Select>
+              </FormControl>
+
+              <FormControl variant="standard" style={styles.weekdropdown}>
+                <InputLabel id="week-end-label">Tuần kết thúc</InputLabel>
+                <Select
+                  labelId="week-end-label"
+                  id="tiet-bat-dau-select"
+                  value={weekData.end}
+                  name="end"
+                  onChange={handleChangeWeek}
+                >
+                  {Array.from({ length: 50 }, (_, index) => index + 1).map(
+                    (week) => (
+                      <MenuItem key={week} value={week}>
+                        Tuần {week}
+                      </MenuItem>
+                    )
+                  )}
+                </Select>
+              </FormControl>
+              
+              <Button disabled = {!enableAddWeekButton} variant="contained" color="primary" onClick={handleAddWeek}>
+                Thêm
+              </Button> 
+              
+            </div>
+            
+            <Box style={styles.weekList}>
+              {weeks.map((week, index) => (
+                    <Paper elevation={3} key={index} style={styles.weekItem}
+                    >
+                      <Box style={styles.weekItemBox}>
+                        <Typography variant="body1">
+                          Tuần {week.start} - Tuần {week.end}
+                        </Typography>
+              
+                        <IconButton
+                          onClick={() => handleRemoveWeek(index)}
+                        >
+                          <ClearIcon />
+                        </IconButton>
+                      </Box>
+                  </Paper>
+              ))}
+            </Box>
           </div>
 
           <div style={styles.textFieldContainer}>

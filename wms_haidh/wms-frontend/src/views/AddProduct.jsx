@@ -18,8 +18,10 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { useNavigate, useParams } from 'react-router-dom';
+import { request } from "../api";
 
 const ProductForm = () => {
+
   const navigate = useNavigate();
   const { id } = useParams();
   const [image, setImage] = useState(null);
@@ -33,44 +35,63 @@ const ProductForm = () => {
   const [description, setDescription] = useState('');
   const [uom, setUom] = useState('');
 
-  const mockProductData = {
-    id: '1',
-    image: 'https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2023/1/8/1135972/HD13.JPG',
-    name: 'Tủ lạnh Samsung',
-    category: 'Tủ lạnh',
-    inventory: [{ warehouse: 'Warehouse A', quantity: 10 }],
-    code: 'P123',
-    weight: '20',
-    height: '30',
-    area: '50',
-    description: 'A great product for your home.',
-    uom: 'kg',
-  };
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    request("get", "/admin/product/category", (res) => {
+      setCategories(res.data);
+    }).then();
+  }, [])
+
+
+
+  // const mockProductData = {
+  //   id: '1',
+  //   image: 'https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2023/1/8/1135972/HD13.JPG',
+  //   name: 'Tủ lạnh Samsung',
+  //   category: '729ab27a-ef0a-11ed-b27c-02420a000304',
+  //   inventory: [{ warehouse: 'Warehouse A', quantity: 10 }],
+  //   code: 'P123',
+  //   weight: '20',
+  //   height: '30',
+  //   area: '50',
+  //   description: 'A great product for your home.',
+  //   uom: 'kg',
+  // };
 
   useEffect(() => {
     if (id) {
-      const product = mockProductData;
-      setImage(product.image);
-      setName(product.name);
-      setCategory(product.category);
-      setInventory(product.inventory);
-      setCode(product.code);
-      setWeight(product.weight);
-      setHeight(product.height);
-      setArea(product.area);
-      setDescription(product.description);
-      setUom(product.uom);
+      const formData = new FormData();
+      formData.append('id', id); // Append the product ID to FormData
+
+      request("post", "/admin/product/get-product-detail", (res) => {
+        const product = res.data;
+        setName(product.name);
+        setCategory(product.categoryId);
+        setCode(product.code);
+        setWeight(product.weight);
+        setHeight(product.height);
+        setArea(product.area);
+        setDescription(product.description);
+        setUom(product.uom);
+
+        // Nếu có ảnh, set nó dưới dạng base64
+        if (product.imageContentType && product.imageData) {
+          setImage(`data:${product.imageContentType};base64,${product.imageData}`);
+        }
+      }, {}, formData); // Gửi FormData trong body của yêu cầu
     }
   }, [id]);
+
+
+  const handleCategoryChange = (e) => {
+    setCategory(e.target.value); // Lưu categoryId khi người dùng thay đổi lựa chọn
+  };
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+      setImage(file);
     }
   };
 
@@ -89,33 +110,70 @@ const ProductForm = () => {
     setInventory(newInventory);
   };
 
-  const handleSubmit = () => {
-    console.log({
-      image,
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+
+    // Serialize product data as a JSON string and append it to the form data
+    const productData = JSON.stringify({
+      productId: id, // Only include the id for update, omit it for create
       name,
-      category,
-      inventory,
+      categoryId: category,
       code,
       weight,
       height,
       area,
       description,
-      uom,
+      uom
     });
+    formData.append("productData", productData);
+
+    // If an image is selected, append it to the FormData
+    if (image instanceof File) {
+      formData.append("image", image); // This sends the binary data of the image
+    }
+
+    const requestUrl = id ? "/admin/product/update-product" : "/admin/product/create-product";
+
+    // Make the request
+    request("post", requestUrl, (res) => {
+      if (res.status === 200) {
+        navigate(`/admin/product`); // Redirect after success
+      }
+    }, {}, formData);
   };
 
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <IconButton color="primary" onClick={() => navigate('/admin/product')}>
+        <IconButton color="primary" onClick={() => navigate('/admin/product')} sx={{ color: 'black' }}>
           <ArrowBackIcon />
         </IconButton>
+
         <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
           {id ? 'Update Product' : 'Add New Product'}
         </Typography>
-        <Button variant="contained" color="primary" sx={{ marginLeft: 'auto' }} onClick={handleSubmit}>
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{
+            marginLeft: 'auto',
+            backgroundColor: 'black',
+            color: 'white',
+            '&:hover': {
+              backgroundColor: 'black', // Giữ màu đen khi hover
+              opacity: 0.75,            // Đặt độ mờ khi hover
+            }
+          }}
+          onClick={handleSubmit}
+        >
           {id ? 'Update Product' : 'Save Product'}
         </Button>
+
+
+
       </Box>
 
       <Grid container spacing={2}>
@@ -140,17 +198,31 @@ const ProductForm = () => {
               }}
             >
               {image ? (
-                <img
-                  src={image}
-                  alt="Product Preview"
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'cover' 
-                  }}
-                />
+                // If image is a file, preview it
+                image instanceof File ? (
+                  <img
+                    src={URL.createObjectURL(image)} // Create a preview URL for the selected file
+                    alt="Product Preview"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  // If it's an existing image URL (from the product data), display that
+                  <img
+                    src={image}
+                    alt="Product Preview"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                )
               ) : (
-                <Typography variant="body2" sx={{ color: 'grey' }}>
+                <Typography variant="body2" sx={{ color: "grey" }}>
                   No image uploaded
                 </Typography>
               )}
@@ -168,10 +240,20 @@ const ProductForm = () => {
                 color="primary"
                 component="span"
                 startIcon={<PhotoCamera />}
-                sx={{ width: '100%' }}
+                sx={{
+                  width: '100%',
+                  backgroundColor: 'black',
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: 'black', // Giữ màu đen khi hover
+                    opacity: 0.75,            // Đặt độ mờ khi hover
+                  }
+                }}
               >
                 Upload Image
               </Button>
+
+
             </label>
           </Paper>
         </Grid>
@@ -197,13 +279,14 @@ const ProductForm = () => {
                   <Select
                     labelId="product-category-label"
                     value={category}
-                    onChange={(e) => setCategory(e.target.value)}
+                    onChange={handleCategoryChange}
                     label="Product Category"
                   >
-                    <MenuItem value="Tủ lạnh">Tủ lạnh</MenuItem>
-                    <MenuItem value="Tivi">Tivi</MenuItem>
-                    <MenuItem value="Quạt điều hòa">Quạt điều hòa</MenuItem>
-                    <MenuItem value="Máy giặt">Máy giặt</MenuItem>
+                    {categories.map((cat) => (
+                      <MenuItem key={cat.categoryId} value={cat.categoryId}>
+                        {cat.name}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Grid>

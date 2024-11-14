@@ -1,18 +1,18 @@
-package openerp.openerpresourceserver.service;
-
-import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import openerp.openerpresourceserver.entity.EntityAuthorization;
-import openerp.openerpresourceserver.repo.EntityAuthorizationRepo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+package openerp.openerpresourceserver.service.implement;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Log4j2
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.entity.EntityAuthorization;
+import openerp.openerpresourceserver.repository.EntityAuthorizationRepo;
+import openerp.openerpresourceserver.service.EntityAuthorizationService;
+
 @AllArgsConstructor(onConstructor_ = @Autowired)
 @Service
 public class EntityAuthorizationServiceImpl implements EntityAuthorizationService {

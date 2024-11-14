@@ -19,6 +19,7 @@ import java.util.Date;
 public class UserFeatures {
     public static final String FEATURE_NUMBER_ACTIONS = "NUMBER_ACTIONS";
     public static final String FEATURE_NUMBER_CONTEST_SUBMISSIONS = "NUMBER_CONTEST_SUBMISSIONS";
+    public static final String FEATURE_NUMBER_CONTEST_ACCEPT_SUBMISSIONS = "NUMBER_CONTEST_ACCEPT_SUBMISSIONS";
     public static final String FEATURE_NUMBER_CONTEST_PARTICIPATIONS = "NUMBER_CONTEST_PARTICIPATIONS";
     
 
