@@ -55,7 +55,7 @@ public class LmsContestSubmissionProcessor {
         Date currentDate = new Date();
         log.info("processCountSubmissionsOfParticipants, run at time point {}",currentDate);
         // to be completed by huyentm
-        
+
 
     }
     @Scheduled(fixedRate = 30000)
