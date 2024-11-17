@@ -10,7 +10,11 @@ export const useClasses = (group, semester, refresh) => {
   const [controller, setController] = useState(new AbortController());
 
   useEffect(() => {
-    if (semester === null) return;
+    if (!semester && !group) {
+      setClasses([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
 
     request(
