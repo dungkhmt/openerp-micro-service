@@ -5,21 +5,21 @@ import {
   Button,
   TextField,
   TablePagination,
-  InputLabel,
   FormControl,
-  Select,
-  MenuItem,
   Autocomplete,
+  CircularProgress,
 } from "@mui/material";
 import { toast } from "react-toastify";
 import { request } from "api";
 import { useClassrooms } from "views/general-time-tabling/hooks/useClassrooms";
+import { Add, Remove } from "@mui/icons-material";
 
 const TimeTable = ({
   classes,
   selectedSemester,
   selectedGroup,
   onSaveSuccess,
+  loading,
 }) => {
   const [classDetails, setClassDetails] = useState([]);
   const [open, setOpen] = useState(false);
@@ -37,8 +37,7 @@ const TimeTable = ({
           weekDay: cls.weekday,
           roomReservationId: cls.roomReservationId,
           code: cls.classCode,
-          shift: cls.crew,
-          elective: "",
+          crew: cls.crew,
           batch: cls.course,
           room: cls.room,
           timetable: {
@@ -49,9 +48,23 @@ const TimeTable = ({
               endTime: cls.endTime,
             },
           },
+          studyClass: cls.studyClass,
+          learningWeeks: cls.learningWeeks,
+          moduleCode: cls.moduleCode,
+          moduleName: cls.moduleName,
+          quantityMax: cls.quantityMax,
+          classType: cls.classType,
+          mass: cls.mass,
+          generalClassId: cls.id,
         }))
-        .sort((a, b) => parseInt(a.code) - parseInt(b.code));
-
+        .sort((a, b) => {
+          if (a.code === b.code) {
+            const idA = parseInt(a.generalClassId.split("-")[0], 10);
+            const idB = parseInt(b.generalClassId.split("-")[0], 10);
+            return idB - idA;
+          }
+          return parseInt(a.code, 10) - parseInt(b.code, 10);
+        });
       setClassDetails(transformedClassDetails);
     }
   }, [classes]);
@@ -119,6 +132,7 @@ const TimeTable = ({
       (error) => {
         setSaveLoading(false);
         if (error.response?.status === 410) {
+          onSaveSuccess();
           toast.warn(error.response.data);
         } else if (error.response?.status === 420) {
           toast.error(error.response.data);
@@ -128,6 +142,45 @@ const TimeTable = ({
         console.log(error);
       },
       { saveRequests: [selectedClassData] }
+    );
+  };
+
+  const handleAddTimeSlot = (generalClassId) => {
+    const cleanGeneralClassId = generalClassId.split("-")[0];
+    request(
+      "post",
+      `/general-classes/${cleanGeneralClassId}/room-reservations/`,
+      (res) => {
+        toast.success("Thêm ca học thành công!");
+        onSaveSuccess();
+      },
+      (err) => {
+        if (err.response?.status === 410) {
+          toast.error(err.response.data);
+        } else {
+          toast.error("Thêm ca học thất bại!");
+        }
+      }
+    );
+  };
+
+  const handleRemoveTimeSlot = (generalClassId, roomReservationId) => {
+    const cleanGeneralClassId = generalClassId.split("-")[0];
+
+    request(
+      "delete",
+      `/general-classes/${cleanGeneralClassId}/room-reservations/${roomReservationId}`,
+      (res) => {
+        toast.success("Xóa ca học thành công!");
+        onSaveSuccess();
+      },
+      (err) => {
+        if (err.response?.status === 410) {
+          toast.error(err.response.data);
+        } else {
+          toast.error("Xóa ca học thất bại!");
+        }
+      }
     );
   };
 
@@ -152,7 +205,8 @@ const TimeTable = ({
       return (
         <td
           key={`${classIndex}-${day}-${period}`}
-          className="border border-gray-300 text-center cursor-pointer px-1"
+          style={{ width: "40px" }}
+          className="border border-gray-300 text-center cursor-pointer px-1 "
           onClick={() => handleRowClick(classIndex, day, period)}
         ></td>
       );
@@ -166,7 +220,7 @@ const TimeTable = ({
           key={`${classIndex}-${day}-${period}`}
           colSpan={colSpan}
           className="border border-gray-300 bg-yellow-400 text-center cursor-pointer px-1"
-          style={{ width: `${70 * colSpan}px` }}
+          style={{ width: `${40 * colSpan}px` }}
           onClick={() => handleRowClick(classIndex, day, period)}
         >
           <span className="text-[14px]">{classInfo.room}</span>
@@ -181,6 +235,7 @@ const TimeTable = ({
     return (
       <td
         key={`${classIndex}-${day}-${period}`}
+        style={{ width: "40px" }}
         className="border border-gray-300 text-center cursor-pointer px-1"
         onClick={() => handleRowClick(classIndex, day, period)}
       ></td>
@@ -224,75 +279,223 @@ const TimeTable = ({
   };
 
   return (
-    <div className="h-full flex flex-col justify-start">
-      <div className="overflow-y-auto border-b-[1px]" style={{ flex: "1" }}>
+    <div className="h-full w-full flex flex-col justify-start">
+      {loading ? (
         <table
-          className="min-w-full border-collapse border border-gray-400"
-          style={{ tableLayout: "fixed" }}
+          className=" overflow-x-auto flex items-center flex-col"
+          style={{ flex: "1" }}
         >
           <thead>
             <tr>
               <th className="border border-gray-300 p-2">Mã lớp</th>
-              <th className="border border-gray-300 p-2">Kíp</th>
-              <th className="border border-gray-300 p-2">Tự chọn</th>
+              <th
+                className="border border-gray-300 p-2"
+                style={{ width: "100px", minWidth: "100px" }}
+              >
+                Lớp học
+              </th>
+              <th
+                className="border border-gray-300 p-2"
+                style={{ width: "52px", minWidth: "52px" }}
+              >
+                Tuần học
+              </th>
+              <th className="border border-gray-300 p-2">Mã học phần</th>
+              <th
+                className="border border-gray-300 p-2"
+                style={{ width: "120px", minWidth: "120px" }}
+              >
+                Tên học phần
+              </th>
+              <th className="border border-gray-300 p-2">SL MAX</th>
+              <th className="border border-gray-300 p-2">Loại lớp</th>
+              <th className="border border-gray-300 p-2">Thời lượng</th>
               <th className="border border-gray-300 p-2">Khóa</th>
+              <th
+                className="border border-gray-300 p-2"
+                style={{ width: "40px", minWidth: "40px" }}
+              >
+                Thêm
+              </th>
+              <th
+                className="border border-gray-300 p-2"
+                style={{ width: "40px", minWidth: "40px" }}
+              >
+                Xóa
+              </th>
               {days.map((day) => (
                 <th
                   key={day}
                   colSpan={6}
-                  className="border border-gray-300 p-2 text-center border-l-0 text-black"
+                  className="border border-gray-300 p-2 text-center min-w-32"
                 >
                   {day}
                 </th>
               ))}
             </tr>
-            <tr className="border-l-0">
-              <td colSpan={4}></td>
+            <tr>
+              <td colSpan={12} className="border"></td>
               {days.flatMap((day) =>
                 periods.map((period) => (
-                  <th
+                  <td
                     key={`${day}-${period}`}
-                    className="border border-gray-300 px-2 py-1 text-center"
+                    className="border border-gray-300 text-center"
                   >
                     {period}
-                  </th>
+                  </td>
                 ))
               )}
             </tr>
           </thead>
-          <tbody>
-            {classDetails
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((classDetail, index) => (
-                <tr
-                  key={`${classDetail.code}-${index}`}
-                  style={{ height: "52px" }}
-                >
-                  <td className="border border-gray-300 text-center px-1">
-                    {classDetail.code}
-                  </td>
-                  <td className="border border-gray-300 text-center px-1">
-                    {classDetail.shift}
-                  </td>
-                  <td className="border border-gray-300 text-center px-1">
-                    {classDetail.elective}
-                  </td>
-                  <td className="border border-gray-300 text-center px-1">
-                    {classDetail.batch}
-                  </td>
-                  {days.flatMap((day) =>
-                    periods.map((period) =>
-                      renderCellContent(index, day, period)
-                    )
-                  )}
-                </tr>
-              ))}
-          </tbody>
+          <div className="flex justify-center items-center h-full w-full ">
+            <CircularProgress />
+          </div>
         </table>
-      </div>
+      ) : (
+        <div className=" overflow-x-auto" style={{ flex: "1" }}>
+          <table className="min-w-full " style={{ tableLayout: "auto" }}>
+            <thead>
+              <tr>
+                <th className="border border-t-0 border-l-0 p-2">Mã lớp</th>
+                <th
+                  className="border border-t-0  p-2"
+                  style={{ width: "100px", minWidth: "100px" }}
+                >
+                  Lớp học
+                </th>
+                <th
+                  className="border border-t-0  p-2"
+                  style={{ width: "52px", minWidth: "52px" }}
+                >
+                  Tuần học
+                </th>
+                <th className="border border-t-0  p-2">Mã học phần</th>
+                <th
+                  className="border border-t-0  p-2"
+                  style={{ width: "120px", minWidth: "120px" }}
+                >
+                  Tên học phần
+                </th>
+                <th className="border border-t-0 p-2">Kíp</th>
+                <th className="border border-t-0 p-2">SL MAX</th>
+                <th className="border border-t-0 p-2">Loại lớp</th>
+                <th className="border border-t-0 p-2">Thời lượng</th>
+                <th className="border border-t-0 p-2">Khóa</th>
+                <th
+                  className="border border-t-0  p-2"
+                  style={{ width: "40px", minWidth: "40px" }}
+                >
+                  Thêm
+                </th>
+                <th className="border border-t-0 p-2">Xóa</th>
+                {days.map((day) => (
+                  <th
+                    key={day}
+                    colSpan={6}
+                    className="border border-t-0 p-2 text-center min-w-32"
+                  >
+                    {day}
+                  </th>
+                ))}
+              </tr>
+              <tr>
+                <td colSpan={12} className="border"></td>
+                {days.flatMap((day) =>
+                  periods.map((period) => (
+                    <td
+                      key={`${day}-${period}`}
+                      className="border border-t-0 text-center"
+                    >
+                      {period}
+                    </td>
+                  ))
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              {classes && classes.length > 0 ? (
+                classDetails
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((classDetail, index) => (
+                    <tr
+                      key={`${classDetail.code}-${index}`}
+                      style={{ height: "52px" }}
+                    >
+                      <td className="border border-l-0  text-center px-1">
+                        {classDetail.code}
+                      </td>
+                      <td className="border  text-center px-1 w-[120px]">
+                        {classDetail.studyClass}
+                      </td>
+                      <td className="border  text-center px-1">
+                        {classDetail.learningWeeks}
+                      </td>
+                      <td className="border  text-center px-1">
+                        {classDetail.moduleCode}
+                      </td>
+                      <td className="border  text-center px-1">
+                        {classDetail.moduleName}
+                      </td>
+                      <td className="border  text-center px-1">
+                        {classDetail.crew}
+                      </td>
+                      <td className="border  text-center px-1">
+                        {classDetail.quantityMax}
+                      </td>
+                      <td className="border  text-center px-1">
+                        {classDetail.classType}
+                      </td>
+                      <td className="border  text-center px-1">
+                        {classDetail.mass}
+                      </td>
+                      <td className="border  text-center px-1">
+                        {classDetail.batch}
+                      </td>
+                      <td className="border  text-center px-1">
+                        <Button
+                          onClick={() =>
+                            handleAddTimeSlot(classDetail.generalClassId)
+                          }
+                        >
+                          <Add />
+                        </Button>
+                      </td>
+                      <td className="border  text-center px-1">
+                        <Button
+                          onClick={() =>
+                            handleRemoveTimeSlot(
+                              classDetail.generalClassId,
+                              classDetail.roomReservationId
+                            )
+                          }
+                        >
+                          <Remove />
+                        </Button>
+                      </td>
+                      {days.flatMap((day) =>
+                        periods.map((period) =>
+                          renderCellContent(index, day, period)
+                        )
+                      )}
+                    </tr>
+                  ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={12 + days.length * periods.length}
+                    className="text-center py-4"
+                  >
+                    <div className="h-full ">Không có dữ liệu</div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <TablePagination
-        className="border-r-[1px] border-l-[1px] border-solid border-gray-300"
+        className="border-y-[1px] border-solid border-gray-300"
         component="div"
         count={classDetails.length}
         page={page}
