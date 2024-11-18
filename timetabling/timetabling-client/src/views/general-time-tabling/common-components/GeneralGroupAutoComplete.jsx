@@ -4,7 +4,7 @@ import { useGroups } from "../hooks/useGroups";
 
 const GeneralGroupAutoComplete = ({ selectedGroup, setSelectedGroup }) => {
   const { loading: groupsLoading, error: groupsError, groups } = useGroups();
-  
+
   return (
     <Autocomplete
       disablePortal
