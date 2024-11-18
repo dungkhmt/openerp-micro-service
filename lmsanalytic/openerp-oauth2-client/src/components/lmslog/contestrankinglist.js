@@ -7,12 +7,14 @@ import {StandardTable} from "erp-hust/lib/StandardTable";
 //import { toFormattedDateTime } from "../../utils/dateutils";
 //import { TextField, MenuItem } from "@mui/material";
 import { Link } from "react-router-dom";
-import { Button } from "@mui/material";
+import { Button, TextField } from "@mui/material";
 function ContestListForRanking(){
 
     const [data, setData] = useState([]);
     //const [contestId, setContestId] = useState("");
     const [contestIds, setContestIds] = useState([]);
+
+    const [length, setLength] = useState(10);
 
     const columnContests = [
         {
@@ -46,7 +48,7 @@ function ContestListForRanking(){
     }, [])
 
     function synchronizeContestSubmission(){
-        request("get", "/synchronize-contest-submission", (res) => {
+        request("get", "/synchronize-contest-submission/" + length, (res) => {
             //setContestIds(res.data);
            alert(res.data);
         }).then();  
@@ -55,6 +57,18 @@ function ContestListForRanking(){
 
         <div>
             <div>
+            <TextField
+                    fullWidth
+                    type=" number"
+                    size="small"
+                    id="length"
+                    label="number max items"
+                    value={length}
+                    onChange={(event) => {
+                      setLength(event.target.value);
+                    }}
+                    
+                  />,
                 <Button onClick={synchronizeContestSubmission}>
                     Synchronize
                 </Button>

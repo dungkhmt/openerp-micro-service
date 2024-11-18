@@ -34,6 +34,7 @@ public class ContestController {
     private LmsContestSubmissionRepo lmsContestSubmissionRepo;
     private ApiService apiService;
 
+
     @PostMapping("/create-contest-submission")
     public ResponseEntity<?> createContestSubmission(Principal principal, @RequestBody ModelCreateContestSubmission m){
         //log.info("createContestSubmission, submissionId = " + m.getContestSubmissionId());
@@ -91,23 +92,30 @@ public class ContestController {
         return ResponseEntity.ok().body(res);
     }
 
-    @GetMapping("/synchronize-contest-submission")
-    public ResponseEntity<?> synchronizeContestSubmission(Principal principal){
+    @GetMapping("/synchronize-contest-submission/{length}")
+    public ResponseEntity<?> synchronizeContestSubmission(Principal principal, @PathVariable int length){
         //List<ContestSubmissionEntity> sub = new ArrayList<ContestSubmissionEntity>();
-
+        log.info("synchronizeContestSubmission, length = " + length);
         ModelInputGetContestSubmissionPage m = new ModelInputGetContestSubmissionPage();
-        m.setLimit(10);
+        m.setLimit(length);
         m.setOffset(0);
-        //Date toDate = new Date();
+        Date toDate = new Date();
         //Date toDate = lmsContestSubmissionRepo.findMinSubmissionCreatedStamp();
         List<LmsContestSubmission> L = lmsContestSubmissionRepo.findEarlestPage5Items();
-        if(L == null || L.size() == 0) return ResponseEntity.ok().body("EMPTY");
-        for(LmsContestSubmission sub: L){
-            log.info("synchronizeContestSubmission, among 5 items " + sub.getContestSubmissionId() + "," + sub.getUserSubmissionId() + ", time = " + sub.getSubmissionCreatedStamp());
+        if(L == null || L.size() == 0){
+            //return ResponseEntity.ok().body("EMPTY");
+        }else {
+            for (LmsContestSubmission sub : L) {
+                log.info("synchronizeContestSubmission, among 5 items " + sub.getContestSubmissionId() + "," + sub.getUserSubmissionId() + ", time = " + sub.getSubmissionCreatedStamp());
+            }
+            if(L.get(0).getSubmissionCreatedStamp() != null)
+                toDate = L.get(0).getSubmissionCreatedStamp();
+            log.info("synchronizeContestSubmission, toDate = {}", toDate);
+            if (toDate == null) {
+                toDate = new Date();
+                //return ResponseEntity.ok().body("toDate NULL");
+            }
         }
-        Date toDate = L.get(0).getSubmissionCreatedStamp();
-        log.info("synchronizeContestSubmission, toDate = {}",toDate);
-        if(toDate == null) return ResponseEntity.ok().body("toDate NULL");
         //Date fromDate = new Date();
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         String sFromDate = "2019-09-01 10:30:00";
@@ -129,7 +137,14 @@ public class ContestController {
         //log.info("synchronizeContestSubmission, got body = " + body);
         ModelResponseGetContestSubmissionPage result = gson.fromJson(body,ModelResponseGetContestSubmissionPage.class);
 
+        int cnt = 0;
         for( ContestSubmissionEntity s: result.getSubmissions()){
+            log.info("synchronizeContestSubmission, GOT sub id = " + s.getContestSubmissionId() + " time = " + s.getCreatedAt());
+            LmsContestSubmission tmp = lmsContestSubmissionRepo.findByContestSubmissionId(s.getContestSubmissionId());
+            if(tmp != null){
+                log.info("synchronizeContestSubmission, submissionId = " + s.getContestSubmissionId() + " exists -> continue");
+                continue;
+            }
             LmsContestSubmission sub = new LmsContestSubmission();
             sub.setContestSubmissionId(s.getContestSubmissionId());
             sub.setContestId(s.getContestId());
@@ -150,10 +165,10 @@ public class ContestController {
             sub.setMessage(s.getMessage());
             sub = lmsContestSubmissionRepo.save(sub);
             log.info("synchronizeContestSubmission, save submission " + s.getContestSubmissionId() + ", date = " + s.getCreatedAt() + " user " + s.getUserId() + " contest " + s.getContestId() + " problem " + s.getProblemId());
-
+            cnt ++;
         }
         //log.info("synchronizeContestSubmission, got {}, toString = {}",res,res.toString());
-        return ResponseEntity.ok().body(res);
+        return ResponseEntity.ok().body(cnt);
     }
     public static void main(String[] args){
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");

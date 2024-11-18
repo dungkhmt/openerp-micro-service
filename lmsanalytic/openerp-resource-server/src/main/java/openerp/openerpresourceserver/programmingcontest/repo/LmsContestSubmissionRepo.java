@@ -17,5 +17,7 @@ public interface LmsContestSubmissionRepo extends JpaRepository<LmsContestSubmis
 
     List<LmsContestSubmission> findAllByUserSubmissionId(String userSubmissionId);
 
+    LmsContestSubmission findByContestSubmissionId(UUID contestSubmissionId);
+
 }
 

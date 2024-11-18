@@ -100,7 +100,7 @@ public class ApiService {
                 // .filter(RuntimeException.class::isInstance))
                 .bodyToMono(String.class)
                 .block();
-        log.info("callGetContestSubmissionPageOfPeriodAPI, GOT JSON = " + json);
+        //log.info("callGetContestSubmissionPageOfPeriodAPI, GOT JSON = " + json);
         return ResponseEntity.ok().body(json);
         /*
         return this.webClient.post()
