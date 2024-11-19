@@ -1,6 +1,8 @@
 package openerp.openerpresourceserver.scheduledservice;
 
+import com.nimbusds.jose.shaded.gson.Gson;
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.callexternalapi.service.ApiService;
 import openerp.openerpresourceserver.log.entity.LmsLog;
 import openerp.openerpresourceserver.masterconfig.entity.LastTimeProcess;
 import openerp.openerpresourceserver.masterconfig.repo.LastTimeProcessRepo;
@@ -8,16 +10,21 @@ import openerp.openerpresourceserver.programmingcontest.entity.CompositeProgramm
 import openerp.openerpresourceserver.programmingcontest.entity.LmsContestSubmission;
 import openerp.openerpresourceserver.programmingcontest.entity.ProgrammingContestProblemRanking;
 import openerp.openerpresourceserver.programmingcontest.entity.ProgrammingContestRanking;
+import openerp.openerpresourceserver.programmingcontest.model.ContestSubmissionEntity;
+import openerp.openerpresourceserver.programmingcontest.model.ModelInputGetContestSubmissionPage;
+import openerp.openerpresourceserver.programmingcontest.model.ModelResponseGetContestSubmissionPage;
 import openerp.openerpresourceserver.programmingcontest.repo.LmsContestSubmissionRepo;
 import openerp.openerpresourceserver.programmingcontest.repo.ProgrammingContestProblemRankingRepo;
 import openerp.openerpresourceserver.programmingcontest.repo.ProgrammingContestRankingRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -41,6 +48,8 @@ public class LmsContestSubmissionProcessor {
     private LastTimeProcessRepo lastTimeProcessRepo;
     private ProgrammingContestProblemRankingRepo programmingContestProblemRankingRepo;
     private ProgrammingContestRankingRepo programmingContestRankingRepo;
+
+    private ApiService apiService;
 
     public static String composeKey(String userId, String contestId, String problemId){
         return userId + "$" + contestId + "$" + problemId;
@@ -158,6 +167,87 @@ public class LmsContestSubmissionProcessor {
                 pcr = programmingContestRankingRepo.save(pcr);
             }
         }
+    }
+    @Scheduled(fixedRate = 5000)
+    @Transactional
+    public void processMigrateContestSubmissions(){
+        Date currentDate = new Date();
+        //log.info("processMigrateContestSubmissions, run at time point {}",currentDate);
+        ModelInputGetContestSubmissionPage m = new ModelInputGetContestSubmissionPage();
+        m.setLimit(20);
+        m.setOffset(0);
+        Date toDate = new Date();
+        //Date toDate = lmsContestSubmissionRepo.findMinSubmissionCreatedStamp();
+        List<LmsContestSubmission> L = lmsContestSubmissionRepo.findEarlestPage5Items();
+        if(L == null || L.size() == 0){
+            //return ResponseEntity.ok().body("EMPTY");
+        }else {
+            for (LmsContestSubmission sub : L) {
+                //log.info("processMigrateContestSubmissions, among 5 items " + sub.getContestSubmissionId() + "," + sub.getUserSubmissionId() + ", time = " + sub.getSubmissionCreatedStamp());
+            }
+            if(L.get(0).getSubmissionCreatedStamp() != null)
+                toDate = L.get(0).getSubmissionCreatedStamp();
+            //log.info("processMigrateContestSubmissions, toDate = {}", toDate);
+            if (toDate == null) {
+                toDate = new Date();
+                //return ResponseEntity.ok().body("toDate NULL");
+            }
+        }
+        //Date fromDate = new Date();
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        String sFromDate = "2010-09-01 10:30:00";
+        Date fromDate = null;
+        try {
+            fromDate = formatter.parse(sFromDate);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        log.info("processMigrateContestSubmissions, run at time point {}",currentDate);
+        //fromDate.setMonth(9);
+        //fromDate.setYear(2024);
+        //fromDate.setDate(1);
+        m.setFromDate(fromDate);
+        m.setToDate(toDate);
+        ResponseEntity<?> res = apiService.callGetContestSubmissionPageOfPeriodAPI("https://hustack.soict.ai/api/get-contest-submissions-page-date-between/",m);
+        //List<ContestSubmissionEntity> L = (List<ContestSubmissionEntity>)res.getBody();
+        String body = res.getBody().toString();
+        Gson gson = new Gson();
+        //log.info("synchronizeContestSubmission, got body = " + body);
+        ModelResponseGetContestSubmissionPage result = gson.fromJson(body,ModelResponseGetContestSubmissionPage.class);
+
+        int cnt = 0;
+        for( ContestSubmissionEntity s: result.getSubmissions()){
+            //log.info("processMigrateContestSubmissions, GOT sub id = " + s.getContestSubmissionId() + " time = " + s.getCreatedAt());
+            LmsContestSubmission tmp = lmsContestSubmissionRepo.findByContestSubmissionId(s.getContestSubmissionId());
+            if(tmp != null){
+                log.info("processMigrateContestSubmissions, submissionId = " + s.getContestSubmissionId() + " exists -> continue");
+                continue;
+            }
+            LmsContestSubmission sub = new LmsContestSubmission();
+            sub.setContestSubmissionId(s.getContestSubmissionId());
+            sub.setContestId(s.getContestId());
+            sub.setProblemId(s.getProblemId());
+            sub.setUserSubmissionId(s.getUserId());
+            sub.setPoint(s.getPoint());
+            sub.setTestCasePass(s.getTestCasePass());
+            sub.setSourceCode(s.getSourceCode());
+            sub.setSourceCodeLanguage(s.getSourceCodeLanguage());
+            sub.setStatus(s.getStatus());
+            sub.setSubmissionCreatedStamp(s.getCreatedAt());
+            sub.setSubmittedByUserId(s.getSubmittedByUserId());
+            sub.setMemoryUsage(s.getMemoryUsage());
+            sub.setRunTime(s.getRuntime());
+            sub.setManagementStatus(s.getManagementStatus());
+            sub.setViolateForbiddenInstructions(s.getViolateForbiddenInstruction());
+            sub.setViolateForbiddenInstructionMessage(s.getViolateForbiddenInstructionMessage());
+            sub.setMessage(s.getMessage());
+            sub = lmsContestSubmissionRepo.save(sub);
+            //log.info("processMigrateContestSubmissions, save submission " + s.getContestSubmissionId() + ", date = " + s.getCreatedAt() + " user " + s.getUserId() + " contest " + s.getContestId() + " problem " + s.getProblemId());
+            cnt ++;
+        }
+
+        log.info("processMigrateContestSubmissions DONE with " + cnt + " items migrated");
+
     }
 
 

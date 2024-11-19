@@ -70,7 +70,7 @@ function ContestListForRanking(){
                     
                   />,
                 <Button onClick={synchronizeContestSubmission}>
-                    Synchronize
+                    Synchronize Contest Submission
                 </Button>
             </div>
             <div>
