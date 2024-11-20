@@ -183,6 +183,7 @@ public class LmsContestSubmissionProcessor {
                 e.printStackTrace();
             }
         }
+        log.info("processMigrateContestSubmissions, GOT LENGTH FROM DB = " + length);
         m.setLimit(length);
         m.setOffset(0);
         Date toDate = new Date();
