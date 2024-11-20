@@ -172,7 +172,8 @@ public class LmsContestSubmissionProcessor {
     @Transactional
     public void processMigrateContestSubmissions(){
         Date currentDate = new Date();
-        //log.info("processMigrateContestSubmissions, run at time point {}",currentDate);
+        log.info("processMigrateContestSubmissions, run at time point {} and RETURN",currentDate);
+        if(true) return;
         ModelInputGetContestSubmissionPage m = new ModelInputGetContestSubmissionPage();
         List<LmsanalyticSystemParams> params = lmsanalyticSystemParamsRepo.findAllByParam(LmsanalyticSystemParams.MIGRATE_CONTEST_SUBMISSION_NUMBER_ITEMS_PER_QUERY);
         int length = 20;
