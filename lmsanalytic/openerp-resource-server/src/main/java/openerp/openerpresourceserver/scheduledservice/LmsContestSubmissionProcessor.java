@@ -3,10 +3,9 @@ package openerp.openerpresourceserver.scheduledservice;
 import com.nimbusds.jose.shaded.gson.Gson;
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.callexternalapi.service.ApiService;
-import openerp.openerpresourceserver.log.entity.LmsLog;
+import openerp.openerpresourceserver.entity.LmsanalyticSystemParams;
 import openerp.openerpresourceserver.masterconfig.entity.LastTimeProcess;
 import openerp.openerpresourceserver.masterconfig.repo.LastTimeProcessRepo;
-import openerp.openerpresourceserver.programmingcontest.entity.CompositeProgrammingContestProblemRankingId;
 import openerp.openerpresourceserver.programmingcontest.entity.LmsContestSubmission;
 import openerp.openerpresourceserver.programmingcontest.entity.ProgrammingContestProblemRanking;
 import openerp.openerpresourceserver.programmingcontest.entity.ProgrammingContestRanking;
@@ -14,6 +13,7 @@ import openerp.openerpresourceserver.programmingcontest.model.ContestSubmissionE
 import openerp.openerpresourceserver.programmingcontest.model.ModelInputGetContestSubmissionPage;
 import openerp.openerpresourceserver.programmingcontest.model.ModelResponseGetContestSubmissionPage;
 import openerp.openerpresourceserver.programmingcontest.repo.LmsContestSubmissionRepo;
+import openerp.openerpresourceserver.repo.LmsanalyticSystemParamsRepo;
 import openerp.openerpresourceserver.programmingcontest.repo.ProgrammingContestProblemRankingRepo;
 import openerp.openerpresourceserver.programmingcontest.repo.ProgrammingContestRankingRepo;
 import org.slf4j.Logger;
@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -50,6 +49,7 @@ public class LmsContestSubmissionProcessor {
     private ProgrammingContestRankingRepo programmingContestRankingRepo;
 
     private ApiService apiService;
+    private LmsanalyticSystemParamsRepo lmsanalyticSystemParamsRepo;
 
     public static String composeKey(String userId, String contestId, String problemId){
         return userId + "$" + contestId + "$" + problemId;
@@ -174,7 +174,16 @@ public class LmsContestSubmissionProcessor {
         Date currentDate = new Date();
         //log.info("processMigrateContestSubmissions, run at time point {}",currentDate);
         ModelInputGetContestSubmissionPage m = new ModelInputGetContestSubmissionPage();
-        m.setLimit(20);
+        List<LmsanalyticSystemParams> params = lmsanalyticSystemParamsRepo.findAllByParam(LmsanalyticSystemParams.MIGRATE_CONTEST_SUBMISSION_NUMBER_ITEMS_PER_QUERY);
+        int length = 20;
+        if(params != null && params.size() > 0){
+            try {
+                length = Integer.valueOf(params.get(0).getValue());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        m.setLimit(length);
         m.setOffset(0);
         Date toDate = new Date();
         //Date toDate = lmsContestSubmissionRepo.findMinSubmissionCreatedStamp();
