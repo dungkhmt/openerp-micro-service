@@ -172,15 +172,17 @@ public class LmsContestSubmissionProcessor {
     @Transactional
     public void processMigrateContestSubmissions(){
         Date currentDate = new Date();
-        log.info("processMigrateContestSubmissions, run at time point {}",currentDate);
+        log.info("processMigrateContestSubmissions, START run at time point {}",currentDate);
         //if(true) return;
         ModelInputGetContestSubmissionPage m = new ModelInputGetContestSubmissionPage();
         List<LmsanalyticSystemParams> params = lmsanalyticSystemParamsRepo.findAllByParam(LmsanalyticSystemParams.MIGRATE_CONTEST_SUBMISSION_NUMBER_ITEMS_PER_QUERY);
+        log.info("processMigrateContestSubmissions, params,size = " + params.size());
         int length = 20;
         if(params != null && params.size() > 0){
             try {
                 length = Integer.valueOf(params.get(0).getValue());
             }catch (Exception e){
+                log.info("processMigrateContestSubmissions HAS EXCEPTION, params.size = " + params.size());
                 e.printStackTrace();
             }
         }
