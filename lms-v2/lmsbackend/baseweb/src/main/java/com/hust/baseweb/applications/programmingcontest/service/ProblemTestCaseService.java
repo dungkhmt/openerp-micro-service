@@ -295,6 +295,6 @@ public interface ProblemTestCaseService {
 
     ModelGetContestPageResponse getAllPublicContests();
 
-    ProblemEntity cloneProblem(ModelCloneProblem cloneRequest) throws MiniLeetCodeException;
+    ProblemEntity cloneProblem(String userId, ModelCloneProblem cloneRequest) throws MiniLeetCodeException;
 
 }

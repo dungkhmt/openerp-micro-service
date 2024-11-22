@@ -254,8 +254,8 @@ public class ProblemController {
     }
 
     @PostMapping(value = "/teachers/problems/clone")
-    public ResponseEntity<?> cloneProblem(@RequestBody ModelCloneProblem cloneRequest) throws MiniLeetCodeException {
-        ProblemEntity savedProblem = problemTestCaseService.cloneProblem(cloneRequest);
+    public ResponseEntity<?> cloneProblem(Principal principal, @RequestBody ModelCloneProblem cloneRequest) throws MiniLeetCodeException {
+        ProblemEntity savedProblem = problemTestCaseService.cloneProblem(principal.getName(), cloneRequest);
         return ResponseEntity.ok().body(savedProblem);
     }
 

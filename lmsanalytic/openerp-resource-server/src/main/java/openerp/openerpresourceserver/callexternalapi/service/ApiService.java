@@ -33,7 +33,9 @@ public class ApiService {
     // TODO: remove hard-coded URL
     //this.webClient = webClientBuilder.baseUrl("http://localhost:8081/api").build();
       //this.webClient = webClientBuilder.baseUrl("http://localhost:9090/api").build();
-      this.webClient = webClientBuilder.baseUrl("https://analytics.soict.ai").build();
+      this.webClient = webClientBuilder.baseUrl("https://analytics.soict.ai")
+              .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(2 * 1024 * 1024))
+              .build();
 
       this.keycloakService = keycloakService;
     this.clientCredential = clientCredential;

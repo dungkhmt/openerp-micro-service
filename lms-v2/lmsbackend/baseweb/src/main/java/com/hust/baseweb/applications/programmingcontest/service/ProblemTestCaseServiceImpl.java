@@ -3858,7 +3858,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
     @Transactional
     @Override
-    public ProblemEntity cloneProblem(ModelCloneProblem cloneRequest) throws MiniLeetCodeException {
+    public ProblemEntity cloneProblem(String userId, ModelCloneProblem cloneRequest) throws MiniLeetCodeException {
 
         ProblemEntity originalProblem = problemRepo.findById(cloneRequest.getOldProblemId())
                                                    .orElseThrow(() -> new MiniLeetCodeException("Original problem not found", HttpStatus.NOT_FOUND.value()));
@@ -3883,7 +3883,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         newProblem.setCorrectSolutionLanguage(originalProblem.getCorrectSolutionLanguage());
         newProblem.setPublicProblem(originalProblem.isPublicProblem());
         newProblem.setTags(originalProblem.getTags());
-        newProblem.setUserId(originalProblem.getUserId());
+        //newProblem.setUserId(originalProblem.getUserId());
+        newProblem.setUserId(userId);
         newProblem.setTimeLimit(originalProblem.getTimeLimit());
         newProblem.setLevelId(originalProblem.getLevelId());
         newProblem.setCategoryId(originalProblem.getCategoryId());
@@ -3914,7 +3915,71 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
             testCaseRepo.save(newTestCase);
         }
+        // grant role owner, manager, view to current user
+        UserContestProblemRole upr = new UserContestProblemRole();
+        upr.setProblemId(newProblem.getProblemId());
+        upr.setUserId(userId);
+        upr.setRoleId(UserContestProblemRole.ROLE_OWNER);
+        upr.setUpdateByUserId(userId);
+        upr.setCreatedStamp(new Date());
+        upr.setLastUpdated(new Date());
+        upr = userContestProblemRoleRepo.save(upr);
 
-        return newProblem;
+        upr = new UserContestProblemRole();
+        upr.setProblemId(newProblem.getProblemId());
+        upr.setUserId(userId);
+        upr.setRoleId(UserContestProblemRole.ROLE_EDITOR);
+        upr.setUpdateByUserId(userId);
+        upr.setCreatedStamp(new Date());
+        upr.setLastUpdated(new Date());
+        upr = userContestProblemRoleRepo.save(upr);
+
+        upr = new UserContestProblemRole();
+        upr.setProblemId(newProblem.getProblemId());
+        upr.setUserId(userId);
+        upr.setRoleId(UserContestProblemRole.ROLE_VIEWER);
+        upr.setUpdateByUserId(userId);
+        upr.setCreatedStamp(new Date());
+        upr.setLastUpdated(new Date());
+        upr = userContestProblemRoleRepo.save(upr);
+
+
+        // grant manager role to user admin
+        UserLogin admin = userLoginRepo.findByUserLoginId("admin");
+        if (admin != null) {
+            upr = new UserContestProblemRole();
+            upr.setProblemId(newProblem.getProblemId());
+            upr.setUserId(admin.getUserLoginId());
+            upr.setRoleId(UserContestProblemRole.ROLE_OWNER);
+            upr.setUpdateByUserId(userId);
+            upr.setCreatedStamp(new Date());
+            upr.setLastUpdated(new Date());
+            upr = userContestProblemRoleRepo.save(upr);
+
+            upr = new UserContestProblemRole();
+            upr.setProblemId(newProblem.getProblemId());
+            upr.setUserId(admin.getUserLoginId());
+            upr.setRoleId(UserContestProblemRole.ROLE_EDITOR);
+            upr.setUpdateByUserId(userId);
+            upr.setCreatedStamp(new Date());
+            upr.setLastUpdated(new Date());
+            upr = userContestProblemRoleRepo.save(upr);
+
+            upr = new UserContestProblemRole();
+            upr.setProblemId(newProblem.getProblemId());
+            upr.setUserId(admin.getUserLoginId());
+            upr.setRoleId(UserContestProblemRole.ROLE_VIEWER);
+            upr.setUpdateByUserId(userId);
+            upr.setCreatedStamp(new Date());
+            upr.setLastUpdated(new Date());
+            upr = userContestProblemRoleRepo.save(upr);
+
+            // push notification to admin
+            notificationsService.create(userId, admin.getUserLoginId(),
+                                        userId + " has cloned a contest problem ID " +
+                                        newProblem.getProblemId()
+                , "");
         }
+        return newProblem;
+    }
 }
