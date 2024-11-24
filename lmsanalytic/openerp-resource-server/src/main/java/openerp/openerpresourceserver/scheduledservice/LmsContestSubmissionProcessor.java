@@ -168,7 +168,7 @@ public class LmsContestSubmissionProcessor {
             }
         }
     }
-    @Scheduled(fixedRate = 5000)
+    //@Scheduled(fixedRate = 5000)
     @Transactional
     public void processMigrateContestSubmissions(){
         Date currentDate = new Date();
