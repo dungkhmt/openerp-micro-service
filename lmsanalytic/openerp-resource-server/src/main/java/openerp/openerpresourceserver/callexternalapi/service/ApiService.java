@@ -34,7 +34,7 @@ public class ApiService {
     //this.webClient = webClientBuilder.baseUrl("http://localhost:8081/api").build();
       //this.webClient = webClientBuilder.baseUrl("http://localhost:9090/api").build();
       this.webClient = webClientBuilder.baseUrl("https://analytics.soict.ai")
-              .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(2 * 1024 * 1024))
+              .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
               .build();
 
       this.keycloakService = keycloakService;
