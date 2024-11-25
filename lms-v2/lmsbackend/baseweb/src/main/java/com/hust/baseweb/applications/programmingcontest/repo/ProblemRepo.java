@@ -28,6 +28,10 @@ public interface ProblemRepo extends JpaRepository<ProblemEntity, String>, JpaSp
            + "p.problemId, p.problemName, p.levelId, p.problemDescription"
            + ") from ProblemEntity p")
     List<ModelProblemGeneralInfo> getAllProblemGeneralInformation();
+    @Query("select new com.hust.baseweb.applications.programmingcontest.model.ModelProblemGeneralInfo("
+           + "p.problemId, p.problemName, p.levelId, p.problemDescription"
+           + ") from ProblemEntity p where p.statusId = 'OPEN'")
+    List<ModelProblemGeneralInfo> getAllOpenProblemGeneralInformation();
 
     boolean existsByProblemId(String problemId);
 

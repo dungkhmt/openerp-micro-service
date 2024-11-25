@@ -338,7 +338,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
     @Override
     public List<ModelProblemGeneralInfo> getAllProblemsGeneralInfo() {
-        return problemRepo.getAllProblemGeneralInformation();
+        //return problemRepo.getAllProblemGeneralInformation();
+        return problemRepo.getAllOpenProblemGeneralInformation();
+
     }
 
     @Override
