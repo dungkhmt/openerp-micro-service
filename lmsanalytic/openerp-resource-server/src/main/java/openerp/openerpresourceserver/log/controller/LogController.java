@@ -7,12 +7,13 @@ import openerp.openerpresourceserver.log.model.LmsLogModelCreate;
 import openerp.openerpresourceserver.log.service.LmsLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Role;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -25,18 +26,32 @@ public class LogController {
 
     @PostMapping("/log/create-log")
     public ResponseEntity<?> createLog(Principal principal, @RequestBody LmsLogModelCreate I){
-        log.info("createLog body = {}",I);
-        log.info("createLog, userId = " + I.getUserId() + " action = " + I.getActionType() + " description = " + I.getDescription());
+        //log.info("createLog body = {}",I);
+        //log.info("createLog, userId = " + I.getUserId() + " action = " + I.getActionType() + " description = " + I.getDescription());
         LmsLog alog = lmsLogService.save(I);
-        log.info("createLog, userId = " + I.getUserId() + " action = " + I.getActionType() + " description = " + I.getDescription() + " save OK!!");
+        //log.info("createLog, userId = " + I.getUserId() + " action = " + I.getActionType() + " description = " + I.getDescription() + " save OK!!");
 
         return ResponseEntity.ok().body(alog);
     }
+    @GetMapping("/log/get-mostrecent-logs")
+    public ResponseEntity<?> getMostRecentLogs(Principal principal){
+        List<LmsLog> res = lmsLogService.getMostRecentLogs(50);
+        //log.info("getMostRecentLogs, return size = " + res.size());
+        return ResponseEntity.ok().body(res);
+    }
     //@Secured("LMS_LOG")
     @GetMapping("/log/get-logs")
-    public ResponseEntity<?> getLmsLogs(Principal principal){
-        log.info("getLmsLog user = " + principal.getName());
-        List<LmsLog> logs = lmsLogService.getAllLogs();
+    public ResponseEntity<?> getLmsLogs(Principal principal,
+                                        @RequestParam("page") int page,
+                                        @RequestParam("size") int size,
+                                        LmsLog filter
+                                        ){
+        //log.info("getLmsLog user = " + principal.getName());
+        //List<LmsLog> logs = lmsLogService.getAllLogs();
+        Pageable sortedByCreatedStampDsc = PageRequest.of(page, size, Sort.by("createdStamp").descending());
+        Page<LmsLog> logs = lmsLogService.search(filter,sortedByCreatedStampDsc);
         return ResponseEntity.ok().body(logs);
     }
+
+
 }

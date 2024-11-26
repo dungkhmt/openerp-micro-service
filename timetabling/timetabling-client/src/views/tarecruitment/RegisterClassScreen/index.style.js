@@ -43,6 +43,32 @@ const styles = {
   title: {
     fontWeight: "bold",
   },
+
+  weekList: {
+    marginTop: "1em",
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center"
+  },
+
+  weekdropdown: {
+    width: "50%",
+    marginRight: "1em",
+  },
+
+  weekItem: {
+    padding: '10px',
+    marginRight: '10px',  
+    minWidth: '120px',    
+  },
+
+  weekItemBox: {
+    marginTop: '10px',
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between"
+  }
 };
 
 export default styles;

@@ -5,25 +5,15 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { toFormattedDateTime } from "../../utils/dateutils";
+import UserFeatures from "./userfeatures";
+import ContestRanking from "./contestranking";
+import ContestProblemRanking from "./contestproblemranking";
+import RealtimeRecentLogs from "./realtimerecentlogs";
+
+
 function LmsLogs() {
 
     const [logs, setLogs] = useState([]);
-
-    useEffect(() => {
-        request("get", "/log/get-logs", (res) => {
-            //setLogs(res.data);
-            const data = res.data.map((log) => ({
-                id: log.id,
-                userId: log.userId,
-                actionType: log.actionType,
-                createdAt: toFormattedDateTime(log.createdStamp)
-                
-              }));
-              setLogs(data);
-
-        }).then();
-    }, [])
-
     const columns = [
         {
             title: "id",
@@ -39,7 +29,7 @@ function LmsLogs() {
         },
         {
             title: "Date",
-            field: "createdAt",
+            field: "createdStamp",
         },
         
         {
@@ -59,6 +49,24 @@ function LmsLogs() {
         }
     ];
 
+    useEffect(() => {
+        /*
+        request("get", "/log/get-logs", (res) => {
+            //setLogs(res.data);
+            const data = res.data.map((log) => ({
+                id: log.id,
+                userId: log.userId,
+                actionType: log.actionType,
+                createdAt: toFormattedDateTime(log.createdStamp)
+                
+              }));
+              setLogs(data);
+
+        }).then();
+        */
+    }, [])
+
+
     const demoFunction = (user) => {
         alert("You clicked on User: " + user.id)
     }
@@ -68,16 +76,74 @@ function LmsLogs() {
             <StandardTable
                 title="LMSLOGS"
                 columns={columns}
-                data={logs}
+                //data={logs}
+                data = {(query) => new Promise((resolve, reject) => {
+                    let url = `/log/get-logs?page=${query.page}&size=${query.pageSize}`;
+        
+                    query.filters.forEach((element) => {
+                      url += `&${element.column.field}=${element.value}`;
+                    });
+        
+                    request(
+                      "get",
+                      url,
+                      (res) => {
+                        const data = res.data;
+                        const content = data.content.map((log) => ({
+                          id: log.id,
+                          userId: log.userId,
+                          actionType: log.actionType,
+                          description: log.description,
+                          param1: log.param1,
+                          param2: log.param2,
+                          param3: log.param3,
+                          param4: log.param4,
+                          param5: log.param5,
+                          createdStamp: toFormattedDateTime(log.createdStamp),
+                        }));
+        
+                        resolve({
+                          data: content, // your data array
+                          page: data.number, // current page number
+                          totalCount: data.totalElements, // total row number
+                        });
+                      },
+                      {
+                        onError: (e) => {
+                          reject({
+                            message:
+                              "Đã có lỗi xảy ra trong quá trình tải dữ liệu. Thử lại ",
+                            errorCause: "query",
+                          });
+                        },
+                      }
+                    );
+                  })
+
+                }
                 // hideCommandBar
+                //options={{
+                //    selection: false,
+                //    pageSize: 20,
+                //    search: true,
+                //    sorting: true,
+                //}}
+
                 options={{
-                    selection: false,
+                    filtering: true,
+                    debounceInterval: 500,
                     pageSize: 20,
-                    search: true,
-                    sorting: true,
-                }}
+                    selection: false,
+                    search: false,
+                  }}
             />
+
+            <UserFeatures/>
+            <ContestProblemRanking/>
+            <RealtimeRecentLogs/>
         </div>
+
+
 
     );
 }

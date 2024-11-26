@@ -12,116 +12,127 @@ import {
   Dropdown,
   DropdownMenu,
   DropdownItem,
-  Chip,
-  User,
   Pagination,
 } from "@nextui-org/react";
-import { PlusIcon } from "./PlusIcon";
-import { VerticalDotsIcon } from "./VerticalDotsIcon";
-import { SearchIcon } from "./SearchIcon";
-import { ChevronDownIcon } from "./ChvronDownIcon";
-import { columns, users, statusOptions } from "./data";
-import { capitalize } from "./utils";
+import { PlusIcon } from "../components/icon/PlusIcon";
+import { VerticalDotsIcon } from "../components/icon/VerticalDotsIcon";
+import { SearchIcon } from "../components/icon/SearchIcon";
+// import { ChevronDownIcon } from "../components/icon/ChvronDownIcon";
+import { columns, statusOptions } from "../config/data";
+// import { capitalize } from "../utils/utils";
+import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { request } from "../api";
+// const statusColorMap = {
+//   active: "success",
+//   paused: "danger",
+//   vacation: "warning",
+// };
 
-const statusColorMap = {
-  active: "success",
-  paused: "danger",
-  vacation: "warning",
-};
-
-const INITIAL_VISIBLE_COLUMNS = ["name", "role", "status", "actions"];
-
+const INITIAL_VISIBLE_COLUMNS = ["name", "code", "totalQuantityOnHand", "actions"];
+const buttonText = "Add Product";
 export default function BaseTable() {
-  const [filterValue, setFilterValue] = React.useState("");
-  const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
-  const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
-  const [statusFilter, setStatusFilter] = React.useState("all");
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [sortDescriptor, setSortDescriptor] = React.useState({
-    column: "age",
+
+  const [items, setItems] = useState([]);
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    request("get", "/admin/product", (res) => {
+      setItems(res.data);
+    }).then();
+  }, [])
+  // const demo = Array.from({ length: 20 }, (_, index) => ({
+  //   id: `product-${index + 1}`,
+  //   name: `Product ${index + 1}`,
+  //   code: `CODE${index + 1}`,
+  //   totalQuantityOnHand: Math.floor(Math.random() * 10) + 1, // Số lượng ngẫu nhiên từ 1 đến 10
+  // }));
+  const [filterValue, setFilterValue] = useState("");
+  const [selectedKeys, setSelectedKeys] = useState(new Set([]));
+  const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [sortDescriptor, setSortDescriptor] = useState({
+    column: "id",
     direction: "ascending",
   });
-  const [page, setPage] = React.useState(1);
 
-  const pages = Math.ceil(users.length / rowsPerPage);
 
+  const pages = Math.ceil(items.length / rowsPerPage);
   const hasSearchFilter = Boolean(filterValue);
 
-  const headerColumns = React.useMemo(() => {
+  const headerColumns = useMemo(() => {
     if (visibleColumns === "all") return columns;
 
     return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
   }, [visibleColumns]);
 
-  const filteredItems = React.useMemo(() => {
-    let filteredUsers = [...users];
+  const filteredItems = useMemo(() => {
+    let filteredItems = [...items];
 
     if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter((user) =>
-        user.name.toLowerCase().includes(filterValue.toLowerCase()),
+      filteredItems = filteredItems.filter((item) =>
+        item.name.toLowerCase().includes(filterValue.toLowerCase()),
       );
     }
     if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
-      filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.status),
+      filteredItems = filteredItems.filter((item) =>
+        Array.from(statusFilter).includes(item.status),
       );
     }
 
-    return filteredUsers;
-  }, [users, filterValue, statusFilter]);
+    return filteredItems;
+  }, [items, filterValue, statusFilter]);
 
-  const items = React.useMemo(() => {
+  const displayItems = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
 
     return filteredItems.slice(start, end);
   }, [page, filteredItems, rowsPerPage]);
 
-  const sortedItems = React.useMemo(() => {
-    return [...items].sort((a, b) => {
+  const sortedItems = useMemo(() => {
+    return [...displayItems].sort((a, b) => {
       const first = a[sortDescriptor.column];
       const second = b[sortDescriptor.column];
       const cmp = first < second ? -1 : first > second ? 1 : 0;
 
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
-  }, [sortDescriptor, items]);
+  }, [sortDescriptor, displayItems]);
 
-  const renderCell = React.useCallback((user, columnKey) => {
-    const cellValue = user[columnKey];
+  const renderCell = useCallback((item, columnKey) => {
+    const cellValue = item[columnKey];
 
     switch (columnKey) {
-      case "name":
-        return (
-          <User
-            avatarProps={{ radius: "full", size: "sm", src: user.avatar }}
-            classNames={{
-              description: "text-default-500",
-            }}
-            description={user.email}
-            name={cellValue}
-          >
-            {user.email}
-          </User>
-        );
-      case "role":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{cellValue}</p>
-            <p className="text-bold text-tiny capitalize text-default-500">{user.team}</p>
-          </div>
-        );
-      case "status":
-        return (
-          <Chip
-            className="capitalize border-none gap-1 text-default-600"
-            color={statusColorMap[user.status]}
-            size="sm"
-            variant="dot"
-          >
-            {cellValue}
-          </Chip>
-        );
+      // case "name":
+      //   return (
+      //     <User
+      //       avatarProps={{ radius: "full", size: "sm", src: item.avatar }}
+      //       classNames={{ description: "text-default-500" }}
+      //       description={"Tủ lạnh"}
+      //       name={cellValue}
+      //     >
+      //     </User>
+      //   );
+      // case "role":
+      //   return (
+      //     <div className="flex flex-col">
+      //       <p className="text-bold text-small capitalize">{cellValue}</p>
+      //       <p className="text-bold text-tiny capitalize text-default-500">{item.team}</p>
+      //     </div>
+      //   );
+      // case "status":
+      //   return (
+      //     <Chip
+      //       className="capitalize border-none gap-1 text-default-600"
+      //       color={statusColorMap[item.status]}
+      //       size="sm"
+      //       variant="dot"
+      //     >
+      //       {cellValue}
+      //     </Chip>
+      //   );
       case "actions":
         return (
           <div className="relative flex justify-end items-center gap-2">
@@ -132,8 +143,8 @@ export default function BaseTable() {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem>Update</DropdownItem>
-                <DropdownItem>Delete</DropdownItem>
+                <DropdownItem onClick={() => handleUpdate(item.id)}>Update</DropdownItem>
+                <DropdownItem onClick={() => handleDelete(item.id)}>Delete</DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
@@ -143,13 +154,12 @@ export default function BaseTable() {
     }
   }, []);
 
-  const onRowsPerPageChange = React.useCallback((e) => {
+  const onRowsPerPageChange = useCallback((e) => {
     setRowsPerPage(Number(e.target.value));
     setPage(1);
   }, []);
 
-
-  const onSearchChange = React.useCallback((value) => {
+  const onSearchChange = useCallback((value) => {
     if (value) {
       setFilterValue(value);
       setPage(1);
@@ -158,7 +168,34 @@ export default function BaseTable() {
     }
   }, []);
 
-  const topContent = React.useMemo(() => {
+  const navigate = useNavigate();
+
+  const handleAddProduct = () => {
+    navigate('/admin/product/add-product');
+  };
+
+  const handleUpdate = (id) => {
+    navigate(`/admin/product/${id}`);
+  };
+
+  const handleDelete = (id) => {
+    request(
+      "post", // HTTP method
+      "/admin/product/delete-product", // Endpoint for deleting product
+      (res) => {
+        if (res.status === 200) {
+          setItems(prevItems => prevItems.filter(item => item.id !== id));
+        }
+      },
+      {
+        onError: (e) => console.error("Error deleting product:", e),
+      },
+      { id }
+    );
+  };
+
+
+  const topContent = useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
         <div className="flex justify-between gap-3 items-end">
@@ -168,11 +205,11 @@ export default function BaseTable() {
             placeholder="Search by name..."
             startContent={<SearchIcon />}
             value={filterValue}
-            onClear={() => onClear()}
+            onClear={() => setFilterValue("")}
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
-            <Dropdown>
+            {/* <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
                   endContent={<ChevronDownIcon className="text-small" />}
@@ -196,8 +233,8 @@ export default function BaseTable() {
                   </DropdownItem>
                 ))}
               </DropdownMenu>
-            </Dropdown>
-            <Dropdown>
+            </Dropdown> */}
+            {/* <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
                   endContent={<ChevronDownIcon className="text-small" />}
@@ -221,18 +258,19 @@ export default function BaseTable() {
                   </DropdownItem>
                 ))}
               </DropdownMenu>
-            </Dropdown>
+            </Dropdown> */}
             <Button
               className="bg-foreground text-background"
               endContent={<PlusIcon />}
               size="md"
+              onClick={handleAddProduct}
             >
-              Add Product
+              {buttonText}
             </Button>
           </div>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-default-400 text-small">Total {users.length} users</span>
+          <span className="text-default-400 text-small">Total {items.length} items</span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
             <select
@@ -253,14 +291,15 @@ export default function BaseTable() {
     visibleColumns,
     onSearchChange,
     onRowsPerPageChange,
-    users.length,
+    items.length,
     hasSearchFilter,
   ]);
 
-  const bottomContent = React.useMemo(() => {
+  const bottomContent = useMemo(() => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
         <Pagination
+          isCompact
           showControls
           classNames={{
             cursor: "bg-foreground text-background",
@@ -275,13 +314,13 @@ export default function BaseTable() {
         <span className="text-small text-default-400">
           {selectedKeys === "all"
             ? "All items selected"
-            : `${selectedKeys.size} of ${items.length} selected`}
+            : `${selectedKeys.size} of ${displayItems.length} selected`}
         </span>
       </div>
     );
-  }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
+  }, [selectedKeys, displayItems.length, page, pages, hasSearchFilter]);
 
-  const classNames = React.useMemo(
+  const classNames = useMemo(
     () => ({
       wrapper: ["max-h-[382px]", "max-w-3xl"],
       th: ["bg-transparent", "text-default-500", "border-b", "border-divider"],
@@ -325,14 +364,14 @@ export default function BaseTable() {
         {(column) => (
           <TableColumn
             key={column.uid}
-            align={column.uid === "actions" ? "center" : "start"}
+            align={column.uid === "actions" || column.uid === "totalQuantityOnHand" ? "center" : "start"}
             allowsSorting={column.sortable}
           >
             {column.name}
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody emptyContent={"No users found"} items={sortedItems}>
+      <TableBody emptyContent={"Loading ..."} items={sortedItems}>
         {(item) => (
           <TableRow key={item.id}>
             {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
