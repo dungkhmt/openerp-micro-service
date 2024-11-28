@@ -144,7 +144,7 @@ public class GccExecutor {
                 "cat <<'" + SOURCECODE_HEREDOC_DELIMITER + "' >> main" + getFileExtension(language),
                 source,
                 SOURCECODE_HEREDOC_DELIMITER,
-                ComputerLanguage.Languages.CPP11.equals(language) ? "ulimit -f 1048576 && " + getBuildCmd(language) : getBuildCmd(language),
+                "ulimit -f 2097152 && " + getBuildCmd(language), // The maximum size limit of the .o file is 1GB. If it exceeds this limit, the program may require allocating a large variable.
                 "FILE=main",
                 "if test -f \"$FILE\"; then",
                 genTestCase.toString(),
