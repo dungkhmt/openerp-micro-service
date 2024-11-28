@@ -144,7 +144,7 @@ public class GccExecutor {
                 "cat <<'" + SOURCECODE_HEREDOC_DELIMITER + "' >> main" + getFileExtension(language),
                 source,
                 SOURCECODE_HEREDOC_DELIMITER,
-                getBuildCmd(language),
+                ComputerLanguage.Languages.CPP11.equals(language) ? "ulimit -f 1048576 && " + getBuildCmd(language) : getBuildCmd(language),
                 "FILE=main",
                 "if test -f \"$FILE\"; then",
                 genTestCase.toString(),
