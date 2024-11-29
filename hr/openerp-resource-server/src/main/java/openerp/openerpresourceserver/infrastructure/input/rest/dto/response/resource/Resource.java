@@ -28,6 +28,5 @@ public class Resource {
         this.meta = new MetaResource(responseCode);
         this.data = data;
     }
-
 }
 

@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.infrastructure.output.persistence.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import openerp.openerpresourceserver.constant.CheckinoutType;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
@@ -25,7 +26,8 @@ public class CheckinoutEntity extends AuditEntity{
     @Column(name = "time_point")
     private LocalDateTime timePoint;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "checkinout", length = 1)
-    private String checkinout;
+    private CheckinoutType checkinout;
 
 }

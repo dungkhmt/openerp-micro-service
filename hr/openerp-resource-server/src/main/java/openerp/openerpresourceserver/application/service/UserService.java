@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.application.service;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.User;
 import openerp.openerpresourceserver.infrastructure.output.persistence.repository.UserRepo;
@@ -14,11 +15,11 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Log4j2
-@AllArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 @Service
 public class UserService implements UserUseCase {
 
-    private UserRepo userRepo;
+    private final UserRepo userRepo;
 
     @Override
     public List<User> getAllUsers() {

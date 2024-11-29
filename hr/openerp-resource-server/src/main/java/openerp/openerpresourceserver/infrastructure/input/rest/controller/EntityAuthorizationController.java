@@ -1,8 +1,8 @@
 package openerp.openerpresourceserver.infrastructure.input.rest.controller;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.application.port.out.EntityAuthorizationUseCase;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,10 +14,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
-@AllArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 public class EntityAuthorizationController {
 
-    private EntityAuthorizationUseCase entityAuthorizationUseCase;
+    private final EntityAuthorizationUseCase entityAuthorizationUseCase;
 
     /**
      * > Get all the entity ids that the user has access to
