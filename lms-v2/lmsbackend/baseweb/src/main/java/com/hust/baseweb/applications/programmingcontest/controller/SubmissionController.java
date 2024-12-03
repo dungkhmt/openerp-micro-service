@@ -64,8 +64,8 @@ public class SubmissionController {
     ContestSubmissionCommentRepository contestSubmissionCommentRepo;
     ApiService apiService;
 
-    @Autowired
-    HttpRequest request;
+    //@Autowired
+    //HttpRequest request;
 
     @Secured("ROLE_TEACHER")
     @PostMapping("/teacher/submissions/{submissionId}/disable")
