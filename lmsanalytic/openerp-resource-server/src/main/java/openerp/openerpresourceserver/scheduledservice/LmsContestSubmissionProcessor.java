@@ -16,6 +16,9 @@ import openerp.openerpresourceserver.programmingcontest.repo.LmsContestSubmissio
 import openerp.openerpresourceserver.repo.LmsanalyticSystemParamsRepo;
 import openerp.openerpresourceserver.programmingcontest.repo.ProgrammingContestProblemRankingRepo;
 import openerp.openerpresourceserver.programmingcontest.repo.ProgrammingContestRankingRepo;
+import openerp.openerpresourceserver.userfeaturestore.entity.UserFeatures;
+import openerp.openerpresourceserver.userfeaturestore.repo.UserFeaturesRepo;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -47,6 +51,7 @@ public class LmsContestSubmissionProcessor {
     private LastTimeProcessRepo lastTimeProcessRepo;
     private ProgrammingContestProblemRankingRepo programmingContestProblemRankingRepo;
     private ProgrammingContestRankingRepo programmingContestRankingRepo;
+    private UserFeaturesRepo userFeaturesRepo;
 
     private ApiService apiService;
     private LmsanalyticSystemParamsRepo lmsanalyticSystemParamsRepo;
@@ -64,8 +69,73 @@ public class LmsContestSubmissionProcessor {
         Date currentDate = new Date();
         log.info("processCountSubmissionsOfParticipants, run at time point {}",currentDate);
         // to be completed by huyentm
+        LastTimeProcess ltp = lastTimeProcessRepo.findByTableNameAndModule(TABLE_CONTEST_SUBMISSION, MODULE_CONTEST_PROBLEM_RANKING);
+        List<LmsContestSubmission> newSubmissions;
 
+        if (ltp == null) {
+            newSubmissions = lmsContestSubmissionRepo.findAll();
+            log.info("process, last time process NULL, get number items lms_contest_submissions = " + newSubmissions.size());
+            ltp = new LastTimeProcess();
+            ltp.setTableName(TABLE_CONTEST_SUBMISSION);
+            ltp.setModule(MODULE_CONTEST_PROBLEM_RANKING);
+            ltp.setLastTimeProcess(currentDate);
+            lastTimeProcessRepo.save(ltp);
+            log.info("process, last time process NULL, save new record to DB");
+        } else {
+            newSubmissions = lmsContestSubmissionRepo.findAllByCreatedStampBetween(ltp.getLastTimeProcess(), currentDate);
+            log.info("process, last time process = " + ltp.getLastTimeProcess() + ", get number items lms_contest_submissions = " + newSubmissions.size());
+            ltp.setLastTimeProcess(currentDate);
+            lastTimeProcessRepo.save(ltp);
+        }
 
+        HashMap<String, Integer> successSubmissionCount = new HashMap<>();
+        HashMap<String, Integer> compileFailSubmissionCount = new HashMap<>();
+        for (LmsContestSubmission submission : newSubmissions) {
+            String userId = submission.getUserSubmissionId();
+            if (ContestSubmissionEntity.SUBMISSION_STATUS_ACCEPTED.equals(submission.getStatus())) {
+                successSubmissionCount.put(userId, successSubmissionCount.getOrDefault(userId, 0) + 1);
+            } else {
+                compileFailSubmissionCount.put(userId, compileFailSubmissionCount.getOrDefault(userId, 0) + 1);
+            }
+        }
+
+        for (LmsContestSubmission submission : newSubmissions) {
+            String userId = submission.getUserSubmissionId();
+            int totalSubmission = successSubmissionCount.getOrDefault(userId, 0) + compileFailSubmissionCount.getOrDefault(userId, 0);
+            int successSubmission = successSubmissionCount.getOrDefault(userId, 0);
+            int failedSubmission = compileFailSubmissionCount.getOrDefault(userId, 0);
+
+            UserFeatures totalSubmissionFeature = UserFeatures.builder()
+                    .userId(userId)
+                    .featureId(UserFeatures.FEATURE_NUMBER_CONTEST_SUBMISSIONS)
+                    .value(totalSubmission)
+                    .status("ACTIVE")
+                    .lastUpdatedStamp(currentDate)
+                    .createdStamp(currentDate)
+                    .build();
+
+            UserFeatures successSubmissionFeature = UserFeatures.builder()
+                    .userId(userId)
+                    .featureId(UserFeatures.FEATURE_NUMBER_CONTEST_ACCEPT_SUBMISSIONS)
+                    .value(successSubmission)
+                    .status("ACTIVE")
+                    .lastUpdatedStamp(currentDate)
+                    .createdStamp(currentDate)
+                    .build();
+
+            UserFeatures failedSubmissionFeature = UserFeatures.builder()
+                    .userId(userId)
+                    .featureId(UserFeatures.FEATURE_NUMBER_CONTEST_COMPILE_ERROR_SUBMISSIONS)
+                    .value(failedSubmission)
+                    .status("ACTIVE")
+                    .lastUpdatedStamp(currentDate)
+                    .createdStamp(currentDate)
+                    .build();
+
+            userFeaturesRepo.save(totalSubmissionFeature);
+            userFeaturesRepo.save(successSubmissionFeature);
+            userFeaturesRepo.save(failedSubmissionFeature);
+        }
     }
     @Scheduled(fixedRate = 30000)
     @Transactional
