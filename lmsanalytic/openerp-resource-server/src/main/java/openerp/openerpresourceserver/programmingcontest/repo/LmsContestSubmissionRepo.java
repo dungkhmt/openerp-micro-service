@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.programmingcontest.repo;
 
 import openerp.openerpresourceserver.programmingcontest.entity.LmsContestSubmission;
+import openerp.openerpresourceserver.programmingcontest.model.ModelResponseGetSubmissionsWithStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -19,5 +20,14 @@ public interface LmsContestSubmissionRepo extends JpaRepository<LmsContestSubmis
 
     LmsContestSubmission findByContestSubmissionId(UUID contestSubmissionId);
 
+    @Query(value = "select new openerp.openerpresourceserver.programmingcontest.model.ModelResponseGetSubmissionsWithStatus(s.id, s.contestSubmissionId, s.userSubmissionId, s.status, s.createdStamp) from LmsContestSubmission s")
+    List<ModelResponseGetSubmissionsWithStatus> findAllSubmissionWithStatus();
+
+
+    @Query(value = "select new openerp.openerpresourceserver.programmingcontest.model.ModelResponseGetSubmissionsWithStatus(" +
+            "s.id, s.contestSubmissionId, s.userSubmissionId, s.status, s.createdStamp) from " +
+            "LmsContestSubmission s where s.createdStamp > :start and s.createdStamp < :end")
+
+    List<ModelResponseGetSubmissionsWithStatus> findAllWithStatusByCreatedStampBetween(Date start, Date end);
 }
 

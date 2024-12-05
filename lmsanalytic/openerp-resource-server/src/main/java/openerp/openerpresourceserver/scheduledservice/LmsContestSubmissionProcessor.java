@@ -12,6 +12,7 @@ import openerp.openerpresourceserver.programmingcontest.entity.ProgrammingContes
 import openerp.openerpresourceserver.programmingcontest.model.ContestSubmissionEntity;
 import openerp.openerpresourceserver.programmingcontest.model.ModelInputGetContestSubmissionPage;
 import openerp.openerpresourceserver.programmingcontest.model.ModelResponseGetContestSubmissionPage;
+import openerp.openerpresourceserver.programmingcontest.model.ModelResponseGetSubmissionsWithStatus;
 import openerp.openerpresourceserver.programmingcontest.repo.LmsContestSubmissionRepo;
 import openerp.openerpresourceserver.repo.LmsanalyticSystemParamsRepo;
 import openerp.openerpresourceserver.programmingcontest.repo.ProgrammingContestProblemRankingRepo;
@@ -29,10 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @Component
 @AllArgsConstructor(onConstructor_ = @Autowired)
@@ -42,6 +40,8 @@ public class LmsContestSubmissionProcessor {
     public static final String TABLE_CONTEST_SUBMISSION = "lms_contest_submission";
 
     public static final String MODULE_CONTEST_PROBLEM_RANKING = "CONTEST_PROBLEM_RANKING";
+    public static final String MODULE_CONTEST_PROBLEM_COUNT_SUBMISSIONS = "CONTEST_COUNT_SUBMISSIONS";
+
 
     private static final Logger log = LoggerFactory.getLogger(LmsLogProcessor.class);
 
@@ -63,44 +63,159 @@ public class LmsContestSubmissionProcessor {
         return userId + "$" + contestId;
     }
 
-    @Scheduled(fixedRate = 6000)
+    @Scheduled(fixedRate = 60000)
     @Transactional
     public void processCountSubmissionsOfParticipants(){
         Date currentDate = new Date();
         log.info("processCountSubmissionsOfParticipants, run at time point {}",currentDate);
         // to be completed by huyentm
-        LastTimeProcess ltp = lastTimeProcessRepo.findByTableNameAndModule(TABLE_CONTEST_SUBMISSION, MODULE_CONTEST_PROBLEM_RANKING);
-        List<LmsContestSubmission> newSubmissions;
+        LastTimeProcess ltp = lastTimeProcessRepo.findByTableNameAndModule(TABLE_CONTEST_SUBMISSION, MODULE_CONTEST_PROBLEM_COUNT_SUBMISSIONS);
+        //List<LmsContestSubmission> newSubmissions;
+        List<ModelResponseGetSubmissionsWithStatus> newSubmissions;
 
         if (ltp == null) {
-            newSubmissions = lmsContestSubmissionRepo.findAll();
-            log.info("process, last time process NULL, get number items lms_contest_submissions = " + newSubmissions.size());
+            //newSubmissions = lmsContestSubmissionRepo.findAll();
+            newSubmissions = lmsContestSubmissionRepo.findAllSubmissionWithStatus();
+            log.info("processCountSubmissionsOfParticipants, last time process NULL, get number items lms_contest_submissions = " + newSubmissions.size());
             ltp = new LastTimeProcess();
             ltp.setTableName(TABLE_CONTEST_SUBMISSION);
-            ltp.setModule(MODULE_CONTEST_PROBLEM_RANKING);
+            ltp.setModule(MODULE_CONTEST_PROBLEM_COUNT_SUBMISSIONS);
             ltp.setLastTimeProcess(currentDate);
             lastTimeProcessRepo.save(ltp);
-            log.info("process, last time process NULL, save new record to DB");
+            log.info("processCountSubmissionsOfParticipants, last time process NULL, save new record to DB");
         } else {
-            newSubmissions = lmsContestSubmissionRepo.findAllByCreatedStampBetween(ltp.getLastTimeProcess(), currentDate);
-            log.info("process, last time process = " + ltp.getLastTimeProcess() + ", get number items lms_contest_submissions = " + newSubmissions.size());
+            //newSubmissions = lmsContestSubmissionRepo.findAllByCreatedStampBetween(ltp.getLastTimeProcess(), currentDate);
+            newSubmissions = lmsContestSubmissionRepo.findAllWithStatusByCreatedStampBetween(ltp.getLastTimeProcess(), currentDate);
+            log.info("processCountSubmissionsOfParticipants, last time process = " + ltp.getLastTimeProcess() + ", get number items lms_contest_submissions = " + newSubmissions.size());
             ltp.setLastTimeProcess(currentDate);
             lastTimeProcessRepo.save(ltp);
         }
 
         HashMap<String, Integer> successSubmissionCount = new HashMap<>();
         HashMap<String, Integer> compileFailSubmissionCount = new HashMap<>();
-        for (LmsContestSubmission submission : newSubmissions) {
+        HashMap<String, Integer> partialSubmissionCount = new HashMap<>();
+        HashMap<String, Integer> failedSubmissionCount = new HashMap<>();
+        HashMap<String, Integer> totalSubmissionCount = new HashMap<>();
+
+        Set<String> userIds = new HashSet<>();
+
+        //for (LmsContestSubmission submission : newSubmissions) {
+        for(ModelResponseGetSubmissionsWithStatus submission: newSubmissions){
             String userId = submission.getUserSubmissionId();
+            userIds.add(userId);
             if (ContestSubmissionEntity.SUBMISSION_STATUS_ACCEPTED.equals(submission.getStatus())) {
                 successSubmissionCount.put(userId, successSubmissionCount.getOrDefault(userId, 0) + 1);
-            } else {
+            }else if (ContestSubmissionEntity.SUBMISSION_STATUS_FAILED.equals(submission.getStatus())) {
+                failedSubmissionCount.put(userId, successSubmissionCount.getOrDefault(userId, 0) + 1);
+            }else if (ContestSubmissionEntity.SUBMISSION_STATUS_PARTIAL.equals(submission.getStatus())) {
+                partialSubmissionCount.put(userId, successSubmissionCount.getOrDefault(userId, 0) + 1);
+            }else if (ContestSubmissionEntity.SUBMISSION_STATUS_COMPILE_ERROR.equals(submission.getStatus())) {
                 compileFailSubmissionCount.put(userId, compileFailSubmissionCount.getOrDefault(userId, 0) + 1);
             }
         }
+        for(String userId: userIds) {
+            int c1 = successSubmissionCount.getOrDefault(userId, 0);
+            int c2 = failedSubmissionCount.getOrDefault(userId,0);
+            int c3 = partialSubmissionCount.getOrDefault(userId,0);
+            int c4 = compileFailSubmissionCount.getOrDefault(userId,0);
+            totalSubmissionCount.put(userId,c1+c2+c3+c4);
+            log.info("processCountSubmissionsOfParticipants, user " + userId + ": c1 = " + c1 + " c2 = " + c2 + " c3 = " + c3 + " c4 = " + c4 + " total = " + totalSubmissionCount.get(userId));
+        }
 
+        // update or create new to DB
+        for(String userId: userIds) {
+            UserFeatures uf = userFeaturesRepo.findByUserIdAndFeatureId(userId,UserFeatures.FEATURE_NUMBER_CONTEST_SUBMISSIONS);
+            if(uf == null){
+                uf = UserFeatures.builder()
+                        .userId(userId)
+                        .featureId(UserFeatures.FEATURE_NUMBER_CONTEST_SUBMISSIONS)
+                        .value(totalSubmissionCount.getOrDefault(userId,0))
+                        .status("ACTIVE")
+                        .lastUpdatedStamp(currentDate)
+                        .createdStamp(currentDate)
+                        .build();
+            }else{
+                uf.setValue(uf.getValue() + totalSubmissionCount.getOrDefault(userId,0));
+            }
+            log.info("processCountSubmissionsOfParticipants, start save " + uf.getUserId() + ", " + uf.getFeatureId() + ", " + uf.getValue());
+            uf = userFeaturesRepo.save(uf);
+            log.info("processCountSubmissionsOfParticipants, finished save " + uf.getUserId() + ", " + uf.getFeatureId() + ", " + uf.getValue());
+
+            // process update accept submissions
+            uf = userFeaturesRepo.findByUserIdAndFeatureId(userId,UserFeatures.FEATURE_NUMBER_CONTEST_ACCEPT_SUBMISSIONS);
+            if(uf == null){
+                uf = UserFeatures.builder()
+                        .userId(userId)
+                        .featureId(UserFeatures.FEATURE_NUMBER_CONTEST_ACCEPT_SUBMISSIONS)
+                        .value(totalSubmissionCount.getOrDefault(userId,0))
+                        .status("ACTIVE")
+                        .lastUpdatedStamp(currentDate)
+                        .createdStamp(currentDate)
+                        .build();
+            }else{
+                uf.setValue(uf.getValue() + successSubmissionCount.getOrDefault(userId,0));
+            }
+            log.info("processCountSubmissionsOfParticipants, start save " + uf.getUserId() + ", " + uf.getFeatureId() + ", " + uf.getValue());
+            uf = userFeaturesRepo.save(uf);
+            log.info("processCountSubmissionsOfParticipants, finished save " + uf.getUserId() + ", " + uf.getFeatureId() + ", " + uf.getValue());
+
+            // process update compile error submissions
+            uf = userFeaturesRepo.findByUserIdAndFeatureId(userId,UserFeatures.FEATURE_NUMBER_CONTEST_COMPILE_ERROR_SUBMISSIONS);
+            if(uf == null){
+                uf = UserFeatures.builder()
+                        .userId(userId)
+                        .featureId(UserFeatures.FEATURE_NUMBER_CONTEST_COMPILE_ERROR_SUBMISSIONS)
+                        .value(totalSubmissionCount.getOrDefault(userId,0))
+                        .status("ACTIVE")
+                        .lastUpdatedStamp(currentDate)
+                        .createdStamp(currentDate)
+                        .build();
+            }else{
+                uf.setValue(uf.getValue() + compileFailSubmissionCount.getOrDefault(userId,0));
+            }
+            log.info("processCountSubmissionsOfParticipants, start save " + uf.getUserId() + ", " + uf.getFeatureId() + ", " + uf.getValue());
+            uf = userFeaturesRepo.save(uf);
+            log.info("processCountSubmissionsOfParticipants, finished save " + uf.getUserId() + ", " + uf.getFeatureId() + ", " + uf.getValue());
+
+            // process update partial submission
+            uf = userFeaturesRepo.findByUserIdAndFeatureId(userId,UserFeatures.FEATURE_NUMBER_CONTEST_PARTIAL_SUBMISSIONS);
+            if(uf == null){
+                uf = UserFeatures.builder()
+                        .userId(userId)
+                        .featureId(UserFeatures.FEATURE_NUMBER_CONTEST_PARTIAL_SUBMISSIONS)
+                        .value(totalSubmissionCount.getOrDefault(userId,0))
+                        .status("ACTIVE")
+                        .lastUpdatedStamp(currentDate)
+                        .createdStamp(currentDate)
+                        .build();
+            }else{
+                uf.setValue(uf.getValue() + partialSubmissionCount.getOrDefault(userId,0));
+            }
+            log.info("processCountSubmissionsOfParticipants, start save " + uf.getUserId() + ", " + uf.getFeatureId() + ", " + uf.getValue());
+            uf = userFeaturesRepo.save(uf);
+            log.info("processCountSubmissionsOfParticipants, finished save " + uf.getUserId() + ", " + uf.getFeatureId() + ", " + uf.getValue());
+
+            // process failed submissions
+            uf = userFeaturesRepo.findByUserIdAndFeatureId(userId,UserFeatures.FEATURE_NUMBER_CONTEST_FAILED_SUBMISSIONS);
+            if(uf == null){
+                uf = UserFeatures.builder()
+                        .userId(userId)
+                        .featureId(UserFeatures.FEATURE_NUMBER_CONTEST_FAILED_SUBMISSIONS)
+                        .value(totalSubmissionCount.getOrDefault(userId,0))
+                        .status("ACTIVE")
+                        .lastUpdatedStamp(currentDate)
+                        .createdStamp(currentDate)
+                        .build();
+            }else{
+                uf.setValue(uf.getValue() + failedSubmissionCount.getOrDefault(userId,0));
+            }
+            uf = userFeaturesRepo.save(uf);
+
+        }
+        /*
         for (LmsContestSubmission submission : newSubmissions) {
             String userId = submission.getUserSubmissionId();
+
             int totalSubmission = successSubmissionCount.getOrDefault(userId, 0) + compileFailSubmissionCount.getOrDefault(userId, 0);
             int successSubmission = successSubmissionCount.getOrDefault(userId, 0);
             int failedSubmission = compileFailSubmissionCount.getOrDefault(userId, 0);
@@ -135,7 +250,9 @@ public class LmsContestSubmissionProcessor {
             userFeaturesRepo.save(totalSubmissionFeature);
             userFeaturesRepo.save(successSubmissionFeature);
             userFeaturesRepo.save(failedSubmissionFeature);
-        }
+
+         */
+
     }
     @Scheduled(fixedRate = 30000)
     @Transactional
