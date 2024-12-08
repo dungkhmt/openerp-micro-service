@@ -98,8 +98,11 @@ public class ContestController {
     ) throws Exception {
         log.info("edit contest modelUpdateContest {}", modelUpdateContest);
 
-        logUpdateContest(principal.getName(),contestId, modelUpdateContest);
-
+        try {
+            logUpdateContest(principal.getName(), contestId, modelUpdateContest);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         problemTestCaseService.updateContest(modelUpdateContest, principal.getName(), contestId);
         return ResponseEntity.status(200).body(null);
     }

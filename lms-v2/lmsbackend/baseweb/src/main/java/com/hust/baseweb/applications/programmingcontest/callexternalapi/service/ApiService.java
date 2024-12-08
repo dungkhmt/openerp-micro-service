@@ -42,14 +42,19 @@ public class ApiService {
         clientCredential.getClientSecret());
     log.debug("Get access token: " + accessToken);
 
-    return this.webClient.get()
-        .uri(endpoint)
-        .header("Authorization", "Bearer " + accessToken)
-        .retrieve()
-        .toEntity(responseType)
-        // .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
-        // .filter(RuntimeException.class::isInstance))
-        .block();
+    try {
+        return this.webClient.get()
+                             .uri(endpoint)
+                             .header("Authorization", "Bearer " + accessToken)
+                             .retrieve()
+                             .toEntity(responseType)
+                             // .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
+                             // .filter(RuntimeException.class::isInstance))
+                             .block();
+    }catch (Exception e){
+        e.printStackTrace();
+    }
+    return null;
   }
     public <T, B> ResponseEntity<T> callPostApi(String endpoint, Class<T> responseType, B body) {
         if (clientCredential == null) {
@@ -59,16 +64,22 @@ public class ApiService {
         String accessToken = keycloakService.getAccessToken(clientCredential.getClientId(),
                                                             clientCredential.getClientSecret());
         log.debug("Get access token: " + accessToken);
-        return this.webClient.post()
-                             .uri(endpoint)
-                             .contentType(MediaType.APPLICATION_JSON)
-                             .header("Authorization", "Bearer " + accessToken)
-                             .body(BodyInserters.fromValue(body))
-                             .retrieve()
-                             .toEntity(responseType)
-                             // .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
-                             // .filter(RuntimeException.class::isInstance))
-                             .block();
+
+        try {
+            return this.webClient.post()
+                                 .uri(endpoint)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .header("Authorization", "Bearer " + accessToken)
+                                 .body(BodyInserters.fromValue(body))
+                                 .retrieve()
+                                 .toEntity(responseType)
+                                 // .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
+                                 // .filter(RuntimeException.class::isInstance))
+                                 .block();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
   public ResponseEntity<?> callLogAPI(String url, LmsLogModelCreate model){
@@ -81,17 +92,23 @@ public class ApiService {
                                                           clientCredential.getClientSecret());
       log.debug("Get access token: " + accessToken);
 
-      return this.webClient.post()
-                           .uri(url)
-                           .contentType(MediaType.APPLICATION_JSON)
-                           .header("Authorization", "Bearer " + accessToken)
-                           .body(BodyInserters.fromValue(model))
-                           .retrieve()
-                           //.toEntity(responseType)
-                           .toEntity(Void.class)
-                           // .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
-                           // .filter(RuntimeException.class::isInstance))
-                           .block();
+      try {
+          return this.webClient.post()
+                               .uri(url)
+                               .contentType(MediaType.APPLICATION_JSON)
+                               .header("Authorization", "Bearer " + accessToken)
+                               .body(BodyInserters.fromValue(model))
+                               .retrieve()
+                               //.toEntity(responseType)
+                               .toEntity(Void.class)
+                               // .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
+                               // .filter(RuntimeException.class::isInstance))
+                               .block();
+      }catch (Exception e){
+          e.printStackTrace();
+      }
+       return null;
+
       /*
       this.webClient.post()
                            //.uri(url + "/log/create-log")
@@ -132,14 +149,19 @@ public class ApiService {
         clientCredential.getClientSecret());
     log.debug("Get access token: " + accessToken);
 
-    return this.webClient.get()
-        .uri(endpoint)
-        .header("Authorization", "Bearer " + accessToken)
-        .retrieve()
-        .toEntity(responseType)
-        // .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
-        // .filter(RuntimeException.class::isInstance))
-        .block();
+    try {
+        return this.webClient.get()
+                             .uri(endpoint)
+                             .header("Authorization", "Bearer " + accessToken)
+                             .retrieve()
+                             .toEntity(responseType)
+                             // .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
+                             // .filter(RuntimeException.class::isInstance))
+                             .block();
+    }catch (Exception e){
+        e.printStackTrace();
+    }
+    return null;
   }
 
   public void setCredential(ClientCredential clientCredential) {

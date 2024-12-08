@@ -91,7 +91,7 @@ export default function Home() {
               <InfoCard
                 icon={CommandLine}
                 iconColor="#b5ba0d"
-                mainTitle="800,000+"
+                mainTitle="900,000+"
                 subTitle="Code Submissions"
               />
             }
