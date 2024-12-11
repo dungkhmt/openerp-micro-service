@@ -31,6 +31,7 @@ package-lock.json
 
 .history/
 .vscode/
+.idea/
 /.idea/
 /.ssh/
 *.bat
