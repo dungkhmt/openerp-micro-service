@@ -1,17 +1,15 @@
 package openerp.openerpresourceserver.infrastructure.output.persistence.specification;
 
-import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.CheckinoutEntity;
-import openerp.openerpresourceserver.infrastructure.output.persistence.specification.filter.ICheckinoutFilter;
+import openerp.openerpresourceserver.application.port.out.checkinout.filter.ICheckinoutFilter;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @RequiredArgsConstructor

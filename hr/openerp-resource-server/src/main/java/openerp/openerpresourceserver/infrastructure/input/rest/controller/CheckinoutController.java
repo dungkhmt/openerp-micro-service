@@ -22,4 +22,6 @@ public class CheckinoutController extends BeanAwareUseCasePublisher {
                 new Resource(null)
         );
     }
+
+
 }

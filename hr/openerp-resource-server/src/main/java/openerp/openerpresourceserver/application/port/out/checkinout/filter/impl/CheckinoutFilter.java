@@ -1,8 +1,8 @@
-package openerp.openerpresourceserver.infrastructure.output.persistence.specification.filter.impl;
+package openerp.openerpresourceserver.application.port.out.checkinout.filter.impl;
 
 import lombok.*;
 import openerp.openerpresourceserver.constant.CheckinoutType;
-import openerp.openerpresourceserver.infrastructure.output.persistence.specification.filter.ICheckinoutFilter;
+import openerp.openerpresourceserver.application.port.out.checkinout.filter.ICheckinoutFilter;
 
 import java.time.LocalDate;
 

@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.infrastructure.output.persistence.specification.filter;
+package openerp.openerpresourceserver.application.port.out.checkinout.filter;
 
 import openerp.openerpresourceserver.constant.CheckinoutType;
 

@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.domain.model;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import openerp.openerpresourceserver.constant.CheckinoutType;
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Builder
 public class CheckinoutModel {
     private String userId;
     private LocalDateTime pointTime;

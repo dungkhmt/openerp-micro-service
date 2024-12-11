@@ -3,15 +3,19 @@ package openerp.openerpresourceserver.infrastructure.output.adapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.application.port.in.port.ICheckinoutPort;
+import openerp.openerpresourceserver.application.port.out.checkinout.filter.ICheckinoutFilter;
 import openerp.openerpresourceserver.application.port.out.checkinout.usecase_data.Checkinout;
 import openerp.openerpresourceserver.constant.CheckinoutType;
+import openerp.openerpresourceserver.domain.model.CheckinoutModel;
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.CheckinoutEntity;
 import openerp.openerpresourceserver.infrastructure.output.persistence.repository.ICheckinoutRepo;
 import openerp.openerpresourceserver.infrastructure.output.persistence.specification.CheckinoutSpecification;
-import openerp.openerpresourceserver.infrastructure.output.persistence.specification.filter.impl.CheckinoutFilter;
+import openerp.openerpresourceserver.application.port.out.checkinout.filter.impl.CheckinoutFilter;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -28,6 +32,16 @@ public class CheckinoutAdapter implements ICheckinoutPort {
         checkinoutRepo.save(entity);
     }
 
+    @Override
+    public List<CheckinoutModel> getCheckinout(ICheckinoutFilter filter) {
+        var spec = new CheckinoutSpecification(filter);
+        Sort sort = Sort.by(Sort.Direction.DESC, "timePoint");
+        var checkinoutList = checkinoutRepo.findAll(spec, sort);
+        return checkinoutList.stream()
+                .map(CheckinoutAdapter::toModel)
+                .toList();
+    }
+
     private boolean existCheckin(LocalDate checkinDate) {
         var filter = CheckinoutFilter.builder()
                 .date(checkinDate)
@@ -35,5 +49,13 @@ public class CheckinoutAdapter implements ICheckinoutPort {
                 .build();
         var spec = new CheckinoutSpecification(filter);
         return checkinoutRepo.exists(spec);
+    }
+
+    private static CheckinoutModel toModel(CheckinoutEntity entity){
+        return CheckinoutModel.builder()
+                .pointTime(entity.getTimePoint())
+                .userId(entity.getUserId())
+                .type(entity.getCheckinout())
+                .build();
     }
 }
