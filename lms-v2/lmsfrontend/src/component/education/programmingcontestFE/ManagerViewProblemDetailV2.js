@@ -260,8 +260,9 @@ function ManagerViewProblemDetailV2() {
             variant="outlined"
             value={newProblemName}
             onChange={(e) => setNewProblemName(e.target.value)}
-            error={hasSpecialCharacterProblemName()}
-            helperText={hasSpecialCharacterProblemName() ? "Invalid characters in Problem Name." : ""}
+            //error={hasSpecialCharacterProblemName()}
+            //helperText={hasSpecialCharacterProblemName() ? "Invalid characters in Problem Name." : ""}
+            helperText={""}
           />
           {errorMessage && <Typography color="error">{errorMessage}</Typography>}
         </DialogContent>
