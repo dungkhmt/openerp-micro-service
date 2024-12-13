@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
@@ -61,4 +65,54 @@ code {
   opacity: 1 !important;
   color: rgba(0, 0, 0, 0.87);
   margin-top: -2px !important;
+}
+
+.css-1t1j96h-MuiPaper-root-MuiDialog-paper {
+  position: unset !important;
+}
+
+.custom-tooltip {
+  margin: 1rem;
+  border-radius: 2rem;
+}
+
+.divider {
+  width: 100%;
+  height: 0.1rem;
+  background-color: black;
+}
+
+.MuiDataGrid-root .MuiDataGrid-cell:focus-within {
+  outline: none !important;
+}
+
+.header-title {
+  font-weight: bold;
+  font-size: medium;
+}
+
+.body-content {
+  margin-top: 1rem;
+}
+
+.google-visualization-tooltip {
+  width: auto !important;
+  height: auto !important;
+  border-radius: 1rem !important;
+}
+
+/* CSS for room-occupation */
+
+.room-occupation-table {
+  table-layout: fixed;
+
+}
+
+.cell {
+  padding: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 26px;
+  height: 41px;
 }

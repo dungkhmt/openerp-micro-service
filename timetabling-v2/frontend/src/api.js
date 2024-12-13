@@ -26,30 +26,55 @@ export function bearerAuth(token) {
  * url, method, and data properties don't need to be specified in config.
  * @param {*} method
  * @param {*} url
- * @param {*} onSuccess
- * @param {*} onErrors
- * @param {*} data
- * @param {*} config
+ * @param {*} onSuccess: success handler
+ * @param {*} onErrors: error handler
+ * @param {*} data: body request
+ * @param {*} config: using for form-data request
+ * @param {optional} token: using for cancle request
  */
 export async function request(
   method,
   url,
   successHandler,
-  errorHandlers = {},
+  errorHandlers,
   data,
-  config
+  config,
+  controller
 ) {
+  if (config !== undefined && config !== null) {
+    axiosInstance.defaults.headers.common["Content-Type"] =
+      "multipart/form-data";
+  } else {
+    axiosInstance.defaults.headers.common["Content-Type"] = "application/json";
+  }
   try {
-    const res = await axiosInstance.request({
-      method: method.toLowerCase(),
-      url: url,
-      data: data,
-      ...config,
-      headers: {
-        authorization: bearerAuth(keycloak.token),
-        ...config?.headers,
-      },
-    });
+    let options = {};
+    if (controller) {
+      options = {
+        method: method.toLowerCase(),
+        url: url,
+        data: data,
+        signal: controller?.signal,
+        ...config,
+        headers: {
+          authorization: bearerAuth(keycloak.token),
+          ...config?.headers,
+        },
+      };
+    } else {
+      options = {
+        method: method.toLowerCase(),
+        url: url,
+        data: data,
+        ...config,
+        headers: {
+          authorization: bearerAuth(keycloak.token),
+          ...config?.headers,
+        },
+      };
+    }
+
+    const res = await axiosInstance.request(options);
 
     if (isFunction(successHandler)) {
       successHandler(res);
@@ -57,10 +82,9 @@ export async function request(
     return res;
   } catch (e) {
     // Handling work to do when encountering all kinds of errors, e.g turn off the loading icon.
-    if (isFunction(errorHandlers["onError"])) {
-      errorHandlers["onError"](e);
+    if (isFunction(errorHandlers)) {
+      errorHandlers(e);
     }
-
     if (e.response) {
       // The request was made and the server responded with a status code that falls out of the range of 2xx.
       switch (e.response.status) {
@@ -80,6 +104,7 @@ export async function request(
           break;
         default:
           if (isFunction(errorHandlers[e.response.status])) {
+            console.error(e);
             errorHandlers[e.response.status](e);
           } else if (isFunction(errorHandlers["rest"])) {
             errorHandlers["rest"](e);

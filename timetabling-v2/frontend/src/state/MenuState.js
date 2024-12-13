@@ -25,6 +25,7 @@ export function fetchMenu() {
     "get",
     "/entity-authorization/MENU_",
     (res) => {
+      console.log(res.data);
       menuState.merge({
         permittedFunctions: new Set(res.data),
         isFetching: false,
