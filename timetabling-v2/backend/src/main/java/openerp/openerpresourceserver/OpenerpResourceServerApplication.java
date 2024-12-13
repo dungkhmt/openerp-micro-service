@@ -9,9 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 @SpringBootApplication
 public class OpenerpResourceServerApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(OpenerpResourceServerApplication.class, args);
     }
-
 }
