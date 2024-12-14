@@ -72,10 +72,10 @@ function NotificationButton() {
     const fetchedNoties = notifications.get();
 
     if (fetchedNoties && fetchedNoties.length > 0) {
-      console.log(
-        "fetchNotification, res = ",
-        fetchedNoties[fetchedNoties.length - 1]
-      );
+      // console.log(
+      //   "fetchNotification, res = ",
+      //   fetchedNoties[fetchedNoties.length - 1]
+      // );
       fromId = fetchedNoties[fetchedNoties.length - 1].id;
     }
 
@@ -169,15 +169,15 @@ function NotificationButton() {
       );
 
       if (e.target.readyState === EventSource.CLOSED) {
-        console.log(
-          new Date(),
-          `SSE closed (event readyState = ${e.target.readyState})`
-        );
+        // console.log(
+        //   new Date(),
+        //   `SSE closed (event readyState = ${e.target.readyState})`
+        // );
       } else if (e.target.readyState === EventSource.CONNECTING) {
-        console.log(
-          new Date(),
-          `SSE reconnecting (event readyState = ${e.target.readyState})`
-        );
+        // console.log(
+        //   new Date(),
+        //   `SSE reconnecting (event readyState = ${e.target.readyState})`
+        // );
       }
 
       es.close();
