@@ -261,10 +261,11 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             throw new MiniLeetCodeException("permission denied", 403);
         }
 
-        if (!userId.equals(problemEntity.getUserId())
-            && !problemEntity.getStatusId().equals(ProblemEntity.PROBLEM_STATUS_OPEN)) {
-            throw new MiniLeetCodeException("Problem is not opened for edit", 400);
-        }
+        // problem há been created, admin is shared edit role, but cannot perform the edit
+        //if (!userId.equals(problemEntity.getUserId())
+        //    && !problemEntity.getStatusId().equals(ProblemEntity.PROBLEM_STATUS_OPEN)) {
+        //    throw new MiniLeetCodeException("Problem is not opened for edit", 400);
+        //}
 
         List<TagEntity> tags = new ArrayList<>();
         Integer[] tagIds = modelUpdateContestProblem.getTagIds();
