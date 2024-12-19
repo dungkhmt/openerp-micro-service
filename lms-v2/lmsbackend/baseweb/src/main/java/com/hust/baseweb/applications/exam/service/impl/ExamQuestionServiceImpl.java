@@ -10,6 +10,7 @@ import com.hust.baseweb.applications.exam.model.request.ExamQuestionSaveReq;
 import com.hust.baseweb.applications.exam.repository.ExamQuestionRepository;
 import com.hust.baseweb.applications.exam.service.ExamQuestionService;
 import com.hust.baseweb.applications.exam.utils.DataUtils;
+import com.hust.baseweb.applications.exam.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -32,7 +33,8 @@ public class ExamQuestionServiceImpl implements ExamQuestionService {
 
     @Override
     public Page<ExamQuestionEntity> filter(Pageable pageable, ExamQuestionFilterReq examQuestionFilterReq) {
-        return examQuestionRepository.filter(pageable, DataUtils.formatStringValueSql(examQuestionFilterReq.getCode()),
+        return examQuestionRepository.filter(pageable, SecurityUtils.getUserLogin(),
+                                             DataUtils.formatStringValueSql(examQuestionFilterReq.getCode()),
                                              DataUtils.formatStringValueSql(examQuestionFilterReq.getContent()),
                                              examQuestionFilterReq.getTypes());
     }

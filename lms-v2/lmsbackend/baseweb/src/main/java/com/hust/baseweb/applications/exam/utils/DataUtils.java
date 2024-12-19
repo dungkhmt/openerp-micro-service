@@ -1,7 +1,8 @@
 package com.hust.baseweb.applications.exam.utils;
 
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class DataUtils {
 
@@ -10,5 +11,17 @@ public class DataUtils {
             return "";
         }
         return value;
+    }
+
+    public static LocalDateTime formatStringValueSqlToLocalDateTime(String value, boolean start){
+        if(value == null){
+            return null;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        if(start){
+            return LocalDate.parse(value, formatter).atStartOfDay();
+        }else{
+            return LocalDate.parse(value, formatter).atTime(23, 59, 59);
+        }
     }
 }

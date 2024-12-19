@@ -21,10 +21,12 @@ public interface ExamQuestionRepository extends JpaRepository<ExamQuestionEntity
                    "from\n" +
                    "   exam_question eq\n" +
                    "where\n" +
+                   "   eq.created_by = :userLogin\n" +
+                   "   and\n" +
                    "   (:code is null or lower(eq.code) like CONCAT('%', LOWER(:code),'%'))\n" +
                    "   and (:content is null or lower(eq.content) like CONCAT('%', LOWER(:content),'%'))\n" +
                    "   and (eq.type in :types)", nativeQuery = true)
-    Page<ExamQuestionEntity> filter(Pageable pageable, @Param("code") String code,
+    Page<ExamQuestionEntity> filter(Pageable pageable, @Param("userLogin") String userLogin, @Param("code") String code,
                                     @Param("content") String content, @Param("types") List<Integer> types);
 
     Optional<ExamQuestionEntity> findByCode(String code);
