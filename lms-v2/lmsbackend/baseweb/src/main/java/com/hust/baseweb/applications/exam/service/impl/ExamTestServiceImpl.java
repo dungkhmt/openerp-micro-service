@@ -129,6 +129,7 @@ public class ExamTestServiceImpl implements ExamTestService {
     }
 
     @Override
+    @Transactional
     public ResponseData<ExamTestEntity> update(ExamTestSaveReq examTestSaveReq) {
         ResponseData<ExamTestEntity> responseData = new ResponseData<>();
 
@@ -160,6 +161,7 @@ public class ExamTestServiceImpl implements ExamTestService {
     }
 
     @Override
+    @Transactional
     public ResponseData<ExamTestEntity> delete(ExamTestDeleteReq examTestDeleteReq) {
         ResponseData<ExamTestEntity> responseData = new ResponseData<>();
         Optional<ExamTestEntity> examTestExist = examTestRepository.findById(examTestDeleteReq.getId());
@@ -169,9 +171,9 @@ public class ExamTestServiceImpl implements ExamTestService {
             responseData.setResultMsg("Chưa tồn tại đề thi");
             return responseData;
         }
-        examTestRepository.delete(examTestExist.get());
         List<ExamTestQuestionEntity> testQuestionEntityList = examTestQuestionRepository.findAllByExamTestId(examTestDeleteReq.getId());
         examTestQuestionRepository.deleteAll(testQuestionEntityList);
+        examTestRepository.delete(examTestExist.get());
         responseData.setHttpStatus(HttpStatus.OK);
         responseData.setResultCode(HttpStatus.OK.value());
         responseData.setResultMsg("Xoá đề thi thành công");
