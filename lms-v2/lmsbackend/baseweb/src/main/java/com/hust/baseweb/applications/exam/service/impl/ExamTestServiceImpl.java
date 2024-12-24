@@ -144,13 +144,11 @@ public class ExamTestServiceImpl implements ExamTestService {
         examTestEntity.setId(examTestExist.get().getId());
         examTestEntity.setCreatedBy(examTestExist.get().getCreatedBy());
         examTestEntity.setCreatedAt(examTestExist.get().getCreatedAt());
-        examTestEntity = examTestRepository.save(examTestEntity);
+        examTestRepository.save(examTestEntity);
 
         List<ExamTestQuestionEntity> examTestQuestionEntityList = new ArrayList<>();
         for(ExamTestQuestionSaveReq examTestQuestionSaveReq: examTestSaveReq.getExamTestQuestionSaveReqList()){
             ExamTestQuestionEntity examTestQuestionEntity = modelMapper.map(examTestQuestionSaveReq, ExamTestQuestionEntity.class);
-            examTestQuestionEntity.setId(UUID.randomUUID().toString());
-            examTestQuestionEntity.setExamTestId(examTestEntity.getId());
             examTestQuestionEntityList.add(examTestQuestionEntity);
         }
         examTestQuestionRepository.saveAll(examTestQuestionEntityList);

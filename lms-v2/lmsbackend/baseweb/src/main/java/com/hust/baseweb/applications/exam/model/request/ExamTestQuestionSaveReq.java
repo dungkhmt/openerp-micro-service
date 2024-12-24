@@ -9,6 +9,7 @@ import lombok.experimental.FieldNameConstants;
 @FieldNameConstants
 public class ExamTestQuestionSaveReq {
 
+    private String id;
     private String examTestId;
     private String examQuestionId;
     private Integer order;
