@@ -6,6 +6,8 @@ import com.hust.baseweb.applications.exam.entity.ExamTestEntity;
 import com.hust.baseweb.applications.exam.entity.ExamTestQuestionEntity;
 import com.hust.baseweb.applications.exam.model.ResponseData;
 import com.hust.baseweb.applications.exam.model.request.*;
+import com.hust.baseweb.applications.exam.model.response.ExamTestDetailsRes;
+import com.hust.baseweb.applications.exam.model.response.ExamTestQuestionDetailsRes;
 import com.hust.baseweb.applications.exam.repository.ExamTestQuestionRepository;
 import com.hust.baseweb.applications.exam.repository.ExamTestRepository;
 import com.hust.baseweb.applications.exam.service.ExamTestService;
@@ -98,6 +100,32 @@ public class ExamTestServiceImpl implements ExamTestService {
     }
 
     @Override
+    public ResponseData<ExamTestDetailsRes> details(ExamTestDetailsReq examTestDetailsReq) {
+        ResponseData<ExamTestDetailsRes> responseData = new ResponseData<>();
+
+        Optional<ExamTestEntity> examTestEntity = examTestRepository.findById(examTestDetailsReq.getId());
+        if(!examTestEntity.isPresent()){
+            responseData.setHttpStatus(HttpStatus.NOT_FOUND);
+            responseData.setResultCode(HttpStatus.NOT_FOUND.value());
+            responseData.setResultMsg("Chưa tồn tại đề thi");
+            return responseData;
+        }
+
+        List<ExamTestQuestionDetailsRes> list = examTestRepository.details(SecurityUtils.getUserLogin(),
+                                                                           examTestDetailsReq.getId());
+
+        responseData.setHttpStatus(HttpStatus.OK);
+        responseData.setResultCode(HttpStatus.OK.value());
+        responseData.setResultMsg("Success");
+        responseData.setData(ExamTestDetailsRes.builder()
+                                 .code(examTestEntity.get().getCode())
+                                 .name(examTestEntity.get().getName())
+                                 .description(examTestEntity.get().getDescription())
+                                 .examTestQuestionDetails(list).build());
+        return responseData;
+    }
+
+    @Override
     @Transactional
     public ResponseData<ExamTestEntity> create(ExamTestSaveReq examTestSaveReq) {
         ResponseData<ExamTestEntity> responseData = new ResponseData<>();
@@ -135,8 +163,8 @@ public class ExamTestServiceImpl implements ExamTestService {
 
         Optional<ExamTestEntity> examTestExist = examTestRepository.findByCode(examTestSaveReq.getCode());
         if(!examTestExist.isPresent()){
-            responseData.setHttpStatus(HttpStatus.ALREADY_REPORTED);
-            responseData.setResultCode(HttpStatus.ALREADY_REPORTED.value());
+            responseData.setHttpStatus(HttpStatus.NOT_FOUND);
+            responseData.setResultCode(HttpStatus.NOT_FOUND.value());
             responseData.setResultMsg("Chưa tồn tại đề thi");
             return responseData;
         }
@@ -166,8 +194,8 @@ public class ExamTestServiceImpl implements ExamTestService {
         ResponseData<ExamTestEntity> responseData = new ResponseData<>();
         Optional<ExamTestEntity> examTestExist = examTestRepository.findById(examTestDeleteReq.getId());
         if(!examTestExist.isPresent()){
-            responseData.setHttpStatus(HttpStatus.ALREADY_REPORTED);
-            responseData.setResultCode(HttpStatus.ALREADY_REPORTED.value());
+            responseData.setHttpStatus(HttpStatus.NOT_FOUND);
+            responseData.setResultCode(HttpStatus.NOT_FOUND.value());
             responseData.setResultMsg("Chưa tồn tại đề thi");
             return responseData;
         }

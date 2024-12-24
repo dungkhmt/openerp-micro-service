@@ -3,10 +3,8 @@ package com.hust.baseweb.applications.exam.controller;
 import com.hust.baseweb.applications.exam.entity.ExamQuestionEntity;
 import com.hust.baseweb.applications.exam.entity.ExamTestEntity;
 import com.hust.baseweb.applications.exam.model.ResponseData;
-import com.hust.baseweb.applications.exam.model.request.ExamQuestionFilterReq;
-import com.hust.baseweb.applications.exam.model.request.ExamTestDeleteReq;
-import com.hust.baseweb.applications.exam.model.request.ExamTestFilterReq;
-import com.hust.baseweb.applications.exam.model.request.ExamTestSaveReq;
+import com.hust.baseweb.applications.exam.model.request.*;
+import com.hust.baseweb.applications.exam.model.response.ExamTestDetailsRes;
 import com.hust.baseweb.applications.exam.service.ExamTestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +31,12 @@ public class ExamTestController {
     @PostMapping("/filter")
     public ResponseEntity<Page<ExamTestEntity>> filter(Pageable pageable, @RequestBody ExamTestFilterReq examTestFilterReq) {
         return ResponseEntity.ok(examTestService.filter(pageable, examTestFilterReq));
+    }
+
+    @Secured("ROLE_TEACHER")
+    @PostMapping("/details")
+    public ResponseEntity<ResponseData<ExamTestDetailsRes>> details(@RequestBody ExamTestDetailsReq examTestDetailsReq) {
+        return ResponseEntity.ok(examTestService.details(examTestDetailsReq));
     }
 
     @Secured("ROLE_TEACHER")
