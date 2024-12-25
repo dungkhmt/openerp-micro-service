@@ -15,11 +15,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.transaction.Transactional;
+import java.math.BigInteger;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -29,14 +34,48 @@ public class ExamQuestionServiceImpl implements ExamQuestionService {
 
     private final ExamQuestionRepository examQuestionRepository;
     private final ModelMapper modelMapper;
+    private final EntityManager entityManager;
     private final ObjectMapper objectMapper;
 
     @Override
     public Page<ExamQuestionEntity> filter(Pageable pageable, ExamQuestionFilterReq examQuestionFilterReq) {
-        return examQuestionRepository.filter(pageable, SecurityUtils.getUserLogin(),
-                                             DataUtils.formatStringValueSql(examQuestionFilterReq.getCode()),
-                                             DataUtils.formatStringValueSql(examQuestionFilterReq.getContent()),
-                                             examQuestionFilterReq.getTypes());
+        StringBuilder sql = new StringBuilder();
+        sql.append("select\n" +
+                   "    *\n" +
+                   "from\n" +
+                   "    exam_question eq\n" +
+                   "where\n" +
+                   "    eq.created_by = :userLogin \n");
+        if(examQuestionFilterReq.getType() != null){
+            sql.append("and\n" +
+                       "    eq.type = :type \n");
+        }
+        if(DataUtils.stringIsNotNullOrEmpty(examQuestionFilterReq.getKeyword())){
+            sql.append("and\n" +
+                       "    ((lower(eq.code) like CONCAT('%', LOWER(:keyword),'%')) or \n" +
+                       "    (lower(eq.content) like CONCAT('%', LOWER(:keyword),'%'))) \n");
+        }
+        sql.append("order by created_at desc\n");
+
+        Query query = entityManager.createNativeQuery(sql.toString(), ExamQuestionEntity.class);
+        Query count = entityManager.createNativeQuery("select count(1) FROM (" + sql + ") as count");
+        query.setFirstResult(pageable.getPageNumber() * pageable.getPageSize());
+        query.setMaxResults(pageable.getPageSize());
+
+        query.setParameter("userLogin", SecurityUtils.getUserLogin());
+        count.setParameter("userLogin", SecurityUtils.getUserLogin());
+        if(examQuestionFilterReq.getType() != null){
+            query.setParameter("type", examQuestionFilterReq.getType());
+            count.setParameter("type", examQuestionFilterReq.getType());
+        }
+        if(DataUtils.stringIsNotNullOrEmpty(examQuestionFilterReq.getKeyword())){
+            query.setParameter("keyword", DataUtils.escapeSpecialCharacters(examQuestionFilterReq.getKeyword()));
+            count.setParameter("keyword", DataUtils.escapeSpecialCharacters(examQuestionFilterReq.getKeyword()));
+        }
+
+        long totalRecord = ((BigInteger) count.getSingleResult()).longValue();
+        List<ExamQuestionEntity> list = query.getResultList();
+        return new PageImpl<>(list, pageable, totalRecord);
     }
 
     @Override
