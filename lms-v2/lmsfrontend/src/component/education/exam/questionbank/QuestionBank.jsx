@@ -14,10 +14,15 @@ import useDebounceValue from "../hooks/use-debounce";
 import {toast} from "react-toastify";
 import TextField from "@material-ui/core/TextField";
 import parser from "html-react-parser"
+import QuestionBankDelete from "./QuestionBankDelete";
 
 function QuestionBank(props) {
 
   const columns = [
+    {
+      field: "id",
+      hidden: true
+    },
     {
       field: "code",
       sorting: false,
@@ -121,6 +126,8 @@ function QuestionBank(props) {
   const [totalCount, setTotalCount] = useState(0)
   const [keywordFilter, setKeywordFilter] = useState("")
   const [typeFilter, setTypeFilter] = useState('all')
+  const [open, setOpen] = useState(false);
+  const [id, setId] = useState("")
 
   const debouncedKeywordFilter = useDebounceValue(keywordFilter, 500)
   const history = useHistory();
@@ -194,6 +201,11 @@ function QuestionBank(props) {
         isCreate: false
       },
     });
+  };
+
+  const handleDeleteQuestion = (rowData) => {
+    setOpen(true)
+    setId(rowData.id)
   };
 
   return (
@@ -302,9 +314,17 @@ function QuestionBank(props) {
           {
             icon: 'delete',
             tooltip: 'Xoá câu hỏi',
-            onClick: (event, rowData) => confirm("You want to delete " + rowData.name)
+            onClick: (event, rowData) => handleDeleteQuestion(rowData)
           }
         ]}
+      />
+      <QuestionBankDelete
+        open={open}
+        setOpen={setOpen}
+        id={id}
+        onReloadQuestions={() => {
+          filterQuestion()
+        }}
       />
     </div>
   );

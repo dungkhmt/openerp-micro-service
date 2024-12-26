@@ -120,7 +120,7 @@ function QuestionBankCreateUpdate(props) {
       explain:  explain
     }
     validateBody(body)
-
+    setIsLoading(true)
     request(
       "post",
       isCreate ? `/exam-question/create` : '/exam-question/update',
@@ -128,6 +128,7 @@ function QuestionBankCreateUpdate(props) {
         if(res.status === 200){
           if(res.data.resultCode === 200){
             toast.success(res.data.resultMsg)
+            setIsLoading(false)
             history.push("/exam/question-bank")
           }else{
             toast.error(res.data.resultMsg)
@@ -178,6 +179,13 @@ function QuestionBankCreateUpdate(props) {
     }
   }
 
+  const handleKeyPress = (event) => {
+    const regex = /^[a-zA-Z0-9]+$/
+    if (!regex.test(event.key)) {
+      event.preventDefault();
+    }
+  }
+
   return (
     <div>
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -194,6 +202,7 @@ function QuestionBankCreateUpdate(props) {
                   <TextField
                     autoFocus
                     required
+                    onKeyPress={handleKeyPress}
                     disabled={!isCreate}
                     id="questionCode"
                     label="Mã câu hỏi"
@@ -449,7 +458,7 @@ function QuestionBankCreateUpdate(props) {
               disabled={isLoading}
               variant="contained"
               color="primary"
-              style={{marginLeft: "45px"}}
+              style={{marginLeft: "15px"}}
               onClick={saveQuestion}
               type="submit"
             >
