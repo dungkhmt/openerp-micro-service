@@ -7,31 +7,47 @@ import {MuiThemeProvider} from "@material-ui/core/styles";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import UploadButton from "../../UploadButton";
 import {request} from "../../../../api";
-import {Link} from "react-router-dom";
+import {Link, useHistory} from "react-router-dom";
 import {themeTable} from "../../../../utils/MaterialTableUtils";
 import {FormControl, MenuItem, Select} from "@mui/material";
 import useDebounceValue from "../hooks/use-debounce";
-import InputLabel from "@material-ui/core/InputLabel";
-import displayTime from "../../../../utils/DateTimeUtils";
+import {toast} from "react-toastify";
+import TextField from "@material-ui/core/TextField";
+import parser from "html-react-parser"
 
 function QuestionBank(props) {
 
   const columns = [
     {
       field: "code",
+      sorting: false,
       title: "Mã câu hỏi",
     },
     {
       field: "content",
       title: "Nội dung câu hỏi",
+      sorting: false,
+      render: (rowData) => {
+        return parser(rowData.content)
+      }
+    },
+    {
+      field: "answer",
+      title: "Đáp án",
+      sorting: false,
+      render: (rowData) => {
+        return parser(rowData.answer)
+      }
     },
     {
       field: "explain",
       title: "Giải thích",
+      hidden: true
     },
     {
       field: "type",
       title: "Loại câu hỏi",
+      sorting: false,
       render: (rowData) => {
         if(rowData.type === 0){
           return 'Trắc nghiệm'
@@ -41,6 +57,46 @@ function QuestionBank(props) {
           return 'Tất cả'
         }
       },
+    },
+    {
+      field: "numberAnswer",
+      title: "Số đáp án",
+      hidden: true,
+    },
+    {
+      field: "contentAnswer1",
+      title: "Phương án số 1",
+      hidden: true,
+    },
+    {
+      field: "contentAnswer2",
+      title: "Phương án số 2",
+      hidden: true,
+    },
+    {
+      field: "contentAnswer2",
+      title: "Phương án số 3",
+      hidden: true,
+    },
+    {
+      field: "contentAnswer3",
+      title: "Phương án số 3",
+      hidden: true,
+    },
+    {
+      field: "contentAnswer4",
+      title: "Phương án số 4",
+      hidden: true,
+    },
+    {
+      field: "contentAnswer5",
+      title: "Phương án số 5",
+      hidden: true,
+    },
+    {
+      field: "multichoice",
+      title: "Nhiều đáp án",
+      hidden: true,
     },
   ];
 
@@ -67,6 +123,7 @@ function QuestionBank(props) {
   const [typeFilter, setTypeFilter] = useState('all')
 
   const debouncedKeywordFilter = useDebounceValue(keywordFilter, 500)
+  const history = useHistory();
 
   useEffect(() => {
     filterQuestion()
@@ -85,13 +142,59 @@ function QuestionBank(props) {
           setQuestionList(res.data.content);
           setTotalCount(res.data.totalElements);
         }else {
-          console.log("filter question bank, error ", res)
+          toast.error(res)
         }
       },
-      { onError: (e) => console.log("filter question bank, error ", e) },
+      { onError: (e) => toast.error(e) },
       body
     );
   }
+
+  const onClickCreateNewButton = () => {
+    history.push({
+      pathname: "/exam/create-update-question-bank",
+      state: {
+        question: {
+          code: "",
+          type: 1,
+          content: "",
+          numberAnswer: "",
+          contentAnswer1: "",
+          contentAnswer2: "",
+          contentAnswer3: "",
+          contentAnswer4: "",
+          contentAnswer5: "",
+          multichoice: false,
+          answer: "",
+          explain: ""
+        },
+        isCreate: true
+      },
+    });
+  };
+
+  const handleUpdateQuestion = (rowData) => {
+    history.push({
+      pathname: "/exam/create-update-question-bank",
+      state: {
+        question: {
+          code: rowData.code,
+          type: rowData.type,
+          content: rowData.content,
+          numberAnswer: rowData.numberAnswer,
+          contentAnswer1: rowData.contentAnswer1,
+          contentAnswer2: rowData.contentAnswer2,
+          contentAnswer3: rowData.contentAnswer3,
+          contentAnswer4: rowData.contentAnswer4,
+          contentAnswer5: rowData.contentAnswer5,
+          multichoice: rowData.multichoice,
+          answer: rowData.answer,
+          explain: rowData.explain
+        },
+        isCreate: false
+      },
+    });
+  };
 
   return (
     <div>
@@ -100,30 +203,39 @@ function QuestionBank(props) {
           <Box display="flex" flexDirection="column" width="100%">
             <h2>Ngân hàng câu hỏi</h2>
             <Box display="flex" justifyContent="flex-end" width="100%">
-              <Input
-                value={keywordFilter}
+              <TextField
+                autoFocus
+                id="questionCode"
+                label="Nội dung tìm kiếm"
                 placeholder="Tìm kiếm theo code hoặc nội dung"
+                value={keywordFilter}
                 style={{ width: "300px", marginRight: "16px"}}
-                onChange={(event) => setKeywordFilter(event.target.value)}
+                onChange={(event) => {
+                  setKeywordFilter(event.target.value);
+                }}
+                InputLabelProps={{
+                  shrink: true,
+                }}
               />
 
-              <FormControl>
-                <InputLabel id="questionType">Loại câu hỏi</InputLabel>
-                <Select
-                  labelId="questionType"
-                  value={typeFilter}
-                  style={{ width: "150px"}}
-                  onChange={event => setTypeFilter(event.target.value)}
-                >
-                  {
-                    questionTypes.map(item => {
-                      return (
-                        <MenuItem value={item.value}>{item.name}</MenuItem>
-                      )
-                    })
-                  }
-                </Select>
-              </FormControl>
+              <TextField
+                id="questionType"
+                select
+                label="Loại câu hỏi"
+                style={{ width: "150px"}}
+                value={typeFilter}
+                onChange={(event) => {
+                  setTypeFilter(event.target.value);
+                }}
+              >
+                {
+                  questionTypes.map(item => {
+                    return (
+                      <MenuItem value={item.value}>{item.name}</MenuItem>
+                    )
+                  })
+                }
+              </TextField>
             </Box>
           </Box>
         }
@@ -153,7 +265,8 @@ function QuestionBank(props) {
           },
         }}
         options={{
-          search: false
+          search: false,
+          actionsColumnIndex: -1
         }}
         components={{
           Toolbar: (props) => (
@@ -164,7 +277,7 @@ function QuestionBank(props) {
                   <Button
                     variant="contained"
                     color="primary"
-                    // onClick={onClickCreateNewButton}
+                    onClick={onClickCreateNewButton}
                     startIcon={<AddCircleIcon />}
                     style={{ marginRight: 16 }}
                   >
@@ -180,6 +293,18 @@ function QuestionBank(props) {
             </div>
           ),
         }}
+        actions={[
+          {
+            icon: 'edit',
+            tooltip: 'Cập nhật câu hỏi',
+            onClick: (event, rowData) => handleUpdateQuestion(rowData)
+          },
+          {
+            icon: 'delete',
+            tooltip: 'Xoá câu hỏi',
+            onClick: (event, rowData) => confirm("You want to delete " + rowData.name)
+          }
+        ]}
       />
     </div>
   );
