@@ -15,6 +15,7 @@ import {toast} from "react-toastify";
 import TextField from "@material-ui/core/TextField";
 import parser from "html-react-parser"
 import QuestionBankDelete from "./QuestionBankDelete";
+import QuestionBankDetails from "./QuestionBankDetails";
 
 function QuestionBank(props) {
 
@@ -126,8 +127,10 @@ function QuestionBank(props) {
   const [totalCount, setTotalCount] = useState(0)
   const [keywordFilter, setKeywordFilter] = useState("")
   const [typeFilter, setTypeFilter] = useState('all')
-  const [open, setOpen] = useState(false);
-  const [id, setId] = useState("")
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [idDelete, setIdDelete] = useState("")
+  const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+  const [questionDetails, setQuestionDetails] = useState(null)
 
   const debouncedKeywordFilter = useDebounceValue(keywordFilter, 500)
   const history = useHistory();
@@ -150,6 +153,26 @@ function QuestionBank(props) {
           setTotalCount(res.data.totalElements);
         }else {
           toast.error(res)
+        }
+      },
+      { onError: (e) => toast.error(e) },
+      body
+    );
+  }
+
+  const detailsQuestion = (id) =>{
+    const body = {
+      id: id
+    }
+    request(
+      "post",
+      `/exam-question/details`,
+      (res) => {
+        if(res.data.resultCode === 200){
+          setQuestionDetails(res.data.data)
+          setOpenDetailsDialog(true)
+        }else{
+          toast.error(res.data.resultMsg)
         }
       },
       { onError: (e) => toast.error(e) },
@@ -203,9 +226,13 @@ function QuestionBank(props) {
     });
   };
 
+  const handleDetailsQuestion = (rowData) => {
+    detailsQuestion(rowData.id)
+  };
+
   const handleDeleteQuestion = (rowData) => {
-    setOpen(true)
-    setId(rowData.id)
+    setOpenDeleteDialog(true)
+    setIdDelete(rowData.id)
   };
 
   return (
@@ -307,6 +334,11 @@ function QuestionBank(props) {
         }}
         actions={[
           {
+            icon: 'info',
+            tooltip: 'Xem chi tiết câu hỏi',
+            onClick: (event, rowData) => handleDetailsQuestion(rowData)
+          },
+          {
             icon: 'edit',
             tooltip: 'Cập nhật câu hỏi',
             onClick: (event, rowData) => handleUpdateQuestion(rowData)
@@ -318,10 +350,19 @@ function QuestionBank(props) {
           }
         ]}
       />
+      {
+        openDetailsDialog && (
+          <QuestionBankDetails
+            open={openDetailsDialog}
+            setOpen={setOpenDetailsDialog}
+            question={questionDetails}
+          />
+        )
+      }
       <QuestionBankDelete
-        open={open}
-        setOpen={setOpen}
-        id={id}
+        open={openDeleteDialog}
+        setOpen={setOpenDeleteDialog}
+        id={idDelete}
         onReloadQuestions={() => {
           filterQuestion()
         }}
