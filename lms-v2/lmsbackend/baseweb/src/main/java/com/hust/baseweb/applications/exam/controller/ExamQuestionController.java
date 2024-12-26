@@ -3,6 +3,7 @@ package com.hust.baseweb.applications.exam.controller;
 import com.hust.baseweb.applications.exam.entity.ExamQuestionEntity;
 import com.hust.baseweb.applications.exam.model.ResponseData;
 import com.hust.baseweb.applications.exam.model.request.ExamQuestionDeleteReq;
+import com.hust.baseweb.applications.exam.model.request.ExamQuestionDetailsReq;
 import com.hust.baseweb.applications.exam.model.request.ExamQuestionFilterReq;
 import com.hust.baseweb.applications.exam.model.request.ExamQuestionSaveReq;
 import com.hust.baseweb.applications.exam.service.ExamQuestionService;
@@ -28,6 +29,12 @@ public class ExamQuestionController {
     @PostMapping("/filter")
     public ResponseEntity<Page<ExamQuestionEntity>> filter(Pageable pageable, @RequestBody ExamQuestionFilterReq examQuestionFilterReq) {
         return ResponseEntity.ok(examQuestionService.filter(pageable, examQuestionFilterReq));
+    }
+
+    @Secured("ROLE_TEACHER")
+    @PostMapping("/details")
+    public ResponseEntity<ResponseData<ExamQuestionEntity>> details(@RequestBody ExamQuestionDetailsReq examQuestionDetailsReq) {
+        return ResponseEntity.ok(examQuestionService.details(examQuestionDetailsReq));
     }
 
     @Secured("ROLE_TEACHER")

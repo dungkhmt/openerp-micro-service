@@ -2,9 +2,11 @@ package com.hust.baseweb.applications.exam.service.impl;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hust.baseweb.applications.exam.entity.ExamEntity;
 import com.hust.baseweb.applications.exam.entity.ExamQuestionEntity;
 import com.hust.baseweb.applications.exam.model.ResponseData;
 import com.hust.baseweb.applications.exam.model.request.ExamQuestionDeleteReq;
+import com.hust.baseweb.applications.exam.model.request.ExamQuestionDetailsReq;
 import com.hust.baseweb.applications.exam.model.request.ExamQuestionFilterReq;
 import com.hust.baseweb.applications.exam.model.request.ExamQuestionSaveReq;
 import com.hust.baseweb.applications.exam.repository.ExamQuestionRepository;
@@ -76,6 +78,37 @@ public class ExamQuestionServiceImpl implements ExamQuestionService {
         long totalRecord = ((BigInteger) count.getSingleResult()).longValue();
         List<ExamQuestionEntity> list = query.getResultList();
         return new PageImpl<>(list, pageable, totalRecord);
+    }
+
+    @Override
+    public ResponseData<ExamQuestionEntity> details(ExamQuestionDetailsReq examQuestionDetailsReq) {
+        ResponseData<ExamQuestionEntity> responseData = new ResponseData<>();
+        if(DataUtils.stringIsNotNullOrEmpty(examQuestionDetailsReq.getId())){
+            Optional<ExamQuestionEntity> examQuestionEntity = examQuestionRepository.findById(examQuestionDetailsReq.getId());
+            if(examQuestionEntity.isPresent()){
+                responseData.setHttpStatus(HttpStatus.OK);
+                responseData.setResultCode(HttpStatus.OK.value());
+                responseData.setResultMsg("Success");
+                responseData.setData(examQuestionEntity.get());
+                return responseData;
+            }
+        }
+
+        if(DataUtils.stringIsNotNullOrEmpty(examQuestionDetailsReq.getCode())){
+            Optional<ExamQuestionEntity> examQuestionEntity = examQuestionRepository.findByCode(examQuestionDetailsReq.getCode());
+            if(examQuestionEntity.isPresent()){
+                responseData.setHttpStatus(HttpStatus.OK);
+                responseData.setResultCode(HttpStatus.OK.value());
+                responseData.setResultMsg("Success");
+                responseData.setData(examQuestionEntity.get());
+                return responseData;
+            }
+        }
+
+        responseData.setHttpStatus(HttpStatus.NOT_FOUND);
+        responseData.setResultCode(HttpStatus.NOT_FOUND.value());
+        responseData.setResultMsg("Chưa tồn tại câu hỏi");
+        return responseData;
     }
 
     @Override
