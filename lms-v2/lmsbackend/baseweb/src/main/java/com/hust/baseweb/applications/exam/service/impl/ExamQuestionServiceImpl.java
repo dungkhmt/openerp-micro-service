@@ -158,7 +158,7 @@ public class ExamQuestionServiceImpl implements ExamQuestionService {
         examQuestionEntity.setId(examQuestionExist.get().getId());
         examQuestionEntity.setCreatedBy(examQuestionExist.get().getCreatedBy());
         examQuestionEntity.setCreatedAt(examQuestionExist.get().getCreatedAt());
-        examQuestionEntity.setFilePath(examQuestionEntity.getFilePath() +";"+String.join(";", filePaths));
+        examQuestionEntity.setFilePath(DataUtils.stringIsNotNullOrEmpty(examQuestionEntity.getFilePath()) ? examQuestionEntity.getFilePath() +";"+ String.join(";", filePaths) : String.join(";", filePaths));
         examQuestionRepository.save(examQuestionEntity);
 
         for(String filePath: examQuestionSaveReq.getDeletePaths()){
