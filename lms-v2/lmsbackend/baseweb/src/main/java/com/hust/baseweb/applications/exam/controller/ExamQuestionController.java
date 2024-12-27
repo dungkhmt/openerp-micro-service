@@ -1,5 +1,6 @@
 package com.hust.baseweb.applications.exam.controller;
 
+import com.google.gson.Gson;
 import com.hust.baseweb.applications.exam.entity.ExamQuestionEntity;
 import com.hust.baseweb.applications.exam.model.ResponseData;
 import com.hust.baseweb.applications.exam.model.request.ExamQuestionDeleteReq;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 
@@ -39,14 +41,18 @@ public class ExamQuestionController {
 
     @Secured("ROLE_TEACHER")
     @PostMapping("/create")
-    public ResponseEntity<ResponseData<ExamQuestionEntity>> create(@RequestBody @Valid ExamQuestionSaveReq examQuestionSaveReq) {
-        return ResponseEntity.ok(examQuestionService.create(examQuestionSaveReq));
+    public ResponseEntity<ResponseData<ExamQuestionEntity>> create(@RequestParam("body") String questions,
+                                                                   @RequestParam("files") MultipartFile[] files) {
+        Gson gson = new Gson();
+        return ResponseEntity.ok(examQuestionService.create(gson.fromJson(questions, ExamQuestionSaveReq.class), files));
     }
 
     @Secured("ROLE_TEACHER")
     @PostMapping("/update")
-    public ResponseEntity<ResponseData<ExamQuestionEntity>> update(@RequestBody @Valid ExamQuestionSaveReq examQuestionSaveReq) {
-        return ResponseEntity.ok(examQuestionService.update(examQuestionSaveReq));
+    public ResponseEntity<ResponseData<ExamQuestionEntity>> update(@RequestParam("body") String questions,
+                                                                   @RequestParam("files") MultipartFile[] files) {
+        Gson gson = new Gson();
+        return ResponseEntity.ok(examQuestionService.update(gson.fromJson(questions, ExamQuestionSaveReq.class), files));
     }
 
     @Secured("ROLE_TEACHER")

@@ -22,8 +22,8 @@ public class ExamQuestionEntity extends BaseEntity {
     @Column(name = "content")
     private String content;
 
-    @Column(name = "file_id")
-    private String fileId;
+    @Column(name = "file_path")
+    private String filePath;
 
     @Column(name = "number_answer")
     private Integer numberAnswer;

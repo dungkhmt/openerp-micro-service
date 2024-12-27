@@ -10,4 +10,5 @@ import java.util.List;
 public interface ExamTestQuestionRepository extends JpaRepository<ExamTestQuestionEntity, String> {
 
     List<ExamTestQuestionEntity> findAllByExamTestId(String examTestId);
+    List<ExamTestQuestionEntity> findAllByExamQuestionId(String examQuestionId);
 }
