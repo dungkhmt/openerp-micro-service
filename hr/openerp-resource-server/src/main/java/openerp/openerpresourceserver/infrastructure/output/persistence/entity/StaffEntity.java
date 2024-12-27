@@ -1,11 +1,9 @@
 package openerp.openerpresourceserver.infrastructure.output.persistence.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import openerp.openerpresourceserver.constant.StaffStatus;
 
 @Getter
 @Setter
@@ -16,13 +14,15 @@ public class StaffEntity extends AuditEntity{
     @Column(name = "staff_code", nullable = false, length = 100)
     private String staffCode;
 
-    @Column(name = "user_login_id", length = 60)
-    private String userLoginId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_login_id", referencedColumnName = "user_login_id", insertable = false, updatable = false)
+    private User user;
 
     @Column(name = "fullname", length = 200)
     private String fullname;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 100)
-    private String status;
+    private StaffStatus status;
 
 }

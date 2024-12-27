@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.Hibernate;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Getter
@@ -21,7 +21,7 @@ public class StaffDepartmentId implements java.io.Serializable {
     private String departmentCode;
 
     @Column(name = "from_date", nullable = false)
-    private Instant fromDate;
+    private LocalDate fromDate;
 
     @Override
     public boolean equals(Object o) {

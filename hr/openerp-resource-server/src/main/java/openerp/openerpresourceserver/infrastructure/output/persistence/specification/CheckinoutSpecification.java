@@ -27,7 +27,7 @@ public class CheckinoutSpecification implements Specification<CheckinoutEntity> 
         }
         if(filter.getDate() != null){
             predicates.add(cb.equal(
-                    cb.function("DATE", LocalDate.class, root.get("timepoint")),
+                    cb.function("DATE", LocalDate.class, root.get("timePoint")),
                     filter.getDate()
             ));
         }

@@ -1,0 +1,26 @@
+package openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource;
+
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.Getter;
+import lombok.Setter;
+import openerp.openerpresourceserver.domain.model.PageInfo;
+
+@Getter
+@Setter
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public class PageableMetaResource extends MetaResource {
+    private PageInfo pageInfo;
+
+    public PageableMetaResource(PageInfo pageInfo) {
+        super(ResponseCode.OK);
+        this.pageInfo = pageInfo;
+    }
+
+    public PageableMetaResource(ResponseCode responseCode) {
+        super(responseCode);
+        this.pageInfo = null;
+    }
+}
+
+

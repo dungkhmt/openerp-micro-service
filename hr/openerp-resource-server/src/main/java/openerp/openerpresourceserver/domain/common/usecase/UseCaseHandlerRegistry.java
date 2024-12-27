@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.domain.common.usecase;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.domain.common.model.UseCase;
+import openerp.openerpresourceserver.domain.model.PageWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +14,8 @@ public class UseCaseHandlerRegistry {
 
     private final Map<Class<? extends UseCase>, UseCaseHandler<?, ? extends UseCase>> registryForUseCaseHandlers;
     private final Map<Class<? extends UseCase>, VoidUseCaseHandler<? extends UseCase>> registryForVoidUseCaseHandlers;
-    private final Map<Class<? extends UseCase>, IterableUseCaseHandler<?, ? extends UseCase>> registryForIterableUseCaseHandlers;
+    private final Map<Class<? extends UseCase>, CollectionUseCaseHandler<?, ? extends UseCase>> registryForCollectionUseCaseHandlers;
+    private final Map<Class<? extends UseCase>, PageWrapperUseCaseHandler<?, ? extends UseCase>> registryForPageWrapperUseCaseHandlers;
     private final Map<Class<?>, NoUseCaseHandler<?>> registryForNoUseCaseHandlers;
 
     public static final UseCaseHandlerRegistry INSTANCE = new UseCaseHandlerRegistry();
@@ -21,8 +23,9 @@ public class UseCaseHandlerRegistry {
     private UseCaseHandlerRegistry() {
         registryForUseCaseHandlers = new HashMap<>();
         registryForVoidUseCaseHandlers = new HashMap<>();
-        registryForIterableUseCaseHandlers = new HashMap<>();
+        registryForCollectionUseCaseHandlers = new HashMap<>();
         registryForNoUseCaseHandlers = new HashMap<>();
+        registryForPageWrapperUseCaseHandlers = new HashMap<>();
     }
 
     public <R, T extends UseCase> void register(Class<T> key, UseCaseHandler<R, T> useCaseHandler) {
@@ -35,11 +38,15 @@ public class UseCaseHandlerRegistry {
         registryForVoidUseCaseHandlers.put(key, useCaseHandler);
     }
 
-    public <R, T extends UseCase> void register(Class<T> key, IterableUseCaseHandler<R, T> useCaseHandler) {
-        log.info("Iterable Use case {} is registered by handler {}", key.getSimpleName(), useCaseHandler.getClass().getSimpleName());
-        registryForIterableUseCaseHandlers.put(key, useCaseHandler);
+    public <R, T extends UseCase> void register(Class<T> key, CollectionUseCaseHandler<R, T> useCaseHandler) {
+        log.info("Collection Use case {} is registered by handler {}", key.getSimpleName(), useCaseHandler.getClass().getSimpleName());
+        registryForCollectionUseCaseHandlers.put(key, useCaseHandler);
     }
 
+    public <R, T extends UseCase> void register(Class<T> key, PageWrapperUseCaseHandler<R, T> useCaseHandler) {
+        log.info("Page Wrapper Use case {} is registered by no param handler {}", key.getSimpleName(), useCaseHandler.getClass().getSimpleName());
+        registryForPageWrapperUseCaseHandlers.put(key, useCaseHandler);
+    }
 
     public <R> void register(Class<R> key, NoUseCaseHandler<R> useCaseHandler) {
         log.info("Use case {} is registered by no param handler {}", key.getSimpleName(), useCaseHandler.getClass().getSimpleName());
@@ -54,8 +61,12 @@ public class UseCaseHandlerRegistry {
         return registryForVoidUseCaseHandlers.get(useCaseClass);
     }
 
-    public IterableUseCaseHandler<?,? extends UseCase> detectIterableUseCaseHandlerFrom(Class<? extends UseCase> useCaseClass) {
-        return registryForIterableUseCaseHandlers.get(useCaseClass);
+    public CollectionUseCaseHandler<?,? extends UseCase> detectCollectionUseCaseHandlerFrom(Class<? extends UseCase> useCaseClass) {
+        return registryForCollectionUseCaseHandlers.get(useCaseClass);
+    }
+
+    public PageWrapperUseCaseHandler<?,? extends UseCase> detectPageWrapperUseCaseHandlerFrom(Class<? extends UseCase> useCaseClass) {
+        return registryForPageWrapperUseCaseHandlers.get(useCaseClass);
     }
 
     public NoUseCaseHandler<?> detectNoUseCaseHandlerFrom(Class<?> returnClass) {

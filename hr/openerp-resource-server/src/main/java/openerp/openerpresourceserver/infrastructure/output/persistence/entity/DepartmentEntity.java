@@ -1,11 +1,9 @@
 package openerp.openerpresourceserver.infrastructure.output.persistence.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import openerp.openerpresourceserver.constant.DepartmentStatus;
 
 @Getter
 @Setter
@@ -14,12 +12,19 @@ import lombok.Setter;
 public class DepartmentEntity extends AuditEntity{
     @Id
     @Column(name = "department_code", nullable = false, length = 100)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "dept_seq_gen")
+    @SequenceGenerator(name = "dept_seq_gen", sequenceName = "hr_dept_sequence", allocationSize = 1)
     private String departmentCode;
 
     @Column(name = "department_name", length = 200)
     private String departmentName;
 
+    @Lob
+    @Column(name = "description")
+    private String description;
+
     @Column(name = "status", length = 100)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private DepartmentStatus status;
 
 }

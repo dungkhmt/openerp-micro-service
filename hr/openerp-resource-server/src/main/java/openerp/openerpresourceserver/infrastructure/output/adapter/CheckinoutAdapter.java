@@ -3,12 +3,14 @@ package openerp.openerpresourceserver.infrastructure.output.adapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.application.port.in.port.ICheckinoutPort;
+import openerp.openerpresourceserver.application.port.out.checkinout.filter.IAttendancesFilter;
 import openerp.openerpresourceserver.application.port.out.checkinout.filter.ICheckinoutFilter;
 import openerp.openerpresourceserver.application.port.out.checkinout.usecase_data.Checkinout;
 import openerp.openerpresourceserver.constant.CheckinoutType;
 import openerp.openerpresourceserver.domain.model.CheckinoutModel;
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.CheckinoutEntity;
 import openerp.openerpresourceserver.infrastructure.output.persistence.repository.ICheckinoutRepo;
+import openerp.openerpresourceserver.infrastructure.output.persistence.specification.AttendanceSpecification;
 import openerp.openerpresourceserver.infrastructure.output.persistence.specification.CheckinoutSpecification;
 import openerp.openerpresourceserver.application.port.out.checkinout.filter.impl.CheckinoutFilter;
 import org.springframework.data.domain.Sort;
@@ -24,10 +26,11 @@ public class CheckinoutAdapter implements ICheckinoutPort {
     private final ICheckinoutRepo checkinoutRepo;
 
     @Override
-    public void checkinout(Checkinout usecase) {
-        var type = existCheckin(usecase.getPointTime().toLocalDate()) ? CheckinoutType.CHECKOUT : CheckinoutType.CHECKIN;
+    public void checkinout(Checkinout checkinout) {
+        var type = existCheckin(checkinout.getPointTime().toLocalDate())
+                ? CheckinoutType.CHECKOUT : CheckinoutType.CHECKIN;
         var entity = new CheckinoutEntity();
-        entity.setTimePoint(usecase.getPointTime());
+        entity.setTimePoint(checkinout.getPointTime());
         entity.setCheckinout(type);
         checkinoutRepo.save(entity);
     }
@@ -37,6 +40,15 @@ public class CheckinoutAdapter implements ICheckinoutPort {
         var spec = new CheckinoutSpecification(filter);
         Sort sort = Sort.by(Sort.Direction.DESC, "timePoint");
         var checkinoutList = checkinoutRepo.findAll(spec, sort);
+        return checkinoutList.stream()
+                .map(CheckinoutAdapter::toModel)
+                .toList();
+    }
+
+    @Override
+    public List<CheckinoutModel> getCheckinout(IAttendancesFilter filter) {
+        var spec = new AttendanceSpecification(filter);
+        var checkinoutList = checkinoutRepo.findAll(spec);
         return checkinoutList.stream()
                 .map(CheckinoutAdapter::toModel)
                 .toList();

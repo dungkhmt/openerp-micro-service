@@ -4,6 +4,8 @@ package openerp.openerpresourceserver.infrastructure.output.persistence.reposito
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepo extends JpaRepository<User, String> {
+import java.util.Optional;
 
+public interface UserRepo extends JpaRepository<User, String> {
+    Optional<User> findByEmail(String email);
 }

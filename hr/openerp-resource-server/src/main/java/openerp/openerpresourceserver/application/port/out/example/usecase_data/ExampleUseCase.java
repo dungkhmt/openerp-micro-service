@@ -5,18 +5,15 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import openerp.openerpresourceserver.domain.common.model.UseCase;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.request.CheckinoutRequest;
-
-import java.time.LocalDateTime;
+import openerp.openerpresourceserver.domain.model.ExampleModel;
 
 @Data
 @Builder
 @Getter
 @Setter
 public class ExampleUseCase implements UseCase {
-    public static ExampleUseCase from() {
-        return ExampleUseCase.builder()
+    public ExampleModel toModel() {
+        return ExampleModel.builder()
                 .build();
-
     }
 }

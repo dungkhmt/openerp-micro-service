@@ -1,8 +1,8 @@
 package openerp.openerpresourceserver.infrastructure.exception.handler;
 
-import openerp.openerpresourceserver.infrastructure.exception.base.ApplicationException;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.response.resource.Resource;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.response.resource.ResponseCode;
+import openerp.openerpresourceserver.domain.exception.ApplicationException;
+import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.Resource;
+import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

@@ -12,7 +12,11 @@ public abstract class ObservableUseCasePublisher extends BeanAwareUseCasePublish
         UseCaseHandlerRegistry.INSTANCE.register(useCaseClass, useCaseHandler);
     }
 
-    public <R, T extends UseCase> void register(Class<T> useCaseClass, IterableUseCaseHandler<R, T> useCaseHandler) {
+    public <R, T extends UseCase> void register(Class<T> useCaseClass, CollectionUseCaseHandler<R, T> useCaseHandler) {
+        UseCaseHandlerRegistry.INSTANCE.register(useCaseClass, useCaseHandler);
+    }
+
+    public <R, T extends UseCase> void register(Class<T> useCaseClass, PageWrapperUseCaseHandler<R, T> useCaseHandler) {
         UseCaseHandlerRegistry.INSTANCE.register(useCaseClass, useCaseHandler);
     }
 

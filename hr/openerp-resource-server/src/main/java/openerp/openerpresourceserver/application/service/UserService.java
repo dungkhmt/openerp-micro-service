@@ -18,6 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class UserService implements UserUseCase {
+    //TODO refactor
 
     private final UserRepo userRepo;
 

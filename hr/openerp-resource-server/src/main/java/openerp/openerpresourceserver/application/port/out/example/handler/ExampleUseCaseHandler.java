@@ -11,7 +11,7 @@ import openerp.openerpresourceserver.domain.model.ExampleModel;
 @DomainComponent
 @Slf4j
 @RequiredArgsConstructor
-public class ExampleUseCaseHandler extends ObservableUseCasePublisher implements UseCaseHandler<ExampleModel,ExampleUseCase> {
+public class ExampleUseCaseHandler extends ObservableUseCasePublisher implements UseCaseHandler<ExampleModel, ExampleUseCase> {
 
     @Override
     public void init() {
