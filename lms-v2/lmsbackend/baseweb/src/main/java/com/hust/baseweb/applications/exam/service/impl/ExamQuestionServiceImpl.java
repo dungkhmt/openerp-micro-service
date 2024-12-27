@@ -193,7 +193,9 @@ public class ExamQuestionServiceImpl implements ExamQuestionService {
 
         String[] filePaths = examQuestionExist.get().getFilePath().split(";");
         for(String filePath: filePaths){
-            mongoFileService.deleteByPath(filePath);
+            if(DataUtils.stringIsNotNullOrEmpty(filePath)){
+                mongoFileService.deleteByPath(filePath);
+            }
         }
 
         examQuestionRepository.delete(examQuestionExist.get());
