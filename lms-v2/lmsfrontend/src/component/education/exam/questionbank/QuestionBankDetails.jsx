@@ -8,20 +8,30 @@ import {
   Input
 } from "@material-ui/core";
 import parse from "html-react-parser";
+import {getFilenameFromString, getFilePathFromString} from "../ultils/FileUltils";
+import {MenuItem} from "@mui/material";
+import {AttachFileOutlined} from "@material-ui/icons";
+import QuestionFilePreview from "./QuestionFilePreview";
 
 function QuestionBankDetails(props) {
 
   const { open, setOpen, question} = props;
 
-  console.log('question',question)
+  const [openFilePreviewDialog, setOpenFilePreviewDialog] = useState(false);
+  const [filePreview, setFilePreview] = useState(null);
 
   const closeDialog = () => {
     setOpen(false)
   }
 
+  const handleOpenFilePreviewDialog = (data) => {
+    setOpenFilePreviewDialog(true)
+    setFilePreview(getFilePathFromString(data))
+  };
+
   return (
     <div>
-      <Dialog open={open}>
+      <Dialog open={open} fullWidth maxWidth="md">
         <DialogTitle>Chi tiết câu hỏi</DialogTitle>
         <DialogContent>
           <div>
@@ -36,6 +46,18 @@ function QuestionBankDetails(props) {
             <div>
               <h3>Nội dung câu hỏi</h3>
               <p>{parse(question?.content)}</p>
+              {
+                (question?.filePath) && (
+                  question?.filePath.split(';').map(item => {
+                    return (
+                      <div style={{display: 'flex', alignItems : 'center'}}>
+                        <AttachFileOutlined></AttachFileOutlined>
+                        <p style={{fontWeight : 'bold', cursor : 'pointer'}} onClick={() => handleOpenFilePreviewDialog(item)}>{getFilenameFromString(item)}</p>
+                      </div>
+                    )
+                  })
+                )
+              }
             </div>
             {
               (question?.type === 0) && (
@@ -104,6 +126,11 @@ function QuestionBankDetails(props) {
               Hủy
             </Button>
           </div>
+          <QuestionFilePreview
+            open={openFilePreviewDialog}
+            setOpen={setOpenFilePreviewDialog}
+            file={filePreview}>
+          </QuestionFilePreview>
         </DialogContent>
       </Dialog>
     </div>

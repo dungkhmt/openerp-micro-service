@@ -14,6 +14,10 @@ import {DropzoneArea} from "material-ui-dropzone";
 import {makeStyles} from "@material-ui/core/styles";
 import {useHistory} from "react-router-dom";
 import {useLocation} from "react-router";
+import {getFilenameFromString, getFilePathFromString} from "../ultils/FileUltils";
+import {AttachFileOutlined} from "@material-ui/icons";
+import QuestionFilePreview from "./QuestionFilePreview";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -92,6 +96,8 @@ function QuestionBankCreateUpdate(props) {
   const [code, setCode] = useState(question?.code);
   const [type, setType] = useState(question?.type);
   const [content, setContent] = useState(question?.content);
+  const [filePath, setFilePath] = useState(question?.filePath);
+  const [deletePaths, setDeletePaths] = useState([]);
   const [contentFiles, setContentFiles] = useState([]);
   const [numberAnswer, setNumberAnswer] = useState(question?.numberAnswer);
   const [contentAnswer1, setContentAnswer1] = useState(question?.contentAnswer1);
@@ -103,12 +109,16 @@ function QuestionBankCreateUpdate(props) {
   const [answer, setAnswer] = useState(question?.answer);
   const [explain, setExplain] = useState(question?.explain);
   const [isLoading, setIsLoading] = useState(false);
+  const [openFilePreviewDialog, setOpenFilePreviewDialog] = useState(false);
+  const [filePreview, setFilePreview] = useState(null);
 
   const saveQuestion = () =>{
     const body = {
       code: code,
       type:  type,
       content:  content,
+      filePath: filePath,
+      deletePaths: isCreate ? null : deletePaths,
       numberAnswer: type === 0 ? numberAnswer : null,
       contentAnswer1: type === 0 ? contentAnswer1 : null,
       contentAnswer2: type === 0 ? contentAnswer2 : null,
@@ -120,6 +130,15 @@ function QuestionBankCreateUpdate(props) {
       explain:  explain
     }
     validateBody(body)
+
+    let formData = new FormData();
+    formData.append("body", JSON.stringify(body));
+    for (const file of contentFiles) {
+      formData.append("files", file);
+    }
+
+    console.log('formData',formData)
+
     setIsLoading(true)
     request(
       "post",
@@ -138,7 +157,7 @@ function QuestionBankCreateUpdate(props) {
         }
       },
       { onError: (e) => toast.error(e) },
-      body
+      formData
     );
   }
 
@@ -184,6 +203,25 @@ function QuestionBankCreateUpdate(props) {
     if (!regex.test(event.key)) {
       event.preventDefault();
     }
+  }
+
+  const handleOpenFilePreviewDialog = (data) => {
+    setOpenFilePreviewDialog(true)
+    setFilePreview(getFilePathFromString(data))
+  };
+
+  const handleDeleteFile = (data) => {
+    let tmpFilePath = []
+    filePath.split(';').map(item => {
+      if(item !== data){
+        tmpFilePath.push(item)
+      }
+    })
+    setFilePath(tmpFilePath.join(';'))
+
+    let tmpDeletePaths = deletePaths
+    tmpDeletePaths.push(data)
+    setDeletePaths(tmpDeletePaths)
   }
 
   return (
@@ -295,6 +333,18 @@ function QuestionBankCreateUpdate(props) {
                   {/*  onChange={(files) => setContentFiles(files)}*/}
                   {/*  multiple*/}
                   {/*/>*/}
+                  {
+                    (filePath) && (filePath.split(';').map(item => {
+                        return (
+                          <div style={{display: 'flex', alignItems : 'center'}}>
+                            <AttachFileOutlined></AttachFileOutlined>
+                            <p style={{fontWeight : 'bold', cursor : 'pointer'}} onClick={() => handleOpenFilePreviewDialog(item)}>{getFilenameFromString(item)}</p>
+                            <DeleteIcon style={{color: 'red', cursor: 'pointer', marginLeft: '10px'}} onClick={() => handleDeleteFile(item)}></DeleteIcon>
+                          </div>
+                        )
+                      })
+                    )
+                  }
                 </div>
 
                 <div>
@@ -465,6 +515,11 @@ function QuestionBankCreateUpdate(props) {
               {isLoading ? <CircularProgress/> : "Lưu"}
             </Button>
           </CardActions>
+          <QuestionFilePreview
+            open={openFilePreviewDialog}
+            setOpen={setOpenFilePreviewDialog}
+            file={filePreview}>
+          </QuestionFilePreview>
         </Card>
       </MuiPickersUtilsProvider>
     </div>
