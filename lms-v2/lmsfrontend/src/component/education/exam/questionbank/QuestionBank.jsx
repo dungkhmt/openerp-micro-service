@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import withScreenSecurity from "../../../withScreenSecurity";
-import {Box, Button, Card, CardContent, Input} from "@material-ui/core";
+import {Box, Button, Card, CardContent, CardHeader, Input} from "@material-ui/core";
 import MaterialTable, {MTableToolbar} from "material-table";
 import {tableIcons} from "../../../../utils/iconutil";
 import {MuiThemeProvider} from "@material-ui/core/styles";
@@ -16,48 +16,53 @@ import TextField from "@material-ui/core/TextField";
 import parser from "html-react-parser"
 import QuestionBankDelete from "./QuestionBankDelete";
 import QuestionBankDetails from "./QuestionBankDetails";
+import {DataGrid} from "@material-ui/data-grid";
+import InfoIcon from "@mui/icons-material/Info";
+import EditIcon from "@material-ui/icons/Edit";
+import DeleteIcon from "@material-ui/icons/Delete";
+
+const baseColumn = {
+  sortable: false,
+};
+
+const rowsPerPage = [5, 10, 20];
 
 function QuestionBank(props) {
 
   const columns = [
     {
-      field: "id",
-      hidden: true
-    },
-    {
       field: "code",
-      sorting: false,
-      title: "Mã câu hỏi",
+      headerName: "Mã câu hỏi",
+      minWidth: 170,
+      ...baseColumn
     },
     {
       field: "content",
-      title: "Nội dung câu hỏi",
-      sorting: false,
-      render: (rowData) => {
-        return parser(rowData.content)
+      headerName: "Nội dung câu hỏi",
+      ...baseColumn,
+      flex: 1,
+      renderCell: (rowData) => {
+        return parser(rowData.value)
       }
     },
     {
       field: "answer",
-      title: "Đáp án",
-      sorting: false,
-      render: (rowData) => {
-        return parser(rowData.answer)
+      headerName: "Đáp án",
+      ...baseColumn,
+      flex: 1,
+      renderCell: (rowData) => {
+        return parser(rowData.value)
       }
     },
     {
-      field: "explain",
-      title: "Giải thích",
-      hidden: true
-    },
-    {
       field: "type",
-      title: "Loại câu hỏi",
-      sorting: false,
-      render: (rowData) => {
-        if(rowData.type === 0){
+      headerName: "Loại câu hỏi",
+      ...baseColumn,
+      minWidth: 170,
+      renderCell: (rowData) => {
+        if(rowData.value === 0){
           return 'Trắc nghiệm'
-        }else if(rowData.type === 1){
+        }else if(rowData.value === 1){
           return 'Tự luận'
         }else{
           return 'Tất cả'
@@ -65,44 +70,20 @@ function QuestionBank(props) {
       },
     },
     {
-      field: "numberAnswer",
-      title: "Số đáp án",
-      hidden: true,
-    },
-    {
-      field: "contentAnswer1",
-      title: "Phương án số 1",
-      hidden: true,
-    },
-    {
-      field: "contentAnswer2",
-      title: "Phương án số 2",
-      hidden: true,
-    },
-    {
-      field: "contentAnswer2",
-      title: "Phương án số 3",
-      hidden: true,
-    },
-    {
-      field: "contentAnswer3",
-      title: "Phương án số 3",
-      hidden: true,
-    },
-    {
-      field: "contentAnswer4",
-      title: "Phương án số 4",
-      hidden: true,
-    },
-    {
-      field: "contentAnswer5",
-      title: "Phương án số 5",
-      hidden: true,
-    },
-    {
-      field: "multichoice",
-      title: "Nhiều đáp án",
-      hidden: true,
+      field: "",
+      headerName: "",
+      sortable: false,
+      minWidth: 120,
+      maxWidth: 120,
+      renderCell: (rowData) => {
+        return (
+          <Box display="flex" justifyContent="space-between" alignItems='center' width="100%">
+            <InfoIcon style={{cursor: 'pointer'}} onClick={(data) => handleDetailsQuestion(rowData?.row)}/>
+            <EditIcon style={{cursor: 'pointer'}} onClick={(data) => handleUpdateQuestion(rowData?.row)}/>
+            <DeleteIcon style={{cursor: 'pointer'}} onClick={(data) => handleDeleteQuestion(rowData?.row)}/>
+          </Box>
+        )
+      }
     },
   ];
 
@@ -239,119 +220,84 @@ function QuestionBank(props) {
 
   return (
     <div>
-      <MaterialTable
-        title={
-          <Box display="flex" flexDirection="column" width="100%">
-            <h2>Ngân hàng câu hỏi</h2>
-            <Box display="flex" justifyContent="flex-end" width="100%">
-              <TextField
-                autoFocus
-                id="questionCode"
-                label="Nội dung tìm kiếm"
-                placeholder="Tìm kiếm theo code hoặc nội dung"
-                value={keywordFilter}
-                style={{ width: "300px", marginRight: "16px"}}
-                onChange={(event) => {
-                  setKeywordFilter(event.target.value);
-                }}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
-
-              <TextField
-                id="questionType"
-                select
-                label="Loại câu hỏi"
-                style={{ width: "150px"}}
-                value={typeFilter}
-                onChange={(event) => {
-                  setTypeFilter(event.target.value);
-                }}
-              >
-                {
-                  questionTypes.map(item => {
-                    return (
-                      <MenuItem value={item.value}>{item.name}</MenuItem>
-                    )
-                  })
-                }
-              </TextField>
-            </Box>
-          </Box>
-        }
-        columns={columns}
-        key = {questionList.length}
-        data={(query) =>
-          new Promise(resolve => {
-            setPage(query.page);
-            setPageSize(query.pageSize);
-            resolve({
-              data: questionList,
-              page: page,
-              totalCount: totalCount,
-            });
-          })
-        }
-        icons={tableIcons}
-        localization={{
-          header: {
-            actions: "",
-          },
-          body: {
-            emptyDataSourceMessage: "Không có bản ghi nào để hiển thị",
-            filterRow: {
-              filterTooltip: "Lọc",
-            },
-          },
-        }}
-        options={{
-          search: false,
-          actionsColumnIndex: -1
-        }}
-        components={{
-          Toolbar: (props) => (
-            <div>
-              <MTableToolbar {...props} />
-              <MuiThemeProvider theme={themeTable}>
-                <Box display="flex" justifyContent="flex-end" width="98%">
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={onClickCreateNewButton}
-                    startIcon={<AddCircleIcon />}
-                    style={{ marginRight: 16 }}
-                  >
-                    Thêm mới
-                  </Button>
-                  <UploadButton
-                    buttonTitle="Tải lên"
-                    // onClickSaveButton={onClickSaveButton}
-                    filesLimit={1}
+      <Card elevation={5} >
+        <CardHeader
+          title={
+            <Box display="flex" justifyContent="space-between" alignItems="end" width="100%">
+              <Box display="flex" flexDirection="column" width="60%">
+                <h4>Ngân hàng câu hỏi</h4>
+                <Box display="flex" justifyContent="flex-start" width="100%">
+                  <TextField
+                    autoFocus
+                    id="questionCode"
+                    label="Nội dung tìm kiếm"
+                    placeholder="Tìm kiếm theo code hoặc nội dung"
+                    value={keywordFilter}
+                    style={{ width: "300px", marginRight: "16px"}}
+                    onChange={(event) => {
+                      setKeywordFilter(event.target.value);
+                    }}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
                   />
+
+                  <TextField
+                    id="questionType"
+                    select
+                    label="Loại câu hỏi"
+                    style={{ width: "150px"}}
+                    value={typeFilter}
+                    onChange={(event) => {
+                      setTypeFilter(event.target.value);
+                    }}
+                  >
+                    {
+                      questionTypes.map(item => {
+                        return (
+                          <MenuItem value={item.value}>{item.name}</MenuItem>
+                        )
+                      })
+                    }
+                  </TextField>
                 </Box>
-              </MuiThemeProvider>
-            </div>
-          ),
-        }}
-        actions={[
-          {
-            icon: 'info',
-            tooltip: 'Xem chi tiết câu hỏi',
-            onClick: (event, rowData) => handleDetailsQuestion(rowData)
-          },
-          {
-            icon: 'edit',
-            tooltip: 'Cập nhật câu hỏi',
-            onClick: (event, rowData) => handleUpdateQuestion(rowData)
-          },
-          {
-            icon: 'delete',
-            tooltip: 'Xoá câu hỏi',
-            onClick: (event, rowData) => handleDeleteQuestion(rowData)
-          }
-        ]}
-      />
+              </Box>
+
+              <Box display="flex" justifyContent="flex-end" width="40%">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={onClickCreateNewButton}
+                  startIcon={<AddCircleIcon />}
+                  style={{ marginRight: 16 }}
+                >
+                  Thêm mới
+                </Button>
+                <UploadButton
+                  buttonTitle="Tải lên"
+                  // onClickSaveButton={onClickSaveButton}
+                  filesLimit={1}
+                />
+              </Box>
+            </Box>
+          }/>
+        <CardContent>
+          <DataGrid
+            rowCount={totalCount}
+            rows={questionList}
+            columns={columns}
+            page={page}
+            pageSize={pageSize}
+            pagination
+            paginationMode="server"
+            onPageChange={(page) => setPage(page)}
+            onPageSizeChange={(pageSize) => setPageSize(pageSize)}
+            rowsPerPageOptions={rowsPerPage}
+            disableColumnMenu
+            autoHeight
+          />
+        </CardContent>
+      </Card>
       {
         openDetailsDialog && (
           <QuestionBankDetails
