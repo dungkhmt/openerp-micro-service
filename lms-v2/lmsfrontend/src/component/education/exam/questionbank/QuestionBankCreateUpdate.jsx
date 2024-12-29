@@ -497,7 +497,7 @@ function QuestionBankCreateUpdate(props) {
               </div>
             </form>
           </CardContent>
-          <CardActions>
+          <CardActions style={{justifyContent: 'flex-end'}}>
             <Button
               variant="contained"
               onClick={() => history.push("/exam/question-bank")}

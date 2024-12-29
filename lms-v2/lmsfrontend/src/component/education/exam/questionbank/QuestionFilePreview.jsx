@@ -8,6 +8,7 @@ import {
   Input
 } from "@material-ui/core";
 import FilePreviewUrl from "../../../common/uploader/FilePreviewUrl";
+import {DialogActions} from "@mui/material";
 
 function QuestionFilePreview(props) {
 
@@ -24,15 +25,15 @@ function QuestionFilePreview(props) {
           <div>
             <FilePreviewUrl file={file}></FilePreviewUrl>
           </div>
-          <div>
-            <Button
-              variant="contained"
-              onClick={closeDialog}
-            >
-              Hủy
-            </Button>
-          </div>
         </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            onClick={closeDialog}
+          >
+            Hủy
+          </Button>
+        </DialogActions>
       </Dialog>
     </div>
   );

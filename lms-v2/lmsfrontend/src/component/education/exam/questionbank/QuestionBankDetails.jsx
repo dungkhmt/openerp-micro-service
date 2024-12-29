@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core";
 import parse from "html-react-parser";
 import {getFilenameFromString, getFilePathFromString} from "../ultils/FileUltils";
-import {MenuItem} from "@mui/material";
+import {DialogActions, MenuItem} from "@mui/material";
 import {AttachFileOutlined} from "@material-ui/icons";
 import QuestionFilePreview from "./QuestionFilePreview";
 
@@ -118,20 +118,20 @@ function QuestionBankDetails(props) {
               <p>{parse(question?.explain)}</p>
             </div>
           </div>
-          <div>
-            <Button
-              variant="contained"
-              onClick={closeDialog}
-            >
-              Hủy
-            </Button>
-          </div>
           <QuestionFilePreview
             open={openFilePreviewDialog}
             setOpen={setOpenFilePreviewDialog}
             file={filePreview}>
           </QuestionFilePreview>
         </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            onClick={closeDialog}
+          >
+            Hủy
+          </Button>
+        </DialogActions>
       </Dialog>
     </div>
   );

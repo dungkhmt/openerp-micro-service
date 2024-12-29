@@ -9,6 +9,7 @@ import {
 } from "@material-ui/core";
 import {request} from "../../../../api";
 import {toast} from "react-toastify";
+import {DialogActions} from "@mui/material";
 
 function QuestionBankDelete(props) {
 
@@ -45,23 +46,23 @@ function QuestionBankDelete(props) {
         <DialogTitle>Xoá câu hỏi</DialogTitle>
         <DialogContent>
           <p style={{marginBottom: "30px"}}>Bạn có chắc chắn muốn xoá câu hỏi?</p>
-          <div>
-            <Button
-              variant="contained"
-              onClick={closeDialog}
-            >
-              Hủy
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              style={{marginLeft: "15px"}}
-              onClick={deleteQuestion}
-            >
-              Lưu
-            </Button>
-          </div>
         </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            onClick={closeDialog}
+          >
+            Hủy
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            style={{marginLeft: "15px"}}
+            onClick={deleteQuestion}
+          >
+            Lưu
+          </Button>
+        </DialogActions>
       </Dialog>
     </div>
   );
