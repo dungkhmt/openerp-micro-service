@@ -17,7 +17,7 @@ public interface ExamTestRepository extends JpaRepository<ExamTestEntity, String
                    "    eq.code as questionCode,\n" +
                    "    eq.type as questionType,\n" +
                    "    eq.content as questionContent,\n" +
-                   "    eq.file_id as questionFile,\n" +
+                   "    eq.file_path as questionFile,\n" +
                    "    eq.number_answer as questionNumberAnswer,\n" +
                    "    eq.content_answer1 as questionContentAnswer1,\n" +
                    "    eq.content_answer2 as questionContentAnswer2,\n" +
