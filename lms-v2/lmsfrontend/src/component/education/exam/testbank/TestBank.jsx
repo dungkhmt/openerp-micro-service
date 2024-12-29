@@ -121,7 +121,7 @@ function TestBank(props) {
       `/exam-test/details`,
       (res) => {
         if(res.data.resultCode === 200){
-          setData(res.data.data)
+          setTestDetails(res.data.data)
           setOpenDetailsDialog(true)
         }else{
           toast.error(res.data.resultMsg)
@@ -136,20 +136,11 @@ function TestBank(props) {
     history.push({
       pathname: "/exam/create-update-test-bank",
       state: {
-        question: {
+        data: {
           code: "",
-          type: 1,
-          content: "",
-          filePath: "",
-          numberAnswer: "",
-          contentAnswer1: "",
-          contentAnswer2: "",
-          contentAnswer3: "",
-          contentAnswer4: "",
-          contentAnswer5: "",
-          multichoice: false,
-          answer: "",
-          explain: ""
+          name: "",
+          description: "",
+          questions: []
         },
         isCreate: true
       },
@@ -157,27 +148,34 @@ function TestBank(props) {
   };
 
   const handleUpdate = (rowData) => {
-    history.push({
-      pathname: "/exam/create-update-test-bank",
-      state: {
-        question: {
-          code: rowData.code,
-          type: rowData.type,
-          content: rowData.content,
-          filePath: rowData.filePath,
-          numberAnswer: rowData.numberAnswer,
-          contentAnswer1: rowData.contentAnswer1,
-          contentAnswer2: rowData.contentAnswer2,
-          contentAnswer3: rowData.contentAnswer3,
-          contentAnswer4: rowData.contentAnswer4,
-          contentAnswer5: rowData.contentAnswer5,
-          multichoice: rowData.multichoice,
-          answer: rowData.answer,
-          explain: rowData.explain
-        },
-        isCreate: false
+    const body = {
+      id: rowData.id
+    }
+    request(
+      "post",
+      `/exam-test/details`,
+      (res) => {
+        if(res.data.resultCode === 200){
+          setTestDetails(res.data.data)
+          history.push({
+            pathname: "/exam/create-update-test-bank",
+            state: {
+              data: {
+                code: res.data.data.code,
+                name: res.data.data.name,
+                description: res.data.data.description,
+                questions: res.data.data.examTestQuestionDetails
+              },
+              isCreate: false
+            },
+          });
+        }else{
+          toast.error(res.data.resultMsg)
+        }
       },
-    });
+      { onError: (e) => toast.error(e) },
+      body
+    );
   };
 
   const handleOpenPopupDetails = (rowData) => {
@@ -187,10 +185,6 @@ function TestBank(props) {
   const handleOpenPopupDelete = (rowData) => {
     setOpenDeleteDialog(true)
     setIdDelete(rowData.id)
-  };
-
-  const handleChangeCreateFrom = (rowData) => {
-    console.log(rowData)
   };
 
   return (
@@ -288,6 +282,6 @@ function TestBank(props) {
   );
 }
 
-const screenName = "MENU_EXAM_QUESTION_BANK";
+const screenName = "MENU_EXAM_TEST_BANK";
 // export default withScreenSecurity(QuestionBank, screenName, true);
 export default TestBank;
