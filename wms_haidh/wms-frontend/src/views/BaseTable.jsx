@@ -29,37 +29,39 @@ import { request } from "../api";
 //   vacation: "warning",
 // };
 
-const INITIAL_VISIBLE_COLUMNS = ["name", "code", "totalQuantityOnHand", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["name", "code", "totalQuantityOnHand", "dateUpdated", "actions"];
 const buttonText = "Add Product";
 export default function BaseTable() {
 
-  const [items, setItems] = useState([]);
   const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [filterValue, setFilterValue] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [pages, setPages] = useState(1);
+  const [items, setItems] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
 
   useEffect(() => {
-    request("get", "/admin/product", (res) => {
-      setItems(res.data);
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(filterValue);  // Chỉ cập nhật sau khi người dùng ngừng gõ
+    }, 500); // 1000ms = 1 giây
+
+    // Hủy bỏ timeout nếu người dùng tiếp tục gõ
+    return () => clearTimeout(timer);
+  }, [filterValue]);
+
+  // useEffect để gửi request sau khi giá trị tìm kiếm đã debounce
+  useEffect(() => {
+    request("get", `/admin/product?page=${page - 1}&size=${rowsPerPage}&search=${debouncedSearchTerm}`, (res) => {
+      setItems(res.data.content);
+      setTotalItems(res.data.totalElements);
+      setPages(res.data.totalPages);
     }).then();
-  }, [])
-  // const demo = Array.from({ length: 20 }, (_, index) => ({
-  //   id: `product-${index + 1}`,
-  //   name: `Product ${index + 1}`,
-  //   code: `CODE${index + 1}`,
-  //   totalQuantityOnHand: Math.floor(Math.random() * 10) + 1, // Số lượng ngẫu nhiên từ 1 đến 10
-  // }));
-  const [filterValue, setFilterValue] = useState("");
+  }, [page, rowsPerPage, debouncedSearchTerm]);
+
   const [selectedKeys, setSelectedKeys] = useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
   const [statusFilter, setStatusFilter] = useState("all");
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [sortDescriptor, setSortDescriptor] = useState({
-    column: "id",
-    direction: "ascending",
-  });
-
-
-  const pages = Math.ceil(items.length / rowsPerPage);
-  const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = useMemo(() => {
     if (visibleColumns === "all") return columns;
@@ -69,12 +71,6 @@ export default function BaseTable() {
 
   const filteredItems = useMemo(() => {
     let filteredItems = [...items];
-
-    if (hasSearchFilter) {
-      filteredItems = filteredItems.filter((item) =>
-        item.name.toLowerCase().includes(filterValue.toLowerCase()),
-      );
-    }
     if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
       filteredItems = filteredItems.filter((item) =>
         Array.from(statusFilter).includes(item.status),
@@ -82,24 +78,7 @@ export default function BaseTable() {
     }
 
     return filteredItems;
-  }, [items, filterValue, statusFilter]);
-
-  const displayItems = useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-
-    return filteredItems.slice(start, end);
-  }, [page, filteredItems, rowsPerPage]);
-
-  const sortedItems = useMemo(() => {
-    return [...displayItems].sort((a, b) => {
-      const first = a[sortDescriptor.column];
-      const second = b[sortDescriptor.column];
-      const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-      return sortDescriptor.direction === "descending" ? -cmp : cmp;
-    });
-  }, [sortDescriptor, displayItems]);
+  }, [items, statusFilter]);
 
   const renderCell = useCallback((item, columnKey) => {
     const cellValue = item[columnKey];
@@ -184,7 +163,13 @@ export default function BaseTable() {
       "/admin/product/delete-product", // Endpoint for deleting product
       (res) => {
         if (res.status === 200) {
-          setItems(prevItems => prevItems.filter(item => item.id !== id));
+          if (items.length === 1 && page > 1) setPage(page - 1);
+          request("get", `/admin/product?page=${page - 1}&size=${rowsPerPage}&search=${debouncedSearchTerm}`, (res) => {
+            setItems(res.data.content);
+            setTotalItems(res.data.totalElements);
+            setPages(res.data.totalPages);
+          }).then();
+
         }
       },
       {
@@ -193,6 +178,21 @@ export default function BaseTable() {
       { id }
     );
   };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false, // Đảm bảo không sử dụng định dạng giờ AM/PM
+    };
+    return date.toLocaleString('en-GB', options); // Hoặc 'en-US' nếu bạn muốn kiểu định dạng kiểu Mỹ
+  };
+
+
 
 
   const topContent = useMemo(() => {
@@ -205,7 +205,7 @@ export default function BaseTable() {
             placeholder="Search by name..."
             startContent={<SearchIcon />}
             value={filterValue}
-            onClear={() => setFilterValue("")}
+            onClear={() => setDebouncedSearchTerm("")}
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
@@ -270,7 +270,7 @@ export default function BaseTable() {
           </div>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-default-400 text-small">Total {items.length} items</span>
+          <span className="text-default-400 text-small">Total {totalItems} items</span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
             <select
@@ -287,12 +287,9 @@ export default function BaseTable() {
     );
   }, [
     filterValue,
-    statusFilter,
-    visibleColumns,
     onSearchChange,
     onRowsPerPageChange,
-    items.length,
-    hasSearchFilter,
+    totalItems
   ]);
 
   const bottomContent = useMemo(() => {
@@ -305,20 +302,19 @@ export default function BaseTable() {
             cursor: "bg-foreground text-background",
           }}
           color="default"
-          isDisabled={hasSearchFilter}
           page={page}
           total={pages}
           variant="light"
           onChange={setPage}
         />
-        <span className="text-small text-default-400">
+        {/* <span className="text-small text-default-400">
           {selectedKeys === "all"
             ? "All items selected"
-            : `${selectedKeys.size} of ${displayItems.length} selected`}
-        </span>
+            : `${selectedKeys.size} of ${filteredItems.length} selected`}
+        </span> */}
       </div>
     );
-  }, [selectedKeys, displayItems.length, page, pages, hasSearchFilter]);
+  }, [page, pages]);
 
   const classNames = useMemo(
     () => ({
@@ -353,12 +349,9 @@ export default function BaseTable() {
       }}
       classNames={classNames}
       selectedKeys={selectedKeys}
-      selectionMode="multiple"
-      sortDescriptor={sortDescriptor}
       topContent={topContent}
       topContentPlacement="outside"
       onSelectionChange={setSelectedKeys}
-      onSortChange={setSortDescriptor}
     >
       <TableHeader columns={headerColumns}>
         {(column) => (
@@ -371,10 +364,16 @@ export default function BaseTable() {
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody emptyContent={"Loading ..."} items={sortedItems}>
+      <TableBody emptyContent={"Loading ..."} items={filteredItems}>
         {(item) => (
           <TableRow key={item.id}>
-            {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+            {(columnKey) => (
+              <TableCell>
+                {columnKey === "dateUpdated"
+                  ? formatDate(item.dateUpdated)
+                  : renderCell(item, columnKey)}
+              </TableCell>
+            )}
           </TableRow>
         )}
       </TableBody>

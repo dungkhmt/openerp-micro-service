@@ -1,8 +1,10 @@
 package openerp.openerpresourceserver.service;
 
-import java.util.List;
+
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import openerp.openerpresourceserver.entity.Product;
@@ -11,7 +13,7 @@ import openerp.openerpresourceserver.model.request.ProductDto;
 
 public interface ProductService {
 
-    List<ProductInfoProjection> getAllProductGeneral();
+    Page<ProductInfoProjection> getAllProductGeneral(String searchTerm,Pageable pageable);
 	
 	boolean deleteProductById(UUID id);
 
@@ -21,18 +23,5 @@ public interface ProductService {
 
 	boolean createProduct(ProductDto productDto, MultipartFile imageFile);
 
-//    boolean deleteProducts(List<String> productIds);
-//
-//    ProductDetailResponse getById(String id);
-//
-//    boolean createProductPrice(ProductPriceRequest request);
-//
-//    List<ProductPriceResponse> getAllProductPrices();
-//
-//    boolean deleteProductPriceById(String[] ids);
-//
-//    BigDecimal getCurrPriceByProductId(UUID id);
-//
-//    Map<UUID, String> getProductNameMap();
 }
 

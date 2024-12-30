@@ -74,11 +74,9 @@ const ProductForm = () => {
         setArea(product.area);
         setDescription(product.description);
         setUom(product.uom);
+        setImage(product.imageUrl);
 
-        // Nếu có ảnh, set nó dưới dạng base64
-        if (product.imageContentType && product.imageData) {
-          setImage(`data:${product.imageContentType};base64,${product.imageData}`);
-        }
+
       }, {}, formData); // Gửi FormData trong body của yêu cầu
     }
   }, [id]);
@@ -206,20 +204,21 @@ const ProductForm = () => {
                     style={{
                       width: "100%",
                       height: "100%",
-                      objectFit: "cover",
+                      objectFit: "contain",
                     }}
                   />
                 ) : (
                   // If it's an existing image URL (from the product data), display that
                   <img
-                    src={image}
-                    alt="Product Preview"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
+                  src={image}
+                  alt="Product Preview"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain", // Đảm bảo ảnh vừa vặn với chiều cao và chiều rộng
+                  }}
+                />
+                
                 )
               ) : (
                 <Typography variant="body2" sx={{ color: "grey" }}>

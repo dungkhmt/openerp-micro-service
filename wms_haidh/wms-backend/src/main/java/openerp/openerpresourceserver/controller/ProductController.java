@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -36,8 +39,15 @@ public class ProductController {
     private ProductCategoryService productCategoryService;
 
     @GetMapping
-    public ResponseEntity<List<ProductInfoProjection>> getProductGeneral() {
-        return ResponseEntity.ok(productService.getAllProductGeneral());
+    public ResponseEntity<Page<ProductInfoProjection>> getProductInfoWithPaging(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(value = "search", required = false) String search) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ProductInfoProjection> products = productService.getAllProductGeneral(search,pageable);
+
+        return ResponseEntity.ok(products);
     }
     
     @PostMapping("/create-product")
