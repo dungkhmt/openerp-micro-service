@@ -11,10 +11,33 @@ import openerp.openerpresourceserver.domain.model.PageWrapper;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.DepartmentEntity;
 import openerp.openerpresourceserver.infrastructure.output.persistence.repository.DepartmentRepo;
+import openerp.openerpresourceserver.infrastructure.output.persistence.specification.DepartmentSpecification;
+import openerp.openerpresourceserver.infrastructure.output.persistence.utils.PageableUtils;
+
+import java.util.Collection;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class DepartmentAdapter implements IDepartmentPort {
     private final DepartmentRepo departmentRepo;
+
+    @Override
+    public DepartmentModel findByCode(String code) {
+        return toModel(
+                departmentRepo.findById(code).orElseThrow(
+                        () -> new ApplicationException(
+                                ResponseCode.DEPARTMENT_NOT_EXISTED,
+                                String.format("Department not existed by code: %s", code)
+                        )
+                )
+        );
+    }
+
+    @Override
+    public List<DepartmentModel> findByCodeIn(List<String> codes) {
+        return toModels(departmentRepo.findByDepartmentCodeIn(codes));
+    }
+
 
     @Override
     public void createDepartment(DepartmentModel department) {
@@ -37,15 +60,27 @@ public class DepartmentAdapter implements IDepartmentPort {
                                 String.format("Department not exist with code: %s", department.getDepartmentCode())
                         )
                 );
-        departmentEntity.setDepartmentName(department.getDepartmentName());
-        departmentEntity.setDescription(department.getDescription());
-        departmentEntity.setStatus(department.getStatus());
+        if(department.getDepartmentName() != null){
+            departmentEntity.setDepartmentName(department.getDepartmentName());
+        }
+        if(department.getDescription() != null){
+            departmentEntity.setDescription(department.getDescription());
+        }
+        if(department.getDepartmentCode() != null){
+            departmentEntity.setDepartmentCode(department.getDepartmentCode());
+        }
         departmentRepo.save(departmentEntity);
     }
 
     @Override
     public PageWrapper<DepartmentModel> getDepartment(IDepartmentFilter filter, IPageableRequest request) {
-        return null;
+        var pageable = PageableUtils.getPageable(request);
+        var spec = new DepartmentSpecification(filter);
+        var page = departmentRepo.findAll(spec ,pageable);
+        return PageWrapper.<DepartmentModel>builder()
+                .pageInfo(PageableUtils.getPageInfo(page))
+                .pageContent(toModels(page.getContent()))
+                .build();
     }
 
 
@@ -56,6 +91,12 @@ public class DepartmentAdapter implements IDepartmentPort {
                 .description(department.getDescription())
                 .status(department.getStatus())
                 .build();
+    }
+
+    private List<DepartmentModel> toModels(Collection<DepartmentEntity> departments) {
+        return departments.stream()
+                .map(this::toModel)
+                .toList();
     }
 
     private void validateCreateDepartment(DepartmentModel department) {

@@ -19,21 +19,4 @@ public class StaffDepartmentEntity extends AuditEntity{
 
     @Column(name = "thru_date")
     private LocalDate thruDate;
-
-/*
- TODO [Reverse Engineering] create field to map the 'user_id' column
- Available actions: Uncomment as is | Remove column mapping
-    @MapsId
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User userId;
-*/
-/*
- TODO [Reverse Engineering] create field to map the 'department_code' column
- Available actions: Uncomment as is | Remove column mapping
-    @MapsId
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "department_code", nullable = false)
-    private HrDepartment departmentCode;
-*/
 }

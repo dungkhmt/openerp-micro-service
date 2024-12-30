@@ -15,12 +15,13 @@ import openerp.openerpresourceserver.domain.model.DepartmentModel;
 public class CreateDepartment implements UseCase {
     private String departmentName;
     private String description;
+    private DepartmentStatus status;
 
     public DepartmentModel toModel() {
         return DepartmentModel.builder()
                 .departmentName(departmentName)
                 .description(description)
-                .status(DepartmentStatus.ACTIVE)
+                .status(status == null ? DepartmentStatus.ACTIVE : status)
                 .build();
     }
 }

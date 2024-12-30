@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.infrastructure.output.persistence.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import openerp.openerpresourceserver.constant.CheckpointPeriodStatus;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.util.UUID;
@@ -30,7 +31,8 @@ public class CheckpointPeriodEntity extends AuditEntity{
     @Column(name = "created_by_user_id", length = 60)
     private String createdByUserId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 100)
-    private String status;
+    private CheckpointPeriodStatus status;
 
 }

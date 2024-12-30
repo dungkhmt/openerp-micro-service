@@ -15,7 +15,7 @@ import openerp.openerpresourceserver.domain.common.usecase.VoidUseCaseHandler;
 public class UpdateJobPositionUseCaseHandler extends ObservableUseCasePublisher
         implements VoidUseCaseHandler<UpdateJobPosition>
 {
-    private final IJobPositionPort departmentPort;
+    private final IJobPositionPort jobPositionPort;
     private final JobPositionValidator validator;
 
     @Override
@@ -29,6 +29,6 @@ public class UpdateJobPositionUseCaseHandler extends ObservableUseCasePublisher
             validator.validateJobName(useCase.getName());
         }
         var model = useCase.toModel();
-        departmentPort.updateJobPosition(model);
+        jobPositionPort.updateJobPosition(model);
     }
 }

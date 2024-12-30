@@ -1,11 +1,9 @@
 package openerp.openerpresourceserver.infrastructure.output.persistence.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import openerp.openerpresourceserver.constant.CheckpointConfigureStatus;
 
 @Getter
 @Setter
@@ -16,10 +14,14 @@ public class CheckpointConfigureEntity extends AuditEntity{
     @Column(name = "checkpoint_code", nullable = false, length = 100)
     private String checkpointCode;
 
-    @Column(name = "description", length = Integer.MAX_VALUE)
+    @Lob
+    @Column(name = "description")
     private String description;
 
-    @Column(name = "status", length = 100)
-    private String status;
+    @Column(name = "name", length = 100, nullable = false)
+    private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 100)
+    private CheckpointConfigureStatus status;
 }

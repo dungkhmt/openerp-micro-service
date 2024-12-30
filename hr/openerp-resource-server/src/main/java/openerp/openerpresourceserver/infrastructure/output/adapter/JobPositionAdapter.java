@@ -10,10 +10,32 @@ import openerp.openerpresourceserver.domain.model.PageWrapper;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.JobPositionEntity;
 import openerp.openerpresourceserver.infrastructure.output.persistence.repository.JobPositionRepo;
+import openerp.openerpresourceserver.infrastructure.output.persistence.specification.JobPositionSpecification;
+import openerp.openerpresourceserver.infrastructure.output.persistence.utils.PageableUtils;
+
+import java.util.Collection;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class JobPositionAdapter implements IJobPositionPort {
     private final JobPositionRepo jobPositionRepo;
+
+    @Override
+    public JobPositionModel findByCode(String code) {
+        return toModel(
+                jobPositionRepo.findById(code).orElseThrow(
+                        () -> new ApplicationException(
+                                ResponseCode.JOB_POSITION_NOT_EXISTED,
+                                String.format("JobPosition not existed by code: %s", code)
+                        )
+                )
+        );
+    }
+
+    @Override
+    public List<JobPositionModel> findByCodeIn(List<String> codes) {
+        return toModels(jobPositionRepo.findByPositionCodeIn(codes));
+    }
 
     @Override
     public void createJobPosition(JobPositionModel jobPosition) {
@@ -35,14 +57,24 @@ public class JobPositionAdapter implements IJobPositionPort {
                                 String.format("JobPosition not exist with code: %s", jobPosition.getCode())
                         )
                 );
-        jobPositionEntity.setPositionName(jobPosition.getName());
-        jobPositionEntity.setDescription(jobPosition.getDescription());
+        if(jobPosition.getName() != null){
+            jobPositionEntity.setPositionName(jobPosition.getName());
+        }
+        if(jobPosition.getDescription() != null){
+            jobPositionEntity.setDescription(jobPosition.getDescription());
+        }
         jobPositionRepo.save(jobPositionEntity);
     }
 
     @Override
     public PageWrapper<JobPositionModel> getJobPosition(IJobPositionFilter filter, IPageableRequest request) {
-        return null;
+        var pageable = PageableUtils.getPageable(request);
+        var spec = new JobPositionSpecification(filter);
+        var page = jobPositionRepo.findAll(spec ,pageable);
+        return PageWrapper.<JobPositionModel>builder()
+                .pageInfo(PageableUtils.getPageInfo(page))
+                .pageContent(toModels(page.getContent()))
+                .build();
     }
 
 
@@ -52,6 +84,12 @@ public class JobPositionAdapter implements IJobPositionPort {
                 .name(jobPosition.getPositionName())
                 .description(jobPosition.getDescription())
                 .build();
+    }
+
+    private List<JobPositionModel> toModels(Collection<JobPositionEntity> departments) {
+        return departments.stream()
+                .map(this::toModel)
+                .toList();
     }
 
     private void validateCreateJobPosition(JobPositionModel jobPosition) {

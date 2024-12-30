@@ -1,11 +1,9 @@
 package openerp.openerpresourceserver.infrastructure.output.persistence.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import openerp.openerpresourceserver.constant.CheckpointPeriodConfigureStatus;
 
 import java.math.BigDecimal;
 
@@ -20,24 +18,7 @@ public class CheckpointPeriodConfigureEntity extends AuditEntity{
     @Column(name = "coefficient")
     private BigDecimal coefficient;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 100)
-    private String status;
-
-
-/*
- TODO [Reverse Engineering] create field to map the 'checkpoint_code' column
- Available actions: Uncomment as is | Remove column mapping
-    @MapsId
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "checkpoint_code", nullable = false)
-    private HrCheckpointConfigure checkpointCode;
-*/
-/*
- TODO [Reverse Engineering] create field to map the 'checkpoint_period_id' column
- Available actions: Uncomment as is | Remove column mapping
-    @MapsId
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "checkpoint_period_id", nullable = false)
-    private HrCheckpointPeriod checkpointPeriodId;
-*/
+    private CheckpointPeriodConfigureStatus status;
 }

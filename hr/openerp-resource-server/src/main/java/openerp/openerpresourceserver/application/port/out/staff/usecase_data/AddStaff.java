@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import openerp.openerpresourceserver.constant.StaffStatus;
 import openerp.openerpresourceserver.domain.common.model.UseCase;
 import openerp.openerpresourceserver.domain.model.StaffModel;
 
@@ -18,6 +19,7 @@ public class AddStaff implements UseCase {
     private String userLoginId;
     private String email;
     private String staffCode;
+    private StaffStatus staffStatus;
 
     public StaffModel toModel(){
         return StaffModel.builder()
@@ -25,6 +27,7 @@ public class AddStaff implements UseCase {
                 .userLoginId(userLoginId)
                 .email(email)
                 .staffCode(staffCode)
+                .status(staffStatus == null ? StaffStatus.ACTIVE : staffStatus)
                 .build();
     }
 }

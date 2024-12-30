@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/openerp-resource-server/src/main/java/openerp/openerpresourceserver/infrastructure/output/persistence/repository/StaffDepartmentRepo.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/openerp-resource-server/src/main/java/openerp/openerpresourceserver/infrastructure/output/persistence/repository/StaffJobPositionRepo.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/openerp-resource-server/src/main/java/openerp/openerpresourceserver/infrastructure/output/persistence/repository/StaffSalaryRepo.java" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/openerp-resource-server/src/main/resources/sql/00001.add_missing_contraint.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/openerp-resource-server/src/main/resources/sql/init.sql" dialect="PostgreSQL" />
   </component>

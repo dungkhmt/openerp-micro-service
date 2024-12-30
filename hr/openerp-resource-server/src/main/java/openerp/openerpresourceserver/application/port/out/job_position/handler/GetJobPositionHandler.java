@@ -16,7 +16,7 @@ import openerp.openerpresourceserver.domain.model.PageWrapper;
 public class GetJobPositionHandler extends ObservableUseCasePublisher
         implements PageWrapperUseCaseHandler<JobPositionModel, GetJobPosition>
 {
-    private final IJobPositionPort departmentPort;
+    private final IJobPositionPort jobPositionPort;
 
     @Override
     public void init() {
@@ -25,6 +25,6 @@ public class GetJobPositionHandler extends ObservableUseCasePublisher
 
     @Override
     public PageWrapper<JobPositionModel> handle(GetJobPosition useCase) {
-        return departmentPort.getJobPosition(useCase, useCase.getPageableRequest());
+        return jobPositionPort.getJobPosition(useCase, useCase.getPageableRequest());
     }
 }

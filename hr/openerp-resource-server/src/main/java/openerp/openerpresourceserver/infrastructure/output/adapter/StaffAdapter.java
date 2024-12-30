@@ -52,7 +52,7 @@ public class StaffAdapter implements IStaffPort {
         staffEntity.setStaffCode(staff.getStaffCode());
         staffEntity.setFullname(staff.getFullname());
         staffEntity.setUser(user);
-        staffEntity.setStatus(StaffStatus.ACTIVE);
+        staffEntity.setStatus(staff.getStatus());
         return toModel(staffRepo.save(staffEntity));
     }
 

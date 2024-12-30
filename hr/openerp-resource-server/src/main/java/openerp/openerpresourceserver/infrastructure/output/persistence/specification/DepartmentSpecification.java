@@ -9,6 +9,7 @@ import openerp.openerpresourceserver.infrastructure.output.persistence.entity.St
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class DepartmentSpecification implements Specification<DepartmentEntity> {
@@ -16,22 +17,30 @@ public class DepartmentSpecification implements Specification<DepartmentEntity> 
 
     @Override
     public Predicate toPredicate(Root<DepartmentEntity> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        var predicates = new ArrayList<Predicate>();
+        List<Predicate> predicates = new ArrayList<>();
 
-        if(filter.getDepartmentCode() != null){
-            Predicate codePredicate = cb.like(cb.lower(root.get("department_code")),
+        List<Predicate> orPredicates = new ArrayList<>();
+        if (filter.getDepartmentCode() != null) {
+            Predicate codePredicate = cb.like(cb.lower(root.get("departmentCode")),
                     "%" + filter.getDepartmentCode().toLowerCase() + "%");
-            predicates.add(codePredicate);
+            orPredicates.add(codePredicate);
         }
-        if (filter.getDepartmentName() != null){
-            Predicate namePredicate = cb.like(cb.lower(root.get("department_name")),
+        if (filter.getDepartmentName() != null) {
+            Predicate namePredicate = cb.like(cb.lower(root.get("departmentName")),
                     "%" + filter.getDepartmentName().toLowerCase() + "%");
-            predicates.add(namePredicate);
-        }
-        if (filter.getStatus() != null) {
-            predicates.add(cb.equal(root.get("status"), filter.getStatus()));
+            orPredicates.add(namePredicate);
         }
 
-        return cb.or(predicates.toArray(new Predicate[0]));
+        if (!orPredicates.isEmpty()) {
+            predicates.add(cb.or(orPredicates.toArray(new Predicate[0])));
+        }
+
+        if (filter.getStatus() != null) {
+            Predicate statusPredicate = cb.equal(root.get("status"), filter.getStatus());
+            predicates.add(statusPredicate);
+        }
+
+        return cb.and(predicates.toArray(new Predicate[0]));
     }
+
 }

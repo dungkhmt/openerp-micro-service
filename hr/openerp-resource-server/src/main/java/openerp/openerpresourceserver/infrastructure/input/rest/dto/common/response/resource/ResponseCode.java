@@ -39,6 +39,10 @@ public enum ResponseCode {
     JOB_POSITION_CODE_EXISTED(1021L, "job position code existed"),
     JOB_POSITION_NAME_EXISTED(1022L, "job position name existed"),
     JOB_POSITION_NOT_EXISTED(1023L, "job position not existed"),
+    ASSIGN_JOB_POSITION_EXCEPTION(1024L, "assign job position exception"),
+    STAFF_SALARY_NOT_EXISTED(1025L, "staff salary not existed"),
+    CHECKPOINT_CONFIGURE_NOT_EXISTED(1026L, "checkpoint configure not existed"),
+    CHECKPOINT_PERIOD_NOT_EXISTED(1027L, "checkpoint period not existed"),
     ;
     private final long code;
     private final String message;

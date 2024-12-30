@@ -1,11 +1,9 @@
 package openerp.openerpresourceserver.infrastructure.output.persistence.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import openerp.openerpresourceserver.constant.SalaryType;
 
 import java.time.LocalDate;
 
@@ -23,4 +21,7 @@ public class StaffSalaryEntity extends AuditEntity {
     @Column(name = "salary")
     private Integer salary;
 
+    @Column(name = "salary_type")
+    @Enumerated(EnumType.STRING)
+    private SalaryType salaryType;
 }
