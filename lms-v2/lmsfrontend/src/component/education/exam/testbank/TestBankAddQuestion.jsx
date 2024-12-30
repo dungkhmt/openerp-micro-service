@@ -12,6 +12,7 @@ import {DataGrid} from "@material-ui/data-grid";
 import InfoIcon from "@mui/icons-material/Info";
 import QuestionBankDetails from "../questionbank/QuestionBankDetails";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 const baseColumn = {
   sortable: false,
@@ -68,6 +69,54 @@ function TestBankAddQuestion(props) {
     },
   ];
 
+  const columnsSelected = [
+    {
+      field: "code",
+      headerName: "Mã câu hỏi",
+      minWidth: 170,
+      ...baseColumn
+    },
+    {
+      field: "content",
+      headerName: "Nội dung câu hỏi",
+      ...baseColumn,
+      flex: 1,
+      renderCell: (rowData) => {
+        return parser(rowData.value)
+      }
+    },
+    {
+      field: "type",
+      headerName: "Loại câu hỏi",
+      ...baseColumn,
+      minWidth: 170,
+      renderCell: (rowData) => {
+        if(rowData.value === 0){
+          return 'Trắc nghiệm'
+        }else if(rowData.value === 1){
+          return 'Tự luận'
+        }else{
+          return 'Tất cả'
+        }
+      },
+    },
+    {
+      field: "",
+      headerName: "",
+      sortable: false,
+      minWidth: 50,
+      maxWidth: 50,
+      renderCell: (rowData) => {
+        return (
+          <Box display="flex" justifyContent="space-between" alignItems='center' width="100%">
+            <InfoIcon style={{cursor: 'pointer'}} onClick={(data) => handleDetailsQuestion(rowData?.row)}/>
+            <DeleteIcon style={{cursor: 'pointer', color: 'red'}} onClick={(data) => handleDeleteQuestionSelected(rowData?.row)}/>
+          </Box>
+        )
+      }
+    },
+  ];
+
   const questionTypes = [
     {
       value: 'all',
@@ -83,7 +132,7 @@ function TestBankAddQuestion(props) {
     }
   ]
 
-  const { open, setOpen} = props;
+  const { open, setOpen, onSubmit} = props;
 
   const [questionList, setQuestionList] = useState([])
   const [questionSelectionList, setQuestionSelectionList] = useState([])
@@ -159,9 +208,15 @@ function TestBankAddQuestion(props) {
     setQuestionSelectionList([])
   }
 
-  useEffect(() => {
-    console.log('questionSelectedList',questionSelectedList)
-  }, [questionSelectedList]);
+  const handleDeleteQuestionSelected = (data) => {
+    let tmpQuestionSelectedList = questionSelectedList.filter(item => item.id !== data.id);
+    setQuestionSelectedList(tmpQuestionSelectedList)
+  }
+
+  const handleAdd = () => {
+    onSubmit(questionSelectedList)
+    closeDialog()
+  }
 
   return (
     <div>
@@ -250,7 +305,7 @@ function TestBankAddQuestion(props) {
             <CardContent>
               <DataGrid
                 rows={questionSelectedList}
-                columns={columns}
+                columns={columnsSelected}
                 disableColumnMenu
                 autoHeight
               />
@@ -268,8 +323,9 @@ function TestBankAddQuestion(props) {
             <Button
               variant="contained"
               color="primary"
+              disabled={questionSelectedList.length < 1}
               style={{marginLeft: "15px"}}
-              // onClick={deleteQuestion}
+              onClick={handleAdd}
             >
               Lưu
             </Button>

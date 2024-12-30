@@ -16,6 +16,7 @@ import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
 import {DatePicker} from "@mui/x-date-pickers";
 import {vi} from "date-fns/locale";
+import parser from "html-react-parser";
 
 const baseColumn = {
   sortable: false,
@@ -42,7 +43,10 @@ function TestBank(props) {
       field: "description",
       headerName: "Mô tả",
       ...baseColumn,
-      flex: 1
+      flex: 1,
+      renderCell: (rowData) => {
+        return parser(rowData.value)
+      },
     },
     {
       field: "createdAt",

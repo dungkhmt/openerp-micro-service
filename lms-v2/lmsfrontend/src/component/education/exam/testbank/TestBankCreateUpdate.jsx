@@ -127,6 +127,10 @@ function TestBankCreateUpdate(props) {
     setFilePreview(getFilePathFromString(data))
   };
 
+  const handleAddQuestionSubmit = (data) => {
+    setQuestions(questions.concat(data))
+  };
+
   return (
     <div>
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -221,6 +225,7 @@ function TestBankCreateUpdate(props) {
           <TestBankAddQuestion
             open={openAddQuestionDialog}
             setOpen={setOpenAddQuestionDialog}
+            onSubmit={handleAddQuestionSubmit}
           ></TestBankAddQuestion>
         </Card>
       </MuiPickersUtilsProvider>

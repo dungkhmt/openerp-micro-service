@@ -12,7 +12,7 @@ function TestBankQuestionList(props) {
       {
         props?.items.map((value, index) => {
           return (
-            <TestBankQuestionItem  key={`item-${index}`} index={index} value={value} />
+            <TestBankQuestionItem  key={`item-${index}`} index={index} id={index} value={value} />
           )
         })
       }
