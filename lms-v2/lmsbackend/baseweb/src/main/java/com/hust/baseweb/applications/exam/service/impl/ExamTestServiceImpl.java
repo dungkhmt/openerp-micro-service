@@ -2,12 +2,14 @@ package com.hust.baseweb.applications.exam.service.impl;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hust.baseweb.applications.exam.entity.ExamEntity;
 import com.hust.baseweb.applications.exam.entity.ExamTestEntity;
 import com.hust.baseweb.applications.exam.entity.ExamTestQuestionEntity;
 import com.hust.baseweb.applications.exam.model.ResponseData;
 import com.hust.baseweb.applications.exam.model.request.*;
 import com.hust.baseweb.applications.exam.model.response.ExamTestDetailsRes;
 import com.hust.baseweb.applications.exam.model.response.ExamTestQuestionDetailsRes;
+import com.hust.baseweb.applications.exam.repository.ExamRepository;
 import com.hust.baseweb.applications.exam.repository.ExamTestQuestionRepository;
 import com.hust.baseweb.applications.exam.repository.ExamTestRepository;
 import com.hust.baseweb.applications.exam.service.ExamTestService;
@@ -36,6 +38,7 @@ import java.util.*;
 @Slf4j
 public class ExamTestServiceImpl implements ExamTestService {
 
+    private final ExamRepository examRepository;
     private final ExamTestRepository examTestRepository;
     private final ExamTestQuestionRepository examTestQuestionRepository;
     private final EntityManager entityManager;
@@ -210,6 +213,15 @@ public class ExamTestServiceImpl implements ExamTestService {
             responseData.setResultMsg("Chưa tồn tại đề thi");
             return responseData;
         }
+
+        List<ExamEntity> examEntityList = examRepository.findALlByExamTestId(examTestDeleteReq.getId());
+        if(!examEntityList.isEmpty()){
+            responseData.setHttpStatus(HttpStatus.NOT_FOUND);
+            responseData.setResultCode(HttpStatus.NOT_FOUND.value());
+            responseData.setResultMsg("Đề thi đã được gán cho bài thi, không được xoá");
+            return responseData;
+        }
+
         List<ExamTestQuestionEntity> testQuestionEntityList = examTestQuestionRepository.findAllByExamTestId(examTestDeleteReq.getId());
         examTestQuestionRepository.deleteAll(testQuestionEntityList);
         examTestRepository.delete(examTestExist.get());
