@@ -51,6 +51,10 @@ function TestBankCreateUpdate(props) {
   const data = location.state?.data
   const isCreate = location.state?.isCreate
 
+  if(isCreate === undefined){
+    window.location.href = '/exam/test-bank';
+  }
+
   const [code, setCode] = useState(data?.code);
   const [name, setName] = useState(data?.name);
   const [description, setDescription] = useState(data?.description);

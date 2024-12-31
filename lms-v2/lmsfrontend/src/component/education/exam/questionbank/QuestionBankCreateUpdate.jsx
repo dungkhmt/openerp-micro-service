@@ -93,6 +93,10 @@ function QuestionBankCreateUpdate(props) {
   const question = location.state?.question
   const isCreate = location.state?.isCreate
 
+  if(isCreate === undefined){
+    window.location.href = '/exam/question-bank';
+  }
+
   const [code, setCode] = useState(question?.code);
   const [type, setType] = useState(question?.type);
   const [content, setContent] = useState(question?.content);
