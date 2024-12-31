@@ -12,8 +12,6 @@ import openerp.openerpresourceserver.constant.DepartmentStatus;
 public class DepartmentEntity extends AuditEntity{
     @Id
     @Column(name = "department_code", nullable = false, length = 100)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "dept_seq_gen")
-    @SequenceGenerator(name = "dept_seq_gen", sequenceName = "hr_dept_sequence", allocationSize = 1)
     private String departmentCode;
 
     @Column(name = "department_name", length = 200)

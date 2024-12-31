@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.infrastructure.input.rest.controller;
 
+import jakarta.validation.Valid;
 import openerp.openerpresourceserver.domain.common.usecase.BeanAwareUseCasePublisher;
 import openerp.openerpresourceserver.domain.model.StaffModel;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.Resource;
@@ -14,11 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/v1/")
+@RequestMapping("/staff/")
 public class StaffController extends BeanAwareUseCasePublisher {
-    @PostMapping("add_staff")
+    @PostMapping("add-staff")
     public ResponseEntity<?> addStaff(
-            @RequestBody AddStaffRequest staff
+            @Valid @RequestBody AddStaffRequest staff
     ){
         publish(staff.toUseCase());
         return ResponseEntity.ok().body(
@@ -26,9 +27,9 @@ public class StaffController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("edit_staff")
+    @PostMapping("edit-staff")
     public ResponseEntity<?> editStaff(
-            @RequestBody EditStaffRequest staff
+            @Valid @RequestBody EditStaffRequest staff
     ){
         publish(staff.toUseCase());
         return ResponseEntity.ok().body(
@@ -36,9 +37,9 @@ public class StaffController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("search_staff")
+    @PostMapping("search-staff")
     public ResponseEntity<?> searchStaff(
-            @RequestBody SearchStaffRequest staff
+            @Valid @RequestBody SearchStaffRequest staff
     ){
         var staffPage = publishPageWrapper(StaffModel.class, staff.toUseCase());
         var responsePage = staffPage.convert(StaffResponse::fromModel);

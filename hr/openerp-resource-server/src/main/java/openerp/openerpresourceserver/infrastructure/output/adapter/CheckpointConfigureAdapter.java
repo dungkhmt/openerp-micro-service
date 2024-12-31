@@ -12,11 +12,13 @@ import openerp.openerpresourceserver.infrastructure.output.persistence.entity.Ch
 import openerp.openerpresourceserver.infrastructure.output.persistence.repository.CheckpointConfigureRepo;
 import openerp.openerpresourceserver.infrastructure.output.persistence.specification.CheckpointConfigureSpecification;
 import openerp.openerpresourceserver.infrastructure.output.persistence.utils.PageableUtils;
+import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Service
 public class CheckpointConfigureAdapter implements ICheckpointConfigurePort {
     private final CheckpointConfigureRepo checkpointConfigureRepo;
 

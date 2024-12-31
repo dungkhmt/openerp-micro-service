@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.infrastructure.input.rest.controller;
 
+import jakarta.validation.Valid;
 import openerp.openerpresourceserver.domain.common.usecase.BeanAwareUseCasePublisher;
 import openerp.openerpresourceserver.domain.model.JobPositionModel;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.Resource;
@@ -14,11 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/v1/")
+@RequestMapping("/job/")
 public class JobPositionController extends BeanAwareUseCasePublisher {
-    @PostMapping("create_jobPosition")
+    @PostMapping("create-job-position")
     public ResponseEntity<?> createJobPosition(
-            @RequestBody CreateJobPositionRequest request
+            @Valid @RequestBody CreateJobPositionRequest request
     ){
         publish(request.toUseCase());
         return ResponseEntity.ok().body(
@@ -26,9 +27,9 @@ public class JobPositionController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("update_jobPosition")
+    @PostMapping("update-job-position")
     public ResponseEntity<?> updateJobPosition(
-            @RequestBody UpdateJobPositionRequest request
+            @Valid @RequestBody UpdateJobPositionRequest request
     ){
         publish(request.toUseCase());
         return ResponseEntity.ok().body(
@@ -36,9 +37,9 @@ public class JobPositionController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("get_jobPosition")
+    @PostMapping("get-job-position")
     public ResponseEntity<?> getJobPosition(
-            @RequestBody GetJobPositionRequest request
+            @Valid @RequestBody GetJobPositionRequest request
     ){
         var modelPage = publishPageWrapper(JobPositionModel.class, request.toUseCase());
         var responsePage = modelPage.convert(JobPositionResponse::fromModel);

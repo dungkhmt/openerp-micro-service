@@ -18,10 +18,12 @@ import openerp.openerpresourceserver.infrastructure.output.persistence.repositor
 import openerp.openerpresourceserver.infrastructure.output.persistence.repository.UserRepo;
 import openerp.openerpresourceserver.infrastructure.output.persistence.specification.StaffInfoSpecification;
 import openerp.openerpresourceserver.infrastructure.output.persistence.utils.PageableUtils;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @RequiredArgsConstructor
+@Service
 public class StaffAdapter implements IStaffPort {
     private final StaffRepo staffRepo;
     private final UserRepo userRepo;

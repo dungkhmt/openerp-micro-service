@@ -8,12 +8,14 @@ import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.respon
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.StaffDepartmentEntity;
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.StaffDepartmentId;
 import openerp.openerpresourceserver.infrastructure.output.persistence.repository.StaffDepartmentRepo;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Service
 public class StaffDepartmentAdapter implements IStaffDepartmentPort {
     private final StaffDepartmentRepo staffDepartmentRepo;
 

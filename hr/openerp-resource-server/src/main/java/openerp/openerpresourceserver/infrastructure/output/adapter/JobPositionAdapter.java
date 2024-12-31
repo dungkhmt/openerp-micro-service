@@ -12,11 +12,13 @@ import openerp.openerpresourceserver.infrastructure.output.persistence.entity.Jo
 import openerp.openerpresourceserver.infrastructure.output.persistence.repository.JobPositionRepo;
 import openerp.openerpresourceserver.infrastructure.output.persistence.specification.JobPositionSpecification;
 import openerp.openerpresourceserver.infrastructure.output.persistence.utils.PageableUtils;
+import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Service
 public class JobPositionAdapter implements IJobPositionPort {
     private final JobPositionRepo jobPositionRepo;
 

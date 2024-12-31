@@ -12,12 +12,14 @@ import openerp.openerpresourceserver.infrastructure.output.persistence.entity.Ch
 import openerp.openerpresourceserver.infrastructure.output.persistence.repository.CheckpointPeriodRepo;
 import openerp.openerpresourceserver.infrastructure.output.persistence.specification.CheckpointPeriodSpecification;
 import openerp.openerpresourceserver.infrastructure.output.persistence.utils.PageableUtils;
+import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
+@Service
 public class CheckpointPeriodAdapter implements ICheckpointPeriodPort {
     private final CheckpointPeriodRepo checkpointPeriodRepo;
 

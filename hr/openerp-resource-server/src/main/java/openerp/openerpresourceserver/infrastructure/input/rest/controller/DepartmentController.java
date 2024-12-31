@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.infrastructure.input.rest.controller;
 
+import jakarta.validation.Valid;
 import openerp.openerpresourceserver.domain.common.usecase.BeanAwareUseCasePublisher;
 import openerp.openerpresourceserver.domain.model.DepartmentModel;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.Resource;
@@ -14,11 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/v1/")
+@RequestMapping("/department/")
 public class DepartmentController extends BeanAwareUseCasePublisher {
-    @PostMapping("create_department")
+    @PostMapping("create-department")
     public ResponseEntity<?> createDepartment(
-            @RequestBody CreateDepartmentRequest request
+            @Valid @RequestBody CreateDepartmentRequest request
     ){
         publish(request.toUseCase());
         return ResponseEntity.ok().body(
@@ -26,9 +27,9 @@ public class DepartmentController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("update_department")
+    @PostMapping("update-department")
     public ResponseEntity<?> updateDepartment(
-            @RequestBody UpdateDepartmentRequest request
+            @Valid @RequestBody UpdateDepartmentRequest request
     ){
         publish(request.toUseCase());
         return ResponseEntity.ok().body(
@@ -36,9 +37,9 @@ public class DepartmentController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("get_department")
+    @PostMapping("get-department")
     public ResponseEntity<?> getDepartment(
-            @RequestBody GetDepartmentRequest request
+            @Valid @RequestBody GetDepartmentRequest request
     ){
         var modelPage = publishPageWrapper(DepartmentModel.class, request.toUseCase());
         var responsePage = modelPage.convert(DepartmentResponse::fromModel);

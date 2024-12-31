@@ -1,6 +1,6 @@
 package openerp.openerpresourceserver.infrastructure.input.rest.controller;
 
-import openerp.openerpresourceserver.application.port.out.staff.usecase_data.ExampleUseCase;
+import openerp.openerpresourceserver.application.port.out.example.usecase_data.ExampleUseCase;
 import openerp.openerpresourceserver.domain.common.usecase.BeanAwareUseCasePublisher;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.Resource;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ public class ExampleController extends BeanAwareUseCasePublisher {
     public ResponseEntity<?> example(Principal principal){
         publish(new ExampleUseCase());
         return ResponseEntity.ok().body(
-                new Resource(null)
+                new Resource()
         );
     }
 }

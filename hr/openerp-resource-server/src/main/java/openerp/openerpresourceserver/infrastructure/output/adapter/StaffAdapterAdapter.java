@@ -8,12 +8,14 @@ import openerp.openerpresourceserver.infrastructure.output.persistence.entity.St
 import openerp.openerpresourceserver.infrastructure.output.persistence.repository.StaffSalaryRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Service
 public class StaffAdapterAdapter implements IStaffSalaryPort {
     private static final Logger log = LoggerFactory.getLogger(StaffAdapterAdapter.class);
     private final StaffSalaryRepo staffSalaryRepo;

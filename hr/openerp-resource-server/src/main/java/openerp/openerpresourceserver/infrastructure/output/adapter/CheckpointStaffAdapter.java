@@ -8,11 +8,13 @@ import openerp.openerpresourceserver.infrastructure.output.persistence.entity.Ch
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.CheckpointStaffId;
 import openerp.openerpresourceserver.infrastructure.output.persistence.repository.CheckpointStaffRepo;
 import openerp.openerpresourceserver.infrastructure.output.persistence.specification.CheckpointStaffSpecification;
+import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Service
 public class CheckpointStaffAdapter implements ICheckpointStaffPort {
     private final CheckpointStaffRepo checkpointStaffRepo;
 

@@ -8,12 +8,14 @@ import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.respon
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.StaffJobPositionEntity;
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.StaffJobPositionId;
 import openerp.openerpresourceserver.infrastructure.output.persistence.repository.StaffJobPositionRepo;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Service
 public class StaffJobPositionAdapter implements IStaffJobPositionPort {
     private final StaffJobPositionRepo staffJobPositionRepo;
 

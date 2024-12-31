@@ -13,11 +13,13 @@ import openerp.openerpresourceserver.infrastructure.output.persistence.entity.De
 import openerp.openerpresourceserver.infrastructure.output.persistence.repository.DepartmentRepo;
 import openerp.openerpresourceserver.infrastructure.output.persistence.specification.DepartmentSpecification;
 import openerp.openerpresourceserver.infrastructure.output.persistence.utils.PageableUtils;
+import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Service
 public class DepartmentAdapter implements IDepartmentPort {
     private final DepartmentRepo departmentRepo;
 
@@ -74,9 +76,9 @@ public class DepartmentAdapter implements IDepartmentPort {
 
     @Override
     public PageWrapper<DepartmentModel> getDepartment(IDepartmentFilter filter, IPageableRequest request) {
-        var pageable = PageableUtils.getPageable(request);
+        var pageable = PageableUtils.getPageable(request, "departmentCode");
         var spec = new DepartmentSpecification(filter);
-        var page = departmentRepo.findAll(spec ,pageable);
+        var page = departmentRepo.findAll(spec, pageable);
         return PageWrapper.<DepartmentModel>builder()
                 .pageInfo(PageableUtils.getPageInfo(page))
                 .pageContent(toModels(page.getContent()))

@@ -8,13 +8,11 @@ import openerp.openerpresourceserver.application.port.out.checkpoint_period_conf
 import openerp.openerpresourceserver.constant.CheckpointPeriodConfigureStatus;
 import openerp.openerpresourceserver.domain.common.model.UseCase;
 
-import java.util.UUID;
-
 @Data
 @Builder
 @Getter
 @Setter
 public class GetCheckpointPeriodConfigure implements ICheckpointPeriodConfigureFilter, UseCase {
-    private UUID periodId;
+    private String periodId;
     private CheckpointPeriodConfigureStatus status;
 }

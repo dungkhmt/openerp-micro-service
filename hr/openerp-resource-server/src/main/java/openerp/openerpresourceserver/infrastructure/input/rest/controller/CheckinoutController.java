@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.infrastructure.input.rest.controller;
 
+import jakarta.validation.Valid;
 import openerp.openerpresourceserver.application.port.out.checkinout.usecase_data.Checkinout;
 import openerp.openerpresourceserver.domain.common.usecase.BeanAwareUseCasePublisher;
 import openerp.openerpresourceserver.domain.model.AttendanceModel;
@@ -29,9 +30,9 @@ public class CheckinoutController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("get_checkinout")
+    @PostMapping("get-checkinout")
     public ResponseEntity<?> getCheckinout(
-            @RequestBody GetCheckinoutRequest request
+            @Valid @RequestBody GetCheckinoutRequest request
     ){
         var models = publishCollection(CheckinoutModel.class, request.toUseCase());
         return ResponseEntity.ok().body(
@@ -39,9 +40,9 @@ public class CheckinoutController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("month_attendance")
+    @PostMapping("month-attendance")
     public ResponseEntity<?> getMonthAttendance(
-            @RequestBody MonthAttendanceRequest request
+            @Valid @RequestBody MonthAttendanceRequest request
     ){
         var models = publishCollection(AttendanceModel.class, request.toUseCase());
         return ResponseEntity.ok().body(

@@ -1,9 +1,6 @@
 package openerp.openerpresourceserver.application.port.out.example.usecase_data;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import openerp.openerpresourceserver.domain.common.model.UseCase;
 import openerp.openerpresourceserver.domain.model.ExampleModel;
 
@@ -11,6 +8,7 @@ import openerp.openerpresourceserver.domain.model.ExampleModel;
 @Builder
 @Getter
 @Setter
+@NoArgsConstructor
 public class ExampleUseCase implements UseCase {
     public ExampleModel toModel() {
         return ExampleModel.builder()
