@@ -59,15 +59,30 @@ function TestBankCreateUpdate(props) {
   const [openFilePreviewDialog, setOpenFilePreviewDialog] = useState(false);
   const [filePreview, setFilePreview] = useState(null);
   const [openAddQuestionDialog, setOpenAddQuestionDialog] = useState(false);
+  const [questionDelete, setQuestionDelete] = useState(null)
+
+  useEffect(() => {
+    let tmpQuestions = questions.filter(item => item.id !== questionDelete.id);
+    setQuestions(tmpQuestions)
+  }, [questionDelete]);
 
   const handleSave = () =>{
+    let examTestQuestionSaveReqList = []
+    for(let i=0;i<questions.length;i++){
+      examTestQuestionSaveReqList.push({
+        examQuestionId: questions[i].id,
+        order: i+1
+      })
+    }
     const body = {
       code: code,
       name:  name,
       description:  description,
-      examTestQuestionSaveReqList: questions
+      examTestQuestionSaveReqList: examTestQuestionSaveReqList
     }
     validateBody(body)
+
+    console.log('body',body)
 
     setIsLoading(true)
     request(
@@ -100,7 +115,7 @@ function TestBankCreateUpdate(props) {
       toast.error('Tên đề thi không được bỏ trống')
       return
     }
-    if(body.questions.length < 1){
+    if(body.examTestQuestionSaveReqList.length < 1){
       toast.error('Đề thi phải có ít nhất 1 câu hỏi')
       return
     }
@@ -189,7 +204,10 @@ function TestBankCreateUpdate(props) {
 
                 <Box display="flex" flexDirection="column" width="100%">
                   <Typography variant="h6">Nội dung</Typography>
-                  <TestBankQuestionList items={questions} onSortEnd={onSortEnd}/>
+                  <TestBankQuestionList
+                    items={questions}
+                    onSortEnd={onSortEnd}
+                    setQuestionDelete={setQuestionDelete}/>
 
                   <Button
                     variant="contained"

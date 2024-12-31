@@ -10,6 +10,8 @@ import QuestionBankDetails from "../questionbank/QuestionBankDetails";
 
 function TestBankQuestionItem(props) {
 
+  const {id, value, setQuestionDelete } = props
+
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 
   const handleDetailsQuestion = () => {
@@ -17,9 +19,7 @@ function TestBankQuestionItem(props) {
   };
 
   const handleDeleteQuestionSelected = () => {
-    // let tmpQuestionSelectedList = questionSelectedList.filter(item => item.id !== data.id);
-    // setQuestionSelectedList(tmpQuestionSelectedList)
-    console.log('props.value',props.value)
+    setQuestionDelete(value)
   }
 
   return (
@@ -32,13 +32,59 @@ function TestBankQuestionItem(props) {
       marginBottom: '10px'}}>
       <Box display="flex" flexDirection='column' width="calc(100% - 110px)" style={{cursor: 'pointer'}}>
         <div style={{display: 'flex'}}>
-          <span style={{display: "block", fontWeight: 'bold', marginRight: '5px'}}>Câu {props.id + 1}.</span>
-          <span style={{fontStyle: 'italic'}}>({props.value.questionType === 0 ? 'Trắc nghiệm' : 'Tự luận'})</span>
+          <span style={{display: "block", fontWeight: 'bold', marginRight: '5px'}}>Câu {id + 1}.</span>
+          <span style={{fontStyle: 'italic'}}>({value.type === 0 ? 'Trắc nghiệm' : 'Tự luận'})</span>
         </div>
-        <p>{parser(props.value.content)}</p>
+        <p>{parser(value.content)}</p>
+        {
+          value.type === 0 &&
+            (<Box display="flex" flexDirection='column'>
+              <div style={{display: "flex", alignItems: "center"}}>
+                <span style={{marginRight: "5px"}}>1.</span>
+                <span>{parser(value.contentAnswer1)}</span>
+              </div>
+              {
+                value.numberAnswer >= 2 && (
+                  <div style={{display: "flex", alignItems: "center"}}>
+                    <span style={{marginRight: "5px"}}>2.</span>
+                    <span>{parser(value.contentAnswer2)}</span>
+                  </div>
+                )
+              }
+              {
+                value.numberAnswer >= 3 && (
+                  <div style={{display: "flex", alignItems: "center"}}>
+                    <span style={{marginRight: "5px"}}>3.</span>
+                    <span>{parser(value.contentAnswer3)}</span>
+                  </div>
+                )
+              }
+              {
+                value.numberAnswer >= 4 && (
+                  <div style={{display: "flex", alignItems: "center"}}>
+                    <span style={{marginRight: "5px"}}>4.</span>
+                    <span>{parser(value.contentAnswer4)}</span>
+                  </div>
+                )
+              }
+              {
+                value.numberAnswer >= 5 && (
+                  <div style={{display: "flex", alignItems: "center"}}>
+                    <span style={{marginRight: "5px"}}>5.</span>
+                    <span>{parser(value.contentAnswer5)}</span>
+                  </div>
+                )
+              }
+            </Box>)
+        }
       </Box>
       <Box display="flex" justifyContent='space-between' width="110px">
-        <button style={{height: 'max-content', padding: '8px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'}} onClick={(event) => {
+        <button style={{
+          height: 'max-content',
+          padding: '8px',
+          border: 'none',
+          borderRadius: '8px',
+          cursor: 'pointer', fontWeight: 'bold'}} onClick={(event) => {
           handleDetailsQuestion()
           event.preventDefault()
           event.stopPropagation()
@@ -59,7 +105,7 @@ function TestBankQuestionItem(props) {
           <QuestionBankDetails
             open={openDetailsDialog}
             setOpen={setOpenDetailsDialog}
-            question={props.value}
+            question={value}
           />
         )
       }
