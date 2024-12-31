@@ -30,7 +30,15 @@ function TestBankQuestionItem(props) {
       borderRadius: '10px',
       padding: '10px',
       marginBottom: '10px'}}>
-      <Box display="flex" flexDirection='column' width="calc(100% - 110px)" style={{cursor: 'pointer'}}>
+      <Box display="flex"
+           flexDirection='column'
+           width="calc(100% - 110px)"
+           style={{
+              cursor: 'pointer',
+              userSelect: "none",
+              WebkitUserSelect: "none",
+              MozUserSelect: "none",
+              msUserSelect: "none"}}>
         <div style={{display: 'flex'}}>
           <span style={{display: "block", fontWeight: 'bold', marginRight: '5px'}}>Câu {id + 1}.</span>
           <span style={{fontStyle: 'italic'}}>({value.type === 0 ? 'Trắc nghiệm' : 'Tự luận'})</span>

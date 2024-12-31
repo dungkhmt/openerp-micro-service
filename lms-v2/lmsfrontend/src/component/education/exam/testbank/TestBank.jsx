@@ -17,6 +17,7 @@ import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
 import {DatePicker} from "@mui/x-date-pickers";
 import {vi} from "date-fns/locale";
 import parser from "html-react-parser";
+import TestBankDelete from "./TestBankDelete";
 
 const baseColumn = {
   sortable: false,
@@ -295,14 +296,14 @@ function TestBank(props) {
       {/*    />*/}
       {/*  )*/}
       {/*}*/}
-      {/*<QuestionBankDelete*/}
-      {/*  open={openDeleteDialog}*/}
-      {/*  setOpen={setOpenDeleteDialog}*/}
-      {/*  id={idDelete}*/}
-      {/*  onReloadQuestions={() => {*/}
-      {/*    filterQuestion()*/}
-      {/*  }}*/}
-      {/*/>*/}
+      <TestBankDelete
+        open={openDeleteDialog}
+        setOpen={setOpenDeleteDialog}
+        id={idDelete}
+        onReloadData={() => {
+          filter()
+        }}
+      />
     </div>
   );
 }
