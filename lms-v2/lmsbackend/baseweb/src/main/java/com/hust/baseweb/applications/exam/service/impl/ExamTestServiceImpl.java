@@ -178,9 +178,20 @@ public class ExamTestServiceImpl implements ExamTestService {
         List<ExamTestQuestionEntity> examTestQuestionEntityList = new ArrayList<>();
         for(ExamTestQuestionSaveReq examTestQuestionSaveReq: examTestSaveReq.getExamTestQuestionSaveReqList()){
             ExamTestQuestionEntity examTestQuestionEntity = modelMapper.map(examTestQuestionSaveReq, ExamTestQuestionEntity.class);
+            if(!DataUtils.stringIsNotNullOrEmpty(examTestQuestionEntity.getId())){
+                examTestQuestionEntity.setId(UUID.randomUUID().toString());
+            }
+            examTestQuestionEntity.setExamTestId(examTestEntity.getId());
             examTestQuestionEntityList.add(examTestQuestionEntity);
         }
         examTestQuestionRepository.saveAll(examTestQuestionEntityList);
+
+        List<ExamTestQuestionEntity> examTestQuestionDeleteList = new ArrayList<>();
+        for(ExamTestQuestionSaveReq examTestQuestion: examTestSaveReq.getExamTestQuestionDeleteReqList()){
+            Optional<ExamTestQuestionEntity> examTestQuestionEntity = examTestQuestionRepository.findById(examTestQuestion.getId());
+            examTestQuestionEntity.ifPresent(examTestQuestionDeleteList::add);
+        }
+        examTestQuestionRepository.deleteAll(examTestQuestionDeleteList);
 
         responseData.setHttpStatus(HttpStatus.OK);
         responseData.setResultCode(HttpStatus.OK.value());

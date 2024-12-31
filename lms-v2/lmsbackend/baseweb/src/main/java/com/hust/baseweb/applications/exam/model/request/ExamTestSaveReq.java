@@ -15,4 +15,5 @@ public class ExamTestSaveReq {
     private String name;
     private String description;
     private List<ExamTestQuestionSaveReq> examTestQuestionSaveReqList;
+    private List<ExamTestQuestionSaveReq> examTestQuestionDeleteReqList;
 }

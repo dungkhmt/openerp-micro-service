@@ -14,6 +14,8 @@ import java.util.Optional;
 public interface ExamTestRepository extends JpaRepository<ExamTestEntity, String> {
 
     @Query(value = "select\n" +
+                   "    etq.id as examTestQuestionId,\n" +
+                   "    eq.id as questionId,\n" +
                    "    eq.code as questionCode,\n" +
                    "    eq.type as questionType,\n" +
                    "    eq.content as questionContent,\n" +

@@ -2,6 +2,8 @@ package com.hust.baseweb.applications.exam.model.response;
 
 public interface ExamTestQuestionDetailsRes {
 
+    String getExamTestQuestionId();
+    String getQuestionId();
     String getQuestionCode();
     Integer getQuestionType();
     String getQuestionContent();
