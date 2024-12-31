@@ -18,6 +18,7 @@ import {DatePicker} from "@mui/x-date-pickers";
 import {vi} from "date-fns/locale";
 import parser from "html-react-parser";
 import TestBankDelete from "./TestBankDelete";
+import TestBankDetails from "./TestBankDetails";
 
 const baseColumn = {
   sortable: false,
@@ -287,15 +288,15 @@ function TestBank(props) {
           />
         </CardContent>
       </Card>
-      {/*{*/}
-      {/*  openDetailsDialog && (*/}
-      {/*    <QuestionBankDetails*/}
-      {/*      open={openDetailsDialog}*/}
-      {/*      setOpen={setOpenDetailsDialog}*/}
-      {/*      question={questionDetails}*/}
-      {/*    />*/}
-      {/*  )*/}
-      {/*}*/}
+      {
+        openDetailsDialog && (
+          <TestBankDetails
+            open={openDetailsDialog}
+            setOpen={setOpenDetailsDialog}
+            data={testDetails}
+          />
+        )
+      }
       <TestBankDelete
         open={openDeleteDialog}
         setOpen={setOpenDeleteDialog}
