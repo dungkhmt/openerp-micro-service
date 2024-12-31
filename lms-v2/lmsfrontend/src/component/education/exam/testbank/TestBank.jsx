@@ -161,6 +161,27 @@ function TestBank(props) {
       (res) => {
         if(res.data.resultCode === 200){
           setTestDetails(res.data.data)
+          let tmpQuestions = []
+          for(let question of res.data.data.examTestQuestionDetails){
+            tmpQuestions.push({
+              examTestQuestionId: question.examTestQuestionId,
+              id: question.questionId,
+              code: question.questionCode,
+              type: question.questionType,
+              content: question.questionContent,
+              filePath: question.questionFile,
+              numberAnswer: question.questionNumberAnswer,
+              contentAnswer1: question.questionContentAnswer1,
+              contentAnswer2: question.questionContentAnswer2,
+              contentAnswer3: question.questionContentAnswer3,
+              contentAnswer4: question.questionContentAnswer4,
+              contentAnswer5: question.questionContentAnswer5,
+              multichoice: question.questionMultichoice,
+              answer: question.questionAnswer,
+              explain: question.questionExplain,
+              order: question.questionOrder
+            })
+          }
           history.push({
             pathname: "/exam/create-update-test-bank",
             state: {
@@ -168,7 +189,7 @@ function TestBank(props) {
                 code: res.data.data.code,
                 name: res.data.data.name,
                 description: res.data.data.description,
-                questions: res.data.data.examTestQuestionDetails
+                questions: tmpQuestions
               },
               isCreate: false
             },

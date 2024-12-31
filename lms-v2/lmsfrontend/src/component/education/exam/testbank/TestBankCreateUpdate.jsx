@@ -60,16 +60,23 @@ function TestBankCreateUpdate(props) {
   const [filePreview, setFilePreview] = useState(null);
   const [openAddQuestionDialog, setOpenAddQuestionDialog] = useState(false);
   const [questionDelete, setQuestionDelete] = useState(null)
+  const [questionDeleteList, setQuestionDeleteList] = useState([])
 
   useEffect(() => {
-    let tmpQuestions = questions.filter(item => item.id !== questionDelete.id);
+    let tmpQuestions = questions.filter(item => item.id !== questionDelete?.id);
     setQuestions(tmpQuestions)
+    if(questionDelete?.examTestQuestionId){
+      setQuestionDeleteList(questionDeleteList.concat([{
+        id: questionDelete?.examTestQuestionId,
+      }]))
+    }
   }, [questionDelete]);
 
   const handleSave = () =>{
     let examTestQuestionSaveReqList = []
     for(let i=0;i<questions.length;i++){
       examTestQuestionSaveReqList.push({
+        id: questions[i].examTestQuestionId ? questions[i].examTestQuestionId : null,
         examQuestionId: questions[i].id,
         order: i+1
       })
@@ -78,7 +85,8 @@ function TestBankCreateUpdate(props) {
       code: code,
       name:  name,
       description:  description,
-      examTestQuestionSaveReqList: examTestQuestionSaveReqList
+      examTestQuestionSaveReqList: examTestQuestionSaveReqList,
+      examTestQuestionDeleteReqList: questionDeleteList
     }
     validateBody(body)
 
@@ -102,7 +110,7 @@ function TestBankCreateUpdate(props) {
         }
       },
       { onError: (e) => toast.error(e) },
-      formData
+      body
     );
   }
 

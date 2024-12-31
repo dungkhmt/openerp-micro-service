@@ -5,7 +5,7 @@ export function formatDateTime(value){
     let date = new Date(value);
     return (
       addZeroBefore(date.getDate(), 2) +
-      "" +
+      "/" +
       addZeroBefore(date.getMonth() + 1, 2) +
       "/" +
       date.getFullYear() +
@@ -25,7 +25,7 @@ export function formatDate(value){
     let date = new Date(value);
     return (
       addZeroBefore(date.getDate(), 2) +
-      "" +
+      "/" +
       addZeroBefore(date.getMonth() + 1, 2) +
       "/" +
       date.getFullYear()
