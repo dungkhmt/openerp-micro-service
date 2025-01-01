@@ -121,6 +121,7 @@ public class ExamTestServiceImpl implements ExamTestService {
         responseData.setResultCode(HttpStatus.OK.value());
         responseData.setResultMsg("Success");
         responseData.setData(ExamTestDetailsRes.builder()
+                                 .id(examTestEntity.get().getId())
                                  .code(examTestEntity.get().getCode())
                                  .name(examTestEntity.get().getName())
                                  .description(examTestEntity.get().getDescription())

@@ -13,6 +13,7 @@ import java.util.List;
 @Builder
 public class ExamTestDetailsRes {
 
+    private String id;
     private String code;
     private String name;
     private String description;
