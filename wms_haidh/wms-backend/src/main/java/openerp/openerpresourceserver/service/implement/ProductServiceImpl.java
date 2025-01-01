@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.service.implement;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,12 +13,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import openerp.openerpresourceserver.config.mongo.ImageService;
 import openerp.openerpresourceserver.entity.Product;
-import openerp.openerpresourceserver.entity.ProductInfoProjection;
-import openerp.openerpresourceserver.model.request.ProductDto;
+import openerp.openerpresourceserver.entity.projection.ProductInfoProjection;
+import openerp.openerpresourceserver.entity.projection.ProductNameProjection;
+import openerp.openerpresourceserver.model.request.ProductCreate;
 import openerp.openerpresourceserver.repository.ProductRepository;
 import openerp.openerpresourceserver.service.ProductService;
+import openerp.openerpresourceserver.service.mongodb.ImageService;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -43,17 +45,16 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public Product getProductById(UUID productId) {
-	    Product product = productRepository.findById(productId).orElse(null);
-	    if (product != null) {
-	        // Tạo URL cho ảnh dựa trên imageId
-	        String baseUrl = "http://localhost:8082"; // URL backend hoặc service hosting ảnh
-	        product.setImageUrl(baseUrl + "/api/images/" + product.getImageId());
-	    }
-	    return product;
+		Product product = productRepository.findById(productId).orElse(null);
+		if (product != null) {
+			// Tạo URL cho ảnh dựa trên imageId
+			String baseUrl = "http://localhost:8082"; // URL backend hoặc service hosting ảnh
+			product.setImageUrl(baseUrl + "/api/images/" + product.getImageId());
+		}
+		return product;
 	}
 
-
-	public boolean createProduct(ProductDto productDto, MultipartFile imageFile) {
+	public boolean createProduct(ProductCreate productDto, MultipartFile imageFile) {
 		try {
 			Optional<Product> existingProduct = productRepository.findByCode(productDto.getCode());
 			if (existingProduct.isPresent()) {
@@ -84,7 +85,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public boolean updateProduct(ProductDto productDto, MultipartFile imageFile) {
+	public boolean updateProduct(ProductCreate productDto, MultipartFile imageFile) {
 		try {
 			// Tìm sản phẩm theo productId
 			Optional<Product> existingProductOpt = productRepository.findById(productDto.getProductId());
@@ -126,6 +127,11 @@ public class ProductServiceImpl implements ProductService {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	@Override
+	public List<ProductNameProjection> searchProductNames(String searchTerm) {
+		return productRepository.findProductNamesByName(searchTerm);
 	}
 
 }

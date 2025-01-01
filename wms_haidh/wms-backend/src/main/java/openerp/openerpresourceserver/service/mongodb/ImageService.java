@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.config.mongo;
+package openerp.openerpresourceserver.service.mongodb;
 
 import java.io.IOException;
 import java.io.InputStream;

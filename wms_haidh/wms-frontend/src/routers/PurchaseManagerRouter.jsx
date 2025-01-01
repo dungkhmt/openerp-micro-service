@@ -1,34 +1,17 @@
-// import { Route, Switch, useRouteMatch } from "react-router";
-// import ReceiptRequestForApproval from "../screens/receipt/receipRequestForApproval";
-// import ReceiptRequestForApprovalListing from "../screens/receipt/receiptRequestForApprovalListing";
-// import receiptRequestDetailForPurchaseManager from "../screens/receipt/receiptRequestDetailForPurchaseManager";
-
-// export default function PurchaseManagerRouter () {
-//   let { path } = useRouteMatch();
-//   return (
-//     <div>
-//       <Switch>
-//         <Route
-//           component={ReceiptRequestForApprovalListing}
-//           exact
-//           path={`${path}/receipts`}
-//         ></Route>
-//         <Route
-//           component={ReceiptRequestForApproval}
-//           exact
-//           path={`${path}/receipts/:id`}
-//         ></Route>
-//         <Route
-//           component={receiptRequestDetailForPurchaseManager} 
-//           exact
-//           path={`${path}/create-receipt`}
-//         ></Route>
-//       </Switch>
-//     </div>
-//   );
-// }
+import { Routes, Route } from "react-router-dom";
+import ReceiptList from "../views/purchase_manager/ReceiptList";
+import AddReceipt from "../views/purchase_manager/AddReceipt";
+import ReceiptBill from "../views/purchase_manager/ReceiptBill";
+import ReceiptDetail from "../views/purchase_manager/ReceiptDetail";
 const PurchaseManagerRouter = () => {
-    return <div>Purchase Manager Router</div>;
+  return (
+    <Routes>
+      <Route path="receipts" element={<ReceiptList />} />
+      <Route path="receipts/add-receipt" element={<AddReceipt />} /> 
+      <Route path="receipts/:receiptId" element={<ReceiptDetail />} /> 
+      <Route path="receipt-bill" element={<ReceiptBill />} />
+    </Routes>
+  );
   };
   
   export default PurchaseManagerRouter;

@@ -6,9 +6,10 @@ const columns = [
   { name: "ACTIONS", uid: "actions" },
 ];
 
+
 const statusOptions = [
   {name: "Active", uid: "active"},
   {name: "Paused", uid: "paused"},
   {name: "Vacation", uid: "vacation"},
 ];
-export { columns, statusOptions };
+export { columns, statusOptions};

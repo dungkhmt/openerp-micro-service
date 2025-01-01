@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductDto {
+public class ProductCreate {
     private UUID productId;
     private String code;
     private String name;
@@ -21,8 +21,5 @@ public class ProductDto {
     private BigDecimal area;
     private String uom;
     private UUID categoryId;
-    private String imageContentType;
-    private Long imageSize;
-    private byte[] imageData;
 }
 

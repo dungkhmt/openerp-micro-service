@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import openerp.openerpresourceserver.config.mongo.ImageService;
+import openerp.openerpresourceserver.service.mongodb.ImageService;
 
 @RestController
 @RequestMapping("/images")

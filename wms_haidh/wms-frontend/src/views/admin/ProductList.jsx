@@ -14,15 +14,15 @@ import {
   DropdownItem,
   Pagination,
 } from "@nextui-org/react";
-import { PlusIcon } from "../components/icon/PlusIcon";
-import { VerticalDotsIcon } from "../components/icon/VerticalDotsIcon";
-import { SearchIcon } from "../components/icon/SearchIcon";
+import { PlusIcon } from "../../components/icon/PlusIcon";
+import { VerticalDotsIcon } from "../../components/icon/VerticalDotsIcon";
+import { SearchIcon } from "../../components/icon/SearchIcon";
 // import { ChevronDownIcon } from "../components/icon/ChvronDownIcon";
-import { columns, statusOptions } from "../config/data";
+import { columns, statusOptions } from "../../config/data";
 // import { capitalize } from "../utils/utils";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { request } from "../api";
+import { request } from "../../api";
 // const statusColorMap = {
 //   active: "success",
 //   paused: "danger",
@@ -84,23 +84,6 @@ export default function BaseTable() {
     const cellValue = item[columnKey];
 
     switch (columnKey) {
-      // case "name":
-      //   return (
-      //     <User
-      //       avatarProps={{ radius: "full", size: "sm", src: item.avatar }}
-      //       classNames={{ description: "text-default-500" }}
-      //       description={"Tủ lạnh"}
-      //       name={cellValue}
-      //     >
-      //     </User>
-      //   );
-      // case "role":
-      //   return (
-      //     <div className="flex flex-col">
-      //       <p className="text-bold text-small capitalize">{cellValue}</p>
-      //       <p className="text-bold text-tiny capitalize text-default-500">{item.team}</p>
-      //     </div>
-      //   );
       // case "status":
       //   return (
       //     <Chip

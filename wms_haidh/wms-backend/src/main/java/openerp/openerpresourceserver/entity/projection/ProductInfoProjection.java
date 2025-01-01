@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.entity;
+package openerp.openerpresourceserver.entity.projection;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

@@ -6,7 +6,6 @@ import {
   Grid,
   Button,
   Paper,
-  Divider,
   IconButton,
   Select,
   MenuItem,
@@ -15,10 +14,8 @@ import {
 } from '@mui/material';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
 import { useNavigate, useParams } from 'react-router-dom';
-import { request } from "../api";
+import { request } from "../../api";
 
 const ProductForm = () => {
 
@@ -351,46 +348,6 @@ const ProductForm = () => {
             </Grid>
           </Paper>
 
-          <Divider sx={{ my: 4 }} />
-
-          <Paper elevation={3} sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6" gutterBottom sx={{ flexGrow: 1 }}>
-                Inventory Management
-              </Typography>
-              <IconButton color="primary" onClick={handleAddInventory}>
-                <AddIcon />
-              </IconButton>
-            </Box>
-            {inventory.map((item, index) => (
-              <Grid container spacing={2} key={index} className="mb-4">
-                <Grid item xs={12} sm={5}>
-                  <TextField
-                    fullWidth
-                    label="Warehouse"
-                    placeholder="Enter warehouse name"
-                    value={item.warehouse}
-                    onChange={(e) => handleChangeInventory(index, 'warehouse', e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={5}>
-                  <TextField
-                    fullWidth
-                    label="Quantity"
-                    placeholder="Enter quantity"
-                    type="number"
-                    value={item.quantity}
-                    onChange={(e) => handleChangeInventory(index, 'quantity', e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={2} sx={{ display: 'flex', alignItems: 'flex-end' }}>
-                  <IconButton color="secondary" onClick={() => handleDeleteInventory(index)}>
-                    <RemoveIcon />
-                  </IconButton>
-                </Grid>
-              </Grid>
-            ))}
-          </Paper>
         </Grid>
       </Grid>
     </Box>
