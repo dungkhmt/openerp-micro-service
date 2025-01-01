@@ -13,6 +13,13 @@ import InfoIcon from "@mui/icons-material/Info";
 import QuestionBankDetails from "../questionbank/QuestionBankDetails";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import DeleteIcon from "@material-ui/icons/Delete";
+import {formatDateApi, formatDateTime} from "../ultils/DateUltils";
+import EditIcon from "@material-ui/icons/Edit";
+import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
+import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
+import {vi} from "date-fns/locale";
+import {DatePicker} from "@mui/x-date-pickers";
+import TestBankDetails from "../testbank/TestBankDetails";
 
 const baseColumn = {
   sortable: false,
@@ -20,37 +27,38 @@ const baseColumn = {
 
 const rowsPerPage = [5, 10, 20];
 
-function TestBankAddQuestion(props) {
+function SelectTestDialog(props) {
 
   const columns = [
     {
       field: "code",
-      headerName: "Mã câu hỏi",
+      headerName: "Mã đề thi",
       minWidth: 170,
       ...baseColumn
     },
     {
-      field: "content",
-      headerName: "Nội dung câu hỏi",
+      field: "name",
+      headerName: "Tên đề thi",
       ...baseColumn,
-      flex: 1,
-      renderCell: (rowData) => {
-        return parser(rowData.value)
-      }
+      minWidth: 250
     },
     {
-      field: "type",
-      headerName: "Loại câu hỏi",
+      field: "description",
+      headerName: "Mô tả",
+      ...baseColumn,
+      flex: 1,
+      minWidth: 170,
+      renderCell: (rowData) => {
+        return parser(rowData.value)
+      },
+    },
+    {
+      field: "createdAt",
+      headerName: "Thời gian tạo",
       ...baseColumn,
       minWidth: 170,
       renderCell: (rowData) => {
-        if(rowData.value === 0){
-          return 'Trắc nghiệm'
-        }else if(rowData.value === 1){
-          return 'Tự luận'
-        }else{
-          return 'Tất cả'
-        }
+        return formatDateTime(rowData.value)
       },
     },
     {
@@ -62,7 +70,7 @@ function TestBankAddQuestion(props) {
       renderCell: (rowData) => {
         return (
           <Box display="flex" justifyContent="space-between" alignItems='center' width="100%">
-            <InfoIcon style={{cursor: 'pointer'}} onClick={(data) => handleDetailsQuestion(rowData?.row)}/>
+            <InfoIcon style={{cursor: 'pointer'}} onClick={(data) => handleOpenPopupDetails(rowData?.row)}/>
           </Box>
         )
       }
@@ -72,32 +80,33 @@ function TestBankAddQuestion(props) {
   const columnsSelected = [
     {
       field: "code",
-      headerName: "Mã câu hỏi",
+      headerName: "Mã đề thi",
       minWidth: 170,
       ...baseColumn
     },
     {
-      field: "content",
-      headerName: "Nội dung câu hỏi",
+      field: "name",
+      headerName: "Tên đề thi",
       ...baseColumn,
-      flex: 1,
-      renderCell: (rowData) => {
-        return parser(rowData.value)
-      }
+      minWidth: 250
     },
     {
-      field: "type",
-      headerName: "Loại câu hỏi",
+      field: "description",
+      headerName: "Mô tả",
+      ...baseColumn,
+      flex: 1,
+      minWidth: 170,
+      renderCell: (rowData) => {
+        return parser(rowData.value)
+      },
+    },
+    {
+      field: "createdAt",
+      headerName: "Thời gian tạo",
       ...baseColumn,
       minWidth: 170,
       renderCell: (rowData) => {
-        if(rowData.value === 0){
-          return 'Trắc nghiệm'
-        }else if(rowData.value === 1){
-          return 'Tự luận'
-        }else{
-          return 'Tất cả'
-        }
+        return formatDateTime(rowData.value)
       },
     },
     {
@@ -109,59 +118,46 @@ function TestBankAddQuestion(props) {
       renderCell: (rowData) => {
         return (
           <Box display="flex" justifyContent="space-between" alignItems='center' width="100%">
-            <InfoIcon style={{cursor: 'pointer'}} onClick={(data) => handleDetailsQuestion(rowData?.row)}/>
-            <DeleteIcon style={{cursor: 'pointer', color: 'red'}} onClick={(data) => handleDeleteQuestionSelected(rowData?.row)}/>
+            <InfoIcon style={{cursor: 'pointer'}} onClick={(data) => handleOpenPopupDetails(rowData?.row)}/>
+            <DeleteIcon style={{cursor: 'pointer', color: 'red'}} onClick={(data) => handleDeleteDataSelected(rowData?.row)}/>
           </Box>
         )
       }
     },
   ];
 
-  const questionTypes = [
-    {
-      value: 'all',
-      name: 'Tất cả'
-    },
-    {
-      value: 0,
-      name: 'Trắc nghiệm'
-    },
-    {
-      value: 1,
-      name: 'Tự luận'
-    }
-  ]
-
   const { open, setOpen, onSubmit} = props;
 
-  const [questionList, setQuestionList] = useState([])
-  const [questionSelectionList, setQuestionSelectionList] = useState([])
-  const [questionSelectedList, setQuestionSelectedList] = useState([])
+  const [dataList, setDataList] = useState([])
+  const [dataSelectionList, setDataSelectionList] = useState([])
+  const [dataSelectedList, setDataSelectedList] = useState([])
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(5)
   const [totalCount, setTotalCount] = useState(0)
   const [keywordFilter, setKeywordFilter] = useState("")
-  const [typeFilter, setTypeFilter] = useState('all')
+  const [createdFromFilter, setCreatedFromFilter] = useState("")
+  const [createdToFilter, setCreatedToFilter] = useState("")
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
-  const [questionDetails, setQuestionDetails] = useState(null)
+  const [testDetails, setTestDetails] = useState(null)
 
   const debouncedKeywordFilter = useDebounceValue(keywordFilter, 500)
 
   useEffect(() => {
-    filterQuestion()
-  }, [page, pageSize, debouncedKeywordFilter, typeFilter]);
+    filter()
+  }, [page, pageSize, debouncedKeywordFilter, createdFromFilter, createdToFilter]);
 
-  const filterQuestion = () =>{
+  const filter = () =>{
     const body = {
       keyword: keywordFilter,
-      type: typeFilter === 'all' ? null : typeFilter
+      createdFrom: formatDateApi(createdFromFilter),
+      createdTo: formatDateApi(createdToFilter)
     }
     request(
       "post",
-      `/exam-question/filter?page=${page}&size=${pageSize}`,
+      `/exam-test/filter?page=${page}&size=${pageSize}`,
       (res) => {
         if(res.status === 200){
-          setQuestionList(res.data.content);
+          setDataList(res.data.content);
           setTotalCount(res.data.totalElements);
         }else {
           toast.error(res)
@@ -172,16 +168,16 @@ function TestBankAddQuestion(props) {
     );
   }
 
-  const detailsQuestion = (id) =>{
+  const detailsTest = (id) =>{
     const body = {
       id: id
     }
     request(
       "post",
-      `/exam-question/details`,
+      `/exam-test/details`,
       (res) => {
         if(res.data.resultCode === 200){
-          setQuestionDetails(res.data.data)
+          setTestDetails(res.data.data)
           setOpenDetailsDialog(true)
         }else{
           toast.error(res.data.resultMsg)
@@ -192,51 +188,51 @@ function TestBankAddQuestion(props) {
     );
   }
 
-  const handleDetailsQuestion = (rowData) => {
-    detailsQuestion(rowData.id)
+  const handleOpenPopupDetails = (rowData) => {
+    detailsTest(rowData.id)
   };
 
   const closeDialog = () => {
-    setQuestionSelectionList([])
-    setQuestionSelectedList([])
+    setDataSelectionList([])
+    setDataSelectedList([])
     setOpen(false)
   }
 
   const onClickAddToSelectedList = () => {
-    const selectedRowsData = questionSelectionList.map((id) => questionList.find((row) => row.id === id));
-    setQuestionSelectedList(questionSelectedList.concat(selectedRowsData))
-    setQuestionSelectionList([])
+    const selectedRowsData = dataSelectionList.map((id) => dataList.find((row) => row.id === id));
+    setDataSelectedList(dataSelectedList.concat(selectedRowsData))
+    setDataSelectionList([])
   }
 
-  const handleDeleteQuestionSelected = (data) => {
-    let tmpQuestionSelectedList = questionSelectedList.filter(item => item.id !== data.id);
-    setQuestionSelectedList(tmpQuestionSelectedList)
+  const handleDeleteDataSelected = (data) => {
+    let tmpDataSelectedList = dataSelectedList.filter(item => item.id !== data.id);
+    setDataSelectedList(tmpDataSelectedList)
   }
 
   const handleAdd = () => {
-    onSubmit(questionSelectedList)
+    onSubmit(dataSelectedList)
     closeDialog()
   }
 
   return (
     <div>
       <Dialog open={open} fullWidth maxWidth="lg">
-        <DialogTitle>Thêm câu hỏi vào đề thi</DialogTitle>
+        <DialogTitle>Thêm đề thi cho kỳ thi</DialogTitle>
         <DialogContent>
           <Card elevation={5}>
             <CardHeader
               title={
                 <Box display="flex" justifyContent="space-between" alignItems="end" width="100%">
                   <Box display="flex" flexDirection="column" width="80%">
-                    <h5 style={{marginTop: '0', paddingTop: '0'}}>Tìm kiếm trong Ngân hàng câu hỏi</h5>
+                    <h5 style={{margin: '0'}}>Ngân hàng đề thi</h5>
                     <Box display="flex" justifyContent="flex-start" width="100%">
                       <TextField
                         autoFocus
-                        id="questionCode"
+                        id="testCode"
                         label="Nội dung tìm kiếm"
-                        placeholder="Tìm kiếm theo code hoặc nội dung"
+                        placeholder="Tìm kiếm theo code hoặc tên"
                         value={keywordFilter}
-                        style={{width: "300px", marginRight: "16px"}}
+                        style={{ width: "300px", marginRight: "16px"}}
                         onChange={(event) => {
                           setKeywordFilter(event.target.value);
                         }}
@@ -245,30 +241,30 @@ function TestBankAddQuestion(props) {
                         }}
                       />
 
-                      <TextField
-                        id="questionType"
-                        select
-                        label="Loại câu hỏi"
-                        style={{width: "150px"}}
-                        value={typeFilter}
-                        onChange={(event) => {
-                          setTypeFilter(event.target.value);
-                        }}
-                      >
-                        {
-                          questionTypes.map(item => {
-                            return (
-                              <MenuItem value={item.value}>{item.name}</MenuItem>
-                            )
-                          })
-                        }
-                      </TextField>
+                      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                        <DatePicker
+                          label="Thời gian tạo từ"
+                          value={createdFromFilter}
+                          onChange={event => setCreatedFromFilter(event)}
+                          renderInput={(params) => <TextField {...params} error={false} style={{ marginRight: '16px' }}/>}
+                        />
+                      </LocalizationProvider>
+
+                      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                        <DatePicker
+                          label="Thời gian tạo đến"
+                          value={createdToFilter}
+                          onChange={event => setCreatedToFilter(event)}
+                          renderInput={(params) => <TextField {...params} error={false}/>}
+                        />
+                      </LocalizationProvider>
                     </Box>
                   </Box>
+
                   <Box display="flex" justifyContent="flex-end" width="20%">
                     <Button
                       variant="contained"
-                      disabled={questionSelectionList.length < 1}
+                      disabled={dataSelectionList.length < 1}
                       color="primary"
                       onClick={onClickAddToSelectedList}
                       startIcon={<AddCircleIcon />}
@@ -281,7 +277,7 @@ function TestBankAddQuestion(props) {
             <CardContent>
               <DataGrid
                 rowCount={totalCount}
-                rows={questionList}
+                rows={dataList}
                 columns={columns}
                 page={page}
                 pageSize={pageSize}
@@ -293,20 +289,20 @@ function TestBankAddQuestion(props) {
                 disableColumnMenu
                 autoHeight
                 checkboxSelection
-                isRowSelectable={(params) => !questionSelectedList.includes(params.row)}
-                onSelectionModelChange = {(ids) => setQuestionSelectionList(ids)}
-                selectionModel={questionSelectionList}
+                isRowSelectable={(params) => !dataSelectedList.includes(params.row)}
+                onSelectionModelChange = {(ids) => setDataSelectionList(ids)}
+                selectionModel={dataSelectionList}
               />
             </CardContent>
           </Card>
 
           <Card elevation={5} >
             <CardHeader title={
-              <h5 style={{marginTop: '0', paddingTop: '0'}}>Danh sách câu hỏi đã chọn</h5>
+              <h5 style={{margin: '0'}}>Danh sách đề thi đã chọn</h5>
             }/>
             <CardContent>
               <DataGrid
-                rows={questionSelectedList}
+                rows={dataSelectedList}
                 columns={columnsSelected}
                 disableColumnMenu
                 autoHeight
@@ -325,7 +321,7 @@ function TestBankAddQuestion(props) {
             <Button
               variant="contained"
               color="primary"
-              disabled={questionSelectedList.length < 1}
+              disabled={dataSelectedList.length < 1}
               style={{marginLeft: "15px"}}
               onClick={handleAdd}
             >
@@ -334,13 +330,12 @@ function TestBankAddQuestion(props) {
           </div>
         </DialogActions>
       </Dialog>
-
       {
         openDetailsDialog && (
-          <QuestionBankDetails
+          <TestBankDetails
             open={openDetailsDialog}
             setOpen={setOpenDetailsDialog}
-            question={questionDetails}
+            data={testDetails}
           />
         )
       }
@@ -348,6 +343,6 @@ function TestBankAddQuestion(props) {
   );
 }
 
-const screenName = "MENU_EXAM_QUESTION_BANK";
+const screenName = "MENU_EXAM_TEST_BANK";
 // export default withScreenSecurity(QuestionBank, screenName, true);
-export default TestBankAddQuestion;
+export default SelectTestDialog;

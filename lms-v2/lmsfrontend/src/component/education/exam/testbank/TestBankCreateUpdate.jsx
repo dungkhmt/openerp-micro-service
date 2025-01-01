@@ -20,7 +20,6 @@ import TestBankAddQuestion from "./TestBankAddQuestion";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    padding: theme.spacing(4),
     "& .MuiTextField-root": {
       margin: theme.spacing(1),
       width: 200,
@@ -108,9 +107,11 @@ function TestBankCreateUpdate(props) {
             history.push("/exam/test-bank")
           }else{
             toast.error(res.data.resultMsg)
+            setIsLoading(false)
           }
         }else {
           toast.error(res)
+          setIsLoading(false)
         }
       },
       { onError: (e) => toast.error(e) },
@@ -165,7 +166,7 @@ function TestBankCreateUpdate(props) {
           <CardContent>
             <Typography variant="h5" component="h2">
               {
-                isCreate ? (<span>Thêm mới đề thi</span>) : (<span>Cập nhật đề thi</span>)
+                isCreate ? (<h4 style={{margin: 0, padding: 0}}>Thêm mới đề thi</h4>) : (<h4 style={{margin: 0, padding: 0}}>Cập nhật đề thi</h4>)
               }
             </Typography>
             <form className={classes.root} noValidate autoComplete="off">

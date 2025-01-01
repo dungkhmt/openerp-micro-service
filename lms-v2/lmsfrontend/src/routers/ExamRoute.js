@@ -4,6 +4,7 @@ import QuestionBankCreateUpdate from "../component/education/exam/questionbank/Q
 import TestBank from "../component/education/exam/testbank/TestBank";
 import TestBankCreateUpdate from "../component/education/exam/testbank/TestBankCreateUpdate";
 import ExamManagement from "../component/education/exam/exammanagement/ExamManagement";
+import ExamCreateUpdate from "../component/education/exam/exammanagement/ExamCreateUpdate";
 
 export default function ExamRoute() {
   let { path } = useRouteMatch();
@@ -36,6 +37,11 @@ export default function ExamRoute() {
           component={ExamManagement}
           exact
           path={`${path}/management`}
+        ></Route>
+        <Route
+          component={ExamCreateUpdate}
+          exact
+          path={`${path}/create-update`}
         ></Route>
 
       </Switch>

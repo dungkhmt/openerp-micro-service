@@ -19,7 +19,8 @@ function TestBankDetails(props) {
 
   const { open, setOpen, data} = props;
 
-  const [questions, setQuestions] = useState(null)
+  const [questions, setQuestions] = useState([])
+  const [questionDetail, setQuestionDetail] = useState(null)
 
   useEffect(() => {
     let tmpData = []
@@ -42,13 +43,13 @@ function TestBankDetails(props) {
         order: question.questionOrder
       })
     }
-    console.log('tmpData')
     setQuestions(tmpData)
   }, []);
 
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 
-  const handleDetailsQuestion = () => {
+  const handleDetailsQuestion = (value) => {
+    setQuestionDetail(value)
     setOpenDetailsDialog(true)
   };
 
@@ -133,7 +134,7 @@ function TestBankDetails(props) {
                         border: 'none',
                         borderRadius: '8px',
                         cursor: 'pointer', fontWeight: 'bold'
-                      }} onClick={handleDetailsQuestion}>
+                      }} onClick={() => handleDetailsQuestion(value)}>
                         Chi tiết
                       </button>
                     </Box>
@@ -143,7 +144,7 @@ function TestBankDetails(props) {
                         <QuestionBankDetails
                           open={openDetailsDialog}
                           setOpen={setOpenDetailsDialog}
-                          question={value}
+                          question={questionDetail}
                         />
                       )
                     }

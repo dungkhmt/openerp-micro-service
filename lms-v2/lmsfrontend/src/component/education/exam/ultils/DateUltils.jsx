@@ -47,3 +47,23 @@ export function formatDateApi(value) {
   }
   return null
 }
+
+export function formatDateTimeApi(value){
+  if(value != null && value !== ''){
+    let date = new Date(value);
+    return (
+      date.getFullYear() +
+      "-" +
+      addZeroBefore(date.getMonth() + 1, 2) +
+      "-" +
+      addZeroBefore(date.getDate(), 2)+
+      " " +
+      addZeroBefore(date.getHours(), 2) +
+      ":" +
+      addZeroBefore(date.getMinutes(), 2) +
+      ":" +
+      addZeroBefore(date.getSeconds(), 2)
+    );
+  }
+  return null
+}

@@ -176,20 +176,15 @@ function ExamManagement(props) {
     history.push({
       pathname: "/exam/create-update",
       state: {
-        question: {
+        data: {
+          examTestId: "",
+          examTests: "",
           code: "",
-          type: 1,
-          content: "",
-          filePath: "",
-          numberAnswer: "",
-          contentAnswer1: "",
-          contentAnswer2: "",
-          contentAnswer3: "",
-          contentAnswer4: "",
-          contentAnswer5: "",
-          multichoice: false,
-          answer: "",
-          explain: ""
+          name: "",
+          description: "",
+          status: 1,
+          startTime: "",
+          endTime: ""
         },
         isCreate: true
       },
@@ -197,27 +192,39 @@ function ExamManagement(props) {
   };
 
   const handleUpdate = (rowData) => {
-    history.push({
-      pathname: "/exam/create-update",
-      state: {
-        question: {
-          code: rowData.code,
-          type: rowData.type,
-          content: rowData.content,
-          filePath: rowData.filePath,
-          numberAnswer: rowData.numberAnswer,
-          contentAnswer1: rowData.contentAnswer1,
-          contentAnswer2: rowData.contentAnswer2,
-          contentAnswer3: rowData.contentAnswer3,
-          contentAnswer4: rowData.contentAnswer4,
-          contentAnswer5: rowData.contentAnswer5,
-          multichoice: rowData.multichoice,
-          answer: rowData.answer,
-          explain: rowData.explain
-        },
-        isCreate: false
+    const body = {
+      id: rowData.examTestId
+    }
+    request(
+      "post",
+      `/exam-test/details`,
+      (res) => {
+        if(res.data.resultCode === 200){
+          let examTests = []
+          examTests.push(res.data.data)
+          history.push({
+            pathname: "/exam/create-update",
+            state: {
+              data: {
+                examTestId: rowData.examTestId,
+                examTests: examTests,
+                code: rowData.code,
+                name: rowData.name,
+                description: rowData.description,
+                status: rowData.status,
+                startTime: rowData.startTime,
+                endTime: rowData.endTime
+              },
+              isCreate: false
+            },
+          });
+        }else{
+          toast.error(res.data.resultMsg)
+        }
       },
-    });
+      { onError: (e) => toast.error(e) },
+      body
+    );
   };
 
   const handleDetailsTest = (rowData) => {
@@ -236,7 +243,7 @@ function ExamManagement(props) {
           title={
             <Box display="flex" justifyContent="space-between" alignItems="end" width="100%">
               <Box display="flex" flexDirection="column" width="80%">
-                <h4>Danh sách kỳ thi</h4>
+                <h4 style={{marginTop: 0, paddingTop: 0}}>Danh sách kỳ thi</h4>
                 <Box display="flex" justifyContent="flex-start" width="100%">
                   <TextField
                     autoFocus

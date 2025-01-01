@@ -32,89 +32,86 @@ function QuestionBankDetails(props) {
   return (
     <div>
       <Dialog open={open} fullWidth maxWidth="md">
-        <DialogTitle>Chi tiết câu hỏi</DialogTitle>
+        <DialogTitle>Chi tiết câu hỏi - {question?.code}</DialogTitle>
         <DialogContent>
           <div>
             <div>
-              <h3>Mã câu hỏi</h3>
-              <p>{question?.code}</p>
-            </div>
-            <div>
-              <h3>Loại câu hỏi</h3>
-              <p>{question?.type === 0 ? 'Trắc nghiệm' : 'Tự luận'}</p>
-            </div>
-            <div>
-              <h3>Nội dung câu hỏi</h3>
-              <p>{parse(question?.content)}</p>
+              <h4 style={{marginRight: '5px', marginTop: 0}}>Nội dung câu hỏi:</h4>
+              <p style={{marginTop: 0, marginBottom: 0}}>{parse(question?.content)}</p>
               {
                 (question?.filePath) && (
                   question?.filePath.split(';').map(item => {
                     return (
-                      <div style={{display: 'flex', alignItems : 'center'}}>
+                      <div style={{display: 'flex', alignItems: 'center'}}>
                         <AttachFileOutlined></AttachFileOutlined>
-                        <p style={{fontWeight : 'bold', cursor : 'pointer'}} onClick={() => handleOpenFilePreviewDialog(item)}>{getFilenameFromString(item)}</p>
+                        <p style={{fontWeight: 'bold', cursor: 'pointer'}}
+                           onClick={() => handleOpenFilePreviewDialog(item)}>{getFilenameFromString(item)}</p>
                       </div>
                     )
                   })
                 )
               }
             </div>
+            <div style={{display: 'flex'}}>
+              <h4 style={{marginRight: '5px', marginTop: 0}}>Loại câu hỏi:</h4>
+              <p style={{marginTop: 0, marginBottom: 0}}>{question?.type === 0 ? 'Trắc nghiệm' : 'Tự luận'}</p>
+            </div>
             {
               (question?.type === 0) && (
                 <>
-                  <div>
-                    <h3>Số đáp án</h3>
-                    <p>{question?.numberAnswer}</p>
+                  <div style={{display: 'flex'}}>
+                    <h4 style={{marginRight: '5px', marginTop: 0}}>Số đáp án:</h4>
+                    <p style={{marginTop: 0, marginBottom: 0}}>{question?.numberAnswer}</p>
                   </div>
                   <div>
-                    <h3>Nội dung phương án 1</h3>
-                    <p>{parse(question?.contentAnswer1)}</p>
+                    <h4 style={{marginRight: '5px', marginTop: 0}}>Nội dung phương án 1:</h4>
+                    <p style={{marginTop: 0, marginBottom: 0}}>{parse(question?.contentAnswer1)}</p>
                   </div>
                   {
                     (question?.numberAnswer >= 2) && (
                       <div>
-                        <h3>Nội dung phương án 2</h3>
-                        <p>{parse(question?.contentAnswer2)}</p>
+                        <h4 style={{marginRight: '5px', marginTop: 0}}>Nội dung phương án 2:</h4>
+                        <p style={{marginTop: 0, marginBottom: 0}}>{parse(question?.contentAnswer2)}</p>
                       </div>
                     )
                   }
                   {
                     (question?.numberAnswer >= 3) && (
                       <div>
-                        <h3>Nội dung phương án 3</h3>
-                        <p>{parse(question?.contentAnswer3)}</p>
+                        <h4 style={{marginRight: '5px', marginTop: 0}}>Nội dung phương án 3:</h4>
+                        <p style={{marginTop: 0, marginBottom: 0}}>{parse(question?.contentAnswer3)}</p>
                       </div>
                     )
                   }
                   {
                     (question?.numberAnswer >= 4) && (
                       <div>
-                        <h3>Nội dung phương án 4</h3>
-                        <p>{parse(question?.contentAnswer4)}</p>
+                        <h4 style={{marginRight: '5px', marginTop: 0}}>Nội dung phương án 4:</h4>
+                        <p style={{marginTop: 0, marginBottom: 0}}>{parse(question?.contentAnswer4)}</p>
                       </div>
                     )
                   }
                   {
                     (question?.numberAnswer >= 5) && (
                       <div>
-                        <h3>Nội dung phương án 5</h3>
-                        <p>{parse(question?.contentAnswer5)}</p>
+                        <h4 style={{marginRight: '5px', marginTop: 0}}>Nội dung phương án 5:</h4>
+                        <p style={{marginTop: 0, marginBottom: 0}}>{parse(question?.contentAnswer5)}</p>
                       </div>
                     )
                   }
-                  <div>
-                    <h3>Nhiều lựa chọn</h3>
-                    <p>{question?.multichoice ? 'Có' : 'không'}</p>
+                  <div style={{display: 'flex'}}>
+                    <h4 style={{marginRight: '5px', marginTop: 0}}>Nhiều lựa chọn:</h4>
+                    <p style={{marginTop: 0, marginBottom: 0}}>{question?.multichoice ? 'Có' : 'không'}</p>
                   </div>
                 </>
               )
             }
             <div>
-              <h3>Nội dung đáp án</h3>
-              <p>{parse(question?.answer)}</p>
+              <h4 style={{marginRight: '5px', marginTop: 0}}>Nội dung đáp án:</h4>
+              <p style={{marginTop: 0, marginBottom: 0}}>{parse(question?.answer)}</p>
             </div>
             <div>
-              <h3>Nội dung giải thích</h3>
+              <h4 style={{marginRight: '5px', marginTop: 0}}>Nội dung giải thích:</h4>
               <p>{parse(question?.explain)}</p>
             </div>
           </div>

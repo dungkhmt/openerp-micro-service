@@ -222,7 +222,7 @@ function QuestionBank(props) {
           title={
             <Box display="flex" justifyContent="space-between" alignItems="end" width="100%">
               <Box display="flex" flexDirection="column" width="80%">
-                <h4>Ngân hàng câu hỏi</h4>
+                <h4 style={{marginTop: 0, paddingTop: 0}}>Ngân hàng câu hỏi</h4>
                 <Box display="flex" justifyContent="flex-start" width="100%">
                   <TextField
                     autoFocus

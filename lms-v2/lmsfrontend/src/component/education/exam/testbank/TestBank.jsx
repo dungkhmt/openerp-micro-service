@@ -222,7 +222,7 @@ function TestBank(props) {
           title={
             <Box display="flex" justifyContent="space-between" alignItems="end" width="100%">
               <Box display="flex" flexDirection="column" width="80%">
-                <h4>Ngân hàng đề thi</h4>
+                <h4 style={{marginTop: 0, paddingTop: 0}}>Ngân hàng đề thi</h4>
                 <Box display="flex" justifyContent="flex-start" width="100%">
                   <TextField
                     autoFocus
