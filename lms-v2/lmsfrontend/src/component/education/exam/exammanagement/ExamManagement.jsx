@@ -9,12 +9,14 @@ import useDebounceValue from "../hooks/use-debounce";
 import {toast} from "react-toastify";
 import TextField from "@material-ui/core/TextField";
 import parser from "html-react-parser"
-import QuestionBankDelete from "./QuestionBankDelete";
-import QuestionBankDetails from "./QuestionBankDetails";
 import {DataGrid} from "@material-ui/data-grid";
 import InfoIcon from "@mui/icons-material/Info";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
+import {formatDateTime} from "../ultils/DateUltils";
+import TestBankDetails from "../testbank/TestBankDetails";
+import {Assignment} from "@material-ui/icons";
+import ExamDelete from "./ExamDelete";
 
 const baseColumn = {
   sortable: false,
@@ -22,47 +24,59 @@ const baseColumn = {
 
 const rowsPerPage = [5, 10, 20];
 
-function QuestionBank(props) {
+function ExamManagement(props) {
 
   const columns = [
     {
       field: "code",
-      headerName: "Mã câu hỏi",
+      headerName: "Mã kỳ thi",
       minWidth: 170,
       ...baseColumn
     },
     {
-      field: "content",
-      headerName: "Nội dung câu hỏi",
+      field: "name",
+      headerName: "Tên kỳ thi",
+      minWidth: 200,
+      ...baseColumn
+    },
+    {
+      field: "description",
+      headerName: "Mô tả kỳ thi",
       ...baseColumn,
       flex: 1,
-      minWidth: 170,
+      minWidth: 200,
       renderCell: (rowData) => {
         return parser(rowData.value)
       }
     },
     {
-      field: "answer",
-      headerName: "Đáp án",
+      field: "startTime",
+      headerName: "Thời gian bắt đầu",
       ...baseColumn,
-      flex: 1,
       minWidth: 170,
       renderCell: (rowData) => {
-        return parser(rowData.value)
-      }
+        return formatDateTime(rowData.value)
+      },
     },
     {
-      field: "type",
-      headerName: "Loại câu hỏi",
+      field: "endTime",
+      headerName: "Thời gian kết thúc",
+      ...baseColumn,
+      minWidth: 170,
+      renderCell: (rowData) => {
+        return formatDateTime(rowData.value)
+      },
+    },
+    {
+      field: "status",
+      headerName: "Trạng thái",
       ...baseColumn,
       minWidth: 170,
       renderCell: (rowData) => {
         if(rowData.value === 0){
-          return 'Trắc nghiệm'
-        }else if(rowData.value === 1){
-          return 'Tự luận'
+          return 'Chưa kích hoạt'
         }else{
-          return 'Tất cả'
+          return 'Kích hoạt'
         }
       },
     },
@@ -75,59 +89,59 @@ function QuestionBank(props) {
       renderCell: (rowData) => {
         return (
           <Box display="flex" justifyContent="space-between" alignItems='center' width="100%">
-            <InfoIcon style={{cursor: 'pointer'}} onClick={(data) => handleDetailsQuestion(rowData?.row)}/>
-            <EditIcon style={{cursor: 'pointer'}} onClick={(data) => handleUpdateQuestion(rowData?.row)}/>
-            <DeleteIcon style={{cursor: 'pointer', color: 'red'}} onClick={(data) => handleDeleteQuestion(rowData?.row)}/>
+            <Assignment style={{cursor: 'pointer'}} onClick={(data) => handleDetailsTest(rowData?.row)}/>
+            <EditIcon style={{cursor: 'pointer'}} onClick={(data) => handleUpdate(rowData?.row)}/>
+            <DeleteIcon style={{cursor: 'pointer', color: 'red'}} onClick={(data) => handleDelete(rowData?.row)}/>
           </Box>
         )
       }
     },
   ];
 
-  const questionTypes = [
+  const statusList = [
     {
       value: 'all',
       name: 'Tất cả'
     },
     {
       value: 0,
-      name: 'Trắc nghiệm'
+      name: 'Chưa kích hoạt'
     },
     {
       value: 1,
-      name: 'Tự luận'
+      name: 'Kích hoạt'
     }
   ]
 
-  const [questionList, setQuestionList] = useState([])
+  const [examList, setExamList] = useState([])
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(5)
   const [totalCount, setTotalCount] = useState(0)
   const [keywordFilter, setKeywordFilter] = useState("")
-  const [typeFilter, setTypeFilter] = useState('all')
+  const [statusFilter, setStatusFilter] = useState('all')
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [idDelete, setIdDelete] = useState("")
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
-  const [questionDetails, setQuestionDetails] = useState(null)
+  const [testDetails, setTestDetails] = useState(null)
 
   const debouncedKeywordFilter = useDebounceValue(keywordFilter, 500)
   const history = useHistory();
 
   useEffect(() => {
-    filterQuestion()
-  }, [page, pageSize, debouncedKeywordFilter, typeFilter]);
+    handleFilter()
+  }, [page, pageSize, debouncedKeywordFilter, statusFilter]);
 
-  const filterQuestion = () =>{
+  const handleFilter = () =>{
     const body = {
       keyword: keywordFilter,
-      type: typeFilter === 'all' ? null : typeFilter
+      status: statusFilter === 'all' ? null : statusFilter
     }
     request(
       "post",
-      `/exam-question/filter?page=${page}&size=${pageSize}`,
+      `/exam/filter?page=${page}&size=${pageSize}`,
       (res) => {
         if(res.status === 200){
-          setQuestionList(res.data.content);
+          setExamList(res.data.content);
           setTotalCount(res.data.totalElements);
         }else {
           toast.error(res)
@@ -138,16 +152,16 @@ function QuestionBank(props) {
     );
   }
 
-  const detailsQuestion = (id) =>{
+  const detailsTest = (id) =>{
     const body = {
       id: id
     }
     request(
       "post",
-      `/exam-question/details`,
+      `/exam-test/details`,
       (res) => {
         if(res.data.resultCode === 200){
-          setQuestionDetails(res.data.data)
+          setTestDetails(res.data.data)
           setOpenDetailsDialog(true)
         }else{
           toast.error(res.data.resultMsg)
@@ -160,7 +174,7 @@ function QuestionBank(props) {
 
   const onClickCreateNewButton = () => {
     history.push({
-      pathname: "/exam/create-update-question-bank",
+      pathname: "/exam/create-update",
       state: {
         question: {
           code: "",
@@ -182,9 +196,9 @@ function QuestionBank(props) {
     });
   };
 
-  const handleUpdateQuestion = (rowData) => {
+  const handleUpdate = (rowData) => {
     history.push({
-      pathname: "/exam/create-update-question-bank",
+      pathname: "/exam/create-update",
       state: {
         question: {
           code: rowData.code,
@@ -206,11 +220,11 @@ function QuestionBank(props) {
     });
   };
 
-  const handleDetailsQuestion = (rowData) => {
-    detailsQuestion(rowData.id)
+  const handleDetailsTest = (rowData) => {
+    detailsTest(rowData.examTestId)
   };
 
-  const handleDeleteQuestion = (rowData) => {
+  const handleDelete = (rowData) => {
     setOpenDeleteDialog(true)
     setIdDelete(rowData.id)
   };
@@ -222,13 +236,13 @@ function QuestionBank(props) {
           title={
             <Box display="flex" justifyContent="space-between" alignItems="end" width="100%">
               <Box display="flex" flexDirection="column" width="80%">
-                <h4>Ngân hàng câu hỏi</h4>
+                <h4>Danh sách kỳ thi</h4>
                 <Box display="flex" justifyContent="flex-start" width="100%">
                   <TextField
                     autoFocus
-                    id="questionCode"
+                    id="examCode"
                     label="Nội dung tìm kiếm"
-                    placeholder="Tìm kiếm theo code hoặc nội dung"
+                    placeholder="Tìm kiếm theo code hoặc tên"
                     value={keywordFilter}
                     style={{ width: "300px", marginRight: "16px"}}
                     onChange={(event) => {
@@ -240,17 +254,17 @@ function QuestionBank(props) {
                   />
 
                   <TextField
-                    id="questionType"
+                    id="examStatus"
                     select
-                    label="Loại câu hỏi"
+                    label="Trạng thái"
                     style={{ width: "150px"}}
-                    value={typeFilter}
+                    value={statusFilter}
                     onChange={(event) => {
-                      setTypeFilter(event.target.value);
+                      setStatusFilter(event.target.value);
                     }}
                   >
                     {
-                      questionTypes.map(item => {
+                      statusList.map(item => {
                         return (
                           <MenuItem value={item.value}>{item.name}</MenuItem>
                         )
@@ -276,7 +290,7 @@ function QuestionBank(props) {
         <CardContent>
           <DataGrid
             rowCount={totalCount}
-            rows={questionList}
+            rows={examList}
             columns={columns}
             page={page}
             pageSize={pageSize}
@@ -292,25 +306,25 @@ function QuestionBank(props) {
       </Card>
       {
         openDetailsDialog && (
-          <QuestionBankDetails
+          <TestBankDetails
             open={openDetailsDialog}
             setOpen={setOpenDetailsDialog}
-            question={questionDetails}
+            data={testDetails}
           />
         )
       }
-      <QuestionBankDelete
+      <ExamDelete
         open={openDeleteDialog}
         setOpen={setOpenDeleteDialog}
         id={idDelete}
-        onReloadQuestions={() => {
-          filterQuestion()
+        onReload={() => {
+          handleFilter()
         }}
       />
     </div>
   );
 }
 
-const screenName = "MENU_EXAM_QUESTION_BANK";
+const screenName = "MENU_EXAM_MANAGEMENT";
 // export default withScreenSecurity(QuestionBank, screenName, true);
-export default QuestionBank;
+export default ExamManagement;

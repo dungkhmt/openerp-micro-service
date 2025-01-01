@@ -46,6 +46,7 @@ function TestBank(props) {
       headerName: "Mô tả",
       ...baseColumn,
       flex: 1,
+      minWidth: 170,
       renderCell: (rowData) => {
         return parser(rowData.value)
       },
@@ -70,7 +71,7 @@ function TestBank(props) {
           <Box display="flex" justifyContent="space-between" alignItems='center' width="100%">
             <InfoIcon style={{cursor: 'pointer'}} onClick={(data) => handleOpenPopupDetails(rowData?.row)}/>
             <EditIcon style={{cursor: 'pointer'}} onClick={(data) => handleUpdate(rowData?.row)}/>
-            <DeleteIcon style={{cursor: 'pointer'}} onClick={(data) => handleOpenPopupDelete(rowData?.row)}/>
+            <DeleteIcon style={{cursor: 'pointer', color: 'red'}} onClick={(data) => handleOpenPopupDelete(rowData?.row)}/>
           </Box>
         )
       }
