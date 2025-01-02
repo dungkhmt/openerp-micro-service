@@ -14,9 +14,8 @@ import InfoIcon from "@mui/icons-material/Info";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import {formatDateTime} from "../ultils/DateUltils";
-import TestBankDetails from "../testbank/TestBankDetails";
-import {Assignment} from "@material-ui/icons";
 import ExamDelete from "./ExamDelete";
+import ExamDetails from "./ExamDetails";
 
 const baseColumn = {
   sortable: false,
@@ -89,7 +88,7 @@ function ExamManagement(props) {
       renderCell: (rowData) => {
         return (
           <Box display="flex" justifyContent="space-between" alignItems='center' width="100%">
-            <Assignment style={{cursor: 'pointer'}} onClick={(data) => handleDetailsTest(rowData?.row)}/>
+            <InfoIcon style={{cursor: 'pointer'}} onClick={(data) => handleDetails(rowData?.row)}/>
             <EditIcon style={{cursor: 'pointer'}} onClick={(data) => handleUpdate(rowData?.row)}/>
             <DeleteIcon style={{cursor: 'pointer', color: 'red'}} onClick={(data) => handleDelete(rowData?.row)}/>
           </Box>
@@ -122,7 +121,7 @@ function ExamManagement(props) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [idDelete, setIdDelete] = useState("")
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
-  const [testDetails, setTestDetails] = useState(null)
+  const [examDetails, setExamDetails] = useState(null)
 
   const debouncedKeywordFilter = useDebounceValue(keywordFilter, 500)
   const history = useHistory();
@@ -145,26 +144,6 @@ function ExamManagement(props) {
           setTotalCount(res.data.totalElements);
         }else {
           toast.error(res)
-        }
-      },
-      { onError: (e) => toast.error(e) },
-      body
-    );
-  }
-
-  const detailsTest = (id) =>{
-    const body = {
-      id: id
-    }
-    request(
-      "post",
-      `/exam-test/details`,
-      (res) => {
-        if(res.data.resultCode === 200){
-          setTestDetails(res.data.data)
-          setOpenDetailsDialog(true)
-        }else{
-          toast.error(res.data.resultMsg)
         }
       },
       { onError: (e) => toast.error(e) },
@@ -217,8 +196,24 @@ function ExamManagement(props) {
     );
   };
 
-  const handleDetailsTest = (rowData) => {
-    detailsTest(rowData.examTestId)
+  const handleDetails = (rowData) => {
+    const body = {
+      id: rowData.id
+    }
+    request(
+      "post",
+      `/exam/details`,
+      (res) => {
+        if(res.data.resultCode === 200){
+          setExamDetails(res.data.data)
+          setOpenDetailsDialog(true)
+        }else{
+          toast.error(res.data.resultMsg)
+        }
+      },
+      { onError: (e) => toast.error(e) },
+      body
+    );
   };
 
   const handleDelete = (rowData) => {
@@ -303,10 +298,10 @@ function ExamManagement(props) {
       </Card>
       {
         openDetailsDialog && (
-          <TestBankDetails
+          <ExamDetails
             open={openDetailsDialog}
             setOpen={setOpenDetailsDialog}
-            data={testDetails}
+            data={examDetails}
           />
         )
       }
