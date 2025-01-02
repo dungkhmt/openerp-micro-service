@@ -41,4 +41,15 @@ public class ReceiptItemRequestService {
     public Optional<ReceiptItemRequestProjection> getReceiptItemRequestDetail(UUID receiptItemRequestId) {
         return receiptItemRequestRepository.findDetailById(receiptItemRequestId);
     }
+    
+    public UUID getReceiptIdByRequestId(UUID receiptItemRequestId) {
+        return receiptItemRequestRepository.findById(receiptItemRequestId)
+                .map(ReceiptItemRequest::getReceiptId)
+                .orElseThrow(() -> new IllegalArgumentException("Receipt Item Request ID not found: " + receiptItemRequestId));
+    }
+    public UUID getProductIdByRequestId(UUID receiptItemRequestId) {
+        return receiptItemRequestRepository.findById(receiptItemRequestId)
+                .map(ReceiptItemRequest::getProductId)
+                .orElseThrow(() -> new IllegalArgumentException("Receipt Item Request ID not found: " + receiptItemRequestId));
+    }
 }

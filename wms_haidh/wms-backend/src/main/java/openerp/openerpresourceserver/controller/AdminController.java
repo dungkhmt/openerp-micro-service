@@ -25,14 +25,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.entity.Product;
 import openerp.openerpresourceserver.entity.ProductCategory;
+import openerp.openerpresourceserver.entity.ReceiptBill;
+import openerp.openerpresourceserver.entity.ReceiptItem;
 import openerp.openerpresourceserver.entity.Warehouse;
 import openerp.openerpresourceserver.entity.projection.BayProjection;
+import openerp.openerpresourceserver.entity.projection.InventoryItemProjection;
 import openerp.openerpresourceserver.entity.projection.ProductInfoProjection;
 import openerp.openerpresourceserver.entity.projection.ReceiptItemProjection;
 import openerp.openerpresourceserver.entity.projection.ReceiptItemRequestProjection;
 import openerp.openerpresourceserver.model.request.ProductCreate;
+import openerp.openerpresourceserver.model.request.ReceiptBillCreate;
+import openerp.openerpresourceserver.model.request.ReceiptItemCreate;
+import openerp.openerpresourceserver.service.BayService;
+import openerp.openerpresourceserver.service.InventoryService;
 import openerp.openerpresourceserver.service.ProductCategoryService;
 import openerp.openerpresourceserver.service.ProductService;
+import openerp.openerpresourceserver.service.ReceiptBillService;
 import openerp.openerpresourceserver.service.ReceiptItemRequestService;
 import openerp.openerpresourceserver.service.ReceiptItemService;
 import openerp.openerpresourceserver.service.WarehouseService;
@@ -48,10 +56,18 @@ public class AdminController {
 	private WarehouseService warehouseService;
 	private ReceiptItemRequestService receiptItemRequestService;
 	private ReceiptItemService receiptItemService;
+	private ReceiptBillService receiptBillService;
+	private InventoryService inventoryService;
+	private BayService bayService;
 
 	@GetMapping("/warehouse")
 	public ResponseEntity<List<Warehouse>> getAllWarehouses() {
 		List<Warehouse> warehouses = warehouseService.getAllWarehouses();
+		return ResponseEntity.ok(warehouses);
+	}
+	@GetMapping("/bay")
+	public ResponseEntity<List<BayProjection>> getAllBays(@RequestParam("warehouseId") UUID warehouseId) {
+		List<BayProjection> warehouses = bayService.getBaysByWarehouseId(warehouseId);
 		return ResponseEntity.ok(warehouses);
 	}
 
@@ -176,4 +192,57 @@ public class AdminController {
 		List<ReceiptItemProjection> items = receiptItemService.getItemsByRequestId(id);
 		return ResponseEntity.ok(items);
 	}
+
+	@GetMapping("/receipt/bill/{id}")
+	public ResponseEntity<List<String>> getAllReceiptBillIds(@PathVariable UUID id) {
+		List<String> receiptBillIds = receiptBillService.getAllReceiptBillIds(id);
+		return ResponseEntity.ok(receiptBillIds);
+	}
+
+	@PostMapping("/receipt/bill/create")
+	public ResponseEntity<ReceiptBill> createReceiptBill(@RequestBody ReceiptBillCreate request) {
+		ReceiptBill receiptBill = receiptBillService.createReceiptBill(request.getReceiptBillId(),
+				request.getDescription(), request.getCreatedBy(), request.getReceiptItemRequestId());
+		return ResponseEntity.ok(receiptBill);
+	}
+
+	@PostMapping("/receipt/receipt-item/create")
+	public ResponseEntity<?> createReceiptItem(@RequestBody ReceiptItemCreate request) {
+		try {
+			ReceiptItem receiptItem = receiptItemService.createReceiptItem(request);
+			return ResponseEntity.ok(receiptItem);
+		} catch (IllegalArgumentException e) {
+			// Xử lý ngoại lệ nếu dữ liệu đầu vào không hợp lệ
+			return ResponseEntity.badRequest().body("Invalid input: " + e.getMessage());
+		} catch (Exception e) {
+			// Xử lý ngoại lệ chung
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("An unexpected error occurred: " + e.getMessage());
+		}
+	}
+
+	@GetMapping("/inventory")
+	public ResponseEntity<Page<InventoryItemProjection>> getInventoryItems(
+	        @RequestParam(required = false) UUID warehouseId,
+	        @RequestParam(required = false) UUID bayId,
+	        @RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "5") int size) {
+	    try {
+
+	        Pageable pageable = PageRequest.of(page, size);
+	        Page<InventoryItemProjection> inventoryItems = inventoryService.getInventoryItems(warehouseId, bayId, pageable);
+
+	        return ResponseEntity.ok(inventoryItems);
+	    } catch (IllegalArgumentException e) {
+	        System.err.println("Invalid request parameters: " + e.getMessage());
+	        e.printStackTrace();
+	        return ResponseEntity.badRequest().build();
+	    } catch (Exception e) {
+	        System.err.println("Unexpected error occurred: " + e.getMessage());
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	    }
+	}
+
+
 }

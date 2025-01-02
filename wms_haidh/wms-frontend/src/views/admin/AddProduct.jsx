@@ -24,7 +24,6 @@ const ProductForm = () => {
   const [image, setImage] = useState(null);
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
-  const [inventory, setInventory] = useState([{ warehouse: '', quantity: '' }]);
   const [code, setCode] = useState('');
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
@@ -88,21 +87,6 @@ const ProductForm = () => {
     if (file) {
       setImage(file);
     }
-  };
-
-  const handleAddInventory = () => {
-    setInventory([...inventory, { warehouse: '', quantity: '' }]);
-  };
-
-  const handleDeleteInventory = (index) => {
-    const newInventory = inventory.filter((_, i) => i !== index);
-    setInventory(newInventory);
-  };
-
-  const handleChangeInventory = (index, field, value) => {
-    const newInventory = [...inventory];
-    newInventory[index][field] = value;
-    setInventory(newInventory);
   };
 
 

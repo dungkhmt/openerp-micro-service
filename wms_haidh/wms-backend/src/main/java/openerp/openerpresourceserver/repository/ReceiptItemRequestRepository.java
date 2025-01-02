@@ -27,6 +27,7 @@ public interface ReceiptItemRequestRepository extends JpaRepository<ReceiptItemR
 
 	@Query(value = """
 			 SELECT r.receiptItemRequestId AS receiptItemRequestId,
+			        rc.receiptName AS receiptName,
 			        r.quantity AS quantity,
 			        r.completed AS completed,
 			        rc.expectedReceiptDate AS expectedReceiptDate,

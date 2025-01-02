@@ -31,7 +31,7 @@ import { request } from "../../api";
 
 const INITIAL_VISIBLE_COLUMNS = ["name", "code", "totalQuantityOnHand", "dateUpdated", "actions"];
 const buttonText = "Add Product";
-export default function BaseTable() {
+export default function ProductList() {
 
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);

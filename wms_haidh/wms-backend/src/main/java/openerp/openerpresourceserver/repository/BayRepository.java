@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,6 @@ import openerp.openerpresourceserver.entity.projection.BayProjection;
 public interface BayRepository extends JpaRepository<Bay, UUID> {
     @Query("SELECT b.bayId AS bayId, b.code AS code FROM Bay b WHERE b.warehouseId = :warehouseId")
     List<BayProjection> findByWarehouseIdWithProjection(@Param("warehouseId") UUID warehouseId);
+
+    Optional<Bay> findByBayId(UUID bayId);
 }

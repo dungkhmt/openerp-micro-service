@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -97,6 +98,7 @@ public class ReceiptService {
 	}
 
 	public void createReceiptItems(UUID receiptId, List<ReceiptItemRequestCreate> receiptItemRequests) {
+		LocalDateTime now = LocalDateTime.now();
 		// Tạo mới ReceiptItemRequest cho từng item
 		for (ReceiptItemRequestCreate item : receiptItemRequests) {
 			ReceiptItemRequest receiptItemRequest = new ReceiptItemRequest();
@@ -104,6 +106,8 @@ public class ReceiptService {
 			receiptItemRequest.setProductId(item.getProductId());
 			receiptItemRequest.setQuantity(item.getQuantity());
 			receiptItemRequest.setWarehouseId(item.getWarehouseId());
+			receiptItemRequest.setCompleted(new BigDecimal(0));
+			receiptItemRequest.setLastUpdated(now);
 			// Lưu ReceiptItemRequest vào DB
 			receiptItemRequestRepository.save(receiptItemRequest);
 		}

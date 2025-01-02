@@ -6,6 +6,8 @@ import java.util.UUID;
 
 public interface ReceiptItemRequestProjection {
 	UUID getReceiptItemRequestId();
+	
+	String getReceiptName();
 
 	int getQuantity();
 
