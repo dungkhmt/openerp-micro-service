@@ -184,7 +184,8 @@ function ExamManagement(props) {
           description: "",
           status: 1,
           startTime: "",
-          endTime: ""
+          endTime: "",
+          examStudents: []
         },
         isCreate: true
       },
@@ -193,28 +194,17 @@ function ExamManagement(props) {
 
   const handleUpdate = (rowData) => {
     const body = {
-      id: rowData.examTestId
+      id: rowData.id
     }
     request(
       "post",
-      `/exam-test/details`,
+      `/exam/details`,
       (res) => {
         if(res.data.resultCode === 200){
-          let examTests = []
-          examTests.push(res.data.data)
           history.push({
             pathname: "/exam/create-update",
             state: {
-              data: {
-                examTestId: rowData.examTestId,
-                examTests: examTests,
-                code: rowData.code,
-                name: rowData.name,
-                description: rowData.description,
-                status: rowData.status,
-                startTime: rowData.startTime,
-                endTime: rowData.endTime
-              },
+              data: res.data.data,
               isCreate: false
             },
           });

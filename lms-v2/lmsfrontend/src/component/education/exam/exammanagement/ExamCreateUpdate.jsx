@@ -15,7 +15,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import {useHistory} from "react-router-dom";
 import {useLocation} from "react-router";
 import {getFilenameFromString, getFilePathFromString} from "../ultils/FileUltils";
-import {AttachFileOutlined} from "@material-ui/icons";
+import {Assignment, AttachFileOutlined} from "@material-ui/icons";
 import DeleteIcon from "@material-ui/icons/Delete";
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 import {vi} from "date-fns/locale";
@@ -26,6 +26,8 @@ import SelectTestDialog from "./SelectTestDialog";
 import parser from "html-react-parser";
 import TestBankDetails from "../testbank/TestBankDetails";
 import {formatDateTime, formatDateTimeApi} from "../ultils/DateUltils";
+import XLSX from "xlsx";
+import {DataGrid} from "@material-ui/data-grid";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -50,8 +52,54 @@ const MenuProps = {
     },
   },
 };
+const baseColumn = {
+  sortable: false,
+};
 
 function ExamCreateUpdate(props) {
+
+  const columns = [
+    {
+      field: "code",
+      headerName: "Mã học viên",
+      minWidth: 170,
+      ...baseColumn
+    },
+    {
+      field: "name",
+      headerName: "Họ và tên",
+      minWidth: 200,
+      flex: 1,
+      ...baseColumn
+    },
+    {
+      field: "email",
+      headerName: "Email",
+      ...baseColumn,
+      flex: 1,
+      minWidth: 200,
+    },
+    {
+      field: "phone",
+      headerName: "Số điện thoại",
+      ...baseColumn,
+      minWidth: 200,
+    },
+    {
+      field: "",
+      headerName: "",
+      sortable: false,
+      minWidth: 30,
+      maxWidth: 30,
+      renderCell: (rowData) => {
+        return (
+          <Box display="flex" justifyContent="space-between" alignItems='center' width="100%">
+            <DeleteIcon style={{cursor: 'pointer', color: 'red'}} onClick={(data) => handleDeleteStudent(rowData?.row)}/>
+          </Box>
+        )
+      }
+    },
+  ];
 
   const statusList = [
     {
@@ -86,6 +134,8 @@ function ExamCreateUpdate(props) {
   const [testList, setTestList] = useState(data?.examTests)
   const [openTestDetailsDialog, setOpenTestDetailsDialog] = useState(false);
   const [testDetails, setTestDetails] = useState(null)
+  const [examStudents, setExamStudents] = useState(data?.examStudents)
+  const [examStudentDeletes, setExamStudentsDeletes] = useState([])
 
   const handleSave = () =>{
     const body = {
@@ -95,7 +145,9 @@ function ExamCreateUpdate(props) {
       status: status,
       examTestId: examTestId,
       startTime: formatDateTimeApi(startTime),
-      endTime: formatDateTimeApi(endTime)
+      endTime: formatDateTimeApi(endTime),
+      examStudents: examStudents,
+      examStudentDeletes: examStudentDeletes
     }
     validateBody(body)
 
@@ -183,6 +235,49 @@ function ExamCreateUpdate(props) {
     detailsTest(data.id)
   };
 
+  const handleImportFile = (file) => {
+    let tmpExamStudents = []
+    if(file){
+      let fileReader = new FileReader();
+      fileReader.onload = (event) => {
+        const data = event.target.result;
+
+        const workbook = XLSX.read(data, {
+          type: 'binary'
+        });
+        workbook.SheetNames.forEach(sheet => {
+          const rowObject = XLSX.utils.sheet_to_json(workbook.Sheets[sheet], {
+            header: 1,
+          });
+          const filteredRows = rowObject.slice(1);
+          filteredRows.map((row) => {
+            tmpExamStudents.push({
+              code: row[1],
+              name: row[2],
+              email: row[3],
+              phone: row[4]
+            })
+          });
+          setExamStudents((prevExamStudents) => {
+            const newStudents = tmpExamStudents.filter(
+              (tmpStudent) =>
+                !prevExamStudents.some((student) => student.code === tmpStudent.code)
+            );
+            return [...prevExamStudents, ...newStudents];
+          });
+        });
+      };
+      fileReader.readAsBinaryString(file);
+    }
+  }
+
+  const handleDeleteStudent = (data) => {
+    setExamStudents(examStudents.filter(value => value.code !== data.code))
+    if(data.id){
+      setExamStudentsDeletes(examStudentDeletes.concat([data]))
+    }
+  }
+
   return (
     <div>
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -256,7 +351,7 @@ function ExamCreateUpdate(props) {
                       label="Thời gian bắt đầu"
                       value={startTime}
                       onChange={event => setStartTime(event)}
-                      renderInput={(params) => <TextField {...params} error={false} style={{ marginRight: '16px' }}/>}
+                      renderInput={(params) => <TextField {...params} error={false} style={{marginRight: '16px'}}/>}
                     />
                   </LocalizationProvider>
 
@@ -265,7 +360,7 @@ function ExamCreateUpdate(props) {
                       label="Thời gian kết thúc"
                       value={endTime}
                       onChange={event => setEndTime(event)}
-                      renderInput={(params) => <TextField {...params} error={false} style={{ marginRight: '16px' }}/>}
+                      renderInput={(params) => <TextField {...params} error={false} style={{marginRight: '16px'}}/>}
                     />
                   </LocalizationProvider>
                 </div>
@@ -273,79 +368,81 @@ function ExamCreateUpdate(props) {
                 <div>
                   {
                     testList.length < 1 ?
-                    (
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => setOpenSelectTestDialog(true)}
-                        startIcon={<AddCircleIcon />}
-                        style={{ marginRight: 16 , width: '200px'}}
-                      >
-                        Chọn đề thi
-                      </Button>
-                    )
-                    :
-                    (
-                      <div style={{
-                        border: '2px solid #f5f5f5',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        borderRadius: '10px',
-                        padding: '10px',
-                        marginBottom: '10px',
-                        marginTop: '10px'}}>
-                        <Box display="flex"
-                             flexDirection='column'
-                             width="calc(100% - 110px)"
-                             style={{
-                               userSelect: "none",
-                               WebkitUserSelect: "none",
-                               MozUserSelect: "none",
-                               msUserSelect: "none"}}>
-                          <div style={{display: 'flex'}}>
-                            <span style={{fontStyle: 'italic', marginRight: '5px'}}>({testList[0]?.code})</span>
-                            <span style={{display: "block", fontWeight: 'bold'}}>{testList[0]?.name}</span>
-                          </div>
-                          <p>{parser(testList[0]?.description)}</p>
-                        </Box>
+                      (
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() => setOpenSelectTestDialog(true)}
+                          startIcon={<AddCircleIcon/>}
+                          style={{marginRight: 16, width: '200px'}}
+                        >
+                          Chọn đề thi
+                        </Button>
+                      )
+                      :
+                      (
+                        <div style={{
+                          border: '2px solid #f5f5f5',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          borderRadius: '10px',
+                          padding: '10px',
+                          marginBottom: '10px',
+                          marginTop: '10px'
+                        }}>
+                          <Box display="flex"
+                               flexDirection='column'
+                               width="calc(100% - 110px)"
+                               style={{
+                                 userSelect: "none",
+                                 WebkitUserSelect: "none",
+                                 MozUserSelect: "none",
+                                 msUserSelect: "none"
+                               }}>
+                            <div style={{display: 'flex'}}>
+                              <span style={{fontStyle: 'italic', marginRight: '5px'}}>({testList[0]?.code})</span>
+                              <span style={{display: "block", fontWeight: 'bold'}}>{testList[0]?.name}</span>
+                            </div>
+                            <p>{parser(testList[0]?.description)}</p>
+                          </Box>
 
-                        <Box display="flex" justifyContent='space-between' width="110px">
-                          <button
-                            style={{
-                              height: 'max-content',
-                              padding: '8px',
-                              border: 'none',
-                              borderRadius: '8px',
-                              cursor: 'pointer',
-                              fontWeight: 'bold'
-                            }}
-                            onClick={(event) => {
-                              handleOpenPopupDetails(testList[0])
-                              event.preventDefault()
-                              event.stopPropagation()
-                            }}>
+                          <Box display="flex" justifyContent='space-between' width="110px">
+                            <button
+                              style={{
+                                height: 'max-content',
+                                padding: '8px',
+                                border: 'none',
+                                borderRadius: '8px',
+                                cursor: 'pointer',
+                                fontWeight: 'bold'
+                              }}
+                              onClick={(event) => {
+                                handleOpenPopupDetails(testList[0])
+                                event.preventDefault()
+                                event.stopPropagation()
+                              }}>
                               Chi tiết
-                          </button>
-                          <button
-                            style={{
-                              height: 'max-content',
-                              padding: '8px',
-                              border: 'none',
-                              borderRadius: '8px',
-                              color: 'red',
-                              cursor: 'pointer',
-                              fontWeight: 'bold'
-                            }}
-                            onClick={(event) => {
-                              setTestList([])
-                              event.preventDefault()
-                              event.stopPropagation()
-                            }}>
+                            </button>
+                            <button
+                              style={{
+                                height: 'max-content',
+                                padding: '8px',
+                                border: 'none',
+                                borderRadius: '8px',
+                                color: 'red',
+                                cursor: 'pointer',
+                                fontWeight: 'bold'
+                              }}
+                              onClick={(event) => {
+                                setTestList([])
+                                event.preventDefault()
+                                event.stopPropagation()
+                              }}>
                               Xoá
-                          </button>
-                        </Box>
-                      </div>
-                    )
+                            </button>
+                          </Box>
+                        </div>
+                      )
                   }
 
                 </div>
@@ -357,6 +454,60 @@ function ExamCreateUpdate(props) {
                     onContentChange={(value) =>
                       setDescription(value)
                     }
+                  />
+                </div>
+
+                <div>
+                  <Typography
+                    variant="subtitle1"
+                    display="block"
+                    style={{margin: "5px 0 0 7px", width: "100%"}}
+                  >
+                    Import danh sách học viên
+                  </Typography>
+                  <DropzoneArea
+                    dropzoneClass={classes.dropZone}
+                    filesLimit={1}
+                    showPreviews={true}
+                    showPreviewsInDropzone={false}
+                    useChipsForPreview
+                    dropzoneText="Kéo và thả tệp vào đây hoặc nhấn để chọn tệp"
+                    previewText="Xem trước:"
+                    previewChipProps={{
+                      variant: "outlined",
+                      color: "primary",
+                      size: "medium",
+                    }}
+                    getFileAddedMessage={(fileName) =>
+                      `Tệp ${fileName} tải lên thành công`
+                    }
+                    getFileRemovedMessage={(fileName) => `Tệp ${fileName} đã loại bỏ`}
+                    getFileLimitExceedMessage={(filesLimit) =>
+                      `Vượt quá số lượng tệp tối đa được cho phép. Chỉ được phép tải lên tối đa ${filesLimit} tệp.`
+                    }
+                    alertSnackbarProps={{
+                      anchorOrigin: {vertical: "bottom", horizontal: "right"},
+                      autoHideDuration: 1800,
+                    }}
+                    acceptedFiles={[".xls", ".xlsx"]}
+                    onChange={(files) => handleImportFile(files[0])}
+                  ></DropzoneArea>
+                </div>
+
+                <div>
+                  <Typography
+                    variant="subtitle1"
+                    display="block"
+                    style={{margin: "5px 0 0 7px", width: "100%"}}
+                  >
+                    Danh sách học viên
+                  </Typography>
+                  <DataGrid
+                    rows={examStudents}
+                    columns={columns}
+                    getRowId={(row) => row.code}
+                    disableColumnMenu
+                    autoHeight
                   />
                 </div>
               </div>
