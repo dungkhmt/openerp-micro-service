@@ -3,6 +3,7 @@ package com.hust.baseweb.applications.exam.controller;
 import com.hust.baseweb.applications.exam.entity.ExamEntity;
 import com.hust.baseweb.applications.exam.model.ResponseData;
 import com.hust.baseweb.applications.exam.model.request.*;
+import com.hust.baseweb.applications.exam.model.response.ExamDetailsRes;
 import com.hust.baseweb.applications.exam.service.ExamService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,12 @@ public class ExamController {
     public ResponseEntity<Page<ExamEntity>> filter(
         Pageable pageable, @RequestBody ExamFilterReq examFilterReq) {
         return ResponseEntity.ok(examService.filter(pageable, examFilterReq));
+    }
+
+    @Secured("ROLE_TEACHER")
+    @PostMapping("/details")
+    public ResponseEntity<ResponseData<ExamDetailsRes>> details(@RequestBody ExamDetailsReq examDetailsReq) {
+        return ResponseEntity.ok(examService.details(examDetailsReq));
     }
 
     @Secured("ROLE_TEACHER")

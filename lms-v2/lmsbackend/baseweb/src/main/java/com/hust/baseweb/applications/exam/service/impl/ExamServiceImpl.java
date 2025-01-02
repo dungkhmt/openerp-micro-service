@@ -3,13 +3,16 @@ package com.hust.baseweb.applications.exam.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hust.baseweb.applications.exam.entity.ExamEntity;
+import com.hust.baseweb.applications.exam.entity.ExamStudentEntity;
 import com.hust.baseweb.applications.exam.entity.ExamTestEntity;
 import com.hust.baseweb.applications.exam.entity.ExamTestQuestionEntity;
 import com.hust.baseweb.applications.exam.model.ResponseData;
 import com.hust.baseweb.applications.exam.model.request.*;
+import com.hust.baseweb.applications.exam.model.response.ExamDetailsRes;
 import com.hust.baseweb.applications.exam.model.response.ExamTestDetailsRes;
 import com.hust.baseweb.applications.exam.model.response.ExamTestQuestionDetailsRes;
 import com.hust.baseweb.applications.exam.repository.ExamRepository;
+import com.hust.baseweb.applications.exam.repository.ExamStudentRepository;
 import com.hust.baseweb.applications.exam.repository.ExamTestQuestionRepository;
 import com.hust.baseweb.applications.exam.repository.ExamTestRepository;
 import com.hust.baseweb.applications.exam.service.ExamService;
@@ -41,10 +44,11 @@ public class ExamServiceImpl implements ExamService {
 
     private final ExamRepository examRepository;
     private final ExamTestRepository examTestRepository;
-    private final ExamTestQuestionRepository examTestQuestionRepository;
+    private final ExamStudentRepository examStudentRepository;
     private final EntityManager entityManager;
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
+    private final ExamTestService examTestService;
 
 
     @Override
@@ -135,6 +139,33 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
+    public ResponseData<ExamDetailsRes> details(ExamDetailsReq examDetailsReq) {
+        ResponseData<ExamDetailsRes> responseData = new ResponseData<>();
+
+        Optional<ExamEntity> examEntityExist = examRepository.findById(examDetailsReq.getId());
+        if(!examEntityExist.isPresent()){
+            responseData.setHttpStatus(HttpStatus.NOT_FOUND);
+            responseData.setResultCode(HttpStatus.NOT_FOUND.value());
+            responseData.setResultMsg("Chưa tồn kỳ thi");
+            return responseData;
+        }
+
+        ExamDetailsRes examDetailsRes = modelMapper.map(examEntityExist.get(), ExamDetailsRes.class);
+
+        List<ExamTestDetailsRes> examTests = new ArrayList<>();
+        examTests.add(examTestService.details(new ExamTestDetailsReq(examDetailsRes.getExamTestId())).getData());
+        examDetailsRes.setExamTests(examTests);
+
+        examDetailsRes.setExamStudents(examStudentRepository.findALlByExamId(examDetailsRes.getId()));
+
+        responseData.setHttpStatus(HttpStatus.OK);
+        responseData.setResultCode(HttpStatus.OK.value());
+        responseData.setResultMsg("Success");
+        responseData.setData(examDetailsRes);
+        return responseData;
+    }
+
+    @Override
     @Transactional
     public ResponseData<ExamEntity> create(ExamSaveReq examSaveReq) {
         ResponseData<ExamEntity> responseData = new ResponseData<>();
@@ -158,7 +189,15 @@ public class ExamServiceImpl implements ExamService {
         ExamEntity examEntity = modelMapper.map(examSaveReq, ExamEntity.class);
         examEntity.setStartTime(DataUtils.formatStringToLocalDateTime(examSaveReq.getStartTime()));
         examEntity.setEndTime(DataUtils.formatStringToLocalDateTime(examSaveReq.getEndTime()));
-        examRepository.save(examEntity);
+        examEntity = examRepository.save(examEntity);
+
+        if(!examSaveReq.getExamStudents().isEmpty()){
+            for(ExamStudentEntity examStudent: examSaveReq.getExamStudents()){
+                examStudent.setExamId(examEntity.getId());
+            }
+            examStudentRepository.saveAll(examSaveReq.getExamStudents());
+        }
+
         responseData.setHttpStatus(HttpStatus.OK);
         responseData.setResultCode(HttpStatus.OK.value());
         responseData.setResultMsg("Thêm mới kỳ thi thành công");
@@ -193,6 +232,18 @@ public class ExamServiceImpl implements ExamService {
         examEntity.setStartTime(DataUtils.formatStringToLocalDateTime(examSaveReq.getStartTime()));
         examEntity.setEndTime(DataUtils.formatStringToLocalDateTime(examSaveReq.getEndTime()));
         examRepository.save(examEntity);
+
+        if(!examSaveReq.getExamStudents().isEmpty()){
+            for(ExamStudentEntity examStudent: examSaveReq.getExamStudents()){
+                examStudent.setExamId(examEntity.getId());
+            }
+            examStudentRepository.saveAll(examSaveReq.getExamStudents());
+        }
+
+        if(!examSaveReq.getExamStudentDeletes().isEmpty()){
+            examStudentRepository.deleteAll(examSaveReq.getExamStudentDeletes());
+        }
+
         responseData.setHttpStatus(HttpStatus.OK);
         responseData.setResultCode(HttpStatus.OK.value());
         responseData.setResultMsg("Cập nhật kỳ thi thành công");
