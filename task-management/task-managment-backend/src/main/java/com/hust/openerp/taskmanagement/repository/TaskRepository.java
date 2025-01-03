@@ -94,6 +94,10 @@ public interface TaskRepository extends JpaRepository<Task, UUID>, JpaSpecificat
             where t.assignee_id is not null
             and t.due_date between CURRENT_DATE AND DATE_TRUNC('day', CURRENT_DATE + INTERVAL '?1 days') + INTERVAL '1 day' - INTERVAL '1 second'""", nativeQuery = true)
     List<Task> getTasksDueDateIntervalDay(Integer intervalDay);
+    
+    List<Task> findByEventId(UUID eventId);
+    
+    List<Task> findByProjectIdAndEventIdIsNull(UUID projectId);
 
     public static interface TaskStatistic {
         Long getTotalCount();
