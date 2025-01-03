@@ -23,19 +23,26 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.entity.AssignedOrderItem;
 import openerp.openerpresourceserver.entity.Product;
 import openerp.openerpresourceserver.entity.ProductCategory;
 import openerp.openerpresourceserver.entity.ReceiptBill;
 import openerp.openerpresourceserver.entity.ReceiptItem;
 import openerp.openerpresourceserver.entity.Warehouse;
+import openerp.openerpresourceserver.entity.projection.AssignedOrderItemProjection;
 import openerp.openerpresourceserver.entity.projection.BayProjection;
 import openerp.openerpresourceserver.entity.projection.InventoryItemProjection;
+import openerp.openerpresourceserver.entity.projection.LotIdProjection;
 import openerp.openerpresourceserver.entity.projection.ProductInfoProjection;
 import openerp.openerpresourceserver.entity.projection.ReceiptItemProjection;
 import openerp.openerpresourceserver.entity.projection.ReceiptItemRequestProjection;
+import openerp.openerpresourceserver.entity.projection.SaleOrderItemDetailProjection;
+import openerp.openerpresourceserver.entity.projection.SaleOrderItemProjection;
+import openerp.openerpresourceserver.model.request.AssignedOrderItemCreate;
 import openerp.openerpresourceserver.model.request.ProductCreate;
 import openerp.openerpresourceserver.model.request.ReceiptBillCreate;
 import openerp.openerpresourceserver.model.request.ReceiptItemCreate;
+import openerp.openerpresourceserver.service.AssignedOrderItemService;
 import openerp.openerpresourceserver.service.BayService;
 import openerp.openerpresourceserver.service.InventoryService;
 import openerp.openerpresourceserver.service.ProductCategoryService;
@@ -43,6 +50,7 @@ import openerp.openerpresourceserver.service.ProductService;
 import openerp.openerpresourceserver.service.ReceiptBillService;
 import openerp.openerpresourceserver.service.ReceiptItemRequestService;
 import openerp.openerpresourceserver.service.ReceiptItemService;
+import openerp.openerpresourceserver.service.SaleOrderItemService;
 import openerp.openerpresourceserver.service.WarehouseService;
 
 @RestController
@@ -59,12 +67,15 @@ public class AdminController {
 	private ReceiptBillService receiptBillService;
 	private InventoryService inventoryService;
 	private BayService bayService;
+	private SaleOrderItemService saleOrderItemService;
+	private AssignedOrderItemService assignedOrderItemService;
 
 	@GetMapping("/warehouse")
 	public ResponseEntity<List<Warehouse>> getAllWarehouses() {
 		List<Warehouse> warehouses = warehouseService.getAllWarehouses();
 		return ResponseEntity.ok(warehouses);
 	}
+
 	@GetMapping("/bay")
 	public ResponseEntity<List<BayProjection>> getAllBays(@RequestParam("warehouseId") UUID warehouseId) {
 		List<BayProjection> warehouses = bayService.getBaysByWarehouseId(warehouseId);
@@ -223,26 +234,81 @@ public class AdminController {
 
 	@GetMapping("/inventory")
 	public ResponseEntity<Page<InventoryItemProjection>> getInventoryItems(
-	        @RequestParam(required = false) UUID warehouseId,
-	        @RequestParam(required = false) UUID bayId,
-	        @RequestParam(defaultValue = "0") int page,
-	        @RequestParam(defaultValue = "5") int size) {
-	    try {
+			@RequestParam(required = false) UUID warehouseId, @RequestParam(required = false) UUID bayId,
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
+		try {
 
-	        Pageable pageable = PageRequest.of(page, size);
-	        Page<InventoryItemProjection> inventoryItems = inventoryService.getInventoryItems(warehouseId, bayId, pageable);
+			Pageable pageable = PageRequest.of(page, size);
+			Page<InventoryItemProjection> inventoryItems = inventoryService.getInventoryItems(warehouseId, bayId,
+					pageable);
 
-	        return ResponseEntity.ok(inventoryItems);
-	    } catch (IllegalArgumentException e) {
-	        System.err.println("Invalid request parameters: " + e.getMessage());
-	        e.printStackTrace();
-	        return ResponseEntity.badRequest().build();
-	    } catch (Exception e) {
-	        System.err.println("Unexpected error occurred: " + e.getMessage());
-	        e.printStackTrace();
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-	    }
+			return ResponseEntity.ok(inventoryItems);
+		} catch (IllegalArgumentException e) {
+			System.err.println("Invalid request parameters: " + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.badRequest().build();
+		} catch (Exception e) {
+			System.err.println("Unexpected error occurred: " + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
 	}
 
+	@GetMapping("/orders")
+	public Page<SaleOrderItemProjection> getAllSaleOrderItems(@RequestParam(defaultValue = "APPROVED") String status,
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		return saleOrderItemService.getSaleOrderItems(status, pageable);
+	}
+
+	@GetMapping("/orders/general-info/{id}")
+	public SaleOrderItemDetailProjection getSaleOrderItemDetail(@PathVariable UUID id) {
+		return saleOrderItemService.getSaleOrderItemDetail(id);
+	}
+
+	@GetMapping("/orders/detail-info/{saleOrderItemId}")
+	public List<AssignedOrderItemProjection> getAssignedOrderItemsBySaleOrderItemId(
+			@PathVariable UUID saleOrderItemId) {
+		return assignedOrderItemService.getAssignedOrderItemsBySaleOrderItemId(saleOrderItemId);
+	}
+
+	@GetMapping("/orders/warehouses/{saleOrderItemId}")
+	public List<Warehouse> getDistinctWarehousesWithStock(@PathVariable UUID saleOrderItemId) {
+		return inventoryService.getDistinctWarehousesWithStockBySaleOrderItemId(saleOrderItemId);
+	}
+
+	@GetMapping("/orders/bays")
+	public ResponseEntity<List<BayProjection>> getBaysWithProductsInSaleOrder(@RequestParam UUID saleOrderItemId,
+			@RequestParam UUID warehouseId) {
+		List<BayProjection> bays = inventoryService.getBaysWithProductsInSaleOrder(saleOrderItemId, warehouseId);
+		return ResponseEntity.ok(bays);
+	}
+
+	@GetMapping("/orders/lots")
+	public ResponseEntity<List<LotIdProjection>> getLotIdsBySaleOrderItemIdAndBayId(@RequestParam UUID saleOrderItemId,
+			@RequestParam UUID bayId) {
+		List<LotIdProjection> lotIds = inventoryService.getLotIdsBySaleOrderItemIdAndBayId(saleOrderItemId, bayId);
+		return ResponseEntity.ok(lotIds);
+	}
+
+	@GetMapping("/orders/quantity")
+	public ResponseEntity<Integer> getQuantityOnHandBySaleOrderItemIdBayIdAndLotId(@RequestParam UUID saleOrderItemId,
+			@RequestParam UUID bayId, @RequestParam String lotId) {
+		return inventoryService.getQuantityOnHandBySaleOrderItemIdBayIdAndLotId(saleOrderItemId, bayId, lotId)
+				.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+	}
+
+	@PostMapping("/orders/assign")
+	public ResponseEntity<AssignedOrderItem> assignOrderItem(@RequestBody AssignedOrderItemCreate dto) {
+		try {
+			AssignedOrderItem assignedOrderItem = assignedOrderItemService.assignOrderItem(dto);
+			return ResponseEntity.ok(assignedOrderItem);
+		} catch (Exception e) {
+			// Ghi log lỗi nếu cần
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+
+		}
+	}
 
 }

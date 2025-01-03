@@ -25,7 +25,7 @@ const ReceiptDetail = () => {
   const handleApprove = () => {
     request(
       "post",
-      `/sale-manager/approve/${receiptId}?approvedBy=admin`,
+      `/sale-manager/receipts/approve/${receiptId}?approvedBy=admin`,
       (res) => {
         if (res.status === 200) {
           navigate(`/sale-manager/receipt`);
@@ -39,7 +39,7 @@ const ReceiptDetail = () => {
   const handleReject = () => {
     request(
       "post",
-      `/sale-manager/cancel/${receiptId}?cancelledBy=admin`,
+      `/sale-manager/receipts/cancel/${receiptId}?cancelledBy=admin`,
       (res) => {
         if (res.status === 200) {
           navigate(`/sale-manager/receipt`);
@@ -77,21 +77,11 @@ const ReceiptDetail = () => {
           </Paper>
         </Grid>
         <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{ mr: 2, backgroundColor: 'green', color: 'white' }}
-            onClick={handleApprove}
-          >
-            Approve
+          <Button variant="contained" color="error" onClick={handleReject} sx={{ mr: 2 }}>
+            Cancel
           </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            sx={{ backgroundColor: 'red', color: 'white' }}
-            onClick={handleReject}
-          >
-            Reject
+          <Button variant="contained" color="primary" onClick={handleApprove}>
+            Approve
           </Button>
         </Grid>
       </Grid>

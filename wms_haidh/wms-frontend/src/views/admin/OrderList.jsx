@@ -12,51 +12,38 @@ import {
   DropdownMenu,
   DropdownItem,
   Pagination,
+  Progress,
   Select, MenuItem
 } from "@nextui-org/react";
 import { VerticalDotsIcon } from "../../components/icon/VerticalDotsIcon";
-import { columns } from "../../config/inventory";
+import { columns, statusOptions } from "../../config/assignorder";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../api";
 
-const INITIAL_VISIBLE_COLUMNS = ["productName", "lotId", "bayCode", "quantityOnHandTotal", "lastUpdatedStamp"];
-export default function InventoryList() {
+const INITIAL_VISIBLE_COLUMNS = ["orderDate", "customerName", "productName", "quantity", "priceUnit", "completed", "actions"];
+const buttonText = "Assign order";
+export default function OrderList() {
 
   const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [pages, setPages] = useState(1);
   const [items, setItems] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
-  const [warehouseId, setWarehouseId] = useState("");
-  const [bayId, setBayId] = useState("");
-  const [warehouses, setWarehouses] = useState([]);
-  const [bays, setBays] = useState([]);
+  const [statusFilter, setStatusFilter] = useState("APPROVED");
 
   useEffect(() => {
-    request("get", "/admin/warehouse", (res) => {
-      setWarehouses(res.data);
-    }).then();
-  }, []);  
-  
-  useEffect(() => {
-    if (warehouseId) {
-      setBayId("");
-      request("get", `/admin/bay?warehouseId=${warehouseId}`, (res) => {
-        setBays(res.data);
-      }).then();
-    }
-  }, [warehouseId]); 
-  
-  useEffect(() => {
-    request("get", `/admin/inventory?warehouseId=${warehouseId}&bayId=${bayId}&page=${page - 1}&size=${rowsPerPage}`, (res) => {
+    request("get", `/admin/orders?status=${statusFilter}&page=${page - 1}&size=${rowsPerPage}`, (res) => {
       setItems(res.data.content);
       setTotalItems(res.data.totalElements);
       setPages(res.data.totalPages);
     }).then();
-  }, [page, rowsPerPage, warehouseId, bayId]); 
-  const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
+  }, [page, rowsPerPage, statusFilter]);
 
+  const visibleColumns = useMemo(() => {
+    const updatedColumns = new Set(INITIAL_VISIBLE_COLUMNS);
+    return updatedColumns;
+  }, [statusFilter]);
   const headerColumns = useMemo(() => {
     if (visibleColumns === "all") return columns;
 
@@ -67,6 +54,17 @@ export default function InventoryList() {
     const cellValue = item[columnKey];
 
     switch (columnKey) {
+      case "completed":
+        return (
+          <Progress
+            aria-label="Completed..."
+            className="max-w-md min-h-[2.5rem]"
+            color={item.completed === 100 ? "success" : "warning"}
+            showValueLabel={true}
+            size="sm"
+            value={item.completed}
+          />
+        );
       case "actions":
         return (
           <div className="relative flex justify-end items-center gap-2">
@@ -77,7 +75,7 @@ export default function InventoryList() {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem onClick={() => handleUpdate(item.receiptId)}>View receipt</DropdownItem>
+                <DropdownItem onClick={() => handleUpdate(item.saleOrderItemId)}>Assign order</DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
@@ -92,19 +90,10 @@ export default function InventoryList() {
     setPage(1);
   }, []);
 
-  const onSearchChange = useCallback((value) => {
-    if (value) {
-      setFilterValue(value);
-      setPage(1);
-    } else {
-      setFilterValue("");
-    }
-  }, []);
-
   const navigate = useNavigate();
 
   const handleUpdate = (id) => {
-    navigate(`/sale-manager/receipt/${id}`);
+    navigate(`/admin/orders/${id}`);
   };
 
   const formatDate = (dateString) => {
@@ -125,70 +114,45 @@ export default function InventoryList() {
 
   const topContent = useMemo(() => {
     return (
-<div className="flex flex-col gap-4">
-  <div className="flex justify-start items-center gap-3">
-    {/* Warehouse Select */}
-    <div className="flex-shrink-0 w-52">
-      <Select
-        labelId="warehouse-label"
-        value={warehouseId} 
-        onChange={(e) => setWarehouseId(e.target.value)}
-        defaultSelectedKeys={["warehouse"]} 
-        className="w-full"
-      >
-        <MenuItem key="warehouse" value=""> 
-          Select a warehouse
-        </MenuItem>
-        {warehouses.map((cat) => (
-          <MenuItem key={cat.warehouseId} value={cat.warehouseId}>
-            {cat.name}
-          </MenuItem>
-        ))}
-      </Select>
-    </div>
-    
-    {/* Bay Select */}
-    <div className="flex-shrink-0 w-52">
-      <Select
-        labelId="bay-label"
-        value={bayId} 
-        onChange={(e) => setBayId(e.target.value)}
-        defaultSelectedKeys={["bay"]} 
-        className="w-full"
-      >
-        <MenuItem key="bay" value=""> 
-          Select a bay
-        </MenuItem>
-        {bays.map((cat) => (
-          <MenuItem key={cat.bayId} value={cat.bayId}>
-            {cat.code}
-          </MenuItem>
-        ))}
-      </Select>
-    </div>
-  </div>
-
-  <div className="flex justify-between items-center">
-    <span className="text-default-400 text-small">Total {totalItems} items</span>
-    <label className="flex items-center text-default-400 text-small">
-      Rows per page:
-      <select
-        className="bg-transparent outline-none text-default-400 text-small"
-        onChange={onRowsPerPageChange}
-      >
-        <option value="5">5</option>
-        <option value="10">10</option>
-        <option value="15">15</option>
-      </select>
-    </label>
-  </div>
-</div>
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-between items-center gap-3">
+          {/* Status Select */}
+          <div className="flex-shrink-0 w-40">
+            <Select
+              labelId="status-label"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              defaultSelectedKeys={["APPROVED"]}
+              className="w-full"
+            >
+              {statusOptions.map((cat) => (
+                <MenuItem key={cat.uid} value={cat.uid}>
+                  {cat.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </div>
+        </div>
 
 
 
+        <div className="flex justify-between items-center">
+          <span className="text-default-400 text-small">Total {totalItems} items</span>
+          <label className="flex items-center text-default-400 text-small">
+            Rows per page:
+            <select
+              className="bg-transparent outline-none text-default-400 text-small"
+              onChange={onRowsPerPageChange}
+            >
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+          </label>
+        </div>
+      </div>
     );
   }, [
-    onSearchChange,
     onRowsPerPageChange,
     totalItems
   ]);
@@ -208,11 +172,6 @@ export default function InventoryList() {
           variant="light"
           onChange={setPage}
         />
-        {/* <span className="text-small text-default-400">
-          {selectedKeys === "all"
-            ? "All items selected"
-            : `${selectedKeys.size} of ${items.length} selected`}
-        </span> */}
       </div>
     );
   }, [page, pages]);
@@ -256,7 +215,7 @@ export default function InventoryList() {
         {(column) => (
           <TableColumn
             key={column.uid}
-            align={column.uid === "productName" ? "start" : "center"}
+            align={column.uid === "actions" ? "center" : "start"}
             allowsSorting={column.sortable}
           >
             {column.name}
@@ -265,11 +224,11 @@ export default function InventoryList() {
       </TableHeader>
       <TableBody emptyContent={"Loading ..."} items={items}>
         {(item) => (
-          <TableRow key={item.inventoryItemId}>
+          <TableRow key={item.saleOrderItemId} >
             {(columnKey) => (
               <TableCell>
-                {columnKey === "lastUpdatedStamp"
-                  ? formatDate(item.lastUpdatedStamp)
+                {columnKey === "orderDate"
+                  ? formatDate(item.orderDate)
                   : renderCell(item, columnKey)}
               </TableCell>
             )}

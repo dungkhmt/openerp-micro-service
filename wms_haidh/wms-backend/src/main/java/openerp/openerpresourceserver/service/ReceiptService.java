@@ -70,6 +70,9 @@ public class ReceiptService {
 
 		if (receiptOptional.isPresent()) {
 			Receipt receipt = receiptOptional.get();
+			if (!"CREATED".equals(receipt.getStatus())) {
+	            return false;
+	        }
 			receipt.setStatus("APPROVED");
 			receipt.setLastUpdatedStamp(LocalDateTime.now());
 			// Thêm thông tin người duyệt
@@ -84,8 +87,11 @@ public class ReceiptService {
 	public boolean cancelReceipt(UUID receiptId, String cancelledBy) {
 		Optional<Receipt> receiptOptional = receiptRepository.findById(receiptId);
 
-		if (receiptOptional.isPresent()) {
+		if (receiptOptional.isPresent()) {		
 			Receipt receipt = receiptOptional.get();
+			if (!"CREATED".equals(receipt.getStatus())) {
+	            return false;
+	        }
 			receipt.setStatus("CANCELLED");
 			receipt.setLastUpdatedStamp(LocalDateTime.now());
 			// Thêm thông tin người từ chối

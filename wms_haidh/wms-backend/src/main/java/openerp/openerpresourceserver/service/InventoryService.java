@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,9 +13,13 @@ import org.springframework.stereotype.Service;
 
 import openerp.openerpresourceserver.entity.InventoryItem;
 import openerp.openerpresourceserver.entity.InventoryItemDetail;
+import openerp.openerpresourceserver.entity.Warehouse;
+import openerp.openerpresourceserver.entity.projection.BayProjection;
 import openerp.openerpresourceserver.entity.projection.InventoryItemProjection;
+import openerp.openerpresourceserver.entity.projection.LotIdProjection;
 import openerp.openerpresourceserver.repository.InventoryItemDetailRepository;
 import openerp.openerpresourceserver.repository.InventoryItemRepository;
+import openerp.openerpresourceserver.repository.WarehouseRepository;
 
 @Service
 public class InventoryService {
@@ -22,6 +27,8 @@ public class InventoryService {
     private InventoryItemRepository inventoryItemRepository;
 	@Autowired
     private InventoryItemDetailRepository inventoryItemDetailRepository;
+	@Autowired
+    private WarehouseRepository warehouseRepository;
     @Autowired
     private BayService bayService;
 
@@ -75,5 +82,24 @@ public class InventoryService {
         } else {
             return inventoryItemRepository.findAllInventoryItems(pageable);
         }
+    }
+    
+    public List<Warehouse> getDistinctWarehousesWithStockBySaleOrderItemId(UUID saleOrderItemId) {
+        List<UUID> warehouseIds = inventoryItemRepository.findDistinctWarehouseIdsWithStockBySaleOrderItemId(saleOrderItemId);
+        return warehouseRepository.findAllById(warehouseIds);
+    }
+    
+    public List<BayProjection> getBaysWithProductsInSaleOrder(UUID saleOrderItemId, UUID warehouseId) {
+        return inventoryItemRepository.findBayProjectionsBySaleOrderItemIdAndWarehouseId(saleOrderItemId, warehouseId);
+    }
+    
+    public List<LotIdProjection> getLotIdsBySaleOrderItemIdAndBayId(UUID saleOrderItemId, UUID bayId) {
+        return inventoryItemRepository.findLotIdsBySaleOrderItemIdAndBayId(saleOrderItemId, bayId);
+    }
+    
+    public Optional<Integer> getQuantityOnHandBySaleOrderItemIdBayIdAndLotId(
+            UUID saleOrderItemId, UUID bayId, String lotId) {
+        return inventoryItemRepository.findQuantityOnHandBySaleOrderItemIdBayIdAndLotId(
+                saleOrderItemId, bayId, lotId);
     }
 }

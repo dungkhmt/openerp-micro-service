@@ -16,19 +16,20 @@ import {
 } from "@nextui-org/react";
 import { VerticalDotsIcon } from "../../components/icon/VerticalDotsIcon";
 import { Badge } from "../../components/button/badge";
-import { columns, statusOptions } from "../../config/sale";
+import { columns, statusOptions } from "../../config/saleorder";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../api";
 const statusColorMap = {
-  CREATED: "default",       
+  CREATED: "default",
   CANCELLED: "destructive",
-  APPROVED: "secondary",    
-  IN_PROGRESS: "warning",   
-  COMPLETED: "success",    
+  APPROVED: "secondary",
+  DELIVERING_A_PART: "warning",
+  DISTRIBUTED: "warning",
+  COMPLETED: "success",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["receiptName", "createdReason", "description", "expectedReceiptDate", "status", "approvedBy", "cancelledBy", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["orderDate", "totalOrderCost", "customerName", "status", "approvedBy", "cancelledBy", "actions"];
 export default function SaleOrderList() {
 
   const [page, setPage] = useState(1);
@@ -39,7 +40,7 @@ export default function SaleOrderList() {
   const [statusFilter, setStatusFilter] = useState("CREATED");
 
   useEffect(() => {
-    request("get", `/purchase-manager/receipts?status=${statusFilter}&page=${page - 1}&size=${rowsPerPage}`, (res) => {
+    request("get", `/sale-manager/orders?status=${statusFilter}&page=${page - 1}&size=${rowsPerPage}`, (res) => {
       setItems(res.data.content);
       setTotalItems(res.data.totalElements);
       setPages(res.data.totalPages);
@@ -85,7 +86,7 @@ export default function SaleOrderList() {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem onClick={() => handleUpdate(item.receiptId)}>View receipt</DropdownItem>
+                <DropdownItem onClick={() => handleUpdate(item.orderId)}>Update order</DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
@@ -100,14 +101,6 @@ export default function SaleOrderList() {
     setPage(1);
   }, []);
 
-  const onSearchChange = useCallback((value) => {
-    if (value) {
-      setFilterValue(value);
-      setPage(1);
-    } else {
-      setFilterValue("");
-    }
-  }, []);
 
   const navigate = useNavigate();
 
@@ -128,6 +121,12 @@ export default function SaleOrderList() {
     return date.toLocaleString('en-GB', options); // Hoặc 'en-US' nếu bạn muốn kiểu định dạng kiểu Mỹ
   };
 
+  const formatPrice = (price) => {
+    return price.toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    });
+  };
 
 
 
@@ -172,7 +171,6 @@ export default function SaleOrderList() {
       </div>
     );
   }, [
-    onSearchChange,
     onRowsPerPageChange,
     totalItems
   ]);
@@ -249,12 +247,12 @@ export default function SaleOrderList() {
       </TableHeader>
       <TableBody emptyContent={"Loading ..."} items={items}>
         {(item) => (
-          <TableRow key={item.receiptId}>
+          <TableRow key={item.orderId}>
             {(columnKey) => (
               <TableCell>
-                {columnKey === "expectedReceiptDate"
-                  ? formatDate(item.expectedReceiptDate)
-                  : renderCell(item, columnKey)}
+                {columnKey === "orderDate"
+                  ? formatDate(item.orderDate)
+                  : (columnKey === "totalOrderCost" ? formatPrice(item.totalOrderCost) : renderCell(item, columnKey))}
               </TableCell>
             )}
           </TableRow>
