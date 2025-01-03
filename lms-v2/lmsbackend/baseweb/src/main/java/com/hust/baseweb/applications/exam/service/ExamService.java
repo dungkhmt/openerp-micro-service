@@ -1,6 +1,7 @@
 package com.hust.baseweb.applications.exam.service;
 
 import com.hust.baseweb.applications.exam.entity.ExamEntity;
+import com.hust.baseweb.applications.exam.entity.ExamResultEntity;
 import com.hust.baseweb.applications.exam.model.ResponseData;
 import com.hust.baseweb.applications.exam.model.request.*;
 import com.hust.baseweb.applications.exam.model.response.ExamDetailsRes;
@@ -24,4 +25,6 @@ public interface ExamService {
     Page<MyExamFilterRes> filterMyExam(Pageable pageable, MyExamFilterReq myExamFilterReq);
 
     ResponseData<MyExamDetailsRes> detailsMyExam(String examId);
+
+    ResponseData<ExamResultEntity> doingMyExam(MyExamResultSaveReq myExamResultSaveReq);
 }

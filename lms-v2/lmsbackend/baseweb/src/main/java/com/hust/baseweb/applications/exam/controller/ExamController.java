@@ -1,6 +1,7 @@
 package com.hust.baseweb.applications.exam.controller;
 
 import com.hust.baseweb.applications.exam.entity.ExamEntity;
+import com.hust.baseweb.applications.exam.entity.ExamResultEntity;
 import com.hust.baseweb.applications.exam.model.ResponseData;
 import com.hust.baseweb.applications.exam.model.request.*;
 import com.hust.baseweb.applications.exam.model.response.ExamDetailsRes;
@@ -65,5 +66,10 @@ public class ExamController {
     @GetMapping("/details-my-exam/{examId}")
     public ResponseEntity<ResponseData<MyExamDetailsRes>> detailsMyExam(@PathVariable("examId") String examId) {
         return ResponseEntity.ok(examService.detailsMyExam(examId));
+    }
+
+    @PostMapping("/doing-my-exam")
+    public ResponseEntity<ResponseData<ExamResultEntity>> doingMyExam(@RequestBody @Valid MyExamResultSaveReq myExamResultSaveReq) {
+        return ResponseEntity.ok(examService.doingMyExam(myExamResultSaveReq));
     }
 }

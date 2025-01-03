@@ -2,17 +2,11 @@ package com.hust.baseweb.applications.exam.service.impl;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hust.baseweb.applications.exam.entity.ExamEntity;
-import com.hust.baseweb.applications.exam.entity.ExamStudentEntity;
-import com.hust.baseweb.applications.exam.entity.ExamTestEntity;
-import com.hust.baseweb.applications.exam.entity.ExamTestQuestionEntity;
+import com.hust.baseweb.applications.exam.entity.*;
 import com.hust.baseweb.applications.exam.model.ResponseData;
 import com.hust.baseweb.applications.exam.model.request.*;
 import com.hust.baseweb.applications.exam.model.response.*;
-import com.hust.baseweb.applications.exam.repository.ExamRepository;
-import com.hust.baseweb.applications.exam.repository.ExamStudentRepository;
-import com.hust.baseweb.applications.exam.repository.ExamTestQuestionRepository;
-import com.hust.baseweb.applications.exam.repository.ExamTestRepository;
+import com.hust.baseweb.applications.exam.repository.*;
 import com.hust.baseweb.applications.exam.service.ExamService;
 import com.hust.baseweb.applications.exam.service.ExamTestService;
 import com.hust.baseweb.applications.exam.utils.Constants;
@@ -21,6 +15,7 @@ import com.hust.baseweb.applications.exam.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +36,8 @@ public class ExamServiceImpl implements ExamService {
     private final ExamRepository examRepository;
     private final ExamTestRepository examTestRepository;
     private final ExamStudentRepository examStudentRepository;
+    private final ExamResultRepository examResultRepository;
+    private final ExamResultDetailsRepository examResultDetailsRepository;
     private final EntityManager entityManager;
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
@@ -407,6 +404,22 @@ public class ExamServiceImpl implements ExamService {
         responseData.setHttpStatus(HttpStatus.OK);
         responseData.setResultCode(HttpStatus.OK.value());
         responseData.setData(myExamDetailsRes);
+        responseData.setResultMsg("Success");
+        return responseData;
+    }
+
+    @Override
+    public ResponseData<ExamResultEntity> doingMyExam(MyExamResultSaveReq myExamResultSaveReq) {
+        ResponseData<ExamResultEntity> responseData = new ResponseData<>();
+
+        ExamResultEntity examResultEntity = modelMapper.map(myExamResultSaveReq, ExamResultEntity.class);
+        examResultRepository.save(examResultEntity);
+
+        List<ExamResultDetailsEntity> examResultDetailsEntities = modelMapper.map(myExamResultSaveReq.getExamResultDetails(), new TypeToken<List<ExamResultDetailsEntity>>(){}.getType());
+        examResultDetailsRepository.saveAll(examResultDetailsEntities);
+
+        responseData.setHttpStatus(HttpStatus.OK);
+        responseData.setResultCode(HttpStatus.OK.value());
         responseData.setResultMsg("Success");
         return responseData;
     }
