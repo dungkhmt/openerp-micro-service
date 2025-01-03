@@ -32,7 +32,7 @@ export const ExamMenu = {
       {
         id: "MENU_EXAMINEE_PARTICIPANT",
         path: "/exam/my-exam",
-        isPublic: false,
+        isPublic: true,
         icon: null,
         text: "My Exams",
         child: [],
