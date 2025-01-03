@@ -194,6 +194,7 @@ public class ExamServiceImpl implements ExamService {
         if(!examSaveReq.getExamStudents().isEmpty()){
             for(ExamStudentEntity examStudent: examSaveReq.getExamStudents()){
                 examStudent.setExamId(examEntity.getId());
+                examStudent.setExamTestId(examSaveReq.getExamTestId());
             }
             examStudentRepository.saveAll(examSaveReq.getExamStudents());
         }
@@ -236,6 +237,7 @@ public class ExamServiceImpl implements ExamService {
         if(!examSaveReq.getExamStudents().isEmpty()){
             for(ExamStudentEntity examStudent: examSaveReq.getExamStudents()){
                 examStudent.setExamId(examEntity.getId());
+                examStudent.setExamTestId(examSaveReq.getExamTestId());
             }
             examStudentRepository.saveAll(examSaveReq.getExamStudents());
         }
