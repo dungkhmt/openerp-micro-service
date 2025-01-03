@@ -1,28 +1,71 @@
 package com.hust.openerp.taskmanagement.entity;
 
-import jakarta.persistence.*;
+import java.io.Serializable;
+import java.util.UUID;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Entity
+@IdClass(TaskSkill.TaskSkillId.class)
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "task_management_task_skill")
 public class TaskSkill {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
-    private UUID id;
 
+    @Id
     @Column(name = "task_id")
     private UUID taskId;
 
+    @Id
     @Column(name = "skill_id")
     private String skillId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "task_id", nullable = false, insertable = false, updatable = false)
+    private Task task;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "skill_id", nullable = false, insertable = false, updatable = false)
+    private Skill skill;
+
+
+    @SuppressWarnings("serial")
+	@AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Setter
+    public static class TaskSkillId implements Serializable {
+        private UUID taskId;
+        private String skillId;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (!(o instanceof TaskSkillId))
+                return false;
+            TaskSkillId that = (TaskSkillId) o;
+            return taskId.equals(that.taskId) && skillId.equals(that.skillId);
+        }
+
+        @Override
+        public int hashCode() {
+            return taskId.hashCode() + skillId.hashCode();
+        }
+    }
 }

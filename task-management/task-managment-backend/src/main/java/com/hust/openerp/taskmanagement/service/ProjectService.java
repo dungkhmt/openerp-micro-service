@@ -22,4 +22,6 @@ public interface ProjectService {
     void deleteProjectById(UUID id, String deleterId);
 
     Page<ProjectDTO> findPaginated(String memberId, Pageable pageable, String searchString);
+    
+    List<String> getProjectsCode();
 }
