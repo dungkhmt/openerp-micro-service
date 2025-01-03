@@ -17,9 +17,6 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { CircularProgress } from "@nextui-org/react";
@@ -28,7 +25,7 @@ import { request } from "../../api";
 
 const OrderItem = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id1, id2 } = useParams();
   const [generalInfo, setGeneralInfo] = useState(null);
   const [warehouseOptions, setWarehouseOptions] = useState([]);
   const [bayOptions, setBayOptions] = useState([]);
@@ -41,23 +38,23 @@ const OrderItem = () => {
   const [details, setDetails] = useState([]);
 
   useEffect(() => {
-    request("get", `/admin/orders/general-info/${id}`, (res) => {
+    request("get", `/admin/orders/general-info/${id2}`, (res) => {
       setGeneralInfo(res.data);
     });
 
-    request("get", `/admin/orders/warehouses/${id}`, (res) => {
+    request("get", `/admin/orders/warehouses/${id2}`, (res) => {
       setWarehouseOptions(res.data);
     });
 
-    request("get", `/admin/orders/detail-info/${id}`, (res) => {
+    request("get", `/admin/orders/detail-info/${id2}`, (res) => {
       setDetails(res.data);
     });
 
-  }, [id]);
+  }, [id2]);
 
   useEffect(() => {
     if (warehouseId) {
-      request("get", `/admin/orders/bays?saleOrderItemId=${id}&warehouseId=${warehouseId}`, (res) => {
+      request("get", `/admin/orders/bays?saleOrderItemId=${id2}&warehouseId=${warehouseId}`, (res) => {
         setBayOptions(res.data);
       }).then();
     }
@@ -65,7 +62,7 @@ const OrderItem = () => {
 
   useEffect(() => {
     if (bayId) {
-      request("get", `/admin/orders/lots?saleOrderItemId=${id}&bayId=${bayId}`, (res) => {
+      request("get", `/admin/orders/lots?saleOrderItemId=${id2}&bayId=${bayId}`, (res) => {
         setLotIds(res.data);
       }).then();
     }
@@ -73,7 +70,7 @@ const OrderItem = () => {
 
   useEffect(() => {
     if (lotId) {
-      request("get", `/admin/orders/quantity?saleOrderItemId=${id}&bayId=${bayId}&lotId=${lotId}`, (res) => {
+      request("get", `/admin/orders/quantity?saleOrderItemId=${id2}&bayId=${bayId}&lotId=${lotId}`, (res) => {
         setQuantityOnHand(res.data);
       }).then();
     }
@@ -85,16 +82,16 @@ const OrderItem = () => {
       bayId,
       lotId,
       quantity,
-      saleOrderItemId: id,
+      saleOrderItemId: id2,
       assignedBy: "admin"
     };
     console.log(payload);
     request("post", `/admin/orders/assign`, (res) => {
       if (res.status === 200) {
-        request("get", `/admin/orders/general-info/${id}`, (res) => {
+        request("get", `/admin/orders/general-info/${id2}`, (res) => {
           setGeneralInfo(res.data);
         });
-        request("get", `/admin/orders/detail-info/${id}`, (res) => {
+        request("get", `/admin/orders/detail-info/${id2}`, (res) => {
           setDetails(res.data);
         });
         alert("Assign successfully!")
@@ -114,7 +111,7 @@ const OrderItem = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <IconButton color="primary" onClick={() => navigate('/admin/orders')} sx={{ color: 'black' }}>
+        <IconButton color="primary" onClick={() => navigate(`/admin/orders/${id1}`)} sx={{ color: 'black' }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>

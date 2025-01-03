@@ -12,18 +12,23 @@ import {
   DropdownMenu,
   DropdownItem,
   Pagination,
-  Progress,
   Select, MenuItem
 } from "@nextui-org/react";
 import { VerticalDotsIcon } from "../../components/icon/VerticalDotsIcon";
+import { Badge } from "../../components/button/badge";
 import { columns, statusOptions } from "../../config/assignorder";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../api";
+const statusColorMap = {
+  APPROVED: "secondary",
+  DELIVERING_A_PART: "warning",
+  DISTRIBUTED: "warning",
+  COMPLETED: "success",
+};
 
-const INITIAL_VISIBLE_COLUMNS = ["orderDate", "customerName", "productName", "quantity", "priceUnit", "completed", "actions"];
-const buttonText = "Assign order";
-export default function OrderList() {
+const INITIAL_VISIBLE_COLUMNS = ["orderDate", "totalOrderCost", "customerName", "status", "approvedBy", "actions"];
+export default function SaleOrderList() {
 
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -33,7 +38,7 @@ export default function OrderList() {
   const [statusFilter, setStatusFilter] = useState("APPROVED");
 
   useEffect(() => {
-    request("get", `/admin/orders?status=${statusFilter}&page=${page - 1}&size=${rowsPerPage}`, (res) => {
+    request("get", `/sale-manager/orders?status=${statusFilter}&page=${page - 1}&size=${rowsPerPage}`, (res) => {
       setItems(res.data.content);
       setTotalItems(res.data.totalElements);
       setPages(res.data.totalPages);
@@ -44,6 +49,7 @@ export default function OrderList() {
     const updatedColumns = new Set(INITIAL_VISIBLE_COLUMNS);
     return updatedColumns;
   }, [statusFilter]);
+
   const headerColumns = useMemo(() => {
     if (visibleColumns === "all") return columns;
 
@@ -54,16 +60,9 @@ export default function OrderList() {
     const cellValue = item[columnKey];
 
     switch (columnKey) {
-      case "completed":
+      case "status":
         return (
-          <Progress
-            aria-label="Completed..."
-            className="max-w-md min-h-[2.5rem]"
-            color={item.completed === 100 ? "success" : "warning"}
-            showValueLabel={true}
-            size="sm"
-            value={item.completed}
-          />
+          <Badge variant={statusColorMap[item.status]}>{cellValue.replace(/_/g, ' ')}</Badge>
         );
       case "actions":
         return (
@@ -75,7 +74,7 @@ export default function OrderList() {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem onClick={() => handleUpdate(item.saleOrderItemId)}>Assign order</DropdownItem>
+                <DropdownItem onClick={() => handleUpdate(item.orderId)}>Update order</DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
@@ -89,6 +88,7 @@ export default function OrderList() {
     setRowsPerPage(Number(e.target.value));
     setPage(1);
   }, []);
+
 
   const navigate = useNavigate();
 
@@ -109,6 +109,12 @@ export default function OrderList() {
     return date.toLocaleString('en-GB', options); // Hoặc 'en-US' nếu bạn muốn kiểu định dạng kiểu Mỹ
   };
 
+  const formatPrice = (price) => {
+    return price.toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    });
+  };
 
 
 
@@ -215,7 +221,7 @@ export default function OrderList() {
         {(column) => (
           <TableColumn
             key={column.uid}
-            align={column.uid === "actions" ? "center" : "start"}
+            align={"center"}
             allowsSorting={column.sortable}
           >
             {column.name}
@@ -224,12 +230,12 @@ export default function OrderList() {
       </TableHeader>
       <TableBody emptyContent={"Loading ..."} items={items}>
         {(item) => (
-          <TableRow key={item.saleOrderItemId} >
+          <TableRow key={item.orderId}>
             {(columnKey) => (
               <TableCell>
                 {columnKey === "orderDate"
                   ? formatDate(item.orderDate)
-                  : renderCell(item, columnKey)}
+                  : (columnKey === "totalOrderCost" ? formatPrice(item.totalOrderCost) : renderCell(item, columnKey))}
               </TableCell>
             )}
           </TableRow>

@@ -5,8 +5,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -34,8 +32,8 @@ public class ReceiptItemRequestService {
 		return bayService.getBaysByWarehouseId(warehouseId);
 	}
     
-    public Page<ReceiptItemRequestProjection> getAllReceiptItemRequests(String status,Pageable pageable) {
-        return receiptItemRequestRepository.findAllWithDetails(status,pageable);
+    public List<ReceiptItemRequestProjection> getAllReceiptItemRequests(UUID id) {
+        return receiptItemRequestRepository.findAllWithDetails(id);
     }
     
     public Optional<ReceiptItemRequestProjection> getReceiptItemRequestDetail(UUID receiptItemRequestId) {

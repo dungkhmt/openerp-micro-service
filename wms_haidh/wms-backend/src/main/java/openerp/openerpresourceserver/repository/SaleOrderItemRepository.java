@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,19 +22,16 @@ public interface SaleOrderItemRepository extends JpaRepository<SaleOrderItem, UU
 
 	@Query("""
 			    SELECT soi.saleOrderItemId AS saleOrderItemId,
-			           o.orderDate AS orderDate,
-			           o.customerName AS customerName,
 			           p.name AS productName,
 			           soi.quantity AS quantity,
 			           soi.priceUnit AS priceUnit,
 			           soi.completed AS completed
 			    FROM SaleOrderItem soi
-			    JOIN Order o ON soi.orderId = o.orderId
 			    JOIN Product p ON soi.productId = p.productId
-			    WHERE o.status = :status
+			    WHERE soi.orderId = :orderId
 			    ORDER BY soi.lastUpdated DESC
 			""")
-	Page<SaleOrderItemProjection> findSaleOrderItems(@Param("status") String status, Pageable pageable);
+	List<SaleOrderItemProjection> findSaleOrderItems(@Param("orderId") UUID id);
 
 	@Query("""
 			    SELECT p.name AS productName,

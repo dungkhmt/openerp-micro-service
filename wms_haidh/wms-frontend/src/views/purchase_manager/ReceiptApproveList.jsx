@@ -29,7 +29,7 @@ const statusColorMap = {
 };
 
 const INITIAL_VISIBLE_COLUMNS = ["receiptName", "createdReason", "description", "expectedReceiptDate", "status", "approvedBy", "cancelledBy", "actions"];
-export default function ReceiptList() {
+export default function ReceiptApproveList() {
 
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -112,7 +112,7 @@ export default function ReceiptList() {
   const navigate = useNavigate();
 
   const handleUpdate = (id) => {
-    navigate(`/sale-manager/receipt/${id}`);
+    navigate(`/purchase-manager/process-receipts/${id}`);
   };
 
   const formatDate = (dateString) => {

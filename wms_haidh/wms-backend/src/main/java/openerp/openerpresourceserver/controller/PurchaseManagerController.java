@@ -131,4 +131,37 @@ public class PurchaseManagerController {
 		return ResponseEntity.ok(products);
 	}
 
+	@PostMapping("/process-receipts/approve/{receiptId}")
+	public ResponseEntity<String> approveReceipt(@PathVariable UUID receiptId, @RequestParam String approvedBy) {
+		try {
+			boolean isApproved = receiptService.approveReceipt(receiptId, approvedBy);
+
+			if (isApproved) {
+				return ResponseEntity.ok("Receipt approved successfully.");
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Receipt not found.");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error approving receipt.");
+		}
+	}
+
+	@PostMapping("/process-receipts/cancel/{receiptId}")
+	public ResponseEntity<String> cancelReceipt(@PathVariable UUID receiptId, @RequestParam String cancelledBy) {
+		try {
+			boolean isCancelled = receiptService.cancelReceipt(receiptId, cancelledBy);
+
+			if (isCancelled) {
+				return ResponseEntity.ok("Receipt cancelled successfully.");
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Receipt not found.");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error cancelling receipt.");
+		}
+	}
+
+
 }

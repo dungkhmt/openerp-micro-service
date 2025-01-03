@@ -1,12 +1,11 @@
 const columns = [
-    { name: "ORDER DATE", uid: "orderDate" },
-    { name: "CUSTOMER NAME", uid: "customerName" },
-    { name: "PRODUCT NAME", uid: "productName" },
-    { name: "QUANTITY", uid: "quantity" },
-    { name: "PRICE UNIT", uid: "priceUnit" },
-    { name: "COMPLETED", uid: "completed" },
-    { name: "ACTIONS", uid: "actions" }
-  ];
+  { name: "ORDER DATE", uid: "orderDate" },
+  { name: "TOTAL ORDER COST", uid: "totalOrderCost" },
+  { name: "CUSTOMER NAME", uid: "customerName" },
+  { name: "STATUS", uid: "status" },
+  { name: "APPROVED BY", uid: "approvedBy" },
+  { name: "ACTIONS", uid: "actions" }
+];
   
   const statusOptions = [
     { name: "APPROVED", uid: "APPROVED" },

@@ -3,8 +3,6 @@ package openerp.openerpresourceserver.service;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import openerp.openerpresourceserver.entity.projection.OrderDetailProjection;
@@ -24,8 +22,8 @@ public class SaleOrderItemService {
         return saleOrderItemRepository.findOrderDetailsByOrderId(orderId);
     }
     
-    public Page<SaleOrderItemProjection> getSaleOrderItems(String status, Pageable pageable) {
-        return saleOrderItemRepository.findSaleOrderItems(status, pageable);
+    public List<SaleOrderItemProjection> getSaleOrderItems(UUID id) {
+        return saleOrderItemRepository.findSaleOrderItems(id);
     }
     
     public SaleOrderItemDetailProjection getSaleOrderItemDetail(UUID id) {

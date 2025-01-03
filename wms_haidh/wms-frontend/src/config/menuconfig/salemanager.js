@@ -11,13 +11,6 @@ export const salemanager = {
       child: [],
     },
     {
-      id: "MENU_WMSv2_SALE_MANAGER.RECEIPT_REQUEST",
-      path: "/sale-manager/receipt",
-      isPublic: true,
-      text: "Process Receipt",
-      child: [],
-    },
-    {
       id: "MENU_WMSv2_SALE_MANAGER.ORDERS",
       path: "/sale-manager/sale-order",
       isPublic: true,

@@ -136,7 +136,7 @@ export default function InventoryList() {
         defaultSelectedKeys={["warehouse"]} 
         className="w-full"
       >
-        <MenuItem key="warehouse" value=""> 
+        <MenuItem key="warehouse" value="" style={{ color: "gray" }}> 
           Select a warehouse
         </MenuItem>
         {warehouses.map((cat) => (
@@ -156,7 +156,7 @@ export default function InventoryList() {
         defaultSelectedKeys={["bay"]} 
         className="w-full"
       >
-        <MenuItem key="bay" value=""> 
+        <MenuItem key="bay" value="" style={{ color: "gray" }}> 
           Select a bay
         </MenuItem>
         {bays.map((cat) => (
@@ -208,11 +208,6 @@ export default function InventoryList() {
           variant="light"
           onChange={setPage}
         />
-        {/* <span className="text-small text-default-400">
-          {selectedKeys === "all"
-            ? "All items selected"
-            : `${selectedKeys.size} of ${items.length} selected`}
-        </span> */}
       </div>
     );
   }, [page, pages]);

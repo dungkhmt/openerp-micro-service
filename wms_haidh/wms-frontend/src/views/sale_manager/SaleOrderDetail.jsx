@@ -138,7 +138,7 @@ const SaleOrderDetail = () => {
                   <TableRow key={index}>
                     <TableCell>{item.productName}</TableCell>
                     <TableCell>{item.quantity}</TableCell>
-                    <TableCell>{item.priceUnit}</TableCell>
+                    <TableCell>{formatPrice(item.priceUnit)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

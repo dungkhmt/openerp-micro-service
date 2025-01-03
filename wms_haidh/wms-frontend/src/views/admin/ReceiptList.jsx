@@ -12,19 +12,22 @@ import {
   DropdownMenu,
   DropdownItem,
   Pagination,
-  Progress,
   Select, MenuItem
 } from "@nextui-org/react";
-import { PlusIcon } from "../../components/icon/PlusIcon";
 import { VerticalDotsIcon } from "../../components/icon/VerticalDotsIcon";
-import { columns, statusOptions } from "../../config/admin";
+import { Badge } from "../../components/button/badge";
+import { columns, statusOptions } from "../../config/receiptadmin";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../api";
+const statusColorMap = {
+  APPROVED: "secondary",    
+  IN_PROGRESS: "warning",   
+  COMPLETED: "success",    
+};
 
-const INITIAL_VISIBLE_COLUMNS = ["receiptName","productName", "quantity", "warehouseName", "expectedReceiptDate", "completed", "actions"];
-const buttonText = "View Receipt Bill";
-export default function ReceiptList() {
+const INITIAL_VISIBLE_COLUMNS = ["receiptName", "createdReason", "description", "expectedReceiptDate", "status", "approvedBy", "actions"];
+export default function ReceiptApproveList() {
 
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -34,20 +37,18 @@ export default function ReceiptList() {
   const [statusFilter, setStatusFilter] = useState("APPROVED");
 
   useEffect(() => {
-    request("get", `/admin/receipt?status=${statusFilter}&page=${page - 1}&size=${rowsPerPage}`, (res) => {
+    request("get", `/purchase-manager/receipts?status=${statusFilter}&page=${page - 1}&size=${rowsPerPage}`, (res) => {
       setItems(res.data.content);
       setTotalItems(res.data.totalElements);
       setPages(res.data.totalPages);
     }).then();
   }, [page, rowsPerPage, statusFilter]);
 
- const visibleColumns = useMemo(() => {
-      const updatedColumns = new Set(INITIAL_VISIBLE_COLUMNS);
-      if (statusFilter === "APPROVED") {
-        updatedColumns.delete("completed");   
-      } 
-      return updatedColumns;
-    }, [statusFilter]);
+  const visibleColumns = useMemo(() => {
+    const updatedColumns = new Set(INITIAL_VISIBLE_COLUMNS);
+    return updatedColumns;
+  }, [statusFilter]);
+
   const headerColumns = useMemo(() => {
     if (visibleColumns === "all") return columns;
 
@@ -58,16 +59,9 @@ export default function ReceiptList() {
     const cellValue = item[columnKey];
 
     switch (columnKey) {
-      case "completed":
+      case "status":
         return (
-          <Progress 
-            aria-label="Completed..."
-            className="max-w-md min-h-[2.5rem]"
-            color={item.completed === 100 ? "success" : "warning"}
-            showValueLabel={true}
-            size="sm"
-            value={item.completed}
-          />
+          <Badge variant={statusColorMap[item.status]}>{cellValue.replace(/_/g, ' ')}</Badge>
         );
       case "actions":
         return (
@@ -79,7 +73,7 @@ export default function ReceiptList() {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem onClick={() => handleUpdate(item.receiptItemRequestId)}>Update request</DropdownItem>
+                <DropdownItem onClick={() => handleUpdate(item.receiptId)}>View receipt</DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
@@ -94,11 +88,16 @@ export default function ReceiptList() {
     setPage(1);
   }, []);
 
-  const navigate = useNavigate();
+  const onSearchChange = useCallback((value) => {
+    if (value) {
+      setFilterValue(value);
+      setPage(1);
+    } else {
+      setFilterValue("");
+    }
+  }, []);
 
-  const handleViewBill = () => {
-    navigate('/admin/receipts/receipt-bill');
-  };
+  const navigate = useNavigate();
 
   const handleUpdate = (id) => {
     navigate(`/admin/receipts/${id}`);
@@ -140,17 +139,6 @@ export default function ReceiptList() {
               ))}
             </Select>
           </div>
-
-          {/* Add Button */}
-          <div className="flex-shrink-0">
-            <Button
-              className="bg-foreground text-background"
-              size="md"
-              onClick={handleViewBill}
-            >
-              {buttonText}
-            </Button>
-          </div>
         </div>
 
 
@@ -172,6 +160,7 @@ export default function ReceiptList() {
       </div>
     );
   }, [
+    onSearchChange,
     onRowsPerPageChange,
     totalItems
   ]);
@@ -191,6 +180,11 @@ export default function ReceiptList() {
           variant="light"
           onChange={setPage}
         />
+        {/* <span className="text-small text-default-400">
+          {selectedKeys === "all"
+            ? "All items selected"
+            : `${selectedKeys.size} of ${items.length} selected`}
+        </span> */}
       </div>
     );
   }, [page, pages]);
@@ -234,7 +228,7 @@ export default function ReceiptList() {
         {(column) => (
           <TableColumn
             key={column.uid}
-            align={column.uid === "actions" ? "center" : "start"}
+            align={"center"}
             allowsSorting={column.sortable}
           >
             {column.name}
@@ -243,7 +237,7 @@ export default function ReceiptList() {
       </TableHeader>
       <TableBody emptyContent={"Loading ..."} items={items}>
         {(item) => (
-          <TableRow key={item.receiptItemRequestId} >
+          <TableRow key={item.receiptId}>
             {(columnKey) => (
               <TableCell>
                 {columnKey === "expectedReceiptDate"

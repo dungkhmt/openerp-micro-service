@@ -176,14 +176,9 @@ public class AdminController {
 		}
 	}
 
-	@GetMapping("/receipt")
-	public ResponseEntity<Page<ReceiptItemRequestProjection>> getAllReceiptItems(
-			@RequestParam(defaultValue = "APPROVED") String status, @RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "5") int size) {
-
-		Pageable pageable = PageRequest.of(page, size);
-		Page<ReceiptItemRequestProjection> receiptItems = receiptItemRequestService.getAllReceiptItemRequests(status,
-				pageable);
+	@GetMapping("/receipt/{id}")
+	public ResponseEntity<List<ReceiptItemRequestProjection>> getAllReceiptItems(@PathVariable UUID id) {
+		List<ReceiptItemRequestProjection> receiptItems = receiptItemRequestService.getAllReceiptItemRequests(id);
 		return ResponseEntity.ok(receiptItems);
 	}
 
@@ -254,11 +249,9 @@ public class AdminController {
 		}
 	}
 
-	@GetMapping("/orders")
-	public Page<SaleOrderItemProjection> getAllSaleOrderItems(@RequestParam(defaultValue = "APPROVED") String status,
-			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
-		Pageable pageable = PageRequest.of(page, size);
-		return saleOrderItemService.getSaleOrderItems(status, pageable);
+	@GetMapping("/orders/{id}")
+	public List<SaleOrderItemProjection> getAllSaleOrderItems(@PathVariable UUID id) {
+		return saleOrderItemService.getSaleOrderItems(id);
 	}
 
 	@GetMapping("/orders/general-info/{id}")
@@ -304,7 +297,6 @@ public class AdminController {
 			AssignedOrderItem assignedOrderItem = assignedOrderItemService.assignOrderItem(dto);
 			return ResponseEntity.ok(assignedOrderItem);
 		} catch (Exception e) {
-			// Ghi log lỗi nếu cần
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 

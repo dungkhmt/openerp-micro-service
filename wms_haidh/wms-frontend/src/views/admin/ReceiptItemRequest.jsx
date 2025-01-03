@@ -28,7 +28,7 @@ import { request } from "../../api";
 
 const ReceiptPage = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id1,id2 } = useParams();
   const [generalInfo, setGeneralInfo] = useState(null);
   const [bayOptions, setBayOptions] = useState([]);
   const [quantity, setQuantity] = useState('');
@@ -43,22 +43,22 @@ const ReceiptPage = () => {
   const [details, setDetails] = useState([]);
 
   useEffect(() => {
-    request("get", `/admin/receipt/general-info/${id}`, (res) => {
+    request("get", `/admin/receipt/general-info/${id2}`, (res) => {
       setGeneralInfo(res.data);
     });
 
-    request("get", `/admin/receipt/bay/${id}`, (res) => {
+    request("get", `/admin/receipt/bay/${id2}`, (res) => {
       setBayOptions(res.data);
     });
 
-    request("get", `/admin/receipt/detail-info/${id}`, (res) => {
+    request("get", `/admin/receipt/detail-info/${id2}`, (res) => {
       setDetails(res.data);
     });
 
-    request("get", `/admin/receipt/bill/${id}`, (res) => {
+    request("get", `/admin/receipt/bill/${id2}`, (res) => {
       setExistingBills(res.data);
     });
-  }, [id]);
+  }, [id2]);
 
   const handleBillOptionChange = (event) => {
     setBillOption(event.target.value);
@@ -70,7 +70,7 @@ const ReceiptPage = () => {
         receiptBillId: billName,
         description: "Create new bill",
         createdBy: "admin",
-        receiptItemRequestId: id
+        receiptItemRequestId: id2
       };
       request("post", `/admin/receipt/bill/create`, (res) => {
         if (res.status !== 200) {
@@ -84,19 +84,19 @@ const ReceiptPage = () => {
       lotId,
       importPrice,
       expiredDate,
-      receiptItemRequestId: id,
+      receiptItemRequestId: id2,
       receiptBillId: billOption === 'new' ? billName : existingBill
     };
     console.log(payload);
     request("post", `/admin/receipt/receipt-item/create`, (res) => {
       if (res.status === 200) {
-        request("get", `/admin/receipt/general-info/${id}`, (res) => {
+        request("get", `/admin/receipt/general-info/${id2}`, (res) => {
           setGeneralInfo(res.data);
         });
-        request("get", `/admin/receipt/detail-info/${id}`, (res) => {
+        request("get", `/admin/receipt/detail-info/${id2}`, (res) => {
           setDetails(res.data);
         });
-        request("get", `/admin/receipt/bill/${id}`, (res) => {
+        request("get", `/admin/receipt/bill/${id2}`, (res) => {
           setExistingBills(res.data);
         });
         alert("Add new receipt item successfully !")
@@ -106,10 +106,30 @@ const ReceiptPage = () => {
     }, {}, payload);
   };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false, // Đảm bảo không sử dụng định dạng giờ AM/PM
+    };
+    return date.toLocaleString('en-GB', options); // Hoặc 'en-US' nếu bạn muốn kiểu định dạng kiểu Mỹ
+  };
+
+  const formatPrice = (price) => {
+    return price.toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    });
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <IconButton color="primary" onClick={() => navigate('/admin/receipts')} sx={{ color: 'black' }}>
+        <IconButton color="primary" onClick={() => navigate(`/admin/receipts/${id1}`)} sx={{ color: 'black' }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>
@@ -327,10 +347,10 @@ const ReceiptPage = () => {
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Quantity</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Lot ID</TableCell>
                   <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Bay Code</TableCell>
                   <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Import Price</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Expired Date</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Lot ID</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Expired Date</TableCell>                  
                   <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Receipt Bill ID</TableCell>
                 </TableRow>
               </TableHead>
@@ -338,10 +358,10 @@ const ReceiptPage = () => {
                 {details.map((detail, index) => (
                   <TableRow key={index}>
                     <TableCell>{detail.quantity}</TableCell>
-                    <TableCell>{detail.bayCode}</TableCell>
-                    <TableCell>{detail.importPrice}</TableCell>
-                    <TableCell>{detail.expiredDate}</TableCell>
                     <TableCell>{detail.lotId}</TableCell>
+                    <TableCell>{detail.bayCode}</TableCell>
+                    <TableCell>{formatPrice(detail.importPrice)}</TableCell>
+                    <TableCell>{formatDate(detail.expiredDate)}</TableCell>                 
                     <TableCell>{detail.receiptBillId}</TableCell>
                   </TableRow>
                 ))}

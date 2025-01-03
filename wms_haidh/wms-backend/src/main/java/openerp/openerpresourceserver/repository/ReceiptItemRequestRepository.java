@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,27 +25,17 @@ public interface ReceiptItemRequestRepository extends JpaRepository<ReceiptItemR
 
 	@Query(value = """
 			 SELECT r.receiptItemRequestId AS receiptItemRequestId,
-			        rc.receiptName AS receiptName,
 			        r.quantity AS quantity,
 			        r.completed AS completed,
-			        rc.expectedReceiptDate AS expectedReceiptDate,
 			        w.name AS warehouseName,
 			        p.name AS productName
 			 FROM ReceiptItemRequest r
 			 JOIN Warehouse w ON r.warehouseId = w.warehouseId
-			 JOIN Receipt rc ON r.receiptId = rc.receiptId
 			 JOIN Product p ON r.productId = p.productId
-			 WHERE rc.status = :status
+			 WHERE r.receiptId = :receiptId
 			 ORDER BY r.lastUpdated DESC
-			""", countQuery = """
-			 SELECT COUNT(r)
-			 FROM ReceiptItemRequest r
-			 JOIN Warehouse w ON r.warehouseId = w.warehouseId
-			 JOIN Receipt rc ON r.receiptId = rc.receiptId
-			 JOIN Product p ON r.productId = p.productId
-			 WHERE  rc.status = :status
 			""")
-	Page<ReceiptItemRequestProjection> findAllWithDetails(@Param("status") String status, Pageable pageable);
+	List<ReceiptItemRequestProjection> findAllWithDetails(@Param("receiptId") UUID id);
 
 	@Query("""
 			 SELECT r.quantity AS quantity,

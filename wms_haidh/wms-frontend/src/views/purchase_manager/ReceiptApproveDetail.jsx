@@ -11,13 +11,13 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router-dom';
 import { request } from "../../api";
 
-const ReceiptDetail = () => {
+const ReceiptApproveDetail = () => {
   const navigate = useNavigate();
   const { receiptId } = useParams();
   const [receiptDetails, setReceiptDetails] = useState([]);
 
   useEffect(() => {
-    request("get", `/sale-manager/receipts/${receiptId}`, (res) => {
+    request("get", `/purchase-manager/receipts/${receiptId}`, (res) => {
       setReceiptDetails(res.data);
     });
   }, [receiptId]);
@@ -25,10 +25,10 @@ const ReceiptDetail = () => {
   const handleApprove = () => {
     request(
       "post",
-      `/sale-manager/receipts/approve/${receiptId}?approvedBy=admin`,
+      `/purchase-manager/process-receipts/approve/${receiptId}?approvedBy=admin`,
       (res) => {
         if (res.status === 200) {
-          navigate(`/sale-manager/receipt`);
+          navigate(`/purchase-manager/process-receipts`);
         } else {
           alert("Error approving receipt!");
         }
@@ -39,10 +39,10 @@ const ReceiptDetail = () => {
   const handleReject = () => {
     request(
       "post",
-      `/sale-manager/receipts/cancel/${receiptId}?cancelledBy=admin`,
+      `/purchase-manager/process-receipts/cancel/${receiptId}?cancelledBy=admin`,
       (res) => {
         if (res.status === 200) {
-          navigate(`/sale-manager/receipt`);
+          navigate(`/purchase-manager/process-receipts`);
         } else {
           alert("Error rejecting receipt!");
         }
@@ -53,7 +53,7 @@ const ReceiptDetail = () => {
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <IconButton color="primary" onClick={() => navigate('/sale-manager/receipt')} sx={{ color: 'black' }}>
+        <IconButton color="primary" onClick={() => navigate('/purchase-manager/process-receipts')} sx={{ color: 'black' }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
@@ -89,4 +89,4 @@ const ReceiptDetail = () => {
   );
 };
 
-export default ReceiptDetail;
+export default ReceiptApproveDetail;
