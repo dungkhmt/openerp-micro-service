@@ -296,7 +296,7 @@ public class ExamServiceImpl implements ExamService {
             if(myExamFilterReq.getStatus().equals(Constants.MyExamStatus.NOT_DOING)){
                 sql.append("and (er.id is null and er.total_score is null) \n");
             }else if(myExamFilterReq.getStatus().equals(Constants.MyExamStatus.NOT_SCORED)){
-                sql.append("and (er.id is not null and er.total_score is null) \n");
+                sql.append("and (er.id is null and er.total_score is not null) \n");
             }else if(myExamFilterReq.getStatus().equals(Constants.MyExamStatus.SCORED)){
                 sql.append("and (er.id is not null and er.total_score is not null) \n");
             }
