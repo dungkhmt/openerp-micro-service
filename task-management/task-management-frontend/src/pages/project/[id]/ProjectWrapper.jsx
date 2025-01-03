@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Outlet, useParams } from "react-router-dom";
 import {
   fetchMembers,
+  fetchMyRole,
   fetchProject,
   resetProject,
   setLoading,
@@ -15,6 +16,7 @@ import { resetGanttData } from "../../../store/project/gantt-chart";
 import { fetchStatisticData } from "../../../store/project/statistic";
 import { resetTasksData } from "../../../store/project/tasks";
 import NotFound from "../../../views/errors/NotFound";
+import { fetchEvents, resetEvents } from "../../../store/project/events";
 
 const ProjectWrapper = () => {
   const { id } = useParams();
@@ -30,10 +32,14 @@ const ProjectWrapper = () => {
     dispatch(resetCalendarData());
     // reset project data
     dispatch(resetProject());
+    //reset events data of previous project
+    dispatch(resetEvents());
     // fetch project data
     await Promise.all([
       dispatch(fetchProject(id)),
       dispatch(fetchMembers(id)),
+      dispatch(fetchMyRole(id)),
+      dispatch(fetchEvents(id)),
       dispatch(
         fetchStatisticData({
           projectId: id,

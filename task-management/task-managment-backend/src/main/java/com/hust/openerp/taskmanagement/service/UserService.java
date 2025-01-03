@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.service;
 
+import com.hust.openerp.taskmanagement.dto.form.UpdateProfileForm;
 import com.hust.openerp.taskmanagement.entity.User;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface UserService {
     List<User> getUserCreateTaskAssignMe(String userId);
 
     List<User> getUserAssignTaskAssignMe(String userId);
+    
+    void updateProfile(String userId, UpdateProfileForm updateProfileForm);
 }

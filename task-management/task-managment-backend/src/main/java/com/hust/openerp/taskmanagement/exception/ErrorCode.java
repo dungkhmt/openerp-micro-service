@@ -22,6 +22,8 @@ public enum ErrorCode {
     USER_NOT_EXIST("E1002", "The user does not exist", HttpStatus.BAD_REQUEST),
     TASK_NOT_EXIST("E1003", "The task does not exist", HttpStatus.BAD_REQUEST),
     FILE_NOT_EXIST("E1004", "The file does not exist", HttpStatus.BAD_REQUEST),
+    EVENT_NOT_EXIST("E1005", "The event does not exist", HttpStatus.BAD_REQUEST),
+    PROJECT_MEMBER_NOT_EXIST("E1006", "The project member does not exist", HttpStatus.BAD_REQUEST),
 
     // 401
 

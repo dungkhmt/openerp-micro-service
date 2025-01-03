@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.hust.openerp.taskmanagement.entity.Project;
 import com.hust.openerp.taskmanagement.entity.ProjectMember;
+import com.hust.openerp.taskmanagement.entity.ProjectMember.ProjectMemberId;
 import com.hust.openerp.taskmanagement.entity.User;
 import com.hust.openerp.taskmanagement.exception.ApiException;
 import com.hust.openerp.taskmanagement.exception.ErrorCode;
@@ -106,5 +107,32 @@ public class ProjectMemberServiceImplement implements ProjectMemberService {
     public boolean checkAddedMemberInProject(String memberId, UUID projectId) {
         return projectMemberRepository.isAddedMemberInProject(memberId, projectId) > 0;
     }
+    
+    @Override
+	public String getMemberRole(String memberId, UUID projectId) {
+    	ProjectMember pm = projectMemberRepository.findByProjectIdAndUserId(projectId, memberId);
+    	return pm.getRoleId();
+	}
+
+	@Override
+	public void deleteMemberFromProject(String userId, UUID projectId, String memberId, String roleId) {
+		projectRepository.findById(projectId).orElseThrow(() -> new ApiException(ErrorCode.PROJECT_NOT_EXIST));
+
+		if (!this.checkAddedMemberInProject(userId, projectId)) {
+			throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_PROJECT);
+		}
+		
+		if(!this.getMemberRole(userId, projectId).equals("owner")) {
+			throw new ApiException(ErrorCode.NOT_OWNER_OF_PROJECT);
+		}
+
+		ProjectMemberId projectMemberId = new ProjectMemberId(projectId, memberId, roleId);
+
+		if (projectMemberRepository.existsById(projectMemberId)) {
+			projectMemberRepository.deleteById(projectMemberId);
+		} else {
+			throw new ApiException(ErrorCode.PROJECT_MEMBER_NOT_EXIST);
+		}
+	}
 
 }
