@@ -56,7 +56,7 @@ public class DataUtils {
     }
 
     public static Double safeToDouble(Object obj1) {
-        return safeToDouble(obj1, 0.0);
+        return safeToDouble(obj1, null);
     }
 
     public static Short safeToShort(Object obj1, Short defaultValue) {
@@ -126,7 +126,7 @@ public class DataUtils {
      * @return String
      */
     public static String safeToString(Object obj1) {
-        return safeToString(obj1, "");
+        return safeToString(obj1, null);
     }
 
     public static Instant safeToInstant(Object obj) {

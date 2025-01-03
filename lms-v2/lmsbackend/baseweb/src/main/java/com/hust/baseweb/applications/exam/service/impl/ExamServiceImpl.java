@@ -8,15 +8,14 @@ import com.hust.baseweb.applications.exam.entity.ExamTestEntity;
 import com.hust.baseweb.applications.exam.entity.ExamTestQuestionEntity;
 import com.hust.baseweb.applications.exam.model.ResponseData;
 import com.hust.baseweb.applications.exam.model.request.*;
-import com.hust.baseweb.applications.exam.model.response.ExamDetailsRes;
-import com.hust.baseweb.applications.exam.model.response.ExamTestDetailsRes;
-import com.hust.baseweb.applications.exam.model.response.ExamTestQuestionDetailsRes;
+import com.hust.baseweb.applications.exam.model.response.*;
 import com.hust.baseweb.applications.exam.repository.ExamRepository;
 import com.hust.baseweb.applications.exam.repository.ExamStudentRepository;
 import com.hust.baseweb.applications.exam.repository.ExamTestQuestionRepository;
 import com.hust.baseweb.applications.exam.repository.ExamTestRepository;
 import com.hust.baseweb.applications.exam.service.ExamService;
 import com.hust.baseweb.applications.exam.service.ExamTestService;
+import com.hust.baseweb.applications.exam.utils.Constants;
 import com.hust.baseweb.applications.exam.utils.DataUtils;
 import com.hust.baseweb.applications.exam.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -32,10 +31,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -269,6 +265,149 @@ public class ExamServiceImpl implements ExamService {
         responseData.setHttpStatus(HttpStatus.OK);
         responseData.setResultCode(HttpStatus.OK.value());
         responseData.setResultMsg("Xoá kỳ thi thành công");
+        return responseData;
+    }
+
+    @Override
+    public Page<MyExamFilterRes> filterMyExam(Pageable pageable, MyExamFilterReq myExamFilterReq) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("select\n" +
+                   "    es.id as examStudentId,\n" +
+                   "    e.id as examId,\n" +
+                   "    e.code as examCode,\n" +
+                   "    e.name as examName,\n" +
+                   "    e.description as examDescription,\n" +
+                   "    e.start_time as startTime,\n" +
+                   "    e.end_time as endTime,\n" +
+                   "    et.id as examTestId,\n" +
+                   "    et.code as examTestCode,\n" +
+                   "    et.name as examTestName,\n" +
+                   "    er.id as examResultId,\n" +
+                   "    er.total_score as totalScore\n" +
+                   "from\n" +
+                   "    exam_student es\n" +
+                   "left join exam e on\n" +
+                   "    e.id = es.exam_id\n" +
+                   "left join exam_test et on\n" +
+                   "    et.id = es.exam_test_id\n" +
+                   "left join exam_result er on\n" +
+                   "    er.exam_student_id = es.id\n" +
+                   "where\n" +
+                   "    es.code = :userLogin\n" +
+                   "    and e.status = 1 \n");
+        if(myExamFilterReq.getStatus() != null){
+            if(myExamFilterReq.getStatus().equals(Constants.MyExamStatus.NOT_DOING)){
+                sql.append("and (er.id is null and er.total_score is null) \n");
+            }else if(myExamFilterReq.getStatus().equals(Constants.MyExamStatus.NOT_SCORED)){
+                sql.append("and (er.id is not null and er.total_score is null) \n");
+            }else if(myExamFilterReq.getStatus().equals(Constants.MyExamStatus.SCORED)){
+                sql.append("and (er.id is not null and er.total_score is not null) \n");
+            }
+        }
+        if(DataUtils.stringIsNotNullOrEmpty(myExamFilterReq.getKeyword())){
+            sql.append("and\n" +
+                       "    ((lower(et.name) like CONCAT('%', LOWER(:keyword),'%')) or \n" +
+                       "    (lower(e.name) like CONCAT('%', LOWER(:keyword),'%'))) \n");
+        }
+        sql.append("order by start_time desc\n");
+
+        Query query = entityManager.createNativeQuery(sql.toString());
+        Query count = entityManager.createNativeQuery("select count(1) FROM (" + sql + ") as count");
+        query.setFirstResult(pageable.getPageNumber() * pageable.getPageSize());
+        query.setMaxResults(pageable.getPageSize());
+
+        query.setParameter("userLogin", SecurityUtils.getUserLogin());
+        count.setParameter("userLogin", SecurityUtils.getUserLogin());
+        if(DataUtils.stringIsNotNullOrEmpty(myExamFilterReq.getKeyword())){
+            query.setParameter("keyword", DataUtils.escapeSpecialCharacters(myExamFilterReq.getKeyword()));
+            count.setParameter("keyword", DataUtils.escapeSpecialCharacters(myExamFilterReq.getKeyword()));
+        }
+
+        long totalRecord = ((BigInteger) count.getSingleResult()).longValue();
+        List<Object[]> result = query.getResultList();
+        List<MyExamFilterRes> list = new ArrayList<>();
+        if (!Objects.isNull(result) && !result.isEmpty()) {
+            for (Object[] obj : result) {
+                list.add(MyExamFilterRes.builder()
+                             .examStudentId(DataUtils.safeToString(obj[0]))
+                             .examId(DataUtils.safeToString(obj[1]))
+                             .examCode(DataUtils.safeToString(obj[2]))
+                             .examName(DataUtils.safeToString(obj[3]))
+                             .examDescription(DataUtils.safeToString(obj[4]))
+                             .startTime(DataUtils.safeToString(obj[5]))
+                             .endTime(DataUtils.safeToString(obj[6]))
+                             .examTestId(DataUtils.safeToString(obj[7]))
+                             .examTestCode(DataUtils.safeToString(obj[8]))
+                             .examTestName(DataUtils.safeToString(obj[9]))
+                             .examResultId(DataUtils.safeToString(obj[10]))
+                             .totalScore(DataUtils.safeToDouble(obj[11])).build());
+            }
+        }
+        return new PageImpl<>(list, pageable, totalRecord);
+    }
+
+    @Override
+    public ResponseData<MyExamDetailsRes> detailsMyExam(String examId) {
+        ResponseData<MyExamDetailsRes> responseData = new ResponseData<>();
+        StringBuilder sql = new StringBuilder();
+        sql.append("select\n" +
+                   "    es.id as examStudentId,\n" +
+                   "    e.id as examId,\n" +
+                   "    e.code as examCode,\n" +
+                   "    e.name as examName,\n" +
+                   "    e.description as examDescription,\n" +
+                   "    e.start_time as startTime,\n" +
+                   "    e.end_time as endTime,\n" +
+                   "    et.id as examTestId,\n" +
+                   "    et.code as examTestCode,\n" +
+                   "    et.name as examTestName,\n" +
+                   "    er.id as examResultId,\n" +
+                   "    er.total_score as totalScore\n" +
+                   "from\n" +
+                   "    exam_student es\n" +
+                   "left join exam e on\n" +
+                   "    e.id = es.exam_id\n" +
+                   "left join exam_test et on\n" +
+                   "    et.id = es.exam_test_id\n" +
+                   "left join exam_result er on\n" +
+                   "    er.exam_student_id = es.id\n" +
+                   "where\n" +
+                   "    es.code = :userLogin\n" +
+                   "    and e.id = :examId\n" +
+                   "    and e.status = 1 \n");
+        sql.append("order by start_time desc\n");
+
+        Query query = entityManager.createNativeQuery(sql.toString());
+
+        query.setParameter("userLogin", SecurityUtils.getUserLogin());
+        query.setParameter("examId", examId);
+        List<Object[]> result = query.getResultList();
+        List<MyExamDetailsRes> list = new ArrayList<>();
+        if (!Objects.isNull(result) && !result.isEmpty()) {
+            for (Object[] obj : result) {
+                list.add(MyExamDetailsRes.builder()
+                                        .examStudentId(DataUtils.safeToString(obj[0]))
+                                        .examId(DataUtils.safeToString(obj[1]))
+                                        .examCode(DataUtils.safeToString(obj[2]))
+                                        .examName(DataUtils.safeToString(obj[3]))
+                                        .examDescription(DataUtils.safeToString(obj[4]))
+                                        .startTime(DataUtils.safeToString(obj[5]))
+                                        .endTime(DataUtils.safeToString(obj[6]))
+                                        .examTestId(DataUtils.safeToString(obj[7]))
+                                        .examTestCode(DataUtils.safeToString(obj[8]))
+                                        .examTestName(DataUtils.safeToString(obj[9]))
+                                        .examResultId(DataUtils.safeToString(obj[10]))
+                                        .totalScore(DataUtils.safeToDouble(obj[11])).build());
+            }
+        }
+
+        MyExamDetailsRes myExamDetailsRes = list.get(0);
+        myExamDetailsRes.setQuestionList(examTestRepository.getMyExamQuestionDetails(myExamDetailsRes.getExamTestId()));
+
+        responseData.setHttpStatus(HttpStatus.OK);
+        responseData.setResultCode(HttpStatus.OK.value());
+        responseData.setData(myExamDetailsRes);
+        responseData.setResultMsg("Success");
         return responseData;
     }
 }

@@ -4,6 +4,8 @@ import com.hust.baseweb.applications.exam.entity.ExamEntity;
 import com.hust.baseweb.applications.exam.model.ResponseData;
 import com.hust.baseweb.applications.exam.model.request.*;
 import com.hust.baseweb.applications.exam.model.response.ExamDetailsRes;
+import com.hust.baseweb.applications.exam.model.response.MyExamDetailsRes;
+import com.hust.baseweb.applications.exam.model.response.MyExamFilterRes;
 import com.hust.baseweb.applications.exam.service.ExamService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,10 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -55,5 +54,16 @@ public class ExamController {
     @PostMapping("/delete")
     public ResponseEntity<ResponseData<ExamEntity>> delete(@RequestBody @Valid ExamDeleteReq examDeleteReq) {
         return ResponseEntity.ok(examService.delete(examDeleteReq));
+    }
+
+    @PostMapping("/filter-my-exam")
+    public ResponseEntity<Page<MyExamFilterRes>> filter(
+        Pageable pageable, @RequestBody MyExamFilterReq myExamFilterReq) {
+        return ResponseEntity.ok(examService.filterMyExam(pageable, myExamFilterReq));
+    }
+
+    @GetMapping("/details-my-exam/{examId}")
+    public ResponseEntity<ResponseData<MyExamDetailsRes>> detailsMyExam(@PathVariable("examId") String examId) {
+        return ResponseEntity.ok(examService.detailsMyExam(examId));
     }
 }
