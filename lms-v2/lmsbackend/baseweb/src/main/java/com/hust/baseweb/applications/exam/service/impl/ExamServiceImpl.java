@@ -9,6 +9,7 @@ import com.hust.baseweb.applications.exam.model.response.*;
 import com.hust.baseweb.applications.exam.repository.*;
 import com.hust.baseweb.applications.exam.service.ExamService;
 import com.hust.baseweb.applications.exam.service.ExamTestService;
+import com.hust.baseweb.applications.exam.service.MongoFileService;
 import com.hust.baseweb.applications.exam.utils.Constants;
 import com.hust.baseweb.applications.exam.utils.DataUtils;
 import com.hust.baseweb.applications.exam.utils.SecurityUtils;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -42,6 +44,7 @@ public class ExamServiceImpl implements ExamService {
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
     private final ExamTestService examTestService;
+    private final MongoFileService mongoFileService;
 
 
     @Override
@@ -409,13 +412,21 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public ResponseData<ExamResultEntity> doingMyExam(MyExamResultSaveReq myExamResultSaveReq) {
+    @Transactional
+    public ResponseData<ExamResultEntity> doingMyExam(MyExamResultSaveReq myExamResultSaveReq, MultipartFile[] files) {
         ResponseData<ExamResultEntity> responseData = new ResponseData<>();
 
+        List<String> filePaths = mongoFileService.storeFiles(files);
+        myExamResultSaveReq.setFilePath(String.join(";", filePaths));
         ExamResultEntity examResultEntity = modelMapper.map(myExamResultSaveReq, ExamResultEntity.class);
-        examResultRepository.save(examResultEntity);
+        examResultEntity = examResultRepository.save(examResultEntity);
 
-        List<ExamResultDetailsEntity> examResultDetailsEntities = modelMapper.map(myExamResultSaveReq.getExamResultDetails(), new TypeToken<List<ExamResultDetailsEntity>>(){}.getType());
+        List<ExamResultDetailsEntity> examResultDetailsEntities = new ArrayList<>();
+        for(MyExamResultDetailsSaveReq examResultDetails: myExamResultSaveReq.getExamResultDetails()){
+            examResultDetails.setExamResultId(examResultEntity.getId());
+            ExamResultDetailsEntity examResultDetailsEntity = modelMapper.map(examResultDetails, ExamResultDetailsEntity.class);
+            examResultDetailsEntities.add(examResultDetailsEntity);
+        }
         examResultDetailsRepository.saveAll(examResultDetailsEntities);
 
         responseData.setHttpStatus(HttpStatus.OK);

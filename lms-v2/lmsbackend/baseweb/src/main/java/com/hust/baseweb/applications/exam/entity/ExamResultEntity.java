@@ -34,6 +34,9 @@ public class ExamResultEntity{
     @Column(name = "total_time")
     private Integer totalTime;
 
+    @Column(name = "file_path")
+    private String filePath;
+
     @Column(name = "submited_at")
     protected LocalDateTime submitedAt;
 

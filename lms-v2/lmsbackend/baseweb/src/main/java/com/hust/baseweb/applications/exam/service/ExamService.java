@@ -9,6 +9,7 @@ import com.hust.baseweb.applications.exam.model.response.MyExamDetailsRes;
 import com.hust.baseweb.applications.exam.model.response.MyExamFilterRes;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface ExamService {
 
@@ -26,5 +27,5 @@ public interface ExamService {
 
     ResponseData<MyExamDetailsRes> detailsMyExam(String examId);
 
-    ResponseData<ExamResultEntity> doingMyExam(MyExamResultSaveReq myExamResultSaveReq);
+    ResponseData<ExamResultEntity> doingMyExam(MyExamResultSaveReq myExamResultSaveReq, MultipartFile[] files);
 }

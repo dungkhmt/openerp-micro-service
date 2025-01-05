@@ -30,9 +30,6 @@ public class ExamResultDetailsEntity {
     @Column(name = "answer")
     private String answer;
 
-    @Column(name = "file_path")
-    private String filePath;
-
     @Column(name = "pass")
     private boolean pass;
 
