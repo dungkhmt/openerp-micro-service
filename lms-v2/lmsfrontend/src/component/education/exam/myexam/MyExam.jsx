@@ -58,7 +58,7 @@ function MyExam(props) {
       ...baseColumn,
       minWidth: 170,
       renderCell: (rowData) => {
-        if(rowData.row?.examResultId == null && rowData.row?.totalScore != null ){
+        if(rowData.row?.examResultId != null && rowData.row?.totalScore == null ){
           return 'Chưa chấm'
         }else if(rowData.row?.examResultId != null && rowData.row?.totalScore != null ){
           return 'Đã chấm'
