@@ -25,7 +25,7 @@ public interface ExamService {
 
     Page<MyExamFilterRes> filterMyExam(Pageable pageable, MyExamFilterReq myExamFilterReq);
 
-    ResponseData<MyExamDetailsRes> detailsMyExam(String examId);
+    ResponseData<MyExamDetailsRes> detailsMyExam(MyExamDetailsReq myExamDetailsReq);
 
     ResponseData<ExamResultEntity> doingMyExam(MyExamResultSaveReq myExamResultSaveReq, MultipartFile[] files);
 }

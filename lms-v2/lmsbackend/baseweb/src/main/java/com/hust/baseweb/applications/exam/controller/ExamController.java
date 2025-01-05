@@ -65,9 +65,9 @@ public class ExamController {
         return ResponseEntity.ok(examService.filterMyExam(pageable, myExamFilterReq));
     }
 
-    @GetMapping("/details-my-exam/{examId}")
-    public ResponseEntity<ResponseData<MyExamDetailsRes>> detailsMyExam(@PathVariable("examId") String examId) {
-        return ResponseEntity.ok(examService.detailsMyExam(examId));
+    @PostMapping("/details-my-exam")
+    public ResponseEntity<ResponseData<MyExamDetailsRes>> detailsMyExam(@RequestBody MyExamDetailsReq myExamDetailsReq) {
+        return ResponseEntity.ok(examService.detailsMyExam(myExamDetailsReq));
     }
 
     @PostMapping("/doing-my-exam")

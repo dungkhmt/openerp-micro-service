@@ -348,7 +348,7 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public ResponseData<MyExamDetailsRes> detailsMyExam(String examId) {
+    public ResponseData<MyExamDetailsRes> detailsMyExam(MyExamDetailsReq myExamDetailsReq) {
         ResponseData<MyExamDetailsRes> responseData = new ResponseData<>();
         StringBuilder sql = new StringBuilder();
         sql.append("select\n" +
@@ -375,13 +375,15 @@ public class ExamServiceImpl implements ExamService {
                    "where\n" +
                    "    es.code = :userLogin\n" +
                    "    and e.id = :examId\n" +
+                   "    and es.id = :examStudentId\n" +
                    "    and e.status = 1 \n");
         sql.append("order by start_time desc\n");
 
         Query query = entityManager.createNativeQuery(sql.toString());
 
         query.setParameter("userLogin", SecurityUtils.getUserLogin());
-        query.setParameter("examId", examId);
+        query.setParameter("examId", myExamDetailsReq.getExamId());
+        query.setParameter("examStudentId", myExamDetailsReq.getExamStudentId());
         List<Object[]> result = query.getResultList();
         List<MyExamDetailsRes> list = new ArrayList<>();
         if (!Objects.isNull(result) && !result.isEmpty()) {
