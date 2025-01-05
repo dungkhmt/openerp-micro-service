@@ -60,10 +60,6 @@ public interface ExamTestRepository extends JpaRepository<ExamTestEntity, String
                    "    eq.content_answer5 as questionContentAnswer5,\n" +
                    "    eq.multichoice as questionMultichoice,\n" +
                    "    etq.order as questionOrder,\n" +
-                   "    er.total_score as totalScore,\n" +
-                   "    er.total_time as totalTime,\n" +
-                   "    er.submited_at as submitedAt,\n" +
-                   "    er.file_path as answerFiles,\n" +
                    "    erd.answer as answer,\n" +
                    "    erd.pass as pass,\n" +
                    "    erd.score as score\n" +

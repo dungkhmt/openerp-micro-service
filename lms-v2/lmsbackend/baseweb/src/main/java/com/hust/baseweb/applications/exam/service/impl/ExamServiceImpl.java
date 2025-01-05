@@ -363,7 +363,10 @@ public class ExamServiceImpl implements ExamService {
                    "    et.code as examTestCode,\n" +
                    "    et.name as examTestName,\n" +
                    "    er.id as examResultId,\n" +
-                   "    er.total_score as totalScore\n" +
+                   "    er.total_score as totalScore,\n" +
+                   "    er.total_time as totalTime,\n" +
+                   "    er.submited_at as submitedAt,\n" +
+                   "    er.file_path as answerFiles\n" +
                    "from\n" +
                    "    exam_student es\n" +
                    "left join exam e on\n" +
@@ -400,7 +403,11 @@ public class ExamServiceImpl implements ExamService {
                                         .examTestCode(DataUtils.safeToString(obj[8]))
                                         .examTestName(DataUtils.safeToString(obj[9]))
                                         .examResultId(DataUtils.safeToString(obj[10]))
-                                        .totalScore(DataUtils.safeToDouble(obj[11])).build());
+                                        .totalScore(DataUtils.safeToInt(obj[11]))
+                                        .totalTime(DataUtils.safeToInt(obj[12]))
+                                        .submitedAt(DataUtils.safeToString(obj[13]))
+                                        .answerFiles(DataUtils.safeToString(obj[14]))
+                                        .build());
             }
         }
 

@@ -24,7 +24,10 @@ public class MyExamDetailsRes {
     private String examTestCode;
     private String examTestName;
     private String examResultId;
-    private Double totalScore;
+    private Integer totalScore;
+    private Integer totalTime;
+    private String submitedAt;
+    private String answerFiles;
     private List<MyExamQuestionDetailsRes> questionList;
 
 }
