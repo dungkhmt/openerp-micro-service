@@ -138,9 +138,13 @@ function MyExam(props) {
   }
 
   const handleDoingExam = (rowData) => {
+    const body = {
+      examId: rowData?.examId,
+      examStudentId: rowData?.examStudentId
+    }
     request(
-      "get",
-      `/exam/details-my-exam/${rowData?.examId}`,
+      "post",
+      `/exam/details-my-exam`,
       (res) => {
         if(res.status === 200){
           if(res.data.resultCode === 200){
@@ -157,7 +161,8 @@ function MyExam(props) {
           toast.error(res)
         }
       },
-      { onError: (e) => toast.error(e) }
+      { onError: (e) => toast.error(e) },
+      body
     );
   };
 
