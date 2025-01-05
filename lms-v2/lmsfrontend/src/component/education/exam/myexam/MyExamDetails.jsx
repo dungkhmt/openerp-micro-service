@@ -57,6 +57,7 @@ function MyExamDetails(props) {
   const [answersFiles, setAnswersFiles] = useState([]);
   const [openFilePreviewDialog, setOpenFilePreviewDialog] = useState(false);
   const [filePreview, setFilePreview] = useState(null);
+  const [startLoadTime, setStartLoadTime] = useState(null);
 
   useEffect(() => {
     let tmpDataAnswers = []
@@ -68,6 +69,7 @@ function MyExamDetails(props) {
       })
     }
     setDataAnswers(tmpDataAnswers)
+    setStartLoadTime(new Date());
   }, []);
 
   const handleAnswerCheckboxChange = (questionOrder, answer, isChecked) => {
@@ -99,10 +101,13 @@ function MyExamDetails(props) {
   };
 
   const handleSubmit = () => {
+    const endLoadTime = new Date();
+    const totalTime = Math.round((endLoadTime - startLoadTime) / 60000);
+
     const body = {
       examId: data?.examId,
       examStudentId: data?.examStudentId,
-      totalTime: 10,
+      totalTime: totalTime,
       examResultDetails: dataAnswers
     }
 
