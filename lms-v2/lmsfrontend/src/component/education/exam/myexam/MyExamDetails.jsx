@@ -304,16 +304,20 @@ function MyExamDetails(props) {
             >
               Hủy
             </Button>
-            <Button
-              disabled={isLoading}
-              variant="contained"
-              color="primary"
-              style={{marginLeft: "15px"}}
-              onClick={handleSubmit}
-              type="submit"
-            >
-              {isLoading ? <CircularProgress/> : "Nộp bài"}
-            </Button>
+            {
+              data?.examResultId == null && (
+                <Button
+                  disabled={isLoading}
+                  variant="contained"
+                  color="primary"
+                  style={{marginLeft: "15px"}}
+                  onClick={handleSubmit}
+                  type="submit"
+                >
+                  {isLoading ? <CircularProgress/> : "Nộp bài"}
+                </Button>
+              )
+            }
           </CardActions>
         </Card>
       </MuiPickersUtilsProvider>
