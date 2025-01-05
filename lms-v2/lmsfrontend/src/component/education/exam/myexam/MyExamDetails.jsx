@@ -289,25 +289,25 @@ function MyExamDetails(props) {
                               value={dataAnswers[value?.questionOrder-1]?.answer}
                               onChange={(event) => handleAnswerRadioChange(event, value?.questionOrder)}
                             >
-                              <FormControlLabel value="1" control={<Radio checked={value?.answer === '1'} disabled={data?.examResultId != null}/>} label={parser(value?.questionContentAnswer1)} />
+                              <FormControlLabel value="1" control={<Radio checked={value?.answer?.includes('1')} disabled={data?.examResultId != null}/>} label={parser(value?.questionContentAnswer1)} />
                               {
                                 value?.questionNumberAnswer >= 2 && (
-                                  <FormControlLabel value="2" control={<Radio checked={value?.answer === '2'} disabled={data?.examResultId != null}/>} label={parser(value?.questionContentAnswer2)} />
+                                  <FormControlLabel value="2" control={<Radio checked={value?.answer?.includes('2')} disabled={data?.examResultId != null}/>} label={parser(value?.questionContentAnswer2)} />
                                 )
                               }
                               {
                                 value?.questionNumberAnswer >= 3 && (
-                                  <FormControlLabel value="3" control={<Radio checked={value?.answer === '3'} disabled={data?.examResultId != null}/>} label={parser(value?.questionContentAnswer3)} />
+                                  <FormControlLabel value="3" control={<Radio checked={value?.answer?.includes('3')} disabled={data?.examResultId != null}/>} label={parser(value?.questionContentAnswer3)} />
                                 )
                               }
                               {
                                 value?.questionNumberAnswer >= 4 && (
-                                  <FormControlLabel value="4" control={<Radio checked={value?.answer === '4'} disabled={data?.examResultId != null}/>} label={parser(value?.questionContentAnswer4)} />
+                                  <FormControlLabel value="4" control={<Radio checked={value?.answer?.includes('4')} disabled={data?.examResultId != null}/>} label={parser(value?.questionContentAnswer4)} />
                                 )
                               }
                               {
                                 value?.questionNumberAnswer >= 5 && (
-                                  <FormControlLabel value="5" control={<Radio checked={value?.answer === '5'} disabled={data?.examResultId != null}/>} label={parser(value?.questionContentAnswer5)} />
+                                  <FormControlLabel value="5" control={<Radio checked={value?.answer?.includes('5')} disabled={data?.examResultId != null}/>} label={parser(value?.questionContentAnswer5)} />
                                 )
                               }
                             </RadioGroup>
