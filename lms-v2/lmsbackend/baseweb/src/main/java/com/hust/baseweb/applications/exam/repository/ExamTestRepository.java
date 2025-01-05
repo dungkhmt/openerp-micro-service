@@ -59,18 +59,34 @@ public interface ExamTestRepository extends JpaRepository<ExamTestEntity, String
                    "    eq.content_answer4 as questionContentAnswer4,\n" +
                    "    eq.content_answer5 as questionContentAnswer5,\n" +
                    "    eq.multichoice as questionMultichoice,\n" +
-                   "    etq.order as questionOrder\n" +
+                   "    etq.order as questionOrder,\n" +
+                   "    er.total_score as totalScore,\n" +
+                   "    er.total_time as totalTime,\n" +
+                   "    er.submited_at as submitedAt,\n" +
+                   "    er.file_path as answerFiles,\n" +
+                   "    erd.answer as answer,\n" +
+                   "    erd.pass as pass,\n" +
+                   "    erd.score as score\n" +
                    "from\n" +
                    "    exam_test et\n" +
                    "left join exam_test_question etq on\n" +
                    "    et.id = etq.exam_test_id\n" +
                    "left join exam_question eq on\n" +
                    "    etq.exam_question_id = eq.id\n" +
+                   "left join exam_student es on\n" +
+                   "    es.exam_test_id = et.id\n" +
+                   "left join exam_result er on\n" +
+                   "    es.id = er.exam_student_id\n" +
+                   "left join exam_result_details erd on\n" +
+                   "    erd.exam_result_id = er.id\n" +
+                   "    and erd.exam_question_id = eq.id\n" +
                    "where\n" +
                    "    et.id = :examTestId\n" +
+                   "    and es.id = :examStudentId\n" +
                    "order by\n" +
                    "    etq.order", nativeQuery = true)
-    List<MyExamQuestionDetailsRes> getMyExamQuestionDetails(@Param("examTestId") String examTestId);
+    List<MyExamQuestionDetailsRes> getMyExamQuestionDetails(@Param("examTestId") String examTestId,
+                                                            @Param("examStudentId") String examStudentId);
 
     Optional<ExamTestEntity> findByCode(String code);
 }

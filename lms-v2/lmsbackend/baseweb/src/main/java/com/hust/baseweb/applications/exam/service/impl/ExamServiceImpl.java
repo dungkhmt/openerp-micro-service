@@ -404,23 +404,26 @@ public class ExamServiceImpl implements ExamService {
 
         MyExamDetailsRes myExamDetailsRes = list.get(0);
 
-        LocalDateTime now = LocalDateTime.now();
-        if(now.isBefore(DataUtils.formatStringToLocalDateTimeFull(myExamDetailsRes.getStartTime()))){
-            responseData.setHttpStatus(HttpStatus.NOT_FOUND);
-            responseData.setResultCode(HttpStatus.NOT_FOUND.value());
-            responseData.setData(myExamDetailsRes);
-            responseData.setResultMsg("Chưa đến thời gian thi");
-            return responseData;
-        }
-        if(now.isAfter(DataUtils.formatStringToLocalDateTimeFull(myExamDetailsRes.getEndTime()))){
-            responseData.setHttpStatus(HttpStatus.NOT_FOUND);
-            responseData.setResultCode(HttpStatus.NOT_FOUND.value());
-            responseData.setData(myExamDetailsRes);
-            responseData.setResultMsg("Đã hết thời gian thi");
-            return responseData;
+        if(!DataUtils.stringIsNotNullOrEmpty(myExamDetailsRes.getExamResultId())){
+            LocalDateTime now = LocalDateTime.now();
+            if(now.isBefore(DataUtils.formatStringToLocalDateTimeFull(myExamDetailsRes.getStartTime()))){
+                responseData.setHttpStatus(HttpStatus.NOT_FOUND);
+                responseData.setResultCode(HttpStatus.NOT_FOUND.value());
+                responseData.setData(myExamDetailsRes);
+                responseData.setResultMsg("Chưa đến thời gian thi");
+                return responseData;
+            }
+            if(now.isAfter(DataUtils.formatStringToLocalDateTimeFull(myExamDetailsRes.getEndTime()))){
+                responseData.setHttpStatus(HttpStatus.NOT_FOUND);
+                responseData.setResultCode(HttpStatus.NOT_FOUND.value());
+                responseData.setData(myExamDetailsRes);
+                responseData.setResultMsg("Đã hết thời gian thi");
+                return responseData;
+            }
         }
 
-        myExamDetailsRes.setQuestionList(examTestRepository.getMyExamQuestionDetails(myExamDetailsRes.getExamTestId()));
+        myExamDetailsRes.setQuestionList(examTestRepository.getMyExamQuestionDetails(myExamDetailsRes.getExamTestId(),
+                                                                                     myExamDetailsRes.getExamStudentId()));
 
         responseData.setHttpStatus(HttpStatus.OK);
         responseData.setResultCode(HttpStatus.OK.value());

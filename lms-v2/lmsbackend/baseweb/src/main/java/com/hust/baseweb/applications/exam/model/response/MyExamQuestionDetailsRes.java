@@ -16,4 +16,10 @@ public interface MyExamQuestionDetailsRes {
     String getQuestionContentAnswer5();
     boolean getQuestionMultichoice();
     Integer getQuestionOrder();
+    Integer getTotalScore();
+    Integer getTotalTime();
+    String getSubmitedAt();
+    String getAnswerFiles();
+    String getAnswer();
+    Integer getScore();
 }
