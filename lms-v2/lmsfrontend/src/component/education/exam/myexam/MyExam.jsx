@@ -144,18 +144,16 @@ function MyExam(props) {
       (res) => {
         if(res.status === 200){
           history.push({
-            pathname: "/exam/doing",
+            pathname: `/exam/doing`,
             state: {
-              data: res.data.data,
-              isCreate: false
+              data: res.data.data
             },
           });
         }else {
           toast.error(res)
         }
       },
-      { onError: (e) => toast.error(e) },
-      body
+      { onError: (e) => toast.error(e) }
     );
   };
 
