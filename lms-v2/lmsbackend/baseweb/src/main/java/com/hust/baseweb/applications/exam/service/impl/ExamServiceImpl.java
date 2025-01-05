@@ -28,6 +28,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -402,6 +403,23 @@ public class ExamServiceImpl implements ExamService {
         }
 
         MyExamDetailsRes myExamDetailsRes = list.get(0);
+
+        LocalDateTime now = LocalDateTime.now();
+        if(now.isBefore(DataUtils.formatStringToLocalDateTimeFull(myExamDetailsRes.getStartTime()))){
+            responseData.setHttpStatus(HttpStatus.NOT_FOUND);
+            responseData.setResultCode(HttpStatus.NOT_FOUND.value());
+            responseData.setData(myExamDetailsRes);
+            responseData.setResultMsg("Chưa đến thời gian thi");
+            return responseData;
+        }
+        if(now.isAfter(DataUtils.formatStringToLocalDateTimeFull(myExamDetailsRes.getEndTime()))){
+            responseData.setHttpStatus(HttpStatus.NOT_FOUND);
+            responseData.setResultCode(HttpStatus.NOT_FOUND.value());
+            responseData.setData(myExamDetailsRes);
+            responseData.setResultMsg("Đã hết thời gian thi");
+            return responseData;
+        }
+
         myExamDetailsRes.setQuestionList(examTestRepository.getMyExamQuestionDetails(myExamDetailsRes.getExamTestId()));
 
         responseData.setHttpStatus(HttpStatus.OK);

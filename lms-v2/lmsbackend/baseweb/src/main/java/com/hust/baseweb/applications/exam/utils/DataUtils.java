@@ -176,6 +176,14 @@ public class DataUtils {
         return LocalDateTime.parse(value, formatter);
     }
 
+    public static LocalDateTime formatStringToLocalDateTimeFull(String value){
+        if(value == null){
+            return null;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+        return LocalDateTime.parse(value, formatter);
+    }
+
     public static boolean stringIsNotNullOrEmpty(String value){
         if(StringUtils.isNotEmpty(value) && StringUtils.isNotBlank(value)){
             return true;
