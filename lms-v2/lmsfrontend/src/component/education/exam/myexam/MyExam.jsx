@@ -143,12 +143,16 @@ function MyExam(props) {
       `/exam/details-my-exam/${rowData?.examId}`,
       (res) => {
         if(res.status === 200){
-          history.push({
-            pathname: `/exam/doing`,
-            state: {
-              data: res.data.data
-            },
-          });
+          if(res.data.resultCode === 200){
+            history.push({
+              pathname: `/exam/doing`,
+              state: {
+                data: res.data.data
+              },
+            });
+          }else{
+            toast.error(res.data.resultMsg)
+          }
         }else {
           toast.error(res)
         }
