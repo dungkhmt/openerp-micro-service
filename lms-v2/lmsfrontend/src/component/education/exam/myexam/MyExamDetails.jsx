@@ -204,6 +204,19 @@ function MyExamDetails(props) {
                       </div>
                       <p style={{display: "flex", alignItems:"center"}}><strong style={{marginRight: '10px'}}>Câu hỏi: </strong>{parser(value?.questionContent)}</p>
                       {
+                        value?.questionFile && (
+                          value?.questionFile.split(';').map(item => {
+                            return (
+                              <div style={{display: 'flex', alignItems: 'center'}}>
+                                <AttachFileOutlined></AttachFileOutlined>
+                                <p style={{fontWeight: 'bold', cursor: 'pointer'}}
+                                   onClick={() => handleOpenFilePreviewDialog(item)}>{getFilenameFromString(item)}</p>
+                              </div>
+                            )
+                          })
+                        )
+                      }
+                      {
                         value?.questionType === 0 && value?.questionMultichoice && (
                           <Box sx={{ display: 'flex', flexDirection: 'column'}}>
                             <p style={{ margin: 0, padding: 0, fontWeight: "bold"}}>Chọn các đáp án đúng trong các đáp án sau:</p>
