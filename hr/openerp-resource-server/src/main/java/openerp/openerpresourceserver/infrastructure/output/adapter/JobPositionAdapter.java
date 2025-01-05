@@ -46,31 +46,39 @@ public class JobPositionAdapter implements IJobPositionPort {
         jobPositionEntity.setPositionCode(jobPosition.getCode());
         jobPositionEntity.setPositionName(jobPosition.getName());
         jobPositionEntity.setDescription(jobPosition.getDescription());
+        jobPositionEntity.setStatus(jobPosition.getStatus());
         jobPositionRepo.save(jobPositionEntity);
     }
 
 
     @Override
     public void updateJobPosition(JobPositionModel jobPosition) {
-        validateJobPositionName(jobPosition.getName());
+
         var jobPositionEntity = jobPositionRepo.findById(jobPosition.getCode())
                 .orElseThrow(() -> new ApplicationException(
                                 ResponseCode.JOB_POSITION_NOT_EXISTED,
                                 String.format("JobPosition not exist with code: %s", jobPosition.getCode())
                         )
                 );
+
         if(jobPosition.getName() != null){
-            jobPositionEntity.setPositionName(jobPosition.getName());
+            if (!jobPositionEntity.getPositionName().equals(jobPosition.getName())) {
+                validateJobPositionName(jobPosition.getName());
+                jobPositionEntity.setPositionName(jobPosition.getName());
+            }
         }
         if(jobPosition.getDescription() != null){
             jobPositionEntity.setDescription(jobPosition.getDescription());
+        }
+        if(jobPosition.getStatus() != null){
+            jobPositionEntity.setStatus(jobPosition.getStatus());
         }
         jobPositionRepo.save(jobPositionEntity);
     }
 
     @Override
     public PageWrapper<JobPositionModel> getJobPosition(IJobPositionFilter filter, IPageableRequest request) {
-        var pageable = PageableUtils.getPageable(request);
+        var pageable = PageableUtils.getPageable(request, "positionCode");
         var spec = new JobPositionSpecification(filter);
         var page = jobPositionRepo.findAll(spec ,pageable);
         return PageWrapper.<JobPositionModel>builder()

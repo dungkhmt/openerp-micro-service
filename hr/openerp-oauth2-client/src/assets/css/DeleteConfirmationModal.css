@@ -1,0 +1,70 @@
+.dialog-container {
+  text-align: center;
+  padding: 10px; /* Reduced padding */
+  border-radius: 12px; /* Rounded corners */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  min-width: 500px; /* Fixed width for compact layout */
+  margin: auto;
+  position: fixed;
+  top: 40%; /* Centered vertically */
+  left: 50%; /* Centered horizontally */
+  transform: translate(-50%, -40%);
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); 
+  background-color: #fff; 
+}
+
+.dialog-title {
+  font-size: 23px; 
+  font-weight: bold;
+  color: #000;
+}
+
+.dialog-content {
+  font-size: 17px;
+  color: #555;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+  gap: 50px; 
+}
+
+.dialog-actions .cancel-button {
+  border: 2px solid #00b7ff;
+  background-color: transparent;
+  color: #00b7ff;
+  font-size: 14px; 
+  padding: 8px 20px;
+  border-radius: 25px; 
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dialog-actions .cancel-button:hover {
+  background-color: #007bff; /* Blue hover effect */
+  color: white;
+  
+}
+
+.dialog-actions .delete-button {
+  background-color: #fa4e51; 
+  color: white;
+  font-size: 14px; 
+  padding: 8px 20px;
+  border-radius: 25px; 
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.dialog-actions .delete-button:hover {
+  background-color: #e20000; /* Darker red on hover */
+}

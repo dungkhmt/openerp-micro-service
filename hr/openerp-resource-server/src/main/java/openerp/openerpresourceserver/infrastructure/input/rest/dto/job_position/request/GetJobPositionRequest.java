@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import openerp.openerpresourceserver.application.port.out.job_position.usecase_data.GetJobPosition;
+import openerp.openerpresourceserver.constant.JobPositionStatus;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.PageableRequest;
 
 @Getter
@@ -14,6 +15,7 @@ import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.Pageab
 public class GetJobPositionRequest {
     private String code;
     private String name;
+    private JobPositionStatus status;
     @NotNull
     private PageableRequest pageableRequest;
 
@@ -21,6 +23,7 @@ public class GetJobPositionRequest {
         return GetJobPosition.builder()
                 .code(code)
                 .name(name)
+                .status(status)
                 .pageableRequest(pageableRequest)
                 .build();
     }

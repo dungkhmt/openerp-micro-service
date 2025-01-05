@@ -55,7 +55,6 @@ public class DepartmentAdapter implements IDepartmentPort {
 
     @Override
     public void updateDepartment(DepartmentModel department) {
-        validateDepartmentName(department.getDepartmentName());
         var departmentEntity = departmentRepo.findById(department.getDepartmentCode())
                 .orElseThrow(() -> new ApplicationException(
                                 ResponseCode.DEPARTMENT_NOT_EXISTED,
@@ -63,13 +62,18 @@ public class DepartmentAdapter implements IDepartmentPort {
                         )
                 );
         if(department.getDepartmentName() != null){
-            departmentEntity.setDepartmentName(department.getDepartmentName());
+            if(!departmentEntity.getDepartmentName().equals(department.getDepartmentName())){
+                validateDepartmentName(department.getDepartmentName());
+                departmentEntity.setDepartmentName(department.getDepartmentName());
+            }
         }
+
+        if(department.getStatus() != null){
+            departmentEntity.setStatus(department.getStatus());
+        }
+
         if(department.getDescription() != null){
             departmentEntity.setDescription(department.getDescription());
-        }
-        if(department.getDepartmentCode() != null){
-            departmentEntity.setDepartmentCode(department.getDepartmentCode());
         }
         departmentRepo.save(departmentEntity);
     }

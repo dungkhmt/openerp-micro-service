@@ -19,7 +19,7 @@ public class CreateJobPositionHandler extends ObservableUseCasePublisher impleme
 
     public CreateJobPositionHandler(
             IJobPositionPort jobPositionPort,
-            @Qualifier("checkpointConfigureCodeGenerator") ICodeGeneratorService codeGenerator,
+            @Qualifier("jobCodeGenerator") ICodeGeneratorService codeGenerator,
             JobPositionValidator validator) {
         this.jobPositionPort = jobPositionPort;
         this.validator = validator;

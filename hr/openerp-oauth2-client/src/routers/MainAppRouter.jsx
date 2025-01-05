@@ -7,7 +7,9 @@ import { useNotificationState } from "state/NotificationState";
 import NotFound from "views/errors/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import TeacherRouter from "./TeacherRouter";
+import EmployeeRouter from "./EmployeeRouter";
 import DemoScreen from "views/DemoScreen";
+import DepartmentScreen from "views/DepartmentScreen";
 
 const styles = {
   loadingProgress: {
@@ -35,9 +37,9 @@ function MainAppRouter(props) {
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Switch>
           <Route component={() => <></>} exact path="/" />
-          <PrivateRoute component={DemoScreen} exact path="/demo" />
+          <PrivateRoute component={DepartmentScreen} exact path="/demo" />
           <PrivateRoute component={TeacherRouter} path="/teacher" />
-
+          
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />
         </Switch>

@@ -5,6 +5,7 @@ import openerp.openerpresourceserver.domain.common.usecase.BeanAwareUseCasePubli
 import openerp.openerpresourceserver.domain.model.JobPositionModel;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.Resource;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.job_position.request.CreateJobPositionRequest;
+import openerp.openerpresourceserver.infrastructure.input.rest.dto.job_position.request.DeleteJobPositionRequest;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.job_position.request.GetJobPositionRequest;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.job_position.request.UpdateJobPositionRequest;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.job_position.response.JobPositionResponse;
@@ -30,6 +31,16 @@ public class JobPositionController extends BeanAwareUseCasePublisher {
     @PostMapping("update-job-position")
     public ResponseEntity<?> updateJobPosition(
             @Valid @RequestBody UpdateJobPositionRequest request
+    ){
+        publish(request.toUseCase());
+        return ResponseEntity.ok().body(
+                new Resource()
+        );
+    }
+
+    @PostMapping("delete-job-position")
+    public ResponseEntity<?> deleteJobPosition(
+            @Valid @RequestBody DeleteJobPositionRequest request
     ){
         publish(request.toUseCase());
         return ResponseEntity.ok().body(

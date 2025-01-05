@@ -5,6 +5,7 @@ import openerp.openerpresourceserver.domain.common.usecase.BeanAwareUseCasePubli
 import openerp.openerpresourceserver.domain.model.DepartmentModel;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.Resource;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.department.request.CreateDepartmentRequest;
+import openerp.openerpresourceserver.infrastructure.input.rest.dto.department.request.DeleteDepartmentRequest;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.department.request.GetDepartmentRequest;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.department.request.UpdateDepartmentRequest;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.department.response.DepartmentResponse;
@@ -30,6 +31,16 @@ public class DepartmentController extends BeanAwareUseCasePublisher {
     @PostMapping("update-department")
     public ResponseEntity<?> updateDepartment(
             @Valid @RequestBody UpdateDepartmentRequest request
+    ){
+        publish(request.toUseCase());
+        return ResponseEntity.ok().body(
+                new Resource()
+        );
+    }
+
+    @PostMapping("delete-department")
+    public ResponseEntity<?> deleteDepartment(
+            @Valid @RequestBody DeleteDepartmentRequest request
     ){
         publish(request.toUseCase());
         return ResponseEntity.ok().body(

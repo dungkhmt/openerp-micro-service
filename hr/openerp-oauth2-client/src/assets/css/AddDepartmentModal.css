@@ -1,0 +1,45 @@
+.custom-modal .MuiDialog-paper {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+  "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+  sans-serif;
+  border-radius: 12px;
+  padding: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.custom-modal .MuiDialogTitle-root {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  padding: 10px 24px;
+}
+
+.custom-modal .MuiDialogContent-root {
+  padding: 20px 24px;
+}
+
+.custom-modal .MuiTextField-root {
+  margin-bottom: 16px;
+}
+
+.custom-modal .MuiDialogActions-root {
+  padding: 10px 24px;
+  justify-content: flex-end;
+}
+
+.custom-modal .MuiButton-containedPrimary {
+  background-color: #ffa500;
+  color: white;
+}
+
+.custom-modal .MuiButton-containedPrimary:hover {
+  background-color: #e69500;
+}
+
+.snackbar-error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 8px;
+}

@@ -26,6 +26,7 @@ import { buildMapPathMenu } from "utils/MenuUtils";
 import { general } from "./menuconfig/general";
 import { student } from "./menuconfig/student";
 import { teacher } from "./menuconfig/teacher";
+import { admin } from "./menuconfig/admin";
 import { user } from "./menuconfig/user";
 import {demo} from "./menuconfig/demo";
 
@@ -33,6 +34,7 @@ export const MENUS = [];
 
 MENUS.push(general);
 MENUS.push(user);
+MENUS.push(admin)
 MENUS.push(teacher);
 MENUS.push(student);
 MENUS.push(demo);

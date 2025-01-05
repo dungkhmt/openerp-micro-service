@@ -10,6 +10,7 @@ import openerp.openerpresourceserver.infrastructure.output.persistence.entity.Jo
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class JobPositionSpecification implements Specification<JobPositionEntity> {
@@ -17,19 +18,27 @@ public class JobPositionSpecification implements Specification<JobPositionEntity
 
     @Override
     public Predicate toPredicate(Root<JobPositionEntity> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        var predicates = new ArrayList<Predicate>();
-
+        var orPredicates = new ArrayList<Predicate>();
+        List<Predicate> predicates = new ArrayList<>();
         if(filter.getCode() != null){
             Predicate codePredicate = cb.like(cb.lower(root.get("positionCode")),
                     "%" + filter.getCode().toLowerCase() + "%");
-            predicates.add(codePredicate);
+            orPredicates.add(codePredicate);
         }
         if (filter.getName() != null){
             Predicate namePredicate = cb.like(cb.lower(root.get("positionName")),
                     "%" + filter.getName().toLowerCase() + "%");
-            predicates.add(namePredicate);
+            orPredicates.add(namePredicate);
+        }
+        if (!orPredicates.isEmpty()) {
+            predicates.add(cb.or(orPredicates.toArray(new Predicate[0])));
         }
 
-        return cb.or(predicates.toArray(new Predicate[0]));
+        if (filter.getStatus() != null) {
+            Predicate statusPredicate = cb.equal(root.get("status"), filter.getStatus());
+            predicates.add(statusPredicate);
+        }
+
+        return cb.and(predicates.toArray(new Predicate[0]));
     }
 }

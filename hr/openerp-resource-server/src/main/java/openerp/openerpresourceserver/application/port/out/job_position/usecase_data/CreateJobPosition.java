@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import openerp.openerpresourceserver.constant.DepartmentStatus;
+import openerp.openerpresourceserver.constant.JobPositionStatus;
 import openerp.openerpresourceserver.domain.common.model.UseCase;
 import openerp.openerpresourceserver.domain.model.DepartmentModel;
 import openerp.openerpresourceserver.domain.model.JobPositionModel;
@@ -21,6 +22,7 @@ public class CreateJobPosition implements UseCase {
         return JobPositionModel.builder()
                 .name(name)
                 .description(description)
+                .status(JobPositionStatus.ACTIVE)
                 .build();
     }
 }
