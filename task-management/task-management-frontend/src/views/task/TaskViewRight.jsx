@@ -19,6 +19,7 @@ import { TaskPriority } from "../../components/task/priority";
 import { TaskStatus } from "../../components/task/status";
 import { useTaskContext } from "../../hooks/useTaskContext";
 import { getDueDateColor, getProgressColor } from "../../utils/color.util";
+import { useParams } from "react-router";
 
 const TitleWrapper = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -31,13 +32,13 @@ const TitleWrapper = styled(Box)(({ theme }) => ({
 
 const TaskViewRight = () => {
   const { task } = useTaskContext();
-  const { project } = useSelector((state) => state.project);
+  const { id: projectId } = useParams();
   const {
     category: categoryStore,
     priority: priorityStore,
     status: statusStore,
   } = useSelector((state) => state);
-
+  
   const category = categoryStore.categories.find(
     (c) => c.categoryId === task.categoryId
   );
@@ -63,7 +64,7 @@ const TaskViewRight = () => {
           <Typography
             variant="body2"
             component={Link}
-            to={`/project/${project.id}`}
+            to={`/project/${projectId}`}
             sx={{
               color: "text.primary",
               textDecoration: "none",
@@ -90,7 +91,7 @@ const TaskViewRight = () => {
             <Typography
               variant="body2"
               component={Link}
-              to={`/project/${project.id}/event/${task.event.id}`}
+              to={`/project/${projectId}/event/${task.event.id}`}
               sx={{
                 color: "text.primary",
                 textDecoration: "none",

@@ -322,7 +322,7 @@ public class TaskServiceImplement implements TaskService {
 	}
 
 	@Override
-//    @Transactional
+    @Transactional
 	public TaskDTO updateTask(UUID taskId, UpdateTaskForm taskForm, String updateBy) {
 		List<TaskLogDetail> taskLogDetails = new ArrayList<>();
 		Task task = taskRepository.findById(taskId).orElse(null);

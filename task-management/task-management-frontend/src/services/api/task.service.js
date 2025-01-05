@@ -12,7 +12,6 @@ const endPoints = {
   getCreatedTasks: `/tasks/created-by-me`,
   getLogs: (id) => `/tasks/${id}/logs`,
   getTaskSkills: (id) => `/task-skills/${id}`,
-  addTaskSkills: (id) => `/task-skills/${id}`,
   updateTaskSkills: (id) => `/task-skills/${id}`,
   getEventTasks: (eventId) => `tasks/event-tasks?eventId=${eventId}`,
   addExistingTasksToEvent: (eventId) => `tasks/event-tasks?eventId=${eventId}`,
@@ -55,7 +54,6 @@ const TaskService = {
   },
   updateTask: async (id, data, cb) => {
     try {
-      console.log(data);
       const response = await privateClient.put(endPoints.updateTask(id), data);
       if (response?.data && isFunction(cb)) cb(null, response.data);
       return response?.data;
@@ -111,16 +109,6 @@ const TaskService = {
   getTaskSkills: async (id, cb) => {
     try {
       const response = await privateClient.get(endPoints.getTaskSkills(id));
-      if (response?.data && isFunction(cb)) cb(null, response.data);
-      return response?.data;
-    } catch (e) {
-      if (isFunction(cb)) cb(e);
-      else throw e;
-    }
-  },
-  addTaskSkills: async (id, data, cb) => {
-    try {
-      const response = await privateClient.post(endPoints.addTaskSkills(id), data);
       if (response?.data && isFunction(cb)) cb(null, response.data);
       return response?.data;
     } catch (e) {
