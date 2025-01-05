@@ -19,8 +19,10 @@ import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import {Radio, RadioGroup} from "@mui/material";
 import {DropzoneArea} from "material-ui-dropzone";
-import {AccessTime, Timer} from "@material-ui/icons";
+import {AccessTime, AttachFileOutlined, Timer} from "@material-ui/icons";
 import {Scoreboard} from "@mui/icons-material";
+import {getFilenameFromString, getFilePathFromString} from "../ultils/FileUltils";
+import QuestionFilePreview from "../questionbank/QuestionFilePreview";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -53,6 +55,8 @@ function MyExamDetails(props) {
   const [dataAnswers, setDataAnswers] = useState([]);
   const [tmpTextAnswer, setTmpTextAnswer] = useState("");
   const [answersFiles, setAnswersFiles] = useState([]);
+  const [openFilePreviewDialog, setOpenFilePreviewDialog] = useState(false);
+  const [filePreview, setFilePreview] = useState(null);
 
   useEffect(() => {
     let tmpDataAnswers = []
@@ -131,6 +135,11 @@ function MyExamDetails(props) {
       formData
     );
   }
+
+  const handleOpenFilePreviewDialog = (data) => {
+    setOpenFilePreviewDialog(true)
+    setFilePreview(getFilePathFromString(data))
+  };
 
   return (
     <div>
@@ -345,6 +354,31 @@ function MyExamDetails(props) {
               )
             }
 
+            {
+              data?.examResultId != null && (
+                <div>
+                  <h4 style={{marginBottom: 0, fontSize: '18px'}}>File đính kèm:</h4>
+                  {
+                    (data?.answerFiles == null || data?.answerFiles == '') ?
+                      (
+                        <div>N/A</div>
+                      ) :
+                      (
+                        data?.answerFiles.split(';').map(item => {
+                          return (
+                            <div style={{display: 'flex', alignItems: 'center'}}>
+                              <AttachFileOutlined></AttachFileOutlined>
+                              <p style={{fontWeight: 'bold', cursor: 'pointer'}}
+                                 onClick={() => handleOpenFilePreviewDialog(item)}>{getFilenameFromString(item)}</p>
+                            </div>
+                          )
+                        })
+                      )
+                  }
+                </div>
+              )
+            }
+
           </CardContent>
           <CardActions style={{justifyContent: 'flex-end'}}>
             <Button
@@ -369,6 +403,11 @@ function MyExamDetails(props) {
             }
           </CardActions>
         </Card>
+        <QuestionFilePreview
+          open={openFilePreviewDialog}
+          setOpen={setOpenFilePreviewDialog}
+          file={filePreview}>
+        </QuestionFilePreview>
       </MuiPickersUtilsProvider>
     </div>
   );

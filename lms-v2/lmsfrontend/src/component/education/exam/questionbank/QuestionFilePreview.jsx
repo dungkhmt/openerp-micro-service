@@ -9,6 +9,7 @@ import {
 } from "@material-ui/core";
 import FilePreviewUrl from "../../../common/uploader/FilePreviewUrl";
 import {DialogActions} from "@mui/material";
+import {getFilenameFromString, getFilePathFromString} from "../ultils/FileUltils";
 
 function QuestionFilePreview(props) {
 
@@ -16,6 +17,20 @@ function QuestionFilePreview(props) {
 
   const closeDialog = () => {
     setOpen(false)
+  }
+
+  const handleDownload = () => {
+    fetch(file)
+      .then(response => response.blob())
+      .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = getFilenameFromString(file); // Tên tệp tải xuống
+        link.click();
+        window.URL.revokeObjectURL(url); // Dọn dẹp URL blob
+      })
+      .catch(error => console.error('Error downloading the file:', error));
   }
 
   return (
@@ -32,6 +47,13 @@ function QuestionFilePreview(props) {
             onClick={closeDialog}
           >
             Hủy
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleDownload}
+          >
+            Tải xuống
           </Button>
         </DialogActions>
       </Dialog>
