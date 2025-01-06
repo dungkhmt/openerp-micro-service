@@ -165,15 +165,27 @@ function MyExamDetails(props) {
             {
               data?.examResultId != null && (
                 <div>
-                  <div style={{display: "flex", alignItems:"center", marginBottom: '10px'}}>
-                    <Scoreboard/>
-                    <p style={{padding: 0, margin: 0}}><strong>Tổng điểm: </strong> {data?.totalScore}</p>
+                  <div style={{
+                    display: "flex",
+                    width: '100%',
+                    border: '2px solid #000000b8',
+                    borderRadius: '10px',
+                    margin: '10px 0'
+                  }}>
+                    <div style={{display: "flex", flexDirection: "column", width: '200px'}}>
+                      <h3 style={{margin: 0, padding: '10px', borderBottom: '2px solid #000000b8'}}>Điểm</h3>
+                      <p style={{padding: 0, margin: "auto", height: '150px', lineHeight: '150px', fontWeight: "bold", fontSize: '70px'}}>{data?.totalScore}</p>
+                    </div>
+                    <div style={{display: "flex", flexDirection: "column", borderLeft: '2px solid #000000b8', width: 'calc(100% - 200px)'}}>
+                      <h3 style={{margin: 0, padding: '10px', borderBottom: '2px solid #000000b8'}}>Nhận xét</h3>
+                      <p style={{padding: '0 10px', margin: 0, height: '150px'}}>{parser(data?.comment)}</p>
+                    </div>
                   </div>
-                  <div style={{display: "flex", alignItems:"center", marginBottom: '10px'}}>
+                  <div style={{display: "flex", alignItems:"center", marginBottom: '10px', justifyContent: "flex-end"}}>
                     <Timer/>
                     <p style={{padding: 0, margin: 0}}><strong>Tổng thời gian làm: </strong> {data?.totalTime} (phút)</p>
                   </div>
-                  <div style={{display: "flex", alignItems:"center", marginBottom: '10px'}}>
+                  <div style={{display: "flex", alignItems:"center", marginBottom: '10px', justifyContent: "flex-end"}}>
                     <AccessTime/>
                     <p style={{padding: 0, margin: 0}}><strong>Thời gian nộp: </strong> {formatDateTime(data?.submitedAt)}</p>
                   </div>
@@ -332,6 +344,20 @@ function MyExamDetails(props) {
                                 <div style={{display: "flex", alignItems:"center"}}><strong style={{marginRight: '10px'}}>Trả lời:</strong>{parse(value?.answer)}</div>
                               )
                             }
+                            {
+                              data?.totalScore && (
+                                <div style={{display: "flex", alignItems: "center"}}>
+                                  <strong style={{marginRight: '10px'}}>Đáp án:</strong>{parse(value?.questionAnswer)}
+                                </div>
+                              )
+                            }
+                          </div>
+                        )
+                      }
+                      {
+                        data?.totalScore && (
+                          <div style={{display: "flex", alignItems: "center"}}>
+                            <strong style={{marginRight: '10px'}}>Giải thích:</strong>{parse(value?.questionExplain)}
                           </div>
                         )
                       }
