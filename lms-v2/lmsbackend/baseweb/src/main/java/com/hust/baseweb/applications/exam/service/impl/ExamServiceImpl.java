@@ -261,6 +261,14 @@ public class ExamServiceImpl implements ExamService {
             return responseData;
         }
 
+        List<ExamResultEntity> examResultEntities = examResultRepository.findAllByExamId(examDeleteReq.getId());
+        if(!examResultEntities.isEmpty()){
+            responseData.setHttpStatus(HttpStatus.NOT_FOUND);
+            responseData.setResultCode(HttpStatus.NOT_FOUND.value());
+            responseData.setResultMsg("Đã có học sinh hoàn thành bài thi, không được xoá");
+            return responseData;
+        }
+
         examRepository.delete(examEntityExist.get());
 
         responseData.setHttpStatus(HttpStatus.OK);
