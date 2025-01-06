@@ -463,7 +463,7 @@ public class ExamServiceImpl implements ExamService {
 
         responseData.setHttpStatus(HttpStatus.OK);
         responseData.setResultCode(HttpStatus.OK.value());
-        responseData.setResultMsg("Success");
+        responseData.setResultMsg("Nộp bài thành công");
         return responseData;
     }
 

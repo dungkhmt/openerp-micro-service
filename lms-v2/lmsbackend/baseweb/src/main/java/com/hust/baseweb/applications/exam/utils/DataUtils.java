@@ -78,8 +78,8 @@ public class DataUtils {
      * @return
      * @author phuvk
      */
-    public static int safeToInt(Object obj1, int defaultValue) {
-        int result = defaultValue;
+    public static Integer safeToInt(Object obj1, Integer defaultValue) {
+        Integer result = defaultValue;
         if (obj1 != null) {
             try {
                 result = Integer.parseInt(obj1.toString());
@@ -95,8 +95,8 @@ public class DataUtils {
      * @param obj1 Object
      * @return int
      */
-    public static int safeToInt(Object obj1) {
-        return safeToInt(obj1, 0);
+    public static Integer safeToInt(Object obj1) {
+        return safeToInt(obj1, null);
     }
 
     /**
