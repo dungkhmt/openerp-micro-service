@@ -1,7 +1,5 @@
 package com.hust.baseweb.applications.exam.model.response;
 
-import com.hust.baseweb.applications.exam.entity.ExamStudentEntity;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,5 +22,5 @@ public class ExamDetailsRes {
     private Integer status;
     private String startTime;
     private String endTime;
-    private List<ExamStudentEntity> examStudents;
+    private List<ExamStudentResultDetailsRes> examStudents;
 }

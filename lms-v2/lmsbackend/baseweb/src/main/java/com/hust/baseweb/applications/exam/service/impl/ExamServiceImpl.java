@@ -153,7 +153,7 @@ public class ExamServiceImpl implements ExamService {
         examTests.add(examTestService.details(new ExamTestDetailsReq(examDetailsRes.getExamTestId())).getData());
         examDetailsRes.setExamTests(examTests);
 
-        examDetailsRes.setExamStudents(examStudentRepository.findALlByExamId(examDetailsRes.getId()));
+        examDetailsRes.setExamStudents(examStudentRepository.findAllWithResult(examDetailsRes.getId()));
 
         responseData.setHttpStatus(HttpStatus.OK);
         responseData.setResultCode(HttpStatus.OK.value());
