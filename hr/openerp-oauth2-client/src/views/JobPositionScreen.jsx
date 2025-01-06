@@ -50,7 +50,14 @@ const JobPositionTable = () => {
         "/job/get-job-position",
         (res) => {
           const { data: jobs, meta } = res.data;
-          setData(jobs);
+          // Convert snake_case to camelCase
+          const transformedJobs = jobs.map((job) => ({
+            code: job.code,
+            name: job.name,
+            description: job.description,
+          }));
+
+          setData(transformedJobs);
           setPageCount(meta.page_info.total_page);
           setCurrentPage(meta.page_info.page);
           setTempPageInput(meta.page_info.page + 1);
@@ -72,7 +79,7 @@ const JobPositionTable = () => {
   }, [itemsPerPage, searchTerm]);
 
   useEffect(() => {
-    // Handle click outside of dropdowns to close them
+    // Close dropdowns when clicking outside
     const handleOutsideClick = (event) => {
       if (
         dropdownVisible !== null &&
@@ -207,13 +214,13 @@ const JobPositionTable = () => {
   const handleEdit = (job) => {
     setSelectedJob(job);
     setOpenModal(true);
-    setDropdownVisible(null); // Hide dropdown
+    setDropdownVisible(null);
   };
 
   const handleOpenDeleteModal = (job) => {
     setDeleteJob(job);
     setDeleteModalOpen(true);
-    setDropdownVisible(null); // Hide dropdown
+    setDropdownVisible(null);
   };
 
   const handleDelete = () => {

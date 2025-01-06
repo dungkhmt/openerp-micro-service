@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StaffJobPositionModel {
-    private String jobPositionCode;
+    private JobPositionModel jobPosition;
     private String userLoginId;
     private LocalDate fromDate;
     private LocalDate thruDate;

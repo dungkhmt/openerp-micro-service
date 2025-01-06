@@ -5,7 +5,7 @@ import openerp.openerpresourceserver.domain.model.StaffDepartmentModel;
 import java.util.List;
 
 public interface IStaffDepartmentPort {
-    StaffDepartmentModel assignDepartment(String userLoginId, String departmentCode);
+    void assignDepartment(String userLoginId, String departmentCode);
     StaffDepartmentModel findCurrentDepartment(String userLoginId);
     List<StaffDepartmentModel> findCurrentDepartmentIn(List<String> userLoginIds);
     List<StaffDepartmentModel> findDepartmentHistory(String userLoginId);

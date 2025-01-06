@@ -10,6 +10,8 @@ import openerp.openerpresourceserver.domain.common.usecase.PageWrapperUseCaseHan
 import openerp.openerpresourceserver.domain.model.PageWrapper;
 import openerp.openerpresourceserver.domain.model.StaffModel;
 
+import java.util.List;
+
 @DomainComponent
 @Slf4j
 @RequiredArgsConstructor
@@ -25,13 +27,6 @@ public class FindStaffHandler extends ObservableUseCasePublisher
 
     @Override
     public PageWrapper<StaffModel> handle(FindStaff useCase) {
-        if(useCase.getPageableRequest() != null){
-            return staffPort.findStaff(useCase, useCase.getPageableRequest());
-        }
-        //get all
-        return PageWrapper.<StaffModel>builder()
-                .pageContent(staffPort.findStaff(useCase))
-                .pageInfo(null)
-                .build();
+        return staffPort.findStaff(useCase, useCase.getPageableRequest());
     }
 }

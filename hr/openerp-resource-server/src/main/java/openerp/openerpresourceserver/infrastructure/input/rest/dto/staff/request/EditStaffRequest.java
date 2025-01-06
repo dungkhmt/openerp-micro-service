@@ -14,14 +14,14 @@ public class EditStaffRequest {
     private String staffCode;
     private String userLoginId;
 
-    private String fullName;
+    private String fullname;
     private StaffStatus staffStatus;
     private String departmentCode;
     private String jobPositionCode;
 
     public EditStaff toUseCase(){
         return EditStaff.builder()
-                .fullName(fullName)
+                .fullName(fullname)
                 .userLoginId(userLoginId)
                 .staffCode(staffCode)
                 .staffStatus(staffStatus)

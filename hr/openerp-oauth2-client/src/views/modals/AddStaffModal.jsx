@@ -106,24 +106,23 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
     try {
       request(
         "post",
-        "/staff/add-staff", 
+        "/staff/add-staff",
         () => {
           onSubmit();
-          onClose(); 
+          onClose();
           setFormValues({
             fullname: "",
             email: "",
             department_code: null,
             job_position_code: null,
-          }); 
+          });
         },
         {
           onError: (err) => {
             if (err.response && err.response.data) {
               const { meta, data } = err.response.data;
-              
+
               if (meta && meta.code) {
-                // Handle validation or other API errors
                 console.warn("Validation error:", meta.message, data);
                 setError({
                   title: meta.message || "Validation Error",
@@ -170,7 +169,6 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
       <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
         <DialogTitle>Add Employee</DialogTitle>
         <DialogContent>
-          {/* Full Name Input */}
           <TextField
             fullWidth
             label="Full Name"
@@ -181,7 +179,6 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
             }
             margin="normal"
           />
-          {/* Email Input */}
           <TextField
             fullWidth
             label="Email"
@@ -192,20 +189,17 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
             }
             margin="normal"
           />
-          {/* Department Dropdown */}
           <Autocomplete
             fullWidth
             options={departments}
-            getOptionLabel={(option) => option.departmentName || ""}
+            getOptionLabel={(option) => option.department_name || ""}
             isOptionEqualToValue={(option, value) =>
-              option.departmentCode === value.departmentCode
+              option.department_code === value.department_code
             }
-            inputValue={searchDepartment} // Controlled search input
+            inputValue={searchDepartment}
             onInputChange={(e, value) => {
-              setSearchDepartment(value); // Update search text
-              fetchDepartments(value); // Fetch new data
-
-              // Reset selected department when search term changes
+              setSearchDepartment(value);
+              fetchDepartments(value);
               if (formValues.department_code) {
                 setFormValues((prev) => ({ ...prev, department_code: null }));
               }
@@ -213,12 +207,12 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
             onChange={(e, value) =>
               setFormValues((prev) => ({
                 ...prev,
-                department_code: value?.departmentCode || null,
+                department_code: value?.department_code || null,
               }))
             }
             value={
               departments.find(
-                (dept) => dept.departmentCode === formValues.department_code
+                (dept) => dept.department_code === formValues.department_code
               ) || null
             }
             loading={loadingDepartments}
@@ -231,9 +225,7 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
                   ...params.InputProps,
                   endAdornment: (
                     <>
-                      {loadingDepartments ? (
-                        <CircularProgress size={20} />
-                      ) : null}
+                      {loadingDepartments ? <CircularProgress size={20} /> : null}
                       {params.InputProps.endAdornment}
                     </>
                   ),
@@ -241,18 +233,15 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
               />
             )}
           />
-          {/* Job Position Dropdown */}
           <Autocomplete
             fullWidth
             options={jobPositions}
             getOptionLabel={(option) => option.name || ""}
             isOptionEqualToValue={(option, value) => option.code === value.code}
-            inputValue={searchJob} // Controlled search input
+            inputValue={searchJob}
             onInputChange={(e, value) => {
-              setSearchJob(value); // Update search text
-              fetchJobPositions(value); // Fetch new data
-
-              // Reset selected job position when search term changes
+              setSearchJob(value);
+              fetchJobPositions(value);
               if (formValues.job_position_code) {
                 setFormValues((prev) => ({ ...prev, job_position_code: null }));
               }
@@ -299,7 +288,6 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
         </DialogActions>
       </Dialog>
 
-      {/* Snackbar for error notifications */}
       <Snackbar
         open={!!error}
         autoHideDuration={6000}
@@ -307,11 +295,14 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <Alert onClose={() => setError(null)} severity="error" variant="filled">
-          <strong>{error?.title}</strong>
+          <strong>{error?.title || "Error"}</strong>
           <br />
-          {error?.info}
+          {typeof error?.info === "string"
+            ? error?.info
+            : JSON.stringify(error?.info, null, 2)} 
         </Alert>
       </Snackbar>
+
     </>
   );
 };

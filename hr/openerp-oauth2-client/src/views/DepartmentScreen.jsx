@@ -50,7 +50,15 @@ const DepartmentTable = () => {
         "/department/get-department",
         (res) => {
           const { data: departments, meta } = res.data;
-          setData(departments);
+          // Transform snake_case response to camelCase
+          const transformedDepartments = departments.map((dept) => ({
+            departmentCode: dept.department_code,
+            departmentName: dept.department_name,
+            description: dept.description,
+            status: dept.status,
+          }));
+
+          setData(transformedDepartments);
           setPageCount(meta.page_info.total_page);
           setCurrentPage(meta.page_info.page);
           setTempPageInput(meta.page_info.page + 1);

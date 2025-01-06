@@ -1,16 +1,18 @@
 package openerp.openerpresourceserver.infrastructure.input.rest.dto.staff.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import openerp.openerpresourceserver.constant.StaffStatus;
 import openerp.openerpresourceserver.domain.model.StaffModel;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-@Builder
+@SuperBuilder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class StaffResponse {
     private String staffCode;
     private String userLoginId;

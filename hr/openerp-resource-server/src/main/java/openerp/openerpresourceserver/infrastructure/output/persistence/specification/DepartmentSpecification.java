@@ -3,9 +3,7 @@ package openerp.openerpresourceserver.infrastructure.output.persistence.specific
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.application.port.out.department.filter.IDepartmentFilter;
-import openerp.openerpresourceserver.application.port.out.staff.filter.IStaffFilter;
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.DepartmentEntity;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.StaffEntity;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;

@@ -1,8 +1,8 @@
 package openerp.openerpresourceserver.infrastructure.input.rest.dto.checkinout.response;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.*;
 import openerp.openerpresourceserver.constant.AttendanceType;
 import openerp.openerpresourceserver.domain.model.AttendanceModel;
 
@@ -13,6 +13,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MonthAttendanceResponse {
     private Map<String, Map<LocalDate, DayAttendance>> userAttendances;
 

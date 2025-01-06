@@ -49,8 +49,10 @@ public class SecurityConfig {
 //            http.requiresChannel().anyRequest().requiresSecure();
 //        }
 
+
         // Route security
-        http
+        //TODO ACTIVE COMMENT
+        /*http
                 .authorizeHttpRequests()
                 .anyRequest().authenticated()
                 .and()
@@ -61,7 +63,7 @@ public class SecurityConfig {
                 .disable()
                 .headers()
                 .frameOptions()
-                .disable();
+                .disable();*/
 
         return http.build();
     }

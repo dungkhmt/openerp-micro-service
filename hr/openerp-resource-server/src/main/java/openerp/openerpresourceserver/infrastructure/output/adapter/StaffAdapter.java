@@ -98,7 +98,7 @@ public class StaffAdapter implements IStaffPort {
 
     @Override
     public PageWrapper<StaffModel> findStaff(IStaffFilter filter, IPageableRequest pageableRequest) {
-        var pageable = PageableUtils.getPageable(pageableRequest);
+        var pageable = PageableUtils.getPageable(pageableRequest, "staffCode");
         var spec = new StaffInfoSpecification(filter);
         var page = staffRepo.findAll(spec ,pageable);
         return PageWrapper.<StaffModel>builder()

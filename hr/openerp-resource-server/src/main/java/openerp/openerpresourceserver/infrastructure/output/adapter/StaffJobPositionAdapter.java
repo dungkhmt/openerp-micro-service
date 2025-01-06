@@ -2,79 +2,81 @@ package openerp.openerpresourceserver.infrastructure.output.adapter;
 
 import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.application.port.in.port.IStaffJobPositionPort;
+import openerp.openerpresourceserver.constant.JobPositionStatus;
 import openerp.openerpresourceserver.domain.exception.ApplicationException;
+import openerp.openerpresourceserver.domain.model.JobPositionModel;
 import openerp.openerpresourceserver.domain.model.StaffJobPositionModel;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.StaffJobPositionEntity;
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.StaffJobPositionId;
+import openerp.openerpresourceserver.infrastructure.output.persistence.projection.StaffJobPositionProjection;
 import openerp.openerpresourceserver.infrastructure.output.persistence.repository.StaffJobPositionRepo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Service
 public class StaffJobPositionAdapter implements IStaffJobPositionPort {
+    private static final Logger log = LoggerFactory.getLogger(StaffJobPositionAdapter.class);
     private final StaffJobPositionRepo staffJobPositionRepo;
 
     @Override
-    public StaffJobPositionModel assignJobPosition(String userLoginId, String jobPositionCode) {
+    public void assignJobPosition(String userLoginId, String jobPositionCode) {
         var currentJobOption = staffJobPositionRepo.findLatestJobByUserId(userLoginId);
-        if(currentJobOption.isPresent()) {
+        if (currentJobOption.isPresent()) {
             var currentJob = currentJobOption.get();
-            if(currentJob.getId().getPositionCode().equals(jobPositionCode)) {
-                throw new ApplicationException(
-                        ResponseCode.ASSIGN_JOB_POSITION_EXCEPTION,
-                        String.format("Job position id %s already assigned to user %s",
-                                currentJob.getId().getPositionCode() , userLoginId)
-                );
+            if (currentJob.getJobPositionCode().equals(jobPositionCode)) {
+                log.warn(String.format("Job position %s already assigned to user %s",
+                        currentJob.getJobPositionCode(), userLoginId));
+                return;
             }
-            currentJob.setThruDate(LocalDate.now());
-            staffJobPositionRepo.save(currentJob);
         }
+        var staffJobEntity = new StaffJobPositionEntity();
         var id = new StaffJobPositionId();
         id.setUserId(userLoginId);
         id.setPositionCode(jobPositionCode);
         id.setFromDate(LocalDate.now());
-        var staffJobEntity = new StaffJobPositionEntity();
         staffJobEntity.setId(id);
-        return toModel(staffJobPositionRepo.save(staffJobEntity));
+        staffJobPositionRepo.save(staffJobEntity);
     }
 
     @Override
     public StaffJobPositionModel findCurrentJobPosition(String userLoginId) {
-        var currentJobOption = staffJobPositionRepo.findLatestJobByUserId(userLoginId);
-        return currentJobOption.map(this::toModel).orElse(null);
+        var projection = staffJobPositionRepo.findLatestJobByUserId(userLoginId);
+        return projection.map(this::toModel).orElse(null);
     }
 
     @Override
     public List<StaffJobPositionModel> findCurrentJobPositionIn(List<String> userLoginIds) {
-        return toModels(
-                staffJobPositionRepo.findLatestPositionsByUserIds(userLoginIds)
-        );
+        var projections = staffJobPositionRepo.findLatestPositionsByUserIds(userLoginIds);
+        return toModels(projections);
     }
 
     @Override
     public List<StaffJobPositionModel> findJobPositionHistory(String userLoginId) {
-        return toModels(
-                staffJobPositionRepo.findHistoryJobByUserId(userLoginId)
-        );
+        var projections = staffJobPositionRepo.findHistoryJobByUserId(userLoginId);
+        return toModels(projections);
     }
 
-    private StaffJobPositionModel toModel(StaffJobPositionEntity entity) {
+    private StaffJobPositionModel toModel(StaffJobPositionProjection projection) {
         return StaffJobPositionModel.builder()
-                .jobPositionCode(entity.getId().getPositionCode())
-                .userLoginId(entity.getId().getUserId())
-                .fromDate(entity.getId().getFromDate())
-                .thruDate(entity.getThruDate())
+                .userLoginId(projection.getUserLoginId())
+                .jobPosition(JobPositionModel.builder()
+                        .code(projection.getJobPositionCode())
+                        .name(projection.getJobPositionName())
+                        .description(projection.getDescription())
+                        .status(JobPositionStatus.valueOf(projection.getStatus()))
+                        .build())
+                .fromDate(projection.getFromDate())
+                .thruDate(projection.getThruDate())
                 .build();
     }
 
-    private List<StaffJobPositionModel> toModels(Collection<StaffJobPositionEntity> entities) {
-        return entities.stream()
-                .map(this::toModel)
-                .toList();
+    private List<StaffJobPositionModel> toModels(List<StaffJobPositionProjection> projections) {
+        return projections.stream().map(this::toModel).toList();
     }
 }

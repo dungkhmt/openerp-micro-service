@@ -1,5 +1,7 @@
 package openerp.openerpresourceserver.infrastructure.input.rest.dto.department.response;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,6 +13,7 @@ import openerp.openerpresourceserver.domain.model.DepartmentModel;
 @Getter
 @Setter
 @Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class DepartmentResponse {
     private String departmentCode;
     private String departmentName;

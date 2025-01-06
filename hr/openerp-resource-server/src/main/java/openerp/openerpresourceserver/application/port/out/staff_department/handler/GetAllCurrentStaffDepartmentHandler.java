@@ -2,12 +2,12 @@ package openerp.openerpresourceserver.application.port.out.staff_department.hand
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import openerp.openerpresourceserver.application.port.in.port.IStaffJobPositionPort;
+import openerp.openerpresourceserver.application.port.in.port.IStaffDepartmentPort;
 import openerp.openerpresourceserver.application.port.out.staff_department.usecase_data.GetAllCurrentStaffDepartment;
 import openerp.openerpresourceserver.domain.common.DomainComponent;
 import openerp.openerpresourceserver.domain.common.usecase.CollectionUseCaseHandler;
 import openerp.openerpresourceserver.domain.common.usecase.ObservableUseCasePublisher;
-import openerp.openerpresourceserver.domain.model.StaffJobPositionModel;
+import openerp.openerpresourceserver.domain.model.StaffDepartmentModel;
 
 import java.util.Collection;
 
@@ -15,9 +15,9 @@ import java.util.Collection;
 @Slf4j
 @RequiredArgsConstructor
 public class GetAllCurrentStaffDepartmentHandler extends ObservableUseCasePublisher
-        implements CollectionUseCaseHandler<StaffJobPositionModel, GetAllCurrentStaffDepartment>
+        implements CollectionUseCaseHandler<StaffDepartmentModel, GetAllCurrentStaffDepartment>
 {
-    private final IStaffJobPositionPort staffJobPositionPort;
+    private final IStaffDepartmentPort staffDepartmentPort;
 
     @Override
     public void init() {
@@ -25,7 +25,7 @@ public class GetAllCurrentStaffDepartmentHandler extends ObservableUseCasePublis
     }
 
     @Override
-    public Collection<StaffJobPositionModel> handle(GetAllCurrentStaffDepartment useCase) {
-        return staffJobPositionPort.findCurrentJobPositionIn(useCase.getUserLoginIds());
+    public Collection<StaffDepartmentModel> handle(GetAllCurrentStaffDepartment useCase) {
+        return staffDepartmentPort.findCurrentDepartmentIn(useCase.getUserLoginIds());
     }
 }
