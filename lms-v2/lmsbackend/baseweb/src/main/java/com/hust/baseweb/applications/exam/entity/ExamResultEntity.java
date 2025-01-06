@@ -29,13 +29,16 @@ public class ExamResultEntity{
     private String examStudentId;
 
     @Column(name = "total_score")
-    private Double totalScore;
+    private Integer totalScore;
 
     @Column(name = "total_time")
     private Integer totalTime;
 
     @Column(name = "file_path")
     private String filePath;
+
+    @Column(name = "comment")
+    private String comment;
 
     @Column(name = "submited_at")
     protected LocalDateTime submitedAt;

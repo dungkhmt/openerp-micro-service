@@ -49,6 +49,12 @@ public class ExamController {
     }
 
     @Secured("ROLE_TEACHER")
+    @PostMapping("/marking-exam")
+    public ResponseEntity<ResponseData<ExamResultEntity>> markingExam(@RequestBody ExamMarkingSaveReq examMarkingSaveReq) {
+        return ResponseEntity.ok(examService.markingExam(examMarkingSaveReq));
+    }
+
+    @Secured("ROLE_TEACHER")
     @PostMapping("/create")
     public ResponseEntity<ResponseData<ExamEntity>> create(@RequestBody @Valid ExamSaveReq examSaveReq) {
         return ResponseEntity.ok(examService.create(examSaveReq));

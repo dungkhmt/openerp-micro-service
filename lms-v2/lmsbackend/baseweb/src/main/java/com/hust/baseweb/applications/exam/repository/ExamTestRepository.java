@@ -103,6 +103,7 @@ public interface ExamTestRepository extends JpaRepository<ExamTestEntity, String
                    "    eq.answer as questionAnswer,\n" +
                    "    eq.explain as questionExplain,\n" +
                    "    etq.order as questionOrder,\n" +
+                   "    erd.id as examResultDetailsId,\n" +
                    "    erd.answer as answer,\n" +
                    "    erd.pass as pass,\n" +
                    "    erd.score as score\n" +

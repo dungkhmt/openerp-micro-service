@@ -3,6 +3,7 @@ package com.hust.baseweb.applications.exam.model.response;
 public interface MyExamQuestionDetailsRes {
 
     String getExamTestQuestionId();
+    String getExamResultDetailsId();
     String getQuestionId();
     String getQuestionCode();
     Integer getQuestionType();

@@ -522,4 +522,34 @@ public class ExamServiceImpl implements ExamService {
         responseData.setResultMsg("Success");
         return responseData;
     }
+
+    @Override
+    @Transactional
+    public ResponseData<ExamResultEntity> markingExam(ExamMarkingSaveReq examMarkingSaveReq) {
+        ResponseData<ExamResultEntity> responseData = new ResponseData<>();
+
+        Optional<ExamResultEntity> examResultExist = examResultRepository.findById(examMarkingSaveReq.getExamResultId());
+        if(!examResultExist.isPresent()){
+            responseData.setHttpStatus(HttpStatus.NOT_FOUND);
+            responseData.setResultCode(HttpStatus.NOT_FOUND.value());
+            responseData.setResultMsg("Chưa tồn tại bài làm của học viên");
+            return responseData;
+        }
+        ExamResultEntity examResult = examResultExist.get();
+        examResult.setTotalScore(examMarkingSaveReq.getTotalScore());
+        examResult.setComment(examMarkingSaveReq.getComment());
+        examResultRepository.save(examResult);
+
+        List<ExamResultDetailsEntity> examResultDetailsEntities = new ArrayList<>();
+        for(ExamMarkingDetailsSaveReq detailsSaveReq: examMarkingSaveReq.getExamResultDetails()){
+            ExamResultDetailsEntity examResultDetailsEntity = modelMapper.map(detailsSaveReq, ExamResultDetailsEntity.class);
+            examResultDetailsEntities.add(examResultDetailsEntity);
+        }
+        examResultDetailsRepository.saveAll(examResultDetailsEntities);
+
+        responseData.setHttpStatus(HttpStatus.OK);
+        responseData.setResultCode(HttpStatus.OK.value());
+        responseData.setResultMsg("Chấm bài thành công");
+        return responseData;
+    }
 }
