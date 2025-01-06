@@ -18,15 +18,15 @@ public class AddStaff implements UseCase {
     private String fullName;
     private String userLoginId;
     private String email;
-    private String staffCode;
     private StaffStatus staffStatus;
+    private String departmentCode;
+    private String jobPositionCode;
 
     public StaffModel toModel(){
         return StaffModel.builder()
                 .fullname(fullName)
                 .userLoginId(userLoginId)
                 .email(email)
-                .staffCode(staffCode)
                 .status(staffStatus == null ? StaffStatus.ACTIVE : staffStatus)
                 .build();
     }

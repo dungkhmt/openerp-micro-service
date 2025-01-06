@@ -17,6 +17,8 @@ public class EditStaff implements UseCase {
     private String staffCode;
     private String fullName;
     private StaffStatus staffStatus;
+    private String departmentCode;
+    private String jobPositionCode;
 
     public StaffModel toModel(){
         return StaffModel.builder()

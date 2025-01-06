@@ -10,6 +10,8 @@ import TeacherRouter from "./TeacherRouter";
 import EmployeeRouter from "./EmployeeRouter";
 import DemoScreen from "views/DemoScreen";
 import DepartmentScreen from "views/DepartmentScreen";
+import JobPositionScreen from "views/JobPositionScreen";
+import StaffScreen from "views/StaffScreen";
 
 const styles = {
   loadingProgress: {
@@ -37,7 +39,9 @@ function MainAppRouter(props) {
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Switch>
           <Route component={() => <></>} exact path="/" />
-          <PrivateRoute component={DepartmentScreen} exact path="/demo" />
+          
+          <PrivateRoute component={StaffScreen} exact path="/demo" />
+          <PrivateRoute component={JobPositionScreen} exact path="/job" />
           <PrivateRoute component={TeacherRouter} path="/teacher" />
           
           {/* <Route component={error} path="*" /> */}

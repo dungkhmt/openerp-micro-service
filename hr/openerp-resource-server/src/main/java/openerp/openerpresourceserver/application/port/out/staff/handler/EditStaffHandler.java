@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.application.port.in.port.IStaffPort;
 import openerp.openerpresourceserver.application.port.out.staff.service.StaffValidator;
 import openerp.openerpresourceserver.application.port.out.staff.usecase_data.EditStaff;
+import openerp.openerpresourceserver.application.port.out.staff_department.usecase_data.AssignDepartment;
+import openerp.openerpresourceserver.application.port.out.staff_job_position.usecase_data.AssignJobPosition;
 import openerp.openerpresourceserver.domain.common.DomainComponent;
 import openerp.openerpresourceserver.domain.common.usecase.ObservableUseCasePublisher;
 import openerp.openerpresourceserver.domain.common.usecase.VoidUseCaseHandler;
@@ -26,6 +28,32 @@ public class EditStaffHandler extends ObservableUseCasePublisher implements Void
         if(useCase.getFullName() != null){
             staffValidator.validateStaffName(useCase.getFullName());
         }
-        staffPort.editStaff(useCase.toModel());
+        var editedModel = staffPort.editStaff(useCase.toModel());
+        if(useCase.getDepartmentCode() != null){
+            assignStaffDepartment(useCase.getDepartmentCode(), editedModel.getUserLoginId());
+        }
+        if(useCase.getJobPositionCode() != null){
+            assignStaffJobPosition(useCase.getJobPositionCode(), editedModel.getUserLoginId());
+        }
     }
+
+    private void assignStaffDepartment(String departmentCode, String userLoginId){
+        var assignDepartmentUseCase = AssignDepartment.builder()
+                .departmentCode(departmentCode)
+                .userLoginId(userLoginId)
+                .build();
+        publish(assignDepartmentUseCase);
+    }
+
+    private void assignStaffJobPosition(String jobPositionCode, String userLoginId){
+        var assignJobPosition = AssignJobPosition.builder()
+                .jobPositionCode(jobPositionCode)
+                .userLoginId(userLoginId)
+                .build();
+        publish(assignJobPosition);
+    }
+
+
 }
+
+

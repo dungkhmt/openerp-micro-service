@@ -15,7 +15,7 @@ public class StaffEntity extends AuditEntity{
     private String staffCode;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_login_id", referencedColumnName = "user_login_id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_login_id", referencedColumnName = "user_login_id", updatable = false)
     private User user;
 
     @Column(name = "fullname", length = 200)

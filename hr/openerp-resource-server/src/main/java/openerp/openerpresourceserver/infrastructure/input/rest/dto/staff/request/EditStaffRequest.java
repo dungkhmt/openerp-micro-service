@@ -11,10 +11,13 @@ import openerp.openerpresourceserver.constant.StaffStatus;
 @Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class EditStaffRequest {
-    private String fullName;
-    private String userLoginId;
     private String staffCode;
+    private String userLoginId;
+
+    private String fullName;
     private StaffStatus staffStatus;
+    private String departmentCode;
+    private String jobPositionCode;
 
     public EditStaff toUseCase(){
         return EditStaff.builder()
@@ -22,6 +25,8 @@ public class EditStaffRequest {
                 .userLoginId(userLoginId)
                 .staffCode(staffCode)
                 .staffStatus(staffStatus)
+                .departmentCode(departmentCode)
+                .jobPositionCode(jobPositionCode)
                 .build();
     }
 }

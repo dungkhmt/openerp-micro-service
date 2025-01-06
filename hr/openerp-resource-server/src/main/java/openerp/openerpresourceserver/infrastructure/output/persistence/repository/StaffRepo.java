@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.infrastructure.output.persistence.repository;
 
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.StaffEntity;
+import openerp.openerpresourceserver.infrastructure.output.persistence.entity.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -11,5 +12,7 @@ public interface StaffRepo extends IBaseRepository<StaffEntity, String>  {
 
     @Query("SELECT MAX(d.staffCode) FROM StaffEntity d WHERE d.staffCode LIKE CONCAT(:prefix, '%')")
     String findMaxStaffCode(@Param("prefix") String prefix);
+
+    boolean existsByUser(User user);
 }
 

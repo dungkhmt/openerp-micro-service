@@ -10,7 +10,7 @@ import java.util.List;
 public interface IStaffPort extends ICodeGeneratorPort {
     StaffModel addStaff(StaffModel staff);
 
-    void editStaff(StaffModel staff);
+    StaffModel editStaff(StaffModel staff);
 
     PageWrapper<StaffModel> findStaff(IStaffFilter filter, IPageableRequest pageableRequest);
 

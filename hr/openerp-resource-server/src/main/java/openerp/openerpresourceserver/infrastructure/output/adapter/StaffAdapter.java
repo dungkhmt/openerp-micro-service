@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.infrastructure.output.adapter;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.application.port.in.port.IStaffPort;
 import openerp.openerpresourceserver.application.port.out.staff.filter.IStaffFilter;
@@ -28,6 +29,7 @@ public class StaffAdapter implements IStaffPort {
     private final StaffRepo staffRepo;
     private final UserRepo userRepo;
 
+    @Transactional
     @Override
     public StaffModel addStaff(StaffModel staff) {
         if(staffRepo.existsById(staff.getStaffCode())){
@@ -50,6 +52,14 @@ public class StaffAdapter implements IStaffPort {
         else
             throw new InvalidParameterException("user login id or email is required");
 
+        if(staffRepo.existsByUser(user)){
+            throw new  ApplicationException(
+                    ResponseCode.STAFF_EXISTED,
+                    String.format("Staff existed by email %s", staff.getEmail())
+            );
+        }
+
+
         var staffEntity =  new StaffEntity();
         staffEntity.setStaffCode(staff.getStaffCode());
         staffEntity.setFullname(staff.getFullname());
@@ -59,7 +69,7 @@ public class StaffAdapter implements IStaffPort {
     }
 
     @Override
-    public void editStaff(StaffModel staff) {
+    public StaffModel editStaff(StaffModel staff) {
         StaffEntity staffEntity;
         if(staff.getUserLoginId() != null){
             staffEntity = staffRepo.findByUser_Id(staff.getUserLoginId())
@@ -83,7 +93,7 @@ public class StaffAdapter implements IStaffPort {
         if(staff.getStatus() != null){
             staffEntity.setStatus(staff.getStatus());
         }
-        staffRepo.save(staffEntity);
+        return toModel(staffRepo.save(staffEntity));
     }
 
     @Override

@@ -16,7 +16,6 @@ public class GetJobPositionRequest {
     private String code;
     private String name;
     private JobPositionStatus status;
-    @NotNull
     private PageableRequest pageableRequest;
 
     public GetJobPosition toUseCase(){

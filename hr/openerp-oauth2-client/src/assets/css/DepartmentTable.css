@@ -85,10 +85,6 @@
   .department-table td:nth-child(1) { 
     text-align: center; 
   }
-  .department-table th:nth-child(2) { 
-    align-items: center; 
-    min-width: 150px;
-  }
   
   .department-table th:nth-child(4) { 
     text-align: center; 

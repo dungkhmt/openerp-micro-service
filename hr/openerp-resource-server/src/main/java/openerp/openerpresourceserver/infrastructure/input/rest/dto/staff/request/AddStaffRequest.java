@@ -7,21 +7,31 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import openerp.openerpresourceserver.application.port.out.staff.usecase_data.AddStaff;
+import openerp.openerpresourceserver.constant.StaffStatus;
 
 @Getter
 @Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class AddStaffRequest {
     @NotNull
-    @Size(min = 1, max = 50)
-    private String fullName;
-    @NotNull
+    @Size(min = 2, max = 50)
+    private String fullname;
+
     private String userLoginId;
+    private String email;
+
+    private StaffStatus staffStatus;
+    private String departmentCode;
+    private String jobPositionCode;
 
     public AddStaff toUseCase(){
         return AddStaff.builder()
-                .fullName(fullName)
+                .fullName(fullname)
                 .userLoginId(userLoginId)
+                .email(email)
+                .staffStatus(staffStatus)
+                .departmentCode(departmentCode)
+                .jobPositionCode(jobPositionCode)
                 .build();
     }
 }

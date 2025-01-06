@@ -14,20 +14,36 @@ public class PageableUtils {
     }
 
     public static Pageable getPageable(IPageableRequest request, String sortBy) {
-        return PageRequest.of(Math.toIntExact(request.getPage()), Math.toIntExact(request.getPageSize()),
-                Sort.by(sortBy).descending());
+        if (request == null) {
+            return Pageable.unpaged();
+        }
+        return PageRequest.of(
+                Math.toIntExact(request.getPage()),
+                Math.toIntExact(request.getPageSize()),
+                Sort.by(sortBy).descending()
+        );
     }
 
     public static <T> PageInfo getPageInfo(Page<T> result) {
         var pageInfo = new PageInfo();
-        pageInfo.setTotalPage( (long) result.getTotalPages());
+        if (result.getPageable().isUnpaged()) {
+            pageInfo.setTotalPage(1L);
+            pageInfo.setTotalRecords(result.getTotalElements());
+            pageInfo.setPageSize(result.getTotalElements());
+            pageInfo.setPage(0L);
+            pageInfo.setNextPage(null);
+            pageInfo.setPreviousPage(null);
+            return pageInfo;
+        }
+
+        pageInfo.setTotalPage((long) result.getTotalPages());
         pageInfo.setTotalRecords(result.getTotalElements());
         pageInfo.setPageSize((long) result.getPageable().getPageSize());
         pageInfo.setPage((long) result.getPageable().getPageNumber());
-        if(result.hasNext()){
+        if (result.hasNext()) {
             pageInfo.setNextPage((long) result.nextPageable().getPageNumber());
         }
-        if(result.hasPrevious()){
+        if (result.hasPrevious()) {
             pageInfo.setPreviousPage((long) result.previousPageable().getPageNumber());
         }
         return pageInfo;

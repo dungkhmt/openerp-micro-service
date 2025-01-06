@@ -2,7 +2,6 @@ package openerp.openerpresourceserver.infrastructure.input.rest.dto.department.r
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import openerp.openerpresourceserver.application.port.out.department.usecase_data.GetDepartment;
@@ -16,7 +15,6 @@ public class GetDepartmentRequest {
     private String departmentCode;
     private String departmentName;
     private DepartmentStatus status;
-    @NotNull
     private PageableRequest pageableRequest;
 
     public GetDepartment toUseCase(){

@@ -20,11 +20,11 @@ public class StaffDepartmentAdapter implements IStaffDepartmentPort {
     private final StaffDepartmentRepo staffDepartmentRepo;
 
     @Override
-    public StaffDepartmentModel assignDepartment(String userLoginId, String jobPositionCode) {
-        var currentJobOption = staffDepartmentRepo.findLatestDepartmentByUserId(userLoginId);
-        if(currentJobOption.isPresent()) {
-            var currentJob = currentJobOption.get();
-            if(currentJob.getId().getDepartmentCode().equals(jobPositionCode)) {
+    public StaffDepartmentModel assignDepartment(String userLoginId, String departmentCode) {
+        var currentDepartmentOption = staffDepartmentRepo.findLatestDepartmentByUserId(userLoginId);
+        if(currentDepartmentOption.isPresent()) {
+            var currentJob = currentDepartmentOption.get();
+            if(currentJob.getId().getDepartmentCode().equals(departmentCode)) {
                 throw new ApplicationException(
                         ResponseCode.ASSIGN_JOB_POSITION_EXCEPTION,
                         String.format("Job position id %s already assigned to user %s",
@@ -36,11 +36,11 @@ public class StaffDepartmentAdapter implements IStaffDepartmentPort {
         }
         var id = new StaffDepartmentId();
         id.setUserId(userLoginId);
-        id.setDepartmentCode(jobPositionCode);
+        id.setDepartmentCode(departmentCode);
         id.setFromDate(LocalDate.now());
-        var staffJobEntity = new StaffDepartmentEntity();
-        staffJobEntity.setId(id);
-        return toModel(staffDepartmentRepo.save(staffJobEntity));
+        var staffDepartmentEntity = new StaffDepartmentEntity();
+        staffDepartmentEntity.setId(id);
+        return toModel(staffDepartmentRepo.save(staffDepartmentEntity));
     }
 
     @Override
