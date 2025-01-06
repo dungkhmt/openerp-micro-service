@@ -343,6 +343,6 @@ function SelectTestDialog(props) {
   );
 }
 
-const screenName = "MENU_EXAM_TEST_BANK";
+const screenName = "MENU_EXAM_MANAGEMENT";
 // export default withScreenSecurity(QuestionBank, screenName, true);
 export default SelectTestDialog;

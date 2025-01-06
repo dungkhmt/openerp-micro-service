@@ -15,10 +15,7 @@ import {request} from "../../../../api";
 import {toast} from "react-toastify";
 import TestBankDetails from "../testbank/TestBankDetails";
 import {DataGrid} from "@material-ui/data-grid";
-import InfoIcon from "@mui/icons-material/Info";
-import EditIcon from "@material-ui/icons/Edit";
-import DeleteIcon from "@material-ui/icons/Delete";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
+import ExamMarking from "./ExamMarking";
 
 const baseColumn = {
   sortable: false,
@@ -103,6 +100,8 @@ function ExamDetails(props) {
 
   const [openTestDetailsDialog, setOpenTestDetailsDialog] = useState(false);
   const [testDetails, setTestDetails] = useState(null)
+  const [openExamDetailsMarkingDialog, setOpenExamDetailsMarkingDialog] = useState(false);
+  const [examDetailsMarking, setExamDetailsMarking] = useState(null)
 
   const handleOpenPopupTestDetails = (test) =>{
     const body = {
@@ -130,6 +129,19 @@ function ExamDetails(props) {
 
   const handleMarking = (rowData) => {
     console.log('rowData',rowData)
+    request(
+      "get",
+      `/exam/details-marking/${rowData?.id}`,
+      (res) => {
+        if(res.data.resultCode === 200){
+          setExamDetailsMarking(res.data.data)
+          setOpenExamDetailsMarkingDialog(true)
+        }else{
+          toast.error(res.data.resultMsg)
+        }
+      },
+      { onError: (e) => toast.error(e) }
+    );
   }
 
   return (
@@ -238,10 +250,19 @@ function ExamDetails(props) {
           />
         )
       }
+      {
+        openExamDetailsMarkingDialog && (
+          <ExamMarking
+            open={openExamDetailsMarkingDialog}
+            setOpen={setOpenExamDetailsMarkingDialog}
+            data={examDetailsMarking}
+          />
+        )
+      }
     </div>
   );
 }
 
-const screenName = "MENU_EXAM_TEST_BANK";
+const screenName = "MENU_EXAM_MANAGEMENT";
 // export default withScreenSecurity(QuestionBank, screenName, true);
 export default ExamDetails;
