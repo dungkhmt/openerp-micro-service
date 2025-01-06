@@ -13,6 +13,7 @@ import java.util.List;
 @Builder
 public class ExamMarkingDetailsRes {
 
+    private String examId;
     private String examTestId;
     private String examStudentId;
     private String examStudentCode;

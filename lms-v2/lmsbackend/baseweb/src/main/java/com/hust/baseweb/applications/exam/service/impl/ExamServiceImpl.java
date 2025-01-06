@@ -470,6 +470,7 @@ public class ExamServiceImpl implements ExamService {
         ResponseData<ExamMarkingDetailsRes> responseData = new ResponseData<>();
         StringBuilder sql = new StringBuilder();
         sql.append("select\n" +
+                   "    es.exam_id as examId,\n" +
                    "    es.exam_test_id as examTestId,\n" +
                    "    es.id as examStudentId,\n" +
                    "    es.code as examStudentCode,\n" +
@@ -496,17 +497,18 @@ public class ExamServiceImpl implements ExamService {
         if (!Objects.isNull(result) && !result.isEmpty()) {
             for (Object[] obj : result) {
                 list.add(ExamMarkingDetailsRes.builder()
-                                         .examTestId(DataUtils.safeToString(obj[0]))
-                                         .examStudentId(DataUtils.safeToString(obj[1]))
-                                         .examStudentCode(DataUtils.safeToString(obj[2]))
-                                         .examStudentName(DataUtils.safeToString(obj[3]))
-                                         .examStudentEmail(DataUtils.safeToString(obj[4]))
-                                         .examStudentPhone(DataUtils.safeToString(obj[5]))
-                                         .examResultId(DataUtils.safeToString(obj[6]))
-                                         .totalScore(DataUtils.safeToInt(obj[7]))
-                                         .totalTime(DataUtils.safeToInt(obj[8]))
-                                         .submitedAt(DataUtils.safeToString(obj[9]))
-                                         .answerFiles(DataUtils.safeToString(obj[10]))
+                                         .examId(DataUtils.safeToString(obj[0]))
+                                         .examTestId(DataUtils.safeToString(obj[1]))
+                                         .examStudentId(DataUtils.safeToString(obj[2]))
+                                         .examStudentCode(DataUtils.safeToString(obj[3]))
+                                         .examStudentName(DataUtils.safeToString(obj[4]))
+                                         .examStudentEmail(DataUtils.safeToString(obj[5]))
+                                         .examStudentPhone(DataUtils.safeToString(obj[6]))
+                                         .examResultId(DataUtils.safeToString(obj[7]))
+                                         .totalScore(DataUtils.safeToInt(obj[8]))
+                                         .totalTime(DataUtils.safeToInt(obj[9]))
+                                         .submitedAt(DataUtils.safeToString(obj[10]))
+                                         .answerFiles(DataUtils.safeToString(obj[11]))
                                          .build());
             }
         }
