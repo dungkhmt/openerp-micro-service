@@ -28,6 +28,7 @@ public class MyExamDetailsRes {
     private Integer totalTime;
     private String submitedAt;
     private String answerFiles;
+    private String comment;
     private List<MyExamQuestionDetailsRes> questionList;
 
 }
