@@ -37,7 +37,7 @@ function ExamMarking(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [dataAnswers, setDataAnswers] = useState([]);
   const [totalScore, setTotalScore] = useState(0);
-  const [comment, setComment] = useState(data?.comment);
+  const [comment, setComment] = useState(data?.comment ? data?.comment : '');
   const [openFilePreviewDialog, setOpenFilePreviewDialog] = useState(false);
   const [filePreview, setFilePreview] = useState(null);
 

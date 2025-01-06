@@ -73,9 +73,13 @@ function ExamManagement(props) {
       minWidth: 170,
       renderCell: (rowData) => {
         if(rowData.value === 0){
-          return 'Chưa kích hoạt'
+          return (
+            <strong style={{color: '#f50000c9'}}>Chưa kích hoạt</strong>
+          )
         }else{
-          return 'Kích hoạt'
+          return (
+            <strong style={{color: '#61bd6d'}}>Kích hoạt</strong>
+          )
         }
       },
     },

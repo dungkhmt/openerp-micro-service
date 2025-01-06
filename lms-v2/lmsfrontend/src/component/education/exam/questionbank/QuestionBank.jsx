@@ -58,9 +58,13 @@ function QuestionBank(props) {
       minWidth: 170,
       renderCell: (rowData) => {
         if(rowData.value === 0){
-          return 'Trắc nghiệm'
+          return (
+            <strong style={{color: '#716DF2'}}>Trắc nghiệm</strong>
+          )
         }else if(rowData.value === 1){
-          return 'Tự luận'
+          return (
+            <strong style={{color: '#61bd6d'}}>Tự luận</strong>
+          )
         }else{
           return 'Tất cả'
         }

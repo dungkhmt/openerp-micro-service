@@ -57,13 +57,20 @@ function MyExam(props) {
       headerName: "Trạng thái",
       ...baseColumn,
       minWidth: 170,
+      height: 20,
       renderCell: (rowData) => {
         if(rowData.row?.examResultId != null && rowData.row?.totalScore == null ){
-          return 'Chưa chấm'
+          return (
+            <strong style={{color: '#716DF2'}}>Chưa chấm</strong>
+          )
         }else if(rowData.row?.examResultId != null && rowData.row?.totalScore != null ){
-          return 'Đã chấm'
+          return (
+            <strong style={{color: '#61bd6d'}}>Đã chấm</strong>
+          )
         }else{
-          return 'Chưa làm'
+          return (
+            <strong style={{color: '#f50000c9'}}>Chưa làm</strong>
+          )
         }
       },
     },
