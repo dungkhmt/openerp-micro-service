@@ -19,10 +19,11 @@ import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import {Radio, RadioGroup} from "@mui/material";
 import {DropzoneArea} from "material-ui-dropzone";
-import {AccessTime, AttachFileOutlined, Timer} from "@material-ui/icons";
+import {AccessTime, AttachFileOutlined, Cancel, Timer} from "@material-ui/icons";
 import {Scoreboard} from "@mui/icons-material";
 import {getFilenameFromString, getFilePathFromString} from "../ultils/FileUltils";
 import QuestionFilePreview from "../questionbank/QuestionFilePreview";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -146,6 +147,15 @@ function MyExamDetails(props) {
     setFilePreview(getFilePathFromString(data))
   };
 
+  const checkAnswerRadioAndCheckbox = (questionType, answerQuestion, answerStudent) => {
+    if(questionType === 0){
+      const answerQuestions = answerQuestion.split(',').sort();
+      const answerStudents = answerStudent.split(',').sort();
+
+      return answerStudents.every(elem => answerQuestions.includes(elem));
+    }
+  }
+
   return (
     <div>
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -201,6 +211,10 @@ function MyExamDetails(props) {
                     key={value?.questionOrder}
                     style={{
                       border: '2px solid #f5f5f5',
+                      borderColor:
+                        (value?.questionType === 0 && data?.totalScore) ?
+                          (checkAnswerRadioAndCheckbox(value?.questionType, value?.questionAnswer, value?.answer) ? '#61bd6d' : '#f50000c9'):
+                          '#f5f5f5',
                       display: 'flex',
                       justifyContent: 'space-between',
                       borderRadius: '10px',
@@ -210,11 +224,41 @@ function MyExamDetails(props) {
                     <Box display="flex"
                          flexDirection='column'
                          width="100%">
-                      <div style={{display: 'flex'}}>
-                        <span style={{display: "block", fontWeight: 'bold', marginRight: '5px'}}>Câu {value?.questionOrder}.</span>
-                        <span style={{fontStyle: 'italic'}}>({value?.questionType === 0 ? 'Trắc nghiệm' : 'Tự luận'})</span>
+
+                      <div style={{display: "flex", justifyContent: "space-between"}}>
+                        <div style={{display: 'flex'}}>
+                        <span style={{
+                          display: "block",
+                          fontWeight: 'bold',
+                          marginRight: '5px'
+                        }}>Câu {value?.questionOrder}.</span>
+                          <span
+                            style={{fontStyle: 'italic'}}>({value?.questionType === 0 ? 'Trắc nghiệm' : 'Tự luận'})</span>
+                        </div>
+
+                        <div style={{display: "flex", alignItems: "center"}} key={questionOrder}>
+                          {
+                            value?.questionType === 0 ?
+                              (checkAnswerRadioAndCheckbox(value?.questionType, value?.questionAnswer, value?.answer) ?
+                                <CheckCircleIcon style={{color: '#61bd6d'}}/> :
+                                <Cancel style={{color: '#f50000c9'}}/>) :
+                              (<></>)
+                          }
+                          <TextField
+                            id={`scoreInput-${questionOrder}`}
+                            label="Điểm"
+                            style={{width: "60px", marginLeft: "16px"}}
+                            value={value?.score}
+                            disabled
+                            InputLabelProps={{
+                              shrink: true,
+                            }}
+                          />
+                        </div>
                       </div>
-                      <p style={{display: "flex", alignItems:"center"}}><strong style={{marginRight: '10px'}}>Câu hỏi: </strong>{parser(value?.questionContent)}</p>
+
+                      <p style={{display: "flex", alignItems: "center"}}><strong style={{marginRight: '10px'}}>Câu
+                        hỏi: </strong>{parser(value?.questionContent)}</p>
                       {
                         value?.questionFile && (
                           value?.questionFile.split(';').map(item => {
@@ -230,15 +274,16 @@ function MyExamDetails(props) {
                       }
                       {
                         value?.questionType === 0 && value?.questionMultichoice && (
-                          <Box sx={{ display: 'flex', flexDirection: 'column'}}>
-                            <p style={{ margin: 0, padding: 0, fontWeight: "bold"}}>Chọn các đáp án đúng trong các đáp án sau:</p>
+                          <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                            <p style={{margin: 0, padding: 0, fontWeight: "bold"}}>Chọn các đáp án đúng trong các đáp án
+                              sau:</p>
                             <FormControlLabel
                               label={parser(value?.questionContentAnswer1)}
                               control={<Checkbox color="primary"
                                                  checked={value?.answer?.includes('1')}
                                                  disabled={data?.examResultId != null}
                                                  onChange={(event) => handleAnswerCheckboxChange(value?.questionOrder, '1', event.target.checked)
-                              }/>}
+                                                 }/>}
                             />
                             {
                               value?.questionNumberAnswer >= 2 && (
@@ -248,7 +293,7 @@ function MyExamDetails(props) {
                                                      checked={value?.answer?.includes('2')}
                                                      disabled={data?.examResultId != null}
                                                      onChange={(event) => handleAnswerCheckboxChange(value?.questionOrder, '2', event.target.checked)
-                                  }/>}
+                                                     }/>}
                                 />
                               )
                             }
@@ -260,7 +305,7 @@ function MyExamDetails(props) {
                                                      checked={value?.answer?.includes('3')}
                                                      disabled={data?.examResultId != null}
                                                      onChange={(event) => handleAnswerCheckboxChange(value?.questionOrder, '3', event.target.checked)
-                                  }/>}
+                                                     }/>}
                                 />
                               )
                             }
@@ -272,7 +317,7 @@ function MyExamDetails(props) {
                                                      checked={value?.answer?.includes('4')}
                                                      disabled={data?.examResultId != null}
                                                      onChange={(event) => handleAnswerCheckboxChange(value?.questionOrder, '4', event.target.checked)
-                                  }/>}
+                                                     }/>}
                                 />
                               )
                             }
@@ -284,7 +329,7 @@ function MyExamDetails(props) {
                                                      checked={value?.answer?.includes('5')}
                                                      disabled={data?.examResultId != null}
                                                      onChange={(event) => handleAnswerCheckboxChange(value?.questionOrder, '5', event.target.checked)
-                                  }/>}
+                                                     }/>}
                                 />
                               )
                             }
@@ -293,33 +338,43 @@ function MyExamDetails(props) {
                       }
                       {
                         value?.questionType === 0 && !value?.questionMultichoice && (
-                          <Box sx={{ display: 'flex', flexDirection: 'column'}}>
+                          <Box sx={{display: 'flex', flexDirection: 'column'}}>
                             <p style={{margin: 0, padding: 0, fontWeight: "bold"}}>Chọn đáp án đúng nhất:</p>
                             <RadioGroup
                               aria-labelledby="demo-radio-buttons-group-label"
                               name="radio-buttons-group"
-                              value={dataAnswers[value?.questionOrder-1]?.answer}
+                              value={dataAnswers[value?.questionOrder - 1]?.answer}
                               onChange={(event) => handleAnswerRadioChange(event, value?.questionOrder)}
                             >
-                              <FormControlLabel value="1" control={<Radio checked={value?.answer?.includes('1')} disabled={data?.examResultId != null}/>} label={parser(value?.questionContentAnswer1)} />
+                              <FormControlLabel value="1" control={<Radio checked={value?.answer?.includes('1')}
+                                                                          disabled={data?.examResultId != null}/>}
+                                                label={parser(value?.questionContentAnswer1)}/>
                               {
                                 value?.questionNumberAnswer >= 2 && (
-                                  <FormControlLabel value="2" control={<Radio checked={value?.answer?.includes('2')} disabled={data?.examResultId != null}/>} label={parser(value?.questionContentAnswer2)} />
+                                  <FormControlLabel value="2" control={<Radio checked={value?.answer?.includes('2')}
+                                                                              disabled={data?.examResultId != null}/>}
+                                                    label={parser(value?.questionContentAnswer2)}/>
                                 )
                               }
                               {
                                 value?.questionNumberAnswer >= 3 && (
-                                  <FormControlLabel value="3" control={<Radio checked={value?.answer?.includes('3')} disabled={data?.examResultId != null}/>} label={parser(value?.questionContentAnswer3)} />
+                                  <FormControlLabel value="3" control={<Radio checked={value?.answer?.includes('3')}
+                                                                              disabled={data?.examResultId != null}/>}
+                                                    label={parser(value?.questionContentAnswer3)}/>
                                 )
                               }
                               {
                                 value?.questionNumberAnswer >= 4 && (
-                                  <FormControlLabel value="4" control={<Radio checked={value?.answer?.includes('4')} disabled={data?.examResultId != null}/>} label={parser(value?.questionContentAnswer4)} />
+                                  <FormControlLabel value="4" control={<Radio checked={value?.answer?.includes('4')}
+                                                                              disabled={data?.examResultId != null}/>}
+                                                    label={parser(value?.questionContentAnswer4)}/>
                                 )
                               }
                               {
                                 value?.questionNumberAnswer >= 5 && (
-                                  <FormControlLabel value="5" control={<Radio checked={value?.answer?.includes('5')} disabled={data?.examResultId != null}/>} label={parser(value?.questionContentAnswer5)} />
+                                  <FormControlLabel value="5" control={<Radio checked={value?.answer?.includes('5')}
+                                                                              disabled={data?.examResultId != null}/>}
+                                                    label={parser(value?.questionContentAnswer5)}/>
                                 )
                               }
                             </RadioGroup>
@@ -341,7 +396,8 @@ function MyExamDetails(props) {
                             }
                             {
                               data?.examResultId != null && (
-                                <div style={{display: "flex", alignItems:"center"}}><strong style={{marginRight: '10px'}}>Trả lời:</strong>{parse(value?.answer)}</div>
+                                <div style={{display: "flex", alignItems: "center"}}><strong style={{marginRight: '10px'}}>Trả
+                                  lời:</strong>{parse(value?.answer)}</div>
                               )
                             }
                             {
