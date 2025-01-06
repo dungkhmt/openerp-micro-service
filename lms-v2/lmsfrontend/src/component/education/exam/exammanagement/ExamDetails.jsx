@@ -15,6 +15,10 @@ import {request} from "../../../../api";
 import {toast} from "react-toastify";
 import TestBankDetails from "../testbank/TestBankDetails";
 import {DataGrid} from "@material-ui/data-grid";
+import InfoIcon from "@mui/icons-material/Info";
+import EditIcon from "@material-ui/icons/Edit";
+import DeleteIcon from "@material-ui/icons/Delete";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
 
 const baseColumn = {
   sortable: false,
@@ -49,6 +53,50 @@ function ExamDetails(props) {
       ...baseColumn,
       minWidth: 200,
     },
+    {
+      field: "totalScore",
+      headerName: "Điểm",
+      ...baseColumn,
+      minWidth: 100,
+    },
+    {
+      field: "totalTime",
+      headerName: "Thời gian làm",
+      ...baseColumn,
+      minWidth: 130,
+    },
+    {
+      field: "",
+      headerName: "",
+      sortable: false,
+      minWidth: 120,
+      maxWidth: 120,
+      renderCell: (rowData) => {
+        return (
+          <Box display="flex" justifyContent="space-between" alignItems='center' width="100%">
+            {
+              rowData?.row?.examResultId ? (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={(data) => handleMarking(rowData?.row)}
+                >
+                  Chấm điểm
+                </Button>
+              ) : (
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  style={{pointerEvents: "none"}}
+                >
+                  Chưa làm
+                </Button>
+              )
+            }
+          </Box>
+        )
+      }
+    },
   ];
 
   const { open, setOpen, data} = props;
@@ -80,6 +128,10 @@ function ExamDetails(props) {
     setOpen(false)
   }
 
+  const handleMarking = (rowData) => {
+    console.log('rowData',rowData)
+  }
+
   return (
     <div>
       <Dialog open={open} fullWidth maxWidth="lg">
@@ -92,7 +144,7 @@ function ExamDetails(props) {
             </div>
             <div style={{display: "flex"}}>
               <h4 style={{margin: '0 5px 0 0', padding: 0}}>Trạng thái:</h4>
-              <span>{data?.status ? 'Chưa kích hoạt' : 'Kích hoạt'}</span>
+              <span>{data?.status === 0 ? 'Chưa kích hoạt' : 'Kích hoạt'}</span>
             </div>
             <div style={{display: "flex"}}>
               <h4 style={{margin: '0 5px 0 0', padding: 0}}>Thời gian bắt đầu:</h4>
