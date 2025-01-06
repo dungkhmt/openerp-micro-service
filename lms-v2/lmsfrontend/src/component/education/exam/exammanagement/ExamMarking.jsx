@@ -37,7 +37,7 @@ function ExamMarking(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [dataAnswers, setDataAnswers] = useState([]);
   const [totalScore, setTotalScore] = useState(0);
-  const [answersFiles, setAnswersFiles] = useState([]);
+  const [comment, setComment] = useState("");
   const [openFilePreviewDialog, setOpenFilePreviewDialog] = useState(false);
   const [filePreview, setFilePreview] = useState(null);
 
@@ -53,7 +53,10 @@ function ExamMarking(props) {
       }
       tmpDataAnswers.push({
         questionOrder: item?.questionOrder,
+        id: item?.examResultDetailsId,
+        examResultId: data?.examResultId,
         examQuestionId: item?.questionId,
+        answer: item?.answer,
         score: score
       })
       totalScore += score
@@ -64,32 +67,23 @@ function ExamMarking(props) {
   }, []);
 
   const handleMarking = () => {
-    const endLoadTime = new Date();
-    const totalTime = Math.round((endLoadTime - startLoadTime) / 60000);
-
     const body = {
-      examId: data?.examId,
-      examStudentId: data?.examStudentId,
-      totalTime: totalTime,
+      examResultId: data?.examResultId,
+      totalScore: totalScore,
+      comment: comment,
       examResultDetails: dataAnswers
-    }
-
-    let formData = new FormData();
-    formData.append("body", JSON.stringify(body));
-    for (const file of answersFiles) {
-      formData.append("files", file);
     }
 
     setIsLoading(true)
     request(
       "post",
-      '/exam/doing-my-exam',
+      '/exam/marking-exam',
       (res) => {
         if(res.status === 200){
           if(res.data.resultCode === 200){
             toast.success(res.data.resultMsg)
             setIsLoading(false)
-            history.push("/exam/my-exam")
+            closeDialog()
           }else{
             toast.error(res.data.resultMsg)
             setIsLoading(false)
@@ -100,7 +94,7 @@ function ExamMarking(props) {
         }
       },
       { onError: (e) => toast.error(e) },
-      formData
+      body
     );
   }
 
@@ -505,6 +499,16 @@ function ExamMarking(props) {
                   })
                 )
             }
+          </div>
+
+          <div>
+            <h4 style={{marginBottom: 0, fontSize: '18px'}}>Nhận xét:</h4>
+            <RichTextEditor
+              content={comment}
+              onContentChange={(value) =>
+                setComment(value)
+              }
+            />
           </div>
         </DialogContent>
         <DialogActions>

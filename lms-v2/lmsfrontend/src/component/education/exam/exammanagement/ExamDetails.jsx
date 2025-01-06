@@ -128,7 +128,6 @@ function ExamDetails(props) {
   }
 
   const handleMarking = (rowData) => {
-    console.log('rowData',rowData)
     request(
       "get",
       `/exam/details-marking/${rowData?.id}`,
