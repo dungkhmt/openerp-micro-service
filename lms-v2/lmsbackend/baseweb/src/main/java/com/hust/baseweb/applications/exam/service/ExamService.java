@@ -5,6 +5,7 @@ import com.hust.baseweb.applications.exam.entity.ExamResultEntity;
 import com.hust.baseweb.applications.exam.model.ResponseData;
 import com.hust.baseweb.applications.exam.model.request.*;
 import com.hust.baseweb.applications.exam.model.response.ExamDetailsRes;
+import com.hust.baseweb.applications.exam.model.response.ExamMarkingDetailsRes;
 import com.hust.baseweb.applications.exam.model.response.MyExamDetailsRes;
 import com.hust.baseweb.applications.exam.model.response.MyExamFilterRes;
 import org.springframework.data.domain.Page;
@@ -28,4 +29,6 @@ public interface ExamService {
     ResponseData<MyExamDetailsRes> detailsMyExam(MyExamDetailsReq myExamDetailsReq);
 
     ResponseData<ExamResultEntity> doingMyExam(MyExamResultSaveReq myExamResultSaveReq, MultipartFile[] files);
+
+    ResponseData<ExamMarkingDetailsRes> detailsExamMarking(String examStudentId);
 }

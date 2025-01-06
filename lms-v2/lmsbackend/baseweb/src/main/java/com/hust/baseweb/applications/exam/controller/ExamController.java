@@ -6,6 +6,7 @@ import com.hust.baseweb.applications.exam.entity.ExamResultEntity;
 import com.hust.baseweb.applications.exam.model.ResponseData;
 import com.hust.baseweb.applications.exam.model.request.*;
 import com.hust.baseweb.applications.exam.model.response.ExamDetailsRes;
+import com.hust.baseweb.applications.exam.model.response.ExamMarkingDetailsRes;
 import com.hust.baseweb.applications.exam.model.response.MyExamDetailsRes;
 import com.hust.baseweb.applications.exam.model.response.MyExamFilterRes;
 import com.hust.baseweb.applications.exam.service.ExamService;
@@ -39,6 +40,12 @@ public class ExamController {
     @PostMapping("/details")
     public ResponseEntity<ResponseData<ExamDetailsRes>> details(@RequestBody ExamDetailsReq examDetailsReq) {
         return ResponseEntity.ok(examService.details(examDetailsReq));
+    }
+
+    @Secured("ROLE_TEACHER")
+    @GetMapping("/details-marking/{examStudentId}")
+    public ResponseEntity<ResponseData<ExamMarkingDetailsRes>> detailsExamMarking(@PathVariable String examStudentId) {
+        return ResponseEntity.ok(examService.detailsExamMarking(examStudentId));
     }
 
     @Secured("ROLE_TEACHER")

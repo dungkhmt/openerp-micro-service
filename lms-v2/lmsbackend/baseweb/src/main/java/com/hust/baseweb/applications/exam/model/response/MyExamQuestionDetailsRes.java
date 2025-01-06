@@ -15,6 +15,8 @@ public interface MyExamQuestionDetailsRes {
     String getQuestionContentAnswer4();
     String getQuestionContentAnswer5();
     boolean getQuestionMultichoice();
+    String getQuestionAnswer();
+    String getQuestionExplain();
     Integer getQuestionOrder();
     String getAnswer();
     Integer getScore();

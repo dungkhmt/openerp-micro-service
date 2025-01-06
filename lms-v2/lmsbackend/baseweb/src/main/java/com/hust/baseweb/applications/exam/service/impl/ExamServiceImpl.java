@@ -464,4 +464,62 @@ public class ExamServiceImpl implements ExamService {
         responseData.setResultMsg("Success");
         return responseData;
     }
+
+    @Override
+    public ResponseData<ExamMarkingDetailsRes> detailsExamMarking(String examStudentId) {
+        ResponseData<ExamMarkingDetailsRes> responseData = new ResponseData<>();
+        StringBuilder sql = new StringBuilder();
+        sql.append("select\n" +
+                   "    es.exam_test_id as examTestId,\n" +
+                   "    es.id as examStudentId,\n" +
+                   "    es.code as examStudentCode,\n" +
+                   "    es.name as examStudentName,\n" +
+                   "    es.email as examStudentEmail,\n" +
+                   "    es.phone as examStudentPhone,\n" +
+                   "    er.id as examResultId,\n" +
+                   "    er.total_score as totalScore,\n" +
+                   "    er.total_time as totalTime,\n" +
+                   "    er.submited_at as submitedAt,\n" +
+                   "    er.file_path as answerFiles\n" +
+                   "from\n" +
+                   "    exam_student es\n" +
+                   "left join exam_result er on\n" +
+                   "    er.exam_student_id = es.id\n" +
+                   "where\n" +
+                   "    es.id = :examStudentId \n");
+
+        Query query = entityManager.createNativeQuery(sql.toString());
+
+        query.setParameter("examStudentId", examStudentId);
+        List<Object[]> result = query.getResultList();
+        List<ExamMarkingDetailsRes> list = new ArrayList<>();
+        if (!Objects.isNull(result) && !result.isEmpty()) {
+            for (Object[] obj : result) {
+                list.add(ExamMarkingDetailsRes.builder()
+                                         .examTestId(DataUtils.safeToString(obj[0]))
+                                         .examStudentId(DataUtils.safeToString(obj[1]))
+                                         .examStudentCode(DataUtils.safeToString(obj[2]))
+                                         .examStudentName(DataUtils.safeToString(obj[3]))
+                                         .examStudentEmail(DataUtils.safeToString(obj[4]))
+                                         .examStudentPhone(DataUtils.safeToString(obj[5]))
+                                         .examResultId(DataUtils.safeToString(obj[6]))
+                                         .totalScore(DataUtils.safeToInt(obj[7]))
+                                         .totalTime(DataUtils.safeToInt(obj[8]))
+                                         .submitedAt(DataUtils.safeToString(obj[9]))
+                                         .answerFiles(DataUtils.safeToString(obj[10]))
+                                         .build());
+            }
+        }
+
+        ExamMarkingDetailsRes examMarkingDetailsRes = list.get(0);
+
+        examMarkingDetailsRes.setQuestionList(examTestRepository.getExamMarkingDetails(examMarkingDetailsRes.getExamTestId(),
+                                                                                          examMarkingDetailsRes.getExamStudentId()));
+
+        responseData.setHttpStatus(HttpStatus.OK);
+        responseData.setResultCode(HttpStatus.OK.value());
+        responseData.setData(examMarkingDetailsRes);
+        responseData.setResultMsg("Success");
+        return responseData;
+    }
 }
