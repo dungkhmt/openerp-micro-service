@@ -96,8 +96,9 @@ function ExamDetails(props) {
     },
   ];
 
-  const { open, setOpen, data} = props;
+  const { open, setOpen, dataExam} = props;
 
+  const [data, setData] = useState(dataExam)
   const [openTestDetailsDialog, setOpenTestDetailsDialog] = useState(false);
   const [testDetails, setTestDetails] = useState(null)
   const [openExamDetailsMarkingDialog, setOpenExamDetailsMarkingDialog] = useState(false);
@@ -210,7 +211,7 @@ function ExamDetails(props) {
                     fontWeight: 'bold'
                   }}
                   onClick={(event) => {
-                    handleOpenPopupTestDetails(data.examTests[0])
+                    handleOpenPopupTestDetails(data?.examTests[0])
                     event.preventDefault()
                     event.stopPropagation()
                   }}>
@@ -255,6 +256,7 @@ function ExamDetails(props) {
             open={openExamDetailsMarkingDialog}
             setOpen={setOpenExamDetailsMarkingDialog}
             data={examDetailsMarking}
+            setDataDetails={setData}
           />
         )
       }

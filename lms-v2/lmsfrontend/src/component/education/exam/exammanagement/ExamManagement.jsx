@@ -301,7 +301,7 @@ function ExamManagement(props) {
           <ExamDetails
             open={openDetailsDialog}
             setOpen={setOpenDetailsDialog}
-            data={examDetails}
+            dataExam={examDetails}
           />
         )
       }

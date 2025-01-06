@@ -32,12 +32,12 @@ import indexEsm from "@heroicons/react";
 
 function ExamMarking(props) {
 
-  const { open, setOpen, data} = props;
+  const { open, setOpen, data, setDataDetails} = props;
 
   const [isLoading, setIsLoading] = useState(false);
   const [dataAnswers, setDataAnswers] = useState([]);
   const [totalScore, setTotalScore] = useState(0);
-  const [comment, setComment] = useState("");
+  const [comment, setComment] = useState(data?.comment);
   const [openFilePreviewDialog, setOpenFilePreviewDialog] = useState(false);
   const [filePreview, setFilePreview] = useState(null);
 
@@ -50,6 +50,9 @@ function ExamMarking(props) {
         if(checkAnswerRadioAndCheckbox(item?.questionType, item?.questionAnswer, item?.answer)){
           score = 1
         }
+      }
+      if(item?.score){
+        score = item?.score
       }
       tmpDataAnswers.push({
         questionOrder: item?.questionOrder,
@@ -83,7 +86,7 @@ function ExamMarking(props) {
           if(res.data.resultCode === 200){
             toast.success(res.data.resultMsg)
             setIsLoading(false)
-            closeDialog()
+            handleExamDetails()
           }else{
             toast.error(res.data.resultMsg)
             setIsLoading(false)
@@ -97,6 +100,26 @@ function ExamMarking(props) {
       body
     );
   }
+
+  const handleExamDetails = () => {
+    const body = {
+      id: data?.examId
+    }
+    request(
+      "post",
+      `/exam/details`,
+      (res) => {
+        if(res.data.resultCode === 200){
+          setDataDetails(res.data.data)
+          closeDialog()
+        }else{
+          toast.error(res.data.resultMsg)
+        }
+      },
+      { onError: (e) => toast.error(e) },
+      body
+    );
+  };
 
   const handleOpenFilePreviewDialog = (data) => {
     setOpenFilePreviewDialog(true)
