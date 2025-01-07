@@ -82,18 +82,19 @@ const EmployeeManagement = () => {
     const handleOutsideClick = (event) => {
       if (
         dropdownVisible !== null &&
-        (!dropdownRefs.current[dropdownVisible] ||
-          !dropdownRefs.current[dropdownVisible].contains(event.target))
+        dropdownRefs.current[dropdownVisible] &&
+        !dropdownRefs.current[dropdownVisible].contains(event.target)
       ) {
-        setDropdownVisible(null);
+        setDropdownVisible(null); 
       }
     };
-
+  
     document.addEventListener("mousedown", handleOutsideClick);
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
   }, [dropdownVisible]);
+ 
 
   const columns = useMemo(
     () => [
@@ -412,14 +413,17 @@ const EmployeeManagement = () => {
               <h3>{employee.fullname}</h3>
               <p>{employee.department?.department_name || "No Department"}</p>
               <p>{employee.job_position?.job_position_name || "No Position"}</p>
-              <div className="card-actions">
+              <div
+                className="card-actions"
+                ref={(ref) => (dropdownRefs.current[index] = ref)}
+              >
                 <IconButton
                   onClick={(e) => {
                     e.stopPropagation();
             
                     setDropdownVisible(dropdownVisible === index ? null : index);
                   }}
-                  ref={(ref) => (dropdownRefs.current[index] = ref)}
+                  
                   style={{
                     width: "40px",
                     height: "40px",
@@ -434,8 +438,8 @@ const EmployeeManagement = () => {
                   <div
                     style={{
                       position: "absolute",
-                      top: "36px", // Adjusted height to align better below the icon
-                      right: "8px", // Keeps it aligned to the right edge of the card
+                      top: "36px",
+                      right: "8px", 
                       backgroundColor: "#fff",
                       boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
                       borderRadius: "4px",
@@ -447,8 +451,8 @@ const EmployeeManagement = () => {
                   >
                     <div
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent dropdown from closing
-                        handleEdit(employee); // Open the modal for Edit
+                        e.stopPropagation(); 
+                        handleEdit(employee); 
                       }}
                       style={{
                         display: "flex",
@@ -467,7 +471,10 @@ const EmployeeManagement = () => {
                       Edit
                     </div>
                     <div
-                      onClick={() => handleOpenDeleteModal(employee)}
+                      onClick={(e) => {
+                        e.stopPropagation(); 
+                        handleOpenDeleteModal(employee); 
+                      }}
                       style={{
                         display: "flex",
                         alignItems: "center",
