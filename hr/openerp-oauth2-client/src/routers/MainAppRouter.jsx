@@ -9,6 +9,7 @@ import PrivateRoute from "./PrivateRoute";
 import TeacherRouter from "./TeacherRouter";
 import EmployeeRouter from "./EmployeeRouter";
 import DemoScreen from "views/DemoScreen";
+import EmployeeDetailsRouter from "./EmployeeDetailsRouter";
 import DepartmentScreen from "views/DepartmentScreen";
 import JobPositionScreen from "views/JobPositionScreen";
 import StaffScreen from "views/StaffScreen";
@@ -43,6 +44,7 @@ function MainAppRouter(props) {
           <PrivateRoute component={StaffScreen} exact path="/demo" />
           <PrivateRoute component={JobPositionScreen} exact path="/job" />
           <PrivateRoute component={TeacherRouter} path="/teacher" />
+          <Route component={EmployeeDetailsRouter} path="/employee" />
           
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />

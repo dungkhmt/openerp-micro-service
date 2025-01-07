@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import openerp.openerpresourceserver.constant.StaffStatus;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @Builder
@@ -14,6 +16,7 @@ public class StaffDetailModel {
     private String fullname;
     private StaffStatus status;
     private String email;
+    private LocalDate dateOfJoin;
     private DepartmentModel department;
     private JobPositionModel jobPosition;
 
@@ -27,6 +30,7 @@ public class StaffDetailModel {
                 .userLoginId(staffModel.getUserLoginId())
                 .fullname(staffModel.getFullname())
                 .status(staffModel.getStatus())
+                .dateOfJoin(staffModel.getDateOfJoin())
                 .email(staffModel.getEmail())
                 .department(departmentModel)
                 .jobPosition(jobPositionModel)

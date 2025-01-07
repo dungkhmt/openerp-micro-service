@@ -7,6 +7,8 @@ import lombok.experimental.SuperBuilder;
 import openerp.openerpresourceserver.constant.StaffStatus;
 import openerp.openerpresourceserver.domain.model.StaffModel;
 
+import java.time.LocalDate;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -19,6 +21,7 @@ public class StaffResponse {
     private String fullname;
     private StaffStatus status;
     private String email;
+    private LocalDate dateOfJoin;
 
     public static StaffResponse fromModel(StaffModel model) {
         return StaffResponse.builder()
@@ -27,6 +30,7 @@ public class StaffResponse {
                 .fullname(model.getFullname())
                 .status(model.getStatus())
                 .email(model.getEmail())
+                .dateOfJoin(model.getDateOfJoin())
                 .build();
     }
 }

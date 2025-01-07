@@ -129,6 +129,7 @@ public class StaffAdapter implements IStaffPort {
                 .userLoginId(staffEntity.getUser().getId())
                 .email(staffEntity.getUser().getEmail())
                 .status(staffEntity.getStatus())
+                .dateOfJoin(staffEntity.getCreatedStamp())
                 .build();
     }
 

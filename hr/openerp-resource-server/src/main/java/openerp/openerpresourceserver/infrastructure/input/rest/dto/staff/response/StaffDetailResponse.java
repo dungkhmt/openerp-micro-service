@@ -30,6 +30,7 @@ public class StaffDetailResponse extends StaffResponse {
                 .userLoginId(model.getUserLoginId())
                 .fullname(model.getFullname())
                 .status(model.getStatus())
+                .dateOfJoin(model.getDateOfJoin())
                 .email(model.getEmail())
                 .build();
     }

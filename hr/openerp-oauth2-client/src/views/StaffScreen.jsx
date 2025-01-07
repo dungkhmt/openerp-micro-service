@@ -6,6 +6,7 @@ import {
   MenuItem,
   TextField,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import AddStaffModal from "./modals/AddStaffModal";
 import DeleteConfirmationModal from "./modals/DeleteConfirmationModal";
@@ -14,6 +15,7 @@ import TableRowsIcon from "@mui/icons-material/TableRows";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import Autocomplete from "@mui/material/Autocomplete";
 import { CSVLink } from "react-csv";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -22,28 +24,35 @@ import "../assets/css/EmployeeTable.css";
 import deleteIcon from "../assets/icons/delete.svg";
 import editIcon from "../assets/icons/edit.svg";
 import { request } from "../api";
+import { useHistory } from "react-router-dom";
+
 
 const EmployeeManagement = () => {
+  const history = useHistory();
   const [data, setData] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [jobPositions, setJobPositions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [tempPageInput, setTempPageInput] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [selectedJobPosition, setSelectedJobPosition] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteEmployee, setDeleteEmployee] = useState(null);
   const [dropdownVisible, setDropdownVisible] = useState(null);
   const dropdownRefs = useRef([]);
-  const [viewMode, setViewMode] = useState("table"); // "table" or "card"
+  const [viewMode, setViewMode] = useState("table");
 
   const fetchEmployees = async (pageIndex, pageSize, searchValue) => {
     const payload = {
       fullname: searchValue || null,
-      department_code: null,
-      job_position_code: null,
+      department_code: selectedDepartment?.department_code || null,
+      job_position_code: selectedJobPosition?.code || null,
       status: "ACTIVE",
       pageable_request: {
         page: pageIndex,
@@ -74,9 +83,43 @@ const EmployeeManagement = () => {
     }
   };
 
+  const fetchDepartments = async () => {
+    try {
+      request(
+        "post",
+        "/department/get-department",
+        (res) => {
+          setDepartments(res.data.data || []);
+        },
+        { onError: (err) => console.error("Error fetching departments:", err) },
+        {}
+      );
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+    }
+  };
+
+  const fetchJobPositions = async () => {
+    try {
+      request(
+        "post",
+        "/job/get-job-position",
+        (res) => {
+          setJobPositions(res.data.data || []);
+        },
+        { onError: (err) => console.error("Error fetching job positions:", err) },
+        {}
+      );
+    } catch (error) {
+      console.error("Error fetching job positions:", error);
+    }
+  };
+
   useEffect(() => {
     fetchEmployees(0, itemsPerPage, searchTerm);
-  }, [itemsPerPage, searchTerm]);
+    fetchDepartments();
+    fetchJobPositions();
+  }, [itemsPerPage, searchTerm, selectedDepartment, selectedJobPosition]);
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -85,16 +128,15 @@ const EmployeeManagement = () => {
         dropdownRefs.current[dropdownVisible] &&
         !dropdownRefs.current[dropdownVisible].contains(event.target)
       ) {
-        setDropdownVisible(null); 
+        setDropdownVisible(null);
       }
     };
-  
+
     document.addEventListener("mousedown", handleOutsideClick);
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
   }, [dropdownVisible]);
- 
 
   const columns = useMemo(
     () => [
@@ -111,14 +153,28 @@ const EmployeeManagement = () => {
         Header: "Fullname",
         accessor: "fullname",
         Cell: ({ row }) => (
-          <div className="employee-name-cell">
+          <div
+            className="employee-name-cell"
+            onClick={() => history.push(`/employee/${row.original.staff_code}`)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              cursor: "pointer",
+            }}
+          >
             <img
               src={userAvatar}
               alt="Avatar"
               className="employee-avatar"
               style={{ width: "40px", borderRadius: "50%" }}
             />
-            <span>{row.original.fullname}</span>
+            <span
+              style={{
+                marginLeft: "10px",
+              }}
+            >
+              {row.original.fullname}
+            </span>
           </div>
         ),
       },
@@ -150,7 +206,7 @@ const EmployeeManagement = () => {
             >
               <IconButton
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevent click from propagating to the document listener
+                  e.stopPropagation();
                   setDropdownVisible(
                     dropdownVisible === rowIndex ? null : rowIndex
                   );
@@ -178,6 +234,7 @@ const EmployeeManagement = () => {
                     width: "150px",
                     padding: "8px 0",
                   }}
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <div
                     onClick={() => handleEdit(row.original)}
@@ -252,28 +309,27 @@ const EmployeeManagement = () => {
 
   const handleDelete = async () => {
     if (!deleteEmployee) return;
-  
+
     try {
       await request(
         "post",
         "/staff/delete-staff",
         () => {
-          fetchEmployees(currentPage, itemsPerPage, searchTerm); 
-          setDeleteModalOpen(false); 
-          setDeleteEmployee(null); 
+          fetchEmployees(currentPage, itemsPerPage, searchTerm);
+          setDeleteModalOpen(false);
+          setDeleteEmployee(null);
         },
         {
           onError: (err) => {
             console.error("Error deleting employee:", err);
           },
         },
-        { staff_code: deleteEmployee.staff_code } 
+        { staff_code: deleteEmployee.staff_code }
       );
     } catch (error) {
       console.error("Error deleting employee:", error);
     }
   };
-  
 
   const exportPDF = () => {
     const doc = new jsPDF();
@@ -320,12 +376,17 @@ const EmployeeManagement = () => {
     <div className="employee-management">
       <div className="header">
         <h2>Employees</h2>
+        
         <div>
           <IconButton onClick={() => setViewMode("table")}>
-            <TableRowsIcon color={viewMode === "table" ? "primary" : "inherit"} />
+            <TableRowsIcon
+              color={viewMode === "table" ? "primary" : "inherit"}
+            />
           </IconButton>
           <IconButton onClick={() => setViewMode("card")}>
-            <GridViewIcon color={viewMode === "card" ? "primary" : "inherit"} />
+            <GridViewIcon
+              color={viewMode === "card" ? "primary" : "inherit"}
+            />
           </IconButton>
           <Button
             variant="contained"
@@ -336,6 +397,7 @@ const EmployeeManagement = () => {
           </Button>
         </div>
       </div>
+
       <AddStaffModal
         open={openModal}
         onClose={() => {
@@ -345,6 +407,7 @@ const EmployeeManagement = () => {
         onSubmit={() => fetchEmployees(0, itemsPerPage, searchTerm)}
         initialValues={selectedEmployee}
       />
+
       <DeleteConfirmationModal
         open={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
@@ -358,24 +421,53 @@ const EmployeeManagement = () => {
       <div className="export-search-container">
         <div className="export-buttons">
           <CSVLink data={data} filename="Employees.csv">
-            <Button variant="contained" color="primary">
+            <Button
+              variant="contained"
+              className="export-button csv-button"
+              startIcon={<i className="fas fa-file-csv"></i>}
+            >
               Export CSV
             </Button>
           </CSVLink>
-          <Button variant="contained" color="secondary" onClick={exportPDF}>
+          <Button
+            variant="contained"
+            className="export-button pdf-button"
+            onClick={exportPDF}
+            startIcon={<i className="fas fa-file-pdf"></i>}
+          >
             Export PDF
           </Button>
         </div>
-        <div className="search-bar">
+        <div className="search-filters">
+          <Autocomplete
+            options={departments}
+            getOptionLabel={(option) => option.department_name || ""}
+            onChange={(e, value) => setSelectedDepartment(value)}
+            renderInput={(params) => (
+              <TextField {...params} label="Filter by Department" size="small" />
+            )}
+            className="filter-item"
+          />
+          <Autocomplete
+            options={jobPositions}
+            getOptionLabel={(option) => option.name || ""}
+            onChange={(e, value) => setSelectedJobPosition(value)}
+            renderInput={(params) => (
+              <TextField {...params} label="Filter by Job Position" size="small" />
+            )}
+            className="filter-item"
+          />
           <TextField
             label="Search by Name"
             variant="outlined"
             size="small"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-bar"
           />
         </div>
       </div>
+
 
       {viewMode === "table" ? (
         <table {...getTableProps()} className="employee-table">
@@ -408,7 +500,15 @@ const EmployeeManagement = () => {
       ) : (
         <div className="card-view">
           {data.map((employee, index) => (
-            <div className="employee-card" key={employee.staff_code} style={{ position: "relative" }}>
+            <div
+              className="employee-card"
+              key={employee.staff_code}
+              style={{
+                position: "relative",
+                cursor: "pointer",
+              }}
+              onClick={() => history.push(`/employee/${employee.staff_code}`)}
+            >
               <img src={userAvatar} alt="Avatar" className="employee-avatar" />
               <h3>{employee.fullname}</h3>
               <p>{employee.department?.department_name || "No Department"}</p>
@@ -420,10 +520,10 @@ const EmployeeManagement = () => {
                 <IconButton
                   onClick={(e) => {
                     e.stopPropagation();
-            
-                    setDropdownVisible(dropdownVisible === index ? null : index);
+                    setDropdownVisible(
+                      dropdownVisible === index ? null : index
+                    );
                   }}
-                  
                   style={{
                     width: "40px",
                     height: "40px",
