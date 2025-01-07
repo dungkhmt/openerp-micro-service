@@ -31,6 +31,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -152,13 +153,21 @@ public class ExamQuestionServiceImpl implements ExamQuestionService {
             return responseData;
         }
 
-        List<String> filePaths = mongoFileService.storeFiles(files);
+        List<String> filePaths = new ArrayList<>();
+        if(files.length > 0){
+            filePaths = mongoFileService.storeFiles(files);
+        }
 
         ExamQuestionEntity examQuestionEntity = modelMapper.map(examQuestionSaveReq, ExamQuestionEntity.class);
         examQuestionEntity.setId(examQuestionExist.get().getId());
         examQuestionEntity.setCreatedBy(examQuestionExist.get().getCreatedBy());
         examQuestionEntity.setCreatedAt(examQuestionExist.get().getCreatedAt());
-        examQuestionEntity.setFilePath(DataUtils.stringIsNotNullOrEmpty(examQuestionEntity.getFilePath()) ? examQuestionEntity.getFilePath() +";"+ String.join(";", filePaths) : String.join(";", filePaths));
+        examQuestionEntity.setFilePath(
+            DataUtils.stringIsNotNullOrEmpty(examQuestionEntity.getFilePath()) ?
+                (!filePaths.isEmpty() ?
+                    examQuestionEntity.getFilePath() +";"+ String.join(";", filePaths) :
+                    examQuestionEntity.getFilePath()) :
+                String.join(";", filePaths));
         examQuestionRepository.save(examQuestionEntity);
 
         for(String filePath: examQuestionSaveReq.getDeletePaths()){
