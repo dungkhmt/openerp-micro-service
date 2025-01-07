@@ -139,17 +139,17 @@ const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
       department_code:
         formValues.department_code === initialValues?.department?.department_code
           ? null
-          : formValues.department_code, // Nếu không thay đổi thì gửi null
+          : formValues.department_code, 
       job_position_code:
         formValues.job_position_code === initialValues?.job_position?.job_position_code
           ? null
-          : formValues.job_position_code, // Nếu không thay đổi thì gửi null
+          : formValues.job_position_code, 
     };
 
     try {
       const apiEndpoint = initialValues
-        ? "/staff/edit-staff" // Nếu có initialValues, đây là chế độ Edit
-        : "/staff/add-staff"; // Nếu không, đây là chế độ Add
+        ? "/staff/edit-staff" 
+        : "/staff/add-staff"; 
 
       await request(
         "post",

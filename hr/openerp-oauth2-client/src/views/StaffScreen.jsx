@@ -163,7 +163,9 @@ const EmployeeManagement = () => {
             }}
           >
             <img
-              src={userAvatar}
+              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                row.original.fullname
+              )}&background=random&size=100`}
               alt="Avatar"
               className="employee-avatar"
               style={{ width: "40px", borderRadius: "50%" }}
@@ -424,7 +426,6 @@ const EmployeeManagement = () => {
             <Button
               variant="contained"
               className="export-button csv-button"
-              startIcon={<i className="fas fa-file-csv"></i>}
             >
               Export CSV
             </Button>
@@ -433,7 +434,6 @@ const EmployeeManagement = () => {
             variant="contained"
             className="export-button pdf-button"
             onClick={exportPDF}
-            startIcon={<i className="fas fa-file-pdf"></i>}
           >
             Export PDF
           </Button>
@@ -509,7 +509,13 @@ const EmployeeManagement = () => {
               }}
               onClick={() => history.push(`/employee/${employee.staff_code}`)}
             >
-              <img src={userAvatar} alt="Avatar" className="employee-avatar" />
+              <img 
+                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                employee.fullname
+                )}&background=random&size=100`}
+                alt="Avatar" 
+                className="employee-avatar" 
+              />
               <h3>{employee.fullname}</h3>
               <p>{employee.department?.department_name || "No Department"}</p>
               <p>{employee.job_position?.job_position_name || "No Position"}</p>

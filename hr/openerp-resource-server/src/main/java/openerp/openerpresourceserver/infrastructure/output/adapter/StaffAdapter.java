@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.application.port.in.port.IStaffPort;
 import openerp.openerpresourceserver.application.port.out.staff.filter.IStaffFilter;
-import openerp.openerpresourceserver.constant.StaffStatus;
 import openerp.openerpresourceserver.domain.exception.ApplicationException;
 import openerp.openerpresourceserver.domain.exception.InvalidParameterException;
 import openerp.openerpresourceserver.domain.exception.StaffNotExistException;

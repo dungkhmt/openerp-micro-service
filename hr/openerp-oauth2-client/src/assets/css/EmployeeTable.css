@@ -236,6 +236,6 @@
 }
 
 .filter-item, .search-bar {
-  flex: 1; /* Distribute space evenly */
-  min-width: 170px; /* Ensure elements don't shrink too much */
+  flex: 1; 
+  min-width: 170px; 
 }
