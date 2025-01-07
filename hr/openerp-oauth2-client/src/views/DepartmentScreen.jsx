@@ -50,7 +50,6 @@ const DepartmentTable = () => {
         "/department/get-department",
         (res) => {
           const { data: departments, meta } = res.data;
-          // Transform snake_case response to camelCase
           const transformedDepartments = departments.map((dept) => ({
             departmentCode: dept.department_code,
             departmentName: dept.department_name,

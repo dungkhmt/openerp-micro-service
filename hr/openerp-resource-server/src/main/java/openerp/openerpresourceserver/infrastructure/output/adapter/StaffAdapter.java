@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.infrastructure.output.adapter;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.application.port.in.port.IStaffPort;
 import openerp.openerpresourceserver.application.port.out.staff.filter.IStaffFilter;
 import openerp.openerpresourceserver.constant.StaffStatus;
@@ -25,6 +26,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class StaffAdapter implements IStaffPort {
     private final StaffRepo staffRepo;
     private final UserRepo userRepo;
@@ -33,6 +35,7 @@ public class StaffAdapter implements IStaffPort {
     @Override
     public StaffModel addStaff(StaffModel staff) {
         if(staffRepo.existsById(staff.getStaffCode())){
+            log.error(String.format("Staff code %s existed", staff.getStaffCode()));
             throw new ApplicationException(
                     ResponseCode.STAFF_EXISTED,
                     String.format("Staff code %s existed", staff.getStaffCode())
@@ -72,21 +75,16 @@ public class StaffAdapter implements IStaffPort {
     public StaffModel editStaff(StaffModel staff) {
         StaffEntity staffEntity;
         if(staff.getUserLoginId() != null){
-            staffEntity = staffRepo.findByUser_Id(staff.getUserLoginId())
-                    .orElseThrow(() -> new StaffNotExistException(
-                            String.format("Staff with User Login Id '%s' does not exist",
-                                    staff.getUserLoginId())
-                    ));
+            staffEntity = findEntityByUserLoginId(staff.getUserLoginId());
         }
         else if(staff.getStaffCode() != null){
-            staffEntity = staffRepo.findById(staff.getStaffCode())
-                    .orElseThrow(() -> new StaffNotExistException(
-                            String.format("Staff code %s does not exist", staff.getStaffCode())
-                    ));
+            staffEntity = findEntityByStaffCode(staff.getStaffCode());
         }
         else {
+            log.error("Staff code or User Login Id is required");
             throw new InvalidParameterException("Staff code or User Login Id is required");
         }
+
         if(staff.getFullname() != null){
             staffEntity.setFullname(staff.getFullname());
         }
@@ -94,6 +92,16 @@ public class StaffAdapter implements IStaffPort {
             staffEntity.setStatus(staff.getStatus());
         }
         return toModel(staffRepo.save(staffEntity));
+    }
+
+    @Override
+    public StaffModel findByStaffCode(String staffCode) {
+        return toModel(findEntityByStaffCode(staffCode));
+    }
+
+    @Override
+    public StaffModel findByUserLoginId(String userLoginId) {
+        return toModel(findEntityByUserLoginId(userLoginId));
     }
 
     @Override
@@ -128,6 +136,22 @@ public class StaffAdapter implements IStaffPort {
         return staffEntities.stream()
                 .map(this::toModel)
                 .toList();
+    }
+
+    public StaffEntity findEntityByStaffCode(String staffCode) {
+        return staffRepo.findById(staffCode)
+                .orElseThrow(() -> new StaffNotExistException(
+                        String.format("Staff code %s does not exist", staffCode)
+                ));
+    }
+
+
+    public StaffEntity findEntityByUserLoginId(String userLoginId) {
+        return staffRepo.findByUser_Id(userLoginId)
+                .orElseThrow(() -> new StaffNotExistException(
+                        String.format("Staff with User Login Id '%s' does not exist",
+                                userLoginId)
+                ));
     }
 
     @Override

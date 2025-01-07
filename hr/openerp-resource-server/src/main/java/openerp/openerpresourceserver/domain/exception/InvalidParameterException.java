@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.domain.exception;
 
-import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
 
 public class InvalidParameterException extends ApplicationException {

@@ -5,26 +5,30 @@ import openerp.openerpresourceserver.domain.common.usecase.BeanAwareUseCasePubli
 import openerp.openerpresourceserver.domain.model.StaffDetailModel;
 import openerp.openerpresourceserver.domain.model.StaffModel;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.Resource;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.staff.request.AddStaffRequest;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.staff.request.EditStaffRequest;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.staff.request.GetAllStaffInfoRequest;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.staff.request.SearchStaffRequest;
+import openerp.openerpresourceserver.infrastructure.input.rest.dto.staff.request.*;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.staff.response.StaffDetailResponse;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.staff.response.StaffResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/staff/")
 public class StaffController extends BeanAwareUseCasePublisher {
     @PostMapping("add-staff")
     public ResponseEntity<?> addStaff(
-            @Valid @RequestBody AddStaffRequest staff
+            @Valid @RequestBody AddStaffRequest request
     ){
-        publish(staff.toUseCase());
+        publish(request.toUseCase());
+        return ResponseEntity.ok().body(
+                new Resource()
+        );
+    }
+
+    @PostMapping("delete-staff")
+    public ResponseEntity<?> deleteStaff(
+            @Valid @RequestBody DeleteStaffRequest request
+    ){
+        publish(request.toUseCase());
         return ResponseEntity.ok().body(
                 new Resource()
         );
@@ -32,9 +36,9 @@ public class StaffController extends BeanAwareUseCasePublisher {
 
     @PostMapping("edit-staff")
     public ResponseEntity<?> editStaff(
-            @Valid @RequestBody EditStaffRequest staff
+            @Valid @RequestBody EditStaffRequest request
     ){
-        publish(staff.toUseCase());
+        publish(request.toUseCase());
         return ResponseEntity.ok().body(
                 new Resource()
         );
@@ -42,9 +46,9 @@ public class StaffController extends BeanAwareUseCasePublisher {
 
     @PostMapping("search-staff")
     public ResponseEntity<?> searchStaff(
-            @Valid @RequestBody SearchStaffRequest staff
+            @Valid @RequestBody SearchStaffRequest request
     ){
-        var staffPage = publishPageWrapper(StaffModel.class, staff.toUseCase());
+        var staffPage = publishPageWrapper(StaffModel.class, request.toUseCase());
         var responsePage = staffPage.convert(StaffResponse::fromModel);
         return ResponseEntity.ok().body(
                 new Resource(responsePage)
@@ -53,12 +57,22 @@ public class StaffController extends BeanAwareUseCasePublisher {
 
     @PostMapping("get-all-staff-info")
     public ResponseEntity<?> getAllStaffInfo(
-            @Valid @RequestBody GetAllStaffInfoRequest staff
+            @Valid @RequestBody GetAllStaffInfoRequest request
     ){
-        var staffPage = publishPageWrapper(StaffDetailModel.class, staff.toUseCase());
+        var staffPage = publishPageWrapper(StaffDetailModel.class, request.toUseCase());
         var responsePage = staffPage.convert(StaffDetailResponse::fromModel);
         return ResponseEntity.ok().body(
                 new Resource(responsePage)
+        );
+    }
+
+    @PostMapping("get-staff-info")
+    public ResponseEntity<?> getStaffInfo(
+            @Valid @RequestBody GetStaffInfoRequest request
+    ){
+        var staff = publish(StaffDetailModel.class, request.toUseCase());
+        return ResponseEntity.ok().body(
+                new Resource(StaffDetailResponse.fromModel(staff))
         );
     }
 }

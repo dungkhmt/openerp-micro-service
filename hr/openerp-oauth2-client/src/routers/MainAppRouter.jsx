@@ -38,7 +38,7 @@ function MainAppRouter(props) {
     <Layout>
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Switch>
-          <Route component={() => <></>} exact path="/" />
+          <Route component={DepartmentScreen} exact path="/" />
           
           <PrivateRoute component={StaffScreen} exact path="/demo" />
           <PrivateRoute component={JobPositionScreen} exact path="/job" />
