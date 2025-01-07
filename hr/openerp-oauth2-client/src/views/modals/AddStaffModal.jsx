@@ -13,7 +13,8 @@ import {
 import Autocomplete from "@mui/material/Autocomplete";
 import { request } from "../../api";
 
-const AddStaffModal = ({ open, onClose, onSubmit }) => {
+
+const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
   const [formValues, setFormValues] = useState({
     fullname: "",
     email: "",
@@ -33,8 +34,24 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
   const [loading, setLoading] = useState(false); // Submit button loading state
   const [error, setError] = useState(null); // Error state for Snackbar
 
-  // Fetch departments based on search term
-  const fetchDepartments = async (searchValue) => {
+  // Load initial values and fetch data when modal opens
+  useEffect(() => {
+    if (open) {
+      setFormValues({
+        fullname: initialValues?.fullname || "",
+        email: initialValues?.email || "",
+        department_code: initialValues?.department?.department_code || null,
+        job_position_code: initialValues?.job_position?.job_position_code || null,
+      });
+      console.warn(initialValues );
+      
+      fetchDepartments("", initialValues?.department?.department_code);
+      fetchJobPositions("", initialValues?.job_position?.job_position_code);
+    }
+  }, [open, initialValues]);
+
+  // Fetch departments
+  const fetchDepartments = async (searchValue, defaultCode = null) => {
     setLoadingDepartments(true);
     try {
       const payload = {
@@ -48,7 +65,21 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
         "post",
         "/department/get-department",
         (res) => {
-          setDepartments(res.data.data || []);
+          const data = res.data.data || [];
+          setDepartments(data);
+
+          // Set default value if department_code exists in initialValues
+          if (defaultCode) {
+            const defaultDepartment = data.find(
+              (dept) => dept.department_code === defaultCode
+            );
+            if (defaultDepartment) {
+              setFormValues((prev) => ({
+                ...prev,
+                department_code: defaultDepartment.department_code,
+              }));
+            }
+          }
         },
         { onError: (err) => console.error("Error fetching departments:", err) },
         payload
@@ -60,8 +91,8 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
     }
   };
 
-  // Fetch job positions based on search term
-  const fetchJobPositions = async (searchValue) => {
+  // Fetch job positions
+  const fetchJobPositions = async (searchValue, defaultCode = null) => {
     setLoadingJobPositions(true);
     try {
       const payload = {
@@ -75,7 +106,19 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
         "post",
         "/job/get-job-position",
         (res) => {
-          setJobPositions(res.data.data || []);
+          const data = res.data.data || [];
+          setJobPositions(data);
+
+          // Set default value if job_position_code exists in initialValues
+          if (defaultCode) {
+            const defaultJob = data.find((job) => job.code === defaultCode);
+            if (defaultJob) {
+              setFormValues((prev) => ({
+                ...prev,
+                job_position_code: defaultJob.code,
+              }));
+            }
+          }
         },
         { onError: (err) => console.error("Error fetching job positions:", err) },
         payload
@@ -87,26 +130,30 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
     }
   };
 
-  useEffect(() => {
-    if (open) {
-      fetchDepartments("");
-      fetchJobPositions("");
-    }
-  }, [open]);
-
   const handleSubmit = async () => {
     setLoading(true);
+
     const payload = {
       fullname: formValues.fullname,
       email: formValues.email,
-      department_code: formValues.department_code,
-      job_position_code: formValues.job_position_code,
+      department_code:
+        formValues.department_code === initialValues?.department?.department_code
+          ? null
+          : formValues.department_code, // Nếu không thay đổi thì gửi null
+      job_position_code:
+        formValues.job_position_code === initialValues?.job_position?.job_position_code
+          ? null
+          : formValues.job_position_code, // Nếu không thay đổi thì gửi null
     };
 
     try {
-      request(
+      const apiEndpoint = initialValues
+        ? "/staff/edit-staff" // Nếu có initialValues, đây là chế độ Edit
+        : "/staff/add-staff"; // Nếu không, đây là chế độ Add
+
+      await request(
         "post",
-        "/staff/add-staff",
+        apiEndpoint,
         () => {
           onSubmit();
           onClose();
@@ -143,15 +190,8 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
               });
             }
           },
-          500: (err) => {
-            console.error("Server error:", err);
-            setError({
-              title: "Server Error",
-              info: "The server is currently unavailable.",
-            });
-          },
         },
-        payload
+        { ...payload, staff_code: initialValues?.staff_code } // Gửi staff_code nếu đang chỉnh sửa
       );
     } catch (error) {
       console.error("API request failed:", error);
@@ -167,7 +207,7 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
   return (
     <>
       <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-        <DialogTitle>Add Employee</DialogTitle>
+        <DialogTitle>{initialValues ? "Edit Employee" : "Add Employee"}</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
@@ -200,9 +240,6 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
             onInputChange={(e, value) => {
               setSearchDepartment(value);
               fetchDepartments(value);
-              if (formValues.department_code) {
-                setFormValues((prev) => ({ ...prev, department_code: null }));
-              }
             }}
             onChange={(e, value) =>
               setFormValues((prev) => ({
@@ -242,9 +279,6 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
             onInputChange={(e, value) => {
               setSearchJob(value);
               fetchJobPositions(value);
-              if (formValues.job_position_code) {
-                setFormValues((prev) => ({ ...prev, job_position_code: null }));
-              }
             }}
             onChange={(e, value) =>
               setFormValues((prev) => ({
@@ -283,7 +317,7 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
             Cancel
           </Button>
           <Button onClick={handleSubmit} color="primary" variant="contained" disabled={loading}>
-            {loading ? "Submitting..." : "Submit"}
+            {loading ? "Submitting..." : initialValues ? "Save Changes" : "Submit"}
           </Button>
         </DialogActions>
       </Dialog>
@@ -299,12 +333,12 @@ const AddStaffModal = ({ open, onClose, onSubmit }) => {
           <br />
           {typeof error?.info === "string"
             ? error?.info
-            : JSON.stringify(error?.info, null, 2)} 
+            : JSON.stringify(error?.info, null, 2)}
         </Alert>
       </Snackbar>
-
     </>
   );
 };
 
 export default AddStaffModal;
+

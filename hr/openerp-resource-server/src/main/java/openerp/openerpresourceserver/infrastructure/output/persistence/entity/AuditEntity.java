@@ -16,12 +16,10 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public class AuditEntity {
 
-    @ColumnDefault("CURRENT_DATE")
     @UpdateTimestamp
     @Column(name = "last_updated_stamp")
     private LocalDateTime lastUpdatedStamp;
 
-    @ColumnDefault("CURRENT_DATE")
     @CreationTimestamp
     @Column(name = "created_stamp", nullable = false, updatable = false)
     private LocalDateTime createdStamp;

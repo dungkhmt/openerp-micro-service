@@ -9,6 +9,7 @@ import openerp.openerpresourceserver.infrastructure.output.persistence.entity.St
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @RequiredArgsConstructor
@@ -68,10 +69,10 @@ public class StaffInfoSpecification implements Specification<StaffEntity> {
 
     private Predicate getDepartmentPredicate(Root<StaffEntity> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
         // Subquery to fetch the latest fromDate for StaffDepartmentEntity
-        Subquery<LocalDate> latestDepartmentSubquery = query.subquery(LocalDate.class);
+        Subquery<LocalDateTime> latestDepartmentSubquery = query.subquery(LocalDateTime.class);
         Root<StaffDepartmentEntity> departmentSubRoot = latestDepartmentSubquery.from(StaffDepartmentEntity.class);
 
-        latestDepartmentSubquery.select(cb.greatest(departmentSubRoot.get("id").get("fromDate").as(LocalDate.class)))
+        latestDepartmentSubquery.select(cb.greatest(departmentSubRoot.get("id").get("fromDate").as(LocalDateTime.class)))
                 .where(cb.equal(departmentSubRoot.get("id").get("userId"), root.get("user").get("id")));
 
         // Join StaffDepartmentEntity
@@ -85,10 +86,10 @@ public class StaffInfoSpecification implements Specification<StaffEntity> {
 
     private Predicate getJobPositionPredicate(Root<StaffEntity> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
         // Subquery to fetch the latest fromDate for StaffJobPositionEntity
-        Subquery<LocalDate> latestJobPositionSubquery = query.subquery(LocalDate.class);
+        Subquery<LocalDateTime> latestJobPositionSubquery = query.subquery(LocalDateTime.class);
         Root<StaffJobPositionEntity> jobPositionSubRoot = latestJobPositionSubquery.from(StaffJobPositionEntity.class);
 
-        latestJobPositionSubquery.select(cb.greatest(jobPositionSubRoot.get("id").get("fromDate").as(LocalDate.class)))
+        latestJobPositionSubquery.select(cb.greatest(jobPositionSubRoot.get("id").get("fromDate").as(LocalDateTime.class)))
                 .where(cb.equal(jobPositionSubRoot.get("id").get("userId"), root.get("user").get("id")));
 
         // Join StaffJobPositionEntity

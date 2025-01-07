@@ -19,7 +19,13 @@ public interface StaffDepartmentRepo extends IBaseRepository<StaffDepartmentEnti
             "WHERE sd.user_id = :userId " +
             "ORDER BY sd.from_date DESC " +
             "LIMIT 1", nativeQuery = true)
-    Optional<StaffDepartmentProjection> findLatestDepartmentByUserId(@Param("userId") String userId);
+    Optional<StaffDepartmentProjection> findLatestProjectionDepartmentByUserId(@Param("userId") String userId);
+
+    @Query(value = "SELECT * FROM hr_staff_department " +
+            "WHERE user_id = :userId " +
+            "ORDER BY from_date DESC " +
+            "LIMIT 1", nativeQuery = true)
+    Optional<StaffDepartmentEntity> findLatestDepartmentByUserId(@Param("userId") String userId);
 
     @Query(value = "SELECT sd.user_id AS userLoginId, d.department_code AS departmentCode, " +
             "d.department_name AS departmentName, d.description AS description, " +

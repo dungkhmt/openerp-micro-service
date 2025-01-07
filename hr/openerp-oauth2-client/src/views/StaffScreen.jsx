@@ -251,27 +251,28 @@ const EmployeeManagement = () => {
 
   const handleDelete = async () => {
     if (!deleteEmployee) return;
-
+  
     try {
-      request(
+      await request(
         "post",
         "/staff/delete-staff",
         () => {
-          fetchEmployees(currentPage, itemsPerPage, searchTerm);
-          setDeleteModalOpen(false);
-          setDeleteEmployee(null);
+          fetchEmployees(currentPage, itemsPerPage, searchTerm); 
+          setDeleteModalOpen(false); 
+          setDeleteEmployee(null); 
         },
         {
           onError: (err) => {
             console.error("Error deleting employee:", err);
           },
         },
-        { staff_code: deleteEmployee.staff_code }
+        { staff_code: deleteEmployee.staff_code } 
       );
     } catch (error) {
       console.error("Error deleting employee:", error);
     }
   };
+  
 
   const exportPDF = () => {
     const doc = new jsPDF();
@@ -442,9 +443,13 @@ const EmployeeManagement = () => {
                       width: "100px", 
                       padding: "4px 0", 
                     }}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <div
-                      onClick={() => handleEdit(employee)}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent dropdown from closing
+                        handleEdit(employee); // Open the modal for Edit
+                      }}
                       style={{
                         display: "flex",
                         alignItems: "center",

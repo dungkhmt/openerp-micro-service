@@ -3,10 +3,8 @@ package openerp.openerpresourceserver.infrastructure.output.adapter;
 import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.application.port.in.port.IStaffDepartmentPort;
 import openerp.openerpresourceserver.constant.DepartmentStatus;
-import openerp.openerpresourceserver.domain.exception.ApplicationException;
 import openerp.openerpresourceserver.domain.model.DepartmentModel;
 import openerp.openerpresourceserver.domain.model.StaffDepartmentModel;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.StaffDepartmentEntity;
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.StaffDepartmentId;
 import openerp.openerpresourceserver.infrastructure.output.persistence.projection.StaffDepartmentProjection;
@@ -15,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -29,16 +27,18 @@ public class StaffDepartmentAdapter implements IStaffDepartmentPort {
         var currentDepartmentOption = staffDepartmentRepo.findLatestDepartmentByUserId(userLoginId);
         if (currentDepartmentOption.isPresent()) {
             var currentDepartment = currentDepartmentOption.get();
-            if (currentDepartment.getDepartmentCode().equals(departmentCode)) {
+            if (currentDepartment.getId().getDepartmentCode().equals(departmentCode)) {
                 log.warn(String.format("Job position id %s already assigned to user %s",
-                        currentDepartment.getDepartmentCode(), userLoginId));
+                        currentDepartment.getId().getDepartmentCode(), userLoginId));
                 return;
             }
+            currentDepartment.setThruDate(LocalDateTime.now());
+            staffDepartmentRepo.save(currentDepartment);
         }
             var id = new StaffDepartmentId();
             id.setUserId(userLoginId);
             id.setDepartmentCode(departmentCode);
-            id.setFromDate(LocalDate.now());
+            id.setFromDate(LocalDateTime.now());
             var staffDepartmentEntity = new StaffDepartmentEntity();
             staffDepartmentEntity.setId(id);;
             staffDepartmentRepo.save(staffDepartmentEntity);
@@ -46,7 +46,7 @@ public class StaffDepartmentAdapter implements IStaffDepartmentPort {
 
     @Override
     public StaffDepartmentModel findCurrentDepartment(String userLoginId) {
-        var projection = staffDepartmentRepo.findLatestDepartmentByUserId(userLoginId);
+        var projection = staffDepartmentRepo.findLatestProjectionDepartmentByUserId(userLoginId);
         return projection.map(this::toModel).orElse(null);
     }
 

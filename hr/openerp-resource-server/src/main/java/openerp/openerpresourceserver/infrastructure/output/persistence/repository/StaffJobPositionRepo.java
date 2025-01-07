@@ -19,7 +19,13 @@ public interface StaffJobPositionRepo extends IBaseRepository<StaffJobPositionEn
             "WHERE sjp.user_id = :userId " +
             "ORDER BY sjp.from_date DESC " +
             "LIMIT 1", nativeQuery = true)
-    Optional<StaffJobPositionProjection> findLatestJobByUserId(@Param("userId") String userId);
+    Optional<StaffJobPositionProjection> findLatestProjectionJobByUserId(@Param("userId") String userId);
+
+    @Query(value = "SELECT * FROM hr_staff_job_position " +
+            "WHERE user_id = :userId " +
+            "ORDER BY from_date DESC " +
+            "LIMIT 1", nativeQuery = true)
+    Optional<StaffJobPositionEntity> findLatestJobByUserId(@Param("userId") String userId);
 
     @Query(value = "SELECT sjp.user_id AS userLoginId, jp.position_code AS jobPositionCode, " +
             "jp.position_name AS jobPositionName, jp.description AS description, " +
