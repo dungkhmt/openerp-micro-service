@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.application.port.in.port.ICheckpointPeriodConfigurePort;
 import openerp.openerpresourceserver.application.port.out.checkpoint_period_configure.filter.ICheckpointPeriodConfigureFilter;
 import openerp.openerpresourceserver.constant.CheckpointPeriodConfigureStatus;
+import openerp.openerpresourceserver.domain.model.CheckpointConfigureModel;
+import openerp.openerpresourceserver.domain.model.CheckpointPeriodConfigureDetailsModel;
 import openerp.openerpresourceserver.domain.model.CheckpointPeriodConfigureModel;
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.CheckpointPeriodConfigureEntity;
 import openerp.openerpresourceserver.infrastructure.output.persistence.entity.CheckpointPeriodConfigureId;
+import openerp.openerpresourceserver.infrastructure.output.persistence.projection.CheckpointPeriodConfigureProjection;
 import openerp.openerpresourceserver.infrastructure.output.persistence.repository.CheckpointPeriodConfigureRepo;
 import openerp.openerpresourceserver.infrastructure.output.persistence.specification.CheckpointPeriodConfigureSpecification;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,15 @@ import java.util.UUID;
 @Service
 public class CheckpointPeriodConfigureAdapter implements ICheckpointPeriodConfigurePort {
     private final CheckpointPeriodConfigureRepo checkpointPeriodConfigureRepo;
+
+    @Override
+    public List<CheckpointPeriodConfigureDetailsModel> getPeriodConfigureDetails(UUID checkpointPeriodId) {
+
+        return toModels(
+                checkpointPeriodConfigureRepo.findConfigureDetails(checkpointPeriodId),
+                checkpointPeriodId
+        ) ;
+    }
 
     @Override
     public List<CheckpointPeriodConfigureModel> getAllPeriodConfigure(ICheckpointPeriodConfigureFilter filter) {
@@ -51,8 +63,39 @@ public class CheckpointPeriodConfigureAdapter implements ICheckpointPeriodConfig
 
     private CheckpointPeriodConfigureModel toModel(CheckpointPeriodConfigureEntity entity) {
         return CheckpointPeriodConfigureModel.builder()
+                .checkpointPeriodId(entity.getId().getCheckpointPeriodId())
+                .configureId(entity.getId().getCheckpointCode())
+                .status(entity.getStatus())
+                .coefficient(entity.getCoefficient())
                 .build();
     }
+
+    private CheckpointPeriodConfigureDetailsModel toModel(
+            CheckpointPeriodConfigureProjection projection,
+            UUID checkpointPeriodId
+    ) {
+        return CheckpointPeriodConfigureDetailsModel.builder()
+                .configureModel(CheckpointConfigureModel.builder()
+                        .code(projection.getCheckpointCode())
+                        .name(projection.getName())
+                        .description(projection.getDescription())
+                        .build())
+                .checkpointPeriodId(checkpointPeriodId)
+                .coefficient(projection.getCoefficient())
+                .status(Enum.valueOf(CheckpointPeriodConfigureStatus.class, projection.getStatus()))
+                .build();
+    }
+
+    private List<CheckpointPeriodConfigureDetailsModel> toModels(
+            List<CheckpointPeriodConfigureProjection> projections,
+            UUID checkpointPeriodId
+    ) {
+        return projections.stream()
+                .map(projection -> toModel(projection, checkpointPeriodId))
+                .toList();
+    }
+
+
 
     private List<CheckpointPeriodConfigureModel> toModels(Collection<CheckpointPeriodConfigureEntity> entities) {
         return entities.stream()

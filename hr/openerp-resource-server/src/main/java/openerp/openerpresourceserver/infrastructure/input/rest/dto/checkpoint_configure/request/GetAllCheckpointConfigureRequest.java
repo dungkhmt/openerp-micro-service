@@ -4,20 +4,20 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.application.port.out.checkpoint_configure.usecase_data.GetCheckpointConfigure;
+import openerp.openerpresourceserver.application.port.out.checkpoint_configure.usecase_data.GetAllCheckpointConfigure;
 import openerp.openerpresourceserver.constant.CheckpointConfigureStatus;
-import openerp.openerpresourceserver.domain.model.IPageableRequest;
+import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.PageableRequest;
 
 @Getter
 @Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class GetCheckpointConfigureRequest {
+public class GetAllCheckpointConfigureRequest {
     private String name;
     private CheckpointConfigureStatus status;
-    private IPageableRequest pageableRequest;
+    private PageableRequest pageableRequest;
 
-    public GetCheckpointConfigure toUseCase(){
-        return GetCheckpointConfigure.builder()
+    public GetAllCheckpointConfigure toUseCase(){
+        return GetAllCheckpointConfigure.builder()
                 .name(name)
                 .status(status)
                 .pageableRequest(pageableRequest)

@@ -3,7 +3,7 @@ package openerp.openerpresourceserver.application.port.out.checkpoint_period.han
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.application.port.in.port.ICheckpointPeriodPort;
-import openerp.openerpresourceserver.application.port.out.checkpoint_period.usecase_data.GetCheckpointPeriod;
+import openerp.openerpresourceserver.application.port.out.checkpoint_period.usecase_data.GetAllCheckpointPeriod;
 import openerp.openerpresourceserver.domain.common.DomainComponent;
 import openerp.openerpresourceserver.domain.common.usecase.ObservableUseCasePublisher;
 import openerp.openerpresourceserver.domain.common.usecase.PageWrapperUseCaseHandler;
@@ -13,18 +13,18 @@ import openerp.openerpresourceserver.domain.model.PageWrapper;
 @DomainComponent
 @Slf4j
 @RequiredArgsConstructor
-public class GetCheckpointPeriodHandler extends ObservableUseCasePublisher
-        implements PageWrapperUseCaseHandler<CheckpointPeriodModel, GetCheckpointPeriod>
+public class GetCheckpointAllPeriodHandler extends ObservableUseCasePublisher
+        implements PageWrapperUseCaseHandler<CheckpointPeriodModel, GetAllCheckpointPeriod>
 {
     private final ICheckpointPeriodPort checkpointPeriodPort;
 
     @Override
     public void init() {
-        register(GetCheckpointPeriod.class,this);
+        register(GetAllCheckpointPeriod.class,this);
     }
 
     @Override
-    public PageWrapper<CheckpointPeriodModel> handle(GetCheckpointPeriod useCase) {
+    public PageWrapper<CheckpointPeriodModel> handle(GetAllCheckpointPeriod useCase) {
         return checkpointPeriodPort.getCheckpointPeriod(useCase, useCase.getPageableRequest());
     }
 }

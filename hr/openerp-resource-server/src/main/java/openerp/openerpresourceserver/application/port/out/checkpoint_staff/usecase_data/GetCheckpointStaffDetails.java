@@ -14,13 +14,7 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
-public class GetCheckpointStaff implements ICheckpointStaffFilter, UseCase {
+public class GetCheckpointStaffDetails implements UseCase {
     private String userId;
     private UUID periodId;
-    private List<String> configureIds;
-
-    @Override
-    public List<String> getUserIds() {
-        return null;
-    }
 }

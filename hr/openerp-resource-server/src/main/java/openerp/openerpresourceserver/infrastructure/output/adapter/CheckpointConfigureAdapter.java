@@ -71,7 +71,7 @@ public class CheckpointConfigureAdapter implements ICheckpointConfigurePort {
 
     @Override
     public PageWrapper<CheckpointConfigureModel> getCheckpointConfigure(ICheckpointConfigureFilter filter, IPageableRequest request) {
-        var pageable = PageableUtils.getPageable(request);
+        var pageable = PageableUtils.getPageable(request, "checkpointCode");
         var spec = new CheckpointConfigureSpecification(filter);
         var page = checkpointConfigureRepo.findAll(spec ,pageable);
         return PageWrapper.<CheckpointConfigureModel>builder()
@@ -87,6 +87,10 @@ public class CheckpointConfigureAdapter implements ICheckpointConfigurePort {
 
     private CheckpointConfigureModel toModel(CheckpointConfigureEntity entity) {
         return CheckpointConfigureModel.builder()
+                .name(entity.getName())
+                .code(entity.getCheckpointCode())
+                .description(entity.getDescription())
+                .status(entity.getStatus())
                 .build();
     }
 

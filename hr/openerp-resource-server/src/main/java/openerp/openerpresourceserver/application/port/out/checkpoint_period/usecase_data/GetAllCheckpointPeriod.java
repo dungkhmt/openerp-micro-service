@@ -13,7 +13,7 @@ import openerp.openerpresourceserver.domain.model.IPageableRequest;
 @Builder
 @Getter
 @Setter
-public class GetCheckpointPeriod implements ICheckpointPeriodFilter, UseCase {
+public class GetAllCheckpointPeriod implements ICheckpointPeriodFilter, UseCase {
     private String name;
     private CheckpointPeriodStatus status;
     private IPageableRequest pageableRequest;

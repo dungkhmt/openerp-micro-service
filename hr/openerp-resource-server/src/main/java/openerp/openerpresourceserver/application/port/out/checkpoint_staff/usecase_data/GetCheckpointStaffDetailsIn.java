@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.application.port.out.checkpoint_staff.filter.ICheckpointStaffFilter;
 import openerp.openerpresourceserver.domain.common.model.UseCase;
 
 import java.util.List;
@@ -14,13 +13,7 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
-public class GetCheckpointStaff implements ICheckpointStaffFilter, UseCase {
-    private String userId;
+public class GetCheckpointStaffDetailsIn implements UseCase {
+    private List<String> userIds;
     private UUID periodId;
-    private List<String> configureIds;
-
-    @Override
-    public List<String> getUserIds() {
-        return null;
-    }
 }

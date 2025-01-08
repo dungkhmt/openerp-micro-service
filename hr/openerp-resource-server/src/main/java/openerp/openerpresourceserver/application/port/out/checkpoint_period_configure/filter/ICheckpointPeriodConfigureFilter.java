@@ -2,7 +2,9 @@ package openerp.openerpresourceserver.application.port.out.checkpoint_period_con
 
 import openerp.openerpresourceserver.constant.CheckpointPeriodConfigureStatus;
 
+import java.util.UUID;
+
 public interface ICheckpointPeriodConfigureFilter {
-    String getPeriodId();
+    UUID getPeriodId();
     CheckpointPeriodConfigureStatus getStatus();
 }
