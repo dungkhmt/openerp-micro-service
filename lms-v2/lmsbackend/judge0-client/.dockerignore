@@ -1,0 +1,26 @@
+# Ignore IDE folders
+.idea/
+*.iml
+
+# Ignore Maven wrapper files (not needed in image)
+mvnw.cmd
+
+# Ignore Git metadata
+.git/
+.gitattributes
+.gitignore
+
+# Ignore build output
+target/
+
+# Ignore OS-specific files
+*.DS_Store
+*.log
+*.bak
+Thumbs.db
+
+# Optional: Ignore markdown and documentation files
+HELP.md
+
+# Ignore anything not required for the build
+Dockerfile
