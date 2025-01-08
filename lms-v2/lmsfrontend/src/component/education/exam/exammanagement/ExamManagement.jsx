@@ -322,5 +322,5 @@ function ExamManagement(props) {
 }
 
 const screenName = "MENU_EXAM_MANAGEMENT";
-// export default withScreenSecurity(QuestionBank, screenName, true);
-export default ExamManagement;
+export default withScreenSecurity(ExamManagement, screenName, true);
+// export default ExamManagement;

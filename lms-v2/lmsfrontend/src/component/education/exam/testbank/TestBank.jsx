@@ -311,5 +311,5 @@ function TestBank(props) {
 }
 
 const screenName = "MENU_EXAM_TEST_BANK";
-// export default withScreenSecurity(QuestionBank, screenName, true);
-export default TestBank;
+export default withScreenSecurity(TestBank, screenName, true);
+// export default TestBank;

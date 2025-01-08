@@ -316,5 +316,5 @@ function QuestionBank(props) {
 }
 
 const screenName = "MENU_EXAM_QUESTION_BANK";
-// export default withScreenSecurity(QuestionBank, screenName, true);
-export default QuestionBank;
+export default withScreenSecurity(QuestionBank, screenName, true);
+// export default QuestionBank;

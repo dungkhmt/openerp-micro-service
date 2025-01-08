@@ -17,6 +17,7 @@ import {arrayMove} from "react-sortable-hoc";
 import QuestionFilePreview from "../questionbank/QuestionFilePreview";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import TestBankAddQuestion from "./TestBankAddQuestion";
+import withScreenSecurity from "../../../withScreenSecurity";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -265,5 +266,5 @@ function TestBankCreateUpdate(props) {
 }
 
 const screenName = "MENU_EXAM_TEST_BANK";
-// export default withScreenSecurity(QuestionBank, screenName, true);
-export default TestBankCreateUpdate;
+export default withScreenSecurity(TestBankCreateUpdate, screenName, true);
+// export default TestBankCreateUpdate;
