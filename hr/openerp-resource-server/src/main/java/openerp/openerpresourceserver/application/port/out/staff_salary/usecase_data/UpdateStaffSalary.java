@@ -9,6 +9,7 @@ import openerp.openerpresourceserver.domain.common.model.UseCase;
 import openerp.openerpresourceserver.domain.model.StaffSalaryModel;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -23,7 +24,7 @@ public class UpdateStaffSalary implements UseCase {
         return StaffSalaryModel.builder()
                 .userLoginId(getUserLoginId())
                 .salary(salary)
-                .fromDate(LocalDate.now())
+                .fromDate(LocalDateTime.now())
                 .salaryType(salaryType == null ? SalaryType.getDefaultValue() : salaryType)
                 .build();
     }

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/staff/")
-public class StaffController extends BeanAwareUseCasePublisher {
+public class  StaffController extends BeanAwareUseCasePublisher {
     @PostMapping("add-staff")
     public ResponseEntity<?> addStaff(
             @Valid @RequestBody AddStaffRequest request

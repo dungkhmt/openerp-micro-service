@@ -4,6 +4,7 @@ import lombok.*;
 import openerp.openerpresourceserver.constant.SalaryType;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -12,8 +13,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class StaffSalaryModel {
     private String userLoginId;
-    private LocalDate fromDate;
-    private LocalDate thruDate;
+    private LocalDateTime fromDate;
+    private LocalDateTime thruDate;
     private Integer salary;
     private SalaryType salaryType;
 }

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class StaffJobPositionController extends BeanAwareUseCasePublisher {
 
     @PostMapping("get-job-position-history")
-    public ResponseEntity<?> getJobPosition(
+    public ResponseEntity<?> getJobPositionHistory(
             @Valid @RequestBody GetJobPositionHistoryRequest request
     ){
         var models = publishCollection(StaffJobPositionModel.class, request.toUseCase());

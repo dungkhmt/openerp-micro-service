@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -31,12 +31,12 @@ public class StaffAdapterAdapter implements IStaffSalaryPort {
                 log.info("staff salary data not change");
                 return toModel(currentSalary);
             }
-            currentSalary.setThruDate(LocalDate.now());
+            currentSalary.setThruDate(LocalDateTime.now());
             staffSalaryRepo.save(currentSalary);
         }
         var id = new StaffSalaryId();
         id.setUserId(staffSalaryModel.getUserLoginId());
-        id.setFromDate(LocalDate.now());
+        id.setFromDate(LocalDateTime.now());
         var staffSalaryEntity = new StaffSalaryEntity();
         staffSalaryEntity.setId(id);
         staffSalaryEntity.setSalary(staffSalaryModel.getSalary());

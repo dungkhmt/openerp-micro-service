@@ -6,6 +6,7 @@ import lombok.Setter;
 import openerp.openerpresourceserver.constant.SalaryType;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,7 +17,7 @@ public class StaffSalaryEntity extends AuditEntity {
     private StaffSalaryId id;
 
     @Column(name = "thru_date")
-    private LocalDate thruDate;
+    private LocalDateTime thruDate;
 
     @Column(name = "salary")
     private Integer salary;

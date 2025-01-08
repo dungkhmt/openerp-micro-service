@@ -3,11 +3,15 @@ import { useParams } from "react-router-dom";
 import { request } from "../api";
 import AddStaffModal from "./modals/AddStaffModal";
 import EditIcon from "@mui/icons-material/Edit";
-import { Button, Divider, Tab, Tabs } from "@mui/material";
+import { Divider, Tab, Tabs } from "@mui/material";
+import Timeline from "../components/item/TimelineItem";
+import SalaryTab from "../components//tab/SalaryTab";
 
 const EmployeeDetails = () => {
   const { staffCode } = useParams(); // Get staffCode from URL
   const [employeeDetails, setEmployeeDetails] = useState(null);
+  const [jobHistory, setJobHistory] = useState([]);
+  const [departmentHistory, setDepartmentHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false); // Control modal visibility
@@ -21,14 +25,15 @@ const EmployeeDetails = () => {
           "post",
           "/staff/get-staff-info",
           (res) => {
-            setEmployeeDetails(res.data?.data);
-            setLoading(false);
+            const data = res.data?.data;
+            setEmployeeDetails(data);
+            fetchJobHistory(data?.user_login_id);
+            fetchDepartmentHistory(data?.user_login_id);
           },
           {
             onError: (err) => {
               console.error(err);
               setError(true);
-              setLoading(false);
             },
           },
           payload
@@ -36,24 +41,76 @@ const EmployeeDetails = () => {
       } catch (err) {
         console.error(err);
         setError(true);
+      } finally {
         setLoading(false);
+      }
+    };
+
+    const fetchJobHistory = async (userLoginId) => {
+      if (!userLoginId) return;
+      const payload = { user_login_id: userLoginId };
+      try {
+        request(
+          "post",
+          "/job/get-job-position-history",
+          (res) => {
+            const history = res.data?.data || [];
+            setJobHistory(
+              history.map((job) => ({
+                title: job.job_position?.name || "N/A",
+                fromDate: formatDate(job.from_date),
+                thruDate: formatDate(job.thru_date),
+              }))
+            );
+          },
+          { onError: (err) => console.error(err) },
+          payload
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    const fetchDepartmentHistory = async (userLoginId) => {
+      if (!userLoginId) return;
+      const payload = { user_login_id: userLoginId };
+      try {
+        request(
+          "post",
+          "/department/get-department-history",
+          (res) => {
+            const history = res.data?.data || [];
+            setDepartmentHistory(
+              history.map((dept) => ({
+                title: dept.department_model?.department_name || "N/A",
+                fromDate: formatDate(dept.from_date),
+                thruDate: formatDate(dept.thru_date),
+              }))
+            );
+          },
+          { onError: (err) => console.error(err) },
+          payload
+        );
+      } catch (err) {
+        console.error(err);
       }
     };
 
     fetchDetails();
   }, [staffCode]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error || !employeeDetails) return <p>Error: Unable to fetch details.</p>;
-
   const handleEdit = () => {
     setOpenEditModal(true); // Open the edit modal
   };
 
   const formatDate = (date) => {
-    const options = { year: "numeric", month: "long", day: "numeric" };
+    if (!date) return "Present";
+    const options = { year: "numeric", month: "short", day: "numeric" };
     return new Date(date).toLocaleDateString(undefined, options);
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (error || !employeeDetails) return <p>Error: Unable to fetch details.</p>;
 
   return (
     <div style={{ margin: "auto" }}>
@@ -67,7 +124,6 @@ const EmployeeDetails = () => {
           backgroundColor: "#fff",
         }}
       >
-        {/* Edit Button */}
         <EditIcon
           onClick={handleEdit}
           style={{
@@ -79,10 +135,7 @@ const EmployeeDetails = () => {
             color: "#007bff",
           }}
         />
-
-        {/* Profile Section */}
         <div style={{ display: "flex", alignItems: "flex-start", gap: "20px" }}>
-          {/* Avatar */}
           <img
             src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
               employeeDetails.fullname
@@ -96,8 +149,6 @@ const EmployeeDetails = () => {
               objectFit: "cover",
             }}
           />
-
-          {/* Name & Info */}
           <div style={{ flex: 1 }}>
             <h2 style={{ margin: "0 0 10px 0", fontSize: "1.5rem" }}>
               {employeeDetails.fullname}
@@ -130,7 +181,6 @@ const EmployeeDetails = () => {
             </div>
           </div>
         </div>
-        {/* Status */}
         <p
           style={{
             margin: "15px 0 0",
@@ -154,34 +204,23 @@ const EmployeeDetails = () => {
         <Tab label="Salary" value="salary" />
       </Tabs>
       <Divider style={{ margin: "10px 0" }} />
-      <div style={{ padding: "10px" }}>
-        {selectedTab === "profile" && (
-          <div>
-            <p>
-              <strong>Department:</strong>{" "}
-              {employeeDetails.department?.department_name || "N/A"}
-            </p>
-            <p>
-              <strong>Job Position:</strong>{" "}
-              {employeeDetails.job_position?.job_position_name || "N/A"}
-            </p>
-          </div>
-        )}
-        {selectedTab === "salary" && (
-          <div>
-            <h3>Salary Information</h3>
-            <p>Salary details are currently unavailable.</p>
-          </div>
-        )}
-      </div>
 
-      {/* Edit Staff Modal */}
+      {selectedTab === "profile" && (
+        <div style={{ display: "flex", gap: "20px" }}>
+          <Timeline title="Job History" items={jobHistory} />
+          <Timeline title="Department History" items={departmentHistory} />
+        </div>
+      )}
+
+      {selectedTab === "salary" && (
+        <SalaryTab userLoginId={employeeDetails.user_login_id} />
+      )}
+
       {openEditModal && (
         <AddStaffModal
           open={openEditModal}
           onClose={() => setOpenEditModal(false)}
           onSubmit={(updatedData) => {
-            // Update employee details after editing
             setEmployeeDetails((prev) => ({ ...prev, ...updatedData }));
             setOpenEditModal(false);
           }}
