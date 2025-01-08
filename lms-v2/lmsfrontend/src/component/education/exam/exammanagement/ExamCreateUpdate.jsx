@@ -28,6 +28,7 @@ import TestBankDetails from "../testbank/TestBankDetails";
 import {formatDateTime, formatDateTimeApi} from "../ultils/DateUltils";
 import XLSX from "xlsx";
 import {DataGrid} from "@material-ui/data-grid";
+import withScreenSecurity from "../../../withScreenSecurity";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -552,5 +553,5 @@ function ExamCreateUpdate(props) {
 }
 
 const screenName = "MENU_EXAM_MANAGEMENT";
-// export default withScreenSecurity(QuestionBank, screenName, true);
-export default ExamCreateUpdate;
+export default withScreenSecurity(ExamCreateUpdate, screenName, true);
+// export default ExamCreateUpdate;

@@ -8,7 +8,7 @@ export const ExamMenu = {
       {
         id: "MENU_EXAM_QUESTION_BANK",
         path: "/exam/question-bank",
-        isPublic: true,
+        isPublic: false,
         icon: null,
         text: "Question bank",
         child: [],
@@ -16,7 +16,7 @@ export const ExamMenu = {
       {
         id: "MENU_EXAM_TEST_BANK",
         path: "/exam/test-bank",
-        isPublic: true,
+        isPublic: false,
         icon: null,
         text: "Test bank",
         child: [],
@@ -24,7 +24,7 @@ export const ExamMenu = {
       {
         id: "MENU_EXAM_MANAGEMENT",
         path: "/exam/management",
-        isPublic: true,
+        isPublic: false,
         icon: null,
         text: "Manage Exams",
         child: [],

@@ -18,6 +18,7 @@ import {getFilenameFromString, getFilePathFromString} from "../ultils/FileUltils
 import {AttachFileOutlined} from "@material-ui/icons";
 import QuestionFilePreview from "./QuestionFilePreview";
 import DeleteIcon from "@material-ui/icons/Delete";
+import withScreenSecurity from "../../../withScreenSecurity";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -532,5 +533,5 @@ function QuestionBankCreateUpdate(props) {
 }
 
 const screenName = "MENU_EXAM_QUESTION_BANK";
-// export default withScreenSecurity(QuestionBank, screenName, true);
-export default QuestionBankCreateUpdate;
+export default withScreenSecurity(QuestionBankCreateUpdate, screenName, true);
+// export default QuestionBankCreateUpdate;
