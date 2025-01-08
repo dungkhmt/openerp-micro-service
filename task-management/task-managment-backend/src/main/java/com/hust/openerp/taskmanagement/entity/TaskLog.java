@@ -30,30 +30,30 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class TaskLog {
-  @Id
-  @SequenceGenerator(name = "task_management_task_log_generator", sequenceName = "task_management_task_log_sequence", allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.AUTO, generator = "task_management_task_log_generator")
-  @Column
-  private Long id;
+	@Id
+	@SequenceGenerator(name = "task_management_task_log_generator", sequenceName = "task_management_task_log_sequence", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "task_management_task_log_generator")
+	@Column
+	private Long id;
 
-  @Column(name = "user_id")
-  private String creatorId;
+	@Column(name = "user_id")
+	private String creatorId;
 
-  @Column(name = "comment")
-  private String comment;
+	@Column(name = "comment")
+	private String comment;
 
-  @Column(name = "task_id")
-  private UUID taskId;
+	@Column(name = "task_id")
+	private UUID taskId;
 
-  @CreationTimestamp
-  @Column(name = "created_at")
-  private Date createdAt;
+	@CreationTimestamp
+	@Column(name = "created_at")
+	private Date createdAt;
 
-  @OneToMany(fetch = jakarta.persistence.FetchType.EAGER)
-  @JoinColumn(name = "log_id")
-  private List<TaskLogDetail> details;
+	@OneToMany(fetch = jakarta.persistence.FetchType.EAGER)
+	@JoinColumn(name = "log_id")
+	private List<TaskLogDetail> details;
 
-  @ManyToOne(fetch = jakarta.persistence.FetchType.EAGER)
-  @JoinColumn(name = "user_id", insertable = false, updatable = false)
-  private User creator;
+	@ManyToOne(fetch = jakarta.persistence.FetchType.EAGER)
+	@JoinColumn(name = "user_id", insertable = false, updatable = false)
+	private User creator;
 }

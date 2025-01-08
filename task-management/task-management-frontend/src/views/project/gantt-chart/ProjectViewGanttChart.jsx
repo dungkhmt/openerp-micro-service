@@ -1,5 +1,4 @@
-import { Icon } from "@iconify/react";
-import { Box, CircularProgress, useTheme } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import dayjs from "dayjs";
 import { Gantt, ViewMode } from "gantt-task-react";
 import "gantt-task-react/dist/index.css";
@@ -14,6 +13,7 @@ import { TaskListHeader } from "./TaskListHeader";
 import { TaskListTable } from "./TaskListTable";
 import { TaskPreview } from "./TaskPreview";
 import { useConvertTasks } from "./helper";
+import { TaskService } from "../../../services/api/task.service";
 
 const ProjectViewGanttChart = () => {
   const ref = useRef(null);
@@ -30,8 +30,6 @@ const ProjectViewGanttChart = () => {
   } = useSelector((state) => state.gantt);
   const dispatch = useDispatch();
 
-  const theme = useTheme();
-
   const [tasks, setTasks] = useConvertTasks(tasksStore, range.startDate);
   const [height, setHeight] = useState(300);
   const [isInitiated, setIsInitiated] = useState(false);
@@ -47,21 +45,46 @@ const ProjectViewGanttChart = () => {
     return 65;
   }, [view]);
 
-  const handleTaskChange = (task) => {
-    // TODO: handler change task
-    let newTasks = tasks.map((t) => (t.id === task.id ? task : t));
+  // const handleTaskChange = (task) => {
+  //   // TODO: handler change task
+  //   let newTasks = tasks.map((t) => (t.id === task.id ? task : t));
+  //   setTasks(newTasks);
+  //   toast("The feature is not available yet", {
+  //     icon: <Icon icon="ic:round-warning" />,
+  //     style: {
+  //       color: theme.palette.warning.main,
+  //       border: `1px solid ${theme.palette.warning.main}`,
+  //     },
+  //     iconTheme: {
+  //       primary: theme.palette.warning.main,
+  //       secondary: theme.palette.warning.contrastText,
+  //     },
+  //   });
+  // };
+
+  const handleTaskChange = async (task) => {
+    // Convert task.start and task.end to Date objects using dayjs
+    const startDate = dayjs(task.start).toDate();
+    const endDate = dayjs(task.end).toDate();
+
+    // Update the task in local state
+    let newTasks = tasks.map((t) =>
+      t.id === task.id ? { ...task, start: startDate, end: endDate } : t
+    );
     setTasks(newTasks);
-    toast("The feature is not available yet", {
-      icon: <Icon icon="ic:round-warning" />,
-      style: {
-        color: theme.palette.warning.main,
-        border: `1px solid ${theme.palette.warning.main}`,
-      },
-      iconTheme: {
-        primary: theme.palette.warning.main,
-        secondary: theme.palette.warning.contrastText,
-      },
-    });
+
+    // Send the updated task to the server
+    try {
+      await TaskService.updateTask(task.id, {
+        fromDate: startDate,
+        dueDate: endDate,
+      });
+      toast.success("Task dates updated successfully");
+      getTasks();
+    } catch (error) {
+      console.error("Error updating task dates", error);
+      toast.error("Failed to update task dates");
+    }
   };
 
   // const handleTaskDelete = (task: Task) => {
@@ -72,21 +95,40 @@ const ProjectViewGanttChart = () => {
   //   return conf;
   // };
 
+  // const handleProgressChange = async (task) => {
+  //   // TODO: handler change task
+  //   setTasks(tasks.map((t) => (t.id === task.id ? task : t)));
+  //   toast("The feature is not available yet", {
+  //     icon: <Icon icon="ic:round-warning" />,
+  //     style: {
+  //       color: theme.palette.warning.main,
+  //       border: `1px solid ${theme.palette.warning.main}`,
+  //     },
+  //     iconTheme: {
+  //       primary: theme.palette.warning.main,
+  //       secondary: theme.palette.warning.contrastText,
+  //     },
+  //   });
+  // };
+
   const handleProgressChange = async (task) => {
-    // TODO: handler change task
-    setTasks(tasks.map((t) => (t.id === task.id ? task : t)));
-    toast("The feature is not available yet", {
-      icon: <Icon icon="ic:round-warning" />,
-      style: {
-        color: theme.palette.warning.main,
-        border: `1px solid ${theme.palette.warning.main}`,
-      },
-      iconTheme: {
-        primary: theme.palette.warning.main,
-        secondary: theme.palette.warning.contrastText,
-      },
-    });
+    // Update the task's progress in local state
+    let newTasks = tasks.map((t) => (t.id === task.id ? { ...t, progress: task.progress } : t));
+    setTasks(newTasks);
+  
+    // Send the updated task to the server
+    try {
+      await TaskService.updateTask(task.id, {
+        progress: task.progress,
+      });
+      toast.success("Task progress updated successfully");
+      getTasks();
+    } catch (error) {
+      console.error("Error updating task progress", error);
+      toast.error("Failed to update task progress");
+    }
   };
+  
 
   const handleClick = (task) => {
     console.log("On Click event Id:" + task.id);
@@ -135,6 +177,7 @@ const ProjectViewGanttChart = () => {
         q: buildQueryString(),
       })
     );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId, range, dispatch, buildQueryString]);
 
   useEffect(() => {

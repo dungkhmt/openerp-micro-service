@@ -1,6 +1,7 @@
 package com.hust.openerp.taskmanagement.controller;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
@@ -41,6 +42,14 @@ public class ProjectController {
     Page<ProjectDTO> result = projectService.findPaginated(principal.getName(), pageable, search);
     return new PaginationDTO<>(result);
   }
+  
+  @GetMapping("/user-projects/{userId}")
+  public PaginationDTO<ProjectDTO> getProjectsPaginationForUser(
+		@PathVariable("userId") String userId, Pageable pageable,
+		@Nullable @RequestParam(value = "search", required = false) String search) {
+	Page<ProjectDTO> result = projectService.findPaginated(userId, pageable, search);
+    return new PaginationDTO<>(result);
+  }
 
   @PostMapping
   public ProjectDTO createProject(Principal principal, @RequestBody @Valid CreateProjectForm projectForm) {
@@ -59,4 +68,10 @@ public class ProjectController {
       @RequestBody @Valid UpdateProjectForm entity) {
     return projectService.updateProject(projectId, entity, principal.getName());
   }
+  
+  @GetMapping("/code")
+  public List<String> getProjectsCode() {
+    return projectService.getProjectsCode();
+  }
+  
 }

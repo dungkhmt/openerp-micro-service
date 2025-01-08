@@ -70,6 +70,20 @@ public class TaskController {
         var tasksDto = taskService.getTasksAssignedToUser(pageable, assignee, search);
         return new PaginationDTO<>(tasksDto);
     }
+    
+    @GetMapping("/assigned-user/{userId}")
+    public PaginationDTO<TaskDTO> getPaginatedTasksAssignedToUser(
+    		@PathVariable("userId") String userId, Pageable pageable, 
+            @RequestParam(value = "search", required = false) String search) {
+        var tasksDto = taskService.getTasksAssignedToUser(pageable, userId, search);
+        return new PaginationDTO<>(tasksDto);
+    }
+    
+    @GetMapping("/member-tasks")
+    public List<TaskDTO> getTasksForMemberInProject(@RequestParam("projectId") UUID projectId, 
+    		@RequestParam("assigneeId") String assigneeId) {
+        return taskService.getTasksForMemberInProject(projectId, assigneeId);
+    }
 
     @GetMapping("/created-by-me")
     public PaginationDTO<TaskDTO> getPaginatedTasksCreatedByMe(
@@ -94,5 +108,23 @@ public class TaskController {
     public TaskDTO updateTask(Principal principal, @PathVariable("id") UUID id,
             @RequestBody @Valid UpdateTaskForm taskForm) {
         return taskService.updateTask(id, taskForm, principal.getName());
+    }
+    
+    @GetMapping("/event-tasks")
+    public List<TaskDTO> getEventTasks(@RequestParam("eventId") UUID eventId, 
+    		Principal principal) {
+        return taskService.getEventTasks(principal.getName(), eventId);
+    }
+    
+    @PutMapping("/event-tasks")
+    public void addExistingTasksToEvent(@RequestParam("eventId") UUID eventId, 
+    		Principal principal, @RequestBody List<UUID> taskIds) {
+        taskService.addExistingTasksToEvent(principal.getName(), eventId, taskIds);
+    }
+    
+    @GetMapping("/without-event")
+    public List<TaskDTO> getTasksWithoutEvent(Principal principal, Pageable pageable,
+            @RequestParam("projectId") UUID projectId) {
+    	return taskService.getTasksWithoutEvent(principal.getName(), projectId); 
     }
 }

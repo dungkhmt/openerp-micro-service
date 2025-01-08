@@ -101,11 +101,12 @@ function CreateContest(props) {
                     onChange={(event) => {
                       setContestName(event.target.value);
                     }}
-                    error={isValidContestName()}
+                    //error={isValidContestName()}
                     helperText={
-                      isValidContestName()
-                        ? "Contest Name must not contain special characters including %^/\\|.?;[]"
-                        : ""
+                      //isValidContestName()
+                      //  ? "Contest Name must not contain special characters including %^/\\|.?;[]"
+                      //  : ""
+                      ""
                     }
                   />
                 </Grid>
@@ -167,7 +168,8 @@ function CreateContest(props) {
             variant="contained"
             style={{ marginTop: "36px" }}
             onClick={handleSubmit}
-            disabled={isValidContestId() || isValidContestName() || loading}
+            //disabled={isValidContestId() || isValidContestName() || loading}
+            disabled={isValidContestId() || loading}
           >
             Save
           </LoadingButton>
