@@ -7,8 +7,18 @@ import { useNotificationState } from "state/NotificationState";
 import NotFound from "views/errors/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import TeacherRouter from "./TeacherRouter";
-import DemoScreen from "views/DemoScreen";
-
+import ScheduleInformationRouter from "./ScheduleInformationRouter";
+// import SchedulePerformanceRouter from "./SchedulePerformanceRouter";
+// import ScheduleScreen from "views/ScheduleScreen";
+import CourseTimeTablingRouter from "./CourseTimeTablingRouter";
+import GeneralTimeTablingRouter from "./GeneralTimeTablingRouter";
+import FirstYearTimeTablingRouter from "./FirstYearTimeTablingRouter";
+import ComputerLabTimeTabling from "./ComputerLabTimeTablingRouter";
+import TaRecruitmentRouter from "./TaRecruitmentRouter";
+import ThesisDefensePlanAssignmentRouter from "./ThesisDefensePlanAssignmentRouter";
+import MainPage from "views/mainPage";
+import AssetManagementRouter from "./AssetManagementRouter";
+import TrainingFrogCourseRouter from "./TrainingFrogCourseRouter";
 const styles = {
   loadingProgress: {
     position: "fixed",
@@ -34,11 +44,48 @@ function MainAppRouter(props) {
     <Layout>
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Switch>
-          <Route component={() => <></>} exact path="/" />
-          <PrivateRoute component={DemoScreen} exact path="/demo" />
+          <Route component={MainPage} exact path="/" />
           <PrivateRoute component={TeacherRouter} path="/teacher" />
-
+          {/* <PrivateRoute component={ScheduleScreen} path="/schedule" /> */}
+          <PrivateRoute
+            component={ScheduleInformationRouter}
+            path="/schedule-information"
+          />
+          {/* <PrivateRoute component={SchedulePerformanceRouter} path="/schedule-performance" /> */}
+          <PrivateRoute
+            component={CourseTimeTablingRouter}
+            path="/course-time-tabling"
+          />
           {/* <Route component={error} path="*" /> */}
+          <PrivateRoute
+            component={GeneralTimeTablingRouter}
+            path="/general-time-tabling"
+          />
+          <PrivateRoute
+            component={FirstYearTimeTablingRouter}
+            path="/first-year-time-tabling"
+          />
+
+          <PrivateRoute
+            component={ComputerLabTimeTabling}
+            path="/lab-time-tabling"
+          />
+          <PrivateRoute
+            component={TaRecruitmentRouter}
+            path="/ta-recruitment"
+          />
+          <PrivateRoute
+            component={ThesisDefensePlanAssignmentRouter}
+            path="/thesis"
+          />
+          <PrivateRoute
+            component={AssetManagementRouter}
+            path="/asset-management"
+          />
+           <PrivateRoute
+            component={TrainingFrogCourseRouter}
+            path="/training_course"
+          />
           <Route component={NotFound} />
         </Switch>
       </Suspense>

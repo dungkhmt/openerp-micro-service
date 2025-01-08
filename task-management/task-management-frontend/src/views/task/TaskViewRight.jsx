@@ -77,6 +77,36 @@ const TaskViewRight = () => {
           </Typography>
         </Box>
 
+        {/* event */}
+        <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
+        <Box sx={{ mb: 2 }}>
+          <TitleWrapper>
+            <Icon icon="pixelarticons:group"></Icon>
+            <Typography sx={{ fontWeight: 600, fontSize: "0.875rem" }}>
+              Sự kiện
+            </Typography>
+          </TitleWrapper>
+          {task.event ? (
+            <Typography
+              variant="body2"
+              component={Link}
+              to={`/project/${project.id}/event/${task.event.id}`}
+              sx={{
+                color: "text.primary",
+                textDecoration: "none",
+                "&:hover": {
+                  color: "primary.main",
+                  textDecoration: "underline",
+                },
+              }}
+            >
+              {task.event.name ?? ""}
+            </Typography>
+          ) : (
+            <Typography> - </Typography>
+          )}
+        </Box>
+
         {/* assignees */}
         <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
         <Box
@@ -93,7 +123,7 @@ const TaskViewRight = () => {
           }}
         >
           <TitleWrapper>
-            <Icon icon="iwwa:assign"></Icon>
+            <Icon icon="ci:user-02"></Icon>
             <Typography sx={{ mr: 2, fontWeight: 600, fontSize: "0.875rem" }}>
               Phân công cho
             </Typography>

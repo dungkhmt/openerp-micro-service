@@ -148,10 +148,10 @@ function CreateProblem() {
       errorNoti(t("missingField", { ns: "validation", fieldName: t("problemName") }), 3000);
       return false;
     }
-    if (hasSpecialCharacterProblemName()) {
-      errorNoti("Problem name must only contain alphanumeric characters.", 3000);
-      return false;
-    }
+    //if (hasSpecialCharacterProblemName()) {
+    //  errorNoti("Problem name must only contain alphanumeric characters.", 3000);
+    //  return false;
+    //}
     if (timeLimitCPP <= 0 || timeLimitJAVA <= 0 || timeLimitPYTHON <= 0 || timeLimitCPP > 300 || timeLimitJAVA > 300 || timeLimitPYTHON > 300) {
       errorNoti(t("numberBetween", { ns: "validation", fieldName: t("timeLimit"), min: 1, max: 300 }), 3000);
       return false;
@@ -267,11 +267,12 @@ function CreateProblem() {
             label={t("problemName")}
             placeholder="Problem Name"
             value={problemName}
-            error={hasSpecialCharacterProblemName()}
+            //error={hasSpecialCharacterProblemName()}
             helperText={
-              hasSpecialCharacterProblemName()
-                ? "Problem ID must not contain special characters including %^/\\|.?;[]"
-                : ""
+              //hasSpecialCharacterProblemName()
+              //  ? "Problem ID must not contain special characters including %^/\\|.?;[]"
+              //  : ""
+              ""
             }
             onChange={(event) => {
               setProblemName(event.target.value);

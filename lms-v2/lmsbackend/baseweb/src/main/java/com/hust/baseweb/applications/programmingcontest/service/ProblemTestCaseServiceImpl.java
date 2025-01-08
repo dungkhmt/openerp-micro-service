@@ -261,10 +261,11 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             throw new MiniLeetCodeException("permission denied", 403);
         }
 
-        if (!userId.equals(problemEntity.getUserId())
-            && !problemEntity.getStatusId().equals(ProblemEntity.PROBLEM_STATUS_OPEN)) {
-            throw new MiniLeetCodeException("Problem is not opened for edit", 400);
-        }
+        // problem há been created, admin is shared edit role, but cannot perform the edit
+        //if (!userId.equals(problemEntity.getUserId())
+        //    && !problemEntity.getStatusId().equals(ProblemEntity.PROBLEM_STATUS_OPEN)) {
+        //    throw new MiniLeetCodeException("Problem is not opened for edit", 400);
+        //}
 
         List<TagEntity> tags = new ArrayList<>();
         Integer[] tagIds = modelUpdateContestProblem.getTagIds();
@@ -1054,6 +1055,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                     case ContestEntity.CONTEST_PARTICIPANT_VIEW_TESTCASE_DETAIL_INPUT_PARTICIPANT_OUTPUT:
                         testCaseContent = tc.getTestCase();
                         testCaseOutput = "---HIDDEN---";
+                        if (tc.getIsPublic().equals("Y")) {
+                            testCaseOutput = tc.getCorrectAnswer();
+                        }
                         participantSolutionOutput = st.getParticipantSolutionOtput();
                         break;
                 }

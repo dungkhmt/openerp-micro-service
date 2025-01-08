@@ -16,11 +16,12 @@ import {
   Select,
   TextField,
   Typography,
+  ListItemText,
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
-import { forwardRef, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
@@ -34,21 +35,98 @@ import { TaskStatus } from "../../components/task/status";
 import { useTaskContext } from "../../hooks/useTaskContext";
 import { FileService } from "../../services/api/file.service";
 import { TaskService } from "../../services/api/task.service";
+import { SkillChip } from "../../components/task/skill";
+import ItemSelector from "../../components/mui/dialog/ItemSelector";
+import { useDispatch } from "react-redux";
+import { fetchEvents } from "../../store/project/events";
+import { useParams } from "react-router";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />;
 });
 
 const DialogEditTask = ({ open, setOpen }) => {
-  const { task, isUpdate, setIsUpdate } = useTaskContext();
+  const dispatch = useDispatch();
+  const { id } = useParams();
+  const { task, isUpdate, setIsUpdate, taskSkills } = useTaskContext();
   const { members } = useSelector((state) => state.project);
-  const { category, priority, status } = useSelector((state) => state);
+  const { events } = useSelector((state) => state.events);
+  const { category, priority, status, skill } = useSelector((state) => state);
 
   const [toggleEditDesc, setToggleEditDesc] = useState(false);
   const [files, setFiles] = useState(null);
   const [updateLoading, setUpdateLoading] = useState(false);
-
   const { register, handleSubmit, errors, setValue, control } = useForm();
+
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [filteredSkills, setFilteredSkills] = useState(skill.skills);
+
+  const handleSkillSearch = (search) => {
+    setFilteredSkills(
+      skill.skills.filter((item) =>
+        item.name.toLowerCase().includes(search.toLowerCase())
+      )
+    );
+  };
+
+  const handleSkillChange = (skill) => {
+    setSelectedSkills((prevSelectedSkills) =>
+      prevSelectedSkills.includes(skill)
+        ? prevSelectedSkills.filter(
+            (selected) => selected.skillId !== skill.skillId
+          )
+        : [...prevSelectedSkills, skill]
+    );
+  };
+
+  const [selectedEvents, setSelectedEvents] = useState();
+  const [filteredEvents, setFilteredEvents] = useState(events);
+
+  const handleEventSearch = (search) => {
+    setFilteredEvents(
+      events.filter((item) =>
+        item.name.toLowerCase().includes(search.toLowerCase())
+      )
+    );
+  };
+
+  const handleEventChange = (event) => {
+    setSelectedEvents((prevSelectedEvents) =>
+      prevSelectedEvents.includes(event)
+        ? prevSelectedEvents.filter(
+            (selected) => selected.eventId !== event.eventId
+          )
+        : [event]
+    );
+  };
+
+  const [selectedAssignees, setSelectedAssignees] = useState();
+  const [filteredAssignees, setFilteredAssignees] = useState(members);
+
+  const handleAssigneeSearch = (search) => {
+    setFilteredAssignees(
+      members.filter(
+        ({ member }) =>
+          member.firstName.toLowerCase().includes(search.toLowerCase()) ||
+          member.lastName.toLowerCase().includes(search.toLowerCase())
+      )
+    );
+  };
+
+  const handleAssigneeChange = (member) => {
+    setSelectedAssignees((prevSelectedAssignees) =>
+      prevSelectedAssignees.includes(member)
+        ? prevSelectedAssignees.filter((selected) => selected.id !== member.id)
+        : [member]
+    );
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedSkills([]);
+    setSelectedEvents([]);
+    setSelectedAssignees([]);
+  };
 
   const onUpdated = async (data) => {
     let attachmentPaths = null;
@@ -61,10 +139,23 @@ const DialogEditTask = ({ open, setOpen }) => {
           : null;
       }
 
+      const updatedAssigneeId =
+        selectedAssignees.length > 0 ? selectedAssignees[0].id : null;
+      const updatedEventId =
+        selectedEvents.length > 0 ? selectedEvents[0].id : null;
       await TaskService.updateTask(task.id, {
         ...data,
         attachmentPaths,
+        assigneeId: updatedAssigneeId,
+        eventId: updatedEventId,
       });
+
+      const skillIdList = selectedSkills.map((skill) => skill.skillId);
+      await TaskService.updateTaskSkills(task.id, skillIdList);
+
+      const originalEventId = task.event ? task.event.id : null;
+      if (updatedEventId !== originalEventId) await dispatch(fetchEvents(id));
+
       toast.success("Cập nhật nhiệm vụ thành công");
       setIsUpdate(!isUpdate);
       setOpen(false);
@@ -76,9 +167,28 @@ const DialogEditTask = ({ open, setOpen }) => {
     }
   };
 
-  const membersNotAssign = members.filter(
-    ({ member }) => !task.assignees?.some((a) => a.id === member?.id)
-  );
+  useEffect(() => {
+    if (open) {
+      const selectedSkills = taskSkills.map((taskSkill) => {
+        return (
+          skill.skills.find((skill) => skill.skillId === taskSkill.skillId) ||
+          null
+        );
+      });
+      setSelectedSkills(selectedSkills);
+      const selectedEvents = task.event
+        ? [events.find((event) => event.id === task.event.id)]
+        : [];
+      setSelectedEvents(selectedEvents);
+      const selectedAssignees = task.assignee
+        ? [members.find(({ member }) => member.id === task.assignee.id)].map(
+            ({ member }) => member
+          )
+        : [];
+      setSelectedAssignees(selectedAssignees);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   return (
     <Dialog
@@ -86,7 +196,8 @@ const DialogEditTask = ({ open, setOpen }) => {
       open={open}
       maxWidth="md"
       scroll="paper"
-      onClose={() => setOpen(false)}
+      onClose={handleClose}
+      onOpen
       TransitionComponent={Transition}
       data-color-mode="light"
     >
@@ -326,54 +437,98 @@ const DialogEditTask = ({ open, setOpen }) => {
               />
             </FormControl>
           </Grid>
-          <Grid item sm={8} xs={12}>
-            <FormControl fullWidth>
-              <InputLabel id="asignee-select">Phân công cho</InputLabel>
-              <Controller
-                name="assigneeId"
-                control={control}
-                defaultValue={task.assignee?.id ?? ""}
-                as={
-                  <Select
-                    id="select-assignee"
-                    label="Phân công cho"
-                    labelId="assignee-select"
-                    inputProps={{ placeholder: "Phân công cho" }}
-                  >
-                    <MenuItem value="">Không chọn</MenuItem>
-                    {membersNotAssign.map(({ member }) => (
-                      <MenuItem key={member.id} value={member.id}>
-                        <Box
-                          sx={{ display: "flex", gap: 2, alignItems: "center" }}
-                        >
-                          <UserAvatar user={member} />
-                          <Typography variant="subtitle2">{`${
-                            member.firstName ?? ""
-                          } ${member.lastName ?? ""}`}</Typography>
-                        </Box>
-                      </MenuItem>
-                    ))}
-                  </Select>
-                }
-              />
-            </FormControl>
-          </Grid>
+
           <Grid item sm={12} xs={12}>
-            <FormControl fullWidth>
-              <Typography variant="subtitle2">Ghi chú</Typography>
-              <Controller
-                name="note"
-                control={control}
-                defaultValue=""
-                render={(field) => (
-                  <CustomMDEditor
-                    {...field}
-                    setValue={(value) => setValue("note", value)}
-                  />
+            <Box
+              sx={{
+                display: "flex",
+                gap: 3,
+                flexWrap: "wrap",
+              }}
+            >
+              <ItemSelector
+                items={filteredAssignees.map(({ member }) => member)}
+                selectedItems={selectedAssignees}
+                onSelectChange={handleAssigneeChange}
+                handleSearch={handleAssigneeSearch}
+                renderItem={(item) => (
+                  <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+                    <UserAvatar user={item} />
+                    <Typography variant="subtitle2">{`${item.firstName ?? ""} ${
+                      item.lastName ?? ""
+                    }`}</Typography>
+                  </Box>
                 )}
+                renderSelectedItem={(items) => (
+                  <Box>
+                    {items.map((member) => (
+                      <Box
+                        key={member.id}
+                        sx={{
+                          display: "flex",
+                          gap: 2,
+                          alignItems: "center",
+                        }}
+                      >
+                        <UserAvatar user={member} />
+                        <Typography variant="subtitle2">{`${
+                          member.firstName ?? ""
+                        } ${member.lastName ?? ""}`}</Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+                placeholder="Tìm kiếm thành viên"
+                label="Phân công cho"
+                startIcon={<Icon icon="ci:user-02" />}
+                idPopover="assignee-popover"
               />
-            </FormControl>
+
+              <ItemSelector
+                items={filteredEvents}
+                selectedItems={selectedEvents}
+                onSelectChange={handleEventChange}
+                handleSearch={handleEventSearch}
+                renderItem={(item) => <ListItemText primary={item.name} />}
+                renderSelectedItem={(items) => (
+                  <Box>
+                    {items.map((item) => (
+                      <ListItemText key={item.skillId} primary={item.name} />
+                    ))}
+                  </Box>
+                )}
+                placeholder="Tìm kiếm sự kiện"
+                label="Sự kiện"
+                startIcon={<Icon icon="pixelarticons:group" />}
+                idPopover="event-popover"
+              />
+
+              <ItemSelector
+                items={filteredSkills}
+                selectedItems={selectedSkills}
+                onSelectChange={handleSkillChange}
+                handleSearch={handleSkillSearch}
+                renderItem={(item) => <ListItemText primary={item.name} />}
+                renderSelectedItem={(items) => (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: "5px",
+                    }}
+                  >
+                    {items.map((value) => (
+                      <SkillChip key={value.skillId} skill={value} />
+                    ))}
+                  </Box>
+                )}
+                placeholder="Tìm kiếm kỹ năng"
+                label="Kỹ năng"
+                startIcon={<Icon icon="gravity-ui:gear" />}
+                idPopover="skill-popover"
+              />
+            </Box>
           </Grid>
+
           <Grid item sm={12} xs={12}>
             <FormControl fullWidth>
               <Typography variant="subtitle2">Tệp đính kèm</Typography>
@@ -400,11 +555,7 @@ const DialogEditTask = ({ open, setOpen }) => {
         >
           Cập nhật
         </LoadingButton>
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={() => setOpen(false)}
-        >
+        <Button variant="outlined" color="secondary" onClick={handleClose}>
           Hủy
         </Button>
       </DialogActions>
