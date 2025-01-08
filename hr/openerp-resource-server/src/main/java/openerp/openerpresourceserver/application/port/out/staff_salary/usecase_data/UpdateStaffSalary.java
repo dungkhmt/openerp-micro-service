@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.application.port.out.staff_salary.usecase_data;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -16,7 +17,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class UpdateStaffSalary implements UseCase {
+    @NotNull
     private String userLoginId;
+    @NotNull
     private Integer salary;
     private SalaryType salaryType;
 

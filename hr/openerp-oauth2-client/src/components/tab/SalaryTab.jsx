@@ -14,15 +14,19 @@ const SalaryTab = ({ userLoginId }) => {
     salary_type: "MONTHLY",
     salary: "",
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null); // Error state for Snackbar
-  const [saving, setSaving] = useState(false); // Loading state for saving
+  const [loading, setLoading] = useState(false); // Loading state for fetching data
+  const [saving, setSaving] = useState(false); // Loading state for saving data
+  const [notification, setNotification] = useState(null); // Success or error notification
 
   useEffect(() => {
     if (userLoginId) {
       fetchSalary();
     }
   }, [userLoginId]);
+
+  const showNotification = (type, message) => {
+    setNotification({ type, message });
+  };
 
   const fetchSalary = async () => {
     setLoading(true);
@@ -41,12 +45,16 @@ const SalaryTab = ({ userLoginId }) => {
           }
         },
         {
-          onError: (err) => console.error("Error fetching salary:", err),
+          onError: (err) => {
+            console.error("Error fetching salary:", err);
+            showNotification("error", "Failed to fetch salary data.");
+          },
         },
         payload
       );
     } catch (err) {
       console.error("Failed to fetch salary data:", err);
+      showNotification("error", "An unexpected error occurred while fetching salary.");
     } finally {
       setLoading(false);
     }
@@ -65,20 +73,32 @@ const SalaryTab = ({ userLoginId }) => {
         "post",
         "/salary/update-salary",
         () => {
-          setError(null);
-          fetchSalary(); // Refresh salary after update
+          fetchSalary(); 
+          showNotification("success", "Salary saved successfully.");
         },
         {
           onError: (err) => {
-            console.error("Error updating salary:", err);
-            setError("Failed to save salary data. Please try again.");
+            if (err.response && err.response.data) {
+              const { meta } = err.response.data;
+
+              if (meta?.code) {
+                console.error("Validation error:", meta.message);
+                showNotification("error", meta.message || "Validation error occurred.");
+              } else {
+                console.error("API Error:", meta?.message || "Error occurred");
+                showNotification("error", "An error occurred while saving salary data.");
+              }
+            } else {
+              console.error("Unexpected error response:", err);
+              showNotification("error", "Unexpected error occurred while saving salary.");
+            }
           },
         },
         payload
       );
     } catch (err) {
       console.error("Error while saving salary:", err);
-      setError("An unexpected error occurred.");
+      showNotification("error", "An unexpected error occurred while saving salary.");
     } finally {
       setSaving(false);
     }
@@ -133,14 +153,19 @@ const SalaryTab = ({ userLoginId }) => {
         {saving ? "Saving..." : "Save"}
       </Button>
 
-      {/* Error Snackbar */}
+      {/* Notification Snackbar */}
       <Snackbar
-        open={!!error}
+        open={!!notification}
         autoHideDuration={6000}
-        onClose={() => setError(null)}
+        onClose={() => setNotification(null)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <Alert severity="error" onClose={() => setError(null)} variant="filled">
-          {error}
+        <Alert
+          severity={notification?.type || "error"}
+          onClose={() => setNotification(null)}
+          variant="filled"
+        >
+          {notification?.message}
         </Alert>
       </Snackbar>
     </div>
