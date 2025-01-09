@@ -8,7 +8,6 @@ mvnw.cmd
 
 # Ignore Git metadata
 .git/
-.gitattributes
 .gitignore
 
 # Ignore build output
@@ -21,8 +20,10 @@ target/
 Thumbs.db
 
 # Optional: Ignore markdown and documentation files
-HELP.md
+README.md
 
 # Ignore anything not required for the build
 .dockerignore
+.editorconfig
 Dockerfile
+LICENSE
