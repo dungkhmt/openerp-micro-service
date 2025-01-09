@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {request} from "api";
 import {Link} from "react-router-dom";
 import StandardTable from "../../table/StandardTable";
-import {Box} from "@mui/material";
+import {Box, Paper} from "@mui/material";
 import {defaultDatetimeFormat} from "../../../utils/dateutils";
 
 export default function ContestsUsingAProblem(props) {
@@ -59,6 +59,9 @@ export default function ContestsUsingAProblem(props) {
           pageSize: 5,
           search: true,
           sorting: true,
+        }}
+        components={{
+          Container: (props) => <Paper {...props} elevation={0}/>,
         }}
       />
     </Box>

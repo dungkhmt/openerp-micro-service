@@ -1,5 +1,6 @@
 {
   "problem": "Problem",
+  "problemList": "Problems",
   "problemId": "Problem ID",
   "problemName": "Problem Name",
   "level": "Level",
@@ -18,26 +19,36 @@
   "checkSolutionCompile": "Check compile",
   "isPreloadCode": "Provide initial Code Segment for participants",
   "preloadCode": "Provided Code Segment",
-  "problemList": {
-    "title": "Problems",
-    "status": "Status",
-    "solution": "Solution",
-    "level": "Level",
-    "createdBy": "Created By",
-    "createdAt": "Created At",
-    "appearances": "Contests Used",
-    "addTestCase": "Add Test Case",
-    "edit": "Edit",
-    "myProblems": "My Problems",
-    "sharedProblems": "Shared Problems",
-    "publicProblems": "Public Problems",    
-    "allProblems": "All Problems"
-  },
-  "createProblem": "Create new Problem",
+  "search": "Search",
+  "reset": "Reset",
+  "export": "Export",
+  "action": "Action",
+  "title": "Problems",
+  "status": "Status",
+  "tag": "Tag",
+  "hidden": "Hidden",
+  "open": "Open",
+  "easy": "Easy",
+  "medium": "Medium",
+  "hard": "Hard",
+  "solution": "Solution",
+  "createdBy": "Created By",
+  "createdAt": "Created Time",
+  "appearances": "Contests Used",
+  "addTestCase": "Add Test Case",
+  "edit": "Edit",
+  "myProblems": "My Problems",
+  "sharedProblems": "Shared Problems",
+  "publicProblems": "Public Problems",
+  "allProblems": "All Problems",
+  "createProblem": "Create",
   "editProblem": "Edit problem",
+  "viewProblem": "View Problem information",
   "validateSubmit": {
-      "warningCheckSolutionCompile": "Your source code must pass \"CHECK COMPILE\" step",
-      "missingField": "Missing required field: {{fieldName}}"
-    }
-
+    "warningCheckSolutionCompile": "Your source code must pass \"CHECK COMPILE\" step",
+    "missingField": "Missing required field: {{fieldName}}"
+  },
+  "generalInfo": "General information",
+  "manageRole": "Manage Role",
+  "clone": "Clone"
 }

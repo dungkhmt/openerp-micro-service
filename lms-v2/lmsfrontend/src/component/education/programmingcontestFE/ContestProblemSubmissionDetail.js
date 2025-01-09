@@ -1,17 +1,15 @@
-import { Divider, Link, Paper, Stack, Typography } from "@mui/material";
+import {Divider, Link, Paper, Stack, Typography} from "@mui/material";
 import Box from "@mui/material/Box";
-import { request } from "api";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import {request} from "api";
+import {useEffect, useState} from "react";
+import {useParams} from "react-router-dom";
 import displayTime from "utils/DateTimeUtils";
-import { localeOption } from "utils/NumberFormat";
+import {localeOption} from "utils/NumberFormat";
 import HustCopyCodeBlock from "../../common/HustCopyCodeBlock";
-import {
-  detail,
-  resolveLanguage,
-} from "./ContestProblemSubmissionDetailViewedByManager";
-import ParticipantProgramSubmissionDetailTestCaseByTestCase from "./ParticipantProgramSubmissionDetailTestCaseByTestCase";
-import { getStatusColor } from "./lib";
+import {detail, resolveLanguage,} from "./ContestProblemSubmissionDetailViewedByManager";
+import ParticipantProgramSubmissionDetailTestCaseByTestCase
+  from "./ParticipantProgramSubmissionDetailTestCaseByTestCase";
+import {getStatusColor} from "./lib";
 
 export default function ContestProblemSubmissionDetail() {
   const { problemSubmissionId } = useParams();
@@ -159,9 +157,9 @@ export default function ContestProblemSubmissionDetail() {
               "Total runtime",
               `${
                 submission.runtime
-                  ? submission.runtime.toLocaleString("fr-FR", localeOption)
+                  ? (submission.runtime / 1000).toLocaleString("fr-FR", localeOption)
                   : 0
-              } ms`,
+              } (s)`,
             ],
             ["Submited by", submission.submittedByUserId],
             ["Submited at", displayTime(submission.createdAt)],

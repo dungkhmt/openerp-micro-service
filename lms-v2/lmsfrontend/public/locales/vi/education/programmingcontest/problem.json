@@ -1,5 +1,6 @@
 {
   "problem": "Bài tập",
+  "problemList": "Danh sách bài tập",
   "problemId": "Mã bài tập",
   "problemName": "Tên bài tập",
   "level": "Mức độ",
@@ -18,28 +19,36 @@
   "checkSolutionCompile": "Biên dịch",
   "isPreloadCode": "Cung cấp đoạn code ban đầu cho sinh viên",
   "preloadCode": "Phần code cung cấp sẵn",
-  "problemList": {
-    "title": "Danh sách bài tập",
-    "status": "Trạng thái",
-    "solution": "Lời giải",
-    "level": "Độ khó",
-    "createdBy": "Người tạo",
-    "createdAt": "Thời gian tạo",
-    "appearances": "Số Contest sử dụng",
-    "addTestCase": "Thêm Test Case",
-    "edit": "Chỉnh sửa",
-    "myProblems": "Bài tập của tôi",
-    "sharedProblems": "Bài tập được chia sẻ",
-    "publicProblems": "Bài tập công khai",
-    
-    "allProblems": "Tất cả Bài tập"
-  },
-  "createProblem": "Tạo mới Bài tập",
+  "search": "Tìm kiếm",
+  "reset": "Đặt lại",
+  "export": "Xuất dữ liệu",
+  "action": "Thao tác",
+  "title": "Danh sách bài tập",
+  "status": "Trạng thái",
+  "tag": "Nhãn",
+  "hidden": "Ẩn",
+  "open": "Mở",
+  "easy": "Dễ",
+  "medium": "Trung bình",
+  "hard": "Khó",
+  "solution": "Lời giải",
+  "createdBy": "Người tạo",
+  "createdAt": "Thời gian tạo",
+  "appearances": "Số contest sử dụng",
+  "addTestCase": "Thêm Test Case",
+  "edit": "Chỉnh sửa",
+  "myProblems": "Bài tập của tôi",
+  "sharedProblems": "Bài tập được chia sẻ",
+  "publicProblems": "Bài tập công khai",
+  "allProblems": "Tất cả Bài tập",
+  "createProblem": "Thêm mới",
   "editProblem": "Chỉnh sửa Bài tập",
+  "viewProblem": "Xem thông tin Bài tập",
   "validateSubmit": {
     "warningCheckSolutionCompile": "Bạn chưa hoàn thành bước \"BIÊN DỊCH\"",
     "missingField": "Trường {{fieldName}} không được bỏ trống"
   },
-  "status": "Trạng thái"
-
+  "generalInfo": "Thông tin chung",
+  "manageRole": "Phân quyền",
+  "clone": "Sao chép"
 }

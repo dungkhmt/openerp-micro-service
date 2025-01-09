@@ -1,4 +1,4 @@
-import { makeStyles } from "@material-ui/core";
+import {makeStyles} from "@material-ui/core";
 import {
   Box,
   Button,
@@ -10,35 +10,36 @@ import {
   InputAdornment,
   InputLabel,
   Link,
-  ListItemText, ListSubheader,
+  ListItemText,
+  ListSubheader,
   MenuItem,
   OutlinedInput,
   Select,
   TextField,
   Typography
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import { useHistory } from "react-router-dom";
-import { CompileStatus } from "./CompileStatus";
-import { sleep } from "./lib";
-import { request } from "../../../api";
-import { useTranslation } from "react-i18next";
+import {useHistory} from "react-router-dom";
+import {CompileStatus} from "./CompileStatus";
+import {sleep} from "./lib";
+import {request} from "../../../api";
+import {useTranslation} from "react-i18next";
 import HustDropzoneArea from "../../common/HustDropzoneArea";
-import { errorNoti, successNoti, warningNoti } from "../../../utils/notification";
+import {errorNoti, successNoti} from "../../../utils/notification";
 import HustCodeEditor from "../../common/HustCodeEditor";
-import { LoadingButton } from "@mui/lab";
+import {LoadingButton} from "@mui/lab";
 import RichTextEditor from "../../common/editor/RichTextEditor";
 import HustContainerCard from "../../common/HustContainerCard";
-import { COMPUTER_LANGUAGES, CUSTOM_EVALUATION, NORMAL_EVALUATION } from "./Constant";
-import { getAllTags } from "./service/TagService";
+import {COMPUTER_LANGUAGES, CUSTOM_EVALUATION, NORMAL_EVALUATION} from "./Constant";
+import {getAllTags} from "./service/TagService";
 import ModelAddNewTag from "./ModelAddNewTag";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 const useStyles = makeStyles((theme) => ({
   description: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2),
+    marginTop: theme.spacing(3),
+    marginBottom: theme.spacing(3),
   }
 }));
 
@@ -110,18 +111,20 @@ function CreateProblem() {
       "post",
       "/check-compile",
       (res) => {
-        if (res.data.status === "Successful") {
-          setShowCompile(true);
-          setStatusSuccessful(true);
-        } else {
-          setShowCompile(true);
-          setStatusSuccessful(false);
-        }
-        setCompileMessage(res.data.message);
+        setLoading(false)
+
+        setShowCompile(true);
+        setStatusSuccessful(res.data.status !== "Compilation Error");
+        setCompileMessage(res.data)
       },
-      {},
+      {
+        onError: (e) => {
+          setLoading(false)
+          errorNoti("Đã xảy ra lỗi", true);
+        }
+      },
       body
-    ).then(() => setLoading(false));
+    );
   }
 
   const isValidProblemId = () => {
@@ -152,21 +155,25 @@ function CreateProblem() {
     //  errorNoti("Problem name must only contain alphanumeric characters.", 3000);
     //  return false;
     //}
-    if (timeLimitCPP <= 0 || timeLimitJAVA <= 0 || timeLimitPYTHON <= 0 || timeLimitCPP > 300 || timeLimitJAVA > 300 || timeLimitPYTHON > 300) {
-      errorNoti(t("numberBetween", { ns: "validation", fieldName: t("timeLimit"), min: 1, max: 300 }), 3000);
+    if (timeLimitCPP < 1
+      || timeLimitJAVA < 1
+      || timeLimitPYTHON < 1
+      || timeLimitCPP > 300
+      || timeLimitJAVA > 300
+      || timeLimitPYTHON > 300) {
+      errorNoti(t("numberBetween", {ns: "validation", fieldName: t("timeLimit"), min: 1, max: 300}), 3000);
       return false;
     }
-    if (memoryLimit <= 0 || memoryLimit > 1024) {
-      errorNoti(t("numberBetween", { ns: "validation", fieldName: t("memoryLimit"), min: 1, max: 1024 }), 3000);
+    if (memoryLimit < 3 || memoryLimit > 1024) {
+      errorNoti(t("numberBetween", {ns: "validation", fieldName: t("memoryLimit"), min: 1, max: 1024}), 3000);
       return false;
     }
     if (!statusSuccessful) {
-      warningNoti(t("validateSubmit.warningCheckSolutionCompile"), 5000);
+      errorNoti(t("validateSubmit.warningCheckSolutionCompile"), 5000);
       return false;
     }
     return true;
-  };
-
+  }
 
   function handleSubmit() {
     if (!validateSubmit()) return;
@@ -237,15 +244,15 @@ function CreateProblem() {
 
   return (
     <HustContainerCard title={t("createProblem")}>
-      <Grid container spacing={2}>
-        <Grid item xs={4}>
+      <Grid container spacing={3}>
+        <Grid item xs={3}>
           <TextField
             fullWidth
             autoFocus={true}
             required
             id={"problemId"}
             label={t("problemId")}
-            placeholder="Problem ID"
+            // placeholder="Problem ID"
             value={problemId}
             onChange={(event) => {
               setProblemID(event.target.value);
@@ -259,13 +266,13 @@ function CreateProblem() {
             sx={{ marginBottom: "12px" }}
           />
         </Grid>
-        <Grid item xs={8}>
+        <Grid item xs={3}>
           <TextField
             fullWidth
             required
             id="problemName"
             label={t("problemName")}
-            placeholder="Problem Name"
+            // placeholder="Problem Name"
             value={problemName}
             //error={hasSpecialCharacterProblemName()}
             helperText={
@@ -280,7 +287,7 @@ function CreateProblem() {
           />
         </Grid>
 
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <TextField
             fullWidth
             required
@@ -300,7 +307,7 @@ function CreateProblem() {
           </TextField>
         </Grid>
 
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <TextField
             fullWidth
             required
@@ -321,61 +328,61 @@ function CreateProblem() {
           </TextField>
         </Grid>
 
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <TextField
             fullWidth
             required
             id="timeLimitCPP"
-            label={t("timeLimit")}
+            label={t("timeLimit") + ' C/CPP'}
             type="number"
             value={timeLimitCPP}
             onChange={(event) => {
               setTimeLimitCPP(event.target.value);
             }}
             InputProps={{
-              startAdornment: <InputAdornment position="start">C/CPP: </InputAdornment>,
+              // startAdornment: <InputAdornment position="start">C/CPP: </InputAdornment>,
               endAdornment: <InputAdornment position="end">s</InputAdornment>
             }}
           />
         </Grid>
 
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <TextField
             fullWidth
             required
             id="timeLimitJAVA"
-            label={t("timeLimit")}
+            label={t("timeLimit") + ' Java'}
             type="number"
             value={timeLimitJAVA}
             onChange={(event) => {
               setTimeLimitJAVA(event.target.value);
             }}
             InputProps={{
-              startAdornment: <InputAdornment position="start">JAVA: </InputAdornment>,
+              // startAdornment: <InputAdornment position="start">JAVA: </InputAdornment>,
               endAdornment: <InputAdornment position="end">s</InputAdornment>
             }}
           />
         </Grid>
 
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <TextField
             fullWidth
             required
             id="timeLimitPYTHON"
-            label={t("timeLimit") + " - PYTHON"}
+            label={t("timeLimit") + ' Python'}
             type="number"
             value={timeLimitPYTHON}
             onChange={(event) => {
               setTimeLimitPYTHON(event.target.value);
             }}
             InputProps={{
-              startAdornment: <InputAdornment position="start">PYTHON: </InputAdornment>,
+              // startAdornment: <InputAdornment position="start">PYTHON: </InputAdornment>,
               endAdornment: <InputAdornment position="end">s</InputAdornment>
             }}
           />
         </Grid>
 
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <TextField
             fullWidth
             required
@@ -432,7 +439,6 @@ function CreateProblem() {
             </Select>
           </FormControl>
         </Grid>
-
       </Grid>
 
       <Box sx={{ marginTop: "24px" }}>
@@ -446,7 +452,7 @@ function CreateProblem() {
 
 
       <Box className={classes.description}>
-        <Typography variant="h5" component="div" sx={{ marginTop: "8px", marginBottom: "8px" }}>
+        <Typography variant="h6" sx={{marginTop: "8px", marginBottom: "8px"}}>
           {t("problemDescription")}
         </Typography>
         <RichTextEditor content={description} onContentChange={text => setDescription(text)} />
@@ -455,13 +461,13 @@ function CreateProblem() {
         */}
         <HustCodeEditor
           title="Sample TestCase"
-          language={COMPUTER_LANGUAGES.C}
+          // language={COMPUTER_LANGUAGES.C}
           sourceCode={sampleTestCase}
           onChangeSourceCode={(code) => {
             setSampleTestCase(code);
           }}
         />
-        <HustDropzoneArea onChangeAttachment={(files) => handleAttachmentFiles(files)} />
+        <HustDropzoneArea onChangeAttachment={(files) => handleAttachmentFiles(files)}/>
       </Box>
       {/* this function is not implemented yet
               <Box>
@@ -476,7 +482,7 @@ function CreateProblem() {
               */}
 
       <HustCodeEditor
-        title={t("correctSourceCode")}
+        title={t("correctSourceCode") + " *"}
         language={languageSolution}
         onChangeLanguage={(event) => {
           setLanguageSolution(event.target.value);
@@ -487,17 +493,17 @@ function CreateProblem() {
         }}
       />
       <LoadingButton
-        variant="contained"
+        variant="outlined"
         loading={loading}
         onClick={checkCompile}
-        sx={{ marginTop: "12px", marginBottom: "6px" }}
+        sx={{margin: "12px 0", textTransform: 'none'}}
       >
         {t("checkSolutionCompile")}
       </LoadingButton>
       <CompileStatus
         showCompile={showCompile}
         statusSuccessful={statusSuccessful}
-        message={compileMessage}
+        detail={compileMessage}
       />
 
       <Box sx={{ marginTop: "12px" }}>
@@ -552,9 +558,9 @@ function CreateProblem() {
       <Box width="100%" sx={{ marginTop: "20px" }}>
         <LoadingButton
           variant="contained"
-          color="success"
           loading={loading}
           onClick={handleSubmit}
+          sx={{textTransform: 'capitalize'}}
         >
           {t("save", { ns: "common" })}
         </LoadingButton>

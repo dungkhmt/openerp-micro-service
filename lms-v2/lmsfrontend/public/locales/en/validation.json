@@ -6,5 +6,6 @@
     "numberMustSmallerThan": "{{fieldName}} must be smaller than {{min}}",
     "numberMustNotSmallerThan": "{{fieldName}} must be greater or equal to than {{min}}",
     "fieldLength": "{{fieldName}} must have less than {{min}} characters",
-    "wrongFormat": "Invalid format: {{fieldName}} "
+  "wrongFormat": "Invalid format: {{fieldName}} ",
+  "required": "Required"
 }

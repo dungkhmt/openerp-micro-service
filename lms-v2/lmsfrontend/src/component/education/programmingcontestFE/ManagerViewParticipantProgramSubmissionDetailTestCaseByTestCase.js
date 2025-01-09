@@ -1,11 +1,11 @@
 import InfoIcon from "@mui/icons-material/Info";
-import { IconButton } from "@mui/material";
-import { request } from "api";
+import {IconButton} from "@mui/material";
+import {request} from "api";
 import StandardTable from "component/table/StandardTable";
-import { useEffect, useState } from "react";
-import { localeOption } from "utils/NumberFormat";
-import { toFormattedDateTime } from "utils/dateutils";
-import { SubmissionTestCaseResultDetail } from "./SubmissionTestCaseResultDetail";
+import {useEffect, useState} from "react";
+import {localeOption} from "utils/NumberFormat";
+import {toFormattedDateTime} from "utils/dateutils";
+import {SubmissionTestCaseResultDetail} from "./SubmissionTestCaseResultDetail";
 
 export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase(
   props
@@ -28,20 +28,27 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
     {
       title: "Point",
       field: "point",
-      // align: "right"
-    },
-    {
-      title: "Runtime (ms)",
-      // align: "right",
-      cellStyle: { minWidth: 150 },
-      render: (rowData) =>
-        rowData.runtime?.toLocaleString("fr-FR", localeOption),
+      type: 'numeric',
     },
     {
       title: "Message",
       field: "message",
       sorting: false,
       cellStyle: { minWidth: 200 },
+    },
+    {
+      title: "Runtime (ms)",
+      type: 'numeric',
+      cellStyle: {minWidth: 150},
+      render: (rowData) =>
+        rowData.runtime?.toLocaleString("fr-FR", localeOption),
+    },
+    {
+      title: "Memory (MB)",
+      type: 'numeric',
+      cellStyle: {minWidth: 150},
+      render: (rowData) =>
+        rowData.memoryUsage ? (rowData.memoryUsage / 1024).toLocaleString("fr-FR", localeOption) : null,
     },
     {
       title: "Detail",

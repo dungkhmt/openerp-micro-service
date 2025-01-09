@@ -2,37 +2,37 @@ import EditIcon from "@mui/icons-material/Edit";
 import {
   Box,
   Button,
-  Checkbox,
-  Chip,
-  FormControl,
-  FormControlLabel,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Grid,
-  InputAdornment,
-  InputLabel,
-  OutlinedInput,
-  Select,
+  LinearProgress,
+  Stack,
   TextField,
   Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { request } from "api";
+import {styled} from "@mui/material/styles";
+import {request} from "api";
 import withScreenSecurity from "component/withScreenSecurity";
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useParams, useHistory } from "react-router-dom";
+import {useEffect, useState} from "react";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import {useTranslation} from "react-i18next";
+import {useHistory, useParams} from "react-router-dom";
 import FileUploadZone from "utils/FileUpload/FileUploadZone";
-import { randomImageName } from "utils/FileUpload/covert";
-import { PROBLEM_ROLE, PROBLEM_STATUS } from "utils/constants";
+import {randomImageName} from "utils/FileUpload/covert";
+import {PROBLEM_ROLE, PROBLEM_STATUS} from "utils/constants";
 import HustCodeEditor from "../../common/HustCodeEditor";
-import HustContainerCard from "../../common/HustContainerCard";
 import RichTextEditor from "../../common/editor/RichTextEditor";
-import { COMPUTER_LANGUAGES, CUSTOM_EVALUATION } from "./Constant";
+import {COMPUTER_LANGUAGES, CUSTOM_EVALUATION} from "./Constant";
 import ContestsUsingAProblem from "./ContestsUsingAProblem";
 import ListTestCase from "./ListTestCase";
+import {localeOption} from "../../../utils/NumberFormat";
+import {detail} from "./ContestProblemSubmissionDetailViewedByManager";
+import ProgrammingContestLayout from "./ProgrammingContestLayout";
+import PrimaryButton from "../../button/PrimaryButton";
+import TertiaryButton from "../../button/TertiaryButton";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 const CssTextField = styled(TextField)({
   ".MuiInputBase-input.Mui-disabled": {
@@ -50,16 +50,18 @@ const CssTextField = styled(TextField)({
 });
 
 function ManagerViewProblemDetailV2() {
-  const { t } = useTranslation([
+  const {t} = useTranslation([
     "education/programmingcontest/problem",
     "common",
     "validation",
   ]);
-  const { problemId } = useParams();
+
+  const {problemId} = useParams();
   const history = useHistory();
 
   const [problemName, setProblemName] = useState("");
   const [description, setDescription] = useState("");
+  // const [timeLimit, setTimeLimit] = useState(1);
   const [timeLimitCPP, setTimeLimitCPP] = useState(1);
   const [timeLimitJAVA, setTimeLimitJAVA] = useState(1);
   const [timeLimitPYTHON, setTimeLimitPYTHON] = useState(1);
@@ -87,9 +89,16 @@ function ManagerViewProblemDetailV2() {
   const [newProblemId, setNewProblemId] = useState("");
   const [newProblemName, setNewProblemName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const handleExit = () => {
+    history.push(`/programming-contest/list-problems`);
+  }
 
   useEffect(() => {
     request("get", "teacher/problems/" + problemId, (res) => {
+      setLoading(false);
+
       res = res.data;
       if (res.attachment && res.attachment.length !== 0) {
         const newFileURLArray = res.attachment.map((url) => ({
@@ -104,6 +113,7 @@ function ManagerViewProblemDetailV2() {
 
       setProblemName(res.problemName);
       setLevelId(res.levelId);
+      // setTimeLimit(res.timeLimit);
       setTimeLimitCPP(res.timeLimitCPP);
       setTimeLimitJAVA(res.timeLimitJAVA);
       setTimeLimitPYTHON(res.timeLimitPYTHON);
@@ -125,7 +135,7 @@ function ManagerViewProblemDetailV2() {
   }, [problemId]);
 
   const hasSpecialCharacterProblemId = () => {
-    return !new RegExp(/^[0-9a-zA-Z_-]*$/).test(newProblemId); 
+    return !new RegExp(/^[0-9a-zA-Z_-]*$/).test(newProblemId);
   };
 
   const hasSpecialCharacterProblemName = () => {
@@ -146,97 +156,90 @@ function ManagerViewProblemDetailV2() {
 
   const handleClone = () => {
     if (hasSpecialCharacterProblemId()) {
-        setErrorMessage("Problem ID can only contain letters, numbers, underscores, and hyphens.");
-        return;
+      setErrorMessage("Problem ID can only contain letters, numbers, underscores, and hyphens.");
+      return;
     }
     if (hasSpecialCharacterProblemName()) {
-        setErrorMessage("Problem Name can only contain letters and numbers.");
-        return;
+      setErrorMessage("Problem Name can only contain letters and numbers.");
+      return;
     }
 
     const cloneRequest = {
-        oldProblemId: problemId,
-        newProblemId: newProblemId,
-        newProblemName: newProblemName,
+      oldProblemId: problemId,
+      newProblemId: newProblemId,
+      newProblemName: newProblemName,
     };
 
     request(
-        "post", 
-        "/teachers/problems/clone",
-        (res) => { 
-            handleCloneDialogClose();
-            history.push("/programming-contest/list-problems");
+      "post",
+      "/teachers/problems/clone",
+      (res) => {
+        handleCloneDialogClose();
+        history.push("/programming-contest/list-problems");
+      },
+      {
+        onError: (error) => {
+          setErrorMessage("Failed to clone the problem. Please try again.");
+          console.error("Error cloning problem:", error);
         },
-        {
-            onError: (error) => {
-                setErrorMessage("Failed to clone the problem. Please try again.");
-                console.error("Error cloning problem:", error);
-            },
-            400: (error) => {
-                setErrorMessage("Invalid request. Please check your input.");
-            },
-            404: (error) => {
-                setErrorMessage("Original problem not found.");
-            },
-            500: (error) => {
-              setErrorMessage("Original problem already exists.");
-          },
+        400: (error) => {
+          setErrorMessage("Invalid request. Please check your input.");
         },
-        cloneRequest 
+        404: (error) => {
+          setErrorMessage("Original problem not found.");
+        },
+        500: (error) => {
+          setErrorMessage("Original problem already exists.");
+        },
+      },
+      cloneRequest
     );
-};
+  };
 
   return (
-    <HustContainerCard
-      title={"Problem Detail"}
-      action={
-        <>
-          <Button
-            variant="contained"
-            color="info"
-            onClick={handleCloneDialogOpen}
-            sx={{ marginRight: "8px" }}
-            disabled={
-              !roles.includes(PROBLEM_ROLE.OWNER) &&
-              (!roles.includes(PROBLEM_ROLE.EDITOR) ||
-                status !== PROBLEM_STATUS.OPEN)
-            }
-          >
-            Clone
-          </Button>
-          <Button
-            variant="contained"
-            color="info"
+    <ProgrammingContestLayout title={t("viewProblem")} onBack={handleExit}>
+      <Stack direction="row" spacing={2} mb={1.5} justifyContent="space-between">
+        <Typography variant="h6" component='span'>
+          {t("generalInfo")}
+        </Typography>
+
+        <Stack direction="row" spacing={2}>
+          {(!roles.includes(PROBLEM_ROLE.OWNER) &&
+            (!roles.includes(PROBLEM_ROLE.EDITOR) || status !== PROBLEM_STATUS.OPEN)
+          ) ? null : (<PrimaryButton
             onClick={() => {
               history.push("/programming-contest/edit-problem/" + problemId);
             }}
-            startIcon={<EditIcon sx={{ marginRight: "4px" }} />}
-            sx={{ marginRight: "8px" }}
-            disabled={
-              !roles.includes(PROBLEM_ROLE.OWNER) &&
-              (!roles.includes(PROBLEM_ROLE.EDITOR) ||
-                status !== PROBLEM_STATUS.OPEN)
-            }
+            startIcon={<EditIcon/>}
           >
-            Edit
-          </Button>
+            {t("edit", {ns: "common"})}
+          </PrimaryButton>)
+          }
+          {(!roles.includes(PROBLEM_ROLE.OWNER) &&
+            (!roles.includes(PROBLEM_ROLE.EDITOR) ||
+              status !== PROBLEM_STATUS.OPEN)) ? null : (<TertiaryButton
+            variant="outlined"
+            onClick={handleCloneDialogOpen}
+            startIcon={<ContentCopyIcon/>}
+          >
+            {t("clone")}
+          </TertiaryButton>)
+          }
           {roles.includes(PROBLEM_ROLE.OWNER) && (
-            <Button
-              variant="contained"
-              color="info"
+            <TertiaryButton
+              variant="outlined"
               onClick={() => {
                 history.push(
                   "/programming-contest/user-contest-problem-role-management/" +
-                    problemId
+                  problemId
                 );
               }}
             >
-              Manage Role
-            </Button>
-          )}
-        </>
-      }
-    >
+              {t("manageRole")}
+            </TertiaryButton>
+          )}</Stack>
+      </Stack>
+
       <Dialog open={openCloneDialog} onClose={handleCloneDialogClose}>
         <DialogTitle>{"Clone Problem"}</DialogTitle>
         <DialogContent>
@@ -275,206 +278,104 @@ function ManagerViewProblemDetailV2() {
           </Button>
         </DialogActions>
       </Dialog>
-
-      <Grid container spacing={2}>
-        <Grid item xs={10}>
-          <CssTextField
-            disabled
-            fullWidth
-            id="problemName"
-            label={t("problemName")}
-            value={problemName}
-          />
-        </Grid>
-
-        <Grid item xs={2}>
-          <CssTextField
-            disabled
-            fullWidth
-            id="status"
-            label={t("status")}
-            value={status}
-          />
-        </Grid>
-
-        <Grid item xs={2}>
-          <CssTextField
-            disabled
-            fullWidth
-            id="levelId"
-            label={t("level")}
-            value={levelId}
-          />
-        </Grid>
-
-        <Grid item xs={2}>
-          <CssTextField
-            disabled
-            fullWidth
-            id="isPublicProblem"
-            label={t("public", { ns: "common" })}
-            value={
-              isPublic ? t("yes", { ns: "common" }) : t("no", { ns: "common" })
-            }
-          />
-        </Grid>
-
-        <Grid item xs={2}>
-          <CssTextField
-            disabled
-            fullWidth
-            id="timeLimitCPP"
-            label={t("timeLimit")}
-            type="number"
-            value={timeLimitCPP}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">C/CPP: </InputAdornment>
-              ),
-              endAdornment: <InputAdornment position="end">s</InputAdornment>,
-            }}
-          />
-        </Grid>
-
-        <Grid item xs={2}>
-          <CssTextField
-            disabled
-            fullWidth
-            id="timeLimitJAVA"
-            label={t("timeLimit")}
-            type="number"
-            value={timeLimitJAVA}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">JAVA: </InputAdornment>
-              ),
-              endAdornment: <InputAdornment position="end">s</InputAdornment>,
-            }}
-          />
-        </Grid>
-
-        <Grid item xs={2}>
-          <CssTextField
-            disabled
-            fullWidth
-            id="timeLimitPYTHON"
-            label={t("timeLimit")}
-            type="number"
-            value={timeLimitPYTHON}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">PYTHON: </InputAdornment>
-              ),
-              endAdornment: <InputAdornment position="end">s</InputAdornment>,
-            }}
-          />
-        </Grid>
-
-        <Grid item xs={2}>
-          <CssTextField
-            disabled
-            fullWidth
-            id="memoryLimit"
-            label={t("memoryLimit")}
-            type="number"
-            value={memoryLimit}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">MB</InputAdornment>,
-            }}
-          />
-        </Grid>
-
-        <Grid item xs={12}>
-          <FormControl sx={{ width: "100%" }}>
-            <InputLabel id="select-tag-label">Tags</InputLabel>
-            <Select
-              id="select-tag"
-              multiple
-              value={selectedTags}
-              input={<OutlinedInput label="Tags" />}
-              renderValue={(selectedTags) => (
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.8 }}>
-                  {selectedTags?.map((selectedTag) => (
-                    <Chip
-                      size="small"
-                      label={selectedTag.name}
-                      sx={{
-                        marginRight: "6px",
-                        marginBottom: "6px",
-                        border: "1px solid lightgray",
-                        fontStyle: "italic",
-                      }}
-                    />
-                  ))}
-                </Box>
-              )}
-            ></Select>
-          </FormControl>
-        </Grid>
+      {loading && <LinearProgress/>}
+      <Grid container spacing={2} display={loading ? "none" : ""}>
+        {[
+          [t("problemName"), problemName],
+          [t("status"), status],
+          [t("level"), levelId],
+          [
+            t("public", {ns: "common"}),
+            isPublic ? t("yes", {ns: "common"}) : t("no", {ns: "common"}),
+          ],
+          [
+            t("timeLimit") + ' C/CPP',
+            `${timeLimitCPP.toLocaleString(
+              "fr-FR",
+              localeOption
+            )} (s)`,
+          ],
+          [
+            t("timeLimit") + ' Java',
+            `${timeLimitJAVA.toLocaleString(
+              "fr-FR",
+              localeOption
+            )} (s)`,
+          ],
+          [
+            t("timeLimit") + ' Python',
+            `${timeLimitPYTHON.toLocaleString(
+              "fr-FR",
+              localeOption
+            )} (s)`,
+          ],
+          [
+            t("memoryLimit"),
+            `${memoryLimit.toLocaleString(
+              "fr-FR",
+              localeOption
+            )} (MB)`,
+          ],
+          [
+            "Tags",
+            selectedTags
+              ? selectedTags.map((selectedTag) => selectedTag.name).join(", ") : null,
+          ],
+        ].map(([key, value, sx, helpText]) => (
+          <Grid item xs={12} sm={12} md={3}>
+            {detail(key, value, sx, helpText)}
+          </Grid>
+        ))}
       </Grid>
 
-      <Box sx={{ marginTop: "24px", marginBottom: "24px" }}>
-        <Typography variant="h5" component="div" sx={{ marginBottom: "8px" }}>
+      <Box sx={{marginTop: "24px", marginBottom: "24px"}}>
+        <Typography variant="h6" sx={{marginBottom: "8px"}}>
           {t("problemDescription")}
         </Typography>
         <RichTextEditor
           toolbarHidden
           content={description}
-          onContentChange ={(text) => setDescription(text)}
+          onContentChange={(text) => setDescription(text)}
         />
         <HustCodeEditor
           title="Sample TestCase"
-          language={COMPUTER_LANGUAGES.C}
+          // language={COMPUTER_LANGUAGES.C}
           sourceCode={sampleTestCase}
         />
       </Box>
 
       {fetchedImageArray.length !== 0 &&
         fetchedImageArray.map((file) => (
-          <FileUploadZone file={file} removable={false} />
+          <FileUploadZone file={file} removable={false}/>
         ))}
 
-      <Box sx={{ marginTop: "28px" }} />
+      <Box sx={{marginTop: "28px"}}/>
       <HustCodeEditor
         title={t("correctSourceCode")}
-        language={languageSolution}
+        // language={languageSolution}
         sourceCode={codeSolution}
       />
 
-      <Box sx={{ marginTop: "12px" }}>
-        <FormControlLabel
-          label={t("isPreloadCode")}
-          control={<Checkbox disabled checked={isPreloadCode} />}
+      {isPreloadCode && (<Box sx={{marginTop: "12px"}}>
+        <HustCodeEditor
+          title={t("preloadCode")}
+          sourceCode={preloadCode}
+          height="280px"/>
+      </Box>)}
+
+      {isCustomEvaluated && (<Box sx={{marginTop: "24px"}}>
+        <HustCodeEditor
+          title={t("checkerSourceCode")}
+          language={solutionCheckerLanguage}
+          sourceCode={solutionChecker}
+          placeholder={t("checkerSourceCodePlaceholder")}
         />
-        {isPreloadCode && (
-          <HustCodeEditor
-            title={t("preloadCode")}
-            sourceCode={preloadCode}
-            height="280px"
-          />
-        )}
-      </Box>
+      </Box>)}
 
-      <Box sx={{ marginTop: "24px" }}>
-        <FormControlLabel
-          label={t("isCustomEvaluated")}
-          control={<Checkbox disabled checked={isCustomEvaluated} />}
-        />
+      <ListTestCase mode={2}/>
 
-        {isCustomEvaluated && (
-          <HustCodeEditor
-            title={t("checkerSourceCode")}
-            language={solutionCheckerLanguage}
-            sourceCode={solutionChecker}
-            placeholder={t("checkerSourceCodePlaceholder")}
-          />
-        )}
-      </Box>
-
-      <ListTestCase />
-
-      <ContestsUsingAProblem problemId={problemId} />
-    </HustContainerCard>
+      <ContestsUsingAProblem problemId={problemId}/>
+    </ProgrammingContestLayout>
   );
 }
 

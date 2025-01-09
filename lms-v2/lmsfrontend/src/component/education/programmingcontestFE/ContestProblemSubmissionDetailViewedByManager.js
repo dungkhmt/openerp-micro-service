@@ -5,27 +5,19 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import {
-  Divider,
-  IconButton,
-  Link,
-  Paper,
-  Stack,
-  Switch,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import {Divider, IconButton, Link, Paper, Stack, Switch, Tooltip, Typography,} from "@mui/material";
 import Box from "@mui/material/Box";
-import { request } from "api";
+import {request} from "api";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
 import withScreenSecurity from "component/withScreenSecurity";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {useParams} from "react-router-dom";
 import displayTime from "utils/DateTimeUtils";
-import { localeOption } from "utils/NumberFormat";
-import { successNoti } from "utils/notification";
-import ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase from "./ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase";
-import { getStatusColor } from "./lib";
+import {localeOption} from "utils/NumberFormat";
+import {successNoti} from "utils/notification";
+import ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase
+  from "./ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase";
+import {getStatusColor} from "./lib";
 
 export const detail = (key, value, sx, helpText) => (
   <>
@@ -311,9 +303,11 @@ function ContestProblemSubmissionDetailViewedByManager() {
             ["Language", submission.sourceCodeLanguage],
             [
               "Total runtime",
-              submission.runtime
-                ? submission.runtime.toLocaleString("fr-FR", localeOption)
-                : 0,
+              `${
+                submission.runtime
+                  ? (submission.runtime / 1000).toLocaleString("fr-FR", localeOption)
+                  : 0
+              } (s)`,
             ],
             // ["Memory usage", `${submission.memoryUsage} KB`],
             ["Submited by", submission.submittedByUserId],

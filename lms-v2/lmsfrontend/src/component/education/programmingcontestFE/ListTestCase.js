@@ -1,5 +1,4 @@
-import {makeStyles} from "@material-ui/core/styles";
-import {Button, IconButton, Typography} from "@mui/material";
+import {Button, IconButton, Paper, Stack, Tooltip, Typography} from "@mui/material";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
 import HustModal from "component/common/HustModal";
 import React, {useEffect, useState} from "react";
@@ -16,19 +15,34 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
 import AddIcon from "@material-ui/icons/Add";
 import {RiCodeSSlashLine} from "react-icons/ri";
 import {errorNoti} from "../../../utils/notification";
+import TestCaseExecutionResult from "./TestCaseExecutionResult";
+import CustomizedDialogs from "../../dialog/CustomizedDialogs";
+import {makeStyles} from "@material-ui/core/styles";
+import {useTranslation} from "react-i18next";
 
-const useStyles = makeStyles((theme) => ({}));
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    minWidth: 800,
+  },
+  dialogContent: {
+    padding: theme.spacing(3),
+  },
+}));
 
-export default function ListTestCase() {
+export default function ListTestCase({mode}) {
   const params = useParams();
-
   const history = useHistory();
+
+  const classes = useStyles();
+  const {t} = useTranslation("education/programmingcontest/testcase");
 
   const problemId = params.problemId;
   const [testCases, setTestCases] = useState([]);
   const [openModalPreviewTestcase, setOpenModalPreviewTestcase] = useState(false);
   const [openModalCopyTestcase, setOpenModalCopyTestcase] = useState(false);
   const [openModalDownloadTestcase, setOpenModalDownloadTestcase] = useState(false);
+  const [executionResult, setExecutionResult] = useState(null);
+  const [open, setOpen] = useState(false);
 
   const [selectedTestcase, setSelectedTestcase] = useState();
 
@@ -41,7 +55,11 @@ export default function ListTestCase() {
         // setTestCases(res.data.filter((item) => item.isPublic === "Y"));
         setTestCases(res.data);
       },
-      {}
+      {
+        onError: (e) => {
+          errorNoti(t("error", {ns: "common"}))
+        },
+      },
     );
   }
 
@@ -50,43 +68,164 @@ export default function ListTestCase() {
   }, []);
 
   function rerunTestCase(problemId, testCaseId) {
+    setExecutionResult(null);
     request(
       "post",
       "/problems/" + problemId + "/testcases/" + testCaseId + "/solution",
-      () => {
-        getTestCases();
+      (res) => {
+        setExecutionResult(res.data);
+        setOpen(true)
+
+        if (res.data.status.id === 3) {
+          getTestCases();
+        }
       },
-      {}
+      {
+        onError: (e) => {
+          errorNoti(t("error", {ns: "common"}))
+        },
+      },
     );
   }
 
-  const testcaseColumns = [
-      {
-        title: "Input (Preview)",
-        sortable: false,
-        render: (testCase) => (
-          <>
-            {testCase?.testCase && testCase.testCase.length > 20
-              ? testCase.testCase.substring(0, 19) + "..."
-              : testCase.testCase}
-          </>
-        )
+  let actions = [
+    {
+      icon: () => {
+        return <FileCopyIcon/>;
       },
-      {
-        title: "Output (Preview)",
-        sortable: false,
-        render: (testCase) => (
-          <>
-            {testCase?.correctAns && testCase.correctAns.length > 20
-              ? testCase.correctAns.substring(0, 19) + "..."
-              : testCase.correctAns}
-          </>
-        )
+      tooltip: 'Copy all Testcase',
+      isFreeAction: true,
+      onClick: () => setOpenModalCopyTestcase(true)
+    },
+    {
+      icon: 'download',
+      tooltip: 'Download all Testcase',
+      isFreeAction: true,
+      onClick: () => setOpenModalDownloadTestcase(true)
+    }
+  ]
+  let testcaseColumns = [
+    {
+      title: "Input (Preview)",
+      sortable: false,
+      cellStyle: {minWidth: 200},
+      render: (testCase) => (
+        <>
+          {testCase?.testCase && testCase.testCase.length > 20
+            ? testCase.testCase.substring(0, 19) + "..."
+            : testCase.testCase}
+        </>
+      )
+    },
+    {
+      title: "Output (Preview)",
+      sortable: false,
+      cellStyle: {minWidth: 200},
+      render: (testCase) => (
+        <>
+          {testCase?.correctAns && testCase.correctAns.length > 20
+            ? testCase.correctAns.substring(0, 19) + "..."
+            : testCase.correctAns}
+        </>
+      )
+    },
+    {title: "Point", field: "point"},
+    {title: "Public", field: "isPublic"},
+    {title: "Description", field: "description"},
+    {title: "Status", field: "status"}
+  ];
+
+  if (mode !== 2) {
+    actions.unshift({
+      icon: () => {
+        return <AddIcon fontSize="large"/>;
       },
-      {
-        title: "Detail",
-        sortable: false,
-        render: (testCase) => (
+      tooltip: 'Add new Testcase',
+      isFreeAction: true,
+      onClick: () => addTestCase()
+    })
+    testcaseColumns.push({
+      title: "Action",
+      align: "center",
+      sortable: false,
+      render: (testCase) => (
+        <Stack spacing={1} direction="row">
+          <Tooltip title='Detail'>
+            <IconButton
+              color="primary"
+              onClick={() => {
+                setSelectedTestcase(testCase);
+                setOpenModalPreviewTestcase(true);
+              }}
+            >
+              <InfoIcon/>
+            </IconButton>
+          </Tooltip>
+          <Tooltip title='Regenerate testcase answer'>
+            <IconButton
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                rerunTestCase(problemId, testCase.testCaseId);
+              }}
+            >
+              <RiCodeSSlashLine/>
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title='Edit'>
+            <Link
+              to={
+                "/programming-contest/edit-testcase/" +
+                problemId +
+                "/" +
+                testCase.testCaseId
+              }
+            >
+              <IconButton variant="contained" color="success">
+                <EditIcon/>
+              </IconButton>
+            </Link>
+          </Tooltip>
+
+          <Tooltip title='Delete'>
+            <IconButton
+              variant="contained"
+              color="error"
+              onClick={() => {
+                request(
+                  "delete",
+                  "/testcases/" + testCase.testCaseId,
+                  () => {
+                    request(
+                      "GET",
+                      "/problems/" + problemId + "/testcases",
+                      (res) => {
+                        setTestCases(res.data);
+                      },
+                      {}
+                    ).then();
+                  },
+                  {
+                    onError: (e) => {
+                      errorNoti(e?.response?.data?.message || "An error happened", 5000)
+                    }
+                  }
+                ).then();
+              }}
+            >
+              <DeleteIcon/>
+            </IconButton>
+          </Tooltip>
+        </Stack>),
+    })
+  } else {
+    testcaseColumns.push({
+      title: "Action",
+      align: "center",
+      sortable: false,
+      render: (testCase) => (
+        <Tooltip title='Detail'>
           <IconButton
             color="primary"
             onClick={() => {
@@ -96,80 +235,10 @@ export default function ListTestCase() {
           >
             <InfoIcon/>
           </IconButton>
-        )
-      },
-
-      {title: "Point", field: "point"},
-      {title: "Public", field: "isPublic"},
-      {title: "Description", field: "description"},
-      {title: "Status", field: "status"},
-      {
-        title: "Rerun",
-        sortable: false,
-        render: (testCase) => (
-          <IconButton
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              rerunTestCase(problemId, testCase.testCaseId);
-            }}
-          >
-            <RiCodeSSlashLine/>
-          </IconButton>
-        ),
-      },
-      {
-        title: "Edit",
-        sortable: false,
-        render: (testCase) => (
-          <Link
-            to={
-              "/programming-contest/edit-testcase/" +
-              problemId +
-              "/" +
-              testCase.testCaseId
-            }
-          >
-            <IconButton variant="contained" color="success">
-              <EditIcon/>
-            </IconButton>
-          </Link>
-        ),
-      },
-      {
-        title: "Delete",
-        sortable: false,
-        render: (testCase) => (
-          <IconButton
-            variant="contained"
-            color="error"
-            onClick={() => {
-              request(
-                "delete",
-                "/testcases/" + testCase.testCaseId,
-                () => {
-                  request(
-                    "GET",
-                    "/problems/" + problemId + "/testcases",
-                    (res) => {
-                      setTestCases(res.data);
-                    },
-                    {}
-                  ).then();
-                },
-                {onError: (e) => {
-                  errorNoti(e?.response?.data?.message || "An error happened", 5000)
-                }}
-              ).then();
-            }}
-          >
-            <DeleteIcon/>
-          </IconButton>
-        ),
-      }
-      ,
-    ]
-  ;
+        </Tooltip>
+      ),
+    })
+  }
 
   const ModalPreview = (chosenTestcase) => {
     return (
@@ -257,7 +326,7 @@ export default function ListTestCase() {
               setOpenModalDownloadTestcase(false);
             }}
           >
-             Download All Testcases
+            Download All Testcases
           </Button>
           <Button
             variant="contained"
@@ -292,32 +361,20 @@ export default function ListTestCase() {
           search: false,
           sorting: true,
         }}
-        actions={[
-          {
-            icon: () => {
-              return <AddIcon fontSize="large"/>;
-            },
-            tooltip: 'Add new Testcase',
-            isFreeAction: true,
-            onClick: () => addTestCase()
-          },
-          {
-            icon: () => {
-              return <FileCopyIcon/>;
-            },
-            tooltip: 'Copy all Testcase',
-            isFreeAction: true,
-            onClick: () => setOpenModalCopyTestcase(true)
-          },
-          {
-            icon: 'download',
-            tooltip: 'Download all Testcase',
-            isFreeAction: true,
-            onClick: () => setOpenModalDownloadTestcase(true)
-          }
-        ]}
+        components={{
+          Container: (props) => <Paper {...props} elevation={0}/>,
+        }}
+        actions={actions}
       />
 
+      <CustomizedDialogs
+        open={open}
+        handleClose={() => setOpen(false)}
+        title={t("reGenerateResult")}
+        contentTopDivider
+        content={<TestCaseExecutionResult uploadResult={executionResult} hideTitle/>}
+        classNames={{paper: classes.paper, content: classes.dialogContent}}
+      />
       <ModalPreview chosenTestcase={selectedTestcase}/>
       <ModalCopy/>
       <ModalDownload/>
