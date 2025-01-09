@@ -19,6 +19,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
     margin-bottom: 20px;
   }
   
@@ -39,6 +42,9 @@
   
   /* Table Styles */
   .department-table {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
@@ -79,6 +85,7 @@
 
   /* Edit column */
   .department-table th:nth-child(1) { 
+  
     text-align: center; 
     min-width: 50px;
   }
