@@ -16,4 +16,6 @@ public interface ICheckpointStaffPort {
     List<CheckpointStaffDetailsModel> getCheckpointStaffDetails(UUID periodId, String userLoginId);
 
     List<CheckpointStaffDetailsModel> getCheckpointStaffDetailsIn(UUID periodId, List<String> userLoginIds);
+
+    Boolean existCheckpointStaff(UUID periodId);
 }

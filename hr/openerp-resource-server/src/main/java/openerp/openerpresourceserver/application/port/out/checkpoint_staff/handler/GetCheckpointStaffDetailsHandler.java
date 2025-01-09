@@ -10,7 +10,6 @@ import openerp.openerpresourceserver.domain.common.usecase.ObservableUseCasePubl
 import openerp.openerpresourceserver.domain.model.CheckpointStaffDetailsModel;
 
 import java.util.Collection;
-import java.util.List;
 
 @DomainComponent
 @RequiredArgsConstructor

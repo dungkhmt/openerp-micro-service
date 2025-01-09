@@ -6,12 +6,14 @@ import openerp.openerpresourceserver.application.port.out.checkpoint_configure.u
 import openerp.openerpresourceserver.application.port.out.code_generator.ICodeGeneratorService;
 import openerp.openerpresourceserver.domain.common.DomainComponent;
 import openerp.openerpresourceserver.domain.common.usecase.ObservableUseCasePublisher;
-import openerp.openerpresourceserver.domain.common.usecase.VoidUseCaseHandler;
+import openerp.openerpresourceserver.domain.common.usecase.UseCaseHandler;
+import openerp.openerpresourceserver.domain.model.CheckpointConfigureModel;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 @DomainComponent
 @Slf4j
-public class CreateCheckpointConfigureHandler extends ObservableUseCasePublisher implements VoidUseCaseHandler<CreateCheckpointConfigure> {
+public class CreateCheckpointConfigureHandler extends ObservableUseCasePublisher
+        implements UseCaseHandler<CheckpointConfigureModel, CreateCheckpointConfigure> {
     private final ICheckpointConfigurePort checkpointConfigurePort;
     private final ICodeGeneratorService codeGenerator;
 
@@ -28,10 +30,10 @@ public class CreateCheckpointConfigureHandler extends ObservableUseCasePublisher
     }
 
     @Override
-    public void handle(CreateCheckpointConfigure useCase) {
+    public CheckpointConfigureModel handle(CreateCheckpointConfigure useCase) {
         var model = useCase.toModel();
         var code = codeGenerator.generateCode(checkpointConfigurePort);
         model.setCode(code);
-        checkpointConfigurePort.createCheckpointConfigure(model);
+        return checkpointConfigurePort.createCheckpointConfigure(model);
     }
 }

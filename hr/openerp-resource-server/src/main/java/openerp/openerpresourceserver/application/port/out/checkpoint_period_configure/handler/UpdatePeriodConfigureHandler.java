@@ -29,10 +29,10 @@ public class UpdatePeriodConfigureHandler extends ObservableUseCasePublisher
     public void handle(UpdateCheckpointPeriodConfigure useCase) {
         try{
             periodConfigurePort.deleteAllPeriodConfigure(useCase.getPeriodId());
-            useCase.getModels().forEach(model ->
+            useCase.getConfigures().forEach(model ->
                 model.setCheckpointPeriodId(useCase.getPeriodId())
             );
-            periodConfigurePort.createPeriodConfigure(useCase.getModels());
+            periodConfigurePort.createPeriodConfigure(useCase.getConfigures());
         }
         catch(Exception e){
             log.error(e.getMessage(), e);

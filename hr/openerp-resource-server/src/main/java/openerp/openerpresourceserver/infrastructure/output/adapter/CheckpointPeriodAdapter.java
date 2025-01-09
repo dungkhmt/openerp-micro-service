@@ -38,17 +38,20 @@ public class CheckpointPeriodAdapter implements ICheckpointPeriodPort {
 
     @Override
     public List<CheckpointPeriodModel> findByCodeIn(List<UUID> ids) {
-        return List.of();
+        return toModels(
+                checkpointPeriodRepo.findByIdIn(ids)
+        );
     }
 
     @Override
-    public void createCheckpointPeriod(CheckpointPeriodModel configure) {
+    public CheckpointPeriodModel createCheckpointPeriod(CheckpointPeriodModel period) {
         var entity = new CheckpointPeriodEntity();
-        entity.setName(configure.getName());
-        entity.setDescription(configure.getDescription());
-        entity.setCheckpointDate(configure.getCheckpointDate());
-        entity.setStatus(configure.getStatus());
-        checkpointPeriodRepo.save(entity);
+        entity.setName(period.getName());
+        entity.setDescription(period.getDescription());
+        entity.setCheckpointDate(period.getCheckpointDate());
+        entity.setCreatedByUserId(period.getCreatedByUserId());
+        entity.setStatus(period.getStatus());
+        return toModel(checkpointPeriodRepo.save(entity));
     }
 
     @Override
@@ -71,12 +74,15 @@ public class CheckpointPeriodAdapter implements ICheckpointPeriodPort {
         if(period.getStatus() != null){
             entity.setStatus(period.getStatus());
         }
+        if(period.getCreatedByUserId() != null){
+            entity.setCreatedByUserId(period.getCreatedByUserId());
+        }
         checkpointPeriodRepo.save(entity);
     }
 
     @Override
     public PageWrapper<CheckpointPeriodModel> getCheckpointPeriod(ICheckpointPeriodFilter filter, IPageableRequest request) {
-        var pageable = PageableUtils.getPageable(request);
+        var pageable = PageableUtils.getPageable(request, "checkpointDate");
         var spec = new CheckpointPeriodSpecification(filter);
         var page = checkpointPeriodRepo.findAll(spec ,pageable);
         return PageWrapper.<CheckpointPeriodModel>builder()
@@ -87,6 +93,12 @@ public class CheckpointPeriodAdapter implements ICheckpointPeriodPort {
 
     private CheckpointPeriodModel toModel(CheckpointPeriodEntity entity) {
         return CheckpointPeriodModel.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .description(entity.getDescription())
+                .checkpointDate(entity.getCheckpointDate())
+                .createdByUserId(entity.getCreatedByUserId())
+                .status(entity.getStatus())
                 .build();
     }
 

@@ -1,0 +1,27 @@
+package openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_staff.request;
+
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+import openerp.openerpresourceserver.application.port.out.checkpoint_staff.usecase_data.GetCheckpoint;
+
+import java.util.UUID;
+
+@Getter
+@Setter
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public class GetCheckpointRequest {
+    @NotNull
+    private UUID periodId;
+    @NotNull
+    private String userId;
+
+    public GetCheckpoint toUseCase(){
+        return GetCheckpoint.builder()
+                .periodId(periodId)
+                .userId(userId)
+                .build();
+    }
+}

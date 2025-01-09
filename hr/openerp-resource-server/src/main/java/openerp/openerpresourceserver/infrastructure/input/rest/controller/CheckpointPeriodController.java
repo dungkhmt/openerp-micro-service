@@ -2,11 +2,10 @@ package openerp.openerpresourceserver.infrastructure.input.rest.controller;
 
 import jakarta.validation.Valid;
 import openerp.openerpresourceserver.domain.common.usecase.BeanAwareUseCasePublisher;
+import openerp.openerpresourceserver.domain.model.CheckpointPeriodDetailsModel;
 import openerp.openerpresourceserver.domain.model.CheckpointPeriodModel;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_period.request.CreateCheckpointPeriodRequest;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_period.request.DeleteCheckpointPeriodRequest;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_period.request.GetAllCheckpointPeriodRequest;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_period.request.UpdateCheckpointPeriodRequest;
+import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_period.request.*;
+import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_period.response.CheckpointPeriodDetailsResponse;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_period.response.CheckpointPeriodResponse;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.Resource;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class CheckpointPeriodController extends BeanAwareUseCasePublisher {
     @PostMapping("create-period")
     public ResponseEntity<?> createCheckpointPeriod(
+            //Principal principal,
             @Valid @RequestBody CreateCheckpointPeriodRequest request
     ){
+        //TODO REMOVE
+        request.setCreatedByUserId("phanhieu2443");
         publish(request.toUseCase());
         return ResponseEntity.ok().body(
                 new Resource()
@@ -61,8 +63,12 @@ public class CheckpointPeriodController extends BeanAwareUseCasePublisher {
 
     @PostMapping("get-period-detail")
     public ResponseEntity<?> getCheckpointPeriodDetail(
-            @Valid @RequestBody GetAllCheckpointPeriodRequest request
+            @Valid @RequestBody GetCheckpointPeriodDetailsRequest request
     ){
-        return null;
+        var model = publish(CheckpointPeriodDetailsModel.class, request.toUseCase());
+        var response = CheckpointPeriodDetailsResponse.fromModel(model);
+        return ResponseEntity.ok().body(
+                new Resource(response)
+        );
     }
 }

@@ -43,6 +43,7 @@ public enum ResponseCode {
     STAFF_SALARY_NOT_EXISTED(1025L, "staff salary not existed"),
     CHECKPOINT_CONFIGURE_NOT_EXISTED(1026L, "checkpoint configure not existed"),
     CHECKPOINT_PERIOD_NOT_EXISTED(1027L, "checkpoint period not existed"),
+    CHECKPOINT_PERIOD_UPDATE_ERROR(1028L, "checkpoint period update error"),
     ;
     private final long code;
     private final String message;

@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface ICheckpointPeriodPort {
     CheckpointPeriodModel findByCode(UUID code);
     List<CheckpointPeriodModel> findByCodeIn(List<UUID> ids);
-    void createCheckpointPeriod(CheckpointPeriodModel checkpointPeriod);
+    CheckpointPeriodModel createCheckpointPeriod(CheckpointPeriodModel checkpointPeriod);
     void updateCheckpointPeriod(CheckpointPeriodModel checkpointPeriod);
     PageWrapper<CheckpointPeriodModel> getCheckpointPeriod(ICheckpointPeriodFilter filter, IPageableRequest request);
 }

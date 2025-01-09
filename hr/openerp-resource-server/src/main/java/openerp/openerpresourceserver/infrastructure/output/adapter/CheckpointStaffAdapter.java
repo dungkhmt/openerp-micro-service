@@ -47,6 +47,11 @@ public class CheckpointStaffAdapter implements ICheckpointStaffPort {
     }
 
     @Override
+    public Boolean existCheckpointStaff(UUID periodId) {
+        return checkpointStaffRepo.existsById_CheckpointPeriodId(periodId);
+    }
+
+    @Override
     public void checkpointStaff(List<CheckpointStaffModel> checkpointStaffModels) {
         var entities = checkpointStaffModels.stream()
                 .map(model -> {
@@ -96,6 +101,11 @@ public class CheckpointStaffAdapter implements ICheckpointStaffPort {
 
     private CheckpointStaffModel toModel(CheckpointStaffEntity entity) {
         return CheckpointStaffModel.builder()
+                .checkedByUserId(entity.getCheckedByUserId())
+                .point(entity.getPoint())
+                .configureId(entity.getId().getCheckpointCode())
+                .periodId(entity.getId().getCheckpointPeriodId())
+                .userId(entity.getId().getUserId())
                 .build();
     }
 

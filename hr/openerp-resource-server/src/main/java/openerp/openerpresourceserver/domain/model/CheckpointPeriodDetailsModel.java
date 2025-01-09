@@ -20,7 +20,7 @@ public class CheckpointPeriodDetailsModel {
     private String createdByUserId;
     private CheckpointPeriodStatus status;
 
-    public CheckpointPeriodDetailsModel of(
+    public static CheckpointPeriodDetailsModel of(
         CheckpointPeriodModel model,
         List<CheckpointPeriodConfigureDetailsModel> configures
     ){

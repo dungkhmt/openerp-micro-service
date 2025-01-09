@@ -30,9 +30,9 @@ public class CheckpointStaffSpecification implements Specification<CheckpointSta
             predicates.add(cb.equal(root.get("id").get("checkpointPeriodId"), filter.getPeriodId()));
         }
 
-        if (filter.getConfigureIds() != null && !filter.getConfigureIds().isEmpty()) {
+        /*if (filter.getConfigureIds() != null && !filter.getConfigureIds().isEmpty()) {
             predicates.add(root.get("id").get("checkpointCode").in(filter.getConfigureIds()));
-        }
+        }*/
 
         return cb.and(predicates.toArray(new Predicate[0]));
     }

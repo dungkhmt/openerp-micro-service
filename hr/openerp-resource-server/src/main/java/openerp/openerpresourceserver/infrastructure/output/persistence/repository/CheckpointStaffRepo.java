@@ -37,4 +37,6 @@ public interface CheckpointStaffRepo
     List<CheckpointStaffProjection> findCheckpointStaffDetailsIn(@Param("periodId") UUID periodId,
                                                                  @Param("userLoginIds") List<String> userLoginIds);
 
+    Boolean existsById_CheckpointPeriodId(UUID periodId);
+
 }

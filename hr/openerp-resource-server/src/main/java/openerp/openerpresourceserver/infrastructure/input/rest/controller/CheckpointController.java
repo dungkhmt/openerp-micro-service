@@ -2,13 +2,12 @@ package openerp.openerpresourceserver.infrastructure.input.rest.controller;
 
 import jakarta.validation.Valid;
 import openerp.openerpresourceserver.domain.common.usecase.BeanAwareUseCasePublisher;
-import openerp.openerpresourceserver.domain.model.JobPositionModel;
+import openerp.openerpresourceserver.domain.model.CheckpointModel;
+import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_staff.request.CheckpointStaffRequest;
+import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_staff.request.GetAllCheckpointRequest;
+import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_staff.request.GetCheckpointRequest;
+import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_staff.response.CheckpointResponse;
 import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.Resource;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.job_position.request.CreateJobPositionRequest;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.job_position.request.DeleteJobPositionRequest;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.job_position.request.GetJobPositionRequest;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.job_position.request.UpdateJobPositionRequest;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.job_position.response.JobPositionResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,44 +17,41 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/checkpoint/")
 public class CheckpointController extends BeanAwareUseCasePublisher {
-    @PostMapping("create-job-position")
-    public ResponseEntity<?> createJobPosition(
-            @Valid @RequestBody CreateJobPositionRequest request
+    @PostMapping("checkpoint-staff")
+    public ResponseEntity<?> checkpointStaff(
+            //Principal principal,
+            @Valid @RequestBody CheckpointStaffRequest request
     ){
-        publish(request.toUseCase());
+        //TODO REMOVE
+        request.setCheckedByUserId("phanhieu2443");
+        var model = publish(CheckpointModel.class, request.toUseCase());
+        var response = CheckpointResponse.fromModel(model);
         return ResponseEntity.ok().body(
-                new Resource()
+                new Resource(response)
         );
     }
 
-    @PostMapping("update-job-position")
-    public ResponseEntity<?> updateJobPosition(
-            @Valid @RequestBody UpdateJobPositionRequest request
-    ){
-        publish(request.toUseCase());
+    @PostMapping("get-all-checkpoint")
+    public ResponseEntity<?> getAllCheckpoint(
+            @Valid @RequestBody GetAllCheckpointRequest request
+    ) {
+        var checkpoints = publishCollection(CheckpointModel.class, request.toUseCase());
+        var response = checkpoints.stream()
+                .map(CheckpointResponse::fromModel)
+                .toList();
         return ResponseEntity.ok().body(
-                new Resource()
+                new Resource(response)
         );
     }
 
-    @PostMapping("delete-job-position")
-    public ResponseEntity<?> deleteJobPosition(
-            @Valid @RequestBody DeleteJobPositionRequest request
-    ){
-        publish(request.toUseCase());
+    @PostMapping("get-checkpoint")
+    public ResponseEntity<?> getCheckpoint(
+            @Valid @RequestBody GetCheckpointRequest request
+    ) {
+        var checkpoint = publish(CheckpointModel.class, request.toUseCase());
+        var response = CheckpointResponse.fromModel(checkpoint);
         return ResponseEntity.ok().body(
-                new Resource()
-        );
-    }
-
-    @PostMapping("get-job-position")
-    public ResponseEntity<?> getJobPosition(
-            @Valid @RequestBody GetJobPositionRequest request
-    ){
-        var modelPage = publishPageWrapper(JobPositionModel.class, request.toUseCase());
-        var responsePage = modelPage.convert(JobPositionResponse::fromModel);
-        return ResponseEntity.ok().body(
-                new Resource(responsePage)
+                new Resource(response)
         );
     }
 }

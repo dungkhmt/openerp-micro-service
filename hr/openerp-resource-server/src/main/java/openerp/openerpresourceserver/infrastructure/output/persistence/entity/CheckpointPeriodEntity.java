@@ -22,7 +22,7 @@ public class CheckpointPeriodEntity extends AuditEntity{
     @Column(name = "name", length = 100)
     private String name;
 
-    @Column(name = "description", length = Integer.MAX_VALUE)
+    @Column(name = "description", columnDefinition="TEXT")
     private String description;
 
     @Column(name = "checkpoint_date", length = 100)

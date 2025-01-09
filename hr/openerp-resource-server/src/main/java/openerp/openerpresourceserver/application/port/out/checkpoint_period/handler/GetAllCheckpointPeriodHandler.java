@@ -13,7 +13,7 @@ import openerp.openerpresourceserver.domain.model.PageWrapper;
 @DomainComponent
 @Slf4j
 @RequiredArgsConstructor
-public class GetCheckpointAllPeriodHandler extends ObservableUseCasePublisher
+public class GetAllCheckpointPeriodHandler extends ObservableUseCasePublisher
         implements PageWrapperUseCaseHandler<CheckpointPeriodModel, GetAllCheckpointPeriod>
 {
     private final ICheckpointPeriodPort checkpointPeriodPort;

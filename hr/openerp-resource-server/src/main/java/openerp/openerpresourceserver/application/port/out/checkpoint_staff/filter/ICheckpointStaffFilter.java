@@ -8,5 +8,5 @@ public interface ICheckpointStaffFilter {
     String getUserId();
     List<String> getUserIds();
     UUID getPeriodId();
-    List<String> getConfigureIds();
+    //List<String> getConfigureIds();
 }

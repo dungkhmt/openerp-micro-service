@@ -40,13 +40,13 @@ public class CheckpointConfigureAdapter implements ICheckpointConfigurePort {
     }
 
     @Override
-    public void createCheckpointConfigure(CheckpointConfigureModel configure) {
+    public CheckpointConfigureModel createCheckpointConfigure(CheckpointConfigureModel configure) {
         var entity = new CheckpointConfigureEntity();
         entity.setName(configure.getName());
         entity.setCheckpointCode(configure.getCode());
         entity.setDescription(configure.getDescription());
         entity.setStatus(configure.getStatus());
-        checkpointConfigureRepo.save(entity);
+        return toModel(checkpointConfigureRepo.save(entity));
     }
 
     @Override

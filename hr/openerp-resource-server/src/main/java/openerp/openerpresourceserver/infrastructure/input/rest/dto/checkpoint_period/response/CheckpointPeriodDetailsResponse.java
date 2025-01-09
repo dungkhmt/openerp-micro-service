@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import openerp.openerpresourceserver.constant.CheckpointPeriodStatus;
 import openerp.openerpresourceserver.domain.model.CheckpointPeriodConfigureDetailsModel;
+import openerp.openerpresourceserver.domain.model.CheckpointPeriodDetailsModel;
 import openerp.openerpresourceserver.domain.model.CheckpointPeriodModel;
 
 import java.util.List;
@@ -17,22 +18,18 @@ import java.util.UUID;
 @Setter
 @SuperBuilder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CheckpointPeriodResponse {
-    private UUID id;
-    private String name;
-    private String description;
-    private String checkpointDate;
-    private String createdByUserId;
-    private CheckpointPeriodStatus status;
+public class CheckpointPeriodDetailsResponse extends CheckpointPeriodResponse {
+    List<CheckpointPeriodConfigureResponse> configures;
 
-    public static CheckpointPeriodResponse fromModel(CheckpointPeriodModel model) {
-        return CheckpointPeriodResponse.builder()
+    public static CheckpointPeriodDetailsResponse fromModel(CheckpointPeriodDetailsModel model) {
+        return CheckpointPeriodDetailsResponse.builder()
                 .id(model.getId())
                 .name(model.getName())
                 .description(model.getDescription())
                 .checkpointDate(model.getCheckpointDate())
                 .createdByUserId(model.getCreatedByUserId())
                 .status(model.getStatus())
+                .configures(CheckpointPeriodConfigureResponse.fromModels(model.getConfigures()))
                 .build();
     }
 }

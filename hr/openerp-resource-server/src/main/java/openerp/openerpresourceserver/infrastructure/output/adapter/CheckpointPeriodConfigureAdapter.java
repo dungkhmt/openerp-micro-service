@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.infrastructure.output.adapter;
 import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.application.port.in.port.ICheckpointPeriodConfigurePort;
 import openerp.openerpresourceserver.application.port.out.checkpoint_period_configure.filter.ICheckpointPeriodConfigureFilter;
+import openerp.openerpresourceserver.constant.CheckpointConfigureStatus;
 import openerp.openerpresourceserver.constant.CheckpointPeriodConfigureStatus;
 import openerp.openerpresourceserver.domain.model.CheckpointConfigureModel;
 import openerp.openerpresourceserver.domain.model.CheckpointPeriodConfigureDetailsModel;
@@ -78,11 +79,12 @@ public class CheckpointPeriodConfigureAdapter implements ICheckpointPeriodConfig
                 .configureModel(CheckpointConfigureModel.builder()
                         .code(projection.getCheckpointCode())
                         .name(projection.getName())
+                        .status(CheckpointConfigureStatus.valueOf(projection.getConfigureStatus()))
                         .description(projection.getDescription())
                         .build())
                 .checkpointPeriodId(checkpointPeriodId)
                 .coefficient(projection.getCoefficient())
-                .status(Enum.valueOf(CheckpointPeriodConfigureStatus.class, projection.getStatus()))
+                .status(CheckpointPeriodConfigureStatus.valueOf(projection.getStatus()))
                 .build();
     }
 

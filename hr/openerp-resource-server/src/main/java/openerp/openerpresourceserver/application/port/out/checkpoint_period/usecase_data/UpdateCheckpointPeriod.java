@@ -6,8 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 import openerp.openerpresourceserver.constant.CheckpointPeriodStatus;
 import openerp.openerpresourceserver.domain.common.model.UseCase;
+import openerp.openerpresourceserver.domain.model.CheckpointPeriodConfigureModel;
 import openerp.openerpresourceserver.domain.model.CheckpointPeriodModel;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -21,6 +23,7 @@ public class UpdateCheckpointPeriod implements UseCase {
     private String checkpointDate;
     private String createdByUserId;
     private CheckpointPeriodStatus status;
+    private List<CheckpointPeriodConfigureModel> configures;
 
     public CheckpointPeriodModel toModel() {
         return CheckpointPeriodModel.builder()

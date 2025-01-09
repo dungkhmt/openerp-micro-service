@@ -22,9 +22,10 @@ public class CheckpointConfigureController extends BeanAwareUseCasePublisher {
     public ResponseEntity<?> createCheckpointConfigure(
             @Valid @RequestBody CreateCheckpointConfigureRequest request
     ){
-        publish(request.toUseCase());
+        var model = publish(CheckpointConfigureModel.class ,request.toUseCase());
+        var response = CheckpointConfigureResponse.fromModel(model);
         return ResponseEntity.ok().body(
-                new Resource()
+                new Resource(response)
         );
     }
 
