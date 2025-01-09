@@ -34,8 +34,8 @@ public class ExamEntity extends BaseEntity {
     private Integer status;
 
     @Column(name = "start_time")
-    protected LocalDateTime startTime;
+    private LocalDateTime startTime;
 
     @Column(name = "end_time")
-    protected LocalDateTime endTime;
+    private LocalDateTime endTime;
 }
