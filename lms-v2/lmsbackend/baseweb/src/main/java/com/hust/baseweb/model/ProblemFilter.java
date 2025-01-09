@@ -1,18 +1,25 @@
-package com.hust.baseweb.applications.programmingcontest.model;
+package com.hust.baseweb.model;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ModelUploadTestCaseOutput {
+public class ProblemFilter {
 
-    String status;
+    String name;
 
-    String message;
+    String levelIds;
+
+    String tagIds;
+
+    String statusIds;
+
+    int page;
+
+    int size;
+
 }

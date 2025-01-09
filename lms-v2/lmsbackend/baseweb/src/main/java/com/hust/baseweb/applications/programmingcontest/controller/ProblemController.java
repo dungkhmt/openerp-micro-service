@@ -5,18 +5,17 @@ import com.hust.baseweb.applications.programmingcontest.callexternalapi.model.Lm
 import com.hust.baseweb.applications.programmingcontest.callexternalapi.service.ApiService;
 import com.hust.baseweb.applications.programmingcontest.entity.ProblemEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.TagEntity;
-import com.hust.baseweb.applications.programmingcontest.entity.TestCaseEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.UserContestProblemRole;
 import com.hust.baseweb.applications.programmingcontest.exception.MiniLeetCodeException;
 import com.hust.baseweb.applications.programmingcontest.model.*;
 import com.hust.baseweb.applications.programmingcontest.model.externalapi.ContestProblemModelResponse;
 import com.hust.baseweb.applications.programmingcontest.model.externalapi.GetSubmissionsOfParticipantModelInput;
 import com.hust.baseweb.applications.programmingcontest.model.externalapi.SubmissionModelResponse;
-import com.hust.baseweb.applications.programmingcontest.repo.ContestProblemRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.ProblemRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.TestCaseRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.UserContestProblemRoleRepo;
 import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseService;
+import com.hust.baseweb.model.ProblemFilter;
 import com.hust.baseweb.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +32,6 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import javax.validation.constraints.NotBlank;
 import java.security.Principal;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -147,14 +145,13 @@ public class ProblemController {
     public ResponseEntity<?> checkCompile(@RequestBody ModelCheckCompile modelCheckCompile, Principal principal)
         throws Exception {
         ModelCheckCompileResponse resp = problemTestCaseService.checkCompile(modelCheckCompile, principal.getName());
-        return ResponseEntity.status(200).body(resp);
+        return ResponseEntity.ok().body(resp);
     }
 
     @GetMapping("/tags")
     public ResponseEntity<?> getAllTags() {
-
-        List<TagEntity> listTag = problemTestCaseService.getAllTags();
-        return ResponseEntity.status(200).body(listTag);
+        List<TagEntity> tags = problemTestCaseService.getAllTags();
+        return ResponseEntity.ok().body(tags);
     }
 
     @PostMapping("/tags")
@@ -186,13 +183,11 @@ public class ProblemController {
 
     @PostMapping("/problems/{problemId}/testcases/{testCaseId}/solution")
     public ResponseEntity<?> rerunCreateTestCaseSolution(
-        Principal principal, @PathVariable String problemId,
+        @PathVariable String problemId,
         @PathVariable UUID testCaseId
-    ) {
+    ) throws Exception {
         log.info("rerunCreateTestCaseSolution problem " + problemId + " testCaseId " + testCaseId);
-        ModelUploadTestCaseOutput res = problemTestCaseService.rerunCreateTestCaseSolution(problemId, testCaseId,
-                                                                                           principal.getName());
-        return ResponseEntity.ok().body(res);
+        return ResponseEntity.ok().body(problemTestCaseService.reCreateTestcaseCorrectAnswer(problemId, testCaseId));
     }
 
     @GetMapping("/problems/{problemId}/users/role")
@@ -259,28 +254,46 @@ public class ProblemController {
         return ResponseEntity.ok().body(savedProblem);
     }
 
+    /**
+     * @param owner
+     * @param filter
+     * @return
+     */
     @Secured("ROLE_TEACHER")
     @GetMapping("/teacher/owned-problems")
-    public List<ProblemEntity> getAllMyProblems(Principal owner) {
-        return this.problemTestCaseService.getOwnerProblems(owner.getName());
+    public ResponseEntity<?> getAllMyProblems(Principal owner, ProblemFilter filter) {
+        return ResponseEntity.ok().body(this.problemTestCaseService.getProblems(owner.getName(), filter, null));
     }
 
+    /**
+     *
+     * @param owner
+     * @param filter
+     * @return
+     */
     @Secured("ROLE_TEACHER")
     @GetMapping("/teacher/shared-problems")
-    public List<ProblemEntity> getAllSharedProblems(Principal owner) {
-        return this.problemTestCaseService.getSharedProblems(owner.getName());
-    }
-    @Secured("ROLE_TEACHER")
-    @GetMapping("/teacher/public-problems")
-    public List<ProblemEntity> getPublicProblems(Principal owner) {
-        return this.problemTestCaseService.getPublicProblems(owner.getName());
+    public ResponseEntity<?> getAllSharedProblems(Principal owner, ProblemFilter filter) {
+        return ResponseEntity.ok().body(this.problemTestCaseService.getSharedProblems(owner.getName(), filter));
     }
 
+    /**
+     *
+     * @param owner
+     * @param filter
+     * @return
+     */
     @Secured("ROLE_TEACHER")
-    @GetMapping("/teacher/all-problems")
-    public List<ProblemEntity> getAllProblems(Principal owner) {
-        return this.problemTestCaseService.getAllProblems(owner.getName());
+    @GetMapping("/teacher/public-problems")
+    public ResponseEntity<?> getPublicProblems(Principal owner, ProblemFilter filter) {
+        return ResponseEntity.ok().body(this.problemTestCaseService.getPublicProblems(owner.getName(), filter));
     }
+
+    //    @Secured("ROLE_TEACHER")
+//    @GetMapping("/teacher/all-problems")
+//    public List<ProblemEntity> getAllProblems(Principal owner) {
+//        return this.problemTestCaseService.getAllProblems(owner.getName());
+//    }
     //@Secured("ROLE_EXT_DATA_QUERY")
     @GetMapping("/extapi/all-problems")
     public ResponseEntity<?> extGetAllProblems(Principal principal){
@@ -293,24 +306,24 @@ public class ProblemController {
         List<SubmissionModelResponse> res = problemTestCaseService.extApiGetSubmissions(participantId);
         return ResponseEntity.ok().body(res);
     }
-    @GetMapping("/grant-owner-role-problem-to-admin")
-    public ResponseEntity<?> grantOwnerRoleProblemToAdmin(Principal principal){
-        List<ProblemEntity> probs = problemRepo.findAll();
-        for(ProblemEntity p: probs){
-            List<UserContestProblemRole> ucpr = userContestProblemRoleRepo
-                .findAllByProblemIdAndUserIdAndRoleId(p.getProblemId(),"admin", UserContestProblemRole.ROLE_OWNER);
-            if(ucpr == null || ucpr.size() == 0){
-                UserContestProblemRole r = new UserContestProblemRole();
-                r.setProblemId(p.getProblemId());
-                r.setUserId("admin");
-                r.setRoleId(UserContestProblemRole.ROLE_OWNER);
-                r.setCreatedStamp(new Date());
-
-                r = userContestProblemRoleRepo.save(r);
-                log.info("grantOwnerRoleProblemToAdmin grant OWNER role of problem " + p.getProblemId() + " to admin");
-            }
-        }
-
-        return ResponseEntity.ok().body("OK");
-    }
+//    @GetMapping("/grant-owner-role-problem-to-admin")
+//    public ResponseEntity<?> grantOwnerRoleProblemToAdmin(Principal principal){
+//        List<ProblemEntity> probs = problemRepo.findAll();
+//        for(ProblemEntity p: probs){
+//            List<UserContestProblemRole> ucpr = userContestProblemRoleRepo
+//                .findAllByProblemIdAndUserIdAndRoleId(p.getProblemId(),"admin", UserContestProblemRole.ROLE_OWNER);
+//            if(ucpr == null || ucpr.size() == 0){
+//                UserContestProblemRole r = new UserContestProblemRole();
+//                r.setProblemId(p.getProblemId());
+//                r.setUserId("admin");
+//                r.setRoleId(UserContestProblemRole.ROLE_OWNER);
+//                r.setCreatedStamp(new Date());
+//
+//                r = userContestProblemRoleRepo.save(r);
+//                log.info("grantOwnerRoleProblemToAdmin grant OWNER role of problem " + p.getProblemId() + " to admin");
+//            }
+//        }
+//
+//        return ResponseEntity.ok().body("OK");
+//    }
 }

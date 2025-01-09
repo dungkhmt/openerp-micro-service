@@ -1,6 +1,5 @@
 name: lms Image CI
 
-
 on:
   push:
     branches:
@@ -36,7 +35,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./lms/lmsbackend/baseweb
-          platforms: linux/amd64,linux/arm64
+#          platforms: linux/amd64,linux/arm64
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/lms:${{ steps.construct-tag.outputs.TAG_NAME }}

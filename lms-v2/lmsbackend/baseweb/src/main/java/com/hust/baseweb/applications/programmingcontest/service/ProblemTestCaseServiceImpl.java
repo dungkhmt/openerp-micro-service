@@ -1,5 +1,7 @@
 package com.hust.baseweb.applications.programmingcontest.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.hust.baseweb.applications.contentmanager.model.ContentHeaderModel;
 import com.hust.baseweb.applications.contentmanager.model.ContentModel;
@@ -19,9 +21,10 @@ import com.hust.baseweb.applications.programmingcontest.utils.ComputerLanguage;
 import com.hust.baseweb.applications.programmingcontest.utils.DateTimeUtils;
 import com.hust.baseweb.applications.programmingcontest.utils.TempDir;
 import com.hust.baseweb.applications.programmingcontest.utils.codesimilaritycheckingalgorithms.CodeSimilarityCheck;
-import com.hust.baseweb.applications.programmingcontest.utils.stringhandler.ProblemSubmission;
-import com.hust.baseweb.applications.programmingcontest.utils.stringhandler.StringHandler;
 import com.hust.baseweb.entity.UserLogin;
+import com.hust.baseweb.model.ProblemFilter;
+import com.hust.baseweb.model.ProblemProjection;
+import com.hust.baseweb.model.dto.ProblemDTO;
 import com.hust.baseweb.repo.UserLoginRepo;
 import com.hust.baseweb.service.UserService;
 import lombok.AllArgsConstructor;
@@ -30,19 +33,25 @@ import net.lingala.zip4j.model.enums.AesKeyStrength;
 import net.lingala.zip4j.model.enums.CompressionMethod;
 import net.lingala.zip4j.model.enums.EncryptionMethod;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import vn.edu.hust.soict.judge0client.config.Judge0Config;
+import vn.edu.hust.soict.judge0client.entity.Judge0Submission;
+import vn.edu.hust.soict.judge0client.service.Judge0Service;
 
-import javax.persistence.criteria.Predicate;
+import javax.persistence.EntityNotFoundException;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -52,41 +61,76 @@ import static com.hust.baseweb.config.rabbitmq.RabbitProgrammingContestConfig.EX
 
 @Slf4j
 @Service
-@AllArgsConstructor(onConstructor = @__(@Autowired))
+@AllArgsConstructor(onConstructor_ = {@Autowired})
 public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
     public static final Integer MAX_SUBMISSIONS_CHECKSIMILARITY = 1000;
 
     private final ProblemRepo problemRepo;
+
     private TestCaseRepo testCaseRepo;
+
     private DockerClientBase dockerClientBase;
+
     private TempDir tempDir;
+
     private ProblemPagingAndSortingRepo problemPagingAndSortingRepo;
+
     private UserLoginRepo userLoginRepo;
+
     private ContestRepo contestRepo;
+
     private Constants constants;
+
     private ContestPagingAndSortingRepo contestPagingAndSortingRepo;
+
     private ContestSubmissionRepo contestSubmissionRepo;
+
     private UserRegistrationContestRepo userRegistrationContestRepo;
+
     private NotificationsService notificationsService;
+
     private UserRegistrationContestPagingAndSortingRepo userRegistrationContestPagingAndSortingRepo;
+
     private ContestSubmissionPagingAndSortingRepo contestSubmissionPagingAndSortingRepo;
+
     private ContestSubmissionTestCaseEntityRepo contestSubmissionTestCaseEntityRepo;
+
     private UserService userService;
+
     private ContestRoleRepo contestRoleRepo;
+
     private CodePlagiarismRepo codePlagiarismRepo;
+
     private ContestSubmissionHistoryRepo contestSubmissionHistoryRepo;
+
     private ContestProblemRepo contestProblemRepo;
+
     private UserContestProblemRoleRepo userContestProblemRoleRepo;
+
     private TagRepo tagRepo;
+
     private MongoContentService mongoContentService;
+
     private ProblemService problemService;
+
     private ContestService contestService;
+
     private TestCaseService testCaseService;
+
     private RabbitTemplate rabbitTemplate;
+
     private ProblemTestCaseServiceCache cacheService;
+
     private ContestProblemExportService exporter;
+
     private ContestUserParticipantGroupRepo contestUserParticipantGroupRepo;
+
+    private Judge0Service judge0Service;
+
+    Judge0Config judge0Config;
+
+    ObjectMapper objectMapper;
 
     @Override
     @Transactional
@@ -428,122 +472,126 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         return timeLimit;
     }
 
-    @Override
-    public ModelGetTestCaseResultResponse getTestCaseResult(
-        String problemId,
-        String userName,
-        ModelGetTestCaseResult modelGetTestCaseResult
-    ) throws Exception {
-        ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
-        String tempName = tempDir.createRandomScriptFileName(userName +
-                                                             "-" +
-                                                             problemEntity.getProblemId() +
-                                                             "-" +
-                                                             problemEntity.getCorrectSolutionLanguage());
-        String output = runCode(
-            problemEntity.getCorrectSolutionSourceCode(),
-            problemEntity.getCorrectSolutionLanguage(),
-            tempName,
-            modelGetTestCaseResult.getTestcase(),
-            getTimeLimitByLanguage(problemEntity, problemEntity.getCorrectSolutionLanguage()),
-            "Correct Solution Language Not Found");
-        if (output.contains("Time Limit Exceeded")) {
-            return ModelGetTestCaseResultResponse.builder()
-                                                 .result("")
-                                                 .status("Time Limit Exceeded")
-                                                 .build();
-        }
-        output = output.substring(0, output.length() - 1);
-        int lastLinetIndexExpected = output.lastIndexOf("\n");
-        output = output.substring(0, lastLinetIndexExpected);
-//        output = output.replaceAll("\n", "");
-        //    log.info("output {}", output);
-        return ModelGetTestCaseResultResponse.builder()
-                                             .result(output)
-                                             .status("ok")
-                                             .build();
-    }
+//    @Override
+//    public ModelGetTestCaseResultResponse getTestCaseResult(
+//        String problemId,
+//        String userName,
+//        ModelGetTestCaseResult modelGetTestCaseResult
+//    ) throws Exception {
+//        ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
+//        String tempName = tempDir.createRandomScriptFileName(userName +
+//                                                             "-" +
+//                                                             problemEntity.getProblemId() +
+//                                                             "-" +
+//                                                             problemEntity.getCorrectSolutionLanguage());
+//        String output = runCode(
+//            problemEntity.getCorrectSolutionSourceCode(),
+//            problemEntity.getCorrectSolutionLanguage(),
+//            tempName,
+//            modelGetTestCaseResult.getTestcase(),
+//            getTimeLimitByLanguage(problemEntity, problemEntity.getCorrectSolutionLanguage()),
+//            "Correct Solution Language Not Found");
+//        if (output.contains("Time Limit Exceeded")) {
+//            return ModelGetTestCaseResultResponse.builder()
+//                                                 .result("")
+//                                                 .status("Time Limit Exceeded")
+//                                                 .build();
+//        }
+//        output = output.substring(0, output.length() - 1);
+//        int lastLinetIndexExpected = output.lastIndexOf("\n");
+//        output = output.substring(0, lastLinetIndexExpected);
+////        output = output.replaceAll("\n", "");
+//        //    log.info("output {}", output);
+//        return ModelGetTestCaseResultResponse.builder()
+//                                             .result(output)
+//                                             .status("ok")
+//                                             .build();
+//    }
 
+    /**
+     * @param modelCheckCompile
+     * @param userName
+     * @return
+     * @throws Exception
+     */
     @Override
     public ModelCheckCompileResponse checkCompile(
         ModelCheckCompile modelCheckCompile,
         String userName
     ) throws Exception {
-        String tempName = tempDir.createRandomScriptFileName(userName);
-        String resp;
+        int languageId;
+        String compilerOptions = null;
         switch (ComputerLanguage.Languages.valueOf(modelCheckCompile.getComputerLanguage())) {
             case C:
-                tempDir.createScriptCompileFile(
-                    modelCheckCompile.getSource(),
-                    ComputerLanguage.Languages.C,
-                    tempName);
-                resp = dockerClientBase.runExecutable(ComputerLanguage.Languages.C, tempName);
+                languageId = 50;
+                compilerOptions = "-std=c17 -w -O2 -lm -fmax-errors=3";
                 break;
             case CPP11:
-                tempDir.createScriptCompileFile(
-                    modelCheckCompile.getSource(),
-                    ComputerLanguage.Languages.CPP11,
-                    tempName);
-                resp = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP11, tempName);
+                languageId = 54;
+                compilerOptions = "-std=c++11 -w -O2 -lm -fmax-errors=3 -march=native -s -Wl,-z,stack-size=268435456";
                 break;
             case CPP14:
-                tempDir.createScriptCompileFile(
-                    modelCheckCompile.getSource(),
-                    ComputerLanguage.Languages.CPP14,
-                    tempName);
-                resp = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP14, tempName);
+                languageId = 54;
+                compilerOptions = "-std=c++14 -w -O2 -lm -fmax-errors=3 -march=native -s -Wl,-z,stack-size=268435456";
                 break;
             case CPP:
             case CPP17:
-                tempDir.createScriptCompileFile(
-                    modelCheckCompile.getSource(),
-                    ComputerLanguage.Languages.CPP17,
-                    tempName);
-                resp = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP17, tempName);
+                languageId = 54;
+                compilerOptions = "-std=c++17 -w -O2 -lm -fmax-errors=3 -march=native -s -Wl,-z,stack-size=268435456";
                 break;
             case JAVA:
-                tempDir.createScriptCompileFile(
-                    modelCheckCompile.getSource(),
-                    ComputerLanguage.Languages.JAVA,
-                    tempName);
-                resp = dockerClientBase.runExecutable(ComputerLanguage.Languages.JAVA, tempName);
+                languageId = 62;
                 break;
             case PYTHON3:
-                tempDir.createScriptCompileFile(
-                    modelCheckCompile.getSource(),
-                    ComputerLanguage.Languages.PYTHON3,
-                    tempName);
-                resp = dockerClientBase.runExecutable(ComputerLanguage.Languages.PYTHON3, tempName);
+                languageId = 71;
                 break;
             default:
-                throw new Exception("Language not found");
+                throw new Exception("Language not supported");
         }
-        if (resp.contains("Successful")) {
-            return ModelCheckCompileResponse.builder()
-                                            .status("Successful")
-                                            .message("")
-                                            .build();
 
-        } else {
-            return ModelCheckCompileResponse.builder()
-                                            .status("Compile Error")
-                                            .message(resp)
-                                            .build();
-        }
-    }
-
-    @Override
-    public TestCaseEntity saveTestCase(String problemId, ModelSaveTestcase modelSaveTestcase) {
-
-        TestCaseEntity testCaseEntity = TestCaseEntity.builder()
-                                                      .correctAnswer(modelSaveTestcase.getResult())
-                                                      .testCase(modelSaveTestcase.getInput())
-                                                      .testCasePoint(modelSaveTestcase.getPoint())
-                                                      .problemId(problemId)
-                                                      .isPublic(modelSaveTestcase.getIsPublic())
+        // Thực tế chỉ cần biên dịch, không cần chạy nên thiết lập giới hạn thời gian đủ nhỏ
+        Judge0Submission submission = Judge0Submission.builder()
+                                                      .sourceCode(modelCheckCompile.getSource())
+                                                      .languageId(languageId)
+                                                      .compilerOptions(compilerOptions)
+                                                      .commandLineArguments(null)
+                                                      .cpuTimeLimit(0.05F)
+                                                      .cpuExtraTime(0.05F)
+                                                      .wallTimeLimit(1.0F)
+                                                      .memoryLimit(Float.valueOf(judge0Config
+                                                                                     .getSubmission()
+                                                                                     .getMaxMemoryLimit()))
+                                                      .stackLimit(judge0Config.getSubmission().getMaxStackLimit())
+                                                      .maxProcessesAndOrThreads(2)
+                                                      .enablePerProcessAndThreadTimeLimit(false)
+                                                      .enablePerProcessAndThreadMemoryLimit(false)
+                                                      .maxFileSize(judge0Config.getSubmission().getMaxMaxFileSize())
+                                                      .redirectStderrToStdout(false)
+                                                      .enableNetwork(false)
+                                                      .numberOfRuns(1)
                                                       .build();
-        return testCaseService.saveTestCaseWithCache(testCaseEntity);
+
+        submission = judge0Service.createASubmission(submission, true, true);
+        submission.decodeBase64();
+
+        return ModelCheckCompileResponse.builder()
+                                        .status(submission.getStatus().getDescription())
+                                        .message(submission.getCompileOutput())
+                                        .build();
     }
+
+//    @Override
+//    public TestCaseEntity saveTestCase(String problemId, ModelSaveTestcase modelSaveTestcase) {
+//
+//        TestCaseEntity testCaseEntity = TestCaseEntity.builder()
+//                                                      .correctAnswer(modelSaveTestcase.getResult())
+//                                                      .testCase(modelSaveTestcase.getInput())
+//                                                      .testCasePoint(modelSaveTestcase.getPoint())
+//                                                      .problemId(problemId)
+//                                                      .isPublic(modelSaveTestcase.getIsPublic())
+//                                                      .build();
+//        return testCaseService.saveTestCaseWithCache(testCaseEntity);
+//    }
 
     @Transactional
     @Override
@@ -852,6 +900,12 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         return contestService.getModelGetContestDetailResponse(contestEntity);
     }
 
+    /**
+     *
+     * @param submissionId
+     * @param testcaseId
+     * @return
+     */
     @Override
     public List<SubmissionDetailByTestcaseOM> getSubmissionDetailByTestcase(UUID submissionId, UUID testcaseId) {
         ContestSubmissionEntity submission = contestSubmissionRepo.findById(submissionId).orElse(null);
@@ -904,6 +958,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 st.getPoint(),
                 st.getUsedToGrade(),
                 st.getRuntime(),
+                st.getMemoryUsage(),
+                null,
                 null,
                 null,
                 st.getCreatedStamp(),
@@ -914,16 +970,19 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 String testcaseContent = "";
                 String testcaseOutput = "";
                 String participantSolutionOutput = "";
+                String stderr = null;
 
                 if (contest != null && tc != null) {
                     testcaseContent = tc.getTestCase();
                     testcaseOutput = tc.getCorrectAnswer();
-                    participantSolutionOutput = st.getParticipantSolutionOtput();
+                    participantSolutionOutput = st.getParticipantSolutionOutput();
+                    stderr = st.getStderr();
                 }
 
                 testcaseOM.setTestCase(testcaseContent);
                 testcaseOM.setTestCaseAnswer(testcaseOutput);
                 testcaseOM.setParticipantAnswer(participantSolutionOutput);
+                testcaseOM.setStderr(stderr);
             }
 
             result.add(testcaseOM);
@@ -983,6 +1042,12 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         return mapTestcaseIdToLatestSubmission;
     }
 
+    /**
+     *
+     * @param userId
+     * @param submissionId
+     * @return
+     */
     @Override
     public List<SubmissionDetailByTestcaseOM> getParticipantSubmissionDetailByTestCase(
         String userId, UUID submissionId
@@ -1037,14 +1102,14 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                     case ContestEntity.CONTEST_PARTICIPANT_VIEW_TESTCASE_DETAIL_ENABLED:
                         testCaseContent = tc.getTestCase();
                         testCaseOutput = tc.getCorrectAnswer();
-                        participantSolutionOutput = st.getParticipantSolutionOtput();
+                        participantSolutionOutput = st.getParticipantSolutionOutput();
                         break;
 
                     case ContestEntity.CONTEST_PARTICIPANT_VIEW_TESTCASE_DETAIL_DISABLED:
                         if (tc.getIsPublic().equals("Y")) {
                             testCaseContent = tc.getTestCase();
                             testCaseOutput = tc.getCorrectAnswer();
-                            participantSolutionOutput = st.getParticipantSolutionOtput();
+                            participantSolutionOutput = st.getParticipantSolutionOutput();
 
                         } else {
                             testCaseContent = "---HIDDEN---";
@@ -1058,7 +1123,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                         if (tc.getIsPublic().equals("Y")) {
                             testCaseOutput = tc.getCorrectAnswer();
                         }
-                        participantSolutionOutput = st.getParticipantSolutionOtput();
+                        participantSolutionOutput = st.getParticipantSolutionOutput();
                         break;
                 }
                 //String graded = ContestSubmissionTestCaseEntity.USED_TO_GRADE_YES;
@@ -1073,9 +1138,11 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                     st.getStatus(),
                     st.getPoint(),
                     st.getUsedToGrade(),
-                    null,
+                    st.getRuntime(),
+                    st.getMemoryUsage(),
                     testCaseOutput,
                     participantSolutionOutput,
+                    null,
                     st.getCreatedStamp(),
                     viewSubmitSolutionOutputMode
                 ));
@@ -1150,7 +1217,13 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                              .build();
     }
 
-
+    /**
+     *
+     * @param modelContestSubmission
+     * @param userName
+     * @param submittedByUserId
+     * @return
+     */
     @Override
     public ModelContestSubmissionResponse submitContestProblemStoreOnlyNotExecute(
         ModelContestSubmission modelContestSubmission,
@@ -1204,7 +1277,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                   .submittedByUserLoginId(userName)
                                                   .point(0)
                                                   .status("N/A")
-                                                  .participantSolutionOtput("")
+                                                  .participantSolutionOutput("")
                                                   .runtime(null)
                                                   .createdStamp(new Date())
                                                   .build();
@@ -1230,178 +1303,172 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                              .build();
     }
 
-    @Transactional
-    @Override
-    public ModelContestSubmissionResponse submitSolutionOutput(
-        String solutionOutput,
-        String contestId,
-        String problemId,
-        UUID testCaseId,
-        String userName
-    ) throws Exception {
-        ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
-
-        UserRegistrationContestEntity userRegistrationContest = null;
-        List<UserRegistrationContestEntity> userRegistrationContests = userRegistrationContestRepo.findUserRegistrationContestEntityByContestIdAndUserIdAndStatus(
-            contestId, userName, Constants.RegistrationType.SUCCESSFUL.getValue());
-        if (userRegistrationContests != null && userRegistrationContests.size() > 0) {
-            userRegistrationContest = userRegistrationContests.get(0);
-        }
-
-        //  log.info("submitSolutionOutput, userRegistrationContest {}", userRegistrationContest);
-        if (userRegistrationContest == null) {
-            throw new MiniLeetCodeException("User not register contest");
-        }
-        TestCaseEntity testCase = testCaseRepo.findTestCaseByTestCaseId(testCaseId);
-        String tempName = tempDir.createRandomScriptFileName(userName + "-" + contestId + "-" + problemId);
-        String response = submissionSolutionOutput(
-            problemEntity.getSolutionCheckerSourceCode(),
-            problemEntity.getSolutionCheckerSourceLanguage(),
-            solutionOutput,
-            tempName,
-            testCase,
-            "language not found",
-            1000000,
-            problemEntity.getMemoryLimit());
-
-
-        //  log.info("submitSolutionOutput, response = " + response);
-
-        ProblemSubmission problemSubmission = StringHandler.handleContestResponseSubmitSolutionOutputOneTestCase(
-            response,
-            testCase.getTestCasePoint());
-
-        String participantAns = "";
-        if (problemSubmission.getParticipantAns() != null && !problemSubmission.getParticipantAns().isEmpty()) {
-            participantAns = problemSubmission.getParticipantAns().get(0);
-        }
-        ContestSubmissionTestCaseEntity cste = ContestSubmissionTestCaseEntity.builder()
-                                                                              .contestId(contestId)
-                                                                              .problemId(problemId)
-                                                                              .testCaseId(testCase.getTestCaseId())
-                                                                              .submittedByUserLoginId(userName)
-                                                                              .point(problemSubmission.getScore())
-                                                                              .status(problemSubmission.getStatus())
-                                                                              .participantSolutionOtput(participantAns)
-                                                                              .runtime(problemSubmission.getRuntime())
-                                                                              .createdStamp(new Date())
-                                                                              .build();
-        cste = contestSubmissionTestCaseEntityRepo.save(cste);
-
-        return ModelContestSubmissionResponse.builder()
-                                             .status(problemSubmission.getStatus())
-                                             .testCasePass("1/1")
-                                             .runtime(problemSubmission.getRuntime())
-                                             .memoryUsage((float) 0.0)
-                                             .problemName(problemEntity.getProblemName())
-                                             .contestSubmissionID(null)
-                                             .submittedAt(new Date())
-                                             .score((long) problemSubmission.getScore())
-                                             .build();
-
-    }
-
-    @Override
-    public ModelContestSubmissionResponse submitSolutionOutputOfATestCase(
-        String userId,
-        String solutionOutput,
-        ModelSubmitSolutionOutputOfATestCase m
-    ) {
-        ModelContestSubmissionResponse res = new ModelContestSubmissionResponse();
-        ContestSubmissionEntity sub = contestSubmissionRepo.findContestSubmissionEntityByContestSubmissionId(m.getSubmissionId());
-        if (sub == null) {
-            return res;
-        }
-        String contestId = sub.getContestId();
-        String problemId = sub.getProblemId();
-        ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
-
-        UserRegistrationContestEntity userRegistrationContest = null;
-        List<UserRegistrationContestEntity> userRegistrationContests = userRegistrationContestRepo.findUserRegistrationContestEntityByContestIdAndUserIdAndStatus(
-            contestId, userId, Constants.RegistrationType.SUCCESSFUL.getValue());
-        if (userRegistrationContests != null && userRegistrationContests.size() > 0) {
-            userRegistrationContest = userRegistrationContests.get(0);
-        }
-
-        //log.info("submitSolutionOutput, userRegistrationContest {}", userRegistrationContest);
-        if (userRegistrationContest == null) {
-            return res;
-        }
-        TestCaseEntity testCase = testCaseRepo.findTestCaseByTestCaseId(m.getTestCaseId());
-        String tempName = tempDir.createRandomScriptFileName(userId + "-" + contestId + "-" + problemId);
-        try {
-            String response = submissionSolutionOutput(
-                problemEntity.getSolutionCheckerSourceCode(),
-                problemEntity.getSolutionCheckerSourceLanguage(),
-                solutionOutput,
-                tempName,
-                testCase,
-                "language not found",
-                1000000,
-                problemEntity.getMemoryLimit());
-
-            //   log.info("submitSolutionOutput, response = " + response);
-            ProblemSubmission problemSubmission = StringHandler.handleContestResponseSubmitSolutionOutputOneTestCase(
-                response,
-                testCase.getTestCasePoint());
-
-            String participantAns = "";
-            if (problemSubmission.getParticipantAns() != null && !problemSubmission.getParticipantAns().isEmpty()) {
-                participantAns = problemSubmission.getParticipantAns().get(0);
-            }
-            ContestSubmissionTestCaseEntity cste = null;
-            List<ContestSubmissionTestCaseEntity> l_cste = contestSubmissionTestCaseEntityRepo
-                .findAllByContestSubmissionIdAndTestCaseId(sub.getContestSubmissionId(), m.getTestCaseId());
-            long subPoint = sub.getPoint();
-            if (l_cste != null && !l_cste.isEmpty()) {
-                cste = l_cste.get(0);
-                subPoint = subPoint - cste.getPoint();// reduce point of submission by old point of test-case
-                cste.setPoint(problemSubmission.getScore());
-                cste.setStatus(problemSubmission.getStatus());
-                cste.setParticipantSolutionOtput(solutionOutput);
-                cste.setRuntime(problemSubmission.getRuntime());
-                cste.setCreatedStamp(new Date());
-            } else {
-                cste = ContestSubmissionTestCaseEntity.builder()
-                                                      .contestId(contestId)
-                                                      .problemId(problemId)
-                                                      .contestSubmissionId(sub.getContestSubmissionId())
-                                                      .testCaseId(testCase.getTestCaseId())
-                                                      .submittedByUserLoginId(userId)
-                                                      .point(problemSubmission.getScore())
-                                                      .status(problemSubmission.getStatus())
-                                                      .participantSolutionOtput(participantAns)
-                                                      .runtime(problemSubmission.getRuntime())
-                                                      .createdStamp(new Date())
-                                                      .build();
-            }
-
-            cste = contestSubmissionTestCaseEntityRepo.save(cste);
-
-            subPoint = subPoint + cste.getPoint(); // update Point;
-            sub.setPoint(subPoint);
-            sub.setStatus(ContestSubmissionEntity.SUBMISSION_STATUS_PARTIAL);
-            sub = contestSubmissionRepo.save(sub);
-
-            return ModelContestSubmissionResponse.builder()
-                                                 .contestId(contestId)
-                                                 .problemId(problemId)
-                                                 .contestSubmissionID(sub.getContestSubmissionId())
-                                                 .selectedTestCaseId(m.getTestCaseId())
-                                                 .status(problemSubmission.getStatus())
-                                                 .testCasePass("1/1")
-                                                 .runtime(problemSubmission.getRuntime())
-                                                 .memoryUsage((float) 0.0)
-                                                 .problemName(problemEntity.getProblemName())
-                                                 .submittedAt(new Date())
-                                                 .score((long) problemSubmission.getScore())
-                                                 .build();
-
-        } catch (Exception e) {
-            return res;
-        }
-
-    }
+//    @Transactional
+//    @Override
+//    public ModelContestSubmissionResponse submitSolutionOutput(
+//        String solutionOutput,
+//        String contestId,
+//        String problemId,
+//        UUID testCaseId,
+//        String userName
+//    ) throws Exception {
+//        ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
+//
+//        UserRegistrationContestEntity userRegistrationContest = null;
+//        List<UserRegistrationContestEntity> userRegistrationContests = userRegistrationContestRepo.findUserRegistrationContestEntityByContestIdAndUserIdAndStatus(
+//            contestId, userName, Constants.RegistrationType.SUCCESSFUL.getValue());
+//        if (userRegistrationContests != null && userRegistrationContests.size() > 0) {
+//            userRegistrationContest = userRegistrationContests.get(0);
+//        }
+//
+//        //  log.info("submitSolutionOutput, userRegistrationContest {}", userRegistrationContest);
+//        if (userRegistrationContest == null) {
+//            throw new MiniLeetCodeException("User not register contest");
+//        }
+//        TestCaseEntity testCase = testCaseRepo.findTestCaseByTestCaseId(testCaseId);
+//        Judge0Submission response = judgeSubmissionTestCaseOutput(
+//            problemEntity.getSolutionCheckerSourceCode(),
+//            problemEntity.getSolutionCheckerSourceLanguage(),
+//            solutionOutput,
+//            testCase,
+//            1000000,
+//            problemEntity.getMemoryLimit());
+//
+//
+//        //  log.info("submitSolutionOutput, response = " + response);
+//
+//        ProblemSubmission problemSubmission = StringHandler.handleContestResponseSubmitSolutionOutputOneTestCase(
+//            response,
+//            testCase.getTestCasePoint());
+//
+//        String participantAns = "";
+//        if (problemSubmission.getParticipantAns() != null && !problemSubmission.getParticipantAns().isEmpty()) {
+//            participantAns = problemSubmission.getParticipantAns().get(0);
+//        }
+//        ContestSubmissionTestCaseEntity cste = ContestSubmissionTestCaseEntity.builder()
+//                                                                              .contestId(contestId)
+//                                                                              .problemId(problemId)
+//                                                                              .testCaseId(testCase.getTestCaseId())
+//                                                                              .submittedByUserLoginId(userName)
+//                                                                              .point(problemSubmission.getScore())
+//                                                                              .status(problemSubmission.getStatus())
+//                                                                              .participantSolutionOutput(participantAns)
+//                                                                              .runtime(problemSubmission.getRuntime())
+//                                                                              .createdStamp(new Date())
+//                                                                              .build();
+//        cste = contestSubmissionTestCaseEntityRepo.save(cste);
+//
+//        return ModelContestSubmissionResponse.builder()
+//                                             .status(problemSubmission.getStatus())
+//                                             .testCasePass("1/1")
+//                                             .runtime(problemSubmission.getRuntime())
+//                                             .memoryUsage((float) 0.0)
+//                                             .problemName(problemEntity.getProblemName())
+//                                             .contestSubmissionID(null)
+//                                             .submittedAt(new Date())
+//                                             .score((long) problemSubmission.getScore())
+//                                             .build();
+//
+//    }
+//
+//    @Override
+//    public ModelContestSubmissionResponse submitSolutionOutputOfATestCase(
+//        String userId,
+//        String solutionOutput,
+//        ModelSubmitSolutionOutputOfATestCase m
+//    ) {
+//        ModelContestSubmissionResponse res = new ModelContestSubmissionResponse();
+//        ContestSubmissionEntity sub = contestSubmissionRepo.findContestSubmissionEntityByContestSubmissionId(m.getSubmissionId());
+//        if (sub == null) {
+//            return res;
+//        }
+//        String contestId = sub.getContestId();
+//        String problemId = sub.getProblemId();
+//        ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
+//
+//        UserRegistrationContestEntity userRegistrationContest = null;
+//        List<UserRegistrationContestEntity> userRegistrationContests = userRegistrationContestRepo.findUserRegistrationContestEntityByContestIdAndUserIdAndStatus(
+//            contestId, userId, Constants.RegistrationType.SUCCESSFUL.getValue());
+//        if (userRegistrationContests != null && userRegistrationContests.size() > 0) {
+//            userRegistrationContest = userRegistrationContests.get(0);
+//        }
+//
+//        //log.info("submitSolutionOutput, userRegistrationContest {}", userRegistrationContest);
+//        if (userRegistrationContest == null) {
+//            return res;
+//        }
+//        TestCaseEntity testCase = testCaseRepo.findTestCaseByTestCaseId(m.getTestCaseId());
+//        try {
+//            Judge0Submission response = judgeSubmissionTestCaseOutput(
+//                problemEntity.getSolutionCheckerSourceCode(),
+//                problemEntity.getSolutionCheckerSourceLanguage(),
+//                solutionOutput,
+//                testCase,
+//                1000000,
+//                problemEntity.getMemoryLimit());
+//
+//            //   log.info("submitSolutionOutput, response = " + response);
+//            ProblemSubmission problemSubmission = StringHandler.handleContestResponseSubmitSolutionOutputOneTestCase(
+//                response,
+//                testCase.getTestCasePoint());
+//
+//            String participantAns = "";
+//            if (problemSubmission.getParticipantAns() != null && !problemSubmission.getParticipantAns().isEmpty()) {
+//                participantAns = problemSubmission.getParticipantAns().get(0);
+//            }
+//            ContestSubmissionTestCaseEntity cste = null;
+//            List<ContestSubmissionTestCaseEntity> l_cste = contestSubmissionTestCaseEntityRepo
+//                .findAllByContestSubmissionIdAndTestCaseId(sub.getContestSubmissionId(), m.getTestCaseId());
+//            long subPoint = sub.getPoint();
+//            if (l_cste != null && !l_cste.isEmpty()) {
+//                cste = l_cste.get(0);
+//                subPoint = subPoint - cste.getPoint();// reduce point of submission by old point of test-case
+//                cste.setPoint(problemSubmission.getScore());
+//                cste.setStatus(problemSubmission.getStatus());
+//                cste.setParticipantSolutionOutput(solutionOutput);
+//                cste.setRuntime(problemSubmission.getRuntime());
+//                cste.setCreatedStamp(new Date());
+//            } else {
+//                cste = ContestSubmissionTestCaseEntity.builder()
+//                                                      .contestId(contestId)
+//                                                      .problemId(problemId)
+//                                                      .contestSubmissionId(sub.getContestSubmissionId())
+//                                                      .testCaseId(testCase.getTestCaseId())
+//                                                      .submittedByUserLoginId(userId)
+//                                                      .point(problemSubmission.getScore())
+//                                                      .status(problemSubmission.getStatus())
+//                                                      .participantSolutionOutput(participantAns)
+//                                                      .runtime(problemSubmission.getRuntime())
+//                                                      .createdStamp(new Date())
+//                                                      .build();
+//            }
+//
+//            cste = contestSubmissionTestCaseEntityRepo.save(cste);
+//
+//            subPoint = subPoint + cste.getPoint(); // update Point;
+//            sub.setPoint(subPoint);
+//            sub.setStatus(ContestSubmissionEntity.SUBMISSION_STATUS_PARTIAL);
+//            sub = contestSubmissionRepo.save(sub);
+//
+//            return ModelContestSubmissionResponse.builder()
+//                                                 .contestId(contestId)
+//                                                 .problemId(problemId)
+//                                                 .contestSubmissionID(sub.getContestSubmissionId())
+//                                                 .selectedTestCaseId(m.getTestCaseId())
+//                                                 .status(problemSubmission.getStatus())
+//                                                 .testCasePass("1/1")
+//                                                 .runtime(problemSubmission.getRuntime())
+//                                                 .memoryUsage((float) 0.0)
+//                                                 .problemName(problemEntity.getProblemName())
+//                                                 .submittedAt(new Date())
+//                                                 .score((long) problemSubmission.getScore())
+//                                                 .build();
+//
+//        } catch (Exception e) {
+//            return res;
+//        }
+//
+//    }
 
     @Override
     public ModelStudentRegisterContestResponse studentRegisterContest(
@@ -1952,10 +2019,10 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         return selectedlistContestSubmissionsByUser;
     }
 
-    @Override
-    public Page<ProblemEntity> getPublicProblemPaging(Pageable pageable) {
-        return problemPagingAndSortingRepo.findAllByPublicIs(pageable);
-    }
+//    @Override
+//    public Page<ProblemEntity> getPublicProblemPaging(Pageable pageable) {
+//        return problemPagingAndSortingRepo.findAllByPublicIs(pageable);
+//    }
 
     @Override
     public List<ModelGetTestCase> getTestCaseByProblem(String problemId) {
@@ -1983,19 +2050,19 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                      .build();
     }
 
-    @Override
-    public void editTestCase(UUID testCaseId, ModelSaveTestcase modelSaveTestcase) throws MiniLeetCodeException {
-        TestCaseEntity testCase = testCaseRepo.findTestCaseByTestCaseId(testCaseId);
-        if (testCase == null) {
-            throw new MiniLeetCodeException("test case not found");
-        }
-
-        testCase.setTestCase(modelSaveTestcase.getInput());
-        testCase.setCorrectAnswer(modelSaveTestcase.getResult());
-        testCase.setTestCasePoint(modelSaveTestcase.getPoint());
-        testCase.setIsPublic(modelSaveTestcase.getIsPublic());
-        testCaseService.saveTestCaseWithCache(testCase);
-    }
+//    @Override
+//    public void editTestCase(UUID testCaseId, ModelSaveTestcase modelSaveTestcase) throws MiniLeetCodeException {
+//        TestCaseEntity testCase = testCaseRepo.findTestCaseByTestCaseId(testCaseId);
+//        if (testCase == null) {
+//            throw new MiniLeetCodeException("test case not found");
+//        }
+//
+//        testCase.setTestCase(modelSaveTestcase.getInput());
+//        testCase.setCorrectAnswer(modelSaveTestcase.getResult());
+//        testCase.setTestCasePoint(modelSaveTestcase.getPoint());
+//        testCase.setIsPublic(modelSaveTestcase.getIsPublic());
+//        testCaseService.saveTestCaseWithCache(testCase);
+//    }
 
     @Override
     public ModelAddUserToContestResponse addUserToContest(ModelAddUserToContest modelAddUserToContest) {
@@ -2786,99 +2853,167 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                           .build();
     }
 
+//    /**
+//     * FIXME
+//     * @param sourceChecker
+//     * @param computerLanguage
+//     * @param submissionTestCaseOutput
+//     * @param testCase
+//     * @param timeLimit
+//     * @param memoryLimit
+//     * @return
+//     * @throws Exception
+//     */
+//    private Judge0Submission judgeSubmissionTestCaseOutput(
+//        String sourceChecker,
+//        String computerLanguage,
+//        String submissionTestCaseOutput,
+//        TestCaseEntity testCase,
+//        int timeLimit,
+//        int memoryLimit
+//    ) throws Exception {
+//        int languageId;
+//        String compilerOptions = null;
+//        switch (ComputerLanguage.Languages.valueOf(computerLanguage)) {
+//            case C:
+//                languageId = 50;
+//                compilerOptions = "-std=c17 -w -O2 -lm -fmax-errors=3";
+//                break;
+//            case CPP11:
+//                languageId = 54;
+//                compilerOptions = "-std=c++11 -w -O2 -lm -fmax-errors=3 -march=native -s -Wl,-z,stack-size=268435456";
+//                break;
+//            case CPP14:
+//                languageId = 54;
+//                compilerOptions = "-std=c++14 -w -O2 -lm -fmax-errors=3 -march=native -s -Wl,-z,stack-size=268435456";
+//                break;
+//            case CPP:
+//            case CPP17:
+//                languageId = 54;
+//                compilerOptions = "-std=c++17 -w -O2 -lm -fmax-errors=3 -march=native -s -Wl,-z,stack-size=268435456";
+//                break;
+//            case JAVA:
+//                languageId = 62;
+//                break;
+//            case PYTHON3:
+//                languageId = 71;
+//                break;
+//            default:
+//                throw new Exception("Language not supported");
+//        }
+//
+//        Judge0Submission submission = Judge0Submission.builder()
+//                                                      .sourceCode(sourceChecker)
+//                                                      .languageId(languageId)
+//                                                      .compilerOptions(compilerOptions)
+//                                                      .commandLineArguments(null)
+//                                                      .stdin(String.join(
+//                                                          "\n", new String[]{
+//                                                              testCase.getTestCase(),
+//                                                              testCase.getCorrectAnswer(),
+//                                                              submissionTestCaseOutput}))
+//                                                      .cpuTimeLimit((float) timeLimit)
+//                                                      .cpuExtraTime((float) (timeLimit * 1.0 + 2.0))
+//                                                      .wallTimeLimit((float) (timeLimit * 1.0 + 10.0))
+//                                                      .memoryLimit((float) memoryLimit * 1024)
+//                                                      .stackLimit(judge0Config.getSubmission().getMaxStackLimit())
+//                                                      .maxProcessesAndOrThreads(2) // OK, chấm output thì không cần đa luồng
+//                                                      .enablePerProcessAndThreadTimeLimit(false)
+//                                                      .enablePerProcessAndThreadMemoryLimit(false)
+//                                                      .maxFileSize(judge0Config.getSubmission().getMaxMaxFileSize())
+//                                                      .redirectStderrToStdout(false)
+//                                                      .enableNetwork(false)
+//                                                      .numberOfRuns(1)
+//                                                      .build();
+//
+//        submission = judge0Service.createASubmission(submission, true, true);
+//        submission.decodeBase64();
+//
+//        return submission;
+//    }
 
-    private String submissionSolutionOutput(
-        String sourceChecker,
-        String computerLanguage,
-        String solutionOutput,
-        String tempName,
-        TestCaseEntity testCase,
-        String exception,
-        int timeLimit,
-        int memoryLimit
-    ) throws Exception {
-        //log.info("submissionSolutionOutput, sourceChecker = " + sourceChecker + " solutionOutput = " + solutionOutput + " testCase = " + testCase.getTestCase());
-
-        String ans = "";
-        tempName = tempName.replaceAll(" ", "");
-        switch (ComputerLanguage.Languages.valueOf(computerLanguage)) {
-            case C:
-            case CPP:
-            case CPP11:
-            case CPP14:
-            case CPP17:
-                tempDir.createScriptSubmissionSolutionOutputFile(
-                    ComputerLanguage.Languages.CPP17,
-                    tempName,
-                    solutionOutput,
-                    testCase,
-                    sourceChecker,
-                    timeLimit);
-                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP17, tempName);
-                //  log.info("submissionSolutionOutput, sourceChecker = " + sourceChecker + " solutionOutput = " + solutionOutput + " testCase = " + testCase.getTestCase()
-                //  + " ans = " + ans);
-                break;
-            case JAVA:
-            case PYTHON3:
-                break;
-            default:
-                throw new Exception(exception);
-        }
-//        tempDir.pushToConcurrentLinkedQueue(tempName);
-        return ans;
-    }
-
-    private String runCode(
+    /**
+     *
+     * @param sourceCode
+     * @param computerLanguage
+     * @param input
+     * @param memoryLimit
+     * @param timeLimit
+     * @return
+     * @throws Exception
+     */
+    private Judge0Submission runCode(
         String sourceCode,
         String computerLanguage,
-        String tempName,
         String input,
-        int timeLimit,
-        String exception
+        int memoryLimit,
+        int timeLimit
     ) throws Exception {
-        String ans;
-        tempName = tempName.replaceAll(" ", "");
+        int languageId;
+        String compilerOptions = null;
         switch (ComputerLanguage.Languages.valueOf(computerLanguage)) {
             case C:
-                tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.C, tempName);
-                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.C, tempName);
+                languageId = 50;
+                compilerOptions = "-std=c17 -w -O2 -lm -fmax-errors=3";
                 break;
-            case CPP:
-                tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.CPP, tempName);
-                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP, tempName);
-                break;
-
             case CPP11:
-                tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.CPP11, tempName);
-                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP11, tempName);
+                languageId = 54;
+                compilerOptions = "-std=c++11 -w -O2 -lm -fmax-errors=3 -march=native -s -Wl,-z,stack-size=268435456";
                 break;
             case CPP14:
-                tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.CPP14, tempName);
-                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP14, tempName);
+                languageId = 54;
+                compilerOptions = "-std=c++14 -w -O2 -lm -fmax-errors=3 -march=native -s -Wl,-z,stack-size=268435456";
                 break;
+            case CPP:
             case CPP17:
-                tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.CPP17, tempName);
-                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.CPP17, tempName);
+                languageId = 54;
+                compilerOptions = "-std=c++17 -w -O2 -lm -fmax-errors=3 -march=native -s -Wl,-z,stack-size=268435456";
                 break;
             case JAVA:
-                tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.JAVA, tempName);
-                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.JAVA, tempName);
+                languageId = 62; // Xem xét JAVA_OPTS giới hạn bộ nhớ nhưng có vẻ không cần thiết lắm với Judge0
                 break;
             case PYTHON3:
-                tempDir.createScriptFile(sourceCode, input, timeLimit, ComputerLanguage.Languages.PYTHON3, tempName);
-                ans = dockerClientBase.runExecutable(ComputerLanguage.Languages.PYTHON3, tempName);
+                languageId = 71;
                 break;
             default:
-                throw new Exception(exception);
+                throw new Exception("Language not supported");
         }
-//        tempDir.pushToConcurrentLinkedQueue(tempName);
-        return ans;
+
+        Judge0Submission submission = Judge0Submission.builder()
+                                                      .sourceCode(sourceCode)
+                                                      .languageId(languageId)
+                                                      .compilerOptions(compilerOptions)
+                                                      .commandLineArguments(null)
+                                                      .stdin(input)
+//                                                      .expectedOutput(Constants.ProblemResultEvaluationType.CUSTOM
+//                                                                          .getValue()
+//                                                                          .equals(evaluationType)
+//                                                                          ? null
+//                                                                          : testCase.getCorrectAnswer())
+                                                      .cpuTimeLimit((float) timeLimit)
+                                                      .cpuExtraTime((float) (timeLimit * 1.0 + 2.0))
+                                                      .wallTimeLimit((float) (timeLimit * 1.0 + 10.0))
+                                                      .memoryLimit((float) memoryLimit * 1024)
+                                                      .stackLimit(judge0Config.getSubmission().getMaxStackLimit())
+                                                      .maxProcessesAndOrThreads(2)
+                                                      .enablePerProcessAndThreadTimeLimit(false)
+                                                      .enablePerProcessAndThreadMemoryLimit(false)
+                                                      .maxFileSize(judge0Config.getSubmission().getMaxMaxFileSize())
+                                                      .redirectStderrToStdout(false)
+                                                      .enableNetwork(false)
+                                                      .numberOfRuns(1)
+                                                      .build();
+
+        submission = judge0Service.createASubmission(submission, true, true);
+        submission.decodeBase64();
+
+        return submission;
     }
 
-    @Override
-    public List<CodePlagiarism> findAllByContestId(String contestId) {
-        return codePlagiarismRepo.findAllByContestId(contestId);
-    }
+//    @Override
+//    public List<CodePlagiarism> findAllByContestId(String contestId) {
+//        return codePlagiarismRepo.findAllByContestId(contestId);
+//    }
 
     private boolean emptyString(String s) {
         return s == null || s.isEmpty();
@@ -3121,159 +3256,144 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         return res;
     }
 
+    /**
+     *
+     * Try to execute the solution code on this test case, if pass then store in DB
+     * otherwise, ignore
+     *
+     * @param testCase
+     * @param dto
+     * @return
+     */
     @Override
-    public ModelUploadTestCaseOutput addTestCase(
+    public Object addTestcase(
         String testCase,
-        ModelProgrammingContestUploadTestCase modelUploadTestCase,
-        String userName
-    ) {
-        // try to execute the solution code on this test-case, if pass then store in DB
-        // otherwise, ignore
-        String problemId = modelUploadTestCase.getProblemId();
-        ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
-        String output = "";
-        ModelUploadTestCaseOutput res = new ModelUploadTestCaseOutput();
-        if (modelUploadTestCase.getUploadMode().equals("EXECUTE")) {
-            String tempName = tempDir.createRandomScriptFileName(userName +
-                                                                 "-" +
-                                                                 problemEntity.getProblemId() +
-                                                                 "-" +
-                                                                 problemEntity.getCorrectSolutionLanguage());
+        ModelProgrammingContestUploadTestCase dto
+    ) throws Exception {
+        ProblemEntity problem = problemRepo.findByProblemId(dto.getProblemId());
+        String testcaseCorrectAnswer;
+        Judge0Submission output = null;
 
-            try {
-                output = runCode(
-                    problemEntity.getCorrectSolutionSourceCode(),
-                    problemEntity.getCorrectSolutionLanguage(),
-                    tempName,
-                    testCase,
-//                    problemEntity.getTimeLimit(),
-                    getTimeLimitByLanguage(problemEntity, problemEntity.getCorrectSolutionLanguage()),
-                    "Correct Solution Language Not Found");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            if (output.contains("Time Limit Exceeded")) {
-                res.setMessage("Time Limit Exceeded");
-                res.setStatus("TLE");
-                return res;
-            }
-            output = output.substring(0, output.length() - 1);
-            int lastLinetIndexExpected = output.lastIndexOf("\n");
-            output = output.substring(0, lastLinetIndexExpected);
-
-        } else {
-            output = modelUploadTestCase.getCorrectAnswer();
-        }
-
-
-        TestCaseEntity tc = new TestCaseEntity();
-        tc.setTestCase(testCase);
-        tc.setProblemId(modelUploadTestCase.getProblemId());
-        tc.setIsPublic(modelUploadTestCase.getIsPublic());
-        tc.setTestCasePoint(modelUploadTestCase.getPoint());
-        tc.setCorrectAnswer(output);
-        tc.setDescription(modelUploadTestCase.getDescription());
-        testCaseService.saveTestCaseWithCache(tc);
-        res.setMessage("Upload Successfully!");
-        res.setStatus("OK");
-        return res;
-    }
-
-    @Override
-    public ModelUploadTestCaseOutput rerunCreateTestCaseSolution(String problemId, UUID testCaseId, String userId) {
-        ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
-        ModelUploadTestCaseOutput res = new ModelUploadTestCaseOutput();
-
-        TestCaseEntity tc = testCaseRepo.findTestCaseByTestCaseId(testCaseId);
-        String testCase = tc.getTestCase();
-        String tempName = tempDir.createRandomScriptFileName(userId +
-                                                             "-" +
-                                                             problemEntity.getProblemId() +
-                                                             "-" +
-                                                             problemEntity.getCorrectSolutionLanguage());
-        String output = "";
-        try {
+        if (TestcaseUploadMode.EXECUTE.equals(dto.getUploadMode())) {
             output = runCode(
-                problemEntity.getCorrectSolutionSourceCode(),
-                problemEntity.getCorrectSolutionLanguage(),
-                tempName,
+                problem.getCorrectSolutionSourceCode(),
+                problem.getCorrectSolutionLanguage(),
                 testCase,
-//                problemEntity.getTimeLimit(),
-                getTimeLimitByLanguage(problemEntity, problemEntity.getCorrectSolutionLanguage()),
-                "Correct Solution Language Not Found");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (output.contains("Time Limit Exceeded")) {
-            res.setMessage("Time Limit Exceeded");
-            res.setStatus("TLE");
-            return res;
-        }
-        output = output.substring(0, output.length() - 1);
-        int lastLinetIndexExpected = output.lastIndexOf("\n");
-        output = output.substring(0, lastLinetIndexExpected);
-        //  log.info("rerunCreateTestCaseSolution, output " + output);
-        tc.setCorrectAnswer(output);
-        tc = testCaseService.saveTestCaseWithCache(tc);
-        res.setMessage("Upload Successfully!");
-        res.setStatus("OK");
+                problem.getMemoryLimit(),
+                getTimeLimitByLanguage(problem, problem.getCorrectSolutionLanguage()));
 
-        return res;
+            if (output.getStatus().getId() != 3) { // Chay khong thanh cong thi khong luu, tra ket qua luon
+                return Judge0Submission.getSubmissionDetailsAfterExecution(output);
+            }
+
+            testcaseCorrectAnswer = output.getStdout();
+        } else { // TestcaseUploadMode.NOT_EXECUTE
+            testcaseCorrectAnswer = dto.getCorrectAnswer();
+        }
+
+        TestCaseEntity tc = TestCaseEntity.builder()
+                                          .testCase(testCase)
+                                          .problemId(dto.getProblemId())
+                                          .isPublic(dto.getIsPublic() ? "Y" : "N")
+                                          .testCasePoint(dto.getPoint())
+                                          .correctAnswer(testcaseCorrectAnswer)
+                                          .description(dto.getDescription())
+                                          .build();
+
+        testCaseService.saveTestCaseWithCache(tc);
+        return Judge0Submission.getSubmissionDetailsAfterExecution(output);
     }
 
+    /**
+     * Can be use when editing the solution's source code
+     *
+     *
+     * @param problemId
+     * @param testCaseId
+     * @return
+     */
     @Override
-    public ModelUploadTestCaseOutput uploadUpdateTestCase(
-        UUID testCaseId,
-        String testCase,
-        ModelProgrammingContestUploadTestCase modelUploadTestCase,
-        String userName
-    ) {
-        TestCaseEntity tc = testCaseRepo.findTestCaseByTestCaseId(testCaseId);
-        if (testCase != null && !testCase.isEmpty()) {
-            String problemId = modelUploadTestCase.getProblemId();
-            ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
-            String tempName = tempDir.createRandomScriptFileName(userName +
-                                                                 "-" +
-                                                                 problemEntity.getProblemId() +
-                                                                 "-" +
-                                                                 problemEntity.getCorrectSolutionLanguage());
-            String output = "";
-            try {
-                output = runCode(
-                    problemEntity.getCorrectSolutionSourceCode(),
-                    problemEntity.getCorrectSolutionLanguage(),
-                    tempName,
-                    testCase,
-//                    problemEntity.getTimeLimit(),
-                    getTimeLimitByLanguage(problemEntity, problemEntity.getCorrectSolutionLanguage()),
-                    "Correct Solution Language Not Found");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            ModelUploadTestCaseOutput res = new ModelUploadTestCaseOutput();
-            if (output.contains("Time Limit Exceeded")) {
-                res.setMessage("Time Limit Exceeded");
-                res.setStatus("TLE");
-                return res;
-            }
-            output = output.substring(0, output.length() - 1);
-            int lastLinetIndexExpected = output.lastIndexOf("\n");
-            output = output.substring(0, lastLinetIndexExpected);
-//        output = output.replaceAll("\n", "");
-            //log.info("addTestCase, output = {}", output);
+    public Object reCreateTestcaseCorrectAnswer(String problemId, UUID testCaseId) throws Exception {
+        ProblemEntity problem = problemRepo
+            .findById(problemId)
+            .orElseThrow(() -> new EntityNotFoundException("Problem with ID " + problemId + " not found"));
+        TestCaseEntity testCase = testCaseRepo
+            .findById(testCaseId)
+            .orElseThrow(() -> new EntityNotFoundException("Testcase with ID " + testCaseId + " not found"));
+        ;
 
-            tc.setTestCase(testCase);
-            tc.setCorrectAnswer(output);
+        String testcaseContent = testCase.getTestCase();
+        Judge0Submission output = runCode(
+            problem.getCorrectSolutionSourceCode(),
+            problem.getCorrectSolutionLanguage(),
+            testcaseContent,
+            problem.getMemoryLimit(),
+            getTimeLimitByLanguage(problem, problem.getCorrectSolutionLanguage()));
+
+        if (output.getStatus().getId() != 3) { // Chay khong thanh cong thi khong luu, tra ket qua luon
+            return Judge0Submission.getSubmissionDetailsAfterExecution(output);
         }
-        tc.setIsPublic(modelUploadTestCase.getIsPublic());
-        tc.setTestCasePoint(modelUploadTestCase.getPoint());
-        tc.setDescription(modelUploadTestCase.getDescription());
-        tc.setCorrectAnswer(modelUploadTestCase.getCorrectAnswer());
-        tc = testCaseService.saveTestCaseWithCache(tc);
-        ModelUploadTestCaseOutput res = new ModelUploadTestCaseOutput();
-        res.setMessage("Successfully");
-        res.setStatus("OK");
-        return res;
+
+        testCase.setCorrectAnswer(output.getStdout());
+        testCaseService.saveTestCaseWithCache(testCase);
+
+        return Judge0Submission.getSubmissionDetailsAfterExecution(output);
+    }
+
+    /**
+     *
+     * @param testCaseId
+     * @param testcaseContent
+     * @param dto
+     * @return
+     */
+    @Override
+    public Object editTestcase(
+        UUID testCaseId,
+        String testcaseContent,
+        ModelProgrammingContestUploadTestCase dto
+    ) throws Exception {
+        TestCaseEntity testCase = testCaseRepo
+            .findById(testCaseId)
+            .orElseThrow(() -> new EntityNotFoundException("Testcase with ID " + testCaseId + " not found"));
+        Judge0Submission output = null;
+
+        if (TestcaseUploadMode.EXECUTE.equals(dto.getUploadMode())) {
+            if (StringUtils.isNotBlank(testcaseContent)) {
+                ProblemEntity problem = problemRepo.findByProblemId(dto.getProblemId());
+
+                output = runCode(
+                    problem.getCorrectSolutionSourceCode(),
+                    problem.getCorrectSolutionLanguage(),
+                    testcaseContent,
+                    problem.getMemoryLimit(),
+                    getTimeLimitByLanguage(problem, problem.getCorrectSolutionLanguage()));
+
+                if (output.getStatus().getId() != 3) { // Chay khong thanh cong thi khong luu, tra ket qua luon
+                    return Judge0Submission.getSubmissionDetailsAfterExecution(output);
+                }
+
+                testCase.setTestCase(testcaseContent);
+                testCase.setCorrectAnswer(output.getStdout());
+            } else {
+                throw new IllegalArgumentException("The file is required when using EXECUTE mode");
+            }
+        } else { // TestcaseUploadMode.NOT_EXECUTE
+            if (StringUtils.isNotBlank(testcaseContent)) {
+                testCase.setTestCase(testcaseContent);
+            }
+
+            if (StringUtils.isNotBlank(dto.getCorrectAnswer())) {
+                testCase.setCorrectAnswer(dto.getCorrectAnswer());
+            }
+        }
+
+        testCase.setTestCasePoint(dto.getPoint());
+        testCase.setIsPublic(dto.getIsPublic() ? "Y" : "N");
+        testCase.setDescription(dto.getDescription());
+
+        testCaseService.saveTestCaseWithCache(testCase);
+        return Judge0Submission.getSubmissionDetailsAfterExecution(output);
     }
 
     private void updateMaxPoint(
@@ -3517,7 +3637,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
     @Override
     public List<TagEntity> getAllTags() {
-        return tagRepo.findAll();
+        return tagRepo.findAll(Sort.by(Sort.Direction.ASC, "name"));
     }
 
     @Override
@@ -3535,28 +3655,28 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         return tagRepo.save(tagEntity);
     }
 
-    @Override
-    @Transactional
-    public TagEntity updateTag(Integer tagId, ModelTag newTag) {
-        TagEntity tagEntity = tagRepo.findByTagId(tagId);
-
-        tagEntity.setName(newTag.getName());
-
-        if (newTag.getDescription() != null) {
-            tagEntity.setDescription(newTag.getDescription());
-        } else {
-            tagEntity.setDescription("");
-        }
-
-        return tagRepo.save(tagEntity);
-    }
-
-    @Override
-    @Transactional
-    public void deleteTag(Integer tagId) {
-        TagEntity tagEntity = tagRepo.findByTagId(tagId);
-        tagRepo.delete(tagEntity);
-    }
+//    @Override
+//    @Transactional
+//    public TagEntity updateTag(Integer tagId, ModelTag newTag) {
+//        TagEntity tagEntity = tagRepo.findByTagId(tagId);
+//
+//        tagEntity.setName(newTag.getName());
+//
+//        if (newTag.getDescription() != null) {
+//            tagEntity.setDescription(newTag.getDescription());
+//        } else {
+//            tagEntity.setDescription("");
+//        }
+//
+//        return tagRepo.save(tagEntity);
+//    }
+//
+//    @Override
+//    @Transactional
+//    public void deleteTag(Integer tagId) {
+//        TagEntity tagEntity = tagRepo.findByTagId(tagId);
+//        tagRepo.delete(tagEntity);
+//    }
 
     @Override
     @Transactional
@@ -3770,39 +3890,91 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         return responseList;
     }
 
-    public List<ProblemEntity> getOwnerProblems(String ownerId) {
-        return this.problemRepo.findAll((root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            predicates.add(criteriaBuilder.equal(root.get("userId"), ownerId));
-            return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
-        });
+    /**
+     *
+     * @param userId
+     * @param filter
+     * @param isPublic
+     * @return
+     */
+    public Page<ProblemDTO> getProblems(String userId, ProblemFilter filter, Boolean isPublic) {
+        return fetchProblems(userId, filter, isPublic, false);
     }
 
-    public List<ProblemEntity> getSharedProblems(String userId) {
-        List<String> problemIds = this.userContestProblemRoleRepo.getProblemIdsShared(userId);
-
-        return this.problemRepo.findAll((root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (problemIds != null && problemIds.size() > 0) {
-                predicates.add(criteriaBuilder.in(root.get("problemId")).value(problemIds));
-            } else {
-                predicates.add(criteriaBuilder.equal(root.get("problemId"), ""));
-            }
-            return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
-        });
+    /**
+     *
+     * @param userId
+     * @param filter
+     * @return
+     */
+    public Page<ProblemDTO> getSharedProblems(String userId, ProblemFilter filter) {
+        return fetchProblems(userId, filter, null, true);
     }
-    public List<ProblemEntity> getPublicProblems(String userId) {
-        List<String> problemIds = this.userContestProblemRoleRepo.getProblemIdsPublic(userId);
 
-        return this.problemRepo.findAll((root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (problemIds != null && problemIds.size() > 0) {
-                predicates.add(criteriaBuilder.in(root.get("problemId")).value(problemIds));
-            } else {
-                predicates.add(criteriaBuilder.equal(root.get("problemId"), ""));
-            }
-            return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
-        });
+    /**
+     *
+     * @param userId
+     * @param filter
+     * @return
+     */
+    public Page<ProblemDTO> getPublicProblems(String userId, ProblemFilter filter) {
+        return this.getProblems(null, filter, true);
+    }
+
+    private Page<ProblemDTO> fetchProblems(
+        String userId,
+        ProblemFilter filter,
+        Boolean isPublic,
+        boolean isSharedProblems
+    ) {
+        Pageable pageable = PageRequest.of(filter.getPage(), filter.getSize());
+
+        String name = StringUtils.isNotBlank(filter.getName()) ? filter.getName().trim() : null;
+
+        normalizeFilter(filter);
+
+        Page<ProblemProjection> problems = isSharedProblems
+            ? problemRepo.findAllSharedProblemsBy(
+            userId,
+            name,
+            filter.getLevelIds(),
+            filter.getTagIds(),
+            filter.getStatusIds(),
+            pageable)
+            : problemRepo.findAllBy(
+                userId,
+                name,
+                filter.getLevelIds(),
+                filter.getTagIds(),
+                filter.getStatusIds(),
+                isPublic,
+                pageable);
+
+        return problems.map(this::convertToProblemDTO);
+    }
+
+    private void normalizeFilter(ProblemFilter filter) {
+        if (StringUtils.isBlank(filter.getLevelIds())) {
+            filter.setLevelIds(null);
+        }
+        if (StringUtils.isBlank(filter.getStatusIds())) {
+            filter.setStatusIds(null);
+        }
+        if (StringUtils.isBlank(filter.getTagIds())) {
+            filter.setTagIds(null);
+        }
+    }
+
+    private ProblemDTO convertToProblemDTO(ProblemProjection item) {
+        ProblemDTO dto = objectMapper.convertValue(item, ProblemDTO.class);
+        try {
+            dto.setTags(objectMapper.readValue(
+                item.getJsonTags(), new TypeReference<List<TagEntity>>() {
+                }));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return dto;
     }
 
     @Override

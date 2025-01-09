@@ -1,8 +1,10 @@
 package com.hust.baseweb.applications.programmingcontest.model;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
 import java.util.UUID;
@@ -10,35 +12,38 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class SubmissionDetailByTestcaseOM {
 
-//    private UUID contestSubmissionTestcaseId;
+//     UUID contestSubmissionTestcaseId;
 //
-//    private String contestId;
+//    String contestId;
 //
-//    private String problemId;
+//    String problemId;
 //
-//    private String userLoginId;
+//    String userLoginId;
 
-    private UUID testCaseId;
+    UUID testCaseId;
 
-    private String testCase;
+    String testCase;
 
-    private String message;
+    String message;
 
-    private int point;
+    int point;
 
-    private String graded;// graded = Y means that the point is accounted to the grade
+    String graded;// graded = Y means that the point is accounted to the grade
 
-    private Long runtime;
+    Long runtime;
 
-    private String testCaseAnswer;
+    Float memoryUsage;
 
-    private String participantAnswer;
+    String testCaseAnswer;
 
+    String participantAnswer;
 
+    String stderr;
 
-    private Date createdAt;
+    Date createdAt;
 
-    private String viewSubmitSolutionOutputMode;
+    String viewSubmitSolutionOutputMode;
 }
