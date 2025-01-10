@@ -1,7 +1,7 @@
 export const lmslog = {
     id: "MENU_TEACHER",
     icon: "GiTeacher",
-    text: "LMSLog",
+    text: "LMSLogs",
     child: [
       {
         id: "MENU_LMSLOG.LOGS",
