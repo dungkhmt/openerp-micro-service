@@ -103,23 +103,20 @@
   }
 
 
-
-  
-  /* Actions Column */
   .action-buttons {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 40px; /* Small width for three dots menu */
+    width: 40px; 
   }
   
   .action-buttons .MuiIconButton-root {
-    padding: 5px; /* Compact padding */
-    width: 30px; /* Small icon button size */
+    padding: 5px;
+    width: 30px; 
     height: 30px;
   }
   
-  /* Pagination */
+
   .pagination {
     display: flex;
     justify-content: space-between;
@@ -180,7 +177,6 @@
     cursor: not-allowed;
   }
   
-  /* Items per Page */
   .items-per-page {
     display: flex;
     align-items: center;
@@ -196,14 +192,14 @@
   }
   
   .items-per-page-select {
-    padding: 4px 8px; /* Smaller padding for a compact look */
+    padding: 4px 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
     background-color: #ffffff;
     cursor: pointer;
-    font-size: 12px; /* Reduced font size for smaller appearance */
+    font-size: 12px; 
     transition: background-color 0.2s ease, border-color 0.2s ease;
-    height: 32px; /* Set a smaller height */
+    height: 32px; 
   }
   
   .items-per-page-select:hover {

@@ -123,7 +123,7 @@ const DepartmentTable = () => {
             >
               <IconButton
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevent click from propagating to the document listener
+                  e.stopPropagation();
                   setDropdownVisible(
                     dropdownVisible === rowIndex ? null : rowIndex
                   );
@@ -214,13 +214,13 @@ const DepartmentTable = () => {
   const handleEdit = (department) => {
     setSelectedDepartment(department);
     setOpenModal(true);
-    setDropdownVisible(null); // Hide dropdown
+    setDropdownVisible(null); 
   };
 
   const handleOpenDeleteModal = (department) => {
     setDeleteDepartment(department);
     setDeleteModalOpen(true);
-    setDropdownVisible(null); // Hide dropdown
+    setDropdownVisible(null); 
   };
 
   const handleDelete = () => {

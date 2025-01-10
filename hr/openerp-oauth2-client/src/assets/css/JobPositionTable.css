@@ -1,4 +1,4 @@
-/* General Container */
+
 .job-position-container {
   padding: 10px 30px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
@@ -7,7 +7,7 @@
   position: relative;
 }
 
-/* Header Section */
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -24,7 +24,7 @@
 
 .export-buttons {
   display: flex;
-  gap: 15px; /* Space between buttons */
+  gap: 15px; 
 }
 
 .search-bar {
@@ -33,7 +33,7 @@
 }
 
 .search-bar input {
-  width: 250px; /* Adjust input width */
+  width: 250px; 
   font-size: 14px;
 }
 
@@ -76,7 +76,7 @@
   background-color: #f1f1f1;
 }
 
-/* Edit column */
+
 .job-position-table th:nth-child(1) { 
   text-align: center; 
   min-width: 50px;
@@ -94,17 +94,16 @@
   align-items: center;
 }
 
-/* Actions Column */
 .action-buttons {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 40px; /* Small width for three dots menu */
+  width: 40px; 
 }
 
 .action-buttons .MuiIconButton-root {
-  padding: 5px; /* Compact padding */
-  width: 30px; /* Small icon button size */
+  padding: 5px;
+  width: 30px; 
   height: 30px;
 }
 
@@ -169,7 +168,7 @@
   cursor: not-allowed;
 }
 
-/* Items per Page */
+
 .items-per-page {
   display: flex;
   align-items: center;
@@ -185,14 +184,14 @@
 }
 
 .items-per-page-select {
-  padding: 4px 8px; /* Smaller padding for a compact look */
+  padding: 4px 8px; 
   border: 1px solid #ddd;
   border-radius: 4px;
   background-color: #ffffff;
   cursor: pointer;
-  font-size: 12px; /* Reduced font size for smaller appearance */
+  font-size: 12px;
   transition: background-color 0.2s ease, border-color 0.2s ease;
-  height: 32px; /* Set a smaller height */
+  height: 32px; 
 }
 
 .items-per-page-select:hover {

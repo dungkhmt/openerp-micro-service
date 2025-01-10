@@ -14,6 +14,7 @@ import DepartmentScreen from "views/DepartmentScreen";
 import JobPositionScreen from "views/JobPositionScreen";
 import CheckpointConfigureScreen from "views/CheckpointConfigureScreen";
 import CheckpointPeriodScreen from "views/CheckpointPeriodScreen";
+import CheckpointEvaluationScreen from "views/CheckpointEvaluationScreen";
 import StaffScreen from "views/StaffScreen";
 
 const styles = {
@@ -41,9 +42,9 @@ function MainAppRouter(props) {
     <Layout>
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Switch>
-          <Route component={CheckpointConfigureScreen} exact path="/" />
+          <Route component={StaffScreen} exact path="/" />
           
-          <PrivateRoute component={CheckpointPeriodScreen} exact path="/demo" />
+          <PrivateRoute component={CheckpointEvaluationScreen} exact path="/demo" />
           <PrivateRoute component={JobPositionScreen} exact path="/job" />
           <PrivateRoute component={TeacherRouter} path="/teacher" />
           <Route component={EmployeeDetailsRouter} path="/employee" />

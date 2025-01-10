@@ -8,14 +8,14 @@ import Timeline from "../components/item/TimelineItem";
 import SalaryTab from "../components//tab/SalaryTab";
 
 const EmployeeDetails = () => {
-  const { staffCode } = useParams(); // Get staffCode from URL
+  const { staffCode } = useParams(); 
   const [employeeDetails, setEmployeeDetails] = useState(null);
   const [jobHistory, setJobHistory] = useState([]);
   const [departmentHistory, setDepartmentHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [openEditModal, setOpenEditModal] = useState(false); // Control modal visibility
-  const [selectedTab, setSelectedTab] = useState("profile"); // Tab state
+  const [openEditModal, setOpenEditModal] = useState(false); 
+  const [selectedTab, setSelectedTab] = useState("profile"); 
 
   useEffect(() => {
     const fetchDetails = async () => {

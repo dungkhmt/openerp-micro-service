@@ -4,18 +4,19 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  CircularProgress,
   Button,
   TextField,
-  CircularProgress,
+  Typography,
+  IconButton,
   Snackbar,
   Alert,
-  IconButton,
-  Typography,
   Box,
+  Grid,
 } from "@mui/material";
-import Autocomplete from "@mui/material/Autocomplete";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import CloseIcon from "@mui/icons-material/Close";
+import Autocomplete from "@mui/material/Autocomplete";
 import { request } from "../../api";
 
 const AddPeriodModal = ({ open, onClose, onSubmit, initialValues }) => {
@@ -34,15 +35,61 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues }) => {
 
   useEffect(() => {
     if (open) {
-      setFormValues({
-        name: initialValues?.name || "",
-        description: initialValues?.description || "",
-        checkpoint_date: initialValues?.checkpoint_date || "",
-        configures: initialValues?.configures || [],
-      });
+      if (initialValues?.id) {
+        fetchPeriodDetail(initialValues.id);
+      } else {
+        setFormValues({
+          name: "",
+          description: "",
+          checkpoint_date: "",
+          configures: [],
+        });
+      }
       fetchConfigures();
     }
   }, [open, initialValues]);
+
+  const fetchPeriodDetail = async (id) => {
+    try {
+      const payload = { id };
+      request(
+        "post",
+        "/checkpoint/get-period-detail",
+        (res) => {
+          const { data } = res.data;
+      
+          if (!data) {
+            console.error("No data received from API");
+            setFormValues({
+              name: "",
+              description: "",
+              checkpoint_date: "",
+              configures: [],
+            });
+            return;
+          }
+          setFormValues({
+            name: data.name || "",
+            description: data.description || "",
+            checkpoint_date: data.checkpoint_date || "",
+            configures: (data.configures || []).map((item) => ({
+              configure_id: item.configure?.code || "",
+              coefficient: item.coefficient || "",
+              description: item.configure?.description || "",
+            })),
+          });
+        },
+        {
+          onError: (err) =>
+            console.error("Error fetching period details:", err),
+        },
+        payload
+      );
+      
+    } catch (error) {
+      console.error("Error fetching period details:", error);
+    }
+  };
 
   const fetchConfigures = async () => {
     setLoadingConfigures(true);
@@ -154,7 +201,7 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues }) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>{initialValues ? "Edit Period" : "Add Period"}</DialogTitle>
       <DialogContent>
         <TextField
@@ -165,6 +212,7 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues }) => {
             setFormValues((prev) => ({ ...prev, name: e.target.value }))
           }
           margin="normal"
+          InputProps={{ style: { fontSize: "1.2rem" } }}
         />
         <TextField
           fullWidth
@@ -174,6 +222,7 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues }) => {
             setFormValues((prev) => ({ ...prev, description: e.target.value }))
           }
           margin="normal"
+          InputProps={{ style: { fontSize: "1.2rem" } }}
         />
         <TextField
           fullWidth
@@ -190,82 +239,103 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues }) => {
           InputLabelProps={{
             shrink: true,
           }}
+          InputProps={{ style: { fontSize: "1.2rem" } }}
         />
-        <Box mt={2}>
-          <Typography variant="h6">Configures</Typography>
-          {formValues.configures.map((config, index) => (
-            <Box
-              key={index}
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
-              mt={2}
-              mb={1}
-            >
-              <Autocomplete
-                options={availableConfigures}
-                getOptionLabel={(option) => option.name || ""}
-                value={
-                  availableConfigures.find(
-                    (c) => c.code === config.configure_id
-                  ) || null
-                }
-                onChange={(e, value) => handleConfigureChange(index, value)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Configure"
-                    size="medium"
-                    InputProps={{
-                      ...params.InputProps,
-                      endAdornment: (
-                        <>
-                          {loadingConfigures ? (
-                            <CircularProgress size={20} />
-                          ) : null}
-                          {params.InputProps.endAdornment}
-                        </>
-                      ),
-                    }}
+        <Box mt={4}>
+          <Typography variant="h6" style={{ marginBottom: "16px" }}>
+            Configures
+          </Typography>
+
+          <Box>
+            {formValues.configures.map((config, index) => (
+              <Grid
+                container
+                alignItems="center"
+                spacing={2}
+                key={index}
+                style={{ marginBottom: "16px" }}
+              >
+                <Grid item xs={4}>
+                  <Autocomplete
+                    options={availableConfigures}
+                    getOptionLabel={(option) => option.name || ""}
+                    value={
+                      availableConfigures.find(
+                        (c) => c.code === config.configure_id
+                      ) || null
+                    }
+                    onChange={(e, value) =>
+                      handleConfigureChange(index, value)
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Configure"
+                        size="medium"
+                        InputProps={{
+                          ...params.InputProps,
+                          endAdornment: (
+                            <>
+                              {loadingConfigures ? (
+                                <CircularProgress size={20} />
+                              ) : null}
+                              {params.InputProps.endAdornment}
+                            </>
+                          ),
+                        }}
+                      />
+                    )}
                   />
-                )}
-                style={{ flex: 2, marginRight: "10px" }}
-              />
-              <TextField
-                label="Coefficient"
-                type="number"
-                size="medium"
-                value={config.coefficient}
-                onChange={(e) =>
-                  handleCoefficientChange(index, e.target.value)
-                }
-                style={{ width: "120px", marginRight: "10px" }}
-              />
-              <Typography
-                style={{
-                  flex: 3,
-                  fontStyle: "italic",
-                  color: "#555",
-                  marginRight: "10px",
-                }}
-              >
-                {config.description || "No description"}
-              </Typography>
-              <IconButton
-                color="secondary"
-                onClick={() => handleRemoveConfigure(index)}
-              >
-                <DeleteOutlineIcon />
-              </IconButton>
-            </Box>
-          ))}
-          <IconButton
-            color="primary"
+                </Grid>
+                <Grid item xs={3}>
+                  <TextField
+                    label="Coefficient"
+                    type="number"
+                    size="medium"
+                    value={config.coefficient}
+                    onChange={(e) =>
+                      handleCoefficientChange(index, e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  <Typography
+                    style={{
+                      fontStyle: "italic",
+                      color: "#555",
+                      overflow: "auto",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "normal",
+                      maxHeight: "8rem",
+                      lineHeight: "1.8rem",
+                      padding: "1rem",
+                      border: "1px solid #ccc",
+                      borderRadius: "6px",
+                      backgroundColor: "#fefefe",
+                      boxShadow: "0 1px 4px rgba(0, 0, 0, 0.1)",
+                    }}
+                  >
+                    {config.description || "No description"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={1}>
+                  <IconButton
+                    color="error"
+                    onClick={() => handleRemoveConfigure(index)}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </Grid>
+              </Grid>
+            ))}
+          </Box>
+          <Button
             onClick={handleAddConfigure}
-            style={{ marginTop: "10px" }}
+            startIcon={<AddCircleOutlineIcon />}
+            color="primary"
           >
-            <AddCircleOutlineIcon fontSize="large" />
-          </IconButton>
+            Add Configure
+          </Button>
         </Box>
       </DialogContent>
       <DialogActions>

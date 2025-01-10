@@ -33,6 +33,24 @@
   font-weight: bold;
 }
 
+/* .checkpoint-table th:nth-child(2) { 
+  
+  text-align: center; 
+  min-width: 100px;
+}
+.checkpoint-table td:nth-child(2) { 
+  text-align: center; 
+}
+
+.checkpoint-table th:nth-child(4) { 
+  text-align: center; 
+}
+
+.checkpoint-table td:nth-child(4) { 
+  text-align: left; 
+  max-width: 400px;
+} */
+
 .checkpoint-table tbody tr:hover {
   background-color: #f9f9f9;
 }

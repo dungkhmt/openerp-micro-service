@@ -16,6 +16,8 @@ public class SearchStaffRequest {
     private String staffCode;
     private String staffEmail;
     private StaffStatus status;
+    private String departmentCode;
+    private String jobPositionCode;
     private PageableRequest pageableRequest;
 
     public FindStaff toUseCase(){
@@ -24,6 +26,8 @@ public class SearchStaffRequest {
                 .staffCode(staffCode)
                 .staffName(fullname)
                 .status(status)
+                .departmentCode(departmentCode)
+                .jobPositionCode(jobPositionCode)
                 .pageableRequest(pageableRequest)
                 .build();
     }

@@ -230,9 +230,9 @@
 
 .search-filters {
   display: flex;
-  gap: 1rem; /* Space between filters */
-  align-items: center; /* Align items vertically */
-  flex-wrap: wrap; /* Handle smaller screens */
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .filter-item, .search-bar {
