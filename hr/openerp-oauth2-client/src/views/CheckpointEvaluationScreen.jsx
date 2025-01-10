@@ -3,10 +3,15 @@ import { useTable, usePagination } from "react-table";
 import { TextField, Select, MenuItem, Button, CircularProgress, Autocomplete } from "@mui/material";
 import { CSVLink } from "react-csv";
 import jsPDF from "jspdf";
+import GradeModal from "./modals/GradeModal";
 import "jspdf-autotable";
 import { request } from "../api";
 import "../assets/css/CheckpointEvaluation.css";
 import { useHistory } from "react-router-dom";
+import { IconButton } from "@mui/material";
+import GradeIcon from "@mui/icons-material/BorderColor";
+
+
 
 const CheckpointEvaluation = () => {
   const history = useHistory();
@@ -24,6 +29,8 @@ const CheckpointEvaluation = () => {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [tempPageInput, setTempPageInput] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState(null);
 
   const fetchStaffData = async (pageIndex, pageSize) => {
     setLoading(true);
@@ -60,7 +67,7 @@ const CheckpointEvaluation = () => {
 
   const fetchPeriods = async () => {
     try {
-      const payload = { name: null, status: "ACTIVE", pageable_request: { page: 0, page_size: 5 } };
+      const payload = { name: null, status: "ACTIVE", pageable_request: null};
       request(
         "post",
         "/checkpoint/get-all-period",
@@ -125,7 +132,6 @@ const CheckpointEvaluation = () => {
     }
   };
 
-  // Export functions
   const exportPDF = () => {
     const doc = new jsPDF();
     doc.text("Checkpoint Evaluation", 20, 10);
@@ -147,6 +153,21 @@ const CheckpointEvaluation = () => {
     fetchJobPositions();
     fetchStaffData(0, itemsPerPage);
   }, [itemsPerPage, searchTerm, selectedDepartment, selectedJobPosition]);
+
+
+  const handleGradeClick = (staff) => {
+    if (!selectedPeriod) {
+      alert("Please select a period before grading.");
+      return;
+    }
+    setSelectedStaff(staff);
+    setModalOpen(true);
+  };
+
+  useEffect(() => {
+    fetchStaffData();
+    fetchPeriods();
+  }, []);
 
   useEffect(() => {
     if (selectedPeriod) {
@@ -195,6 +216,17 @@ const CheckpointEvaluation = () => {
         accessor: "total_point",
         Cell: ({ row }) => totalPoints[row.original.user_login_id] || "Not Evaluated",
       },
+      {
+        Header: "Actions",
+        Cell: ({ row }) => (
+          <IconButton
+            className="icon-button"
+            onClick={() => handleGradeClick(row.original)}
+          >
+            <GradeIcon />
+          </IconButton>
+        ),
+      },
     ],
     [currentPage, itemsPerPage, totalPoints]
   );
@@ -229,6 +261,13 @@ const CheckpointEvaluation = () => {
           renderInput={(params) => <TextField {...params} label="Select Period" size="small" />}
         />
       </div>
+
+      <GradeModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        staff={selectedStaff}
+        period={selectedPeriod}
+      />
 
       <div className="export-search-container">
         <div className="export-buttons">

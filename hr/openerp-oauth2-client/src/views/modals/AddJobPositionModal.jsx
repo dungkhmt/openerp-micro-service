@@ -161,7 +161,6 @@ const AddJobPositionModal = ({ open, onClose, onSubmit, initialValues }) => {
         </DialogActions>
       </Dialog>
 
-      {/* Snackbar for error notifications */}
       <Snackbar
         open={!!error}
         autoHideDuration={6000}

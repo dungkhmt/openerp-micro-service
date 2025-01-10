@@ -141,3 +141,12 @@
     gap: 5px;
   }
   
+
+  .icon-button {
+    color: #007bff; /* Màu xanh cho biểu tượng */
+    transition: transform 0.3s;
+  }
+  
+  .icon-button:hover {
+    transform: scale(1.2); /* Phóng to nhẹ khi hover */
+  }
