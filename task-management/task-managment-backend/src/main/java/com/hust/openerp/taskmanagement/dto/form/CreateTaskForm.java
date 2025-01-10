@@ -1,11 +1,7 @@
 package com.hust.openerp.taskmanagement.dto.form;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import jakarta.annotation.Nullable;
@@ -13,6 +9,10 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -25,6 +25,8 @@ public class CreateTaskForm {
     private String description;
     @NotNull
     private UUID projectId;
+    @Nullable
+    private UUID eventId;
     @Nullable
     private Date fromDate;
     @Nullable
@@ -47,4 +49,6 @@ public class CreateTaskForm {
     private Integer progress;
     @Nullable
     private UUID parentId;
+    @Nullable
+    private List<String> skillIdList;
 }

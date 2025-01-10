@@ -1,16 +1,23 @@
-import { Box, CardContent, Typography } from "@mui/material";
+import { useState } from "react";
+import {
+  Box,
+  CardContent,
+  Typography,
+} from "@mui/material";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import { forwardRef } from "react";
-import { useSelector } from "react-redux";
+import { useSelector} from "react-redux";
 import { DashboardCard } from "../../../../components/card/DashboardCard";
+import { DialogEditInfo } from "./DialogEditInfo";
 
 const ProjectInfo = forwardRef(function ProjectInfo(
   { style, className, onMouseDown, onMouseUp, onTouchEnd, children, ...props },
   ref
 ) {
   const { project } = useSelector((state) => state.project);
-
+  const [isEditing, setIsEditing] = useState(false);
+  
   return (
     <DashboardCard
       title={"Thông tin dự án"}
@@ -24,6 +31,8 @@ const ProjectInfo = forwardRef(function ProjectInfo(
       isRefreshable={false}
       isExpandable={false}
       ref={ref}
+      showEditIcon={true}
+      onEditClick={() => setIsEditing(true)}
     >
       <CardContent>
         <Box sx={{ py: 3 }}>
@@ -60,6 +69,12 @@ const ProjectInfo = forwardRef(function ProjectInfo(
         </Box>
       </CardContent>
       {children}
+
+      <DialogEditInfo
+        isEditing={isEditing}
+        setIsEditing={setIsEditing}
+        project={project}
+      />
     </DashboardCard>
   );
 });
