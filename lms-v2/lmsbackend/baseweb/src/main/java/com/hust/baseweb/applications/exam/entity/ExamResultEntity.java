@@ -41,7 +41,7 @@ public class ExamResultEntity{
     private String comment;
 
     @Column(name = "submited_at")
-    protected LocalDateTime submitedAt;
+    private LocalDateTime submitedAt;
 
     @PrePersist
     protected void onCreate() {
