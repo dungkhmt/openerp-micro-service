@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useTable, usePagination } from "react-table";
-import { TextField, Select, MenuItem, Button, CircularProgress, Autocomplete } from "@mui/material";
+import {
+  TextField,
+  Select,
+  MenuItem,
+  Button,
+  CircularProgress,
+  Autocomplete,
+  Snackbar,
+  Alert,
+  IconButton,
+} from "@mui/material";
 import { CSVLink } from "react-csv";
 import jsPDF from "jspdf";
 import GradeModal from "./modals/GradeModal";
@@ -8,10 +18,7 @@ import "jspdf-autotable";
 import { request } from "../api";
 import "../assets/css/CheckpointEvaluation.css";
 import { useHistory } from "react-router-dom";
-import { IconButton } from "@mui/material";
 import GradeIcon from "@mui/icons-material/BorderColor";
-
-
 
 const CheckpointEvaluation = () => {
   const history = useHistory();
@@ -31,6 +38,8 @@ const CheckpointEvaluation = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState(null);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const fetchStaffData = async (pageIndex, pageSize) => {
     setLoading(true);
@@ -67,7 +76,7 @@ const CheckpointEvaluation = () => {
 
   const fetchPeriods = async () => {
     try {
-      const payload = { name: null, status: "ACTIVE", pageable_request: null};
+      const payload = { name: null, status: "ACTIVE", pageable_request: null };
       request(
         "post",
         "/checkpoint/get-all-period",
@@ -154,10 +163,9 @@ const CheckpointEvaluation = () => {
     fetchStaffData(0, itemsPerPage);
   }, [itemsPerPage, searchTerm, selectedDepartment, selectedJobPosition]);
 
-
   const handleGradeClick = (staff) => {
     if (!selectedPeriod) {
-      alert("Please select a period before grading.");
+      setError("Please select a period before grading.");
       return;
     }
     setSelectedStaff(staff);
@@ -222,6 +230,7 @@ const CheckpointEvaluation = () => {
           <IconButton
             className="icon-button"
             onClick={() => handleGradeClick(row.original)}
+            disabled={!selectedPeriod}
           >
             <GradeIcon />
           </IconButton>
@@ -249,6 +258,23 @@ const CheckpointEvaluation = () => {
 
   return (
     <div className="checkpoint-evaluation">
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={() => setError("")}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert severity="error">{error}</Alert>
+      </Snackbar>
+      <Snackbar
+        open={!!success}
+        autoHideDuration={6000}
+        onClose={() => setSuccess("")}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert severity="success">{success}</Alert>
+      </Snackbar>
+
       <div className="header">
         <h2>Checkpoint Evaluation</h2>
       </div>
@@ -264,7 +290,7 @@ const CheckpointEvaluation = () => {
 
       <GradeModal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={() => {setModalOpen(false); fetchCheckpointData(); }}
         staff={selectedStaff}
         period={selectedPeriod}
       />
