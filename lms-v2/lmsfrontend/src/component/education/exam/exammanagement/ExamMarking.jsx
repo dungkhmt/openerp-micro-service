@@ -60,6 +60,7 @@ function ExamMarking(props) {
         examResultId: data?.examResultId,
         examQuestionId: item?.questionId,
         answer: item?.answer,
+        filePath: item?.filePathAnswer,
         score: score
       })
       totalScore += score
@@ -278,7 +279,8 @@ function ExamMarking(props) {
                               <FormGroup row>
                                 <Box display="flex" alignItems="center">
                                   <span>{parser(value?.questionContentAnswer1)}</span>
-                                  {value?.questionAnswer?.includes('1') && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
+                                  {value?.questionAnswer?.includes('1') && (
+                                    <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                 </Box>
                               </FormGroup>
                             }
@@ -295,7 +297,8 @@ function ExamMarking(props) {
                                   <FormGroup row>
                                     <Box display="flex" alignItems="center">
                                       <span>{parser(value?.questionContentAnswer2)}</span>
-                                      {value?.questionAnswer?.includes('2') && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
+                                      {value?.questionAnswer?.includes('2') && (
+                                        <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                     </Box>
                                   </FormGroup>
                                 }
@@ -314,7 +317,8 @@ function ExamMarking(props) {
                                   <FormGroup row>
                                     <Box display="flex" alignItems="center">
                                       <span>{parser(value?.questionContentAnswer3)}</span>
-                                      {value?.questionAnswer?.includes('3') && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
+                                      {value?.questionAnswer?.includes('3') && (
+                                        <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                     </Box>
                                   </FormGroup>
                                 }
@@ -333,7 +337,8 @@ function ExamMarking(props) {
                                   <FormGroup row>
                                     <Box display="flex" alignItems="center">
                                       <span>{parser(value?.questionContentAnswer4)}</span>
-                                      {value?.questionAnswer?.includes('4') && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
+                                      {value?.questionAnswer?.includes('4') && (
+                                        <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                     </Box>
                                   </FormGroup>
                                 }
@@ -352,7 +357,8 @@ function ExamMarking(props) {
                                   <FormGroup row>
                                     <Box display="flex" alignItems="center">
                                       <span>{parser(value?.questionContentAnswer5)}</span>
-                                      {value?.questionAnswer?.includes('5') && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
+                                      {value?.questionAnswer?.includes('5') && (
+                                        <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                     </Box>
                                   </FormGroup>
                                 }
@@ -387,7 +393,8 @@ function ExamMarking(props) {
                                 <FormGroup row>
                                   <Box display="flex" alignItems="center">
                                     <span>{parser(value?.questionContentAnswer1)}</span>
-                                    {value?.questionAnswer?.includes('1') && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
+                                    {value?.questionAnswer?.includes('1') && (
+                                      <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                   </Box>
                                 </FormGroup>
                               }
@@ -406,7 +413,8 @@ function ExamMarking(props) {
                                     <FormGroup row>
                                       <Box display="flex" alignItems="center">
                                         <span>{parser(value?.questionContentAnswer2)}</span>
-                                        {value?.questionAnswer?.includes('2') && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
+                                        {value?.questionAnswer?.includes('2') && (
+                                          <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                       </Box>
                                     </FormGroup>
                                   }
@@ -427,7 +435,8 @@ function ExamMarking(props) {
                                     <FormGroup row>
                                       <Box display="flex" alignItems="center">
                                         <span>{parser(value?.questionContentAnswer3)}</span>
-                                        {value?.questionAnswer?.includes('3') && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
+                                        {value?.questionAnswer?.includes('3') && (
+                                          <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                       </Box>
                                     </FormGroup>
                                   }
@@ -448,7 +457,8 @@ function ExamMarking(props) {
                                     <FormGroup row>
                                       <Box display="flex" alignItems="center">
                                         <span>{parser(value?.questionContentAnswer4)}</span>
-                                        {value?.questionAnswer?.includes('4') && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
+                                        {value?.questionAnswer?.includes('4') && (
+                                          <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                       </Box>
                                     </FormGroup>
                                   }
@@ -469,7 +479,8 @@ function ExamMarking(props) {
                                     <FormGroup row>
                                       <Box display="flex" alignItems="center">
                                         <span>{parser(value?.questionContentAnswer5)}</span>
-                                        {value?.questionAnswer?.includes('5') && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
+                                        {value?.questionAnswer?.includes('5') && (
+                                          <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                       </Box>
                                     </FormGroup>
                                   }
@@ -488,9 +499,27 @@ function ExamMarking(props) {
                       )
                     }
                     {
+                      value?.questionType === 1 && value?.filePathAnswer != null && value?.filePathAnswer !== '' && (
+                        <div style={{marginTop: '10px'}}>
+                          <strong>File trả lời đính kèm:</strong>
+                          {
+                            value?.filePathAnswer.split(';').map(item => {
+                              return (
+                                <div style={{display: 'flex', alignItems: 'center'}}>
+                                  <AttachFileOutlined></AttachFileOutlined>
+                                  <p style={{fontWeight: 'bold', cursor: 'pointer'}}
+                                     onClick={() => handleOpenFilePreviewDialog(item)}>{getFilenameFromString(item)}</p>
+                                </div>
+                              )
+                            })
+                          }
+                        </div>
+                      )
+                    }
+                    {
                       value?.questionType === 1 && (
                         <div style={{display: "flex", alignItems: "center"}}>
-                        <strong style={{marginRight: '10px'}}>Đáp án:</strong>{parse(value?.questionAnswer)}
+                          <strong style={{marginRight: '10px'}}>Đáp án:</strong>{parse(value?.questionAnswer)}
                         </div>
                       )
                     }
@@ -503,26 +532,26 @@ function ExamMarking(props) {
             })
           }
 
-          <div>
-            <h4 style={{marginBottom: 0, fontSize: '18px'}}>File đính kèm:</h4>
-            {
-              (data?.answerFiles == null || data?.answerFiles == '') ?
-                (
-                  <div>N/A</div>
-                ) :
-                (
-                  data?.answerFiles.split(';').map(item => {
-                    return (
-                      <div style={{display: 'flex', alignItems: 'center'}}>
-                        <AttachFileOutlined></AttachFileOutlined>
-                        <p style={{fontWeight: 'bold', cursor: 'pointer'}}
-                           onClick={() => handleOpenFilePreviewDialog(item)}>{getFilenameFromString(item)}</p>
-                      </div>
-                    )
-                  })
-                )
-            }
-          </div>
+          {/*<div>*/}
+          {/*  <h4 style={{marginBottom: 0, fontSize: '18px'}}>File đính kèm:</h4>*/}
+          {/*  {*/}
+          {/*    (data?.answerFiles == null || data?.answerFiles == '') ?*/}
+          {/*      (*/}
+          {/*        <div>N/A</div>*/}
+          {/*      ) :*/}
+          {/*      (*/}
+          {/*        data?.answerFiles.split(';').map(item => {*/}
+          {/*          return (*/}
+          {/*            <div style={{display: 'flex', alignItems: 'center'}}>*/}
+          {/*              <AttachFileOutlined></AttachFileOutlined>*/}
+          {/*              <p style={{fontWeight: 'bold', cursor: 'pointer'}}*/}
+          {/*                 onClick={() => handleOpenFilePreviewDialog(item)}>{getFilenameFromString(item)}</p>*/}
+          {/*            </div>*/}
+          {/*          )*/}
+          {/*        })*/}
+          {/*      )*/}
+          {/*  }*/}
+          {/*</div>*/}
 
           <div>
             <h4 style={{marginBottom: 0, fontSize: '18px'}}>Nhận xét:</h4>

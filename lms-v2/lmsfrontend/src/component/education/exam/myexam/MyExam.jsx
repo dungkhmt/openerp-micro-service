@@ -200,7 +200,7 @@ function MyExam(props) {
                   <TextField
                     id="statusMyExam"
                     select
-                    label="Loại câu hỏi"
+                    label="Trạng thái"
                     style={{ width: "150px"}}
                     value={statusFilter}
                     onChange={(event) => {

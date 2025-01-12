@@ -64,14 +64,20 @@ function MyExamDetails(props) {
 
   useEffect(() => {
     let tmpDataAnswers = []
+    let tmpFileAnswers = []
     for(let item of data?.questionList){
       tmpDataAnswers.push({
         questionOrder: item?.questionOrder,
         examQuestionId: item?.questionId,
         answer: ""
       })
+      tmpFileAnswers.push({
+        questionOrder: item?.questionOrder,
+        files: null
+      })
     }
     setDataAnswers(tmpDataAnswers)
+    setAnswersFiles(tmpFileAnswers)
     setStartLoadTime(new Date());
   }, []);
 
@@ -103,6 +109,12 @@ function MyExamDetails(props) {
     setDataAnswers(dataAnswers)
   };
 
+  const handleAnswerFileChange = (files, questionOrder) => {
+    answersFiles[questionOrder-1].files = files
+
+    setAnswersFiles(answersFiles)
+  }
+
   const handleSubmit = () => {
     const endLoadTime = new Date();
     const totalTime = Math.round((endLoadTime - startLoadTime) / 60000);
@@ -114,9 +126,26 @@ function MyExamDetails(props) {
       examResultDetails: dataAnswers
     }
 
+    let tmpAnswersFiles = []
+    for(let item of answersFiles){
+      if(item?.files != null){
+        for(let file of item?.files){
+          const fileNameParts = file.name.split('.');
+          const newFileName = `${fileNameParts[0]}_${item?.questionOrder}.${fileNameParts[1]}`;
+
+          const updatedFile = new File([file], newFileName, {
+            type: file.type,
+            lastModified: file.lastModified,
+          });
+
+          tmpAnswersFiles.push(updatedFile)
+        }
+      }
+    }
+
     let formData = new FormData();
     formData.append("body", JSON.stringify(body));
-    for (const file of answersFiles) {
+    for (const file of tmpAnswersFiles) {
       formData.append("files", file);
     }
 
@@ -158,6 +187,31 @@ function MyExamDetails(props) {
     }
   }
 
+  // Checking focus tab
+  useEffect(() => {
+    // handleCheckingFocusTab()
+  }, []);
+  const onFocus = () => {
+    console.log("Tab is in focus");
+    console.log("Ghi lại nội dung tab hiện tại:", document.documentURI, document.title);
+  };
+  const onBlur = () => {
+    console.log("Tab is blurred");
+  };
+  const onVisibilitychange = () => {
+    console.log("Tab is visibilitychange");
+  };
+  const handleCheckingFocusTab = () => {
+    window.addEventListener("focus", onFocus);
+    window.addEventListener("blur", onBlur);
+    document.addEventListener("visibilitychange", onVisibilitychange);
+    onFocus();
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("blur", onBlur);
+      document.removeEventListener("visibilitychange", onVisibilitychange);
+    };
+  }
   return (
     <div>
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -462,18 +516,64 @@ function MyExamDetails(props) {
                           <div key={questionOrder}>
                             {
                               data?.examResultId == null && (
-                                <RichTextEditor
-                                  content={tmpTextAnswer}
-                                  onContentChange={(value) =>
-                                    handleAnswerTextChange(value, questionOrder)
-                                  }
-                                />
+                                <div>
+                                  <RichTextEditor
+                                    content={tmpTextAnswer}
+                                    onContentChange={(value) =>
+                                      handleAnswerTextChange(value, questionOrder)
+                                    }
+                                  />
+                                  <DropzoneArea
+                                    dropzoneClass={classes.dropZone}
+                                    filesLimit={20}
+                                    showPreviews={true}
+                                    showPreviewsInDropzone={false}
+                                    useChipsForPreview
+                                    dropzoneText={`Kéo và thả tệp vào đây hoặc nhấn để chọn tệp cho Câu hỏi số ${questionOrder}`}
+                                    previewText="Xem trước:"
+                                    previewChipProps={{
+                                      variant: "outlined",
+                                      color: "primary",
+                                      size: "medium",
+                                    }}
+                                    getFileAddedMessage={(fileName) =>
+                                      `Tệp ${fileName} tải lên thành công`
+                                    }
+                                    getFileRemovedMessage={(fileName) => `Tệp ${fileName} đã loại bỏ`}
+                                    getFileLimitExceedMessage={(filesLimit) =>
+                                      `Vượt quá số lượng tệp tối đa được cho phép. Chỉ được phép tải lên tối đa ${filesLimit} tệp.`
+                                    }
+                                    alertSnackbarProps={{
+                                      anchorOrigin: {vertical: "bottom", horizontal: "right"},
+                                      autoHideDuration: 1800,
+                                    }}
+                                    onChange={(files) => handleAnswerFileChange(files, questionOrder)}
+                                  ></DropzoneArea>
+                                </div>
                               )
                             }
                             {
                               data?.examResultId != null && (
                                 <div style={{display: "flex", alignItems: "center"}}><strong style={{marginRight: '10px'}}>Trả
                                   lời:</strong>{parse(value?.answer)}</div>
+                              )
+                            }
+                            {
+                              data?.examResultId != null && value?.filePathAnswer != null && value?.filePathAnswer !== '' && (
+                                <div style={{marginTop: '10px'}}>
+                                  <strong>File trả lời đính kèm:</strong>
+                                  {
+                                    value?.filePathAnswer.split(';').map(item => {
+                                      return (
+                                        <div style={{display: 'flex', alignItems: 'center'}}>
+                                          <AttachFileOutlined></AttachFileOutlined>
+                                          <p style={{fontWeight: 'bold', cursor: 'pointer'}}
+                                             onClick={() => handleOpenFilePreviewDialog(item)}>{getFilenameFromString(item)}</p>
+                                        </div>
+                                      )
+                                    })
+                                  }
+                                </div>
                               )
                             }
                             {
@@ -499,61 +599,61 @@ function MyExamDetails(props) {
               })
             }
 
-            {
-              data?.examResultId == null && (
-                <DropzoneArea
-                  dropzoneClass={classes.dropZone}
-                  filesLimit={20}
-                  showPreviews={true}
-                  showPreviewsInDropzone={false}
-                  useChipsForPreview
-                  dropzoneText={`Kéo và thả tệp vào đây hoặc nhấn để chọn tệp cho bài thi`}
-                  previewText="Xem trước:"
-                  previewChipProps={{
-                    variant: "outlined",
-                    color: "primary",
-                    size: "medium",
-                  }}
-                  getFileAddedMessage={(fileName) =>
-                    `Tệp ${fileName} tải lên thành công`
-                  }
-                  getFileRemovedMessage={(fileName) => `Tệp ${fileName} đã loại bỏ`}
-                  getFileLimitExceedMessage={(filesLimit) =>
-                    `Vượt quá số lượng tệp tối đa được cho phép. Chỉ được phép tải lên tối đa ${filesLimit} tệp.`
-                  }
-                  alertSnackbarProps={{
-                    anchorOrigin: {vertical: "bottom", horizontal: "right"},
-                    autoHideDuration: 1800,
-                  }}
-                  onChange={(files) => setAnswersFiles(files)}
-                ></DropzoneArea>
-              )
-            }
+            {/*{*/}
+            {/*  data?.examResultId == null && (*/}
+            {/*    <DropzoneArea*/}
+            {/*      dropzoneClass={classes.dropZone}*/}
+            {/*      filesLimit={20}*/}
+            {/*      showPreviews={true}*/}
+            {/*      showPreviewsInDropzone={false}*/}
+            {/*      useChipsForPreview*/}
+            {/*      dropzoneText={`Kéo và thả tệp vào đây hoặc nhấn để chọn tệp cho bài thi`}*/}
+            {/*      previewText="Xem trước:"*/}
+            {/*      previewChipProps={{*/}
+            {/*        variant: "outlined",*/}
+            {/*        color: "primary",*/}
+            {/*        size: "medium",*/}
+            {/*      }}*/}
+            {/*      getFileAddedMessage={(fileName) =>*/}
+            {/*        `Tệp ${fileName} tải lên thành công`*/}
+            {/*      }*/}
+            {/*      getFileRemovedMessage={(fileName) => `Tệp ${fileName} đã loại bỏ`}*/}
+            {/*      getFileLimitExceedMessage={(filesLimit) =>*/}
+            {/*        `Vượt quá số lượng tệp tối đa được cho phép. Chỉ được phép tải lên tối đa ${filesLimit} tệp.`*/}
+            {/*      }*/}
+            {/*      alertSnackbarProps={{*/}
+            {/*        anchorOrigin: {vertical: "bottom", horizontal: "right"},*/}
+            {/*        autoHideDuration: 1800,*/}
+            {/*      }}*/}
+            {/*      onChange={(files) => setAnswersFiles(files)}*/}
+            {/*    ></DropzoneArea>*/}
+            {/*  )*/}
+            {/*}*/}
 
-            {
-              data?.examResultId != null && (
-                <div>
-                  <h4 style={{marginBottom: 0, fontSize: '18px'}}>File đính kèm:</h4>
-                  {
-                    (data?.answerFiles == null || data?.answerFiles == '') ?
-                      (
-                        <div>N/A</div>
-                      ) :
-                      (
-                        data?.answerFiles.split(';').map(item => {
-                          return (
-                            <div style={{display: 'flex', alignItems: 'center'}}>
-                              <AttachFileOutlined></AttachFileOutlined>
-                              <p style={{fontWeight: 'bold', cursor: 'pointer'}}
-                                 onClick={() => handleOpenFilePreviewDialog(item)}>{getFilenameFromString(item)}</p>
-                            </div>
-                          )
-                        })
-                      )
-                  }
-                </div>
-              )
-            }
+            {/*{*/}
+            {/*  data?.examResultId != null && (*/}
+            {/*    <div>*/}
+            {/*      <h4 style={{marginBottom: 0, fontSize: '18px'}}>File đính kèm:</h4>*/}
+            {/*      {*/}
+            {/*        (data?.answerFiles == null || data?.answerFiles == '') ?*/}
+            {/*          (*/}
+            {/*            <div>N/A</div>*/}
+            {/*          ) :*/}
+            {/*          (*/}
+            {/*            data?.answerFiles.split(';').map(item => {*/}
+            {/*              return (*/}
+            {/*                <div style={{display: 'flex', alignItems: 'center'}}>*/}
+            {/*                  <AttachFileOutlined></AttachFileOutlined>*/}
+            {/*                  <p style={{fontWeight: 'bold', cursor: 'pointer'}}*/}
+            {/*                     onClick={() => handleOpenFilePreviewDialog(item)}>{getFilenameFromString(item)}</p>*/}
+            {/*                </div>*/}
+            {/*              )*/}
+            {/*            })*/}
+            {/*          )*/}
+            {/*      }*/}
+            {/*    </div>*/}
+            {/*  )*/}
+            {/*}*/}
 
           </CardContent>
           <CardActions style={{justifyContent: 'flex-end'}}>
