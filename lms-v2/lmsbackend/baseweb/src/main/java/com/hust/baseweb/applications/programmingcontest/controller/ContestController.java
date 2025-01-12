@@ -79,6 +79,7 @@ public class ContestController {
 
     @Async
     public void logUpdateContest(String userId, String contestId, ModelUpdateContest modelUpdateContest){
+        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logUpdateContest, userId = " + logM.getUserId());
@@ -140,6 +141,7 @@ public class ContestController {
 
     @Async
     public void logGetContestDetail(String userId, String contestId){
+        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logGetContestDetail, userId = " + logM.getUserId());
@@ -154,7 +156,7 @@ public class ContestController {
     public ResponseEntity<?> getContestDetail(@PathVariable("contestId") String contestId, Principal principal) {
         log.info("getContestDetail constestid {}", contestId);
 
-        logGetContestDetail(principal.getName(),contestId);
+        //logGetContestDetail(principal.getName(),contestId);
 
         ModelGetContestDetailResponse response = problemTestCaseService.getContestDetailByContestIdAndTeacher(
             contestId,
@@ -164,6 +166,7 @@ public class ContestController {
 
     @Async
     public void logStudentGetProblemOfContestForSolving(String userId, String contestId, String problemId){
+        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logStudentGetProblemOfContestForSolving, userId = " + logM.getUserId());
@@ -174,6 +177,8 @@ public class ContestController {
         logM.setDescription("an user get a problem of a contest for solving");
         apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
     }
+
+
     @GetMapping("/contests/{contestId}/problems/{problemId}")
     public ResponseEntity<?> getProblemDetailInContestViewByStudent(Principal principal,
         @PathVariable("problemId") String problemId, @PathVariable("contestId") String contestId
@@ -224,6 +229,7 @@ public class ContestController {
     }
     @Async
     public void logStudentGetDetailContest(String userId, String contestId){
+        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logStudentGetDetailContest, userId = " + logM.getUserId());
@@ -327,6 +333,7 @@ public class ContestController {
 
     @Async
     public void logTeacherGetMyContest(String userId){
+        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logTeacherGetMyContest, userId = " + logM.getUserId());
@@ -475,6 +482,7 @@ public class ContestController {
 
     @Async
     public void logStudentGetHisContests(String userId){
+        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logStudentGetHisContests, userId = " + logM.getUserId());
@@ -486,7 +494,7 @@ public class ContestController {
 
     @GetMapping("/students/contests")
     public ResponseEntity<?> getContestRegisteredStudent(Principal principal) {
-        logStudentGetHisContests(principal.getName());
+        //logStudentGetHisContests(principal.getName());
 
         ModelGetContestPageResponse res = problemTestCaseService.getRegisteredContestsByUser (principal.getName());
         List<ModelGetContestResponse> filteredContests = res.getContests().stream()
@@ -570,7 +578,9 @@ public class ContestController {
     }
 
     @Async
+
     private void logGetRankingOfContest(String userId, String contestId){
+        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logGetRankingOfContest, userId = " + logM.getUserId());
@@ -638,6 +648,7 @@ public class ContestController {
 
     @Async
     private void logGetSubmissionsOfContest(String userId, String contestId){
+        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logGetSubmissionsOfContest, userId = " + logM.getUserId());

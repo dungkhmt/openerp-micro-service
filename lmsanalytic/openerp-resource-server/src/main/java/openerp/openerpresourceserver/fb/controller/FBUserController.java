@@ -5,9 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.fb.entity.FbGroup;
 import openerp.openerpresourceserver.fb.entity.FbUser;
+import openerp.openerpresourceserver.fb.entity.FbUserGroup;
 import openerp.openerpresourceserver.fb.model.ModelInputImportSyncFbGroups;
 import openerp.openerpresourceserver.fb.model.ModelInputImportSyncFbUsers;
 import openerp.openerpresourceserver.fb.model.ModelResponseUser;
+import openerp.openerpresourceserver.fb.repo.FbGroupRepo;
+import openerp.openerpresourceserver.fb.repo.FbUserGroupRepo;
 import openerp.openerpresourceserver.fb.repo.FbUserRepo;
 import openerp.openerpresourceserver.fb.service.FbUserService;
 import org.apache.poi.ss.usermodel.Cell;
@@ -36,6 +39,8 @@ import java.util.List;
 public class FBUserController {
     private FbUserService fbUserService;
     private FbUserRepo fbUserRepo;
+    private FbUserGroupRepo fbUserGroupRepo;
+    private FbGroupRepo fbGroupRepo;
 
     @Secured("ROLE_ADMIN")
     @GetMapping("/get-all-fb-users")
@@ -50,6 +55,7 @@ public class FBUserController {
             @RequestParam("inputJson") String inputJson,
             @RequestParam("file") MultipartFile file
     ) {
+        /*
         Gson gson = new Gson();
         ModelInputImportSyncFbUsers modelUpload = gson.fromJson(
                 inputJson,
@@ -105,29 +111,47 @@ public class FBUserController {
                     log.info("link = " +link);
                 }
 
-                FbUser g = fbUserRepo.findById(groupId).orElse(null);
-                if(g != null){
+                FbUser u = fbUserRepo.findById(groupId).orElse(null);
+                if(u != null){
                     // update with new info
-                    g.setLink(link);
-                    g.setName(name);
-                    g.setGroupId(groupId);
-                    g.setLastUpdated(new Date());
+                    u.setLink(link);
+                    u.setName(name);
+                    u.setGroupId(groupId);
+                    u.setLastUpdated(new Date());
                 }else {
-                    g = new FbUser();
-                    g.setId(userId);
-                    g.setLink(link);
-                    g.setName(name);
-                    g.setCreateStamp(new Date());
+                    u = new FbUser();
+                    u.setId(userId);
+                    u.setLink(link);
+                    u.setName(name);
+                    u.setCreateStamp(new Date());
                 }
-                g = fbUserRepo.save(g);
-                res.add(g);
-            }
+                u = fbUserRepo.save(u);
 
+                FbUserGroup ug = fbUserGroupRepo.findByUserIdAndGroupId(userId, groupId);
+                if(ug == null){
+                    FbGroup g = fbGroupRepo.findById(groupId).orElse(null);
+                    if(g != null) {
+                        Date d = new Date();
+                        ug = new FbUserGroup(userId, groupId, d, d);
+                        ug = fbUserGroupRepo.save(ug);
+                    }
+                }else{
+                    // do nothing as group not exist
+                }
+                res.add(u);
+            }
+            */
+        try {
+            List<FbUser> res = fbUserService.synchronizeUsers(inputJson, file);
             return ResponseEntity.ok().body(res);
         }catch (Exception e){
             e.printStackTrace();
+            return ResponseEntity.ok().body("null");
         }
-        return ResponseEntity.ok().body("null");
+        //}catch (Exception e){
+        //    e.printStackTrace();
+        //}
+        //return ResponseEntity.ok().body(res);
 
     }
 }

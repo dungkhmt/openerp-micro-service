@@ -147,6 +147,7 @@ public class SubmissionController {
 
     @Async
     public void logTeacherViewDetailSubmissionOfStudentContest(String userId, String contestId, String problemId, String studentId, UUID submissionId){
+        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logTeacherViewDetailSubmissionOfStudentContest, userId = " + logM.getUserId());
@@ -287,7 +288,9 @@ public class SubmissionController {
     @Async
     public void logStudentSubmitToAContest(String userId, String contestId,
                                            ModelContestSubmitProgramViaUploadFile model){
+        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
+
         logM.setUserId(userId);
         log.info("logStudentSubmitToAContest, userId = " + logM.getUserId());
         logM.setParam1(contestId);
