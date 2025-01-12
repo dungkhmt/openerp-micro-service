@@ -14,6 +14,5 @@ public class MyExamResultSaveReq {
     private String examId;
     private String examStudentId;
     private Integer totalTime;
-    private String filePath;
     private List<MyExamResultDetailsSaveReq> examResultDetails;
 }

@@ -13,5 +13,6 @@ public class ExamMarkingDetailsSaveReq {
     private String examResultId;
     private String examQuestionId;
     private String answer;
+    private String filePath;
     private Integer score;
 }
