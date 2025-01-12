@@ -12,5 +12,7 @@ public class MyExamResultDetailsSaveReq {
 
     private String examResultId;
     private String examQuestionId;
+    private Integer questionOrder;
+    private String filePath;
     private String answer;
 }

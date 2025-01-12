@@ -456,10 +456,23 @@ public class ExamServiceImpl implements ExamService {
     public ResponseData<ExamResultEntity> doingMyExam(MyExamResultSaveReq myExamResultSaveReq, MultipartFile[] files) {
         ResponseData<ExamResultEntity> responseData = new ResponseData<>();
 
-        List<String> filePaths = mongoFileService.storeFiles(files);
-        myExamResultSaveReq.setFilePath(String.join(";", filePaths));
         ExamResultEntity examResultEntity = modelMapper.map(myExamResultSaveReq, ExamResultEntity.class);
         examResultEntity = examResultRepository.save(examResultEntity);
+
+        for(MultipartFile file: files){
+            String filename = file.getOriginalFilename();
+            for(MyExamResultDetailsSaveReq examResultDetails: myExamResultSaveReq.getExamResultDetails()){
+                if(Objects.equals(examResultDetails.getQuestionOrder(), getQuestionOrderFromFilename(filename))){
+                    String filePath = mongoFileService.storeFile(file);
+                    if(DataUtils.stringIsNotNullOrEmpty(examResultDetails.getFilePath())){
+                        examResultDetails.setFilePath(examResultDetails.getFilePath() + ";" + filePath);
+                    }else{
+                        examResultDetails.setFilePath(filePath);
+                    }
+                }
+            }
+
+        }
 
         List<ExamResultDetailsEntity> examResultDetailsEntities = new ArrayList<>();
         for(MyExamResultDetailsSaveReq examResultDetails: myExamResultSaveReq.getExamResultDetails()){
@@ -473,6 +486,14 @@ public class ExamServiceImpl implements ExamService {
         responseData.setResultCode(HttpStatus.OK.value());
         responseData.setResultMsg("Nộp bài thành công");
         return responseData;
+    }
+    private Integer getQuestionOrderFromFilename(String filename){
+        if(DataUtils.stringIsNotNullOrEmpty(filename)){
+            String[] fileParts = filename.split("\\.");
+            String[] subFileParts = fileParts[fileParts.length - 2].split("_");
+            return Integer.parseInt(subFileParts[subFileParts.length-1]);
+        }
+        return null;
     }
 
     @Override

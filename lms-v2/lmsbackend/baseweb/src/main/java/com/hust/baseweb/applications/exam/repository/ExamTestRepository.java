@@ -63,6 +63,7 @@ public interface ExamTestRepository extends JpaRepository<ExamTestEntity, String
                    "    case when erd.score is not null then eq.explain else null end as questionExplain,\n" +
                    "    etq.order as questionOrder,\n" +
                    "    erd.answer as answer,\n" +
+                   "    erd.file_path as filePathAnswer,\n" +
                    "    erd.pass as pass,\n" +
                    "    erd.score as score\n" +
                    "from\n" +
@@ -105,6 +106,7 @@ public interface ExamTestRepository extends JpaRepository<ExamTestEntity, String
                    "    etq.order as questionOrder,\n" +
                    "    erd.id as examResultDetailsId,\n" +
                    "    erd.answer as answer,\n" +
+                   "    erd.file_path as filePathAnswer,\n" +
                    "    erd.pass as pass,\n" +
                    "    erd.score as score\n" +
                    "from\n" +
