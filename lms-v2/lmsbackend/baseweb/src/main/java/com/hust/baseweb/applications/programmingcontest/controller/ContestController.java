@@ -570,11 +570,16 @@ public class ContestController {
         //         .body("This contest size is too big. Contact the contest manager for ranking table");
         // }
 
+        // temporary remove
+        /*
         List<ContestSubmissionsByUser> res = problemTestCaseService.getRankingByContestIdNew(
             contestId,
             getPointForRankingType);
+        */
+        List<ContestSubmissionsByUser> res = new ArrayList<>();
 
         return ResponseEntity.status(200).body(res);
+        //return ResponseEntity.status(200).body(null);
     }
 
     @Async
@@ -741,7 +746,59 @@ public class ContestController {
 
         return ResponseEntity.status(200).body("ok");
     }
+    @Secured("ROLE_TEACHER")
+    @PostMapping("/contests/students/upload-list-for-update-fullname")
+    public ResponseEntity<?> uploadExcelStudentListForUpdateFullNameOfContest(
+        @RequestParam("inputJson") String inputJson,
+        @RequestParam("file") MultipartFile file
+    ) {
+        Gson gson = new Gson();
+        ModelUploadExcelParticipantToContestInput modelUpload = gson.fromJson(
+            inputJson, ModelUploadExcelParticipantToContestInput.class);
+        List<ModelAddUserToContestResponse> uploadedUsers = new ArrayList<>();
+        String contestId = modelUpload.getContestId();
+        String role = modelUpload.getRole();
+        try (InputStream is = file.getInputStream()) {
+            XSSFWorkbook wb = new XSSFWorkbook(is);
+            XSSFSheet sheet = wb.getSheetAt(0);
+            int lastRowNum = sheet.getLastRowNum();
+            //System.out.println("uploadExcelStudentListOfQuizTest, lastRowNum = " + lastRowNum);
+            for (int i = 1; i <= lastRowNum; i++) {
+                Row row = sheet.getRow(i);
+                Cell c = row.getCell(0);
 
+                if (c == null || c.getStringCellValue().equals("")) {
+                    continue;
+                }
+                String userId = c.getStringCellValue();
+                c = row.getCell(1);
+
+                if (c == null || c.getStringCellValue().equals("")) {
+                    continue;
+                }
+                String fullname = c.getStringCellValue();
+                ModelAddUserToContest m = new ModelAddUserToContest();
+                m.setContestId(contestId);
+                m.setUserId(userId);
+                m.setFullname(fullname);
+                if ("Manager".equalsIgnoreCase(role)) {
+                    m.setRole(UserRegistrationContestEntity.ROLE_MANAGER);
+                } else if ("Owner".equalsIgnoreCase(role)) {
+                    m.setRole(UserRegistrationContestEntity.ROLE_OWNER);
+                } else {
+                    m.setRole(UserRegistrationContestEntity.ROLE_PARTICIPANT);
+                }
+                ModelAddUserToContestResponse response = problemTestCaseService.updateUserFullnameOfContest(m);
+                uploadedUsers.add(response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.ok().body(uploadedUsers);
+    }
+
+    @Secured("ROLE_TEACHER")
     @PostMapping("/contests/students/upload-list")
     public ResponseEntity<?> uploadExcelStudentListOfContest(
         @RequestParam("inputJson") String inputJson,

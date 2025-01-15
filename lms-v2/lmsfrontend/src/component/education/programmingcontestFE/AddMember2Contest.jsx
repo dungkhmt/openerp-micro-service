@@ -22,6 +22,8 @@ import { isEmpty, trim } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import { successNoti } from "utils/notification";
 import UploadUserToContestDialog from "./UploadUserToContestDialog";
+import UploadUserUpdateFullNameContestDialog from "./UploadUserUpdateFullNameContestDialog";
+
 
 // https://mui.com/material-ui/react-avatar/#letter-avatars
 function stringToColor(string) {
@@ -116,6 +118,7 @@ export default function AddMember2Contest(props) {
 
   //
   const [openUploadDialog, setOpenUploadDialog] = useState(false);
+  const [openUploadToUpdateUserFullnameDialog, setOpenUploadToUpdateUserFullnameDialog] = useState(false);
 
   //
   const [value, setValue] = useState(undefined);
@@ -312,6 +315,15 @@ export default function AddMember2Contest(props) {
               Import
             </PrimaryButton>
           </Tooltip>
+          <Tooltip arrow title="Add members by uploading Excel file">
+            <PrimaryButton
+              onClick={() => {
+                setOpenUploadToUpdateUserFullnameDialog(true);
+              }}
+            >
+              Import update fullname
+            </PrimaryButton>
+          </Tooltip>
         </Stack>
       </Stack>
       <UploadUserToContestDialog
@@ -319,6 +331,14 @@ export default function AddMember2Contest(props) {
         contestId={contestId}
         onClose={() => {
           setOpenUploadDialog(false);
+          props.onAddedSuccessfully();
+        }}
+      />
+      <UploadUserUpdateFullNameContestDialog
+        isOpen={openUploadToUpdateUserFullnameDialog}
+        contestId={contestId}
+        onClose={() => {
+          setOpenUploadToUpdateUserFullnameDialog(false);
           props.onAddedSuccessfully();
         }}
       />

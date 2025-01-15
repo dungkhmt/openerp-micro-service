@@ -204,7 +204,7 @@ public class SubmissionController {
         ContestSubmissionEntity sub = problemTestCaseService.updateContestSubmissionSourceCode(input);
         return ResponseEntity.ok().body(sub);
     }
-
+    @Secured("ROLE_TEACHER")
     @PostMapping("/submissions/{submissionId}/evaluation")
     public ResponseEntity<?> evaluateSubmission(@PathVariable UUID submissionId) {
         problemTestCaseService.evaluateSubmission(submissionId);
