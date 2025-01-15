@@ -1922,7 +1922,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 System.out.println("RANKING, nbProblem = " + nbProblems + " total percent = " + totalPercentage);
             }
 
-            contestSubmission.setFullname(userService.getUserFullName(userId));
+            //contestSubmission.setFullname(userService.getUserFullName(userId));
+            contestSubmission.setFullname(getUserFullNameOfContest(contestId,userId));
             contestSubmission.setMapProblemsToPoints(mapProblemsToPoints);
             contestSubmission.setTotalPoint(totalPoint);
             contestSubmission.setTotalPercentagePoint(totalPercentage);
