@@ -17,7 +17,7 @@ import { programUrl } from "../apiURL";
 import { successNoti, warningNoti, errorNoti } from "utils/notification";
 
 
-const ProgramDetailPage = () => {
+const StudentViewProgramDetail = () => {
   const { programId } = useParams(); 
   const [courses, setCourses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -111,14 +111,6 @@ const ProgramDetailPage = () => {
         {`Chương trình: ${programName} (Mã: ${programId})`} 
         </Typography>
         <div style={styles.searchArea}>  
-        <Button
-            variant="contained"
-            color="primary"
-            style={styles.firstButton}
-            onClick={handleEditProgram}
-          >
-            Chỉnh sửa chương trình
-          </Button>
           <TextField
             label="Tìm kiếm"
             variant="outlined"
@@ -143,4 +135,4 @@ const ProgramDetailPage = () => {
   );
 };
 
-export default ProgramDetailPage;
+export default StudentViewProgramDetail;

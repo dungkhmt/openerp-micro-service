@@ -44,12 +44,12 @@ const AddCourseScreen = () => {
         "post",
         `${courseUrl.createCourse}`,
         (res) => {
-          successNoti("Khóa học đã được thêm thành công!", 5000);
+          successNoti("Học phần đã được thêm thành công!", 5000);
           history.push("/training_course/teacher/course");
         },
         (error) => {
           console.log(error);
-          const errorMessage = error?.response?.data?.message || "Có lỗi xảy ra khi thêm khóa học";
+          const errorMessage = error?.response?.data?.message || "Có lỗi xảy ra khi thêm học phần";
           errorNoti(errorMessage, 5000);
         },
         newCourse

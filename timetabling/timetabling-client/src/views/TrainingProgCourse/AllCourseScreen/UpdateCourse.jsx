@@ -87,7 +87,7 @@ const UpdateCoursePage = () => {
   return (
     <Paper elevation={3} sx={{ padding: 3 }}>
       <Typography variant="h5" fontWeight="bold" style={updateStyles.title}>
-        Chỉnh sửa thông tin khóa học
+        Chỉnh sửa thông tin học phần
       </Typography>
 
       <form onSubmit={handleSubmit}>

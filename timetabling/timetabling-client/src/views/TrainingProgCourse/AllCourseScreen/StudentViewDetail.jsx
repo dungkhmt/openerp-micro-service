@@ -5,16 +5,20 @@ import { updateStyles } from "./index.style";
 import { request } from "api";
 import { courseUrl } from "../apiURL";
 
-const CourseDetailPage = () => {
+const StudentViewCourseDetail = () => {
   const history = useHistory();
   const { courseId } = useParams();
   const [courseDetails, setCourseDetails] = useState(null);
 
   useEffect(() => {
     if (courseId) {
-      request("get", `${courseUrl.getCourseDetail}/${courseId}`, (res) => {
-        setCourseDetails(res.data);
-      });
+      request(
+        "get",
+        `${courseUrl.getCourseDetail}/${courseId}`,
+        (res) => {
+          setCourseDetails(res.data);
+        }
+      );
     }
   }, [courseId]);
 
@@ -61,11 +65,7 @@ const CourseDetailPage = () => {
       <div style={updateStyles.textFieldContainer}>
         <Typography variant="h6">Học phần tiên quyết</Typography>
         <TextField
-          value={
-            courseDetails.prerequisites
-              ? courseDetails.prerequisites.join(", ")
-              : ""
-          }
+          value={courseDetails.prerequisites ? courseDetails.prerequisites.join(", ") : ""}
           variant="outlined"
           style={updateStyles.textField}
           disabled
@@ -73,15 +73,7 @@ const CourseDetailPage = () => {
       </div>
 
       <div style={updateStyles.buttonGroup}>
-        <Button
-          variant="contained"
-          style={{ backgroundColor: "#0099FF", color: "white" }}
-          onClick={() =>
-            history.push(`/training_course/teacher/course/${courseId}/edit`)
-          }
-        >
-          Chỉnh sửa
-        </Button>
+
         <Button
           color="error"
           variant="contained"
@@ -94,4 +86,4 @@ const CourseDetailPage = () => {
   );
 };
 
-export default CourseDetailPage;
+export default StudentViewCourseDetail;

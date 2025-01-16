@@ -18,7 +18,4 @@ public class TrainingProgSemester {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(mappedBy = "semester")
-    private List<TrainingProgSchedule> schedules;
-
 }

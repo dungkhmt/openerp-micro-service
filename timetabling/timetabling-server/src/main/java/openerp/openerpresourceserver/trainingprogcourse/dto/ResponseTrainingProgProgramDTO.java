@@ -20,5 +20,7 @@ public class ResponseTrainingProgProgramDTO {
 
     private Date lastUpdated;
 
+    private Long semesterCount;
+
     private List<TrainingProgCourseDetail> schedules;
 }

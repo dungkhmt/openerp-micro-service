@@ -21,4 +21,5 @@ public interface TrainingProgScheduleRepo extends JpaRepository<TrainingProgSche
             @Param("courseId") String courseId
     );
 
+
 }

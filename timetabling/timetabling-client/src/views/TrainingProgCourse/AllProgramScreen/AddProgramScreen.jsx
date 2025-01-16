@@ -13,6 +13,7 @@ const AddProgramScreen = () => {
   const [name, setName] = useState("");
   const [courses, setCourses] = useState([]);
   const [selectedCourses, setSelectedCourses] = useState([]);
+  const [semesterCount, setSemesterCount] = useState("");
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -43,6 +44,7 @@ const AddProgramScreen = () => {
         createStamp: new Date(), 
         lastUpdated: new Date(), 
         courses: courseIds,
+        semesterCount : semesterCount,
     };
 
     try {
@@ -51,7 +53,7 @@ const AddProgramScreen = () => {
         `${programUrl.createProgram}`,
         (res) => {
           successNoti("Chương trình đã được thêm thành công!", 5000);
-          history.push("/training_course/teacher/course");
+          history.push("/training_course/teacher/program");
         },
         (error) => {
           console.log(error);
@@ -99,18 +101,49 @@ const AddProgramScreen = () => {
             required
           />
         </div>
+        <div style={updateStyles.textFieldContainer}>
+  <Typography variant="h6">Số học kỳ</Typography>
+  <TextField
+    value={semesterCount}
+    onChange={(e) => setSemesterCount(e.target.value)}
+    variant="outlined"
+    style={updateStyles.textField}
+    placeholder="Nhập số học kỳ"
+    type="number"
+    required
+  />
+</div>
 
         <div style={updateStyles.textFieldContainer}>
           <Typography variant="h6">Học phần trong chương trình</Typography>
           <Autocomplete
-            multiple
-            options={courses}
-            disableCloseOnSelect
-            getOptionLabel={(option) => `${option.id} : ${option.courseName}`}
-            value={selectedCourses}
-            onChange={(event, newValue) => {
-              setSelectedCourses(newValue);
-            }}
+  multiple
+  options={courses}
+  disableCloseOnSelect
+  getOptionLabel={(option) => `${option.id} : ${option.courseName}`}
+  value={selectedCourses}
+  onChange={(event, newValue) => {
+    // Lấy danh sách ID các môn học đã chọn
+    const selectedIds = new Set(newValue.map((course) => course.id));
+
+    // Lấy danh sách môn học tiên quyết chưa có trong danh sách đã chọn
+    newValue.forEach((course) => {
+      if (course.prerequisites) {
+        course.prerequisites.forEach((prerequisiteId) => {
+          // Kiểm tra xem môn tiên quyết đã có trong danh sách chưa
+          if (!selectedIds.has(prerequisiteId)) {
+            const prerequisiteCourse = courses.find((c) => c.id === prerequisiteId);
+            if (prerequisiteCourse) {
+              newValue.push(prerequisiteCourse); // Thêm vào danh sách
+              selectedIds.add(prerequisiteId);  // Đánh dấu là đã chọn
+            }
+          }
+        });
+      }
+    });
+
+    setSelectedCourses(newValue); // Cập nhật danh sách đã chọn
+  }}
             renderOption={(props, option, { selected }) => (
               <li {...props}>
                 <Checkbox
@@ -144,7 +177,7 @@ const AddProgramScreen = () => {
           <Button
             color="error"
             variant="contained"
-            onClick={() => history.push("/training_course/teacher/course")}
+            onClick={() => history.push("/training_course/teacher/program")}
           >
             Hủy bỏ
           </Button>

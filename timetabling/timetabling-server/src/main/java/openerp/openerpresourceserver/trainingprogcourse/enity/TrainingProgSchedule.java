@@ -33,9 +33,6 @@ public class TrainingProgSchedule {
 
     @ManyToOne
     @JoinColumn(name = "created_by_user_id", referencedColumnName = "user_login_id")
-    private User createdByUserId;;
-
-
-
+    private User createdByUserId;
 
 }

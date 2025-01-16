@@ -51,6 +51,35 @@ export const styles = {
       fontSize: 16,
       height: "65vh",
     },
+    semesterCount: {
+      display: "flex",
+      marginBottom: "0.5em",
+      paddingTop: "0.1em",
+    },
+    editContainer: {
+      display: "flex",
+      alignItems: "center", // Căn chỉnh các phần tử theo chiều ngang
+      height: "50px",  // Điều chỉnh chiều cao tổng thể cho container
+    },
+    viewContainer: {
+      display: "flex",
+      alignItems: "center", 
+      height: "50px",  // Điều chỉnh chiều cao tổng thể cho container
+    },
+    iconButton: {
+      marginLeft: "8px", // Khoảng cách giữa các icon
+      height: "40px",  // Đảm bảo các icon có chiều cao tương tự với TextField
+    },
+    firstsButton: {
+      height: "40px",
+      marginTop: "0.5em",
+      marginLeft: "0.5em",
+    },
+    buttonGroup: {
+      marginTop: 3,
+      display: "flex",
+      gap: 2,
+    },
   };
   
   export const applicatorDialogStyles = {
@@ -165,7 +194,7 @@ export const styles = {
       marginBottom: 2,
     },
     textField: {
-      width: "100%",
+      width: "80%",
       marginTop: 1,
     },
     buttonGroup: {

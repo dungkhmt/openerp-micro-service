@@ -25,6 +25,9 @@ public class TrainingProgProgram {
     @Column(name = "last_updated")
     private Date lastUpdated;
 
+    @Column(name = "semester_count")
+    private Long semesterCount;
+
     @OneToMany(mappedBy = "program", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TrainingProgSchedule> schedules;
 

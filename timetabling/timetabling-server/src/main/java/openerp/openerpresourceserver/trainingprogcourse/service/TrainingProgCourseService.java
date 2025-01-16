@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.trainingprogcourse.service;
 
 import openerp.openerpresourceserver.trainingprogcourse.dto.ResponseTrainingProgCourse;
 import openerp.openerpresourceserver.trainingprogcourse.dto.request.RequestTrainingProgCourse;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,5 +16,7 @@ public interface TrainingProgCourseService {
 
     ResponseTrainingProgCourse getDetail(String id);
 
-   /// void delete(String id);
+    void delete(String id);
+
+    int importTrainingProgCourse(MultipartFile file);
 }

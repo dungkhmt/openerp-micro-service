@@ -75,7 +75,8 @@ export const styles = {
       display: "flex",
       justifyContent: "space-around",
       alignItems: "center",
-      height: "90%",
+     
+      height: "70%",
       overflowX: "hidden",
     },
     slide1: {

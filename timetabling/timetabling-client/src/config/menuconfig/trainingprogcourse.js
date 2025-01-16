@@ -2,29 +2,38 @@ const prefix = "/training_course";
 export const TrainingFrogCourse = {
   id: "MENU_TRAINING_COURSE",
   icon: "DashboardIcon",
-  text: "Quản lý chương trình học",
+  text: "Quản lý chương trình",
   child: [
-    
+
     {
-      id: "MENU_TRAINING_COURSE_LIST",
-      path: `${prefix}/teacher/course_list`,
+      id: "MENU_STUDENT_COURSE",
+      path: `${prefix}/student/course`,
       isPublic: true,
-      text: "Danh mục học tập",
+      text: "Danh sách học phần",
+      child: [],
+    },
+    {
+      id: "MENU_STUDENT_PROGRAM",
+      path: `${prefix}/student/program`,
+      isPublic: true,
+      text: "Danh sách học phần",
       child: [],
     },
     {
       id: "MENU_TRAINING_COURSE",
       path: `${prefix}/teacher/course`,
       isPublic: true,
-      text: "Danh mục học phần",
+      text: "Quản lý học phần",
       child: [],
     },
     {
       id: "MENU_TRAINING_PROGRAM",
       path: `${prefix}/teacher/program`,
       isPublic: true,
-      text: "Danh mục quản lý chương trình",
+      text: "Quản lý chương trình học",
       child: [],
     },
+    
+   
   ],
 };

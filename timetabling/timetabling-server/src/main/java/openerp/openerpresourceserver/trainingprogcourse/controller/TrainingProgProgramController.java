@@ -5,12 +5,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.trainingprogcourse.config.CustomException;
-import openerp.openerpresourceserver.trainingprogcourse.dto.PaginationDTO;
-import openerp.openerpresourceserver.trainingprogcourse.dto.ResponseTrainingProgCourse;
-import openerp.openerpresourceserver.trainingprogcourse.dto.ResponseTrainingProgProgramDTO;
-import openerp.openerpresourceserver.trainingprogcourse.dto.TrainingProgProgramInfo;
-import openerp.openerpresourceserver.trainingprogcourse.dto.request.RequestTrainingProgProgramDTO;
-import openerp.openerpresourceserver.trainingprogcourse.dto.request.TrainingProgScheduleUpdateRequest;
+import openerp.openerpresourceserver.trainingprogcourse.dto.*;
+import openerp.openerpresourceserver.trainingprogcourse.dto.request.*;
 import openerp.openerpresourceserver.trainingprogcourse.service.TrainingProgProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +16,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -85,6 +82,67 @@ public class TrainingProgProgramController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi");
+        }
+    }
+
+    @GetMapping("/schedule/{programId}")
+    public ResponseEntity<List<ResponseProgramAlterDTO>> scheduleProgram(@PathVariable String programId) {
+        try {
+            // Gọi service để sắp xếp chương trình và nhận kết quả là Map<Long, List<String>>
+            List<ResponseProgramAlterDTO> scheduledCourses = trainingProgProgramService.courseScheduler(programId);
+
+            // Trả về kết quả dưới dạng Map<Long, List<String>>
+            return ResponseEntity.ok(scheduledCourses);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
+
+}
+
+    @PutMapping("/semester")
+    public ResponseEntity<Boolean> updateSemesterCount(
+         @RequestBody   RequestSemesterCountDTO requestSemesterCountDTO) {
+        try {
+            Boolean result = trainingProgProgramService.updateSemesterCount(requestSemesterCountDTO);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteCoursesFromProgram(
+        @RequestBody  RequestDeleteTrainingProgProgramDTO request) {
+        try {
+            Boolean result = trainingProgProgramService.deleteCourse(request);
+            if (result != null && result) {
+                return ResponseEntity.ok("Courses deleted successfully.");
+            } else {
+                return ResponseEntity.status(500).body("Failed to delete courses.");
+            }
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(404).body(ex.getMessage());
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).body("An error occurred: " + ex.getMessage());
+        }
+    }
+
+    @PostMapping("/course-change")
+    public ResponseEntity<List<ResponseCourseChangeDTO>> changeCourse(
+            @RequestBody RequestChangeCourseDTO request) {
+        List<ResponseCourseChangeDTO> response = trainingProgProgramService.changeCourse(request);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete-programs")
+    public ResponseEntity<?> deletePrograms(@RequestBody List<String> ids) {
+        try {
+            int deletedCount = trainingProgProgramService.deletePrograms(ids);
+            return ResponseEntity.ok().body("Successfully deleted " + deletedCount + " programs.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete programs.");
         }
     }
 

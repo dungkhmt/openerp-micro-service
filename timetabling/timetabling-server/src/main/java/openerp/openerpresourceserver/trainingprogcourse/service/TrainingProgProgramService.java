@@ -1,13 +1,10 @@
 package openerp.openerpresourceserver.trainingprogcourse.service;
 
-import openerp.openerpresourceserver.trainingprogcourse.dto.PaginationDTO;
-import openerp.openerpresourceserver.trainingprogcourse.dto.ResponseTrainingProgCourse;
-import openerp.openerpresourceserver.trainingprogcourse.dto.ResponseTrainingProgProgramDTO;
-import openerp.openerpresourceserver.trainingprogcourse.dto.TrainingProgProgramInfo;
-import openerp.openerpresourceserver.trainingprogcourse.dto.request.RequestTrainingProgProgramDTO;
-import openerp.openerpresourceserver.trainingprogcourse.dto.request.TrainingProgScheduleUpdateRequest;
+import openerp.openerpresourceserver.trainingprogcourse.dto.*;
+import openerp.openerpresourceserver.trainingprogcourse.dto.request.*;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TrainingProgProgramService {
     void create(RequestTrainingProgProgramDTO trainingProgProgram);
@@ -24,6 +21,15 @@ public interface TrainingProgProgramService {
 
     List<ResponseTrainingProgCourse> getAvailableCourse(String programId);
 
+    List<ResponseProgramAlterDTO> courseScheduler(String programId);
+
+    Boolean updateSemesterCount(RequestSemesterCountDTO requestSemesterCountDTO);
+
+    Boolean deleteCourse(RequestDeleteTrainingProgProgramDTO request);
+
+    List<ResponseCourseChangeDTO> changeCourse(RequestChangeCourseDTO request);
+
+    int deletePrograms(List<String> ids);
 }
 
 

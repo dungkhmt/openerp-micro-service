@@ -10,20 +10,22 @@ import { useHistory } from "react-router-dom";
 import { request } from "api";
 import { courseUrl } from "../apiURL";
 import { styles } from './index.style';
+import ImportDialog from "./ImportDialog"; // Đường dẫn tới file ImportDialog
 
 const AllCourseScreen = () => {
   const history = useHistory();
   const [courses, setCourses] = useState([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false); // Trạng thái cho dialog Import
 
   useEffect(() => {
     const fetchCourses = async () => {
       setIsLoading(true);
       try {
-        const response = await request("get",`${courseUrl.getAllCourse}`);
+        const response = await request("get", `${courseUrl.getAllCourse}`);
         setCourses(response.data);
-       } catch (error) {
+      } catch (error) {
         console.error("Error fetching courses:", error);
       } finally {
         setIsLoading(false);
@@ -46,49 +48,24 @@ const AllCourseScreen = () => {
     history.push(`/training_course/teacher/course/create`);
   };
 
-  const actionCell = (params) => {
-    const rowData = params.row;
-
-    return (
-      <div>
-        <Button variant="outlined" onClick={() => handleNavigateCourseDetail(rowData)}>
-          Xem chi tiết
-        </Button>
-      </div>
-    );
+  const handleImportDialogOpen = () => {
+    setIsImportDialogOpen(true);
   };
 
-  const handleNavigateCourseDetail = (course) => {
-    history.push(`/training_course/teacher/course/${course.id}`);
+  const handleImportDialogClose = () => {
+    setIsImportDialogOpen(false);
   };
 
-  const dataGridColumns = [
-    {
-      field: "id",
-      headerName: "Mã học phần",
-      align: "center",
-      headerAlign: "center",
-      flex: 1
-    },
-    { field: "courseName", headerName: "Tên học phần", flex: 1.5 },
-    { field: "credit", headerName: "Số tín chỉ",align: "center", flex: 0.5 },
-    {
-      field: "prerequisites",
-      headerName: "Học phần tiên quyết",
-      flex: 1.5,
-      renderCell: (params) => {
-        const prerequisites = params.value;
-        return prerequisites.join(", ");
-      },
-    },
-    {
-      headerName: "Hành động",
-      renderCell: actionCell,
-      align: "center",
-      headerAlign: "center",
-      flex: 1,
-    },
-  ];
+  const fetchData = () => {
+    // Reload data after importing
+    setIsLoading(true);
+    request("get", `${courseUrl.getAllCourse}`)
+      .then((res) => {
+        setCourses(res.data);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setIsLoading(false));
+  };
 
   return (
     <Paper elevation={3} style={styles.paper}>
@@ -106,12 +83,19 @@ const AllCourseScreen = () => {
             Thêm học phần
           </Button>
           <Button
-           color="error"
-           variant="outlined"
-          //  disabled={rowSelect.length === 0}
+            color="error"
+            variant="contained"
             style={styles.actionButton}
           >
             Xóa
+          </Button>
+          <Button
+            color="success"
+            variant="contained"
+            onClick={handleImportDialogOpen} // Mở dialog
+            style={styles.actionButton}
+          >
+            Import danh sách
           </Button>
           <TextField
             variant="outlined"
@@ -125,14 +109,46 @@ const AllCourseScreen = () => {
 
       <DataGrid
         rows={filteredCourses}
-        columns={dataGridColumns}
+        columns={[
+          { field: "id", headerName: "Mã học phần", flex: 1 },
+          { field: "courseName", headerName: "Tên học phần", flex: 1.5 },
+          { field: "credit", headerName: "Số tín chỉ", flex: 0.5 },
+          {
+            field: "prerequisites",
+            headerName: "Học phần tiên quyết",
+            flex: 1.5,
+            renderCell: (params) => params.value.join(", "),
+          },
+          {
+            headerName: "Hành động",
+            renderCell: (params) => (
+              <Button
+                variant="outlined"
+                onClick={() =>
+                  history.push(`/training_course/teacher/course/${params.row.id}`)
+                }
+              >
+                Xem chi tiết
+              </Button>
+            ),
+            flex: 1,
+          },
+        ]}
         checkboxSelection
         disableRowSelectionOnClick
         loading={isLoading}
         hideFooter
         pagination={false}
         style={styles.table}
-       />
+      />
+
+      {/* Import Dialog */}
+      <ImportDialog
+        open={isImportDialogOpen}
+        handleClose={handleImportDialogClose}
+        fetchData={fetchData} // Truyền hàm fetch lại danh sách
+        semester={"2025A"} // Ví dụ: học kỳ hiện tại
+      />
     </Paper>
   );
 };

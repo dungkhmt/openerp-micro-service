@@ -21,5 +21,7 @@ public class RequestTrainingProgProgramDTO {
 
     private Date lastUpdated;
 
+    private Long semesterCount;
+
     private List<String> courses;
 }

@@ -4,14 +4,11 @@ import jakarta.persistence.EntityNotFoundException;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.User;
 import openerp.openerpresourceserver.generaltimetabling.repo.ScheduleRepo;
 import openerp.openerpresourceserver.generaltimetabling.repo.UserRepo;
+import openerp.openerpresourceserver.trainingprogcourse.algorithm.CourseScheduler;
 import openerp.openerpresourceserver.trainingprogcourse.config.CustomException;
 import openerp.openerpresourceserver.trainingprogcourse.dto.*;
-import openerp.openerpresourceserver.trainingprogcourse.dto.request.RequestTrainingProgProgramDTO;
-import openerp.openerpresourceserver.trainingprogcourse.dto.request.TrainingProgScheduleUpdateRequest;
-import openerp.openerpresourceserver.trainingprogcourse.enity.TrainingProgCourse;
-import openerp.openerpresourceserver.trainingprogcourse.enity.TrainingProgProgram;
-import openerp.openerpresourceserver.trainingprogcourse.enity.TrainingProgSchedule;
-import openerp.openerpresourceserver.trainingprogcourse.enity.TrainingProgSemester;
+import openerp.openerpresourceserver.trainingprogcourse.dto.request.*;
+import openerp.openerpresourceserver.trainingprogcourse.enity.*;
 import openerp.openerpresourceserver.trainingprogcourse.repository.TrainingProgCourseRepo;
 import openerp.openerpresourceserver.trainingprogcourse.repository.TrainingProgProgramRepo;
 import openerp.openerpresourceserver.trainingprogcourse.repository.TrainingProgScheduleRepo;
@@ -23,11 +20,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static openerp.openerpresourceserver.trainingprogcourse.algorithm.CourseScheduler.moveCourse;
 
 @Service
 public class TrainingProgProgramServiceImpl implements TrainingProgProgramService {
@@ -56,6 +52,7 @@ public class TrainingProgProgramServiceImpl implements TrainingProgProgramServic
         program.setName(requestDTO.getName());
         program.setCreateStamp(requestDTO.getCreateStamp());
         program.setLastUpdated(requestDTO.getLastUpdated());
+        program.setSemesterCount(requestDTO.getSemesterCount());
 
         // Tạo danh sách TrainingProgSchedule từ requestDTO
         List<TrainingProgSchedule> schedules = requestDTO.getCourses().stream().map(
@@ -65,12 +62,9 @@ public class TrainingProgProgramServiceImpl implements TrainingProgProgramServic
                     if (optionalTrainingProgCourse.isPresent()) {
                         TrainingProgCourse course = optionalTrainingProgCourse.get();
                         schedule.setCourse(course);
-                        schedule.setProgram(program); // Đảm bảo đây là chương trình mới tạo
+                        schedule.setProgram(program);
                         schedule.setStatus("active");
                         schedule.setId(UUID.randomUUID());
-
-
-                        // Giả sử bạn có user đã tồn tại
                         Optional<User> existUser = userRepo.findById("dungpq");
                         if (existUser.isPresent()) {
                             schedule.setCreatedByUserId(existUser.get());
@@ -82,8 +76,6 @@ public class TrainingProgProgramServiceImpl implements TrainingProgProgramServic
 
         // Set danh sách schedules cho program
         program.setSchedules(schedules);
-
-        // Lưu TrainingProgProgram vào database
         trainingProgProgramRepo.save(program);
     }
 
@@ -144,7 +136,7 @@ public class TrainingProgProgramServiceImpl implements TrainingProgProgramServic
 
         Optional<TrainingProgProgram> trainingProgProgram = trainingProgProgramRepo.findById(id);
         if (!trainingProgProgram.isPresent()) {
-            throw new EntityNotFoundException("Program not found with id: " + id);
+            throw new EntityNotFoundException("Mã chương trình không tồn tại " + id);
         }
         TrainingProgProgram program = trainingProgProgram.get();
         ResponseTrainingProgProgramDTO responseDTO = new ResponseTrainingProgProgramDTO();
@@ -152,6 +144,7 @@ public class TrainingProgProgramServiceImpl implements TrainingProgProgramServic
         responseDTO.setName(program.getName());
         responseDTO.setCreateStamp(program.getCreateStamp());
         responseDTO.setLastUpdated(program.getLastUpdated());
+        responseDTO.setSemesterCount(program.getSemesterCount());
 
         List<TrainingProgSchedule> schedules = program.getSchedules();
         List<TrainingProgCourseDetail> courseDetails = schedules.stream().map(
@@ -177,7 +170,6 @@ public class TrainingProgProgramServiceImpl implements TrainingProgProgramServic
                 }
         ).toList();
         responseDTO.setSchedules(courseDetails);
-
         return responseDTO;
     }
 
@@ -187,7 +179,7 @@ public class TrainingProgProgramServiceImpl implements TrainingProgProgramServic
         // Tìm chương trình đào tạo
         Optional<TrainingProgProgram> optionalProgram = trainingProgProgramRepo.findById(programId);
         if (optionalProgram.isEmpty()) {
-            throw new EntityNotFoundException("Program not found with id: " + programId);
+            throw new EntityNotFoundException("Mã chương trình không tồn tại  " + programId);
         }
 
         TrainingProgProgram program = optionalProgram.get();
@@ -209,7 +201,7 @@ public class TrainingProgProgramServiceImpl implements TrainingProgProgramServic
             // Tìm môn học dựa trên courseId
             Optional<TrainingProgCourse> optionalCourse = trainingProgCourseRepo.findById(courseId);
             if (optionalCourse.isEmpty()) {
-                throw new EntityNotFoundException("Course not found with id: " + courseId);
+                throw new EntityNotFoundException("Học phần không tìm thấy với id : " + courseId);
             }
 
             TrainingProgCourse course = optionalCourse.get();
@@ -243,12 +235,12 @@ public class TrainingProgProgramServiceImpl implements TrainingProgProgramServic
         if (trainingProgProgramOptional.isPresent()) {
 
             TrainingProgProgram trainingProgProgram = trainingProgProgramOptional.get();
-            courseIds = trainingProgProgram.getSchedules().stream().map(schedule -> schedule.getCourse().getId())
+            courseIds = trainingProgProgram.getSchedules().stream().map(
+                    schedule -> schedule.getCourse().getId())
                     .collect(Collectors.toList());
 
-
         } else {
-            throw new EntityNotFoundException("Course not found with id: " + programId);
+            throw new EntityNotFoundException("Học phần không tìm thấy với id : " + programId);
         }
 
         return courseIds;
@@ -261,7 +253,7 @@ public class TrainingProgProgramServiceImpl implements TrainingProgProgramServic
 
         Optional<TrainingProgProgram> optionalProgram = trainingProgProgramRepo.findById(programId);
         if (optionalProgram.isEmpty()) {
-            throw new EntityNotFoundException("Program not found with id: " + programId);
+            throw new EntityNotFoundException("Mã chương trình không tồn tại  " + programId);
         }
 
         TrainingProgProgram program = optionalProgram.get();
@@ -277,6 +269,161 @@ public class TrainingProgProgramServiceImpl implements TrainingProgProgramServic
 
         return availableCourses;
     }
+
+    @Override
+    public  List<ResponseProgramAlterDTO> courseScheduler(String programId) {
+        Optional<TrainingProgProgram> optionalProgram = trainingProgProgramRepo.findById(programId);
+        if (optionalProgram.isEmpty()) {
+            throw new EntityNotFoundException("Mã chương trình không tồn tại  " + programId);
+        }
+
+        TrainingProgProgram program = optionalProgram.get();
+
+        List<TrainingProgSchedule> schedules = program.getSchedules();
+
+        List<TrainingProgCourse> courses = schedules.stream().map(trainingProgSchedule ->{
+            TrainingProgCourse course = trainingProgSchedule.getCourse();
+            return course;
+        } ).toList();
+
+        long semesterCountLong = program.getSemesterCount();
+        int semesterCount = (int) semesterCountLong; // Ép kiểu từ long sang int
+
+        CourseScheduler courseScheduler = new CourseScheduler();
+        Map<Long, List<String>> linh = courseScheduler.scheduleCourses(courses,semesterCount);
+
+        List<ResponseProgramAlterDTO> responseList = new ArrayList<>();
+        for (Map.Entry<Long, List<String>> entry : linh.entrySet()) {
+            Long id = entry.getKey();
+            List<String> course1 = entry.getValue();
+
+            for (String course : course1) {
+                ResponseProgramAlterDTO dto = new ResponseProgramAlterDTO();
+                dto.setId(course);
+                dto.setSemester(String.valueOf(id+1));
+                responseList.add(dto);
+            }
+        }
+
+        return responseList;
+
+    }
+
+    @Override
+    public Boolean updateSemesterCount(RequestSemesterCountDTO requestSemesterCountDTO) {
+
+        String programId = requestSemesterCountDTO.getProgramId();
+        long semester = requestSemesterCountDTO.getSemesterCount();
+        Optional<TrainingProgProgram> optionalProgram = trainingProgProgramRepo.findById(programId);
+        if (optionalProgram.isEmpty()) {
+            throw new EntityNotFoundException("Mã chương trình không tồn tại  " + programId);
+        }
+
+        TrainingProgProgram program = optionalProgram.get();
+        program.setSemesterCount(semester);
+        trainingProgProgramRepo.save(program);
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public Boolean deleteCourse(RequestDeleteTrainingProgProgramDTO request) {
+        String programId = request.getProgramId();
+        List<String> courseIds = request.getCourseIds();
+        Optional<TrainingProgProgram> optionalProgram = trainingProgProgramRepo.findById(programId);
+        if (optionalProgram.isEmpty()) {
+            throw new EntityNotFoundException("Mã chương trình không tồn tại  " + programId);
+        }
+
+        TrainingProgProgram program = optionalProgram.get();
+
+        for(String courseId : courseIds) {
+          Optional <TrainingProgSchedule> trainingProgSchedule = trainingProgScheduleRepo.findByProgramIdAndCourseId(programId,courseId);
+            trainingProgSchedule.ifPresent(trainingProgScheduleRepo::delete);
+
+        }
+        return true;
+    }
+
+    @Override
+    public List<ResponseCourseChangeDTO> changeCourse(RequestChangeCourseDTO request) {
+        String programId = request.getProgramId();
+        int targetSemester = (int) request.getTargetSemester();
+        String targetCourseId = request.getCourseId();
+
+        // Kiểm tra xem chương trình có tồn tại không
+        Optional<TrainingProgProgram> optionalProgram = trainingProgProgramRepo.findById(programId);
+        if (optionalProgram.isEmpty()) {
+            throw new EntityNotFoundException("Mã chương trình không tồn tại  " + programId);
+        }
+        TrainingProgProgram program = optionalProgram.get();
+        List<TrainingProgCourse> courses = getCoursesFromProgram(program);
+        int totalSemesters = program.getSemesterCount().intValue();
+        Map<String, Integer> initialSemesters = buildInitialSemesters(program);
+        CourseScheduler courseScheduler = new CourseScheduler();
+
+        Map<String, Integer> movedCourses = moveCourse(targetCourseId, targetSemester, courses, initialSemesters, totalSemesters);
+
+
+        // Lọc và chỉ giữ các phần tử từ movedCourses mà giá trị của chúng khác với initialSemesters
+        return movedCourses.entrySet().stream()
+                .filter(entry -> !entry.getValue().equals(initialSemesters.get(entry.getKey())))
+                .map(entry -> new ResponseCourseChangeDTO(entry.getKey(), String.valueOf(entry.getValue())))
+                .collect(Collectors.toList());
+
+    }
+
+    @Transactional
+    @Override
+    public int deletePrograms(List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            throw new IllegalArgumentException("Danh sách không được để trống!");
+        }
+
+        // Fetch all programs by IDs
+        List<TrainingProgProgram> programs = trainingProgProgramRepo.findAllById(ids);
+        if (programs.isEmpty()) {
+            throw new IllegalArgumentException("Danh sách không được để trống!");
+        }
+
+        // Delete schedules associated with these programs
+        List<TrainingProgSchedule> schedulesToDelete = programs.stream()
+                .flatMap(program -> program.getSchedules().stream())
+                .collect(Collectors.toList());
+        if (!schedulesToDelete.isEmpty()) {
+            trainingProgScheduleRepo.deleteAll(schedulesToDelete);
+        }
+
+        // Delete programs
+        trainingProgProgramRepo.deleteAll(programs);
+
+        return programs.size();
+    }
+
+
+
+    private Map<String, Integer> buildInitialSemesters(TrainingProgProgram program) {
+        Map<String, Integer> initialSemesters = new HashMap<>();
+
+
+        for (TrainingProgSchedule schedule : program.getSchedules()) {
+
+            Integer semesterId = Integer.valueOf(schedule.getSemester().getId());
+            TrainingProgCourse course = schedule.getCourse();
+            initialSemesters.put(course.getId(), semesterId);
+
+        }
+        return initialSemesters;
+    }
+
+    public List<TrainingProgCourse> getCoursesFromProgram(TrainingProgProgram program) {
+
+        return program.getSchedules().stream()
+                .map(TrainingProgSchedule::getCourse)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
 
 
 }

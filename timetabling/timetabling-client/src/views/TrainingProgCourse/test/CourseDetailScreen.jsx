@@ -119,7 +119,7 @@ const CourseInfoPage = () => {
         </Typography>
         <div style={styles.searchArea}>
           <Button variant="contained" color="primary" style={styles.firstButton}>
-            Thêm khóa học
+            Thêm học phần
           </Button>
           <Button variant="outlined" color="error" style={styles.actionButton}>
             Xóa

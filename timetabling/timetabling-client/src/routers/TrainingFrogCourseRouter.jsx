@@ -8,22 +8,20 @@ import AllProgramScreen from "views/TrainingProgCourse/AllProgramScreen";
 import AddProgramScreen from "views/TrainingProgCourse/AllProgramScreen/AddProgramScreen";
 import ProgramDetailPage from "views/TrainingProgCourse/AllProgramScreen/ProgramScreenDetail";
 import UpdateProgramPage from "views/TrainingProgCourse/AllProgramScreen/UpdateProgramScreenDetail";
+import ViewStudentCourseScreen from "views/TrainingProgCourse/AllCourseScreen/ViewStudent";
+import StudentViewCourseDetail from "views/TrainingProgCourse/AllCourseScreen/StudentViewDetail";
+import StudentProgramView from "views/TrainingProgCourse/AllProgramScreen/StudentProgram";
+import StudentViewProgramDetail from "views/TrainingProgCourse/AllProgramScreen/StudentViewDetail";
 export default function StudentRouter() {
-  let {path } = useRouteMatch();
+  let { path } = useRouteMatch();
   return (
     <div>
       <Switch>
-        <Route
-          component={CourseInfoPage}
-          path={`${path}/teacher/course_list`}
-          exact
-        ></Route>  
         <Route
           component={AllCourseScreen}
           path={`${path}/teacher/course`}
           exact
         ></Route>
-
         <Route
           component={AddCourseScreen}
           path={`${path}/teacher/course/create`}
@@ -35,7 +33,7 @@ export default function StudentRouter() {
           path={`${path}/teacher/course/:courseId`}
           exact
         ></Route>
-        
+
         <Route
           component={UpdateCoursePage}
           path={`${path}/teacher/course/:courseId/edit`}
@@ -59,9 +57,33 @@ export default function StudentRouter() {
           path={`${path}/teacher/program/:programId`}
           exact
         ></Route>
-         <Route
+        <Route
           component={UpdateProgramPage}
           path={`${path}/teacher/program/edit/:programId`}
+          exact
+        ></Route>
+
+        <Route
+          component={ViewStudentCourseScreen}
+          path={`${path}/student/course`}
+          exact
+        ></Route>
+
+        <Route
+          component={StudentProgramView}
+          path={`${path}/student/program`}
+          exact
+        ></Route>
+
+        <Route
+          component={StudentViewProgramDetail}
+          path={`${path}/student/program/:programId`}
+          exact
+        ></Route>
+
+        <Route
+          component={StudentViewCourseDetail}
+          path={`${path}/student/course/:courseId`}
           exact
         ></Route>
       </Switch>

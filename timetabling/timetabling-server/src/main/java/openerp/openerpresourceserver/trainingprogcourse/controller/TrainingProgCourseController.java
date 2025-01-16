@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -60,16 +61,29 @@ public class TrainingProgCourseController {
         }
     }
 
-//    @DeleteMapping("/delete/{id}")
-//    public ResponseEntity<Void> deleteCourse(@PathVariable String id) {
-//        try {
-//            trainingProgCourseService.delete(id);
-//            return ResponseEntity.noContent().build();
-//        } catch (IllegalArgumentException e) {
-//            return ResponseEntity.notFound().build();
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteCourse(@PathVariable String id) {
+        try {
+            trainingProgCourseService.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/import-training-prog-course")
+    public ResponseEntity<?> importTrainingProgCourse(@RequestParam("excelFile") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Need to upload a file");
+        }
+        try {
+            int numberOfData = trainingProgCourseService.importTrainingProgCourse(file);
+            return ResponseEntity.ok().body("Successfully imported " + numberOfData + " courses.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
 }

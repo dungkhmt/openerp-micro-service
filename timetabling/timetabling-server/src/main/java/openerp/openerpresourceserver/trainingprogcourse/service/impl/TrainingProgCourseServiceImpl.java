@@ -9,9 +9,17 @@ import openerp.openerpresourceserver.trainingprogcourse.enity.TrainingProgPrereq
 import openerp.openerpresourceserver.trainingprogcourse.repository.TrainingProgCourseRepo;
 import openerp.openerpresourceserver.trainingprogcourse.repository.TrainingProgPrerequisiteRepo;
 import openerp.openerpresourceserver.trainingprogcourse.service.TrainingProgCourseService;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,7 +43,7 @@ public class TrainingProgCourseServiceImpl implements TrainingProgCourseService 
         try {
             // Kiểm tra nếu học phần  đã tồn tại
             if (trainingProgCourseRepo.existsById(request.getId())) {
-                throw new IllegalArgumentException("Course with ID " + request.getId() + " already exists.");
+                throw new IllegalArgumentException("Học phần với mã " + request.getId() + " đã tồn tại");
             }
 
             // Tạo học phần  mới
@@ -57,7 +65,7 @@ public class TrainingProgCourseServiceImpl implements TrainingProgCourseService 
                 for (String prerequisiteId : request.getPrerequisites()) {
                     // Kiểm tra nếu học phần  tiên quyết tồn tại
                     TrainingProgCourse coursePrerequisite = trainingProgCourseRepo.findById(prerequisiteId)
-                            .orElseThrow(() -> new IllegalArgumentException("Prerequisite course with ID " + prerequisiteId + " does not exist."));
+                            .orElseThrow(() -> new IllegalArgumentException("Môn học tiên quyết với Id  " + prerequisiteId + " không tồn tại."));
 
                     // Tạo đối tượng TrainingProgPrerequisite
                     TrainingProgPrerequisite prerequisite = new TrainingProgPrerequisite();
@@ -88,7 +96,7 @@ public class TrainingProgCourseServiceImpl implements TrainingProgCourseService 
         try {
             // Kiểm tra nếu học phần  tồn tại
             TrainingProgCourse existingCourse = trainingProgCourseRepo.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException(" " + id + " does not exist."));
+                    .orElseThrow(() -> new IllegalArgumentException("Mã học phần với id : " + id + " không tồn tại."));
 
             // Cập nhật thông tin học phần cơ bản
             existingCourse.setCourseName(request.getCourseName());
@@ -103,7 +111,7 @@ public class TrainingProgCourseServiceImpl implements TrainingProgCourseService 
             if (request.getPrerequisites() != null && !request.getPrerequisites().isEmpty()) {
                 for (String prerequisiteId : request.getPrerequisites()) {
                     TrainingProgCourse prerequisiteCourse = trainingProgCourseRepo.findById(prerequisiteId)
-                            .orElseThrow(() -> new IllegalArgumentException("Prerequisite course with ID " + prerequisiteId + " does not exist."));
+                            .orElseThrow(() -> new IllegalArgumentException("Môn học tiên quyết với Id   " + prerequisiteId + "không tồn tại."));
 
                     TrainingProgPrerequisite prerequisite = new TrainingProgPrerequisite();
                     TrainingProgPrerequisiteId prerequisiteIds = new TrainingProgPrerequisiteId();
@@ -154,24 +162,19 @@ public class TrainingProgCourseServiceImpl implements TrainingProgCourseService 
         return response;
     }
 
-//    @Override
-//    @Transactional
-//    public void delete(String id) {
-//        Optional<TrainingProgCourse> course = trainingProgCourseRepo.findById(id);
-//
-//        if (!course.isPresent()) {
-//            throw new IllegalArgumentException("Course with ID " + id + " does not exist.");
-//        }
-//
-//        course.get().setStatus("inactive");// hoac enum
-//        trainingProgCourseRepo.save(course.get());
-//
-//        // Xoa hoc phan tien quyet
-//        //course.get().getPrerequisites().clear();
-//
-//        // Xoa hoc phan
-//        //trainingProgCourseRepo.delete(course);
-//    }
+    @Override
+    @Transactional
+    public void delete(String id) {
+        Optional<TrainingProgCourse> course = trainingProgCourseRepo.findById(id);
+
+        if (!course.isPresent()) {
+            throw new IllegalArgumentException("Course with ID " + id + " does not exist.");
+        }
+        course.get().setStatus("inactive");
+        trainingProgCourseRepo.save(course.get());
+        course.get().getPrerequisites().clear();
+        trainingProgCourseRepo.save(course.get());
+    }
 
 
     @Override
@@ -201,4 +204,88 @@ public class TrainingProgCourseServiceImpl implements TrainingProgCourseService 
         return responseList;
     }
 
+    @Override
+    @Transactional
+    public int importTrainingProgCourse(MultipartFile file) {
+        try (InputStream inputStream = file.getInputStream()) {
+            int numberOfData = 0;
+            Workbook workbook = new XSSFWorkbook(inputStream);
+            Sheet sheet = workbook.getSheetAt(0);
+
+            Row headerRow = sheet.getRow(0);
+            if (headerRow == null) {
+                throw new IllegalArgumentException("Excel file is empty");
+            }
+
+            // Validate header
+            if (!"Mã học phần".equals(headerRow.getCell(0).getStringCellValue()) ||
+                    !"Tên học phần".equals(headerRow.getCell(1).getStringCellValue()) ||
+                    !"Số tín chỉ".equals(headerRow.getCell(2).getStringCellValue()) ||
+                    !"Học phần tiên quyết".equals(headerRow.getCell(3).getStringCellValue())) {
+                throw new IllegalArgumentException("Excel file headers are invalid");
+            }
+
+            // Read data rows
+            int rowNum = 1;
+            Row dataRow = sheet.getRow(rowNum);
+            while (dataRow != null) {
+                String id = dataRow.getCell(0).getStringCellValue().trim();
+                String courseName = dataRow.getCell(1).getStringCellValue().trim();
+                Long credits = (long) dataRow.getCell(2).getNumericCellValue();
+                Cell prerequisitesCell = dataRow.getCell(3);
+                String prerequisitesStr = (prerequisitesCell != null)
+                        ? prerequisitesCell.getStringCellValue().trim()
+                        : "";
+                // Check for existing course
+                if (trainingProgCourseRepo.existsById(id)) {
+                    rowNum++;
+                    dataRow = sheet.getRow(rowNum);
+                    continue;
+                }
+
+                // Create new course
+                TrainingProgCourse course = new TrainingProgCourse();
+                course.setId(id);
+                course.setCourseName(courseName);
+                course.setCredit(credits);
+                course.setStatus("active");
+                course.setCreateStamp(new Date());
+                course.setLastUpdated(new Date());
+
+                // Process prerequisites
+                Set<TrainingProgPrerequisite> prerequisites = new HashSet<>();
+                if (!prerequisitesStr.isEmpty()) {
+                    String[] prerequisiteIds = prerequisitesStr.split(",");
+                    for (String prerequisiteId : prerequisiteIds) {
+                        prerequisiteId = prerequisiteId.trim();
+                        TrainingProgCourse prerequisiteCourse = trainingProgCourseRepo.findById(prerequisiteId)
+                                .orElseThrow(() -> new IllegalArgumentException("Học phần tiên quyết không tồn tại."));
+                        TrainingProgPrerequisite prerequisite = new TrainingProgPrerequisite();
+                        TrainingProgPrerequisiteId prerequisiteIdObj = new TrainingProgPrerequisiteId();
+                        prerequisiteIdObj.setCourseId(course.getId());
+                        prerequisiteIdObj.setPrerequisiteCourseId(prerequisiteCourse.getId());
+                        prerequisite.setId(prerequisiteIdObj);
+                        prerequisite.setCourse(course);
+                        prerequisite.setPrerequisiteCourse(prerequisiteCourse);
+                        prerequisite.setCreateStamp(new Date());
+                        prerequisite.setLastUpdated(new Date());
+
+                        prerequisites.add(prerequisite);
+                    }
+                }
+                course.setPrerequisites(prerequisites);
+
+                // Save the course
+                trainingProgCourseRepo.save(course);
+                numberOfData++;
+
+                rowNum++;
+                dataRow = sheet.getRow(rowNum);
+            }
+
+            return numberOfData;
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Error reading Excel file", e);
+        }
+    }
 }
