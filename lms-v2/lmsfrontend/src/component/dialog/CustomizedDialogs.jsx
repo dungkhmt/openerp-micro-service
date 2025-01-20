@@ -62,7 +62,7 @@ const DialogTitle = withStyles(dialogTitleStyles)((props) => {
 
 const DialogContent = withStyles((theme) => ({
   root: {
-    padding: theme.spacing(1),
+    padding: theme.spacing(2),
   },
 }))(MuiDialogContent);
 
@@ -71,6 +71,8 @@ const useStyles = makeStyles((theme) => ({
     margin: 0,
     height: theme.spacing(8),
     padding: theme.spacing(1),
+    justifyContent: 'center',
+    gap: theme.spacing(0.5),
   },
   paper: {
     borderRadius: 8,

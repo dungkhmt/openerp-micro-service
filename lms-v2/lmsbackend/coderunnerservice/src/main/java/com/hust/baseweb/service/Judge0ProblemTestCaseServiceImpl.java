@@ -83,8 +83,10 @@ public class Judge0ProblemTestCaseServiceImpl implements ProblemTestCaseService 
                     timeLimitByLanguage,
                     problem.getMemoryLimit(),
                     problem.getScoreEvaluationType());
-            // TODO: Optimize: if the first testcase be Compile Error then it's not necessary to judge the remain testcases
             testcasesEvaluationResult.add(result);
+            if (result.getStatus().getId() == 6) { // if the first testcase be Compile Error then it's not necessary to judge the remain testcases
+                break;
+            }
         }
 
         submissionResponseHandler.processSubmissionResponseV2(

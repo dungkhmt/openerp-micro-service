@@ -7,6 +7,7 @@ import com.hust.baseweb.applications.programmingcontest.model.*;
 import com.hust.baseweb.applications.programmingcontest.model.externalapi.ContestProblemModelResponse;
 import com.hust.baseweb.applications.programmingcontest.model.externalapi.SubmissionModelResponse;
 import com.hust.baseweb.model.ProblemFilter;
+import com.hust.baseweb.model.TestCaseFilter;
 import com.hust.baseweb.model.dto.ProblemDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,12 +19,12 @@ import java.util.UUID;
 
 public interface ProblemTestCaseService {
 
-    ProblemEntity createContestProblem(String userID, String json, MultipartFile[] files) throws MiniLeetCodeException;
+    ProblemEntity createContestProblem(String userID, ModelCreateContestProblem dto, MultipartFile[] files);
 
     ProblemEntity updateContestProblem(
         String problemId,
         String userId,
-        String json,
+        ModelUpdateContestProblem dto,
         MultipartFile[] files
     ) throws Exception;
 
@@ -152,9 +153,9 @@ public interface ProblemTestCaseService {
 
 //    Page<ProblemEntity> getPublicProblemPaging(Pageable pageable);
 
-    List<ModelGetTestCase> getTestCaseByProblem(String problemId);
+    Page<ModelGetTestCaseDetail> getTestCaseByProblem(String problemId, TestCaseFilter filter);
 
-    ModelGetTestCaseDetail getTestCaseDetail(UUID testCaseId) throws MiniLeetCodeException;
+    TestCaseDetailProjection getTestCaseDetail(UUID testCaseId);
 
 //    void editTestCase(UUID testCaseId, ModelSaveTestcase modelSaveTestcase) throws MiniLeetCodeException;
 

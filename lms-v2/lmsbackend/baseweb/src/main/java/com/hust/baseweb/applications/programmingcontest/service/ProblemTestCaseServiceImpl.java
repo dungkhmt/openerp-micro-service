@@ -2,7 +2,6 @@ package com.hust.baseweb.applications.programmingcontest.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import com.hust.baseweb.applications.contentmanager.model.ContentHeaderModel;
 import com.hust.baseweb.applications.contentmanager.model.ContentModel;
 import com.hust.baseweb.applications.contentmanager.repo.MongoContentService;
@@ -24,9 +23,11 @@ import com.hust.baseweb.applications.programmingcontest.utils.codesimilaritychec
 import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.model.ProblemFilter;
 import com.hust.baseweb.model.ProblemProjection;
+import com.hust.baseweb.model.TestCaseFilter;
 import com.hust.baseweb.model.dto.ProblemDTO;
 import com.hust.baseweb.repo.UserLoginRepo;
 import com.hust.baseweb.service.UserService;
+import com.hust.baseweb.utils.CommonUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.model.enums.AesKeyStrength;
@@ -37,6 +38,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -47,6 +49,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import vn.edu.hust.soict.judge0client.config.Judge0Config;
 import vn.edu.hust.soict.judge0client.entity.Judge0Submission;
 import vn.edu.hust.soict.judge0client.service.Judge0Service;
@@ -128,6 +131,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
     private Judge0Service judge0Service;
 
+    private ProblemTagRepo problemTagRepo;
+
     Judge0Config judge0Config;
 
     ObjectMapper objectMapper;
@@ -135,28 +140,18 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     @Override
     @Transactional
     public ProblemEntity createContestProblem(
-        String userID,
-        String json,
+        String createdBy,
+        ModelCreateContestProblem dto,
         MultipartFile[] files
-    ) throws MiniLeetCodeException {
-        Gson gson = new Gson();
-        ModelCreateContestProblem modelCreateContestProblem = gson.fromJson(json, ModelCreateContestProblem.class);
-
-        String problemId = modelCreateContestProblem.getProblemId().trim();
+    ) {
+        String problemId = dto.getProblemId().trim();
 
         if (problemRepo.findByProblemId(problemId) != null) {
-            throw new MiniLeetCodeException("problem id already exist");
-        }
-
-        List<TagEntity> tags = new ArrayList<>();
-        Integer[] tagIds = modelCreateContestProblem.getTagIds();
-        for (Integer tagId : tagIds) {
-            TagEntity tag = tagRepo.findByTagId(tagId);
-            tags.add(tag);
+            throw new DuplicateKeyException("Problem ID already exist");
         }
 
         List<String> attachmentId = new ArrayList<>();
-        String[] fileId = modelCreateContestProblem.getFileId();
+        String[] fileId = dto.getFileId();
         List<MultipartFile> fileArray = Arrays.asList(files);
 
         fileArray.forEach((file) -> {
@@ -175,128 +170,105 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             }
         });
 
-        ProblemEntity problemEntity = ProblemEntity.builder()
-                                                   .problemId(problemId)
-                                                   .problemName(modelCreateContestProblem.getProblemName())
-                                                   .problemDescription(modelCreateContestProblem.getProblemDescription())
-                                                   .memoryLimit(modelCreateContestProblem.getMemoryLimit())
-                                                   .timeLimit(modelCreateContestProblem.getTimeLimitCPP()) //TODO: remove this after moving all to lms
-                                                   .timeLimitCPP(modelCreateContestProblem.getTimeLimitCPP())
-                                                   .timeLimitJAVA(modelCreateContestProblem.getTimeLimitJAVA())
-                                                   .timeLimitPYTHON(modelCreateContestProblem.getTimeLimitPYTHON())
-                                                   .levelId(modelCreateContestProblem.getLevelId())
-                                                   .correctSolutionLanguage(modelCreateContestProblem.getCorrectSolutionLanguage())
-                                                   .correctSolutionSourceCode(modelCreateContestProblem.getCorrectSolutionSourceCode())
-                                                   .solution(modelCreateContestProblem.getSolution())
-                                                   .isPreloadCode(modelCreateContestProblem.getIsPreloadCode())
-                                                   .preloadCode(modelCreateContestProblem.getPreloadCode())
-                                                   .solutionCheckerSourceCode(modelCreateContestProblem.getSolutionChecker())
-                                                   .solutionCheckerSourceLanguage(modelCreateContestProblem.getSolutionCheckerLanguage())
-                                                   .scoreEvaluationType(modelCreateContestProblem.getScoreEvaluationType() !=
-                                                                        null
-                                                                            ?
-                                                                            modelCreateContestProblem.getScoreEvaluationType()
-                                                                            :
-                                                                                Constants.ProblemResultEvaluationType.NORMAL.getValue())
-                                                   .createdAt(new Date())
-                                                   .isPublicProblem(modelCreateContestProblem.getIsPublic())
-                                                   .levelOrder(constants
-                                                                   .getMapLevelOrder()
-                                                                   .get(modelCreateContestProblem.getLevelId()))
-                                                   .attachment(String.join(";", attachmentId))
-                                                   .tags(tags)
-                                                   .userId(userID)
-                                                   .statusId(ProblemEntity.PROBLEM_STATUS_HIDDEN)
-                                                   .sampleTestcase(modelCreateContestProblem.getSampleTestCase())
-                                                   .build();
-        problemEntity = problemService.saveProblemWithCache(problemEntity);
-
-        // grant role owner, manager, view to current user
-        UserContestProblemRole upr = new UserContestProblemRole();
-        upr.setProblemId(problemEntity.getProblemId());
-        upr.setUserId(userID);
-        upr.setRoleId(UserContestProblemRole.ROLE_OWNER);
-        upr.setUpdateByUserId(userID);
-        upr.setCreatedStamp(new Date());
-        upr.setLastUpdated(new Date());
-        upr = userContestProblemRoleRepo.save(upr);
-
-        upr = new UserContestProblemRole();
-        upr.setProblemId(problemEntity.getProblemId());
-        upr.setUserId(userID);
-        upr.setRoleId(UserContestProblemRole.ROLE_EDITOR);
-        upr.setUpdateByUserId(userID);
-        upr.setCreatedStamp(new Date());
-        upr.setLastUpdated(new Date());
-        upr = userContestProblemRoleRepo.save(upr);
-
-        upr = new UserContestProblemRole();
-        upr.setProblemId(problemEntity.getProblemId());
-        upr.setUserId(userID);
-        upr.setRoleId(UserContestProblemRole.ROLE_VIEWER);
-        upr.setUpdateByUserId(userID);
-        upr.setCreatedStamp(new Date());
-        upr.setLastUpdated(new Date());
-        upr = userContestProblemRoleRepo.save(upr);
+        ProblemEntity problem = ProblemEntity.builder()
+                                             .problemId(problemId)
+                                             .problemName(dto.getProblemName())
+                                             .problemDescription(dto.getProblemDescription())
+                                             .memoryLimit(dto.getMemoryLimit())
+//                                                   .timeLimit(dto.getTimeLimitCPP()) //TODO: remove this after moving all to lms
+                                             .timeLimitCPP(dto.getTimeLimitCPP())
+                                             .timeLimitJAVA(dto.getTimeLimitJAVA())
+                                             .timeLimitPYTHON(dto.getTimeLimitPYTHON())
+                                             .levelId(dto.getLevelId())
+                                             .correctSolutionLanguage(dto.getCorrectSolutionLanguage())
+                                             .correctSolutionSourceCode(dto.getCorrectSolutionSourceCode())
+                                             .solution(dto.getSolution())
+                                             .isPreloadCode(dto.getIsPreloadCode())
+                                             .preloadCode(dto.getPreloadCode())
+                                             .solutionCheckerSourceCode(dto.getSolutionChecker())
+                                             .solutionCheckerSourceLanguage(dto.getSolutionCheckerLanguage())
+                                             .scoreEvaluationType(dto.getScoreEvaluationType() != null
+                                                                      ? dto.getScoreEvaluationType()
+                                                                      : Constants.ProblemResultEvaluationType.NORMAL.getValue())
+                                             .isPublicProblem(dto.getIsPublic())
+                                             .levelOrder(constants.getMapLevelOrder().get(dto.getLevelId()))
+                                             .attachment(String.join(";", attachmentId))
+                                             .statusId(dto.getStatus().toString())
+                                             .sampleTestcase(dto.getSampleTestCase())
+                                             .build();
+        problem = problemService.saveProblemWithCache(problem);
 
 
-        // grant manager role to user admin
-        UserLogin admin = userLoginRepo.findByUserLoginId("admin");
-        if (admin != null) {
-            upr = new UserContestProblemRole();
-            upr.setProblemId(problemEntity.getProblemId());
-            upr.setUserId(admin.getUserLoginId());
-            upr.setRoleId(UserContestProblemRole.ROLE_OWNER);
-            upr.setUpdateByUserId(userID);
-            upr.setCreatedStamp(new Date());
-            upr.setLastUpdated(new Date());
-            upr = userContestProblemRoleRepo.save(upr);
+        List<ProblemTag> problemTags = Arrays.stream(dto.getTagIds())
+                                             .map(tagId -> ProblemTag.builder()
+                                                                     .id(new ProblemTagId(tagId, problemId))
+                                                                     .build())
+                                             .collect(Collectors.toList());
+        problemTagRepo.saveAll(problemTags);
 
-            upr = new UserContestProblemRole();
-            upr.setProblemId(problemEntity.getProblemId());
-            upr.setUserId(admin.getUserLoginId());
-            upr.setRoleId(UserContestProblemRole.ROLE_EDITOR);
-            upr.setUpdateByUserId(userID);
-            upr.setCreatedStamp(new Date());
-            upr.setLastUpdated(new Date());
-            upr = userContestProblemRoleRepo.save(upr);
-
-            upr = new UserContestProblemRole();
-            upr.setProblemId(problemEntity.getProblemId());
-            upr.setUserId(admin.getUserLoginId());
-            upr.setRoleId(UserContestProblemRole.ROLE_VIEWER);
-            upr.setUpdateByUserId(userID);
-            upr.setCreatedStamp(new Date());
-            upr.setLastUpdated(new Date());
-            upr = userContestProblemRoleRepo.save(upr);
-
-            // push notification to admin
-            notificationsService.create(userID, admin.getUserLoginId(),
-                                        userID + " has created a contest problem ID " +
-                                        problemEntity.getProblemId()
-                , "");
-
+        // grant role owner, manager, view to current user and admin
+        List<String> roleIds = Arrays.asList(
+            UserContestProblemRole.ROLE_OWNER,
+            UserContestProblemRole.ROLE_EDITOR,
+            UserContestProblemRole.ROLE_VIEWER
+        );
+        List<UserContestProblemRole> roles = new ArrayList<>();
+        List<String> users = Arrays.asList(createdBy);
+        if (!"admin".equals(createdBy)) {
+            users.add("admin");
         }
-        return problemEntity;
+        for (String user : users) {
+            for (String roleId : roleIds) {
+                UserContestProblemRole role = new UserContestProblemRole();
+
+                role.setProblemId(problem.getProblemId());
+                role.setUserId(user);
+                role.setRoleId(roleId);
+
+                roles.add(role);
+            }
+        }
+
+        userContestProblemRoleRepo.saveAll(roles);
+
+        // push notification to admin
+        notificationsService.create(
+            createdBy,
+            "admin",
+            createdBy + " has created a contest problem ID " + problem.getProblemId(),
+            "");
+
+        return problem;
     }
 
     @Override
     public ProblemEntity updateContestProblem(
         String problemId,
         String userId,
-        String json,
+        ModelUpdateContestProblem dto,
         MultipartFile[] files
     ) throws Exception {
+        List<UserContestProblemRole> roles = userContestProblemRoleRepo.findAllByProblemIdAndUserId(
+            problemId,
+            userId);
 
-        if (!problemRepo.existsById(problemId)) {
-            throw new MiniLeetCodeException("problem id not found");
+        boolean hasPermission = false;
+        for (UserContestProblemRole role : roles) {
+            if (role.getRoleId().equals(UserContestProblemRole.ROLE_EDITOR) ||
+                role.getRoleId().equals(UserContestProblemRole.ROLE_OWNER)) {
+                hasPermission = true;
+                break;
+            }
         }
 
-        Gson gson = new Gson();
-        ModelUpdateContestProblem modelUpdateContestProblem = gson.fromJson(json, ModelUpdateContestProblem.class);
+        if (!hasPermission) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No permission");
+        }
 
-        ProblemEntity problemEntity = problemRepo.findByProblemId(problemId);
-        if (!userId.equals(problemEntity.getUserId())
+        ProblemEntity problem = problemRepo
+            .findById(problemId)
+            .orElseThrow(() -> new EntityNotFoundException("Problem ID not found"));
+        if (!userId.equals(problem.getCreatedBy())
             &&
             !userContestProblemRoleRepo.existsByProblemIdAndUserIdAndRoleId(
                 problemId,
@@ -306,26 +278,26 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         }
 
         // problem há been created, admin is shared edit role, but cannot perform the edit
-        //if (!userId.equals(problemEntity.getUserId())
-        //    && !problemEntity.getStatusId().equals(ProblemEntity.PROBLEM_STATUS_OPEN)) {
+        //if (!userId.equals(problem.getUserId())
+        //    && !problem.getStatusId().equals(ProblemEntity.PROBLEM_STATUS_OPEN)) {
         //    throw new MiniLeetCodeException("Problem is not opened for edit", 400);
         //}
 
         List<TagEntity> tags = new ArrayList<>();
-        Integer[] tagIds = modelUpdateContestProblem.getTagIds();
+        Integer[] tagIds = dto.getTagIds();
         for (Integer tagId : tagIds) {
             TagEntity tag = tagRepo.findByTagId(tagId);
             tags.add(tag);
         }
 
         List<String> attachmentId = new ArrayList<>();
-        attachmentId.add(problemEntity.getAttachment());
-        String[] fileId = modelUpdateContestProblem.getFileId();
+        attachmentId.add(problem.getAttachment());
+        String[] fileId = dto.getFileId();
         List<MultipartFile> fileArray = Arrays.asList(files);
 
-        List<String> removedFilesId = modelUpdateContestProblem.getRemovedFilesId();
-        if (problemEntity.getAttachment() != null && !problemEntity.getAttachment().isEmpty()) {
-            String[] oldAttachmentIds = problemEntity.getAttachment().split(";");
+        List<String> removedFilesId = dto.getRemovedFilesId();
+        if (problem.getAttachment() != null && !problem.getAttachment().isEmpty()) {
+            String[] oldAttachmentIds = problem.getAttachment().split(";");
             for (String s : oldAttachmentIds) {
                 try {
                     GridFsResource content = mongoContentService.getById(s);
@@ -355,30 +327,32 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             }
         });
 
-        problemEntity.setProblemName(modelUpdateContestProblem.getProblemName());
-        problemEntity.setProblemDescription(modelUpdateContestProblem.getProblemDescription());
-        problemEntity.setLevelId(modelUpdateContestProblem.getLevelId());
-        problemEntity.setSolution(modelUpdateContestProblem.getSolution());
-        problemEntity.setIsPreloadCode(modelUpdateContestProblem.getIsPreloadCode());
-        problemEntity.setPreloadCode(modelUpdateContestProblem.getPreloadCode());
-//        problemEntity.setTimeLimit(modelUpdateContestProblem.getTimeLimit());
-        problemEntity.setTimeLimitCPP(modelUpdateContestProblem.getTimeLimitCPP());
-        problemEntity.setTimeLimitJAVA(modelUpdateContestProblem.getTimeLimitJAVA());
-        problemEntity.setTimeLimitPYTHON(modelUpdateContestProblem.getTimeLimitPYTHON());
-        problemEntity.setMemoryLimit(modelUpdateContestProblem.getMemoryLimit());
-        problemEntity.setCorrectSolutionLanguage(modelUpdateContestProblem.getCorrectSolutionLanguage());
-        problemEntity.setCorrectSolutionSourceCode(modelUpdateContestProblem.getCorrectSolutionSourceCode());
-        problemEntity.setSolutionCheckerSourceCode(modelUpdateContestProblem.getSolutionChecker());
-        problemEntity.setScoreEvaluationType(modelUpdateContestProblem.getScoreEvaluationType());
-        problemEntity.setPublicProblem(modelUpdateContestProblem.getIsPublic());
-        problemEntity.setAttachment(String.join(";", attachmentId));
-        problemEntity.setTags(tags);
-        if (userId.equals(problemEntity.getUserId())) {
-            problemEntity.setStatusId(modelUpdateContestProblem.getStatus());
+        problem.setProblemName(dto.getProblemName());
+        problem.setProblemDescription(dto.getProblemDescription());
+        problem.setLevelId(dto.getLevelId());
+        problem.setSolution(dto.getSolution());
+        problem.setIsPreloadCode(dto.getIsPreloadCode());
+        problem.setPreloadCode(dto.getPreloadCode());
+//        problem.setTimeLimit(dto.getTimeLimit());
+        problem.setTimeLimitCPP(dto.getTimeLimitCPP());
+        problem.setTimeLimitJAVA(dto.getTimeLimitJAVA());
+        problem.setTimeLimitPYTHON(dto.getTimeLimitPYTHON());
+        problem.setMemoryLimit(dto.getMemoryLimit());
+        problem.setCorrectSolutionLanguage(dto.getCorrectSolutionLanguage());
+        problem.setCorrectSolutionSourceCode(dto.getCorrectSolutionSourceCode());
+        problem.setSolutionCheckerSourceCode(dto.getSolutionChecker());
+        problem.setSolutionCheckerSourceLanguage(dto.getSolutionCheckerLanguage());
+        problem.setScoreEvaluationType(dto.getScoreEvaluationType());
+        problem.setPublicProblem(dto.getIsPublic());
+        problem.setAttachment(String.join(";", attachmentId));
+        problem.setTags(tags);
+        problem.setSampleTestcase(dto.getSampleTestCase());
+
+        if (userId.equals(problem.getCreatedBy())) {
+            problem.setStatusId(dto.getStatus().toString());
         }
-        problemEntity.setSampleTestcase(modelUpdateContestProblem.getSampleTestCase());
-        problemEntity = problemService.saveProblemWithCache(problemEntity);
-        return problemEntity;
+
+        return problemService.saveProblemWithCache(problem);
     }
 
     @Override
@@ -400,7 +374,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             problemResponse.setProblemId(problemEntity.getProblemId());
             problemResponse.setProblemName(problemEntity.getProblemName());
             problemResponse.setProblemDescription(problemEntity.getProblemDescription());
-            problemResponse.setUserId(problemEntity.getUserId());
+            problemResponse.setUserId(problemEntity.getCreatedBy());
 //            problemResponse.setTimeLimit(problemEntity.getTimeLimit());
             problemResponse.setTimeLimitCPP(problemEntity.getTimeLimitCPP());
             problemResponse.setTimeLimitJAVA(problemEntity.getTimeLimitJAVA());
@@ -454,8 +428,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         }
     }
 
-    private int getTimeLimitByLanguage(ProblemEntity problem, String language) {
-        int timeLimit;
+    private float getTimeLimitByLanguage(ProblemEntity problem, String language) {
+        float timeLimit;
         switch (language) {
             case ContestSubmissionEntity.LANGUAGE_CPP:
                 timeLimit = problem.getTimeLimitCPP();
@@ -749,9 +723,10 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 userRegistrationContestRepo.save(urc);
 
                 //push notification to admin
-                notificationsService.create(userName, u.getUserLoginId(),
-                                            userName + " has created a contest " +
-                                            modelCreateContest.getContestId()
+                notificationsService.create(
+                    userName, u.getUserLoginId(),
+                    userName + " has created a contest " +
+                    modelCreateContest.getContestId()
                     , "");
 
             }
@@ -820,7 +795,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                    .contestType(modelUpdateContest.getContestType())
                                                    .contestShowTag(modelUpdateContest.getContestShowTag())
                                                    .contestShowComment(modelUpdateContest.getContestShowComment())
-            .contestPublic(modelUpdateContest.getContestPublic())
+                                                   .contestPublic(modelUpdateContest.getContestPublic())
                                                    .build();
         return contestService.updateContestWithCache(contestEntity);
 
@@ -901,7 +876,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     /**
-     *
      * @param submissionId
      * @param testcaseId
      * @return
@@ -1043,7 +1017,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     /**
-     *
      * @param userId
      * @param submissionId
      * @return
@@ -1218,7 +1191,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     /**
-     *
      * @param modelContestSubmission
      * @param userName
      * @param submittedByUserId
@@ -1905,10 +1877,10 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             long totalPoint = 0;
             List<TestCaseEntity> TC = testCaseRepo.findAllByProblemId(problemId);
             for (TestCaseEntity tc : TC) {
-                if(contest.getEvaluateBothPublicPrivateTestcase().equals("Y")) {
+                if (contest.getEvaluateBothPublicPrivateTestcase().equals("Y")) {
                     totalPoint += tc.getTestCasePoint();
-                }else{
-                    if(tc.getIsPublic().equals("N")){
+                } else {
+                    if (tc.getIsPublic().equals("N")) {
                         totalPoint += tc.getTestCasePoint();
                     }
                 }
@@ -1954,7 +1926,12 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 double percentage = 0;
                 if (problemPoint > 0) {
                     percentage = submission.getPoint() * 1.0 / problemPoint;
-                    System.out.println("RANKING, problem " + problemId + " problemPoint = " + problemPoint + " submission points = " + submission.getPoint());
+                    System.out.println("RANKING, problem " +
+                                       problemId +
+                                       " problemPoint = " +
+                                       problemPoint +
+                                       " submission points = " +
+                                       submission.getPoint());
                 }
                 mapProblem2PointPercentage.put(problemId, percentage);
             }
@@ -1976,7 +1953,12 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                     percent = mapProblem2PointPercentage.get(problemId);
                 }
                 totalPercentage = totalPercentage + percent;
-                System.out.println("RANKING, problem " + problemId + " percent = " + percent + " total percent = " + totalPercentage);
+                System.out.println("RANKING, problem " +
+                                   problemId +
+                                   " percent = " +
+                                   percent +
+                                   " total percent = " +
+                                   totalPercentage);
                 tmp.setPointPercentage(percent);
             }
             if (nbProblems > 0) {
@@ -2025,29 +2007,29 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 //    }
 
     @Override
-    public List<ModelGetTestCase> getTestCaseByProblem(String problemId) {
-        List<TestCaseEntity> testCases = testCaseRepo.findAllByProblemId(problemId);
-        return testCases.stream().map(this::convertToModelGetTestCase).collect(Collectors.toList());
+    public Page<ModelGetTestCaseDetail> getTestCaseByProblem(String problemId, TestCaseFilter filter) {
+        Pageable pageable = CommonUtils.getPageable(
+            filter.getPage(),
+            filter.getSize(),
+            Sort.by("lastUpdatedStamp").descending());
+
+        if (filter.getFullView() != null && filter.getFullView()) {
+            return testCaseRepo.getFullByProblemId(problemId, filter.getPublicOnly(), pageable);
+        } else {
+            return testCaseRepo.getPreviewByProblemId(problemId, pageable);
+        }
     }
 
     @Override
-    public ModelGetTestCaseDetail getTestCaseDetail(UUID testCaseId) throws MiniLeetCodeException {
-        TestCaseEntity testCase = testCaseRepo.findTestCaseByTestCaseId(testCaseId);
+    public TestCaseDetailProjection getTestCaseDetail(UUID testCaseId) {
+        TestCaseDetailProjection testCase = testCaseRepo.getTestCaseDetailByTestCaseId(
+            testCaseId,
+            1_048_576); // 1MB, align with reality
         if (testCase == null) {
-            throw new MiniLeetCodeException("testcase not found");
+            throw new EntityNotFoundException("Test case not found");
+        } else {
+            return testCase;
         }
-
-        ProblemEntity problem = problemRepo.findByProblemId(testCase.getProblemId());
-
-        return ModelGetTestCaseDetail.builder()
-                                     .testCaseId(testCaseId)
-                                     .correctAns(testCase.getCorrectAnswer())
-                                     .testCase(testCase.getTestCase())
-                                     .point(testCase.getTestCasePoint()).isPublic(testCase.getIsPublic())
-                                     .problemSolution(problem.getSolution())
-                                     .problemDescription(problem.getProblemDescription())
-                                     .description(testCase.getDescription())
-                                     .build();
     }
 
 //    @Override
@@ -2622,12 +2604,13 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 }
             }
             // SORT listSubmissions in an increasing order of userId
-            Collections.sort(listSubmissions, new Comparator<ContestSubmissionEntity>() {
-                @Override
-                public int compare(ContestSubmissionEntity o1, ContestSubmissionEntity o2) {
-                    return o1.getUserId().compareTo(o2.getUserId());
-                }
-            });
+            Collections.sort(
+                listSubmissions, new Comparator<ContestSubmissionEntity>() {
+                    @Override
+                    public int compare(ContestSubmissionEntity o1, ContestSubmissionEntity o2) {
+                        return o1.getUserId().compareTo(o2.getUserId());
+                    }
+                });
 
             //log.info("computeSimilarity, consider problem " + problemId + " listSubmissions = " + listSubmissions.size());
             //for(ContestSubmissionEntity e: listSubmissions){
@@ -2697,9 +2680,10 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                     list.add(e);
 
                     List<CodePlagiarism> codePlagiarisms = codePlagiarismRepo
-                        .findAllByContestIdAndProblemIdAndSubmissionId1AndSubmissionId2(contestId, problemId,
-                                                                                        s1.getContestSubmissionId(),
-                                                                                        s2.getContestSubmissionId());
+                        .findAllByContestIdAndProblemIdAndSubmissionId1AndSubmissionId2(
+                            contestId, problemId,
+                            s1.getContestSubmissionId(),
+                            s2.getContestSubmissionId());
 
                     if (codePlagiarisms != null && codePlagiarisms.size() > 0) {
                         //log.info("checkSimilarity, codePlagiarism sz = " + codePlagiarisms.size());
@@ -2812,23 +2796,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         return judgeAllInProgressSubmissionsOfContest(contestId);
     }
 
-    private ModelGetTestCase convertToModelGetTestCase(TestCaseEntity testCaseEntity) {
-        String correctAns = testCaseEntity.getCorrectAnswer();
-        String testCase = testCaseEntity.getTestCase();
-        int point = testCaseEntity.getTestCasePoint();
-
-        return ModelGetTestCase.builder()
-                               .correctAns(correctAns)
-                               .testCase(testCase)
-                               .point(point)
-                               .isPublic(testCaseEntity.getIsPublic())
-                               .status(testCaseEntity.getStatusId())
-                               .viewMore(false)
-                               .testCaseId(testCaseEntity.getTestCaseId())
-                               .description(testCaseEntity.getDescription())
-                               .build();
-    }
-
     private ModelGetContestPageResponse getModelGetContestPageResponse(Page<ContestEntity> contestPage, long count) {
         List<ModelGetContestResponse> lists = new ArrayList<>();
         if (contestPage != null) {
@@ -2933,7 +2900,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 //    }
 
     /**
-     *
      * @param sourceCode
      * @param computerLanguage
      * @param input
@@ -2946,8 +2912,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         String sourceCode,
         String computerLanguage,
         String input,
-        int memoryLimit,
-        int timeLimit
+        float memoryLimit,
+        float timeLimit
     ) throws Exception {
         int languageId;
         String compilerOptions = null;
@@ -2990,10 +2956,10 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 //                                                                          .equals(evaluationType)
 //                                                                          ? null
 //                                                                          : testCase.getCorrectAnswer())
-                                                      .cpuTimeLimit((float) timeLimit)
-                                                      .cpuExtraTime((float) (timeLimit * 1.0 + 2.0))
-                                                      .wallTimeLimit((float) (timeLimit * 1.0 + 10.0))
-                                                      .memoryLimit((float) memoryLimit * 1024)
+                                                      .cpuTimeLimit(timeLimit)
+                                                      .cpuExtraTime((float) (timeLimit + 2.0))
+                                                      .wallTimeLimit((float) (timeLimit + 10.0))
+                                                      .memoryLimit(memoryLimit * 1024)
                                                       .stackLimit(judge0Config.getSubmission().getMaxStackLimit())
                                                       .maxProcessesAndOrThreads(2)
                                                       .enablePerProcessAndThreadTimeLimit(false)
@@ -3189,21 +3155,22 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             e.setHighestSimilarity(mUser2HighestSimilarity.get(u));
             res.add(e);
         }
-        Collections.sort(res, new Comparator<ModelReponseCodeSimilaritySummaryParticipant>() {
-            @Override
-            public int compare(
-                ModelReponseCodeSimilaritySummaryParticipant u1,
-                ModelReponseCodeSimilaritySummaryParticipant u2
-            ) {
-                if (u2.getHighestSimilarity() > u1.getHighestSimilarity()) {
-                    return 1;
-                } else if (u2.getHighestSimilarity() < u1.getHighestSimilarity()) {
-                    return -1;
-                } else {
-                    return 0;
+        Collections.sort(
+            res, new Comparator<ModelReponseCodeSimilaritySummaryParticipant>() {
+                @Override
+                public int compare(
+                    ModelReponseCodeSimilaritySummaryParticipant u1,
+                    ModelReponseCodeSimilaritySummaryParticipant u2
+                ) {
+                    if (u2.getHighestSimilarity() > u1.getHighestSimilarity()) {
+                        return 1;
+                    } else if (u2.getHighestSimilarity() < u1.getHighestSimilarity()) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
                 }
-            }
-        });
+            });
         return res;
     }
 
@@ -3257,7 +3224,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     /**
-     *
      * Try to execute the solution code on this test case, if pass then store in DB
      * otherwise, ignore
      *
@@ -3307,7 +3273,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     /**
      * Can be use when editing the solution's source code
      *
-     *
      * @param problemId
      * @param testCaseId
      * @return
@@ -3341,7 +3306,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     /**
-     *
      * @param testCaseId
      * @param testcaseContent
      * @param dto
@@ -3764,15 +3728,16 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             throw new MiniLeetCodeException("Problem not found", 404);
         }
 
-        if(problemEntity.isPublicProblem()!=true) {
+        if (problemEntity.isPublicProblem() != true) {
 
             List<UserContestProblemRole> ucpr = userContestProblemRoleRepo
                 .findAllByProblemIdAndUserId(problemEntity.getProblemId(), teacherId);
 
             boolean ok = true;
-            if (!problemEntity.getUserId().equals(teacherId)) {
-                if (ucpr == null || ucpr.size() == 0) ok = false;
-                else {
+            if (!problemEntity.getCreatedBy().equals(teacherId)) {
+                if (ucpr == null || ucpr.size() == 0) {
+                    ok = false;
+                } else {
                     boolean owner = false;
                     for (UserContestProblemRole e : ucpr) {
                         if (e.getRoleId().equals(UserContestProblemRole.ROLE_OWNER)) {
@@ -3802,7 +3767,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         problemResponse.setProblemId(problemEntity.getProblemId());
         problemResponse.setProblemName(problemEntity.getProblemName());
         problemResponse.setProblemDescription(problemEntity.getProblemDescription());
-        problemResponse.setUserId(problemEntity.getUserId());
+        problemResponse.setUserId(problemEntity.getCreatedBy());
 //        problemResponse.setTimeLimit(problemEntity.getTimeLimit());
         problemResponse.setTimeLimitCPP(problemEntity.getTimeLimitCPP());
         problemResponse.setTimeLimitJAVA(problemEntity.getTimeLimitJAVA());
@@ -3891,7 +3856,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     /**
-     *
      * @param userId
      * @param filter
      * @param isPublic
@@ -3902,7 +3866,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     /**
-     *
      * @param userId
      * @param filter
      * @return
@@ -3912,7 +3875,6 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     /**
-     *
      * @param userId
      * @param filter
      * @return
@@ -4015,16 +3977,17 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         List<ContestEntity> publicContestEntities = contestRepo.findByContestPublicTrue();
 
         List<ModelGetContestResponse> publicContests = publicContestEntities.stream()
-                                                                            .map(contest -> ModelGetContestResponse.builder()
-                                                                                                                   .contestId(contest.getContestId())
-                                                                                                                   .contestName(contest.getContestName())
-                                                                                                                   .contestTime(contest.getContestSolvingTime())
-                                                                                                                   .countDown(contest.getCountDown())
-                                                                                                                   .startAt(contest.getStartedAt())
-                                                                                                                   .statusId(contest.getStatusId())
-                                                                                                                   .userId(contest.getUserId())
-                                                                                                                   .createdAt(contest.getCreatedAt())
-                                                                                                                   .build())
+                                                                            .map(contest -> ModelGetContestResponse
+                                                                                .builder()
+                                                                                .contestId(contest.getContestId())
+                                                                                .contestName(contest.getContestName())
+                                                                                .contestTime(contest.getContestSolvingTime())
+                                                                                .countDown(contest.getCountDown())
+                                                                                .startAt(contest.getStartedAt())
+                                                                                .statusId(contest.getStatusId())
+                                                                                .userId(contest.getUserId())
+                                                                                .createdAt(contest.getCreatedAt())
+                                                                                .build())
                                                                             .collect(Collectors.toList());
 
         long count = publicContests.size();
@@ -4034,12 +3997,15 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                           .count(count)
                                           .build();
     }
+
     @Transactional
     @Override
     public ProblemEntity cloneProblem(String userId, ModelCloneProblem cloneRequest) throws MiniLeetCodeException {
 
         ProblemEntity originalProblem = problemRepo.findById(cloneRequest.getOldProblemId())
-                                                   .orElseThrow(() -> new MiniLeetCodeException("Original problem not found", HttpStatus.NOT_FOUND.value()));
+                                                   .orElseThrow(() -> new MiniLeetCodeException(
+                                                       "Original problem not found",
+                                                       HttpStatus.NOT_FOUND.value()));
 
         if (problemRepo.existsByProblemId(cloneRequest.getNewProblemId())) {
             throw new MiniLeetCodeException("New problem ID already exists", HttpStatus.CONFLICT.value());
@@ -4050,6 +4016,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         }
 
         ProblemEntity newProblem = new ProblemEntity();
+
         newProblem.setProblemId(cloneRequest.getNewProblemId());
         newProblem.setProblemName(cloneRequest.getNewProblemName());
         newProblem.setProblemDescription(originalProblem.getProblemDescription());
@@ -4061,16 +4028,15 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         newProblem.setCorrectSolutionLanguage(originalProblem.getCorrectSolutionLanguage());
         newProblem.setPublicProblem(originalProblem.isPublicProblem());
         newProblem.setTags(originalProblem.getTags());
-        //newProblem.setUserId(originalProblem.getUserId());
-        newProblem.setUserId(userId);
-        newProblem.setTimeLimit(originalProblem.getTimeLimit());
+        //newProblem.setCreatedBy(originalProblem.getUserId());
+        newProblem.setCreatedBy(userId);
+//        newProblem.setTimeLimit(originalProblem.getTimeLimit());
         newProblem.setLevelId(originalProblem.getLevelId());
         newProblem.setCategoryId(originalProblem.getCategoryId());
         newProblem.setSolutionCheckerSourceCode(originalProblem.getSolutionCheckerSourceCode());
         newProblem.setSolutionCheckerSourceLanguage(originalProblem.getSolutionCheckerSourceLanguage());
         newProblem.setSolution(originalProblem.getSolution());
         newProblem.setLevelOrder(originalProblem.getLevelOrder());
-        newProblem.setCreatedAt(new Date()); 
         newProblem.setAttachment(originalProblem.getAttachment());
         newProblem.setScoreEvaluationType(originalProblem.getScoreEvaluationType());
         newProblem.setPreloadCode(originalProblem.getPreloadCode());
@@ -4153,9 +4119,10 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             upr = userContestProblemRoleRepo.save(upr);
 
             // push notification to admin
-            notificationsService.create(userId, admin.getUserLoginId(),
-                                        userId + " has cloned a contest problem ID " +
-                                        newProblem.getProblemId()
+            notificationsService.create(
+                userId, admin.getUserLoginId(),
+                userId + " has cloned a contest problem ID " +
+                newProblem.getProblemId()
                 , "");
         }
         return newProblem;

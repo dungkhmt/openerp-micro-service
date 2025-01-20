@@ -16,8 +16,11 @@ import com.hust.baseweb.applications.programmingcontest.repo.TestCaseRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.UserContestProblemRoleRepo;
 import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseService;
 import com.hust.baseweb.model.ProblemFilter;
+import com.hust.baseweb.model.TestCaseFilter;
 import com.hust.baseweb.service.UserService;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -37,14 +40,19 @@ import java.util.UUID;
 
 @RestController
 @CrossOrigin
-@AllArgsConstructor(onConstructor = @__(@Autowired))
+@AllArgsConstructor(onConstructor_ = {@Autowired})
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ProblemController {
 
-    private final TestCaseRepo testCaseRepo;
+    TestCaseRepo testCaseRepo;
+
     ProblemTestCaseService problemTestCaseService;
+
     UserService userService;
+
     UserContestProblemRoleRepo userContestProblemRoleRepo;
+
     ProblemRepo problemRepo;
 
     ChatGPTService chatGPTService;
@@ -52,21 +60,19 @@ public class ProblemController {
     ApiService apiService;
 
     @Secured("ROLE_TEACHER")
-    @PostMapping("/problems")
+    @PostMapping(value = "/problems", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> createProblem(
         Principal principal,
-        @RequestParam("ModelCreateContestProblem") String json,
-        @RequestParam("files") MultipartFile[] files
-    ) throws MiniLeetCodeException {
-        ProblemEntity resp = problemTestCaseService.createContestProblem(principal.getName(), json, files);
-        return ResponseEntity.status(200).body(resp);
+        @RequestPart("dto") ModelCreateContestProblem dto,
+        @RequestPart(value = "files", required = false) MultipartFile[] files
+    ) {
+        return ResponseEntity.ok().body(problemTestCaseService.createContestProblem(principal.getName(), dto, files));
     }
 
     @Secured("ROLE_TEACHER")
     @GetMapping("/problems/general-info")
     public ResponseEntity<?> getAllContestProblemsGeneralInfo() {
-        List<ModelProblemGeneralInfo> problems = problemTestCaseService.getAllProblemsGeneralInfo();
-        return ResponseEntity.ok().body(problems);
+        return ResponseEntity.ok().body(problemTestCaseService.getAllProblemsGeneralInfo());
     }
 
     @Secured("ROLE_TEACHER")
@@ -112,33 +118,18 @@ public class ProblemController {
     }
 
     @Secured("ROLE_TEACHER")
-    @PutMapping("/problems/{problemId}")
+    @PutMapping(value = "/problems/{problemId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> updateProblem(
-        @PathVariable("problemId") String problemId, Principal principal,
-        @RequestParam("ModelUpdateContestProblem") String json, @RequestParam("files") MultipartFile[] files
-    )
-        throws Exception {
-        List<UserContestProblemRole> L = userContestProblemRoleRepo.findAllByProblemIdAndUserId(
-            problemId,
-            principal.getName());
-
-        boolean hasPermission = false;
-        for (UserContestProblemRole e : L) {
-            if (e.getRoleId().equals(UserContestProblemRole.ROLE_EDITOR) ||
-                e.getRoleId().equals(UserContestProblemRole.ROLE_OWNER)) {
-                hasPermission = true;
-                break;
-            }
-        }
-        if (!hasPermission) {
-            return ResponseEntity.status(403).body("No permission");
-        }
-        ProblemEntity problemResponse = problemTestCaseService.updateContestProblem(
+        Principal principal,
+        @PathVariable("problemId") String problemId,
+        @RequestPart("dto") ModelUpdateContestProblem dto,
+        @RequestPart("files") MultipartFile[] files
+    ) throws Exception {
+        return ResponseEntity.ok().body(problemTestCaseService.updateContestProblem(
             problemId,
             principal.getName(),
-            json,
-            files);
-        return ResponseEntity.status(HttpStatus.OK).body(problemResponse);
+            dto,
+            files));
     }
 
     @PostMapping("/check-compile")
@@ -169,9 +160,8 @@ public class ProblemController {
     }
     @Secured("ROLE_TEACHER")
     @GetMapping("/problems/{problemId}/testcases")
-    public ResponseEntity<?> getTestCaseListByProblem(@PathVariable("problemId") String problemId) {
-        List<ModelGetTestCase> list = problemTestCaseService.getTestCaseByProblem(problemId);
-        return ResponseEntity.status(200).body(list);
+    public ResponseEntity<?> getTestCaseListByProblem(@PathVariable("problemId") String problemId, TestCaseFilter filter) {
+        return ResponseEntity.ok().body(problemTestCaseService.getTestCaseByProblem(problemId, filter));
     }
 
     @Secured("ROLE_TEACHER")
@@ -250,8 +240,7 @@ public class ProblemController {
 
     @PostMapping(value = "/teachers/problems/clone")
     public ResponseEntity<?> cloneProblem(Principal principal, @RequestBody ModelCloneProblem cloneRequest) throws MiniLeetCodeException {
-        ProblemEntity savedProblem = problemTestCaseService.cloneProblem(principal.getName(), cloneRequest);
-        return ResponseEntity.ok().body(savedProblem);
+        return ResponseEntity.ok().body(problemTestCaseService.cloneProblem(principal.getName(), cloneRequest));
     }
 
     /**

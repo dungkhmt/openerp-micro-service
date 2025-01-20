@@ -1,28 +1,9 @@
 import {makeStyles} from "@material-ui/core";
-import {
-  Box,
-  Button,
-  Checkbox,
-  Chip,
-  FormControl,
-  FormControlLabel,
-  Grid,
-  InputAdornment,
-  InputLabel,
-  Link,
-  ListItemText,
-  ListSubheader,
-  MenuItem,
-  OutlinedInput,
-  Select,
-  TextField,
-  Typography
-} from "@mui/material";
+import {Box, Checkbox, Chip, FormControlLabel, Grid, InputAdornment, Link, TextField, Typography} from "@mui/material";
 import React, {useEffect, useState} from "react";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import {useHistory} from "react-router-dom";
 import {CompileStatus} from "./CompileStatus";
-import {sleep} from "./lib";
 import {request} from "../../../api";
 import {useTranslation} from "react-i18next";
 import HustDropzoneArea from "../../common/HustDropzoneArea";
@@ -30,11 +11,15 @@ import {errorNoti, successNoti} from "../../../utils/notification";
 import HustCodeEditor from "../../common/HustCodeEditor";
 import {LoadingButton} from "@mui/lab";
 import RichTextEditor from "../../common/editor/RichTextEditor";
-import HustContainerCard from "../../common/HustContainerCard";
 import {COMPUTER_LANGUAGES, CUSTOM_EVALUATION, NORMAL_EVALUATION} from "./Constant";
 import {getAllTags} from "./service/TagService";
 import ModelAddNewTag from "./ModelAddNewTag";
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+import AddIcon from '@mui/icons-material/Add';
+import ProgrammingContestLayout from "./ProgrammingContestLayout";
+import StyledSelect from "../../select/StyledSelect";
+import TertiaryButton from "../../button/TertiaryButton";
+import FilterByTag from "../../table/FilterByTag";
+import withScreenSecurity from "../../withScreenSecurity";
 
 const useStyles = makeStyles((theme) => ({
   description: {
@@ -43,12 +28,53 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+export const getLevels = (t) => [
+  {
+    label: t("easy"),
+    value: "easy",
+  },
+  {
+    label: t("medium"),
+    value: "medium",
+  },
+  {
+    label: t("hard"),
+    value: "hard",
+  },
+];
+
+export const getPublicOptions = (t) => [
+  {
+    label: t("common:yes"),
+    value: "Y",
+  },
+  {
+    label: t("common:no"),
+    value: "N",
+  },
+];
+
+export const getStatuses = (t) => [
+  {
+    label: t('open'),
+    value: "OPEN",
+  },
+  {
+    label: t('hidden'),
+    value: "HIDDEN",
+  }
+];
+
 function CreateProblem() {
-  const { t } = useTranslation(
+  const history = useHistory();
+  const classes = useStyles();
+
+  const {t} = useTranslation(
     ["education/programmingcontest/problem", "common", "validation"]
   );
-  const classes = useStyles();
-  const history = useHistory();
+  const levels = getLevels(t);
+  const publicOptions = getPublicOptions(t)
+  const statuses = getStatuses(t)
 
   const [problemId, setProblemID] = useState("");
   const [problemName, setProblemName] = useState("");
@@ -58,7 +84,6 @@ function CreateProblem() {
   const [timeLimitPYTHON, setTimeLimitPYTHON] = useState(1);
   const [memoryLimit, setMemoryLimit] = useState(256);
   const [levelId, setLevelId] = useState("medium");
-  const defaultLevel = ["easy", "medium", "hard"];
   const [description, setDescription] = useState("");
   const [solution, setSolution] = useState("");
   const [codeSolution, setCodeSolution] = useState("");
@@ -67,9 +92,10 @@ function CreateProblem() {
   const [languageSolution, setLanguageSolution] = useState(COMPUTER_LANGUAGES.CPP17);
   const [solutionChecker, setSolutionChecker] = useState("");
   const [solutionCheckerLanguage, setSolutionCheckerLanguage] = useState(COMPUTER_LANGUAGES.CPP17);
-  const [isPublic, setIsPublic] = useState(false);
+  const [isPublic, setIsPublic] = useState('N');
   const [tags, setTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [status, setStatus] = useState('HIDDEN');
   const [sampleTestCase, setSampleTestCase] = useState(null);
 
   const [isCustomEvaluated, setIsCustomEvaluated] = useState(false);
@@ -83,23 +109,16 @@ function CreateProblem() {
   const [openModalAddNewTag, setOpenModalAddNewTag] = useState(false);
 
   const handleGetTagsSuccess = (res) => setTags(res.data);
-  useEffect(() => {
-    getAllTags(handleGetTagsSuccess);
-  }, [])
 
-  const handleSelectTags = (event) => {
-    const selectingTags = event.target.value;
-
-    const filteredTags = [...new Map(selectingTags.map(tag => [tag.tagId, tag])).values()]
-
-    setSelectedTags(filteredTags);
+  const handleSelectTags = (tags) => {
+    setSelectedTags(tags);
   };
 
   const handleAttachmentFiles = (files) => {
     setAttachmentFiles(files);
   };
 
-  function checkCompile() {
+  const checkCompile = () => {
     let body = {
       source: codeSolution,
       computerLanguage: languageSolution,
@@ -120,7 +139,7 @@ function CreateProblem() {
       {
         onError: (e) => {
           setLoading(false)
-          errorNoti("Đã xảy ra lỗi", true);
+          errorNoti(t("common:error"))
         }
       },
       body
@@ -131,16 +150,16 @@ function CreateProblem() {
     return new RegExp(/[%^/\\|.?;[\]]/g).test(problemId);
   };
   const hasSpecialCharacterProblemId = () => {
-    return !new RegExp(/^[0-9a-zA-Z_-]*$/).test(problemId); 
+    return !new RegExp(/^[0-9a-zA-Z_-]*$/).test(problemId);
   };
 
   const hasSpecialCharacterProblemName = () => {
-    return !new RegExp(/^[0-9a-zA-Z ]*$/).test(problemName); 
+    return !new RegExp(/^[0-9a-zA-Z ]*$/).test(problemName);
   };
 
   const validateSubmit = () => {
     if (problemId === "") {
-      errorNoti(t("missingField", { ns: "validation", fieldName: t("problemId") }), 3000);
+      errorNoti(t("missingField", {ns: "validation", fieldName: t("problemId")}), 3000);
       return false;
     }
     if (hasSpecialCharacterProblemId()) {
@@ -148,7 +167,7 @@ function CreateProblem() {
       return false;
     }
     if (problemName === "") {
-      errorNoti(t("missingField", { ns: "validation", fieldName: t("problemName") }), 3000);
+      errorNoti(t("missingField", {ns: "validation", fieldName: t("problemName")}), 3000);
       return false;
     }
     //if (hasSpecialCharacterProblemName()) {
@@ -178,6 +197,7 @@ function CreateProblem() {
   function handleSubmit() {
     if (!validateSubmit()) return;
 
+    setLoading(true);
     const fileId = attachmentFiles.map((file) => file.name);
     const tagIds = selectedTags.map((tag) => tag.tagId);
 
@@ -198,25 +218,24 @@ function CreateProblem() {
       preloadCode: preloadCode,
       solutionChecker: solutionChecker,
       solutionCheckerLanguage: solutionCheckerLanguage,
-      isPublic: isPublic,
+      isPublic: isPublic === 'Y',
       fileId: fileId,
       scoreEvaluationType: isCustomEvaluated ? CUSTOM_EVALUATION : NORMAL_EVALUATION,
       tagIds: tagIds,
+      status: status,
       sampleTestCase: sampleTestCase
     };
 
-    let formData = new FormData();
-    formData.append("ModelCreateContestProblem", JSON.stringify(body));
+    const formData = new FormData();
+    formData.append("dto", new Blob([JSON.stringify(body)], {type: 'application/json'}));
 
     for (const file of attachmentFiles) {
       formData.append("files", file);
     }
 
-    setLoading(true);
-
     const config = {
       headers: {
-        "content-Type": "multipart/form-data",
+        "content-type": "multipart/form-data",
       },
     };
 
@@ -225,34 +244,43 @@ function CreateProblem() {
       "/problems",
       (res) => {
         setLoading(false);
-        successNoti("Problem saved successfully", 1000);
-        sleep(1000).then(() => {
-          history.push("/programming-contest/list-problems");
-        });
+        successNoti(t("common:addSuccess", {name: t("problem")}), 3000);
+        history.push("/programming-contest/list-problems");
       },
       {
         onError: () => {
-          errorNoti(t("error", { ns: "common" }), 3000);
+          errorNoti(t("common:error"), 3000);
           setLoading(false);
         },
       },
       formData,
       config
     );
-
   }
 
+  const handleExit = () => {
+    history.push(`/programming-contest/list-problems`);
+  }
+
+  useEffect(() => {
+    getAllTags(handleGetTagsSuccess);
+  }, [])
+
   return (
-    <HustContainerCard title={t("createProblem")}>
-      <Grid container spacing={3}>
+    <ProgrammingContestLayout title={t("common:create", {name: t("problem")})} onBack={handleExit}>
+      <Typography variant="h6">
+        {t("generalInfo")}
+      </Typography>
+
+      <Grid container spacing={2} mt={0}>
         <Grid item xs={3}>
           <TextField
             fullWidth
-            autoFocus={true}
+            size='small'
+            autoFocus
             required
             id={"problemId"}
             label={t("problemId")}
-            // placeholder="Problem ID"
             value={problemId}
             onChange={(event) => {
               setProblemID(event.target.value);
@@ -263,16 +291,16 @@ function CreateProblem() {
                 ? "Problem ID must not contain special characters including %^/\\|.?;[]"
                 : ""
             }
-            sx={{ marginBottom: "12px" }}
+            sx={{marginBottom: "12px"}}
           />
         </Grid>
         <Grid item xs={3}>
           <TextField
             fullWidth
+            size='small'
             required
             id="problemName"
             label={t("problemName")}
-            // placeholder="Problem Name"
             value={problemName}
             //error={hasSpecialCharacterProblemName()}
             helperText={
@@ -288,49 +316,39 @@ function CreateProblem() {
         </Grid>
 
         <Grid item xs={3}>
-          <TextField
+          <StyledSelect
             fullWidth
             required
-            select
-            id="levelId"
-            label={t("level")}
-            value={levelId}
+            key={t("status")}
+            label={t("status")}
+            options={statuses}
+            value={status}
+            sx={{minWidth: 'unset', mr: 'unset'}}
             onChange={(event) => {
-              setLevelId(event.target.value);
+              setStatus(event.target.value);
             }}
-          >
-            {defaultLevel.map((item) => (
-              <MenuItem key={item} value={item}>
-                {item}
-              </MenuItem>
-            ))}
-          </TextField>
+          />
         </Grid>
 
         <Grid item xs={3}>
-          <TextField
+          <StyledSelect
             fullWidth
             required
-            select
-            id="isPublicProblem"
-            label={t("public", { ns: "common" })}
+            key={t("common:public")}
+            label={t("common:public")}
+            options={publicOptions}
+            sx={{minWidth: 'unset', mr: 'unset'}}
+            value={isPublic}
             onChange={(event) => {
               setIsPublic(event.target.value);
             }}
-            value={isPublic}
-          >
-            <MenuItem key={"true"} value={true}>
-              {t("yes", { ns: "common" })}
-            </MenuItem>
-            <MenuItem key={"false"} value={false}>
-              {t("no", { ns: "common" })}
-            </MenuItem>
-          </TextField>
+          />
         </Grid>
 
         <Grid item xs={3}>
           <TextField
             fullWidth
+            size='small'
             required
             id="timeLimitCPP"
             label={t("timeLimit") + ' C/CPP'}
@@ -340,7 +358,6 @@ function CreateProblem() {
               setTimeLimitCPP(event.target.value);
             }}
             InputProps={{
-              // startAdornment: <InputAdornment position="start">C/CPP: </InputAdornment>,
               endAdornment: <InputAdornment position="end">s</InputAdornment>
             }}
           />
@@ -349,6 +366,7 @@ function CreateProblem() {
         <Grid item xs={3}>
           <TextField
             fullWidth
+            size='small'
             required
             id="timeLimitJAVA"
             label={t("timeLimit") + ' Java'}
@@ -358,7 +376,6 @@ function CreateProblem() {
               setTimeLimitJAVA(event.target.value);
             }}
             InputProps={{
-              // startAdornment: <InputAdornment position="start">JAVA: </InputAdornment>,
               endAdornment: <InputAdornment position="end">s</InputAdornment>
             }}
           />
@@ -367,6 +384,7 @@ function CreateProblem() {
         <Grid item xs={3}>
           <TextField
             fullWidth
+            size='small'
             required
             id="timeLimitPYTHON"
             label={t("timeLimit") + ' Python'}
@@ -376,7 +394,6 @@ function CreateProblem() {
               setTimeLimitPYTHON(event.target.value);
             }}
             InputProps={{
-              // startAdornment: <InputAdornment position="start">PYTHON: </InputAdornment>,
               endAdornment: <InputAdornment position="end">s</InputAdornment>
             }}
           />
@@ -385,6 +402,7 @@ function CreateProblem() {
         <Grid item xs={3}>
           <TextField
             fullWidth
+            size='small'
             required
             id="memoryLimit"
             label={t("memoryLimit")}
@@ -393,75 +411,57 @@ function CreateProblem() {
             onChange={(event) => {
               setMemoryLimit(event.target.value);
             }}
-            InputProps={{ endAdornment: <InputAdornment position="end">MB</InputAdornment>, }}
+            InputProps={{endAdornment: <InputAdornment position="end">MB</InputAdornment>,}}
           />
         </Grid>
 
-        <Grid item xs={12}>
-          <FormControl sx={{ width: "100%" }}>
-            <InputLabel id="select-tag-label">Tags</InputLabel>
-            <Select
-              labelId="select-tag-label"
-              id="select-tag"
-              multiple
-              value={selectedTags}
-              onChange={handleSelectTags}
-              input={<OutlinedInput label="Tags" />}
-              renderValue={(selectedTags) => (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
-                  {selectedTags?.map((selectedTag) => (
-                    <Chip size="small" label={selectedTag.name} sx={{
-                      marginRight: "6px",
-                      marginBottom: "6px",
-                      border: "1px solid lightgray",
-                      fontStyle: "italic"
-                    }} />
-                  ))}
-                </Box>
-              )}
-            >
-              <ListSubheader>
-                <Button
-                  sx={{ marginLeft: "20px" }}
-                  startIcon={<AddCircleIcon />}
-                  onClick={() => setOpenModalAddNewTag(true)}
-                >
-                  {t("common:addNew")}
-                </Button>
-              </ListSubheader>
+        <Grid item xs={3}>
+          <StyledSelect
+            fullWidth
+            required
+            key={t("level")}
+            label={t("level")}
+            options={levels}
+            value={levelId}
+            sx={{minWidth: 'unset', mr: 'unset'}}
+            onChange={(event) => {
+              setLevelId(event.target.value);
+            }}
+          />
+        </Grid>
 
-              {tags.map((tag) => (
-                <MenuItem key={tag.tagId} value={tag}>
-                  <Checkbox checked={selectedTags.indexOf(tag) > -1} />
-                  <ListItemText primary={tag.name} secondary={tag?.description} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+        <Grid item xs={6}>
+          <FilterByTag limitTags={3} tags={tags} onSelect={handleSelectTags} value={selectedTags}/>
+        </Grid>
+        <Grid item xs={3}>
+          <TertiaryButton
+            startIcon={<AddIcon/>}
+            onClick={() => setOpenModalAddNewTag(true)}
+          >
+            {t("common:add", {name: t('tag')})}
+          </TertiaryButton>
         </Grid>
       </Grid>
 
-      <Box sx={{ marginTop: "24px" }}>
-        <Link href="/programming-contest/suggest-problem" target="_blank" underline="hover">
-          <Typography variant="body1" color="primary">
-            Struggling to create a fresh and exciting challenge? Try our new <b>Problem Suggestion</b> feature
-            <Chip label="Beta" color="secondary" variant="outlined" size="small"
-              sx={{ marginLeft: "8px", marginBottom: "8px", fontWeight: "bold" }} /></Typography>
-        </Link>
-      </Box>
-
+      <Link sx={{mt: 3, display: 'inline-block'}} href="/programming-contest/suggest-problem" target="_blank"
+            underline="hover">
+        <Typography variant="body1" color="primary">
+          Struggling to create a fresh and exciting challenge? Try our new <b>Problem Suggestion</b> feature
+          <Chip label="Beta" color="secondary" variant="outlined" size="small"
+                sx={{marginLeft: "8px", marginBottom: "8px", fontWeight: "bold"}}/></Typography>
+      </Link>
 
       <Box className={classes.description}>
         <Typography variant="h6" sx={{marginTop: "8px", marginBottom: "8px"}}>
           {t("problemDescription")}
         </Typography>
-        <RichTextEditor content={description} onContentChange={text => setDescription(text)} />
+        <RichTextEditor content={description} onContentChange={text => setDescription(text)}/>
         {/*  
          <RichTextEditor content={sampleTestCase} onContentChange={text => setSampleTestCase(text)}/>
         */}
         <HustCodeEditor
-          title="Sample TestCase"
-          // language={COMPUTER_LANGUAGES.C}
+          title={t("sampleTestCase")}
+          placeholder={null}
           sourceCode={sampleTestCase}
           onChangeSourceCode={(code) => {
             setSampleTestCase(code);
@@ -482,7 +482,7 @@ function CreateProblem() {
               */}
 
       <HustCodeEditor
-        title={t("correctSourceCode") + " *"}
+        title={t("solutionSourceCode") + " *"}
         language={languageSolution}
         onChangeLanguage={(event) => {
           setLanguageSolution(event.target.value);
@@ -506,7 +506,7 @@ function CreateProblem() {
         detail={compileMessage}
       />
 
-      <Box sx={{ marginTop: "12px" }}>
+      <Box sx={{marginTop: "12px"}}>
         <FormControlLabel
           label={t("isPreloadCode")}
           control={
@@ -528,7 +528,7 @@ function CreateProblem() {
         }
       </Box>
 
-      <Box sx={{ marginTop: "12px" }}>
+      <Box sx={{marginTop: "12px"}}>
         <FormControlLabel
           label={t("isCustomEvaluated")}
           control={
@@ -555,26 +555,28 @@ function CreateProblem() {
         }
       </Box>
 
-      <Box width="100%" sx={{ marginTop: "20px" }}>
+      <Box width="100%" sx={{marginTop: "20px"}}>
         <LoadingButton
           variant="contained"
           loading={loading}
           onClick={handleSubmit}
           sx={{textTransform: 'capitalize'}}
         >
-          {t("save", { ns: "common" })}
+          {t("save", {ns: "common"})}
         </LoadingButton>
       </Box>
 
       <ModelAddNewTag
         isOpen={openModalAddNewTag}
         handleSuccess={() => {
+          successNoti(t("common:addSuccess", {name: t('tag')}), 3000)
           getAllTags(handleGetTagsSuccess)
         }}
         handleClose={() => setOpenModalAddNewTag(false)}
       />
-    </HustContainerCard>
+    </ProgrammingContestLayout>
   );
 }
 
-export default CreateProblem;
+const screenName = "SCR_CREATE_PROBLEM";
+export default withScreenSecurity(CreateProblem, screenName, true);

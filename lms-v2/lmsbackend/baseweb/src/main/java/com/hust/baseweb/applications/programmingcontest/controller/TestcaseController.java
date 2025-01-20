@@ -52,11 +52,10 @@ public class TestcaseController {
         }
     }
 
+    @Secured("ROLE_TEACHER")
     @GetMapping("/testcases/{testCaseId}")
-    public ResponseEntity<?> getTestCaseDetail(@PathVariable("testCaseId") UUID testCaseId)
-        throws MiniLeetCodeException {
-        ModelGetTestCaseDetail resp = problemTestCaseService.getTestCaseDetail(testCaseId);
-        return ResponseEntity.status(200).body(resp);
+    public ResponseEntity<?> getTestCaseDetail(@PathVariable("testCaseId") UUID testCaseId) {
+        return ResponseEntity.ok().body(problemTestCaseService.getTestCaseDetail(testCaseId));
     }
 
     /**
@@ -66,6 +65,7 @@ public class TestcaseController {
      * @return
      * @throws IOException
      */
+    @Secured("ROLE_TEACHER")
     @PutMapping(value = "/testcases/{testCaseId}",
                 produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> editTestcase(

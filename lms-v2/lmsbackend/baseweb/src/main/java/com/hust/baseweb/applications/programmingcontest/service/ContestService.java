@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -99,7 +98,7 @@ public class ContestService {
                                                                                .forbiddenInstructions(forbiddenInstructions)
                                                                                .levelOrder(contestProblem.getLevelOrder())
                                                                                .problemDescription(contestProblem.getProblemDescription())
-                                                                               .createdByUserId(contestProblem.getUserId())
+                                                                               .createdByUserId(contestProblem.getCreatedBy())
                                                                                .submissionMode(submissionMode)
                                                                                .build();
 

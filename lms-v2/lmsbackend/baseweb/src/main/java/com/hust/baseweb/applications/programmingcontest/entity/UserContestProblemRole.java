@@ -1,6 +1,10 @@
 package com.hust.baseweb.applications.programmingcontest.entity;
 
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -16,7 +20,7 @@ import java.util.UUID;
 @Entity
 @Builder
 @Table(name = "user_contest_problem_role")
-
+@EntityListeners(AuditingEntityListener.class)
 public class UserContestProblemRole {
 
     public static final String ROLE_EDITOR = "EDITOR";
@@ -45,12 +49,15 @@ public class UserContestProblemRole {
     @Column(name = "role_id")
     private String roleId;
 
+    @LastModifiedBy
     @Column(name = "update_by_user_id")
     private String updateByUserId;
 
+    @CreatedDate
     @Column(name = "created_stamp")
     private Date createdStamp;
 
+    @LastModifiedDate
     @Column(name = "last_updated_stamp")
     private Date lastUpdated;
 

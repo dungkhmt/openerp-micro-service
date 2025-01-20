@@ -16,6 +16,7 @@ import AutorenewIcon from "@mui/icons-material/Autorenew";
 import TertiaryButton from "../../button/TertiaryButton";
 import StyledSelect from "../../select/StyledSelect";
 import {useKeycloak} from "@react-keycloak/web";
+import {getLevels, getStatuses} from "./CreateProblem";
 
 const filterInitValue = {levelIds: [], tags: [], name: "", statuses: []}
 const selectProps = (options) => ({
@@ -118,36 +119,14 @@ function ListProblemContent({type}) {
       {
         onError: (e) => {
           setLoading(false);
-          errorNoti("Đã có lỗi xảy ra trong quá trình tải dữ liệu", true);
+          errorNoti(t("common:error", 3000))
         }
       });
   }
 
-  const {t} = useTranslation("education/programmingcontest/problem");
-  const levels = [
-    {
-      label: t("easy"),
-      value: "easy",
-    },
-    {
-      label: t("medium"),
-      value: "medium",
-    },
-    {
-      label: t("hard"),
-      value: "hard",
-    },
-  ];
-  const statuses = [
-    {
-      label: t('open'),
-      value: "OPEN",
-    },
-    {
-      label: t('hidden'),
-      value: "HIDDEN",
-    }
-  ];
+  const {t} = useTranslation(["education/programmingcontest/problem", "common"]);
+  const levels = getLevels(t);
+  const statuses = getStatuses(t)
 
   const ACCESS_TOKEN = keycloak?.token;
 
@@ -203,7 +182,7 @@ function ListProblemContent({type}) {
       ),
     },
     {title: t("problemName"), field: "problemName", cellStyle: {minWidth: 300}},
-    {title: t("createdBy"), field: "userId", cellStyle: {minWidth: 120}},
+    {title: t("common:createdBy"), field: "userId", cellStyle: {minWidth: 120}},
     {
       title: t("level"),
       field: "levelId",
@@ -222,7 +201,7 @@ function ListProblemContent({type}) {
       cellStyle: {minWidth: 120},
       render: (rowData) => (
         <Typography component="span" variant="subtitle2" sx={{color: getColorStatus(`${rowData.statusId}`)}}>
-          {`${statuses.find(item => item.value === rowData.statusId).label}`}
+          {`${statuses.find(item => item.value === rowData.statusId)?.label || ''}`}
         </Typography>
       )
     },
@@ -260,13 +239,13 @@ function ListProblemContent({type}) {
       },
     },
     {
-      title: t("createdAt"),
+      title: t("common:createdTime"),
       field: "createdAt",
       cellStyle: {minWidth: 200},
       render: (rowData) => toFormattedDateTime(rowData.createdAt)
     },
     {
-      title: t("action"),
+      title: t("common:action"),
       cellStyle: {minWidth: 120},
       render: (rowData) => {
         return (
@@ -289,7 +268,7 @@ function ListProblemContent({type}) {
   }, [page, pageSize]);
 
   return (
-    <Paper elevation={1} sx={{padding: "16px 24px"}} square={false}>
+    <Paper elevation={1} sx={{padding: "16px 24px", borderRadius: 4}} square={false}>
       <Typography variant="h6" sx={{marginBottom: "12px"}}>{t("search")}</Typography>
       <Grid container spacing={3}>
         <Grid item xs={3}>
@@ -299,7 +278,7 @@ function ListProblemContent({type}) {
             label={t("problemName")}
             value={filter.name}
             onChange={handleChangeProblemName}
-            autoFocus/>
+          />
         </Grid>
         <Grid item xs={3}>
           <StyledSelect
@@ -349,9 +328,20 @@ function ListProblemContent({type}) {
           {t("search")}
         </PrimaryButton>
       </Stack>
+
       <Divider sx={{mt: 2, mb: 2}}/>
+
+      <Stack direction="row" justifyContent='space-between' mb={1.5}>
+        <Typography variant="h6">{t("problemList")}</Typography>
+        <PrimaryButton
+          startIcon={<AddIcon/>}
+          onClick={() => {
+            window.open("/programming-contest/create-problem");
+          }}>
+          {t("common:create", {name: ''})}
+        </PrimaryButton>
+      </Stack>
       <StandardTable
-        title={t("problemList")}
         columns={COLUMNS.filter(item => {
           if (type === 0) {
             return item.field !== 'userId'
@@ -360,33 +350,22 @@ function ListProblemContent({type}) {
           }
         })}
         data={problems}
-        isLoading={loading}
         hideCommandBar
-        onChangeRowsPerPage={handleChangePageSize}
+        hideToolBar
         options={{
           selection: false,
           pageSize: pageSize,
           search: false,
-          sorting: true,
+          sorting: false,
         }}
-        totalCount={totalCount}
-        page={page}
-        onChangePage={handleChangePage}
         components={{
           Container: (props) => <Paper {...props} elevation={0}/>,
         }}
-        actions={[
-          {
-            icon: () => {
-              return <AddIcon color='primary' fontSize="large"/>;
-            },
-            tooltip: t("createProblem"),
-            isFreeAction: true,
-            onClick: () => {
-              window.open("/programming-contest/create-problem");
-            },
-          },
-        ]}
+        isLoading={loading}
+        page={page}
+        totalCount={totalCount}
+        onChangePage={handleChangePage}
+        onChangeRowsPerPage={handleChangePageSize}
       />
     </Paper>
   );

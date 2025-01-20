@@ -12,8 +12,8 @@ import ParticipantProgramSubmissionDetailTestCaseByTestCase
 import {getStatusColor} from "./lib";
 
 export default function ContestProblemSubmissionDetail() {
-  const { problemSubmissionId } = useParams();
-  
+  const {problemSubmissionId} = useParams();
+
   const [submission, setSubmission] = useState({});
   const [comments, setComments] = useState([]);
 
@@ -28,8 +28,8 @@ export default function ContestProblemSubmissionDetail() {
     );
 
     const getComments = async () => {
-        const res = await request("get", `submissions/${problemSubmissionId}/comments`);
-        setComments(res.data);
+      const res = await request("get", `submissions/${problemSubmissionId}/comments`);
+      setComments(res.data);
 
     };
 
@@ -57,13 +57,7 @@ export default function ContestProblemSubmissionDetail() {
             backgroundColor: "transparent",
           }}
         >
-          <Box
-            sx={{
-              mb: 4,
-              fontFamily: "'Fira Code', 'JetBrains Mono', monospace",
-              fontVariantLigatures: "none",
-            }}
-          >
+          <Box sx={{mb: 4}}>
             <HustCopyCodeBlock
               title="Message"
               text={submission.message}
@@ -73,8 +67,8 @@ export default function ContestProblemSubmissionDetail() {
           {submission.status &&
             submission.status !== "Compile Error" &&
             submission.status !== "In Progress" && (
-              <Box sx={{ mb: 4 }}>
-                <Typography variant={"h6"} sx={{ mb: 1 }}>
+              <Box sx={{mb: 4}}>
+                <Typography variant={"h6"} sx={{mb: 1}}>
                   Test cases
                 </Typography>
                 <ParticipantProgramSubmissionDetailTestCaseByTestCase
@@ -82,12 +76,7 @@ export default function ContestProblemSubmissionDetail() {
                 />
               </Box>
             )}
-          <Box
-            sx={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontVariantLigatures: "none",
-            }}
-          >
+          <Box>
             <HustCopyCodeBlock
               title="Source code"
               text={submission.sourceCode}
@@ -95,12 +84,12 @@ export default function ContestProblemSubmissionDetail() {
               showLineNumbers
             />
           </Box>
-          <Box sx={{ mt: 4 }}>
-            <Typography variant={"h6"} sx={{ mb: 1 }}>
+          <Box sx={{mt: 4}}>
+            <Typography variant={"h6"} sx={{mb: 1}}>
               Comments
             </Typography>
             {comments.map((comment) => (
-              <Typography key={comment.id} variant="body2" sx={{ mb: 1 }}>
+              <Typography key={comment.id} variant="body2" sx={{mb: 1}}>
                 <strong>{comment.username}:</strong> {comment.comment}
               </Typography>
             ))}
@@ -119,11 +108,11 @@ export default function ContestProblemSubmissionDetail() {
             height: "calc(100vh - 112px)",
           }}
         >
-          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+          <Typography variant="subtitle1" sx={{fontWeight: 600}}>
             Submission details
           </Typography>
-          <Divider sx={{ mb: 1 }} />
-          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+          <Divider sx={{mb: 1}}/>
+          <Typography variant="subtitle2" sx={{fontWeight: 600}}>
             Status
           </Typography>
           <Typography

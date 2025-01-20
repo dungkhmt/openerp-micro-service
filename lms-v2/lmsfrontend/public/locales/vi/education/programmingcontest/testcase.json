@@ -7,7 +7,6 @@
   "addSuccess": "Thêm mới testcase thành công",
   "edit": "Chỉnh sửa testcase",
   "editSuccess": "Chỉnh sửa testcase thành công",
-  "description": "Mô tả",
   "selectTestcaseFile": "Chọn tệp testcase",
   "testcaseContent": "Nội dung testcase",
   "note": "Lưu ý",
@@ -25,5 +24,17 @@
   "space": "Khoảng trắng",
   "tab": "Tab ngang",
   "correctAnswer": "Đáp án",
-  "reGenerateResult": "Kết quả sinh đáp án testcase"
+  "reGenerateResult": "Kết quả sinh đáp án testcase",
+  "reGenerate": "Sinh đáp án testcase",
+  "inputPreview": "Đầu vào (Xem trước)",
+  "outputPreview": "Đầu ra (Xem trước)",
+  "confirmDownload": "Bạn muốn tải xuống tất cả test case hay chỉ những test case công khai?",
+  "allTestCases": "Tất cả test case",
+  "publicTestCases": "Test case công khai",
+  "confirmCopy": "Bạn muốn sao chép tất cả test case hay chỉ những test case công khai?",
+  "input": "Đầu vào",
+  "output": "Đầu ra",
+  "copied": "Đã sao chép",
+  "noTestCase": "Không có test case nào thỏa mãn yêu cầu",
+  "cannotShowTestCaseDetail": "Kích thước test case quá lớn. Vui lòng Sao chép hoặc Tải xuống để xem chi tiết"
 }

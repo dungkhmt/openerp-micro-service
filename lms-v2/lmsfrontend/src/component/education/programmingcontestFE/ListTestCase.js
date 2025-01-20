@@ -1,6 +1,5 @@
-import {Button, IconButton, Paper, Stack, Tooltip, Typography} from "@mui/material";
+import {IconButton, Paper, Stack, Tooltip, Typography} from "@mui/material";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
-import HustModal from "component/common/HustModal";
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router";
 import {Link, useHistory} from "react-router-dom";
@@ -11,21 +10,26 @@ import Box from "@mui/material/Box";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {copyTestCasesWithPublicMode, downloadAllTestCasesWithPublicMode} from "./service/TestCaseService";
-import FileCopyIcon from '@mui/icons-material/FileCopy';
 import AddIcon from "@material-ui/icons/Add";
 import {RiCodeSSlashLine} from "react-icons/ri";
-import {errorNoti} from "../../../utils/notification";
+import {errorNoti, successNoti} from "../../../utils/notification";
 import TestCaseExecutionResult from "./TestCaseExecutionResult";
 import CustomizedDialogs from "../../dialog/CustomizedDialogs";
 import {makeStyles} from "@material-ui/core/styles";
 import {useTranslation} from "react-i18next";
+import PrimaryButton from "../../button/PrimaryButton";
+import TertiaryButton from "../../button/TertiaryButton";
+import DownloadIcon from "@mui/icons-material/Download";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import {FacebookCircularProgress} from "../../common/progressBar/CustomizedCircularProgress";
+import {ConfirmDeleteDialog} from "../../dialog/ConfirmDeleteDialog";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
     minWidth: 800,
   },
   dialogContent: {
-    padding: theme.spacing(3),
+    padding: theme.spacing(2),
   },
 }));
 
@@ -34,80 +38,116 @@ export default function ListTestCase({mode}) {
   const history = useHistory();
 
   const classes = useStyles();
-  const {t} = useTranslation("education/programmingcontest/testcase");
+  const {t} = useTranslation(["education/programmingcontest/testcase", 'common']);
 
   const problemId = params.problemId;
   const [testCases, setTestCases] = useState([]);
   const [openModalPreviewTestcase, setOpenModalPreviewTestcase] = useState(false);
   const [openModalCopyTestcase, setOpenModalCopyTestcase] = useState(false);
   const [openModalDownloadTestcase, setOpenModalDownloadTestcase] = useState(false);
+  const [openModalReGenerateResult, setOpenModalReGenerateResult] = useState(false);
   const [executionResult, setExecutionResult] = useState(null);
-  const [open, setOpen] = useState(false);
+  const [loadingTestCaseDetail, setLoadingTestCaseDetail] = useState(false);
+  const [testCasesDetail, setTestCasesDetail] = useState({});
+  const [selectedTestCase, setSelectedTestCase] = useState();
+  const [openModalConfirmDelete, setOpenModalConfirmDelete] = useState(false);
 
-  const [selectedTestcase, setSelectedTestcase] = useState();
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(5);
+  const [totalCount, setTotalCount] = useState(0);
 
-  function getTestCases() {
+  const handleChangePage = (newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangePageSize = (newSize) => {
+    setPage(0)
+    setPageSize(newSize)
+  }
+
+  const getTestCases = () => {
+    setLoading(true);
+
     request(
       "GET",
-      "/problems/" + problemId + "/testcases",
-
+      `/problems/${problemId}/testcases?page=${page}&size=${pageSize}`,
       (res) => {
-        // setTestCases(res.data.filter((item) => item.isPublic === "Y"));
-        setTestCases(res.data);
+        setLoading(false);
+        const data = res.data
+
+        if (data.numberOfElements === 0 && data.number > 0) {
+          setPage(0)
+        } else {
+          setTestCases(data.content);
+          setTotalCount(data.totalElements)
+        }
       },
       {
         onError: (e) => {
-          errorNoti(t("error", {ns: "common"}))
+          setLoading(false);
+          errorNoti(t("common:error", 3000))
         },
       },
     );
   }
 
-  useEffect(() => {
-    getTestCases();
-  }, []);
+  const addTestCase = () => {
+    history.push(
+      "/programming-contest/problem-detail-create-test-case/" + problemId
+    );
+  }
 
-  function rerunTestCase(problemId, testCaseId) {
+  const rerunTestCase = (problemId, testCaseId) => {
     setExecutionResult(null);
     request(
       "post",
       "/problems/" + problemId + "/testcases/" + testCaseId + "/solution",
       (res) => {
         setExecutionResult(res.data);
-        setOpen(true)
+        setOpenModalReGenerateResult(true)
 
         if (res.data.status.id === 3) {
           getTestCases();
         }
+
+        setTestCasesDetail((prev) => ({
+          ...prev,
+          [testCaseId]: null,
+        }));
       },
       {
         onError: (e) => {
-          errorNoti(t("error", {ns: "common"}))
+          errorNoti(t("common:error"))
         },
       },
     );
   }
 
-  let actions = [
-    {
-      icon: () => {
-        return <FileCopyIcon/>;
+  const handleCloseConfirmDeleteModal = () => {
+    setOpenModalConfirmDelete(false)
+  }
+
+  const handleDelete = () => {
+    handleCloseConfirmDeleteModal()
+    request(
+      "delete",
+      "/testcases/" + selectedTestCase.testCaseId,
+      () => {
+        getTestCases()
+        successNoti(t('common:deleteSuccess', {name: 'Test case'}))
       },
-      tooltip: 'Copy all Testcase',
-      isFreeAction: true,
-      onClick: () => setOpenModalCopyTestcase(true)
-    },
-    {
-      icon: 'download',
-      tooltip: 'Download all Testcase',
-      isFreeAction: true,
-      onClick: () => setOpenModalDownloadTestcase(true)
-    }
-  ]
+      {
+        onError: (e) => {
+          errorNoti(e?.response?.data?.message || t('common:error'), 3000)
+        }
+      }
+    );
+  }
+
   let testcaseColumns = [
     {
-      title: "Input (Preview)",
-      sortable: false,
+      title: t("inputPreview"),
       cellStyle: {minWidth: 200},
       render: (testCase) => (
         <>
@@ -118,8 +158,7 @@ export default function ListTestCase({mode}) {
       )
     },
     {
-      title: "Output (Preview)",
-      sortable: false,
+      title: t("outputPreview"),
       cellStyle: {minWidth: 200},
       render: (testCase) => (
         <>
@@ -129,39 +168,31 @@ export default function ListTestCase({mode}) {
         </>
       )
     },
-    {title: "Point", field: "point"},
-    {title: "Public", field: "isPublic"},
-    {title: "Description", field: "description"},
-    {title: "Status", field: "status"}
+    {title: t('point'), field: "point"},
+    {
+      title: t("common:public"),
+      field: "isPublic",
+      render: (testCase) => testCase.isPublic === 'Y' ? t("common:yes") : t("common:no")
+    },
+    {title: t("status"), field: "status"},
+    {title: t("common:description"), field: "description"}
   ];
 
   if (mode !== 2) {
-    actions.unshift({
-      icon: () => {
-        return <AddIcon fontSize="large"/>;
-      },
-      tooltip: 'Add new Testcase',
-      isFreeAction: true,
-      onClick: () => addTestCase()
-    })
     testcaseColumns.push({
-      title: "Action",
+      title: t("common:action"),
       align: "center",
-      sortable: false,
       render: (testCase) => (
         <Stack spacing={1} direction="row">
-          <Tooltip title='Detail'>
+          <Tooltip title={t('common:viewDetail')}>
             <IconButton
               color="primary"
-              onClick={() => {
-                setSelectedTestcase(testCase);
-                setOpenModalPreviewTestcase(true);
-              }}
+              onClick={() => handleViewDetail(testCase)}
             >
               <InfoIcon/>
             </IconButton>
           </Tooltip>
-          <Tooltip title='Regenerate testcase answer'>
+          <Tooltip title={t('reGenerate')}>
             <IconButton
               variant="contained"
               color="primary"
@@ -173,7 +204,7 @@ export default function ListTestCase({mode}) {
             </IconButton>
           </Tooltip>
 
-          <Tooltip title='Edit'>
+          <Tooltip title={t('common:edit', {name: ''})}>
             <Link
               to={
                 "/programming-contest/edit-testcase/" +
@@ -188,30 +219,13 @@ export default function ListTestCase({mode}) {
             </Link>
           </Tooltip>
 
-          <Tooltip title='Delete'>
+          <Tooltip title={t('common:delete')}>
             <IconButton
               variant="contained"
               color="error"
               onClick={() => {
-                request(
-                  "delete",
-                  "/testcases/" + testCase.testCaseId,
-                  () => {
-                    request(
-                      "GET",
-                      "/problems/" + problemId + "/testcases",
-                      (res) => {
-                        setTestCases(res.data);
-                      },
-                      {}
-                    ).then();
-                  },
-                  {
-                    onError: (e) => {
-                      errorNoti(e?.response?.data?.message || "An error happened", 5000)
-                    }
-                  }
-                ).then();
+                setSelectedTestCase(testCase)
+                setOpenModalConfirmDelete(true)
               }}
             >
               <DeleteIcon/>
@@ -221,17 +235,13 @@ export default function ListTestCase({mode}) {
     })
   } else {
     testcaseColumns.push({
-      title: "Action",
+      title: t("common:action"),
       align: "center",
-      sortable: false,
       render: (testCase) => (
-        <Tooltip title='Detail'>
+        <Tooltip title={t('common:viewDetail')}>
           <IconButton
             color="primary"
-            onClick={() => {
-              setSelectedTestcase(testCase);
-              setOpenModalPreviewTestcase(true);
-            }}
+            onClick={() => handleViewDetail(testCase)}
           >
             <InfoIcon/>
           </IconButton>
@@ -240,144 +250,243 @@ export default function ListTestCase({mode}) {
     })
   }
 
-  const ModalPreview = (chosenTestcase) => {
-    return (
-      <HustModal
-        open={openModalPreviewTestcase}
-        onClose={() => setOpenModalPreviewTestcase(false)}
-        isNotShowCloseButton
-        showCloseBtnTitle={false}
-      >
-        <HustCopyCodeBlock
-          title="Input"
-          text={chosenTestcase?.chosenTestcase?.testCase}
-        />
-        <Box sx={{height: "18px"}}/>
-        <HustCopyCodeBlock
-          title="Output"
-          text={chosenTestcase?.chosenTestcase?.correctAns}
-          mt={2}
-        />
-      </HustModal>
-    );
-  };
+  const handleViewDetail = (rowData) => {
+    const testCaseId = rowData.testCaseId;
 
-  const ModalCopy = () => {
-    return (
-      <HustModal
-        open={openModalCopyTestcase}
-        onClose={() => setOpenModalCopyTestcase(false)}
-        isNotShowCloseButton
-        showCloseBtnTitle={false}
-        maxWidthPaper={500}
-      >
-        <Typography variant="subtitle2">Do you want to copy all testcases or only public testcases?</Typography>
-        <Box sx={{
-          marginTop: "28px",
-          marginBottom: "-24px",
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between"
-        }}>
-          <Button
-            variant="outlined"
-            onClick={() => {
-              copyTestCasesWithPublicMode(testCases, false);
-              setOpenModalCopyTestcase(false);
-            }}
-          >
-            Copy all Testcases
-          </Button>
-          <Button
-            variant="contained"
-            onClick={() => {
-              copyTestCasesWithPublicMode(testCases, true);
-              setOpenModalCopyTestcase(false);
-            }}
-          >
-            Copy public Testcases
-          </Button>
-        </Box>
-      </HustModal>
-    );
-  };
+    setOpenModalPreviewTestcase(true);
 
-  const ModalDownload = () => {
-    return (
-      <HustModal
-        open={openModalDownloadTestcase}
-        onClose={() => setOpenModalDownloadTestcase(false)}
-        isNotShowCloseButton
-        showCloseBtnTitle={false}
-        maxWidthPaper={580}
-      >
-        <Typography variant="subtitle2">Do you want to download all testcases or only public testcases?</Typography>
-        <Box sx={{
-          marginTop: "28px",
-          marginBottom: "-24px",
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between"
-        }}>
-          <Button
-            variant="outlined"
-            onClick={() => {
-              downloadAllTestCasesWithPublicMode(testCases, false);
-              setOpenModalDownloadTestcase(false);
-            }}
-          >
-            Download All Testcases
-          </Button>
-          <Button
-            variant="contained"
-            onClick={() => {
-              downloadAllTestCasesWithPublicMode(testCases, true);
-              setOpenModalDownloadTestcase(false);
-            }}
-          >
-            Download Public Testcases
-          </Button>
-        </Box>
-      </HustModal>
-    );
-  };
+    if (testCasesDetail[testCaseId]) {
+      setSelectedTestCase(testCasesDetail[testCaseId]);
+    } else {
+      setLoadingTestCaseDetail(true);
 
-  function addTestCase() {
-    history.push(
-      "/programming-contest/problem-detail-create-test-case/" + problemId
+      request(
+        "GET",
+        `/testcases/${testCaseId}`,
+        (res) => {
+          setLoadingTestCaseDetail(false);
+          setTestCasesDetail((prev) => ({
+            ...prev,
+            [testCaseId]: res.data || {},
+          }));
+
+          setSelectedTestCase(res.data);
+        },
+        {
+          onError: (e) => {
+            setLoadingTestCaseDetail(false);
+            errorNoti(t('common:error'), 3000)
+          },
+        }
+      );
+    }
+  }
+
+  const ModalPreview = ({testCase}) => (
+    <CustomizedDialogs
+      open={openModalPreviewTestcase}
+      title={t('common:viewDetail')}
+      contentTopDivider
+      classNames={{
+        paper: (loadingTestCaseDetail || testCase?.testCase != null) ? classes.paper : null,
+        content: classes.dialogContent
+      }}
+      handleClose={() => setOpenModalPreviewTestcase(false)}
+      content={
+        loadingTestCaseDetail ? (
+          <Stack
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+            sx={{minHeight: 128}}
+          >
+            <FacebookCircularProgress/>
+          </Stack>
+        ) : (testCase?.testCase == null ?
+          <Stack sx={{minHeight: 64}}>
+            <Typography variant="subtitle2">{t('cannotShowTestCaseDetail')}</Typography>
+          </Stack>
+          :
+          <>
+            <HustCopyCodeBlock
+              title={t("input")}
+              text={testCase?.testCase}
+            />
+            <Box sx={{height: "16px"}}/>
+            <HustCopyCodeBlock
+              title={t("output")}
+              text={testCase?.correctAns}
+              mt={2}
+            />
+          </>)
+      }
+    />
+  );
+
+  const getFullTestCases = (publicOnly, successHandler) => {
+    request(
+      "GET",
+      `/problems/${problemId}/testcases?fullView=true${publicOnly ? "&publicOnly=true" : ""}`,
+      (res) => {
+        successHandler(res)
+      },
+      {
+        onError: (e) => {
+          errorNoti(t("common:error", 3000))
+        },
+      },
     );
   }
 
+  const handleCopyTestCase = (publicOnly, successHandler) => {
+    setOpenModalCopyTestcase(false);
+    getFullTestCases(publicOnly, successHandler);
+  }
+
+  const ModalCopy = () => (
+    <CustomizedDialogs
+      open={openModalCopyTestcase}
+      handleClose={() => setOpenModalCopyTestcase(false)}
+      title={t('common:copy')}
+      contentTopDivider
+      content={<Typography variant="subtitle2">{t('confirmCopy')}</Typography>}
+      actions={
+        <>
+          <TertiaryButton
+            variant="outlined"
+            onClick={() => handleCopyTestCase(
+              false,
+              (res) => {
+                copyTestCasesWithPublicMode(res.data.content, t);
+              })}
+          >
+            {t('allTestCases')}
+          </TertiaryButton>
+          <PrimaryButton
+            onClick={() => handleCopyTestCase(
+              true,
+              (res) => {
+                copyTestCasesWithPublicMode(res.data.content, t);
+              })}
+          >
+            {t('publicTestCases')}
+          </PrimaryButton>
+        </>}
+      classNames={{content: classes.dialogContent}}
+    />
+  );
+
+  const handleDownloadTestCase = (publicOnly, successHandler) => {
+    setOpenModalDownloadTestcase(false);
+    getFullTestCases(publicOnly, successHandler);
+  }
+
+  const ModalDownload = () => (
+    <CustomizedDialogs
+      open={openModalDownloadTestcase}
+      handleClose={() => setOpenModalDownloadTestcase(false)}
+      title={t('common:download')}
+      contentTopDivider
+      content={<Typography variant="subtitle2">{t('confirmDownload')}</Typography>}
+      actions={
+        <>
+          <TertiaryButton
+            variant="outlined"
+            onClick={() => handleDownloadTestCase(
+              false,
+              (res) => {
+                downloadAllTestCasesWithPublicMode(res.data.content, t);
+              })}
+          >
+            {t('allTestCases')}
+          </TertiaryButton>
+          <PrimaryButton
+            onClick={() => handleDownloadTestCase(
+              true,
+              (res) => {
+                downloadAllTestCasesWithPublicMode(res.data.content, t);
+              })}
+          >
+            {t('publicTestCases')}
+          </PrimaryButton>
+        </>
+      }
+      classNames={{content: classes.dialogContent}}
+    />
+  );
+
+  useEffect(() => {
+    getTestCases()
+  }, [page, pageSize]);
+
   return (
     <Box sx={{marginTop: "36px"}}>
+      <Stack direction="row" justifyContent='space-between' mb={1.5}>
+        <Typography variant="h6">{t("Test Case")}</Typography>
+
+        <Stack direction='row' spacing={2}>
+          {mode !== 2 && <PrimaryButton
+            startIcon={<AddIcon/>}
+            onClick={() => addTestCase()}
+          >
+            {t("common:create", {name: ''})}
+          </PrimaryButton>}
+          {testCases?.length > 0 && <>
+            <TertiaryButton
+              variant="outlined"
+              startIcon={<ContentCopyIcon/>}
+              onClick={() => setOpenModalCopyTestcase(true)}
+            >
+              {t('common:copy')}
+            </TertiaryButton>
+            <TertiaryButton
+              variant="outlined"
+              startIcon={<DownloadIcon/>}
+              onClick={() => setOpenModalDownloadTestcase(true)}
+            >
+              {t('common:download')}
+            </TertiaryButton>
+          </>}
+        </Stack>
+      </Stack>
       <StandardTable
-        title={"Problem's testcases"}
         columns={testcaseColumns}
         data={testCases}
         hideCommandBar
+        hideToolBar
         options={{
           selection: false,
           pageSize: 5,
           search: false,
-          sorting: true,
+          sorting: false,
         }}
         components={{
           Container: (props) => <Paper {...props} elevation={0}/>,
         }}
-        actions={actions}
+        isLoading={loading}
+        page={page}
+        totalCount={totalCount}
+        onChangePage={handleChangePage}
+        onChangeRowsPerPage={handleChangePageSize}
       />
 
+      <ModalCopy/>
+      <ModalDownload/>
+      <ModalPreview testCase={selectedTestCase}/>
       <CustomizedDialogs
-        open={open}
-        handleClose={() => setOpen(false)}
+        open={openModalReGenerateResult}
+        handleClose={() => setOpenModalReGenerateResult(false)}
         title={t("reGenerateResult")}
         contentTopDivider
         content={<TestCaseExecutionResult uploadResult={executionResult} hideTitle/>}
         classNames={{paper: classes.paper, content: classes.dialogContent}}
       />
-      <ModalPreview chosenTestcase={selectedTestcase}/>
-      <ModalCopy/>
-      <ModalDownload/>
+      <ConfirmDeleteDialog open={openModalConfirmDelete}
+                           handleClose={handleCloseConfirmDeleteModal}
+                           handleDelete={handleDelete}
+                           entity='test case'
+                           name={selectedTestCase?.description}
+      />
     </Box>
   );
 }

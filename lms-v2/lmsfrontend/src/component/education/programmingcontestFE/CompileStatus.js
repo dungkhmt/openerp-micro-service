@@ -23,7 +23,7 @@ export function CompileStatus(props) {
         <div>
           {
             statusSuccessful ?
-              <Alert icon={false} severity="success">Successful</Alert> :
+              <Alert icon={false} severity="success">{t("common:success")}</Alert> :
               <Alert icon={false} severity="error">{detail.status}</Alert>
           }
         </div>

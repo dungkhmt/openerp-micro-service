@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import {request} from "api";
 import {PopperComponent} from "../education/programmingcontestFE/AddMember2Contest";
-import {autocompleteClasses} from "@mui/material";
+import {autocompleteClasses, ListItemText} from "@mui/material";
 import {useTranslation} from "react-i18next";
 
 const FilterByTag = (props) => {
@@ -30,8 +30,9 @@ const FilterByTag = (props) => {
       PopperComponent={PopperComponent}
       getOptionLabel={(option) => option.name}
       // filterOptions={(x) => x} // disable filtering on client
-      options={definedTags}
+      options={props.tags || definedTags}
       noOptionsText="No matches found"
+      isOptionEqualToValue={(option, value) => option.tagId === value.tagId}
       onChange={(event, newValue) => {
         props.onSelect(newValue);
       }}
@@ -66,7 +67,7 @@ const FilterByTag = (props) => {
           },
         },
       }}
-      limitTags={1}
+      limitTags={props.limitTags || 1}
     />
   );
 };

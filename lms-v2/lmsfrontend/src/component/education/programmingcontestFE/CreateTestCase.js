@@ -16,6 +16,7 @@ import TertiaryButton from "../../button/TertiaryButton";
 import {Controller, useForm} from "react-hook-form";
 import ProgrammingContestLayout from "./ProgrammingContestLayout";
 import TestCaseExecutionResult from "./TestCaseExecutionResult";
+import {getPublicOptions} from "./CreateProblem";
 
 export const getStatusColorById = (statusId) => {
   switch (statusId) {
@@ -221,7 +222,8 @@ function CreateTestCase(props) {
   const [result, setResult] = useState(null);
   const [load, setLoad] = useState(false);
   const [checkTestcaseResult, setCheckTestcaseResult] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [disableSaveButton, setDisableSaveButton] = useState(false);
   const [fileName, setFileName] = useState(null);
   const [fileContent, setFileContent] = useState(null);
   const [showWarning, setShowWarning] = useState(false);
@@ -247,16 +249,7 @@ function CreateTestCase(props) {
     }
   });
 
-  const publicOptions = [
-    {
-      label: t("yes", {ns: "common"}),
-      value: "Y",
-    },
-    {
-      label: t("no", {ns: "common"}),
-      value: "N",
-    },
-  ];
+  const publicOptions = getPublicOptions(t)
 
   const uploadModes = [
     {
@@ -322,6 +315,7 @@ function CreateTestCase(props) {
   // };
 
   const onFileChange = (event) => {
+    setDisableSaveButton(false)
     setShowWarning(false);
     setUploadResult(null)
 
@@ -360,7 +354,7 @@ function CreateTestCase(props) {
   }
 
   const onSubmit = (data) => {
-    setSubmitting(true);
+    setLoading(true);
     setUploadResult(null);
 
     const body = {
@@ -384,7 +378,8 @@ function CreateTestCase(props) {
       "post",
       "/testcases",
       (res) => {
-        setSubmitting(false);
+        setDisableSaveButton(true);
+        setLoading(false);
 
         if (body.uploadMode === "EXECUTE") {
           setUploadResult(res.data);
@@ -402,8 +397,8 @@ function CreateTestCase(props) {
       },
       {
         onError: (e) => {
-          setSubmitting(false);
-          errorNoti(t("error", {ns: "common"}))
+          setLoading(false);
+          errorNoti(t("common:error"))
         },
       },
       formData,
@@ -422,6 +417,10 @@ function CreateTestCase(props) {
       triggerValidation("point")
     }
   }, [i18n.language]);
+
+  useEffect(() => {
+    setDisableSaveButton(false);
+  }, [watch('correctAnswer')]);
 
   return (
     <ProgrammingContestLayout title={tTestcase("add")} onBack={handleExit}>
@@ -476,8 +475,8 @@ function CreateTestCase(props) {
           <Grid item xs={6}>
             <TextField
               fullWidth
-              id={tTestcase("description")}
-              label={tTestcase("description")}
+              id={t("common:description")}
+              label={t("common:description")}
               name="description"
               size="small"
               error={!!errors.description}
@@ -553,15 +552,15 @@ function CreateTestCase(props) {
 
         <Stack direction="row" spacing={2} mt={2}>
           <TertiaryButton variant="outlined" onClick={handleExit}>
-            {t("exit", {ns: "common"})}
+            {t("common:exit")}
           </TertiaryButton>
           <LoadingButton
             color="primary"
             variant="contained"
             type="submit"
-            disabled={(watch("uploadMode") === "EXECUTE" && !fileName) || submitting}
+            disabled={(watch("uploadMode") === "EXECUTE" && !fileName) || loading || disableSaveButton}
             sx={{textTransform: 'capitalize'}}
-            loading={submitting}
+            loading={loading}
           >
             {t("save", {ns: "common"})}
           </LoadingButton>

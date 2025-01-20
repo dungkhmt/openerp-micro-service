@@ -21,14 +21,14 @@ import {getStatusColor} from "./lib";
 
 export const detail = (key, value, sx, helpText) => (
   <>
-    <Typography variant="subtitle2" sx={{ fontWeight: 600, ...sx?.key }}>
+    <Typography variant="subtitle2" sx={{fontWeight: 600, ...sx?.key}}>
       {helpText ? (
         <>
           {key}
           {
             <Tooltip arrow title={helpText}>
-              <IconButton sx={{ p: 0.5, pt: 0 }}>
-                <HelpOutlineIcon sx={{ fontSize: 16, color: "#000000de" }} />
+              <IconButton sx={{p: 0.5, pt: 0}}>
+                <HelpOutlineIcon sx={{fontSize: 16, color: "#000000de"}}/>
               </IconButton>
             </Tooltip>
           }
@@ -53,7 +53,7 @@ export const detail = (key, value, sx, helpText) => (
       {value}{" "}
     </Typography>
   </>
- );
+);
 
 export const resolveLanguage = (str) => {
   if (str) {
@@ -78,13 +78,13 @@ export const resolveLanguage = (str) => {
 };
 
 function ContestProblemSubmissionDetailViewedByManager() {
-  const { problemSubmissionId } = useParams();
+  const {problemSubmissionId} = useParams();
 
   const [submission, setSubmission] = useState({});
   const [submissionSource, setSubmissionSource] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [comment, setComment] = useState('');
-  const userLoginId = "exampleUserId"; 
+  const userLoginId = "exampleUserId";
 
   const handleChange = (event) => {
     if (event.target.checked === true) {
@@ -150,7 +150,7 @@ function ContestProblemSubmissionDetailViewedByManager() {
       submissionId: problemSubmissionId,
       userId: userLoginId,
       comment: comment,
-      createdStamp: new Date(), 
+      createdStamp: new Date(),
     };
 
     request(
@@ -201,27 +201,15 @@ function ContestProblemSubmissionDetailViewedByManager() {
             backgroundColor: "transparent",
           }}
         >
-          <Box
-            sx={{
-              mb: 4,
-              fontFamily: "'Fira Code', 'JetBrains Mono', monospace",
-              fontVariantLigatures: "none",
-            }}
-          >
+          <Box sx={{mb: 4}}>
             <HustCopyCodeBlock
               title="Message"
               text={submission.message}
               language="bash"
             />
           </Box>
-          <Box
-            sx={{
-              mb: 4,
-              fontFamily: "'JetBrains Mono', monospace",
-              fontVariantLigatures: "none",
-            }}
-          >
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+          <Box sx={{mb: 4}}>
+            <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1}}>
               <Typography variant="h6">Source code</Typography>
               <Button onClick={handleOpenDialog}>
                 Comment
@@ -237,7 +225,7 @@ function ContestProblemSubmissionDetailViewedByManager() {
             submission.status !== "Compile Error" &&
             submission.status !== "In Progress" && (
               <Box>
-                <Typography variant={"h6"} sx={{ mb: 1 }}>
+                <Typography variant={"h6"} sx={{mb: 1}}>
                   Test cases
                 </Typography>
                 <ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase
@@ -259,11 +247,11 @@ function ContestProblemSubmissionDetailViewedByManager() {
             height: "calc(100vh - 112px)",
           }}
         >
-          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+          <Typography variant="subtitle1" sx={{fontWeight: 600}}>
             Submission details
           </Typography>
-          <Divider sx={{ mb: 1 }} />
-          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+          <Divider sx={{mb: 1}}/>
+          <Typography variant="subtitle2" sx={{fontWeight: 600}}>
             Enabled
           </Typography>
           {submission.managementStatus !== undefined && (
@@ -274,8 +262,8 @@ function ContestProblemSubmissionDetailViewedByManager() {
                 submission.managementStatus === null
               }
               onChange={handleChange}
-              inputProps={{ "aria-label": "Switch enable submission" }}
-              sx={{ ml: -1.25, mb: 1.25, mt: -1 }}
+              inputProps={{"aria-label": "Switch enable submission"}}
+              sx={{ml: -1.25, mb: 1.25, mt: -1}}
             />
           )}
           {[
@@ -348,7 +336,7 @@ function ContestProblemSubmissionDetailViewedByManager() {
                 width: "100%",
                 height: "80vh",
                 overflowY: "scroll",
-                
+
               }}
             >
               <HustCopyCodeBlock
@@ -360,13 +348,13 @@ function ContestProblemSubmissionDetailViewedByManager() {
               <TextField
                 label="Comment"
                 multiline
-                rows={8} 
+                rows={8}
                 value={comment}
                 onChange={(event) => setComment(event.target.value)}
                 sx={{
                   width: "100%",
-                  height: 300, 
-                  mt: 2, 
+                  height: 300,
+                  mt: 2,
                 }}
               />
             </DialogContent>

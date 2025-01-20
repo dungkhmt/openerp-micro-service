@@ -111,6 +111,7 @@
   "devDependencies": {
     "babel-plugin-import": "^1.13.3",
     "compression-webpack-plugin": "^6.1.1",
+    "immutable": "^5.0.3",
     "prop-types": "^15.7.2"
   },
   "resolutions": {

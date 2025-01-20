@@ -18,7 +18,7 @@ const ProgrammingContestLayout = ({title, children, onBack}) => {
         </Typography>
       </Stack>
 
-      <Paper elevation={1} sx={{padding: "16px 24px"}}>
+      <Paper elevation={1} sx={{padding: "16px 24px", borderRadius: 4}}>
         {children}
       </Paper>
     </>

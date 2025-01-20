@@ -7,7 +7,6 @@
   "addSuccess": "Create testcase successfully",
   "edit": "Edit testcase",
   "editSuccess": "Edit testcase successfully",
-  "description": "Description",
   "selectTestcaseFile": "Select testcase file",
   "testcaseContent": "Testcase content",
   "note": "Note",
@@ -25,5 +24,17 @@
   "space": "Space",
   "tab": "Horizontal Tab",
   "correctAnswer": "Answer",
-  "reGenerateResult": "Result of regenerating testcase answer"
+  "reGenerateResult": "Result of regenerating testcase answer",
+  "reGenerate": "Regenerate testcase answer",
+  "inputPreview": "Input (Preview)",
+  "outputPreview": "Output (Preview)",
+  "confirmDownload": "Do you want to download all test cases or only public test cases?",
+  "allTestCases": "All Test cases",
+  "publicTestCases": "Public Test cases",
+  "confirmCopy": "Do you want to copy all test cases or only public test cases?",
+  "input": "Input",
+  "output": "Output",
+  "copied": "Copied",
+  "noTestCase": "No testcase satisfies the requirement",
+  "cannotShowTestCaseDetail": "The test case size is too large. Please Copy or Download it to view the details"
 }

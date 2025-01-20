@@ -82,11 +82,11 @@ function EditTestCase(props) {
 
   const publicOptions = [
     {
-      label: t("yes", {ns: "common"}),
+      label: t("common:yes"),
       value: "Y",
     },
     {
-      label: t("no", {ns: "common"}),
+      label: t("common:no"),
       value: "N",
     },
   ];
@@ -285,7 +285,7 @@ function EditTestCase(props) {
       {
         onError: (e) => {
           setSubmitting(false);
-          errorNoti(t("error", {ns: "common"}));
+          errorNoti(t("common:error"));
         }
       },
       formData,
@@ -314,7 +314,7 @@ function EditTestCase(props) {
       },
       {
         onError: (e) => {
-          errorNoti(t("error", {ns: "common"}))
+          errorNoti(t("common:error"))
         },
       });
   }, []);
@@ -393,8 +393,8 @@ function EditTestCase(props) {
           <Grid item xs={6}>
             <TextField
               fullWidth
-              id={tTestcase("description")}
-              label={tTestcase("description")}
+              id={t("common:description")}
+              label={t("common:description")}
               name="description"
               size="small"
               error={!!errors.description}
@@ -479,7 +479,7 @@ function EditTestCase(props) {
 
         <Stack direction="row" spacing={2} mt={2}>
           <TertiaryButton variant="outlined" onClick={handleExit}>
-            {t("exit", {ns: "common"})}
+            {t("common:exit")}
           </TertiaryButton>
           <LoadingButton
             color="primary"
