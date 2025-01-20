@@ -169,8 +169,7 @@ const AllProgramScreen = () => {
         checkboxSelection
         disableRowSelectionOnClick
         loading={isLoading}
-        hideFooter
-        pagination={false}
+        pagination
         pageSize={pageSize}
         rowCount={totalCount}
         paginationMode="server"
