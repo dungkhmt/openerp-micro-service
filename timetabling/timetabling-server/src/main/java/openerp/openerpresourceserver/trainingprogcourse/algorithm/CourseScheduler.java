@@ -80,15 +80,15 @@ public class CourseScheduler {
         IntVar minTotalCredits = solver.makeMin(semesterTotalCredits).var();
         IntVar maxTotalCredits = solver.makeMax(semesterTotalCredits).var();
         IntVar creditDifference = solver.makeDifference(maxTotalCredits, minTotalCredits).var();
-
-        // Các ràng buộc tín chỉ với độ lệch chặt chẽ hơn
-        long totalCredits = Arrays.stream(credits).sum();
-        long avgCreditsPerSemester = totalCredits / semesterCount;
-        long maxDeviation = Math.max(3, avgCreditsPerSemester / 4); // More strict deviation limit
+//
+//        // Các ràng buộc tín chỉ với độ lệch chặt chẽ hơn
+//        long totalCredits = Arrays.stream(credits).sum();
+//        long avgCreditsPerSemester = totalCredits / semesterCount;
+//        long maxDeviation = Math.max(3, avgCreditsPerSemester / 4); // More strict deviation limit
 
         for (IntVar semesterCredits : semesterTotalCredits) {
-            solver.addConstraint(solver.makeLessOrEqual(semesterCredits, avgCreditsPerSemester + maxDeviation));
-            solver.addConstraint(solver.makeGreaterOrEqual(semesterCredits, avgCreditsPerSemester - maxDeviation));
+            solver.addConstraint(solver.makeLessOrEqual(semesterCredits, 24));//avgCreditsPerSemester + maxDeviation));
+            solver.addConstraint(solver.makeGreaterOrEqual(semesterCredits,1 ));//avgCreditsPerSemester - maxDeviation));
         }
 
         // Cải thiện phân bổ số môn học vào các kỳ bằng giới hạn max min học phần 1 kì
@@ -158,11 +158,11 @@ public class CourseScheduler {
                 semesterVars.put(courseId, solver.makeIntVar(1, totalSemesters, "semester_" + courseId));
             }
 
-            // 1. Ràng buộc môn học mục tiêu phải ở kỳ mới
+            //  Ràng buộc môn học mục tiêu phải ở kỳ mới
             solver.addConstraint(
                     solver.makeEquality(semesterVars.get(targetCourseId), targetSemester));
 
-            // 2. Xử lý ràng buộc môn tiên quyết
+            //  Xử lý ràng buộc môn tiên quyết
             Map<String, List<String>> prerequisites = new HashMap<>();
             for (TrainingProgCourse course : courses) {
                 prerequisites.put(course.getId(),
@@ -183,7 +183,7 @@ public class CourseScheduler {
                 }
             }
 
-            // 3. Ràng buộc mỗi kỳ phải có ít nhất 1 môn học
+            //  Ràng buộc mỗi kỳ phải có ít nhất 1 môn học
             for (int semester = 1; semester <= totalSemesters; semester++) {
                 final int currentSemester = semester;
                 List<IntVar> coursesInSemester = new ArrayList<>();
@@ -201,7 +201,8 @@ public class CourseScheduler {
                                 solver.makeSum(coursesInSemester.toArray(new IntVar[0])), 1));
             }
 
-            // 4. Tạo biến đánh dấu môn học di chuyển
+
+            //  Tạo biến đánh dấu môn học di chuyển
             Map<String, IntVar> moveVars = new HashMap<>();
             for (Map.Entry<String, Integer> entry : initialSemesters.entrySet()) {
                 String courseId = entry.getKey();
@@ -216,7 +217,7 @@ public class CourseScheduler {
                                         initialSemester)));
             }
 
-            // 5. Tối thiểu hóa số môn học di chuyển
+            //  Tối thiểu hóa số môn học di chuyển
             IntVar[] moveVarsArray = moveVars.values().toArray(new IntVar[0]);
             IntVar totalMoves = solver.makeSum(moveVarsArray).var();
             OptimizeVar objective = solver.makeMinimize(totalMoves, 1);
