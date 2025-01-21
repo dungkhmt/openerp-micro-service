@@ -4,13 +4,14 @@ import {
   Autocomplete,
   IconButton,
   LinearProgress,
-  Link,
+  //Link,
   Paper,
   Popper,
   Stack,
   TextField,
   Tooltip,
 } from "@mui/material";
+import { Link } from "react-router-dom";
 import { autocompleteClasses } from "@mui/material/Autocomplete";
 import Box from "@mui/material/Box";
 import { styled, useTheme } from "@mui/material/styles";
@@ -86,15 +87,18 @@ export function ContestManagerManageProblem(props) {
     {
       title: "Name",
       minWidth: 170,
+      field: "problemName",
       render: (rowData) => (
         <Link
-          href={`/programming-contest/manager-view-problem-detail/${rowData["problemId"]}`}
-          variant="subtitle2"
-          underline="none"
-          target="_blank"
+          to={{
+            pathname:
+              "/programming-contest/contest-manager-view-problem/" + contestId + "/" + rowData["problemId"],
+          }}
         >
           {rowData["problemName"]}
+        
         </Link>
+        
       ),
     },
     {

@@ -33,8 +33,8 @@ class ExamAccount{
 public class PDFCreator {
     public static void main(String[] args){
         try {
-            String dir = "C:\\DungPQ\\teaching\\nhap-mon-lap-trinh-it1108\\HK-2024-1\\thi-cuoi-ky\\";
-            InputStream inp = new FileInputStream(dir + "map-tai-khoan-exam-HiepHV.xlsx");
+            String dir = "C:\\DungPQ\\teaching\\Applied-algorithms\\HK-2024-2025-1\\thi-cuoi-ky-IT3170E\\";
+            InputStream inp = new FileInputStream(dir + "map-tai-khoan-thi-K4.xlsx");
             XSSFWorkbook wb = new XSSFWorkbook(inp);
             XSSFSheet sheet = wb.getSheetAt(0);
             int lastRowNum = sheet.getLastRowNum();
@@ -49,8 +49,10 @@ public class PDFCreator {
                 String email = cell.getStringCellValue();
                 cell = row.getCell(3);
                 String fullName = cell.getStringCellValue();
+                System.out.println(i + " Fullname " + fullName);
                 cell = row.getCell(4);
                 String studentCode = cell.getStringCellValue();
+                System.out.println(i + " MSSV " + studentCode);
                 lst.add(new ExamAccount(examUserLogin,examPassword,email,fullName,studentCode));
 
             }
@@ -147,7 +149,7 @@ public class PDFCreator {
                 contentStream.close();
 
             }
-            document.save(dir + "tai-khoan-exam-HiepHV.pdf");
+            document.save(dir + "tai-khoan-exam.pdf");
             document.close();
         }catch (Exception e){
             e.printStackTrace();

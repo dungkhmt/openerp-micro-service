@@ -12,6 +12,7 @@ import EditTestCase from "component/education/programmingcontestFE/EditTestCase"
 import ListContestManager from "component/education/programmingcontestFE/ListContestManager";
 import ListProblemV2 from "component/education/programmingcontestFE/ListProblemV2";
 import ManagerViewProblemDetailV2 from "component/education/programmingcontestFE/ManagerViewProblemDetailV2";
+import ManagerViewProblemDetailAndSubmisionsInContest from "component/education/programmingcontestFE/ManagerViewProblemDetailAndSubmisionsInContest";
 import { StudentContestNotRegistered } from "component/education/programmingcontestFE/StudentContestNotRegistered";
 import StudentViewContestDetail from "component/education/programmingcontestFE/StudentViewContestDetail";
 import StudentViewProgrammingContestProblemDetailV2 from "component/education/programmingcontestFE/StudentViewProgrammingContestProblemDetailV2";
@@ -89,6 +90,11 @@ export default function ProgrammingContestRoutes() {
           component={ContestManager}
           path={`${path}/contest-manager/:contestId`}
         />
+        <Route
+          component={ManagerViewProblemDetailAndSubmisionsInContest}
+          path={`${path}/contest-manager-view-problem/:contestId/:problemId`}
+        />
+        
         <Route
           component={EditContest}
           path={`${path}/contest-edit/:contestId`}

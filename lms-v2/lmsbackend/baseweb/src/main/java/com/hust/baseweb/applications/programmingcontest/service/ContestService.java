@@ -2,8 +2,9 @@ package com.hust.baseweb.applications.programmingcontest.service;
 
 import com.hust.baseweb.applications.programmingcontest.entity.ContestEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestProblem;
-import com.hust.baseweb.applications.programmingcontest.model.ModelGetContestDetailResponse;
-import com.hust.baseweb.applications.programmingcontest.model.ModelGetProblemDetailResponse;
+import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
+import com.hust.baseweb.applications.programmingcontest.entity.UserRegistrationContestEntity;
+import com.hust.baseweb.applications.programmingcontest.model.*;
 import com.hust.baseweb.applications.programmingcontest.repo.ContestProblemRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.ContestRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.ContestSubmissionRepo;
@@ -15,10 +16,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -153,5 +151,112 @@ public class ContestService {
     public String getProblemNameInContest(String contestId, String problemId) {
         ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(contestId, problemId);
         return cp != null ? cp.getProblemRename() : null;
+    }
+
+    public int mapNewProblemToSubmissionsInContest(ModelInputMapNewProblemToSubmissionsInContest m){
+        List<ContestSubmissionEntity> L = contestSubmissionRepo.findAllByContestIdAndProblemId(m.getContestId(),m.getProblemId());
+        for(ContestSubmissionEntity sub: L){
+            sub.setProblemId(
+                m.getNewProblemId()
+            );
+            sub = contestSubmissionRepo.save(sub);
+        }
+        return L.size();
+    }
+    @Transactional
+    public ModelGetContestResponse cloneContest(String userId, ModelInputCloneContest m){
+        ContestEntity fromContest = contestRepo.findContestByContestId(m.getFromContestId());
+        if(fromContest == null) return null;
+
+        ContestEntity contest = ContestEntity.builder()
+            .contestId(m.getToContestId())
+            .contestName(m.getToContestName())
+            .contestPublic(fromContest.getContestPublic())
+            .contestType(fromContest.getContestType())
+            .contestSolvingTime(fromContest.getContestSolvingTime())
+            .sendConfirmEmailUponSubmission(fromContest.getSendConfirmEmailUponSubmission())
+            .languagesAllowed(fromContest.getLanguagesAllowed())
+            .endTime(fromContest.getEndTime())
+            .createdAt(new Date())
+            .judgeMode(fromContest.getJudgeMode())
+            .contestShowTag(fromContest.getContestShowTag())
+            .countDown(fromContest.getCountDown())
+            .contestShowComment(fromContest.getContestShowComment())
+            .participantViewSubmissionMode(fromContest.getParticipantViewSubmissionMode())
+            .maxNumberSubmissions(fromContest.getMaxNumberSubmissions())
+            .problems(fromContest.getProblems())
+            .userId(userId)
+            .evaluateBothPublicPrivateTestcase(fromContest.getEvaluateBothPublicPrivateTestcase())
+            .maxSourceCodeLength(fromContest.getMaxSourceCodeLength())
+            .minTimeBetweenTwoSubmissions(fromContest.getMinTimeBetweenTwoSubmissions())
+            .problemDescriptionViewType(fromContest.getProblemDescriptionViewType())
+            .statusId(ContestEntity.CONTEST_STATUS_CREATED)
+            .submissionActionType(fromContest.getSubmissionActionType())
+            .build();
+
+        contest = contestRepo.save(contest);
+
+        // clone problems in contest
+        List<ContestProblem> problems = contestProblemRepo.findAllByContestId(m.getFromContestId());
+        for(ContestProblem p: problems){
+            ContestProblem cp = ContestProblem.builder()
+                .contestId(m.getToContestId())
+                .forbiddenInstructions(p.getForbiddenInstructions())
+                .problemId(p.getProblemId())
+                .problemRecode(p.getProblemRecode())
+                .problemRename(p.getProblemRename())
+                .submissionMode(p.getSubmissionMode())
+                                              .build();
+            cp = contestProblemRepo.save(cp);
+        }
+
+        // clone submissions
+        List<ContestSubmissionEntity> submissions = contestSubmissionRepo.findAllByContestId(m.getFromContestId());
+        for(ContestSubmissionEntity sub: submissions){
+            ContestSubmissionEntity cloneSub = ContestSubmissionEntity.builder()
+                .contestId(m.getToContestId())
+                .point(sub.getPoint())
+                .runtime(sub.getRuntime())
+                .memoryUsage(sub.getMemoryUsage())
+                .message(sub.getMessage())
+                .problemId(sub.getProblemId())
+                .sourceCode(sub.getSourceCode())
+                .memoryUsage(sub.getMemoryUsage())
+                .sourceCodeLanguage(sub.getSourceCodeLanguage())
+                .submittedByUserId(sub.getSubmittedByUserId())
+                .testCasePass(sub.getTestCasePass())
+                .managementStatus(sub.getManagementStatus())
+                .status(sub.getStatus())
+                .userId(sub.getUserId())
+                .submittedByUserId(sub.getSubmittedByUserId())
+                .violateForbiddenInstruction(sub.getViolateForbiddenInstruction())
+                .violateForbiddenInstructionMessage(sub.getViolateForbiddenInstructionMessage())
+                .createdAt(sub.getCreatedAt())
+                                                                      .build();
+            cloneSub = contestSubmissionRepo.save(cloneSub);
+        }
+
+        // clone contest user roles, table user_registration_contest_new
+        List<UserRegistrationContestEntity> userRegis = userRegistrationContestRepo.findAllByContestId(m.getFromContestId());
+        for(UserRegistrationContestEntity u: userRegis){
+            UserRegistrationContestEntity ure = UserRegistrationContestEntity.builder()
+                .contestId(m.getToContestId())
+                .fullname(u.getFullname())
+                .roleId(u.getRoleId())
+                .status(u.getStatus())
+                .createdStamp(u.getCreatedStamp())
+                .lastUpdated(u.getLastUpdated())
+                .permissionId(u.getPermissionId())
+                .userId(u.getUserId())
+                .updatedByUserLogin_id(u.getUpdatedByUserLogin_id())
+                .build();
+            ure = userRegistrationContestRepo.save(ure);
+        }
+
+
+        ModelGetContestResponse res = ModelGetContestResponse.builder()
+            .contestId(contest.getContestId())
+            .build();
+        return res;
     }
 }
