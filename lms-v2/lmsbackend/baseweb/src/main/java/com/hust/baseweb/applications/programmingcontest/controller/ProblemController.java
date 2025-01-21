@@ -86,6 +86,7 @@ public class ProblemController {
 
     @Async
     public void logManagerGetProblemDetail(String userId, String problemId){
+        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logManagerGetProblemDetail, userId = " + logM.getUserId());

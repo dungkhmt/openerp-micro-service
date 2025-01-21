@@ -141,6 +141,7 @@ public class SubmissionController {
 
     @Async
     public void logTeacherViewDetailSubmissionOfStudentContest(String userId, String contestId, String problemId, String studentId, UUID submissionId){
+        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logTeacherViewDetailSubmissionOfStudentContest, userId = " + logM.getUserId());
@@ -197,7 +198,7 @@ public class SubmissionController {
         ContestSubmissionEntity sub = problemTestCaseService.updateContestSubmissionSourceCode(input);
         return ResponseEntity.ok().body(sub);
     }
-
+    @Secured("ROLE_TEACHER")
     @PostMapping("/submissions/{submissionId}/evaluation")
     public ResponseEntity<?> evaluateSubmission(@PathVariable UUID submissionId) {
         problemTestCaseService.evaluateSubmission(submissionId);
@@ -281,7 +282,9 @@ public class SubmissionController {
     @Async
     public void logStudentSubmitToAContest(String userId, String contestId,
                                            ModelContestSubmitProgramViaUploadFile model){
+        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
+
         logM.setUserId(userId);
         log.info("logStudentSubmitToAContest, userId = " + logM.getUserId());
         logM.setParam1(contestId);

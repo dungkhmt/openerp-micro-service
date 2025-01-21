@@ -128,6 +128,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     private ContestProblemExportService exporter;
 
     private ContestUserParticipantGroupRepo contestUserParticipantGroupRepo;
+    private UserRegistrationContestService userRegistrationContestService;
 
     private Judge0Service judge0Service;
 
@@ -1499,9 +1500,13 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                             " does not have privilege to manage contest " +
                                             modelTeacherManageStudentRegisterContest.getContestId());
         }
-        UserRegistrationContestEntity userRegistrationContestEntity = userRegistrationContestRepo.findUserRegistrationContestEntityByContestIdAndUserId(
+        List<UserRegistrationContestEntity> userRegistrationContestEntities = userRegistrationContestRepo.findUserRegistrationContestEntityByContestIdAndUserId(
             modelTeacherManageStudentRegisterContest.getContestId(),
             modelTeacherManageStudentRegisterContest.getUserId());
+
+        UserRegistrationContestEntity userRegistrationContestEntity = null;
+        if(userRegistrationContestEntities != null && userRegistrationContestEntities.size() > 0)
+            userRegistrationContestEntity= userRegistrationContestEntities.get(0);
 
         if (Constants.RegisterCourseStatus.SUCCESSES
             .getValue()
@@ -1966,7 +1971,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 System.out.println("RANKING, nbProblem = " + nbProblems + " total percent = " + totalPercentage);
             }
 
-            contestSubmission.setFullname(userService.getUserFullName(userId));
+            //contestSubmission.setFullname(userService.getUserFullName(userId));
+            contestSubmission.setFullname(getUserFullNameOfContest(contestId,userId));
             contestSubmission.setMapProblemsToPoints(mapProblemsToPoints);
             contestSubmission.setTotalPoint(totalPoint);
             contestSubmission.setTotalPercentagePoint(totalPercentage);
@@ -2078,6 +2084,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                                           .userId(modelAddUserToContest.getUserId())
                                                                           .status(Constants.RegistrationType.SUCCESSFUL.getValue())
                                                                           .roleId(modelAddUserToContest.getRole())
+                                                                            .fullname(modelAddUserToContest.getFullname())
                                                                           .permissionId(UserRegistrationContestEntity.PERMISSION_SUBMIT)
                                                                           .build());
         } else {
@@ -2086,6 +2093,37 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         }
         response.setStatus("Successful");
         return response;
+    }
+
+    @Override
+    public ModelAddUserToContestResponse updateUserFullnameOfContest(ModelAddUserToContest modelAddUserToContest) {
+        String contestId = modelAddUserToContest.getContestId();
+        String userId = modelAddUserToContest.getUserId();
+        String role = modelAddUserToContest.getRole();
+        String fullname = modelAddUserToContest.getFullname();
+
+        ModelAddUserToContestResponse response = new ModelAddUserToContestResponse();
+        response.setUserId(userId);
+        response.setRoleId(role);
+        response.setFullname(fullname);
+
+        if (userLoginRepo.findByUserLoginId(userId) == null) {
+            response.setStatus("User not found");
+            return response;
+        }
+
+        List<UserRegistrationContestEntity> userRegistrationContests = userRegistrationContestRepo
+            .findUserRegistrationContestEntityByContestIdAndUserId(contestId, userId);
+        if(userRegistrationContests != null){
+            for(UserRegistrationContestEntity u: userRegistrationContests){
+                u.setFullname(modelAddUserToContest.getFullname());
+                u = userRegistrationContestRepo.save(u);
+            }
+        }
+
+        response.setStatus("Successful");
+        return response;
+
     }
 
     @Transactional
@@ -2097,7 +2135,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             .forEach(userId -> addUserToContest(new ModelAddUserToContest(
                 contestId,
                 userId,
-                addUsers2Contest.getRole())));
+                addUsers2Contest.getRole(),"")));
     }
 
     @Override
@@ -2136,9 +2174,13 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
     @Override
     public void deleteUserContest(ModelAddUserToContest modelAddUserToContest) throws MiniLeetCodeException {
-        UserRegistrationContestEntity userRegistrationContest = userRegistrationContestRepo.findUserRegistrationContestEntityByContestIdAndUserId(
+        //UserRegistrationContestEntity userRegistrationContest = userRegistrationContestRepo.findUserRegistrationContestEntityByContestIdAndUserId(
+        //    modelAddUserToContest.getContestId(),
+        //    modelAddUserToContest.getUserId());
+        UserRegistrationContestEntity userRegistrationContest = userRegistrationContestRepo.findUserRegistrationContestEntityByContestIdAndUserIdAndRoleId(
             modelAddUserToContest.getContestId(),
-            modelAddUserToContest.getUserId());
+            modelAddUserToContest.getUserId(),modelAddUserToContest.getRole());
+
         if (userRegistrationContest == null) {
             throw new MiniLeetCodeException("user not register contest");
         }
@@ -2268,6 +2310,11 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         return retList;
     }
 
+    private String getUserFullNameOfContest(String contestId, String userId){
+        String fullname = userRegistrationContestService.findUserFullnameOfContest(contestId,userId);
+        if(fullname == null) fullname = userService.getUserFullName(userId);
+        return fullname;
+    }
     @Override
     public Page<ContestSubmission> findContestSubmissionByContestIdPaging(
         Pageable pageable,
@@ -2300,7 +2347,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 .violationForbiddenInstructionMessage(contestSubmissionEntity.getViolateForbiddenInstructionMessage())
                 .message(contestSubmissionEntity.getMessage())
                 .userId(contestSubmissionEntity.getUserId())
-                .fullname(userService.getUserFullName(contestSubmissionEntity.getUserId()))
+                //.fullname(userService.getUserFullName(contestSubmissionEntity.getUserId()))
+                //.fullname(userRegistrationContestService.findUserFullnameOfContest(contestId,contestSubmissionEntity.getUserId()))
+                .fullname(getUserFullNameOfContest(contestId,contestSubmissionEntity.getUserId()))
                 .build());
     }
 

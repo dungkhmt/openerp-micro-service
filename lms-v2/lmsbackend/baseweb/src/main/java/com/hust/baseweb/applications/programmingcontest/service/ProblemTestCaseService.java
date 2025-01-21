@@ -161,6 +161,8 @@ public interface ProblemTestCaseService {
 
     ModelAddUserToContestResponse addUserToContest(ModelAddUserToContest modelAddUserToContest);
 
+    ModelAddUserToContestResponse updateUserFullnameOfContest(ModelAddUserToContest modelAddUserToContest);
+
     void addUsers2ToContest(String contestId, AddUsers2Contest addUsers2Contest);
 
     ModelAddUserToContestGroupResponse addUserToContestGroup(ModelAddUserToContestGroup modelAddUserToContestGroup);
