@@ -21,21 +21,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>itextpdf</artifactId>
-            <version>5.5.13.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>pdfbox</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk18on</artifactId>
-            <version>1.76</version>
-        </dependency>
-        <dependency>
             <groupId>vn.edu.hust.soict</groupId>
             <artifactId>judge0-client</artifactId>
             <version>0.0.1</version>
@@ -345,11 +330,6 @@
             <artifactId>docker-client</artifactId>
             <version>8.15.2</version>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>org.apache.pdfbox</groupId>-->
-        <!--            <artifactId>pdfbox</artifactId>-->
-        <!--            <version>1.8.3</version>-->
-        <!--        </dependency>-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
