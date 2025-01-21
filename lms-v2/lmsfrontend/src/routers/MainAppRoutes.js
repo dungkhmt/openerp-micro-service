@@ -68,7 +68,6 @@ function MainAppRoute(props) {
 
           <PrivateRoute component={AdminRoute} path="/admin/data" />
           <PrivateRoute component={ExamRoute} path="/exam" />
-          {/*<PrivateRoute component={AccountActivationRoute} path="/activation" />*/}
           <PrivateRoute
             component={ProgrammingContestRoutes}
             path="/programming-contest"
