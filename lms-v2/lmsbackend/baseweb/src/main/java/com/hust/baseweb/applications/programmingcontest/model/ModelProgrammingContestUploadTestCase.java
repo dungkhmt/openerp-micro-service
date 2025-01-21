@@ -1,20 +1,32 @@
 package com.hust.baseweb.applications.programmingcontest.model;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
+import lombok.experimental.FieldDefaults;
 
-@Getter
-@Setter
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+@Data
 @AllArgsConstructor
-@NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ModelProgrammingContestUploadTestCase {
 
+    @NotBlank
     private String problemId;
-    private String isPublic;
+
+    @NotNull
+    private Boolean isPublic;
+
+    @Min(1)
     private int point;
+
     private String correctAnswer;
+
     private String description;
-    private String uploadMode;
+
+    @NotNull
+    private TestcaseUploadMode uploadMode;
 }

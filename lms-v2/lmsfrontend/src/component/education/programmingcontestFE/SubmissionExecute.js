@@ -59,7 +59,7 @@
 //   const status = props.status;
 //   const statusContent = props.statusContent;
 //   const getSeverity = (s) => {
-//     if (s == "Accept") {
+//     if (s == "Accepted") {
 //       return "success";
 //     } else if (s == "Wrong Answer") {
 //       return "warning";

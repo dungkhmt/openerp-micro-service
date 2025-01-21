@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class ContestService {
@@ -97,7 +98,7 @@ public class ContestService {
                                                                                .forbiddenInstructions(forbiddenInstructions)
                                                                                .levelOrder(contestProblem.getLevelOrder())
                                                                                .problemDescription(contestProblem.getProblemDescription())
-                                                                               .createdByUserId(contestProblem.getUserId())
+                                                                               .createdByUserId(contestProblem.getCreatedBy())
                                                                                .submissionMode(submissionMode)
                                                                                .build();
 

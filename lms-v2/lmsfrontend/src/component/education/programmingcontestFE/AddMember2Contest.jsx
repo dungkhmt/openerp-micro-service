@@ -1,5 +1,5 @@
 //import { makeStyles } from "@mui/styles"; //"@material-ui/core/styles";
-import { makeStyles } from "@material-ui/core/styles";
+import {makeStyles} from "@material-ui/core/styles";
 import {
   Autocomplete,
   Avatar,
@@ -11,16 +11,16 @@ import {
   TextField,
   Tooltip,
 } from "@mui/material";
-import { autocompleteClasses } from "@mui/material/Autocomplete";
-import { styled } from "@mui/material/styles";
-import { debounce } from "@mui/material/utils";
-import { request } from "api";
+import {autocompleteClasses} from "@mui/material/Autocomplete";
+import {styled} from "@mui/material/styles";
+import {debounce} from "@mui/material/utils";
+import {request} from "api";
 import PrimaryButton from "component/button/PrimaryButton";
 import StyledSelect from "component/select/StyledSelect";
-import { getTextAvatar } from "layout/account/AccountButton";
-import { isEmpty, trim } from "lodash";
-import { useEffect, useMemo, useState } from "react";
-import { successNoti } from "utils/notification";
+import {getTextAvatar} from "layout/account/AccountButton";
+import {isEmpty, trim} from "lodash";
+import {useEffect, useMemo, useState} from "react";
+import {successNoti} from "utils/notification";
 import UploadUserToContestDialog from "./UploadUserToContestDialog";
 import UploadUserUpdateFullNameContestDialog from "./UploadUserUpdateFullNameContestDialog";
 
@@ -79,7 +79,7 @@ const StyledAutocompletePopper = styled(Popper)(({ theme }) => ({
   },
 }));
 
-function PopperComponent(props) {
+export function PopperComponent(props) {
   // console.log(props);
   // const { disablePortal, anchorEl, open, ...other } = props;
   return <StyledAutocompletePopper {...props} />;

@@ -1,9 +1,13 @@
 package com.hust.baseweb.applications.programmingcontest.entity;
 
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -13,6 +17,7 @@ import java.util.UUID;
 @Entity
 @Builder
 @Table(name = "test_case_new")
+@EntityListeners(AuditingEntityListener.class)
 public class TestCaseEntity implements Serializable {
     private static final long serialVersionUID = 3487495895819801L;
 
@@ -45,27 +50,12 @@ public class TestCaseEntity implements Serializable {
     @Column(name = "status_id")
     private String statusId;
 
-    public String getTestCaseShort(int sz) {
-        String res = "";
-        if (sz > testCase.length()) {
-            sz = testCase.length();
-        }
-        for (int i = 0; i < sz; i++) {
-            res += testCase.charAt(i);
-        }
-        return res;
-    }
+    @LastModifiedDate
+    private Date lastUpdatedStamp;
 
-    public String getCorrectAnswerShort(int sz) {
-        String res = "";
-        if (sz > correctAnswer.length()) {
-            sz = correctAnswer.length();
-        }
-        for (int i = 0; i < sz; i++) {
-            res += correctAnswer.charAt(i);
-        }
-        return res;
-    }
+    @CreatedDate
+    private Date createdStamp;
+
 //    @JoinColumn(name = "contest_problem_id", referencedColumnName = "problem_id")
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    private ProblemEntity problem;

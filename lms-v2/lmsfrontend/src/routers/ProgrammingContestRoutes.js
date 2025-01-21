@@ -1,7 +1,8 @@
 import AllContestsManager from "component/education/programmingcontestFE/AllContestsManager";
 import ContestManager from "component/education/programmingcontestFE/ContestManager";
 import ContestProblemSubmissionDetail from "component/education/programmingcontestFE/ContestProblemSubmissionDetail";
-import ContestProblemSubmissionDetailViewedByManager from "component/education/programmingcontestFE/ContestProblemSubmissionDetailViewedByManager";
+import ContestProblemSubmissionDetailViewedByManager
+  from "component/education/programmingcontestFE/ContestProblemSubmissionDetailViewedByManager";
 import ContestStudentList from "component/education/programmingcontestFE/ContestStudentList";
 import CreateContest from "component/education/programmingcontestFE/CreateContest";
 import CreateProblem from "component/education/programmingcontestFE/CreateProblem";
@@ -15,11 +16,11 @@ import ManagerViewProblemDetailV2 from "component/education/programmingcontestFE
 import ManagerViewProblemDetailAndSubmisionsInContest from "component/education/programmingcontestFE/ManagerViewProblemDetailAndSubmisionsInContest";
 import { StudentContestNotRegistered } from "component/education/programmingcontestFE/StudentContestNotRegistered";
 import StudentViewContestDetail from "component/education/programmingcontestFE/StudentViewContestDetail";
-import StudentViewProgrammingContestProblemDetailV2 from "component/education/programmingcontestFE/StudentViewProgrammingContestProblemDetailV2";
-import SubmitSolutionOutput from "component/education/programmingcontestFE/SubmitSolutionOutput";
+import StudentViewProgrammingContestProblemDetailV2
+  from "component/education/programmingcontestFE/StudentViewProgrammingContestProblemDetailV2";
 import SuggestProblem from "component/education/programmingcontestFE/SuggestProblem";
 import UserContestProblemRole from "component/education/programmingcontestFE/UserContestProblemRole";
-import { Route, Switch, useRouteMatch } from "react-router";
+import {Route, Switch, useRouteMatch} from "react-router";
 import ContestLibrarytList from "component/education/programmingcontestFE/ContestLibraryList"
 
 export default function ProgrammingContestRoutes() {
@@ -60,10 +61,10 @@ export default function ProgrammingContestRoutes() {
           path={`${path}/manager-view-problem-detail/:problemId`}
         />
 
-        <Route
-          component={SubmitSolutionOutput}
-          path={`${path}/submit-solution-output/:contestId/:problemId/:testCaseId`}
-        />
+        {/*<Route*/}
+        {/*  component={SubmitSolutionOutput}*/}
+        {/*  path={`${path}/submit-solution-output/:contestId/:problemId/:testCaseId`}*/}
+        {/*/>*/}
 
         <Route
           component={StudentContestNotRegistered}

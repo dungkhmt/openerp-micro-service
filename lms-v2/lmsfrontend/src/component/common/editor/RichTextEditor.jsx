@@ -38,14 +38,14 @@ export default function RichTextEditor(props) {
       onEditorStateChange={updateBindingContentOnEditorStateChange}
       toolbarStyle={props.editorStyle.toolbar}
       editorStyle={props.editorStyle.editor}
-      placeholder={"Enter your text"}
+      readOnly={props.readOnly}
     />
   );
 }
 
 RichTextEditor.propTypes = {
   content: PropTypes.string.isRequired,
-  onContentChange: PropTypes.func.isRequired,
+  // onContentChange: PropTypes.func.isRequired,
   editorStyle: PropTypes.object
 }
 

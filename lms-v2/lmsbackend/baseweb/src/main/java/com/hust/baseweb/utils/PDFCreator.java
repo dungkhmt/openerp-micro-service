@@ -1,5 +1,5 @@
 package com.hust.baseweb.utils;
-
+/*
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -14,7 +14,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.io.InputStream;
 import java.io.FileInputStream;
-
+*/
 class ExamAccount{
     public String examUserLogin;
     public String examPassword;
@@ -32,6 +32,7 @@ class ExamAccount{
 }
 public class PDFCreator {
     public static void main(String[] args){
+        /*
         try {
             String dir = "C:\\DungPQ\\teaching\\Applied-algorithms\\HK-2024-2025-1\\thi-cuoi-ky-IT3170E\\";
             InputStream inp = new FileInputStream(dir + "map-tai-khoan-thi-K4.xlsx");
@@ -136,14 +137,6 @@ public class PDFCreator {
                 //contentStream.drawString(fullName);
                 contentStream.drawString("MSSV: " + ea.studentCode);
                 contentStream.moveTextPositionByAmount(0, -leading);
-                /*
-                for (String line: lines)
-                {
-                    System.out.println("A line: " + line);
-                    contentStream.drawString(line);
-                    contentStream.moveTextPositionByAmount(0, -leading);
-                }
-                */
 
                 contentStream.endText();
                 contentStream.close();
@@ -154,5 +147,7 @@ public class PDFCreator {
         }catch (Exception e){
             e.printStackTrace();
         }
+
+         */
     }
 }

@@ -29,12 +29,16 @@ yarn-error.log*
 yarn.lock
 package-lock.json
 
-.history/
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### VS Code ###
 .vscode/
-.idea/
-/.idea/
+.history/
 /.ssh/
 *.bat
-.idea
 
 .prettierrc

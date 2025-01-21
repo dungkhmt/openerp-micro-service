@@ -1,11 +1,12 @@
 import InfoIcon from "@mui/icons-material/Info";
-import { CircularProgress, IconButton, LinearProgress } from "@mui/material";
+import {IconButton, LinearProgress} from "@mui/material";
 import Box from "@mui/material/Box";
-import { request } from "api";
-import { useEffect, useState } from "react";
-import { toFormattedDateTime } from "utils/dateutils";
+import {request} from "api";
+import {useEffect, useState} from "react";
+import {toFormattedDateTime} from "utils/dateutils";
 import StandardTable from "../../table/StandardTable";
-import { SubmissionTestCaseResultDetail } from "./SubmissionTestCaseResultDetail";
+import {SubmissionTestCaseResultDetail} from "./SubmissionTestCaseResultDetail";
+import {localeOption} from "../../../utils/NumberFormat";
 
 export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
   props
@@ -22,14 +23,12 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
   const [score, setScore] = useState(0);
 
   const columns = [
-    { title: "Point", field: "point" },
-    // {
-    //   title: "Runtime (ms)",
-    //   // align: "right",
-    //   cellStyle: { minWidth: 150 },
-    //   render: (rowData) =>
-    //     rowData.runtime.toLocaleString("fr-FR", localeOption),
-    // },
+    {
+      title: "Graded",
+      field: "graded",
+      align: 'center'
+    },
+    {title: "Point", field: "point", type: 'numeric'},
     {
       title: "Message",
       field: "message",
@@ -37,8 +36,18 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
       cellStyle: { minWidth: 200 },
     },
     {
-      title: "Graded",
-      field: "graded",
+      title: "Runtime (ms)",
+      type: 'numeric',
+      cellStyle: {minWidth: 150},
+      render: (rowData) =>
+        rowData.runtime?.toLocaleString("fr-FR", localeOption),
+    },
+    {
+      title: "Memory (MB)",
+      type: 'numeric',
+      cellStyle: {minWidth: 150},
+      render: (rowData) =>
+        rowData.memoryUsage ? (rowData.memoryUsage / 1024).toLocaleString("fr-FR", localeOption) : null,
     },
     {
       title: "Detail",
@@ -60,32 +69,32 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
         </IconButton>
       ),
     },
-    {
-      title: "",
-      render: (rowData) =>
-        rowData.viewSubmitSolutionOutputMode == "Y" ? (
-          <div>
-            {isProcessing ? <CircularProgress /> : ""}
-            <button
-              color="primary"
-              type="submit"
-              //onChange={onInputChange}
-              onClick={() => handleFormSubmit(event, rowData.testCaseId)}
-              width="100%"
-            >
-              UPLOAD
-            </button>
-
-            <input
-              type="file"
-              id="selected-upload-file"
-              onChange={() => onFileChange(event, rowData.testCaseId)}
-            />
-          </div>
-        ) : (
-          ""
-        ),
-    },
+    // {
+    //   title: "",
+    //   render: (rowData) =>
+    //     rowData.viewSubmitSolutionOutputMode == "Y" ? (
+    //       <div>
+    //         {isProcessing ? <CircularProgress /> : ""}
+    //         <button
+    //           color="primary"
+    //           type="submit"
+    //           //onChange={onInputChange}
+    //           onClick={() => handleFormSubmit(event, rowData.testCaseId)}
+    //           width="100%"
+    //         >
+    //           UPLOAD
+    //         </button>
+    //
+    //         <input
+    //           type="file"
+    //           id="selected-upload-file"
+    //           onChange={() => onFileChange(event, rowData.testCaseId)}
+    //         />
+    //       </div>
+    //     ) : (
+    //       ""
+    //     ),
+    // },
   ];
 
   function handleFormSubmit(event, testCaseId) {

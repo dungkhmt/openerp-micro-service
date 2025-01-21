@@ -1,4 +1,4 @@
-name: lms-ui Image CI
+name: lms-ui-v2 Image CI
 
 on:
   push:
