@@ -17,7 +17,7 @@ COPY src src
 COPY --from=leanhtuan/judge0-client:latest /root/.m2/repository/vn /root/.m2/repository/vn
 RUN rm -f /root/.m2/repository/vn/edu/hust/soict/judge0-client/0.0.1/_remote.repositories
 
-RUN --mount=type=cache,target=/root/.m2 ./mvnw install -DskipTests
+RUN ./mvnw install -DskipTests
 
 # Unpack Spring Boot fat JAR
 RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
