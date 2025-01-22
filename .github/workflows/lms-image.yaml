@@ -1,48 +1,48 @@
-name: lms Image CI
-
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - "lms/lmsbackend/baseweb/**"
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Create file appication.yml
-        uses: timheuer/base64-to-file@v1.1
-        with:
-          fileName: "application.yml"
-          fileDir: "./lms/lmsbackend/baseweb/src/main/resources/"
-          encodedString: ${{ secrets.LMS_B64_SECRET }}
-      - name: Construct tag
-        id: construct-tag
-        run: |
-          TAG_NAME=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')-${{ github.sha }}
-          echo "::set-output name=TAG_NAME::$TAG_NAME"
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: ./lms/lmsbackend/baseweb
-#          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/lms:${{ steps.construct-tag.outputs.TAG_NAME }}
-            ${{ secrets.DOCKER_USERNAME }}/lms:latest
-          cache-from: type=gha,scope=$GITHUB_REF_NAME-lms
-          cache-to: type=gha,mode=max,scope=$GITHUB_REF_NAME-lms
-      - name: Remove config file
-        uses: JesseTG/rm@v1.0.2
-        with:
-          path: "./lms/lmsbackend/baseweb/src/main/resources/application.yml"
+#name: lms Image CI
+#
+#on:
+#  push:
+#    branches:
+#      - main
+#    paths:
+#      - "lms/lmsbackend/baseweb/**"
+#
+#jobs:
+#  build:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v3
+#      - name: Login to Docker Hub
+#        uses: docker/login-action@v3
+#        with:
+#          username: ${{ secrets.DOCKER_USERNAME }}
+#          password: ${{ secrets.DOCKER_PASSWORD }}
+#      - name: Create file appication.yml
+#        uses: timheuer/base64-to-file@v1.1
+#        with:
+#          fileName: "application.yml"
+#          fileDir: "./lms/lmsbackend/baseweb/src/main/resources/"
+#          encodedString: ${{ secrets.LMS_B64_SECRET }}
+#      - name: Construct tag
+#        id: construct-tag
+#        run: |
+#          TAG_NAME=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')-${{ github.sha }}
+#          echo "::set-output name=TAG_NAME::$TAG_NAME"
+#      - name: Build and push
+#        uses: docker/build-push-action@v5
+#        with:
+#          context: ./lms/lmsbackend/baseweb
+##          platforms: linux/amd64,linux/arm64
+#          push: true
+#          tags: |
+#            ${{ secrets.DOCKER_USERNAME }}/lms:${{ steps.construct-tag.outputs.TAG_NAME }}
+#            ${{ secrets.DOCKER_USERNAME }}/lms:latest
+#          cache-from: type=gha,scope=$GITHUB_REF_NAME-lms
+#          cache-to: type=gha,mode=max,scope=$GITHUB_REF_NAME-lms
+#      - name: Remove config file
+#        uses: JesseTG/rm@v1.0.2
+#        with:
+#          path: "./lms/lmsbackend/baseweb/src/main/resources/application.yml"
