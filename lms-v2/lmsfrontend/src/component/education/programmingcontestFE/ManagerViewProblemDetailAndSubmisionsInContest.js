@@ -9,7 +9,8 @@ import StandardTable from "../../table/StandardTable";
 import { RejudgeButton } from "./RejudgeButton";
 import { getStatusColor } from "./lib";
 //import { Box, IconButton, Tooltip, LinearProgress } from "@mui/material";
-
+import {useTranslation} from "react-i18next";
+import RichTextEditor from "../../common/editor/RichTextEditor";
 import { Box, Tooltip, LinearProgress,
     Dialog,
     DialogTitle,
@@ -30,6 +31,12 @@ export default function ManagerViewProblemDetailAndSubmisionsInContest(props) {
   const [newProblemId, setNewProblemId] = useState(null);  
   const [openMapNewProblemDialog, setOpenMapNewProblemDialog] = useState(false);  
   const [errorMessage, setErrorMessage] = useState("");
+
+   const {t} = useTranslation([
+      "education/programmingcontest/problem",
+      "common",
+      "validation",
+    ]);
 
   const columns = [
     {
@@ -169,6 +176,40 @@ export default function ManagerViewProblemDetailAndSubmisionsInContest(props) {
     );
 };
 
+const handleRejudge = () => {
+
+
+  const body = {
+      contestId: contestId,
+      problemId: problemId,
+  
+  };
+
+  request(
+      "post", 
+      "/submissions-of-a-problem-in-contest/rejudge",
+      (res) => { 
+          //handleMapNewProblemDialogClose();
+          //history.push("/programming-contest/contest-manager/"+newContestId);
+      },
+      {
+          onError: (error) => {
+              setErrorMessage("Failed to rejudge submissions. Please try again.");
+              console.error("Error cloning problem:", error);
+          },
+          400: (error) => {
+              setErrorMessage("400 Invalid request. Please check your input.");
+          },
+          404: (error) => {
+              setErrorMessage("404 not found.");
+          },
+          500: (error) => {
+            setErrorMessage("Error 500");
+        },
+      },
+      body 
+  );
+};
 
   useEffect(() => {
     getProblemDetail();
@@ -181,16 +222,29 @@ export default function ManagerViewProblemDetailAndSubmisionsInContest(props) {
       <PrimaryButton onClick={handleMapNewProblemDialogOpen}>
         Map New Problem
       </PrimaryButton>
+      <PrimaryButton onClick={handleRejudge}>
+        Rejudge
+      </PrimaryButton>
+      
       <div>
       {contestId}:{problemId}
       </div>
       <div>
-        Problem Description:
-        {problemDescription}
+        
+        <Box sx={{marginTop: "24px", marginBottom: "24px"}}>
+                <Typography variant="h6" sx={{marginBottom: "8px"}}>
+                  {t("problemDescription")}
+                </Typography>
+                <RichTextEditor
+                  toolbarHidden
+                  content={problemDescription}
+                  readOnly
+                />
+              </Box>
+        
       </div>
       <div>
-        Source Code:
-        {solutionCode}
+     
       </div>
       <StandardTable
               title={"Submissions"}

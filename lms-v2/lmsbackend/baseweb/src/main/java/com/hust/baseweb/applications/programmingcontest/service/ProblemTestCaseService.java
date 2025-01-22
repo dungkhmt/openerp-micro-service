@@ -219,6 +219,8 @@ public interface ProblemTestCaseService {
     ModelEvaluateBatchSubmissionResponse judgeAllSubmissionsOfContest(String contestId);
 
     void evaluateSubmission(UUID submisionId);
+    void evaluateSubmissions(String contestId, String problemId);
+
 
     void evaluateSubmission(ContestSubmissionEntity sub, ContestEntity contest);
 
