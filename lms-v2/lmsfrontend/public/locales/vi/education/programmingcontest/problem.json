@@ -1,7 +1,7 @@
 {
   "problem": "Bài tập",
   "problemList": "Danh sách bài tập",
-  "problemId": "Mã bài tập",
+  "problemId": "ID",
   "problemName": "Tên bài tập",
   "level": "Mức độ",
   "timeLimit": "Giới hạn thời gian",
@@ -32,7 +32,7 @@
   "medium": "Trung bình",
   "hard": "Khó",
   "solution": "Lời giải",
-  "appearances": "Số contest sử dụng",
+  "appearances": "Số cuộc thi sử dụng",
   "contestUsingProblem": "Cuộc thi sử dụng bài tập",
   "addTestCase": "Thêm Test Case",
   "sampleTestCase": "Test Case mẫu",
