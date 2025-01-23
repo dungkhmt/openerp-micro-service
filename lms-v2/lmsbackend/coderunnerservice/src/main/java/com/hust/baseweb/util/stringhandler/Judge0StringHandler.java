@@ -58,9 +58,9 @@ public class Judge0StringHandler {
 
                 if (testcaseEvaluationResult.getMemory() > testcaseEvaluationResult.getMemoryLimit()) { // Chỉ phát hiện trường hợp tổng bộ nhớ quá giới hạn
                     status = ContestSubmissionEntity.SUBMISSION_STATUS_MEMORY_LIMIT_EXCEEDED;
-                } else if (output.contains(Constants.TestCaseSubmissionError.MEMORY_ERROR.getValue())) {
+                } else if (output != null && output.contains(Constants.TestCaseSubmissionError.MEMORY_ERROR.getValue())) {
                     status = ContestSubmissionEntity.SEGMENTATION_FAULT;
-                } else if (output.contains(Constants.TestCaseSubmissionError.FILE_LIMIT.getValue())) { // OK
+                } else if (output != null && output.contains(Constants.TestCaseSubmissionError.FILE_LIMIT.getValue())) { // OK
                     status = ContestSubmissionEntity.SUBMISSION_STATUS_OUTPUT_LIMIT_EXCEEDED;
                 } else {
                     status = testcaseEvaluationResult.getStatus().getDescription();
