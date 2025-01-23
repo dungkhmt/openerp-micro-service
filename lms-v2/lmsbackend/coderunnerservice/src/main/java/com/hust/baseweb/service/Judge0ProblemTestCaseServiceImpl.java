@@ -226,7 +226,7 @@ public class Judge0ProblemTestCaseServiceImpl implements ProblemTestCaseService 
                 .wallTimeLimit((float) (timeLimit * 1.0 + 10.0))
                 .memoryLimit((float) memoryLimit * 1024)
                 .stackLimit(judge0Config.getSubmission().getMaxStackLimit())
-                .maxProcessesAndOrThreads(languageId != 62 ? 2 : 20) // TODO: adjust this config for multi-thread program
+                .maxProcessesAndOrThreads(languageId != 62 ? 2 : 21) // TODO: adjust this config for multi-thread program
                 .enablePerProcessAndThreadTimeLimit(false)
                 .enablePerProcessAndThreadMemoryLimit(false)
                 .maxFileSize(judge0Config.getSubmission().getMaxMaxFileSize())
@@ -304,7 +304,7 @@ public class Judge0ProblemTestCaseServiceImpl implements ProblemTestCaseService 
                 .wallTimeLimit((float) (timeLimit * 1.0 + 10.0))
                 .memoryLimit((float) memoryLimit * 1024)
                 .stackLimit(judge0Config.getSubmission().getMaxStackLimit())
-                .maxProcessesAndOrThreads(languageId != 62 ? 2 : 20) // OK, chấm output thì không cần đa luồng, trừ Java
+                .maxProcessesAndOrThreads(languageId != 62 ? 2 : 21) // OK, chấm output thì không cần đa luồng, trừ Java
                 .enablePerProcessAndThreadTimeLimit(false)
                 .enablePerProcessAndThreadMemoryLimit(false)
                 .maxFileSize(judge0Config.getSubmission().getMaxMaxFileSize())
