@@ -1,11 +1,11 @@
 name: code-runner Image CI
 
-on: []
-#  push:
-#    branches:
-#      - main
-#    paths:
-#      - "lms/lmsbackend/coderunnerservice/**"
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "lms/lmsbackend/coderunnerservice/**"
 
 jobs:
   build:

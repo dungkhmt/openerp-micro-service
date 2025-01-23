@@ -1,11 +1,11 @@
 name: lms-ui Image CI
 
-on: []
-#  push:
-#    branches:
-#      - main
-#    paths:
-#      - "lms/lmsfrontend/**"
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "lms/lmsfrontend/**"
 
 env:
   NODE_OPTIONS: "--max-old-space-size=4096"

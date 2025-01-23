@@ -1,11 +1,11 @@
 name: lms Image CI
 
-on: []
-#  push:
-#    branches:
-#      - main
-#    paths:
-#      - "lms/lmsbackend/baseweb/**"
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "lms/lmsbackend/baseweb/**"
 
 jobs:
   build:
