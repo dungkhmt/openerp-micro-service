@@ -537,7 +537,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                                                      .getSubmission()
                                                                                      .getMaxMemoryLimit()))
                                                       .stackLimit(judge0Config.getSubmission().getMaxStackLimit())
-                                                      .maxProcessesAndOrThreads(languageId != 62 ? 2 : 18)
+                                                      .maxProcessesAndOrThreads(languageId != 62 ? 2 : 20)
                                                       .enablePerProcessAndThreadTimeLimit(false)
                                                       .enablePerProcessAndThreadMemoryLimit(false)
                                                       .maxFileSize(judge0Config.getSubmission().getMaxMaxFileSize())
@@ -2950,7 +2950,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 //                                                      .wallTimeLimit((float) (timeLimit * 1.0 + 10.0))
 //                                                      .memoryLimit((float) memoryLimit * 1024)
 //                                                      .stackLimit(judge0Config.getSubmission().getMaxStackLimit())
-//                                                      .maxProcessesAndOrThreads(languageId != 62 ? 2 : 18) // OK, chấm output thì không cần đa luồng, trừ Java
+//                                                      .maxProcessesAndOrThreads(languageId != 62 ? 2 : 20) // OK, chấm output thì không cần đa luồng, trừ Java
 //                                                      .enablePerProcessAndThreadTimeLimit(false)
 //                                                      .enablePerProcessAndThreadMemoryLimit(false)
 //                                                      .maxFileSize(judge0Config.getSubmission().getMaxMaxFileSize())
@@ -3027,7 +3027,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                                                       .wallTimeLimit((float) (timeLimit + 10.0))
                                                       .memoryLimit(memoryLimit * 1024)
                                                       .stackLimit(judge0Config.getSubmission().getMaxStackLimit())
-                                                      .maxProcessesAndOrThreads(languageId != 62 ? 2 : 18)
+                                                      .maxProcessesAndOrThreads(languageId != 62 ? 2 : 20)
                                                       .enablePerProcessAndThreadTimeLimit(false)
                                                       .enablePerProcessAndThreadMemoryLimit(false)
                                                       .maxFileSize(judge0Config.getSubmission().getMaxMaxFileSize())
