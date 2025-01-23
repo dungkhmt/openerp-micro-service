@@ -12,7 +12,7 @@ export default function ContestsUsingAProblem(props) {
   const [contests, setContests] = useState([]);
   const columns = [
     {
-      title: t("contestId"),
+      title: 'ID',
       field: "contestId",
       render: (rowData) => (
         <Link
