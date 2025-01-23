@@ -193,22 +193,22 @@ function MyExamDetails(props) {
   }, []);
   const onFocus = () => {
     console.log("Tab is in focus");
-    console.log("Ghi lại nội dung tab hiện tại:", document.documentURI, document.title);
   };
-  const onBlur = () => {
-    console.log("Tab is blurred");
-  };
+  // const onBlur = () => {
+  //   console.log("Tab is blurred");
+  // };
   const onVisibilitychange = () => {
-    console.log("Tab is visibilitychange");
+    console.log('document.visibilityState',document.visibilityState)
+    console.log("Ghi lại nội dung tab hiện tại:", document.documentURI, document.title);
   };
   const handleCheckingFocusTab = () => {
     window.addEventListener("focus", onFocus);
-    window.addEventListener("blur", onBlur);
+    // window.addEventListener("blur", onBlur);
     document.addEventListener("visibilitychange", onVisibilitychange);
     onFocus();
     return () => {
       window.removeEventListener("focus", onFocus);
-      window.removeEventListener("blur", onBlur);
+      // window.removeEventListener("blur", onBlur);
       document.removeEventListener("visibilitychange", onVisibilitychange);
     };
   }

@@ -6,9 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -181,7 +179,13 @@ public class DataUtils {
             return null;
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
-        return LocalDateTime.parse(value, formatter);
+        ZonedDateTime zonedDateTime = LocalDateTime.parse(value, formatter).atZone(ZoneOffset.UTC);
+        return zonedDateTime.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
+    }
+
+    public static LocalDateTime getTimeNowWithZone(){
+        ZonedDateTime zonedDateTime = LocalDateTime.now().atZone(ZoneOffset.UTC);
+        return zonedDateTime.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
     }
 
     public static boolean stringIsNotNullOrEmpty(String value){
