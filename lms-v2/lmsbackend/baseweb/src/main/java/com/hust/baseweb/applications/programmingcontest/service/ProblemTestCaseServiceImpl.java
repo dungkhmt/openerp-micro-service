@@ -2780,6 +2780,23 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
+    public void evaluateSubmissions(String contestId, String problemId) {
+        List<ContestSubmissionEntity> submissions = contestSubmissionRepo.findAllByContestIdAndProblemId(contestId, problemId);
+        if(submissions == null){
+            log.info("evaluateSubmissions, contest " + contestId + " problem " + problemId + " -> NO Submissions");
+            return;
+        }
+        log.info("evaluateSubmissions, contest " + contestId + " problem " + problemId + " nbSubmissions = " + submissions.size());
+        ContestEntity contest = contestService.findContestWithCache(contestId);
+
+        for(ContestSubmissionEntity sub: submissions){
+            log.info("evaluateSubmissions, contest " + contestId + " problem " + problemId + " submission " + sub.getContestSubmissionId());
+            evaluateSubmission(sub, contest);
+        }
+
+    }
+
+    @Override
     public void evaluateSubmissionUsingQueue(ContestSubmissionEntity submission, ContestEntity contest) {
         contestService.updateContestSubmissionStatus(
             submission.getContestSubmissionId(),

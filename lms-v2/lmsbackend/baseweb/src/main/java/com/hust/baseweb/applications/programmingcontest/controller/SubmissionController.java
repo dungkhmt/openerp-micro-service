@@ -198,10 +198,21 @@ public class SubmissionController {
         ContestSubmissionEntity sub = problemTestCaseService.updateContestSubmissionSourceCode(input);
         return ResponseEntity.ok().body(sub);
     }
+
     @Secured("ROLE_TEACHER")
     @PostMapping("/submissions/{submissionId}/evaluation")
     public ResponseEntity<?> evaluateSubmission(@PathVariable UUID submissionId) {
         problemTestCaseService.evaluateSubmission(submissionId);
+        return ResponseEntity.ok().body("ok");
+    }
+    @Secured("ROLE_TEACHER")
+    //@PostMapping("/submissions/{contestId}/{problemId}/evaluation")
+    //public ResponseEntity<?> evaluateSubmissionOfAProblemInContest(@PathVariable String contestId, @PathVariable String problemId) {
+    @PostMapping("/submissions-of-a-problem-in-contest/rejudge")
+    public ResponseEntity<?> evaluateSubmissionOfAProblemInContest(Principal principal, @RequestBody ModelInputRejudgeSubmissionsOfAProblemInContest m){
+        log.info("evaluateSubmissionOfAProblemInContest, contestId = " + m.getContestId() + " and problemId = " + m.getProblemId());
+        problemTestCaseService.evaluateSubmissions(m.getContestId(), m.getProblemId());
+
         return ResponseEntity.ok().body("ok");
     }
 
