@@ -424,7 +424,7 @@ public class ExamServiceImpl implements ExamService {
         MyExamDetailsRes myExamDetailsRes = list.get(0);
 
         if(!DataUtils.stringIsNotNullOrEmpty(myExamDetailsRes.getExamResultId())){
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = DataUtils.getTimeNowWithZone();
             if(now.isBefore(DataUtils.formatStringToLocalDateTimeFull(myExamDetailsRes.getStartTime()))){
                 responseData.setHttpStatus(HttpStatus.NOT_FOUND);
                 responseData.setResultCode(HttpStatus.NOT_FOUND.value());
