@@ -189,7 +189,7 @@ function MyExamDetails(props) {
 
   // Checking focus tab
   useEffect(() => {
-    handleCheckingFocusTab()
+    // handleCheckingFocusTab()
   }, []);
   const onFocus = () => {
     console.log("Tab is in focus");
