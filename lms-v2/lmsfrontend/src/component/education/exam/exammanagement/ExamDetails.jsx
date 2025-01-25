@@ -10,12 +10,12 @@ import {
 } from "@material-ui/core";
 import {DialogActions} from "@mui/material";
 import {formatDateTime} from "../ultils/DateUltils";
-import parser from "html-react-parser";
 import {request} from "../../../../api";
 import {toast} from "react-toastify";
 import TestBankDetails from "../testbank/TestBankDetails";
 import {DataGrid} from "@material-ui/data-grid";
 import ExamMarking from "./ExamMarking";
+import {parseHTMLToString} from "../ultils/DataUltils";
 
 const baseColumn = {
   sortable: false,
@@ -170,7 +170,7 @@ function ExamDetails(props) {
 
           <div style={{display: "flex", flexDirection: "column"}}>
             <h4 style={{margin: '15px 5px 0 0', padding: 0}}>Mô tả kỳ thi:</h4>
-            <p style={{margin: 0, padding: 0}}>{parser(data?.description)}</p>
+            <p style={{margin: 0, padding: 0}}>{parseHTMLToString(data?.description)}</p>
           </div>
 
           <div style={{display: "flex", flexDirection: "column"}}>
@@ -197,7 +197,7 @@ function ExamDetails(props) {
                   <span style={{fontStyle: 'italic', marginRight: '5px'}}>({data.examTests[0]?.code})</span>
                   <span style={{display: "block", fontWeight: 'bold'}}>{data.examTests[0]?.name}</span>
                 </div>
-                <p>{parser(data.examTests[0]?.description)}</p>
+                <p>{parseHTMLToString(data.examTests[0]?.description)}</p>
               </Box>
 
               <Box display="flex" justifyContent='space-between' width="80px">

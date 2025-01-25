@@ -16,9 +16,9 @@ import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
 import {DatePicker} from "@mui/x-date-pickers";
 import {vi} from "date-fns/locale";
-import parser from "html-react-parser";
 import TestBankDelete from "./TestBankDelete";
 import TestBankDetails from "./TestBankDetails";
+import {parseHTMLToString} from "../ultils/DataUltils";
 
 const baseColumn = {
   sortable: false,
@@ -48,7 +48,7 @@ function TestBank(props) {
       flex: 1,
       minWidth: 170,
       renderCell: (rowData) => {
-        return parser(rowData.value)
+        return parseHTMLToString(rowData.value)
       },
     },
     {
