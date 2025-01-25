@@ -18,6 +18,8 @@ import {successNoti} from "utils/notification";
 import ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase
   from "./ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase";
 import {getStatusColor} from "./lib";
+import {useTranslation} from "react-i18next";
+import TertiaryButton from "../../button/TertiaryButton";
 
 export const detail = (key, value, sx, helpText) => (
   <>
@@ -79,6 +81,7 @@ export const resolveLanguage = (str) => {
 
 function ContestProblemSubmissionDetailViewedByManager() {
   const {problemSubmissionId} = useParams();
+  const {t} = useTranslation(["education/programmingcontest/testcase", "education/programmingcontest/problem", "education/programmingcontest/contest", 'common']);
 
   const [submission, setSubmission] = useState({});
   const [submissionSource, setSubmissionSource] = useState("");
@@ -181,17 +184,18 @@ function ContestProblemSubmissionDetailViewedByManager() {
   }, [problemSubmissionId]);
 
   return (
-    <Stack direction="row">
+    <Stack sx={{minWidth: 400, flexDirection: {xs: 'column', md: 'row'}, gap: {xs: 2, md: 0}}}>
       <Stack
         sx={{
           display: "flex",
           flexGrow: 1,
           boxShadow: 1,
-          overflowY: "scroll ",
-          borderTopLeftRadius: 8,
-          borderBottomLeftRadius: 8,
+          overflowY: "auto",
+          borderTopLeftRadius: 16,
+          borderBottomLeftRadius: 16,
           backgroundColor: "#fff",
-          height: "calc(100vh - 112px)",
+          height: {md: "calc(100vh - 112px)"},
+          order: {xs: 1, md: 0}
         }}
       >
         <Paper
@@ -203,17 +207,17 @@ function ContestProblemSubmissionDetailViewedByManager() {
         >
           <Box sx={{mb: 4}}>
             <HustCopyCodeBlock
-              title="Message"
+              title={t('common:message')}
               text={submission.message}
               language="bash"
             />
           </Box>
           <Box sx={{mb: 4}}>
             <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1}}>
-              <Typography variant="h6">Source code</Typography>
-              <Button onClick={handleOpenDialog}>
-                Comment
-              </Button>
+              <Typography variant="h6">{t('common:sourceCode')}</Typography>
+              <TertiaryButton variant='outlined' onClick={handleOpenDialog}>
+                {t('common:comment')}
+              </TertiaryButton>
             </Box>
             <HustCopyCodeBlock
               text={submission.sourceCode}
@@ -224,35 +228,29 @@ function ContestProblemSubmissionDetailViewedByManager() {
           {submission.status &&
             submission.status !== "Compile Error" &&
             submission.status !== "In Progress" && (
-              <Box>
-                <Typography variant={"h6"} sx={{mb: 1}}>
-                  Test cases
-                </Typography>
-                <ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase
-                  submissionId={problemSubmissionId}
-                />
-              </Box>
+              <ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase
+                submissionId={problemSubmissionId}
+              />
             )}
         </Paper>
       </Stack>
-      <Box>
+      <Box sx={{order: {xs: 0, md: 1}}}>
         <Paper
           elevation={1}
           sx={{
             p: 2,
-            width: 300,
-            overflowY: "scroll",
-            borderTopRightRadius: 8,
-            borderBottomRightRadius: 8,
-            height: "calc(100vh - 112px)",
+            width: {md: 300},
+            overflowY: "auto",
+            borderRadius: "0 16px 16px 0",
+            height: {md: "calc(100vh - 112px)"},
           }}
         >
           <Typography variant="subtitle1" sx={{fontWeight: 600}}>
-            Submission details
+            {t('common:submissionDetails')}
           </Typography>
           <Divider sx={{mb: 1}}/>
           <Typography variant="subtitle2" sx={{fontWeight: 600}}>
-            Enabled
+            {t('common:enabled')}
           </Typography>
           {submission.managementStatus !== undefined && (
             <Switch
@@ -268,7 +266,7 @@ function ContestProblemSubmissionDetailViewedByManager() {
           )}
           {[
             [
-              "Status",
+              t("common:status"),
               submission.status,
               {
                 value: {
@@ -277,20 +275,20 @@ function ContestProblemSubmissionDetailViewedByManager() {
               },
             ],
             [
-              "Pass",
+              t("pass"),
               submission.testCasePass
-                ? `${submission.testCasePass} test cases`
+                ? `${submission.testCasePass} test case`
                 : "",
             ],
             [
-              "Point",
+              t("point"),
               submission.point
                 ? submission.point.toLocaleString("fr-FR", localeOption)
                 : 0,
             ],
-            ["Language", submission.sourceCodeLanguage],
+            [t("common:language"), submission.sourceCodeLanguage],
             [
-              "Total runtime",
+              t("totalRuntime"),
               `${
                 submission.runtime
                   ? (submission.runtime / 1000).toLocaleString("fr-FR", localeOption)
@@ -298,11 +296,11 @@ function ContestProblemSubmissionDetailViewedByManager() {
               } (s)`,
             ],
             // ["Memory usage", `${submission.memoryUsage} KB`],
-            ["Submited by", submission.submittedByUserId],
-            ["Submited at", displayTime(submission.createdAt)],
-            ["Last modified", displayTime(submission.updateAt)],
+            [t("common:createdBy"), submission.submittedByUserId],
+            [t("common:createdTime"), displayTime(submission.createdAt)],
+            [t("common:lastModified"), displayTime(submission.updateAt)],
             [
-              "Problem",
+              t("education/programmingcontest/problem:problem"),
               <Link
                 href={`/programming-contest/manager-view-problem-detail/${submission.problemId}`}
                 variant="subtitle2"
@@ -313,7 +311,7 @@ function ContestProblemSubmissionDetailViewedByManager() {
               </Link>,
             ],
             [
-              "Contest",
+              t("education/programmingcontest/contest:contest"),
               <Link
                 href={`/programming-contest/contest-manager/${submission.contestId}`}
                 variant="subtitle2"
@@ -323,8 +321,8 @@ function ContestProblemSubmissionDetailViewedByManager() {
                 {submission.contestId}
               </Link>,
             ],
-
           ].map(([key, value, sx]) => detail(key, value, sx))}
+
           <Dialog
             open={openDialog}
             onClose={handleCloseDialog}

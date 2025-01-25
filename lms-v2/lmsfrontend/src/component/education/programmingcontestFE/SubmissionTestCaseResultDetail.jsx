@@ -4,6 +4,7 @@ import Box from "@mui/material/Box";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
 import {FacebookCircularProgress} from "component/common/progressBar/CustomizedCircularProgress";
 import CustomizedDialogs from "component/dialog/CustomizedDialogs";
+import {useTranslation} from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   paper: (props) => ({maxWidth: props.showStderr ? 1341 : 900}),
@@ -22,11 +23,13 @@ export const SubmissionTestCaseResultDetail = ({
                                                  loading,
                                                  data,
                                                }) => {
+  const {t} = useTranslation(['common']);
   const classes = useStyles({showStderr: data?.stderr});
 
   return (
     <CustomizedDialogs
       open={open}
+      title={t('common:viewDetail')}
       handleClose={handleClose}
       contentTopDivider
       classNames={{paper: classes.paper, content: classes.content}}

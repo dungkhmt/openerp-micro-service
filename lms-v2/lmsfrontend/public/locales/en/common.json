@@ -28,6 +28,13 @@
   "confirmDeleteHead": "Are you sure you want to delete",
   "confirmDeleteTail": "?",
   "manager": "Manager",
-  "createdBy": "Created By",
-  "createdTime": "Created Time"
+  "createdBy": "Created by",
+  "createdTime": "Created time",
+  "lastModified":  "Last modified",
+  "language": "Language",
+  "enabled": "Enabled",
+  "sourceCode": "Source code",
+  "message": "Message",
+  "comment": "Comment",
+  "submissionDetails": "Submission details"
 }

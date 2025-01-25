@@ -1,16 +1,16 @@
 import InfoIcon from "@mui/icons-material/Info";
-import {IconButton} from "@mui/material";
+import {IconButton, Paper, Stack, Tooltip, Typography} from "@mui/material";
 import {request} from "api";
 import StandardTable from "component/table/StandardTable";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {localeOption} from "utils/NumberFormat";
 import {toFormattedDateTime} from "utils/dateutils";
 import {SubmissionTestCaseResultDetail} from "./SubmissionTestCaseResultDetail";
+import {useTranslation} from "react-i18next";
 
-export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase(
-  props
-) {
-  const { submissionId } = props;
+export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase(props) {
+  const {submissionId} = props;
+  const {t} = useTranslation(["education/programmingcontest/testcase", 'common']);
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -20,76 +20,85 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
 
   const columns = [
     {
-      title: "TestCase ID",
+      title: "ID",
       sorting: false,
-      cellStyle: { minWidth: 112 },
+      cellStyle: {minWidth: 112},
       render: (rowData) => rowData.testCaseId.substring(0, 6),
     },
     {
-      title: "Point",
+      title: t("graded"),
+      field: "graded",
+      cellStyle: {minWidth: 120},
+      render: (rowData) => rowData.graded === 'Y' ? t("common:yes") : t("common:no")
+    },
+    {
+      title: t('point'),
       field: "point",
       type: 'numeric',
     },
     {
-      title: "Message",
+      title: t("message"),
       field: "message",
       sorting: false,
-      cellStyle: { minWidth: 200 },
+      cellStyle: {minWidth: 200},
     },
     {
-      title: "Runtime (ms)",
+      title: t("runtime") + " (ms)",
       type: 'numeric',
       cellStyle: {minWidth: 150},
       render: (rowData) =>
         rowData.runtime?.toLocaleString("fr-FR", localeOption),
     },
     {
-      title: "Memory (MB)",
+      title: t("memory") + " (MB)",
       type: 'numeric',
       cellStyle: {minWidth: 150},
       render: (rowData) =>
         rowData.memoryUsage ? (rowData.memoryUsage / 1024).toLocaleString("fr-FR", localeOption) : null,
     },
     {
-      title: "Detail",
+      title: t("common:action"),
       sorting: false,
-      // align: "center",
+      align: "center",
+      cellStyle: {minWidth: 100},
       render: (rowData) => (
-        <IconButton
-          color="primary"
-          onClick={() => {
-            const testCaseId = rowData.testCaseId;
+        <Tooltip title={t('common:viewDetail')}>
+          <IconButton
+            color="primary"
+            onClick={() => {
+              const testCaseId = rowData.testCaseId;
 
-            setOpen(true);
+              setOpen(true);
 
-            if (testCasesResultDetail[testCaseId]) {
-              setSelectedTestCase(testCasesResultDetail[testCaseId]);
-            } else {
-              setLoading(true);
+              if (testCasesResultDetail[testCaseId]) {
+                setSelectedTestCase(testCasesResultDetail[testCaseId]);
+              } else {
+                setLoading(true);
 
-              request(
-                "get",
-                `/teacher/submissions/${submissionId}/testcases/${testCaseId}`,
-                (res) => {
-                  setLoading(false);
-                  setTestCasesResultDetail((prev) => ({
-                    ...prev,
-                    [testCaseId]: res.data[0] || {},
-                  }));
-
-                  setSelectedTestCase(res.data[0]);
-                },
-                {
-                  onError: (e) => {
+                request(
+                  "get",
+                  `/teacher/submissions/${submissionId}/testcases/${testCaseId}`,
+                  (res) => {
                     setLoading(false);
+                    setTestCasesResultDetail((prev) => ({
+                      ...prev,
+                      [testCaseId]: res.data[0] || {},
+                    }));
+
+                    setSelectedTestCase(res.data[0]);
                   },
-                }
-              );
-            }
-          }}
-        >
-          <InfoIcon />
-        </IconButton>
+                  {
+                    onError: (e) => {
+                      setLoading(false);
+                    },
+                  }
+                );
+              }
+            }}
+          >
+            <InfoIcon/>
+          </IconButton>
+        </Tooltip>
       ),
     },
   ];
@@ -111,6 +120,9 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
 
   return (
     <>
+      <Stack direction="row" justifyContent='space-between' mb={1.5}>
+        <Typography variant="h6">{t("Test Case")}</Typography>
+      </Stack>
       <StandardTable
         columns={columns}
         data={testCasesResult}
@@ -121,6 +133,9 @@ export default function ManagerViewParticipantProgramSubmissionDetailTestCaseByT
           pageSize: 5,
           search: false,
           sorting: true,
+        }}
+        components={{
+          Container: (props) => <Paper {...props} elevation={0}/>,
         }}
       />
       <SubmissionTestCaseResultDetail

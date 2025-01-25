@@ -36,5 +36,8 @@
   "output": "Output",
   "copied": "Copied",
   "noTestCase": "No testcase satisfies the requirement",
-  "cannotShowTestCaseDetail": "The test case size is too large. Please Copy or Download it to view the details"
+  "cannotShowTestCaseDetail": "The test case size is too large. Please Copy or Download it to view the details",
+  "graded": "Graded",
+  "totalRuntime": "Total runtime",
+  "pass": "Pass"
 }

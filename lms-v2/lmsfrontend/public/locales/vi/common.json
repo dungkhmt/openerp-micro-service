@@ -29,5 +29,12 @@
   "confirmDeleteTail": " không?",
   "manager": "Người quản lý",
   "createdBy": "Người tạo",
-  "createdTime": "Thời gian tạo"
+  "createdTime": "Thời gian tạo",
+  "lastModified":  "Lần sửa đổi gần đây nhất ",
+  "language": "Ngôn ngữ",
+  "enabled": "Hiệu lực",
+  "sourceCode": "Mã nguồn",
+  "message": "Thông báo",
+  "comment": "Bình luận",
+  "submissionDetails": "Thông tin chi tiết"
 }
