@@ -7,7 +7,6 @@ import {Dialog, DialogActions, DialogContent, FormControl, MenuItem, Select} fro
 import useDebounceValue from "../hooks/use-debounce";
 import {toast} from "react-toastify";
 import TextField from "@material-ui/core/TextField";
-import parser from "html-react-parser"
 import {DataGrid} from "@material-ui/data-grid";
 import InfoIcon from "@mui/icons-material/Info";
 import QuestionBankDetails from "../questionbank/QuestionBankDetails";
@@ -20,6 +19,7 @@ import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 import {vi} from "date-fns/locale";
 import {DatePicker} from "@mui/x-date-pickers";
 import TestBankDetails from "../testbank/TestBankDetails";
+import {parseHTMLToString} from "../ultils/DataUltils";
 
 const baseColumn = {
   sortable: false,
@@ -49,7 +49,7 @@ function SelectTestDialog(props) {
       flex: 1,
       minWidth: 170,
       renderCell: (rowData) => {
-        return parser(rowData.value)
+        return parseHTMLToString(rowData.value)
       },
     },
     {
@@ -97,7 +97,7 @@ function SelectTestDialog(props) {
       flex: 1,
       minWidth: 170,
       renderCell: (rowData) => {
-        return parser(rowData.value)
+        return parseHTMLToString(rowData.value)
       },
     },
     {

@@ -12,6 +12,7 @@ import {getFilenameFromString, getFilePathFromString} from "../ultils/FileUltils
 import {DialogActions, MenuItem} from "@mui/material";
 import {AttachFileOutlined} from "@material-ui/icons";
 import QuestionFilePreview from "./QuestionFilePreview";
+import {parseHTMLToString} from "../ultils/DataUltils";
 
 function QuestionBankDetails(props) {
 
@@ -37,7 +38,7 @@ function QuestionBankDetails(props) {
           <div>
             <div>
               <h4 style={{marginRight: '5px', marginTop: 0}}>Nội dung câu hỏi:</h4>
-              <p style={{marginTop: 0, marginBottom: 0}}>{parse(question?.content)}</p>
+              <p style={{marginTop: 0, marginBottom: 0}}>{parseHTMLToString(question?.content)}</p>
               {
                 (question?.filePath) && (
                   question?.filePath.split(';').map(item => {
@@ -65,13 +66,13 @@ function QuestionBankDetails(props) {
                   </div>
                   <div>
                     <h4 style={{marginRight: '5px', marginTop: 0}}>Nội dung phương án 1:</h4>
-                    <p style={{marginTop: 0, marginBottom: 0}}>{parse(question?.contentAnswer1)}</p>
+                    <p style={{marginTop: 0, marginBottom: 0}}>{parseHTMLToString(question?.contentAnswer1)}</p>
                   </div>
                   {
                     (question?.numberAnswer >= 2) && (
                       <div>
                         <h4 style={{marginRight: '5px', marginTop: 0}}>Nội dung phương án 2:</h4>
-                        <p style={{marginTop: 0, marginBottom: 0}}>{parse(question?.contentAnswer2)}</p>
+                        <p style={{marginTop: 0, marginBottom: 0}}>{parseHTMLToString(question?.contentAnswer2)}</p>
                       </div>
                     )
                   }
@@ -79,7 +80,7 @@ function QuestionBankDetails(props) {
                     (question?.numberAnswer >= 3) && (
                       <div>
                         <h4 style={{marginRight: '5px', marginTop: 0}}>Nội dung phương án 3:</h4>
-                        <p style={{marginTop: 0, marginBottom: 0}}>{parse(question?.contentAnswer3)}</p>
+                        <p style={{marginTop: 0, marginBottom: 0}}>{parseHTMLToString(question?.contentAnswer3)}</p>
                       </div>
                     )
                   }
@@ -87,7 +88,7 @@ function QuestionBankDetails(props) {
                     (question?.numberAnswer >= 4) && (
                       <div>
                         <h4 style={{marginRight: '5px', marginTop: 0}}>Nội dung phương án 4:</h4>
-                        <p style={{marginTop: 0, marginBottom: 0}}>{parse(question?.contentAnswer4)}</p>
+                        <p style={{marginTop: 0, marginBottom: 0}}>{parseHTMLToString(question?.contentAnswer4)}</p>
                       </div>
                     )
                   }
@@ -95,7 +96,7 @@ function QuestionBankDetails(props) {
                     (question?.numberAnswer >= 5) && (
                       <div>
                         <h4 style={{marginRight: '5px', marginTop: 0}}>Nội dung phương án 5:</h4>
-                        <p style={{marginTop: 0, marginBottom: 0}}>{parse(question?.contentAnswer5)}</p>
+                        <p style={{marginTop: 0, marginBottom: 0}}>{parseHTMLToString(question?.contentAnswer5)}</p>
                       </div>
                     )
                   }
@@ -108,11 +109,11 @@ function QuestionBankDetails(props) {
             }
             <div>
               <h4 style={{marginRight: '5px', marginTop: 0}}>Nội dung đáp án:</h4>
-              <p style={{marginTop: 0, marginBottom: 0}}>{parse(question?.answer)}</p>
+              <p style={{marginTop: 0, marginBottom: 0}}>{parseHTMLToString(question?.answer)}</p>
             </div>
             <div>
               <h4 style={{marginRight: '5px', marginTop: 0}}>Nội dung giải thích:</h4>
-              <p>{parse(question?.explain)}</p>
+              <p>{parseHTMLToString(question?.explain)}</p>
             </div>
           </div>
           <QuestionFilePreview

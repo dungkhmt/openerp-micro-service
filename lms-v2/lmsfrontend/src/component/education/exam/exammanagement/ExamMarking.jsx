@@ -10,12 +10,10 @@ import {
 } from "@material-ui/core";
 import {DialogActions, Radio, RadioGroup} from "@mui/material";
 import {formatDateTime} from "../ultils/DateUltils";
-import parser from "html-react-parser";
 import {request} from "../../../../api";
 import {toast} from "react-toastify";
 import TestBankDetails from "../testbank/TestBankDetails";
 import {DataGrid} from "@material-ui/data-grid";
-import parse from "html-react-parser";
 import {Scoreboard} from "@mui/icons-material";
 import {AccessTime, AttachFileOutlined, Cancel, Timer} from "@material-ui/icons";
 import {getFilenameFromString, getFilePathFromString} from "../ultils/FileUltils";
@@ -29,6 +27,7 @@ import FormGroup from "@material-ui/core/FormGroup";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import TextField from "@material-ui/core/TextField";
 import indexEsm from "@heroicons/react";
+import {parseHTMLToString} from "../ultils/DataUltils";
 
 function ExamMarking(props) {
 
@@ -254,7 +253,7 @@ function ExamMarking(props) {
                     </div>
 
                     <p style={{display: "flex", alignItems: "center"}}>
-                      <strong style={{marginRight: '10px'}}>Câu hỏi: </strong>{parser(value?.questionContent)}
+                      <strong style={{marginRight: '10px'}}>Câu hỏi: </strong>{parseHTMLToString(value?.questionContent)}
                     </p>
                     {
                       value?.questionFile && (
@@ -278,7 +277,7 @@ function ExamMarking(props) {
                             label={
                               <FormGroup row>
                                 <Box display="flex" alignItems="center">
-                                  <span>{parser(value?.questionContentAnswer1)}</span>
+                                  <span>{parseHTMLToString(value?.questionContentAnswer1)}</span>
                                   {value?.questionAnswer?.includes('1') && (
                                     <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                 </Box>
@@ -296,7 +295,7 @@ function ExamMarking(props) {
                                 label={
                                   <FormGroup row>
                                     <Box display="flex" alignItems="center">
-                                      <span>{parser(value?.questionContentAnswer2)}</span>
+                                      <span>{parseHTMLToString(value?.questionContentAnswer2)}</span>
                                       {value?.questionAnswer?.includes('2') && (
                                         <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                     </Box>
@@ -316,7 +315,7 @@ function ExamMarking(props) {
                                 label={
                                   <FormGroup row>
                                     <Box display="flex" alignItems="center">
-                                      <span>{parser(value?.questionContentAnswer3)}</span>
+                                      <span>{parseHTMLToString(value?.questionContentAnswer3)}</span>
                                       {value?.questionAnswer?.includes('3') && (
                                         <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                     </Box>
@@ -336,7 +335,7 @@ function ExamMarking(props) {
                                 label={
                                   <FormGroup row>
                                     <Box display="flex" alignItems="center">
-                                      <span>{parser(value?.questionContentAnswer4)}</span>
+                                      <span>{parseHTMLToString(value?.questionContentAnswer4)}</span>
                                       {value?.questionAnswer?.includes('4') && (
                                         <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                     </Box>
@@ -356,7 +355,7 @@ function ExamMarking(props) {
                                 label={
                                   <FormGroup row>
                                     <Box display="flex" alignItems="center">
-                                      <span>{parser(value?.questionContentAnswer5)}</span>
+                                      <span>{parseHTMLToString(value?.questionContentAnswer5)}</span>
                                       {value?.questionAnswer?.includes('5') && (
                                         <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                     </Box>
@@ -392,7 +391,7 @@ function ExamMarking(props) {
                               label={
                                 <FormGroup row>
                                   <Box display="flex" alignItems="center">
-                                    <span>{parser(value?.questionContentAnswer1)}</span>
+                                    <span>{parseHTMLToString(value?.questionContentAnswer1)}</span>
                                     {value?.questionAnswer?.includes('1') && (
                                       <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                   </Box>
@@ -412,7 +411,7 @@ function ExamMarking(props) {
                                   label={
                                     <FormGroup row>
                                       <Box display="flex" alignItems="center">
-                                        <span>{parser(value?.questionContentAnswer2)}</span>
+                                        <span>{parseHTMLToString(value?.questionContentAnswer2)}</span>
                                         {value?.questionAnswer?.includes('2') && (
                                           <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                       </Box>
@@ -434,7 +433,7 @@ function ExamMarking(props) {
                                   label={
                                     <FormGroup row>
                                       <Box display="flex" alignItems="center">
-                                        <span>{parser(value?.questionContentAnswer3)}</span>
+                                        <span>{parseHTMLToString(value?.questionContentAnswer3)}</span>
                                         {value?.questionAnswer?.includes('3') && (
                                           <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                       </Box>
@@ -456,7 +455,7 @@ function ExamMarking(props) {
                                   label={
                                     <FormGroup row>
                                       <Box display="flex" alignItems="center">
-                                        <span>{parser(value?.questionContentAnswer4)}</span>
+                                        <span>{parseHTMLToString(value?.questionContentAnswer4)}</span>
                                         {value?.questionAnswer?.includes('4') && (
                                           <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                       </Box>
@@ -478,7 +477,7 @@ function ExamMarking(props) {
                                   label={
                                     <FormGroup row>
                                       <Box display="flex" alignItems="center">
-                                        <span>{parser(value?.questionContentAnswer5)}</span>
+                                        <span>{parseHTMLToString(value?.questionContentAnswer5)}</span>
                                         {value?.questionAnswer?.includes('5') && (
                                           <CheckIcon style={{marginLeft: 8, color: 'green'}}/>)}
                                       </Box>
@@ -494,7 +493,7 @@ function ExamMarking(props) {
                     {
                       value?.questionType === 1 && (
                         <div style={{display: "flex", alignItems: "center"}}>
-                          <strong style={{marginRight: '10px'}}>Trả lời:</strong>{parse(value?.answer)}
+                          <strong style={{marginRight: '10px'}}>Trả lời:</strong>{parseHTMLToString(value?.answer)}
                         </div>
                       )
                     }
@@ -519,12 +518,12 @@ function ExamMarking(props) {
                     {
                       value?.questionType === 1 && (
                         <div style={{display: "flex", alignItems: "center"}}>
-                          <strong style={{marginRight: '10px'}}>Đáp án:</strong>{parse(value?.questionAnswer)}
+                          <strong style={{marginRight: '10px'}}>Đáp án:</strong>{parseHTMLToString(value?.questionAnswer)}
                         </div>
                       )
                     }
                     <div style={{display: "flex", alignItems: "center"}}>
-                      <strong style={{marginRight: '10px'}}>Giải thích:</strong>{parse(value?.questionExplain)}
+                      <strong style={{marginRight: '10px'}}>Giải thích:</strong>{parseHTMLToString(value?.questionExplain)}
                     </div>
                   </Box>
                 </div>

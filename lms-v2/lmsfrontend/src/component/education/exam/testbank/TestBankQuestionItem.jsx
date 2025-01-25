@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import withScreenSecurity from "../../../withScreenSecurity";
 import {SortableElement} from "react-sortable-hoc";
-import parser from "html-react-parser";
 import InfoIcon from "@mui/icons-material/Info";
 import DeleteIcon from "@material-ui/icons/Delete";
 import {Box} from "@material-ui/core";
 import QuestionBankDetails from "../questionbank/QuestionBankDetails";
+import {parseHTMLToString} from "../ultils/DataUltils";
 
 
 function TestBankQuestionItem(props) {
@@ -43,19 +43,19 @@ function TestBankQuestionItem(props) {
           <span style={{display: "block", fontWeight: 'bold', marginRight: '5px'}}>Câu {id + 1}.</span>
           <span style={{fontStyle: 'italic'}}>({value.type === 0 ? 'Trắc nghiệm' : 'Tự luận'})</span>
         </div>
-        <p>{parser(value.content)}</p>
+        <p>{parseHTMLToString(value.content)}</p>
         {
           value.type === 0 &&
             (<Box display="flex" flexDirection='column'>
               <div style={{display: "flex", alignItems: "center"}}>
                 <span style={{marginRight: "5px"}}>1.</span>
-                <span>{parser(value.contentAnswer1)}</span>
+                <span>{parseHTMLToString(value.contentAnswer1)}</span>
               </div>
               {
                 value.numberAnswer >= 2 && (
                   <div style={{display: "flex", alignItems: "center"}}>
                     <span style={{marginRight: "5px"}}>2.</span>
-                    <span>{parser(value.contentAnswer2)}</span>
+                    <span>{parseHTMLToString(value.contentAnswer2)}</span>
                   </div>
                 )
               }
@@ -63,7 +63,7 @@ function TestBankQuestionItem(props) {
                 value.numberAnswer >= 3 && (
                   <div style={{display: "flex", alignItems: "center"}}>
                     <span style={{marginRight: "5px"}}>3.</span>
-                    <span>{parser(value.contentAnswer3)}</span>
+                    <span>{parseHTMLToString(value.contentAnswer3)}</span>
                   </div>
                 )
               }
@@ -71,7 +71,7 @@ function TestBankQuestionItem(props) {
                 value.numberAnswer >= 4 && (
                   <div style={{display: "flex", alignItems: "center"}}>
                     <span style={{marginRight: "5px"}}>4.</span>
-                    <span>{parser(value.contentAnswer4)}</span>
+                    <span>{parseHTMLToString(value.contentAnswer4)}</span>
                   </div>
                 )
               }
@@ -79,7 +79,7 @@ function TestBankQuestionItem(props) {
                 value.numberAnswer >= 5 && (
                   <div style={{display: "flex", alignItems: "center"}}>
                     <span style={{marginRight: "5px"}}>5.</span>
-                    <span>{parser(value.contentAnswer5)}</span>
+                    <span>{parseHTMLToString(value.contentAnswer5)}</span>
                   </div>
                 )
               }

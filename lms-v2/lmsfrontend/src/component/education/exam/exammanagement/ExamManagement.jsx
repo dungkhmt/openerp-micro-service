@@ -8,7 +8,6 @@ import {FormControl, MenuItem, Select} from "@mui/material";
 import useDebounceValue from "../hooks/use-debounce";
 import {toast} from "react-toastify";
 import TextField from "@material-ui/core/TextField";
-import parser from "html-react-parser"
 import {DataGrid} from "@material-ui/data-grid";
 import InfoIcon from "@mui/icons-material/Info";
 import EditIcon from "@material-ui/icons/Edit";
@@ -16,6 +15,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import {formatDateTime} from "../ultils/DateUltils";
 import ExamDelete from "./ExamDelete";
 import ExamDetails from "./ExamDetails";
+import {parseHTMLToString} from "../ultils/DataUltils";
 
 const baseColumn = {
   sortable: false,
@@ -45,7 +45,7 @@ function ExamManagement(props) {
       flex: 1,
       minWidth: 200,
       renderCell: (rowData) => {
-        return parser(rowData.value)
+        return parseHTMLToString(rowData.value)
       }
     },
     {

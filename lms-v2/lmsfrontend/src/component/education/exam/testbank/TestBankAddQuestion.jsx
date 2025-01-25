@@ -7,12 +7,12 @@ import {Dialog, DialogActions, DialogContent, FormControl, MenuItem, Select} fro
 import useDebounceValue from "../hooks/use-debounce";
 import {toast} from "react-toastify";
 import TextField from "@material-ui/core/TextField";
-import parser from "html-react-parser"
 import {DataGrid} from "@material-ui/data-grid";
 import InfoIcon from "@mui/icons-material/Info";
 import QuestionBankDetails from "../questionbank/QuestionBankDetails";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import DeleteIcon from "@material-ui/icons/Delete";
+import {parseHTMLToString} from "../ultils/DataUltils";
 
 const baseColumn = {
   sortable: false,
@@ -35,7 +35,7 @@ function TestBankAddQuestion(props) {
       ...baseColumn,
       flex: 1,
       renderCell: (rowData) => {
-        return parser(rowData.value)
+        return parseHTMLToString(rowData.value)
       }
     },
     {
@@ -86,7 +86,7 @@ function TestBankAddQuestion(props) {
       ...baseColumn,
       flex: 1,
       renderCell: (rowData) => {
-        return parser(rowData.value)
+        return parseHTMLToString(rowData.value)
       }
     },
     {
