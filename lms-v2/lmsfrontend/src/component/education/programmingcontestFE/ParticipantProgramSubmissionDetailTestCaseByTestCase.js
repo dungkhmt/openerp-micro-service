@@ -1,17 +1,17 @@
 import InfoIcon from "@mui/icons-material/Info";
-import {IconButton, LinearProgress} from "@mui/material";
-import Box from "@mui/material/Box";
+import {IconButton, Paper, Stack, Tooltip} from "@mui/material";
 import {request} from "api";
 import {useEffect, useState} from "react";
 import {toFormattedDateTime} from "utils/dateutils";
 import StandardTable from "../../table/StandardTable";
 import {SubmissionTestCaseResultDetail} from "./SubmissionTestCaseResultDetail";
 import {localeOption} from "../../../utils/NumberFormat";
+import {useTranslation} from "react-i18next";
+import Typography from "@mui/material/Typography";
 
-export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
-  props
-) {
-  const { submissionId } = props;
+export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(props) {
+  const {submissionId} = props;
+  const {t} = useTranslation(["education/programmingcontest/testcase", 'common']);
 
   const [submissionTestCase, setSubmissionTestCase] = useState([]);
   const [open, setOpen] = useState(false);
@@ -24,49 +24,54 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
 
   const columns = [
     {
-      title: "Graded",
+      title: t("graded"),
       field: "graded",
-      align: 'center'
+      cellStyle: {minWidth: 120},
+      render: (rowData) => rowData.graded === 'Y' ? t("common:yes") : t("common:no")
     },
-    {title: "Point", field: "point", type: 'numeric'},
+    {title: t('point'), field: "point", type: 'numeric'},
     {
-      title: "Message",
+      title: t("message"),
       field: "message",
       sorting: false,
-      cellStyle: { minWidth: 200 },
+      cellStyle: {minWidth: 200},
     },
     {
-      title: "Runtime (ms)",
+      title: t("runtime") + " (ms)",
       type: 'numeric',
       cellStyle: {minWidth: 150},
       render: (rowData) =>
         rowData.runtime?.toLocaleString("fr-FR", localeOption),
     },
     {
-      title: "Memory (MB)",
+      title: t("memory") + " (MB)",
       type: 'numeric',
       cellStyle: {minWidth: 150},
       render: (rowData) =>
         rowData.memoryUsage ? (rowData.memoryUsage / 1024).toLocaleString("fr-FR", localeOption) : null,
     },
     {
-      title: "Detail",
+      title: t("common:action"),
       sorting: false,
+      align: "center",
+      cellStyle: {minWidth: 100},
       render: (rowData) => (
-        <IconButton
-          color="primary"
-          onClick={() => {
-            for (let i = 0; i < testCaseDetailList.length; i++) {
-              if (testCaseDetailList[i].testCaseId === rowData.testCaseId) {
-                setSelectedTestCase(testCaseDetailList[i]);
+        <Tooltip title={t('common:viewDetail')}>
+          <IconButton
+            color="primary"
+            onClick={() => {
+              for (let i = 0; i < testCaseDetailList.length; i++) {
+                if (testCaseDetailList[i].testCaseId === rowData.testCaseId) {
+                  setSelectedTestCase(testCaseDetailList[i]);
+                }
               }
-            }
 
-            setOpen(true);
-          }}
-        >
-          <InfoIcon />
-        </IconButton>
+              setOpen(true);
+            }}
+          >
+            <InfoIcon/>
+          </IconButton>
+        </Tooltip>
       ),
     },
     // {
@@ -141,7 +146,8 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
         //setFilename("");
       },
       {
-        onError: (e) => {},
+        onError: (e) => {
+        },
       },
       formData,
       config
@@ -187,7 +193,8 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
         setTestCaseDetailList(tcl);
       },
       {
-        401: () => {},
+        401: () => {
+        },
       }
     ).then(() => setIsProcessing(false));
   }
@@ -197,8 +204,10 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
   }, []);
 
   return (
-    <Box>
-      {isProcessing && <LinearProgress />}
+    <>
+      <Stack direction="row" justifyContent='space-between' mb={1.5}>
+        <Typography variant="h6">{t("Test Case")}</Typography>
+      </Stack>
       <StandardTable
         columns={columns}
         data={submissionTestCase}
@@ -210,12 +219,16 @@ export default function ParticipantProgramSubmissionDetailTestCaseByTestCase(
           search: false,
           sorting: true,
         }}
+        components={{
+          Container: (props) => <Paper {...props} elevation={0}/>,
+        }}
+        isLoading={isProcessing}
       />
       <SubmissionTestCaseResultDetail
         open={open}
         data={selectedTestCase}
         handleClose={() => setOpen(false)}
       />
-    </Box>
+    </>
   );
 }

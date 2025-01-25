@@ -14,12 +14,13 @@ import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import displayTime from "utils/DateTimeUtils";
 import {localeOption} from "utils/NumberFormat";
-import {successNoti} from "utils/notification";
+import {errorNoti, successNoti} from "utils/notification";
 import ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase
   from "./ManagerViewParticipantProgramSubmissionDetailTestCaseByTestCase";
 import {getStatusColor} from "./lib";
 import {useTranslation} from "react-i18next";
 import TertiaryButton from "../../button/TertiaryButton";
+import {mapLanguageToDisplayName} from "./Constant";
 
 export const detail = (key, value, sx, helpText) => (
   <>
@@ -97,26 +98,30 @@ function ContestProblemSubmissionDetailViewedByManager() {
     }
   };
 
-  function updateCode() {
-    let body = {
-      contestSubmissionId: problemSubmissionId,
-      modifiedSourceCodeSubmitted: submissionSource,
-      problemId: submission.problemId,
-      contestId: submission.contestId,
-    };
+  // const updateCode = () => {
+  //   const body = {
+  //     contestSubmissionId: problemSubmissionId,
+  //     modifiedSourceCodeSubmitted: submissionSource,
+  //     problemId: submission.problemId,
+  //     contestId: submission.contestId,
+  //   };
+  //
+  //   request(
+  //     "put",
+  //     "/submissions/source-code",
+  //     (res) => {
+  //       console.log("update submission source code", res.data);
+  //     },
+  //     {
+  //       onError: (e) => {
+  //         errorNoti(t("common:error"))
+  //       }
+  //     },
+  //     body
+  //   );
+  // }
 
-    request(
-      "put",
-      "/submissions/source-code",
-      (res) => {
-        console.log("update submission source code", res.data);
-      },
-      {},
-      body
-    ).then();
-  }
-
-  function handleDisableSubmission() {
+  const handleDisableSubmission = () => {
     request(
       "post",
       "/teacher/submissions/" + problemSubmissionId + "/disable",
@@ -124,11 +129,15 @@ function ContestProblemSubmissionDetailViewedByManager() {
         setSubmission(res.data);
         successNoti("Submission disabled");
       },
-      {}
+      {
+        onError: (e) => {
+          errorNoti(t("common:error"))
+        }
+      },
     );
   }
 
-  function handleEnableSubmission() {
+  const handleEnableSubmission = () => {
     request(
       "post",
       "/teacher/submissions/" + problemSubmissionId + "/enable",
@@ -136,7 +145,11 @@ function ContestProblemSubmissionDetailViewedByManager() {
         setSubmission(res.data);
         successNoti("Submission enabled");
       },
-      {}
+      {
+        onError: (e) => {
+          errorNoti(t("common:error"))
+        }
+      },
     );
   }
 
@@ -164,11 +177,13 @@ function ContestProblemSubmissionDetailViewedByManager() {
         handleCloseDialog();
         successNoti("Comment added successfully");
       },
-      {},
+      {
+        onError: (e) => {
+          errorNoti(t("common:error"))
+        }
+      },
       body
-    ).catch((error) => {
-      console.error("Error saving comment:", error);
-    });
+    )
   };
 
   useEffect(() => {
@@ -179,7 +194,11 @@ function ContestProblemSubmissionDetailViewedByManager() {
         setSubmission(res.data);
         setSubmissionSource(res.data.sourceCode);
       },
-      {}
+      {
+        onError: (e) => {
+          errorNoti(t("common:error"))
+        }
+      },
     );
   }, [problemSubmissionId]);
 
@@ -191,8 +210,7 @@ function ContestProblemSubmissionDetailViewedByManager() {
           flexGrow: 1,
           boxShadow: 1,
           overflowY: "auto",
-          borderTopLeftRadius: 16,
-          borderBottomLeftRadius: 16,
+          borderRadius: {xs: 4, md: "16px 0 0 16px"},
           backgroundColor: "#fff",
           height: {md: "calc(100vh - 112px)"},
           order: {xs: 1, md: 0}
@@ -241,7 +259,7 @@ function ContestProblemSubmissionDetailViewedByManager() {
             p: 2,
             width: {md: 300},
             overflowY: "auto",
-            borderRadius: "0 16px 16px 0",
+            borderRadius: {xs: 4, md: "0 16px 16px 0"},
             height: {md: "calc(100vh - 112px)"},
           }}
         >
@@ -286,7 +304,7 @@ function ContestProblemSubmissionDetailViewedByManager() {
                 ? submission.point.toLocaleString("fr-FR", localeOption)
                 : 0,
             ],
-            [t("common:language"), submission.sourceCodeLanguage],
+            [t("common:language"), mapLanguageToDisplayName(submission.sourceCodeLanguage) || ''],
             [
               t("totalRuntime"),
               `${

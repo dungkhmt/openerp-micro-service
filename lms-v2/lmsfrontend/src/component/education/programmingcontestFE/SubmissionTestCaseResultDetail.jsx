@@ -17,13 +17,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const SubmissionTestCaseResultDetail = ({
-                                                 open,
-                                                 handleClose,
-                                                 loading,
-                                                 data,
-                                               }) => {
-  const {t} = useTranslation(['common']);
+export const SubmissionTestCaseResultDetail = ({open, handleClose, loading, data,}) => {
+  const {t} = useTranslation(["education/programmingcontest/testcase", 'common']);
   const classes = useStyles({showStderr: data?.stderr});
 
   return (
@@ -53,13 +48,13 @@ export const SubmissionTestCaseResultDetail = ({
             >
               <Box sx={{width: data?.stderr ? "calc(33% - 8px)" : "calc(50% - 8px)"}}>
                 <HustCopyCodeBlock
-                  title="Correct output"
+                  title={t('correctOutput')}
                   text={data?.testCaseAnswer}
                 />
               </Box>
               <Box sx={{width: data?.stderr ? "calc(33% - 8px)" : "calc(50% - 8px)"}}>
                 <HustCopyCodeBlock
-                  title="User output"
+                  title={t('programOutput')}
                   text={data?.participantAnswer}
                 />
               </Box>
@@ -71,7 +66,7 @@ export const SubmissionTestCaseResultDetail = ({
                   />
                 </Box>)}
             </Stack>
-            <HustCopyCodeBlock title="Input" text={data?.testCase}/>
+            <HustCopyCodeBlock title={t("input")} text={data?.testCase}/>
           </Box>
         )
       }

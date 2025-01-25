@@ -10,9 +10,13 @@ import {detail, resolveLanguage,} from "./ContestProblemSubmissionDetailViewedBy
 import ParticipantProgramSubmissionDetailTestCaseByTestCase
   from "./ParticipantProgramSubmissionDetailTestCaseByTestCase";
 import {getStatusColor} from "./lib";
+import {useTranslation} from "react-i18next";
+import {errorNoti} from "../../../utils/notification";
+import {mapLanguageToDisplayName} from "./Constant";
 
 export default function ContestProblemSubmissionDetail() {
   const {problemSubmissionId} = useParams();
+  const {t} = useTranslation(["education/programmingcontest/testcase", "education/programmingcontest/problem", "education/programmingcontest/contest", 'common']);
 
   const [submission, setSubmission] = useState({});
   const [comments, setComments] = useState([]);
@@ -24,30 +28,32 @@ export default function ContestProblemSubmissionDetail() {
       (res) => {
         setSubmission(res.data);
       },
-      {}
+      {
+        onError: (e) => {
+          errorNoti(t("common:error"))
+        }
+      },
     );
 
-    const getComments = async () => {
-      const res = await request("get", `submissions/${problemSubmissionId}/comments`);
-      setComments(res.data);
-
-    };
-
-    getComments();
+    request("GET",
+      `submissions/${problemSubmissionId}/comments`,
+      (res) => {
+        setComments(res.data);
+      });
   }, [problemSubmissionId]);
 
   return (
-    <Stack direction="row">
+    <Stack sx={{minWidth: 400, flexDirection: {xs: 'column', md: 'row'}, gap: {xs: 2, md: 0}}}>
       <Stack
         sx={{
           display: "flex",
           flexGrow: 1,
           boxShadow: 1,
-          overflowY: "scroll",
-          borderTopLeftRadius: 8,
-          borderBottomLeftRadius: 8,
+          overflowY: "auto",
+          borderRadius: {xs: 4, md: "16px 0 0 16px"},
           backgroundColor: "#fff",
-          height: "calc(100vh - 112px)",
+          height: {md: "calc(100vh - 112px)"},
+          order: {xs: 1, md: 0}
         }}
       >
         <Paper
@@ -59,7 +65,7 @@ export default function ContestProblemSubmissionDetail() {
         >
           <Box sx={{mb: 4}}>
             <HustCopyCodeBlock
-              title="Message"
+              title={t('common:message')}
               text={submission.message}
               language="bash"
             />
@@ -68,17 +74,14 @@ export default function ContestProblemSubmissionDetail() {
             submission.status !== "Compile Error" &&
             submission.status !== "In Progress" && (
               <Box sx={{mb: 4}}>
-                <Typography variant={"h6"} sx={{mb: 1}}>
-                  Test cases
-                </Typography>
                 <ParticipantProgramSubmissionDetailTestCaseByTestCase
                   submissionId={problemSubmissionId}
                 />
               </Box>
             )}
           <Box>
+            <Typography variant="h6" sx={{mb: 1}}>{t('common:sourceCode')}</Typography>
             <HustCopyCodeBlock
-              title="Source code"
               text={submission.sourceCode}
               language={resolveLanguage(submission.sourceCodeLanguage)}
               showLineNumbers
@@ -86,7 +89,7 @@ export default function ContestProblemSubmissionDetail() {
           </Box>
           <Box sx={{mt: 4}}>
             <Typography variant={"h6"} sx={{mb: 1}}>
-              Comments
+              {t('common:comment')}
             </Typography>
             {comments.map((comment) => (
               <Typography key={comment.id} variant="body2" sx={{mb: 1}}>
@@ -96,24 +99,23 @@ export default function ContestProblemSubmissionDetail() {
           </Box>
         </Paper>
       </Stack>
-      <Box>
+      <Box sx={{order: {xs: 0, md: 1}}}>
         <Paper
           elevation={1}
           sx={{
             p: 2,
-            width: 300,
-            overflowY: "scroll",
-            borderTopRightRadius: 8,
-            borderBottomRightRadius: 8,
-            height: "calc(100vh - 112px)",
+            width: {md: 300},
+            overflowY: "auto",
+            borderRadius: {xs: 4, md: "0 16px 16px 0"},
+            height: {md: "calc(100vh - 112px)"},
           }}
         >
           <Typography variant="subtitle1" sx={{fontWeight: 600}}>
-            Submission details
+            {t('common:submissionDetails')}
           </Typography>
           <Divider sx={{mb: 1}}/>
           <Typography variant="subtitle2" sx={{fontWeight: 600}}>
-            Status
+            {t("common:status")}
           </Typography>
           <Typography
             variant="subtitle2"
@@ -128,33 +130,33 @@ export default function ContestProblemSubmissionDetail() {
           </Typography>
           {[
             [
-              "Pass",
+              t("pass"),
               submission.testCasePass
-                ? `${submission.testCasePass} test cases`
+                ? `${submission.testCasePass} test case`
                 : "",
             ],
             [
-              "Point",
+              t("point"),
               `${
                 submission.point
                   ? submission.point.toLocaleString("fr-FR", localeOption)
                   : 0
               }`,
             ],
-            ["Language ", submission.sourceCodeLanguage],
+            [t("common:language"), mapLanguageToDisplayName(submission.sourceCodeLanguage) || ''],
             [
-              "Total runtime",
+              t("totalRuntime"),
               `${
                 submission.runtime
                   ? (submission.runtime / 1000).toLocaleString("fr-FR", localeOption)
                   : 0
               } (s)`,
             ],
-            ["Submited by", submission.submittedByUserId],
-            ["Submited at", displayTime(submission.createdAt)],
-            ["Last modified", displayTime(submission.updateAt)],
+            [t("common:createdBy"), submission.submittedByUserId],
+            [t("common:createdTime"), displayTime(submission.createdAt)],
+            [t("common:lastModified"), displayTime(submission.updateAt)],
             [
-              "Problem",
+              t("education/programmingcontest/problem:problem"),
               <Link
                 href={`/programming-contest/student-view-contest-problem-detail/${submission.contestId}/${submission.problemId}`}
                 variant="subtitle2"
@@ -165,7 +167,7 @@ export default function ContestProblemSubmissionDetail() {
               </Link>,
             ],
             [
-              "Contest",
+              t("education/programmingcontest/contest:contest"),
               <Link
                 href={`/programming-contest/student-view-contest-detail/${submission.contestId}`}
                 variant="subtitle2"

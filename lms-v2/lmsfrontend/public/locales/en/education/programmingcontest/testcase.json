@@ -39,5 +39,7 @@
   "cannotShowTestCaseDetail": "The test case size is too large. Please Copy or Download it to view the details",
   "graded": "Graded",
   "totalRuntime": "Total runtime",
-  "pass": "Pass"
+  "pass": "Pass",
+  "correctOutput":"Correct output",
+  "programOutput": "Program output"
 }
