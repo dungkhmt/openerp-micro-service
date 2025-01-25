@@ -11,21 +11,18 @@ import RichTextEditor from "../../../common/editor/RichTextEditor";
 import {makeStyles} from "@material-ui/core/styles";
 import {useHistory} from "react-router-dom";
 import {useLocation} from "react-router";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
-import parse from "html-react-parser";
 import {formatDateTime} from "../ultils/DateUltils";
-import parser from "html-react-parser";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import {Radio, RadioGroup} from "@mui/material";
 import {DropzoneArea} from "material-ui-dropzone";
 import {AccessTime, AttachFileOutlined, Cancel, Timer} from "@material-ui/icons";
-import {Scoreboard} from "@mui/icons-material";
 import {getFilenameFromString, getFilePathFromString} from "../ultils/FileUltils";
 import QuestionFilePreview from "../questionbank/QuestionFilePreview";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import FormGroup from "@material-ui/core/FormGroup";
 import CheckIcon from "@mui/icons-material/Check";
+import {parseHTMLToString} from "../ultils/DataUltils";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -219,7 +216,7 @@ function MyExamDetails(props) {
           <CardContent>
             <div style={{display: "flex", flexDirection: "column", alignItems: 'center', width: '100%'}}>
               <h1 style={{margin: 0, padding: 0}}>{data?.examName}</h1>
-              <p style={{margin: 0, padding: 0}}>{parse(data?.examDescription)}</p>
+              <p style={{margin: 0, padding: 0}}>{parseHTMLToString(data?.examDescription)}</p>
               <h2 style={{margin: 0, padding: 0}}>{data?.examTestName}</h2>
               <div style={{margin: 0, padding: 0, display: "flex"}}><span style={{fontWeight: "bold", marginRight: '5px'}}>Mã đề:</span>{data?.examTestCode}</div>
               <div style={{display: "flex"}}>
@@ -244,7 +241,7 @@ function MyExamDetails(props) {
                     </div>
                     <div style={{display: "flex", flexDirection: "column", borderLeft: '2px solid #000000b8', width: 'calc(100% - 200px)'}}>
                       <h3 style={{margin: 0, padding: '10px', borderBottom: '2px solid #000000b8'}}>Nhận xét</h3>
-                      <p style={{padding: '0 10px', margin: 0, height: '150px'}}>{data?.comment ? parser(data?.comment) : ''}</p>
+                      <p style={{padding: '0 10px', margin: 0, height: '150px'}}>{data?.comment ? parseHTMLToString(data?.comment) : ''}</p>
                     </div>
                   </div>
                   <div style={{display: "flex", alignItems:"center", marginBottom: '10px', justifyContent: "flex-end"}}>
@@ -318,7 +315,7 @@ function MyExamDetails(props) {
                       </div>
 
                       <p style={{display: "flex", alignItems: "center"}}><strong style={{marginRight: '10px'}}>Câu
-                        hỏi: </strong>{parser(value?.questionContent)}</p>
+                        hỏi: </strong>{parseHTMLToString(value?.questionContent)}</p>
                       {
                         value?.questionFile && (
                           value?.questionFile.split(';').map(item => {
@@ -341,7 +338,7 @@ function MyExamDetails(props) {
                               label={
                                 <FormGroup row>
                                   <Box display="flex" alignItems="center">
-                                    <span>{parser(value?.questionContentAnswer1)}</span>
+                                    <span>{parseHTMLToString(value?.questionContentAnswer1)}</span>
                                     {( data?.totalScore && value?.questionAnswer?.includes('1')) && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
                                   </Box>
                                 </FormGroup>
@@ -358,7 +355,7 @@ function MyExamDetails(props) {
                                   label={
                                     <FormGroup row>
                                       <Box display="flex" alignItems="center">
-                                        <span>{parser(value?.questionContentAnswer2)}</span>
+                                        <span>{parseHTMLToString(value?.questionContentAnswer2)}</span>
                                         {( data?.totalScore && value?.questionAnswer?.includes('2')) && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
                                       </Box>
                                     </FormGroup>
@@ -377,7 +374,7 @@ function MyExamDetails(props) {
                                   label={
                                     <FormGroup row>
                                       <Box display="flex" alignItems="center">
-                                        <span>{parser(value?.questionContentAnswer3)}</span>
+                                        <span>{parseHTMLToString(value?.questionContentAnswer3)}</span>
                                         {( data?.totalScore && value?.questionAnswer?.includes('3')) && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
                                       </Box>
                                     </FormGroup>
@@ -396,7 +393,7 @@ function MyExamDetails(props) {
                                   label={
                                     <FormGroup row>
                                       <Box display="flex" alignItems="center">
-                                        <span>{parser(value?.questionContentAnswer4)}</span>
+                                        <span>{parseHTMLToString(value?.questionContentAnswer4)}</span>
                                         {( data?.totalScore && value?.questionAnswer?.includes('4')) && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
                                       </Box>
                                     </FormGroup>
@@ -415,7 +412,7 @@ function MyExamDetails(props) {
                                   label={
                                     <FormGroup row>
                                       <Box display="flex" alignItems="center">
-                                        <span>{parser(value?.questionContentAnswer5)}</span>
+                                        <span>{parseHTMLToString(value?.questionContentAnswer5)}</span>
                                         {( data?.totalScore && value?.questionAnswer?.includes('5')) && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
                                       </Box>
                                     </FormGroup>
@@ -446,7 +443,7 @@ function MyExamDetails(props) {
                                                 label={
                                                   <FormGroup row>
                                                     <Box display="flex" alignItems="center">
-                                                      <span>{parser(value?.questionContentAnswer1)}</span>
+                                                      <span>{parseHTMLToString(value?.questionContentAnswer1)}</span>
                                                       {( data?.totalScore && value?.questionAnswer?.includes('1')) && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
                                                     </Box>
                                                   </FormGroup>
@@ -458,7 +455,7 @@ function MyExamDetails(props) {
                                                     label={
                                                       <FormGroup row>
                                                         <Box display="flex" alignItems="center">
-                                                          <span>{parser(value?.questionContentAnswer2)}</span>
+                                                          <span>{parseHTMLToString(value?.questionContentAnswer2)}</span>
                                                           {( data?.totalScore && value?.questionAnswer?.includes('2')) && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
                                                         </Box>
                                                       </FormGroup>
@@ -472,7 +469,7 @@ function MyExamDetails(props) {
                                                     label={
                                                       <FormGroup row>
                                                         <Box display="flex" alignItems="center">
-                                                          <span>{parser(value?.questionContentAnswer3)}</span>
+                                                          <span>{parseHTMLToString(value?.questionContentAnswer3)}</span>
                                                           {( data?.totalScore && value?.questionAnswer?.includes('3')) && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
                                                         </Box>
                                                       </FormGroup>
@@ -486,7 +483,7 @@ function MyExamDetails(props) {
                                                     label={
                                                       <FormGroup row>
                                                         <Box display="flex" alignItems="center">
-                                                          <span>{parser(value?.questionContentAnswer4)}</span>
+                                                          <span>{parseHTMLToString(value?.questionContentAnswer4)}</span>
                                                           {( data?.totalScore && value?.questionAnswer?.includes('4')) && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
                                                         </Box>
                                                       </FormGroup>
@@ -500,7 +497,7 @@ function MyExamDetails(props) {
                                                     label={
                                                       <FormGroup row>
                                                         <Box display="flex" alignItems="center">
-                                                          <span>{parser(value?.questionContentAnswer5)}</span>
+                                                          <span>{parseHTMLToString(value?.questionContentAnswer5)}</span>
                                                           {( data?.totalScore && value?.questionAnswer?.includes('5')) && (<CheckIcon style={{ marginLeft: 8, color: 'green' }} />)}
                                                         </Box>
                                                       </FormGroup>
@@ -555,7 +552,7 @@ function MyExamDetails(props) {
                             {
                               data?.examResultId != null && (
                                 <div style={{display: "flex", alignItems: "center"}}><strong style={{marginRight: '10px'}}>Trả
-                                  lời:</strong>{parse(value?.answer)}</div>
+                                  lời:</strong>{parseHTMLToString(value?.answer)}</div>
                               )
                             }
                             {
@@ -579,7 +576,7 @@ function MyExamDetails(props) {
                             {
                               data?.totalScore && (
                                 <div style={{display: "flex", alignItems: "center"}}>
-                                  <strong style={{marginRight: '10px'}}>Đáp án:</strong>{parse(value?.questionAnswer)}
+                                  <strong style={{marginRight: '10px'}}>Đáp án:</strong>{parseHTMLToString(value?.questionAnswer)}
                                 </div>
                               )
                             }
@@ -589,7 +586,7 @@ function MyExamDetails(props) {
                       {
                         data?.totalScore && (
                           <div style={{display: "flex", alignItems: "center"}}>
-                            <strong style={{marginRight: '10px'}}>Giải thích:</strong>{parse(value?.questionExplain)}
+                            <strong style={{marginRight: '10px'}}>Giải thích:</strong>{parseHTMLToString(value?.questionExplain)}
                           </div>
                         )
                       }

@@ -23,12 +23,12 @@ import {DatePicker, DateTimePicker} from "@mui/x-date-pickers";
 import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import SelectTestDialog from "./SelectTestDialog";
-import parser from "html-react-parser";
 import TestBankDetails from "../testbank/TestBankDetails";
 import {formatDateTime, formatDateTimeApi} from "../ultils/DateUltils";
 import XLSX from "xlsx";
 import {DataGrid} from "@material-ui/data-grid";
 import withScreenSecurity from "../../../withScreenSecurity";
+import {parseHTMLToString} from "../ultils/DataUltils";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -404,7 +404,7 @@ function ExamCreateUpdate(props) {
                               <span style={{fontStyle: 'italic', marginRight: '5px'}}>({testList[0]?.code})</span>
                               <span style={{display: "block", fontWeight: 'bold'}}>{testList[0]?.name}</span>
                             </div>
-                            <p>{parser(testList[0]?.description)}</p>
+                            <p>{parseHTMLToString(testList[0]?.description)}</p>
                           </Box>
 
                           <Box display="flex" justifyContent='space-between' width="110px">
