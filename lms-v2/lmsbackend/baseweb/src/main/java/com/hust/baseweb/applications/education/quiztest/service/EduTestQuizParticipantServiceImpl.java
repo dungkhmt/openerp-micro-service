@@ -2,6 +2,7 @@ package com.hust.baseweb.applications.education.quiztest.service;
 
 import com.hust.baseweb.applications.education.quiztest.entity.EduTestQuizParticipant;
 import com.hust.baseweb.applications.education.quiztest.model.edutestquizparticipation.EduTestQuizParticipationCreateInputModel;
+import com.hust.baseweb.applications.education.quiztest.model.edutestquizparticipation.ModelResponseImportExcelUsersToQuizTest;
 import com.hust.baseweb.applications.education.quiztest.repo.EduTestQuizParticipantRepo;
 import com.hust.baseweb.applications.education.quiztest.utils.Utils;
 import com.hust.baseweb.entity.UserLogin;
@@ -94,5 +95,39 @@ public class EduTestQuizParticipantServiceImpl implements EduTestQuizParticipant
         eduTestQuizParticipant = eduTestQuizParticipationRepo.save(eduTestQuizParticipant);
 
         return true;
+    }
+
+    @Override
+    public int addParticipants2QuizTest(String testId, List<ModelResponseImportExcelUsersToQuizTest> L) {
+        for(int i = 0; i < L.size(); i++){
+            ModelResponseImportExcelUsersToQuizTest I = L.get(i);
+            EduTestQuizParticipant etqp = null;
+            List<EduTestQuizParticipant> etqps = eduTestQuizParticipationRepo
+                .findByTestIdAndParticipantUserLoginId(testId,I.getUserId());
+            if(etqps != null && etqps.size() > 0){
+                etqp = etqps.get(0);
+                etqp.setFullname(I.getFullName());
+                etqp.setRefUserId(I.getRefUserId());
+                if(etqp.getStatusId() == null)
+                    etqp.setStatusId(EduTestQuizParticipant.STATUS_APPROVED);
+                if(etqp.getPermutation() == null) {
+                    // generate random permutation
+                    //String p = Utils.genRandomPermutation(10);
+                    //etqp.setPermutation(p);
+                }
+            }else{
+                etqp = new EduTestQuizParticipant();
+                etqp.setTestId(testId);
+                etqp.setParticipantUserLoginId(I.getUserId());
+                etqp.setFullname(I.getFullName());
+                etqp.setRefUserId(I.getRefUserId());
+                etqp.setStatusId(EduTestQuizParticipant.STATUS_APPROVED);
+                // generate random permutation
+                String p = Utils.genRandomPermutation(10);
+                etqp.setPermutation(p);
+            }
+            etqp = eduTestQuizParticipationRepo.save(etqp);
+        }
+        return L.size();
     }
 }
