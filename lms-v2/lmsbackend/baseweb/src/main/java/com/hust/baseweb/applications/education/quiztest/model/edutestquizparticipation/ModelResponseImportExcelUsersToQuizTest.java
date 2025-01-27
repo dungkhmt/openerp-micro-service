@@ -13,4 +13,6 @@ public class ModelResponseImportExcelUsersToQuizTest {
     private String userId;
     private String fullName;
     private String refUserId;
+    private String email;
+    private String code;
 }

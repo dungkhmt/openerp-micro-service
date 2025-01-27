@@ -916,6 +916,8 @@ public class QuizTestController {
                 String userId = "";
                 String fullName = "";
                 String refUserId = "";
+                String email = "";
+                String code = "";
                 for(int j = 0; j < nbCol; j++){
                     Cell cj = row.getCell(j);
                     if(r0.getCell(j).getStringCellValue().equals("user_id")){
@@ -924,9 +926,13 @@ public class QuizTestController {
                         fullName = cj.getStringCellValue();
                     }else if(r0.getCell(j).getStringCellValue().equals("ref_user_id")){
                         refUserId = cj.getStringCellValue();
+                    }else if(r0.getCell(j).getStringCellValue().equals("email")){
+                        email = cj.getStringCellValue();
+                    }else if(r0.getCell(j).getStringCellValue().equals("code")){
+                        code = cj.getStringCellValue();
                     }
                 }
-                res.add(new ModelResponseImportExcelUsersToQuizTest(userId,fullName,refUserId));
+                res.add(new ModelResponseImportExcelUsersToQuizTest(userId,fullName,refUserId,email,code));
             }
             eduTestQuizParticipantService.addParticipants2QuizTest(testId,res);
         }catch (Exception e){
