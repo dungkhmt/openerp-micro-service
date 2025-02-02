@@ -314,7 +314,7 @@ function MyExamDetails(props) {
                         }
                       </div>
 
-                      <p style={{display: "flex", alignItems: "center"}}><strong style={{marginRight: '10px'}}>Câu
+                      <p><strong style={{marginRight: '10px'}}>Câu
                         hỏi: </strong>{parseHTMLToString(value?.questionContent)}</p>
                       {
                         value?.questionFile && (

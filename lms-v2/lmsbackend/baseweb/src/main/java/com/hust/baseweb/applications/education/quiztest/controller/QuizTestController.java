@@ -27,6 +27,7 @@ import com.hust.baseweb.applications.education.quiztest.entity.InteractiveQuizAn
 import com.hust.baseweb.applications.education.quiztest.entity.InteractiveQuizQuestion;
 import com.hust.baseweb.applications.education.quiztest.model.*;
 import com.hust.baseweb.applications.education.quiztest.model.edutestquizparticipation.GetQuizTestParticipationExecutionResultInputModel;
+import com.hust.baseweb.applications.education.quiztest.model.edutestquizparticipation.ModelResponseImportExcelUsersToQuizTest;
 import com.hust.baseweb.applications.education.quiztest.model.edutestquizparticipation.QuizTestParticipationExecutionResultOutputModel;
 import com.hust.baseweb.applications.education.quiztest.model.quitestgroupquestion.AutoAssignQuestion2QuizTestGroupInputModel;
 import com.hust.baseweb.applications.education.quiztest.model.quiztestgroup.AutoAssignParticipants2QuizTestGroupInputModel;
@@ -901,11 +902,49 @@ public class QuizTestController {
             ModelUploadExcelStudentListOfQuizTest.class);
         String testId = modelUpload.getTestId();
         log.info("uploadExcelStudentListOfQuizTest, testId = " + testId);
-
+        List<ModelResponseImportExcelUsersToQuizTest> res = new ArrayList<>();
+        try{
+            InputStream is = file.getInputStream();
+            XSSFWorkbook wb = new XSSFWorkbook(is);
+            XSSFSheet sheet = wb.getSheetAt(0);
+            Row r0 = sheet.getRow(0);
+            int nbCol = r0.getLastCellNum();
+            int lastRowNum = sheet.getLastRowNum();
+            for (int i = 1; i <= lastRowNum; i++) {
+                Row row = sheet.getRow(i);
+                //Cell c = row.getCell(0);
+                String userId = "";
+                String fullName = "";
+                String refUserId = "";
+                String email = "";
+                String code = "";
+                for(int j = 0; j < nbCol; j++){
+                    Cell cj = row.getCell(j);
+                    if(r0.getCell(j).getStringCellValue().equals("user_id")){
+                        userId = cj.getStringCellValue();
+                    }else if(r0.getCell(j).getStringCellValue().equals("full_name")){
+                        fullName = cj.getStringCellValue();
+                    }else if(r0.getCell(j).getStringCellValue().equals("ref_user_id")){
+                        refUserId = cj.getStringCellValue();
+                    }else if(r0.getCell(j).getStringCellValue().equals("email")){
+                        email = cj.getStringCellValue();
+                    }else if(r0.getCell(j).getStringCellValue().equals("code")){
+                        code = cj.getStringCellValue();
+                    }
+                }
+                res.add(new ModelResponseImportExcelUsersToQuizTest(userId,fullName,refUserId,email,code));
+            }
+            eduTestQuizParticipantService.addParticipants2QuizTest(testId,res);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok().body(res);
+        /*
         List<String> uploadedUsers = new ArrayList();
         try (InputStream is = file.getInputStream()) {
             XSSFWorkbook wb = new XSSFWorkbook(is);
             XSSFSheet sheet = wb.getSheetAt(0);
+
             int lastRowNum = sheet.getLastRowNum();
             //System.out.println("uploadExcelStudentListOfQuizTest, lastRowNum = " + lastRowNum);
             for (int i = 1; i <= lastRowNum; i++) {
@@ -923,7 +962,7 @@ public class QuizTestController {
             e.printStackTrace();
         }
         return ResponseEntity.ok().body(uploadedUsers);
-
+        */
 
     }
 
