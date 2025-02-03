@@ -18,6 +18,7 @@ public class ExamSaveReq {
     private String name;
     private String description;
     private Integer status;
+    private String answerStatus;
     private String startTime;
     private String endTime;
     private List<ExamStudentEntity> examStudents;

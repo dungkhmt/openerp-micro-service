@@ -15,6 +15,7 @@ public class MyExamDetailsRes {
 
     private String examStudentId;
     private String examId;
+    private String examAnswerStatus;
     private String examCode;
     private String examName;
     private String examDescription;

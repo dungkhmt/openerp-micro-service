@@ -375,7 +375,8 @@ public class ExamServiceImpl implements ExamService {
                    "    er.total_time as totalTime,\n" +
                    "    er.submited_at as submitedAt,\n" +
                    "    er.file_path as answerFiles,\n" +
-                   "    er.comment as comment\n" +
+                   "    er.comment as comment,\n" +
+                   "    e.answer_status as examAnswerStatus\n" +
                    "from\n" +
                    "    exam_student es\n" +
                    "left join exam e on\n" +
@@ -417,6 +418,7 @@ public class ExamServiceImpl implements ExamService {
                                         .submitedAt(DataUtils.safeToString(obj[13]))
                                         .answerFiles(DataUtils.safeToString(obj[14]))
                                         .comment(DataUtils.safeToString(obj[15]))
+                                        .examAnswerStatus(DataUtils.safeToString(obj[16]))
                                         .build());
             }
         }

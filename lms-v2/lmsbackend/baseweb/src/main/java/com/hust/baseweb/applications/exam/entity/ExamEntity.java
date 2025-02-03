@@ -33,6 +33,9 @@ public class ExamEntity extends BaseEntity {
     @Column(name = "status")
     private Integer status;
 
+    @Column(name = "answer_status")
+    private String answerStatus;
+
     @Column(name = "start_time")
     private LocalDateTime startTime;
 

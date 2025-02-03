@@ -59,8 +59,8 @@ public interface ExamTestRepository extends JpaRepository<ExamTestEntity, String
                    "    eq.content_answer4 as questionContentAnswer4,\n" +
                    "    eq.content_answer5 as questionContentAnswer5,\n" +
                    "    eq.multichoice as questionMultichoice,\n" +
-                   "    case when erd.score is not null then eq.answer else null end as questionAnswer,\n" +
-                   "    case when erd.score is not null then eq.explain else null end as questionExplain,\n" +
+                   "    case when erd.score is not null and e.answer_status = 'OPEN' then eq.answer else null end as questionAnswer,\n" +
+                   "    case when erd.score is not null and e.answer_status = 'OPEN' then eq.explain else null end as questionExplain,\n" +
                    "    etq.order as questionOrder,\n" +
                    "    erd.answer as answer,\n" +
                    "    erd.file_path as filePathAnswer,\n" +
@@ -74,6 +74,8 @@ public interface ExamTestRepository extends JpaRepository<ExamTestEntity, String
                    "    etq.exam_question_id = eq.id\n" +
                    "left join exam_student es on\n" +
                    "    es.exam_test_id = et.id\n" +
+                   "left join exam e on\n" +
+                   "    e.id = es.exam_id\n" +
                    "left join exam_result er on\n" +
                    "    es.id = er.exam_student_id\n" +
                    "left join exam_result_details erd on\n" +
