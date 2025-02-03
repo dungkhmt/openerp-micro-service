@@ -70,7 +70,7 @@ function ExamManagement(props) {
       field: "status",
       headerName: "Trạng thái",
       ...baseColumn,
-      minWidth: 170,
+      minWidth: 120,
       renderCell: (rowData) => {
         if(rowData.value === 0){
           return (
@@ -80,6 +80,25 @@ function ExamManagement(props) {
           return (
             <strong style={{color: '#61bd6d'}}>Kích hoạt</strong>
           )
+        }
+      },
+    },
+    {
+      field: "answerStatus",
+      headerName: "Trạng thái đáp án",
+      ...baseColumn,
+      minWidth: 170,
+      renderCell: (rowData) => {
+        if(rowData.value === 'NO_OPEN'){
+          return (
+            <strong style={{color: '#f50000c9'}}>Không được xem</strong>
+          )
+        }else if(rowData.value === 'OPEN'){
+          return (
+            <strong style={{color: '#61bd6d'}}>Được xem</strong>
+          )
+        }else{
+          return ''
         }
       },
     },
@@ -166,6 +185,7 @@ function ExamManagement(props) {
           name: "",
           description: "",
           status: 1,
+          answerStatus: "NO_OPEN",
           startTime: "",
           endTime: "",
           examStudents: []

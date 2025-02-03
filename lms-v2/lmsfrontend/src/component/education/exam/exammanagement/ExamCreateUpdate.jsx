@@ -113,6 +113,17 @@ function ExamCreateUpdate(props) {
     }
   ]
 
+  const answerStatusList = [
+    {
+      value: 'NO_OPEN',
+      name: 'Không được xem'
+    },
+    {
+      value: 'OPEN',
+      name: 'Được xem'
+    }
+  ]
+
   const classes = useStyles();
   const history = useHistory();
   const location = useLocation();
@@ -126,7 +137,8 @@ function ExamCreateUpdate(props) {
   const [code, setCode] = useState(data?.code);
   const [name, setName] = useState(data?.name);
   const [status, setStatus] = useState(data?.status);
-  const [description, setDescription] = useState(data?.description);
+  const [answerStatus, setAnswerStatus] = useState(data?.answerStatus);
+  const [description, setDescription] = useState(data?.description ? data?.description : '');
   const [examTestId, setExamTestId] = useState(data?.examTestId);
   const [startTime, setStartTime] = useState(data?.startTime);
   const [endTime, setEndTime] = useState(data?.endTime);
@@ -144,6 +156,7 @@ function ExamCreateUpdate(props) {
       name: name,
       description: description,
       status: status,
+      answerStatus: answerStatus,
       examTestId: examTestId,
       startTime: formatDateTimeApi(startTime),
       endTime: formatDateTimeApi(endTime),
@@ -340,6 +353,26 @@ function ExamCreateUpdate(props) {
                   >
                     {
                       statusList.map(item => {
+                        return (
+                          <MenuItem value={item.value}>{item.name}</MenuItem>
+                        )
+                      })
+                    }
+                  </TextField>
+
+                  <TextField
+                    required
+                    autoFocus
+                    id="ExamAnswerstatus"
+                    select
+                    label="Trạng thái đáp án"
+                    value={answerStatus}
+                    onChange={(event) => {
+                      setAnswerStatus(event.target.value);
+                    }}
+                  >
+                    {
+                      answerStatusList.map(item => {
                         return (
                           <MenuItem value={item.value}>{item.name}</MenuItem>
                         )

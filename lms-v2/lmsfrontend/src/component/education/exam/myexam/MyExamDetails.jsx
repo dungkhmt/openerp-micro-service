@@ -176,7 +176,7 @@ function MyExamDetails(props) {
   };
 
   const checkAnswerRadioAndCheckbox = (questionType, answerQuestion, answerStudent) => {
-    if(questionType === 0){
+    if(questionType === 0 && answerQuestion != null){
       const answerQuestions = answerQuestion.split(',').sort();
       const answerStudents = answerStudent.split(',').sort();
 
@@ -265,7 +265,7 @@ function MyExamDetails(props) {
                     style={{
                       border: '2px solid #f5f5f5',
                       borderColor:
-                        (value?.questionType === 0 && data?.totalScore) ?
+                        (value?.questionType === 0 && data?.totalScore && data?.examAnswerStatus === 'OPEN') ?
                           (checkAnswerRadioAndCheckbox(value?.questionType, value?.questionAnswer, value?.answer) ? '#61bd6d' : '#f50000c9'):
                           '#f5f5f5',
                       display: 'flex',
@@ -290,7 +290,7 @@ function MyExamDetails(props) {
                         </div>
 
                         {
-                          data?.totalScore && (
+                          data?.totalScore && data?.examAnswerStatus === 'OPEN' && (
                             <div style={{display: "flex", alignItems: "center"}} key={questionOrder}>
                               {
                                 value?.questionType === 0 ?
@@ -574,7 +574,7 @@ function MyExamDetails(props) {
                               )
                             }
                             {
-                              data?.totalScore && (
+                              data?.totalScore && data?.examAnswerStatus === 'OPEN' && (
                                 <div style={{display: "flex", alignItems: "center"}}>
                                   <strong style={{marginRight: '10px'}}>Đáp án:</strong>{parseHTMLToString(value?.questionAnswer)}
                                 </div>
@@ -584,7 +584,7 @@ function MyExamDetails(props) {
                         )
                       }
                       {
-                        data?.totalScore && (
+                        data?.totalScore && data?.examAnswerStatus === 'OPEN' && (
                           <div style={{display: "flex", alignItems: "center"}}>
                             <strong style={{marginRight: '10px'}}>Giải thích:</strong>{parseHTMLToString(value?.questionExplain)}
                           </div>
