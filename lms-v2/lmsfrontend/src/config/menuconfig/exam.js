@@ -6,6 +6,14 @@ export const ExamMenu = {
     text: "Exam",
     child: [
       {
+        id: "MENU_EXAM_SUBJECT",
+        path: "/exam/subject",
+        isPublic: false,
+        icon: null,
+        text: "Manage Subjects",
+        child: [],
+      },
+      {
         id: "MENU_EXAM_QUESTION_BANK",
         path: "/exam/question-bank",
         isPublic: false,

@@ -7,12 +7,25 @@ import ExamManagement from "../component/education/exam/exammanagement/ExamManag
 import ExamCreateUpdate from "../component/education/exam/exammanagement/ExamCreateUpdate";
 import MyExam from "../component/education/exam/myexam/MyExam";
 import MyExamDetails from "../component/education/exam/myexam/MyExamDetails";
+import ExamSubjectManagement from "../component/education/exam/subject/ExamSubjectManagement";
+import ExamSubjectCreateUpdate from "../component/education/exam/subject/ExamSubjectCreateUpdate";
 
 export default function ExamRoute() {
   let { path } = useRouteMatch();
   return (
     <div>
       <Switch>
+        <Route
+          component={ExamSubjectManagement}
+          exact
+          path={`${path}/subject`}
+        ></Route>
+        <Route
+          component={ExamSubjectCreateUpdate}
+          exact
+          path={`${path}/create-update-subject`}
+        ></Route>
+
         <Route
           component={QuestionBank}
           exact
