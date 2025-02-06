@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
-import { request } from "api";
+import { useState, useEffect } from "react";
 import {
   Button,
   TextField,
@@ -13,7 +12,12 @@ import {
 import { useHistory } from "react-router-dom";
 import { DataGrid } from "@mui/x-data-grid";
 import styles from "./index.style";
-import { classCallUrl, semesterUrl } from "../apiURL";
+import {
+  useClasses,
+  useRegisteredClasses,
+  useSemesters,
+  useCurrentSemester,
+} from "services/useClassRegistrationData";
 
 const DEFAULT_PAGINATION_MODEL = {
   page: 0,
@@ -22,91 +26,34 @@ const DEFAULT_PAGINATION_MODEL = {
 
 const AllRegisterClassScreen = () => {
   const history = useHistory();
-  const [classes, setClasses] = useState([]);
-  const [registeredClass, setRegisteredClass] = useState([]);
-
-  const [semester, setSemester] = useState("");
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [totalElements, setTotalElements] = useState(0);
-
   const [search, setSearch] = useState("");
-
+  const [semester, setSemester] = useState("");
   const [paginationModel, setPaginationModel] = useState(
     DEFAULT_PAGINATION_MODEL
   );
 
-  const [allSemester, setAllSemester] = useState([]);
-
-  useEffect(() => {
-    request("get", semesterUrl.getCurrentSemester, (res) => {
-      setSemester(res.data);
-    });
-    request("get", semesterUrl.getAllSemester, (res) => {
-      setAllSemester(res.data);
-    });
-  }, []);
-
-  const debouncedSearch = useCallback(
-    (search) => {
-      const timer = setTimeout(() => {
-        setPaginationModel({
-          ...DEFAULT_PAGINATION_MODEL,
-          page: 0,
-        });
-        handleFetchData();
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [search]
+  const { data: currentSemesterData } = useCurrentSemester();
+  const { data: semestersData } = useSemesters();
+  const { data: classesData, isLoading } = useClasses(
+    semester,
+    paginationModel.page,
+    paginationModel.pageSize,
+    search
   );
+  const { data: registeredClassData } = useRegisteredClasses(semester);
 
   useEffect(() => {
-    if (semester !== "") {
-      return debouncedSearch(search);
+    if (currentSemesterData?.data) {
+      setSemester(currentSemesterData.data);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, debouncedSearch]);
-
-  useEffect(() => {
-    if (semester !== "") {
-      handleFetchData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paginationModel, semester]);
-
-  useEffect(() => {
-    if (semester !== "") {
-      fetchRegisteredData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [semester]);
-
-  const handleFetchData = () => {
-    const searchParam =
-      search !== "" ? `&search=${encodeURIComponent(search)}` : "";
-    setIsLoading(true);
-    request(
-      "get",
-      `${classCallUrl.getClassBySemesterL}/${semester}?page=${paginationModel.page}&limit=${paginationModel.pageSize}${searchParam}`,
-      (res) => {
-        setClasses(res.data.data);
-        setTotalElements(res.data.totalElement);
-        setIsLoading(false);
-      }
-    );
-  };
-
-  const fetchRegisteredData = () => {
-    request("get", `${classCallUrl.getMyRegisterClass}/${semester}`, (res) => {
-      setRegisteredClass(res.data);
-    });
-  };
+  }, [currentSemesterData]);
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
+    setPaginationModel({
+      ...DEFAULT_PAGINATION_MODEL,
+      page: 0,
+    });
   };
 
   const handleRegister = (klass) => {
@@ -114,13 +61,16 @@ const AllRegisterClassScreen = () => {
       classId: klass.id,
     });
   };
+
   const handleChangeSemester = (event) => {
     setSemester(event.target.value);
   };
 
   const actionCell = (params) => {
     const rowData = params.row;
-    const isRegistered = registeredClass.some((item) => item.id === rowData.id);
+    const isRegistered = registeredClassData?.data?.some(
+      (item) => item.id === rowData.id
+    );
     return (
       <div>
         <Button
@@ -162,13 +112,14 @@ const AllRegisterClassScreen = () => {
     },
   ];
 
-  const dataGridRows = classes.map((klass) => ({
-    id: klass.id,
-    subjectId: klass.subjectId,
-    subjectName: klass.subjectName,
-    day: `Thứ ${klass.day}, tiết ${klass.startPeriod} - ${klass.endPeriod}`,
-    actions: { rowData: klass },
-  }));
+  const dataGridRows =
+    classesData?.data?.data?.map((klass) => ({
+      id: klass.id,
+      subjectId: klass.subjectId,
+      subjectName: klass.subjectName,
+      day: `Thứ ${klass.day}, tiết ${klass.startPeriod} - ${klass.endPeriod}`,
+      actions: { rowData: klass },
+    })) || [];
 
   return (
     <Paper elevation={3}>
@@ -177,8 +128,8 @@ const AllRegisterClassScreen = () => {
           Danh sách lớp học
         </Typography>
 
-        <div style={styles.searchArea}>
-          <FormControl style={styles.dropdown} fullWidth size="small">
+        <div style={styles.searchArea} className="w-[200px]">
+          <FormControl style={styles.dropdown} size="small" >
             <InputLabel id="semester-label">Học kì</InputLabel>
             <Select
               labelId="semester-label"
@@ -189,9 +140,9 @@ const AllRegisterClassScreen = () => {
               onChange={handleChangeSemester}
               MenuProps={{ PaperProps: { sx: styles.selection } }}
             >
-              {allSemester.map((semester, index) => (
-                <MenuItem key={index} value={semester}>
-                  {semester}
+              {semestersData?.data?.map((sem, index) => (
+                <MenuItem key={index} value={sem}>
+                  {sem}
                 </MenuItem>
               ))}
             </Select>
@@ -214,7 +165,7 @@ const AllRegisterClassScreen = () => {
         sx={styles.table}
         rows={dataGridRows}
         columns={dataGridColumns}
-        rowCount={totalElements}
+        rowCount={classesData?.data?.totalElement || 0}
         pagination
         paginationMode="server"
         paginationModel={paginationModel}

@@ -184,7 +184,7 @@ export const LocationScreen = () => {
 	}
 
     return (
-        <div className="location-container">
+        <div className="">
             <Button variant="contained" onClick={handleCreate}>Create</Button>
             <StandardTable
                 title="Location List"

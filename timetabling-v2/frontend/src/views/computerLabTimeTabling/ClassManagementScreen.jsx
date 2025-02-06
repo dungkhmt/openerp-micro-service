@@ -329,6 +329,22 @@ function ClassManagementScreen() {
     );
   };
 
+  const update_invalid_rows = (assignedData_var, assignsBySemester_var) => {
+    var assigned_set_array = [];
+    assignedData_var.forEach((assign) => {
+      if (assignsBySemester_var.filter((a) => a.id == assign.id).length == 0) {
+        assigned_set_array.push(assign);
+      }
+    });
+    assignsBySemester_var.forEach((assign) => {
+      assigned_set_array.push(assign);
+    });
+    var invalid = {};
+    assignedData_var.forEach((assign) => {
+      invalid[assign.id] = is_invalid(assign, assigned_set_array);
+    });
+    setInvalidRows(invalid);
+  };
   const is_invalid = (object, assigned_set_array) => {
     // not null constraint
     for (let key in object) {
@@ -377,6 +393,21 @@ function ClassManagementScreen() {
   };
 
   const save_class_onclick = () => {
+    // const assigned = assignedData?.map((assign) => {
+    //   return {
+    //     ...assign,
+    //     lesson: { id: assign.class_id },
+    //     room: { id: assign.room_id },
+    //     semester_id: selectedItem.semester_id,
+    //   };
+    // });
+
+    // const redundant_assigned = redundantAssignedData.map((id) => {
+    //   return {
+    //     id: id,
+    //   };
+    // });
+    // console.log(assigned);
 
     const update_class = {
       class_code: idInput,
@@ -395,6 +426,11 @@ function ClassManagementScreen() {
       `/lab-timetabling/class/${selectedItem.id}`,
       update_class
     );
+    // submit_handler("post", `/lab-timetabling/assign`, {
+    //   update: assigned,
+    //   remove: redundant_assigned,
+    // });
+    // console.log(assigned);
   };
   return (
     <div>
@@ -571,6 +607,89 @@ function ClassManagementScreen() {
                 </TableBody>
               </Table>
             </TableContainer>
+            {/* <div>
+              time table (assigned = {selectedItem.assigns?.length}, require ={" "}
+              {totalLessons})
+              <table sx={{ width: 1 }}>
+                {assignedData?.map((assign, idx) => {
+                  var row = assign;
+                  return (
+                    <Box sx={{ width: 1, mt: 1}}>
+                      <FormControl error={invalidRows[assign.id]} variant="standard">
+                      <tr id={assign.id}>
+                        <td>
+                          <BasicSelect
+                            items={roomsByDepartment}
+                            label={"Phòng"}
+                            value={row.room_id}
+                            onChange={(item) =>
+                              handleInputChange(item, assign.id, "room_id")
+                            }
+                          />
+                        </td>
+                        <td>
+                          <BasicSelect
+                            items={weeks_Of_Semester}
+                            label={"Tuần"}
+                            value={row.week}
+                            onChange={(item) =>
+                              handleInputChange(item, assign.id, "week")
+                            }
+                          />
+                        </td>
+                        <td>
+                          <BasicSelect
+                            items={days_Of_Week}
+                            label={"Ngày"}
+                            value={row.day_of_week}
+                            onChange={(item) =>
+                              handleInputChange(item, assign.id, "day_of_week")
+                            }
+                          />
+                        </td>
+                        <td>
+                          <BasicSelect
+                            items={periods_Of_Day}
+                            label={"Buổi"}
+                            value={row.period}
+                            onChange={(item) =>
+                              handleInputChange(item, assign.id, "period")
+                            }
+                          />
+                        </td>
+                        <td>
+                          <BasicSelect
+                            items={slots_Of_Period}
+                            label={"Tiết"}
+                            value={row.start_slot}
+                            onChange={(item) =>
+                              handleInputChange(item, assign.id, "start_slot")
+                            }
+                          />
+                        </td>
+                        <td>
+                          <Button onClick={(e) => remove_btn_onclick(e)}>
+                            remove
+                          </Button>
+                        </td>
+                      </tr>
+                      <FormHelperText>
+                        {invalidRows[assign.id] ? "Invalid assign input" : ""}
+                      </FormHelperText>
+                      </FormControl>
+                    </Box>
+                  );
+                })}
+              </table>
+              <Button
+                disabled={assignedData.length < totalLessons ? false : true}
+                variant="text"
+                size="small"
+                onClick={add_row_btn_onclick}
+              >
+                Add row
+              </Button>
+            </div> */}
           </Box>
         </DialogContent>
         <DialogActions>
