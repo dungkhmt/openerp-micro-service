@@ -6,7 +6,7 @@ export const generalTimeTabling = {
     {
       id: "MENU_GENERAL_TIME_TABLING.UPLOAD_SCREEN",
       path: "/general-time-tabling/plan-class-open",
-      isPublic: false,
+      isPublic: true,
       text: "Kế hoạch mở lớp",
       child: [],
     },

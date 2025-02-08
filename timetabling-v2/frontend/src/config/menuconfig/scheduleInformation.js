@@ -20,7 +20,7 @@ export const scheduleInformation = {
     {
       id: "MENU_SCHEDULE_INFORMATION.CLASSROOM",
       path: "/schedule-information/classroom",
-      isPublic: false,
+      isPublic: true,
       text: "Phòng học",
       child: [],
     },
