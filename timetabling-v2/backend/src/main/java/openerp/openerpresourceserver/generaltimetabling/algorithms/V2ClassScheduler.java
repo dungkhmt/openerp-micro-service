@@ -28,6 +28,19 @@ public class V2ClassScheduler {
         return false;
     }
 
+    class MapDataScheduleTimeSlotRoom{
+        int n;// number ò class-segment
+        int[] d; // d[i] is the duration (so tiet)
+        int[] vol;// vol[i] is the number of students of class-segment i
+        boolean[][] conflict; // conflict[i][j] = true means that class-segment i and j cannot be scheduled in overlapping time durations
+        List<Integer>[] D;// D[i] is the domain of class-segment i
+        //List<Integer> rooms; // list of indices of rooms sorted in descendant of priority
+        int[] cap; // cap[i] is the capacity of room i
+        int[] p; // priority of room i (high value of p[i] = high priority to be used)
+    }
+    public static void mapData(List<GeneralClass> classes){
+
+    }
     public static List<GeneralClass> autoScheduleTimeSlot(List<GeneralClass> classes, int timeLimit) {
         int n = classes.size();
         if (n == 0) {
@@ -35,6 +48,10 @@ public class V2ClassScheduler {
             return null;
         }
         classes.sort(Comparator.comparing(GeneralClass::hasNonNullTimeSlot).reversed());
+        for(int i = 0; i < classes.size(); i++){
+            GeneralClass c = classes.get(i);
+            log.info("autoScheduleTimeSlot, class[" + i + "] = " + c.toString() + " total duration" + MassExtractor.extract(c.getMass()));
+        }
         List<int[]> conflict = new ArrayList<int[]>();
         int[] durations = classes.stream().filter(c -> c.getMass() != null).mapToInt(c -> MassExtractor.extract(c.getMass())).toArray();
         int[] splitDurations = new int[150];
@@ -46,7 +63,10 @@ public class V2ClassScheduler {
         for (int i = 0; i < classes.size(); i++) {
             GeneralClass c = classes.get(i);
             if (c.getTimeSlots().size() > 1) {
+                log.info("autoScheduleTimeSlot, class " + c.getClassCode() + " has " + c.getTimeSlots().size());
+
                 for (RoomReservation rr: c.getTimeSlots()) {
+                    log.info("autoScheduleTimeSlot, roomreservation " + rr.toString());
                     if (!rr.isTimeSlotNotNull()) {
                         throw new InvalidFieldException("Lớp " + c.getClassCode() + " có nhiều 2 hơn ca học và có lịch trống!");
                     }
@@ -144,9 +164,7 @@ public class V2ClassScheduler {
                         }
                     }
                 }
-
             }
-
         }
 
         for (int i = 0; i < totalSessions; i++) {
@@ -155,6 +173,9 @@ public class V2ClassScheduler {
             }
         }
 
+        for(int i = 0; i < splitDurations.length; i++){
+            log.info("autoScheduleTimeSlot, class-segment " + i + " duration = " + splitDurations[i] + " domain = " + domains[i].toArray());
+        }
         ClassTimeScheduleBacktrackingSolver solver = new ClassTimeScheduleBacktrackingSolver(totalSessions, splitDurations, domains, conflict, timeLimit);
         solver.solve();
         if (!solver.hasSolution()) {
