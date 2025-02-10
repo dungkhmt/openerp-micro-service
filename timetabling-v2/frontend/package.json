@@ -37,7 +37,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-google-charts": "^4.0.1",
-    "react-hook-form": "^7.51.4",
+    "react-hook-form": "^7.54.2",
     "react-icons": "^4.8.0",
     "react-infinite-scroll-component": "^4.1.0",
     "react-query": "^3.39.3",
