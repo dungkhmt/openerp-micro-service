@@ -146,7 +146,7 @@ const DialogAddTask = ({ open, setOpen, defaultEvent }) => {
       });
 
       const skillIdList = selectedSkills.map((skill) => skill.skillId);
-      await TaskService.addTaskSkills(res.id, skillIdList);
+      await TaskService.updateTaskSkills(res.id, skillIdList);
       dispatch(clearCache());
       toast.success("Thêm nhiệm vụ thành công");
       navigate(`/project/${project.id}/task/${res.id}`);

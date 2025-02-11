@@ -8,13 +8,10 @@ import org.springframework.stereotype.Repository;
 
 import com.hust.openerp.taskmanagement.entity.TaskSkill;
 
-import jakarta.transaction.Transactional;
-
 @Repository
 public interface TaskSkillRepository extends JpaRepository<TaskSkill, UUID> {
 	
 	List<TaskSkill> findByTaskId(UUID taskId);
 	
-	@Transactional
 	void deleteByTaskId(UUID taskId);
 }

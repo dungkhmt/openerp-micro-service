@@ -15,6 +15,7 @@ import com.hust.openerp.taskmanagement.repository.TaskSkillRepository;
 import com.hust.openerp.taskmanagement.service.ProjectMemberService;
 import com.hust.openerp.taskmanagement.service.TaskSkillService;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -40,24 +41,8 @@ public class TaskSkillServiceImplement implements TaskSkillService {
         return entities.stream().map(entity -> entity.getSkill()).toList();
     }
 
-
 	@Override
-	public void addTaskSkills(UUID taskId, List<String> skillIdList, String userId) {
-		var task = taskRepository.findById(taskId).orElseThrow(
-                () -> new ApiException(ErrorCode.TASK_NOT_EXIST));
-
-        if (!projectMemberService.checkAddedMemberInProject(userId, task.getProjectId())) {
-            throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_PROJECT);
-        }
-        
-        for(String skillId : skillIdList) {
-    		TaskSkill taskSkill = TaskSkill.builder().taskId(taskId).skillId(skillId).build();
-    		taskSkillRepository.save(taskSkill);
-    	}
-	}
-
-
-	@Override
+	@Transactional
 	public void updateTaskSkills(UUID taskId, List<String> skillIdList, String userId) {
 		var task = taskRepository.findById(taskId).orElseThrow(
                 () -> new ApiException(ErrorCode.TASK_NOT_EXIST));
@@ -73,6 +58,4 @@ public class TaskSkillServiceImplement implements TaskSkillService {
     		taskSkillRepository.save(taskSkill);
     	}
 	}
-
-    
 }

@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,12 +31,6 @@ public class TaskSkillController {
     @GetMapping("{taskId}")
     public List<Skill> getTaskSkills(@PathVariable("taskId") UUID taskId, Principal principal) {
     	return taskSkillService.getTaskSkills(taskId, principal.getName());
-    }
-    
-    @PostMapping("{taskId}")
-    public void addTaskSkills(@PathVariable("taskId") UUID taskId, 
-    		@RequestBody List<String> skillIdList, Principal principal) {
-    	taskSkillService.addTaskSkills(taskId, skillIdList, principal.getName());
     }
     
     @PutMapping("{taskId}")

@@ -99,15 +99,11 @@ const MyProfile = () => {
     setSelectedSkills(event.target.value);
   };
 
-  const onUpdate = async (data) => {
+  const onUpdate = async () => {
     try {
       setUpdateLoading(true);
-      data.skillList = selectedSkills.map((skill) => skill.skillId);
-      await dispatch(
-        updateUserSkills({
-          ...data,
-        })
-      );
+      const skillList = selectedSkills.map((skill) => skill.skillId);
+      await dispatch(updateUserSkills(skillList));
       toast.success("Cập nhật thông tin thành công");
     } catch (e) {
       console.error(e);
@@ -445,10 +441,18 @@ const MyProfile = () => {
           <DialogActions
             sx={{ justifyContent: "flex-end", pr: 8, pb: 5, gap: 3 }}
           >
-            <Button onClick={handleCancelImage} color="primary" variant="outlined">
+            <Button
+              onClick={handleCancelImage}
+              color="primary"
+              variant="outlined"
+            >
               Cancel
             </Button>
-            <Button onClick={handleSaveImage} color="primary" variant="contained">
+            <Button
+              onClick={handleSaveImage}
+              color="primary"
+              variant="contained"
+            >
               Save
             </Button>
           </DialogActions>
