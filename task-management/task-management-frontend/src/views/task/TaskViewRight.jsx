@@ -33,6 +33,7 @@ const TitleWrapper = styled(Box)(({ theme }) => ({
 const TaskViewRight = () => {
   const { task } = useTaskContext();
   const { id: projectId } = useParams();
+  const { project } = useSelector((state) => state.project);
   const {
     category: categoryStore,
     priority: priorityStore,

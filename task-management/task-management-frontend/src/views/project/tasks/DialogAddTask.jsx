@@ -104,11 +104,15 @@ const DialogAddTask = ({ open, setOpen, defaultEvent }) => {
     setFilteredAssignees(
       members.filter(
         ({ member }) =>
-          member.firstName.toLowerCase().includes(search.toLowerCase()) ||
-          member.lastName.toLowerCase().includes(search.toLowerCase())
+          (member.firstName && member.firstName.toLowerCase().includes(search.toLowerCase())) ||
+          (member.lastName && member.lastName.toLowerCase().includes(search.toLowerCase()))
+      ).filter(
+        ({ member }) =>
+          member.firstName || member.lastName
       )
     );
   };
+  
 
   const handleAssigneeChange = (member) => {
     setSelectedAssignees((prevSelectedAssignees) =>

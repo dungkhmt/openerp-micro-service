@@ -36,6 +36,8 @@ import {
 import { deleteEvent } from "../../../../../store/project/events";
 import { useDispatch } from "react-redux";
 import { DialogEditEvent } from "../../../../../views/project/event/DialogEditEvent";
+import ConfirmationDialog from "../../../../../components/mui/dialog/ConfirmationDialog";
+
 
 const Event = () => {
   const {
@@ -210,6 +212,7 @@ const Event = () => {
   const [addNewTaskDialog, setAddNewTaskDialog] = useState(false);
   const [addExistingTaskDialog, setAddExistingTaskDialog] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
   const { project, fetchLoading: projectLoading } = useSelector(
     (state) => state.project
@@ -231,6 +234,14 @@ const Event = () => {
   const handleAddNewTaskClick = () => {
     handleClose();
     setAddNewTaskDialog(true);
+  };
+
+  const handleDeleteClick = () => {
+    setIsConfirmDialogOpen(true);
+  }
+
+  const handleCancelDelete = () => {
+    setIsConfirmDialogOpen(false);
   };
 
   const getEvent = useCallback(async () => {
@@ -279,7 +290,7 @@ const Event = () => {
     setEditDialog(true);
   };
 
-  const handleDelete = async () => {
+  const handleConfirmDelete = async () => {
     try {
       await dispatch(
         deleteEvent({
@@ -291,6 +302,9 @@ const Event = () => {
     } catch (error) {
       console.error(error);
       toast.error("Lỗi khi xóa sự kiện.");
+    } finally {
+      setIsConfirmDialogOpen(false);
+      navigate(`/project/${id}/event`);
     }
   };
 
@@ -316,7 +330,7 @@ const Event = () => {
   ) {
     return <CircularProgressLoading />;
   }
-console.log(event)
+  console.log(event);
   return (
     <>
       <Helmet>
@@ -370,7 +384,7 @@ console.log(event)
               <Icon fontSize={18} icon="mingcute:pencil-line" />
             </IconButton>
             <IconButton
-              onClick={handleDelete}
+              onClick={handleDeleteClick}
               sx={{
                 transition: "background-color 0.5s",
                 border: "1px solid #FFCCCC",
@@ -460,10 +474,7 @@ console.log(event)
                   }}
                 >
                   <MenuItem onClick={handleAddNewTaskClick} sx={{ gap: 3 }}>
-                    <Icon
-                      fontSize={18}
-                      icon="icon-park-outline:add"
-                    />
+                    <Icon fontSize={18} icon="icon-park-outline:add" />
                     <Typography variant="body1">Tạo nhiệm vụ mới</Typography>
                   </MenuItem>
                   <MenuItem onClick={handleAddExistingClick} sx={{ gap: 3 }}>
@@ -603,6 +614,19 @@ console.log(event)
           setOpenDialog={setEditDialog}
           isUpdate={isUpdate}
           setIsUpdate={setIsUpdate}
+        />
+        <ConfirmationDialog
+          open={isConfirmDialogOpen}
+          onClose={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+          title="Xoá sự kiện"
+          content={
+            <>
+              Bạn có chắc chắn muốn xoá{" "}
+              <span style={{ fontWeight: "bold" }}>{event.name}</span>?
+              Hành động này không thể hoàn tác.
+            </>
+          }
         />
       </Box>
     </>
