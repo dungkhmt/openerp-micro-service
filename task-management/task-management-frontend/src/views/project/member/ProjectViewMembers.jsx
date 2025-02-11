@@ -124,7 +124,7 @@ const columns = (handleMemberClick, projectId, myRole) => {
   ];
 
   // Conditionally add the "Actions" field based on the role
-  if (myRole === "owner") {
+  if (myRole === "owner" || myRole === "member") {
     baseColumns.push({
       flex: 0.1,
       minWidth: 60,
@@ -296,10 +296,13 @@ const ProjectViewMembers = () => {
   useEffect(() => {
     setFilterMembers(
       members.filter((member) => {
-        const fullName =
-          `${member.member.firstName ?? ""} ${
-            member.member.lastName ?? ""
-          }`?.toLowerCase() ?? "";
+        const firstName = member.member.firstName ?? "";
+        const lastName = member.member.lastName ?? "";
+        if (!firstName && !lastName) {
+          return false;
+        }
+        
+        const fullName = `${firstName} ${lastName}`.toLowerCase();
         const id = member.member.id.toLowerCase();
         const email = member.member.email?.toLowerCase() ?? "";
         return (
@@ -310,6 +313,7 @@ const ProjectViewMembers = () => {
       })
     );
   }, [search, members]);
+  
 
   useEffect(() => {
     updateHeight(20);
@@ -320,7 +324,7 @@ const ProjectViewMembers = () => {
       <Box
         sx={{ display: "flex", justifyContent: "space-between", mb: 2, px: 2 }}
       >
-        <Typography variant="h6">{members.length} thành viên</Typography>
+        <Typography variant="h6">{filterMembers.length} thành viên</Typography>
         <Box
           sx={{
             display: "flex",

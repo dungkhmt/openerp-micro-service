@@ -66,6 +66,7 @@ const DialogEditInfo = ({ isEditing, setIsEditing, project }) => {
   const handleCancelClick = () => {
     setIsEditing(false);
     setEditedProject({ ...project });
+    setWarning("");
   };
 
   const handleInputChange = (e) => {

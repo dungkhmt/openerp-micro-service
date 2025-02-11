@@ -44,7 +44,7 @@ const ConfirmationDialog = ({
           <Typography variant="body1">{content}</Typography>
         </Box>
       </DialogContent>
-      <Divider />
+      <Divider sx={{ width: "90%", mx: "auto" }} />
       <DialogActions sx={{ justifyContent: "flex-end", pr: 7 }}>
         <Button
           onClick={onClose}
