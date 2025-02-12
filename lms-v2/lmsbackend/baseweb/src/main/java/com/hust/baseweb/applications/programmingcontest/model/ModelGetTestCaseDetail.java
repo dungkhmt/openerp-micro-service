@@ -1,7 +1,9 @@
 package com.hust.baseweb.applications.programmingcontest.model;
 
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
@@ -9,26 +11,15 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ModelGetTestCaseDetail {
 
-    String testCase;
-
-//     String problemId;
-
-    String correctAns;
-
-//     String problemDescription;
-//
-//     String problemSolution;
-
-    int point;
-
-    UUID testCaseId;
-
-    String isPublic;
-
-    String status;
-
-    String description;
+    private UUID testCaseId;
+    private String problemId;
+    private String correctAns;
+    private String testCase;
+    private String problemDescription;
+    private String problemSolution;
+    private int point;
+    private String isPublic;
+    private String description;
 }

@@ -8,6 +8,30 @@ export const user = {
   icon: "UsersIcon",
   text: "Users",
   child: [
+    // {
+    //   id: "MENU_USER_CREATE",
+    //   path: "/userlogin/create",
+    //   isPublic: false,
+    //   icon: "StarBorder",
+    //   text: "Tạo mới",
+    //   child: [],
+    // },
+    // {
+    //   id: "MENU_USER_LIST",
+    //   path: "/userlogin/list",
+    //   isPublic: false,
+    //   icon: "StarBorder",
+    //   text: "Danh sách",
+    //   child: [],
+    // },
+    // {
+      //   id: "MENU_USER_APPROVE_REGISTRATION",
+      //   path: "/user-group/user/approve-register",
+      //   isPublic: false,
+      //   icon: "StarBorder",
+      //   text: "Phê duyệt",
+      //   child: [],
+      // },
     {
       id: "MENU_USER.MENU_USER_LIST",
       onClick: () => {

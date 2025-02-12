@@ -15,10 +15,8 @@ const dev = {
   },
   keycloak: {
     url: "https://erp3.soict.ai/iam",
-    // realm: "LMS",
-    // clientId: "task-management",
-    realm: "OpenERP-Dev",
-    clientId: "openerp-ui-dev",
+    realm: "LMS",
+    clientId: "task-management",
   },
 };
 

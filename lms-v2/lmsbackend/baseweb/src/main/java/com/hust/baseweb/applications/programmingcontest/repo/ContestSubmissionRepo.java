@@ -1,6 +1,7 @@
 package com.hust.baseweb.applications.programmingcontest.repo;
 
 import com.hust.baseweb.applications.admin.dataadmin.education.model.ProgrammingContestSubmissionOM;
+import com.hust.baseweb.applications.education.entity.LogUserLoginCourseChapterMaterial;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
 import com.hust.baseweb.applications.programmingcontest.model.ModelProblemMaxSubmissionPoint;
 import com.hust.baseweb.applications.programmingcontest.model.ModelSubmissionInfoRanking;
@@ -45,7 +46,7 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmissionEn
     @Query(value = "select distinct problem_id from contest_submission_new " +
                    "where user_submission_id = :user_id " +
                    "and contest_id = :contest_id " +
-                   "and status = 'Accepted'"
+                   "and status = 'Accept'"
         ,
            nativeQuery = true
     )
@@ -74,16 +75,6 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmissionEn
     List<ContestSubmissionEntity> findAllByContestIdAndUserIdAndProblemId(
         @Param("cid") String cid,
         @Param("uid") String uid,
-        @Param("pid") String pid
-    );
-    @Query(value =
-               "select * from contest_submission_new csn where csn.contest_id = :cid and csn.problem_id=:pid" +
-               " order by created_stamp desc "
-        ,
-           nativeQuery = true
-    )
-    List<ContestSubmissionEntity> findAllByContestIdAndProblemId(
-        @Param("cid") String cid,
         @Param("pid") String pid
     );
 
@@ -117,7 +108,7 @@ public interface ContestSubmissionRepo extends JpaRepository<ContestSubmissionEn
     @Query(value = "select count(*) from contest_submission_new", nativeQuery = true)
     int countTotal();
 
-    @Query(value = "select count(*) from contest_submission_new where status = 'Accepted'", nativeQuery = true)
+    @Query(value = "select count(*) from contest_submission_new where status = 'Accept'", nativeQuery = true)
     int countTotalAccept();
 
     @Query(

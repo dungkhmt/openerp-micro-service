@@ -2,8 +2,6 @@ package com.hust.baseweb.utils;
 
 import com.hust.baseweb.model.querydsl.SortCriteria;
 import org.javatuples.Pair;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 
@@ -122,18 +120,6 @@ public class CommonUtils {
             n = n - 1;
         }
         return ans;
-    }
-
-    public static Pageable getPageable(Integer page, Integer size, Sort sort) {
-        if (page == null || page < 0) {
-            page = 0;
-        }
-
-        if (size == null || size < 1) {
-            size = Integer.MAX_VALUE;
-        }
-
-        return PageRequest.of(page, size, sort);
     }
 
 }

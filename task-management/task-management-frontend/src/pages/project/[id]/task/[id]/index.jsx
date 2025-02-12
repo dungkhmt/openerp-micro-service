@@ -1,5 +1,4 @@
-import { Grid, Card, Box, Skeleton, Divider, IconButton } from "@mui/material";
-import { Icon } from "@iconify/react";
+import { Grid, Card, Box, Skeleton, Divider } from "@mui/material";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -9,7 +8,6 @@ import { TaskViewLeft } from "../../../../../views/task/TaskViewLeft";
 import TaskViewRight from "../../../../../views/task/TaskViewRight";
 import { usePreventOverflow } from "../../../../../hooks/usePreventOverflow";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 const LeftLoading = () => (
   <Card sx={{ p: 6 }}>
@@ -66,7 +64,6 @@ const RightLoading = () => (
 );
 
 const Task = () => {
-  const navigate = useNavigate();
   const { task, error, isLoading: taskLoading } = useTaskContext();
   const { project, fetchLoading: projectLoading } = useSelector(
     (state) => state.project
@@ -99,9 +96,6 @@ const Task = () => {
           } | ${project?.name ?? ""} | Task management`}
         </title>
       </Helmet>
-      <IconButton onClick={() => navigate(-1)} >
-        <Icon fontSize={24} icon="mdi:arrow-left" />
-      </IconButton>
       <Box
         ref={ref}
         sx={{

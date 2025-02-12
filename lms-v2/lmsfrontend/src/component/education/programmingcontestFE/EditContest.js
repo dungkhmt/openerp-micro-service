@@ -1,19 +1,19 @@
 import DateFnsUtils from "@date-io/date-fns";
-import {MuiPickersUtilsProvider} from "@material-ui/pickers";
-import {LoadingButton} from "@mui/lab";
+import { MuiPickersUtilsProvider } from "@material-ui/pickers";
+import { LoadingButton } from "@mui/lab";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import DateTimePicker from "@mui/lab/DateTimePicker";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
-import {Grid, InputAdornment, LinearProgress} from "@mui/material";
+import { Grid, InputAdornment, LinearProgress } from "@mui/material";
 import TextField from "@mui/material/TextField";
-import {request} from "api";
+import { request } from "api";
 import StyledSelect from "component/select/StyledSelect";
 import withScreenSecurity from "component/withScreenSecurity";
 import _ from "lodash";
-import React, {useEffect, useState} from "react";
-import {useTranslation} from "react-i18next";
-import {useParams} from "react-router-dom";
-import {errorNoti, successNoti} from "utils/notification";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
+import { errorNoti, successNoti } from "utils/notification";
 import HustContainerCard from "../../common/HustContainerCard";
 
 function EditContest() {
@@ -100,7 +100,7 @@ function EditContest() {
   };
 
   function getContestInfo() {
-    request("get", "/contests/" + contestId, (res) => {
+    request("get", "/contests/" + contestId , (res) => {
       setLoading(false);
 
       const data = res.data;
@@ -268,7 +268,7 @@ function EditContest() {
                   />,
                   <TextField
                     fullWidth
-                    type="number"
+                    type=" number"
                     size="small"
                     id="maxSourceCodeLength"
                     label="Source length limit"
