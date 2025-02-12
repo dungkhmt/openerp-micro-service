@@ -7,15 +7,8 @@ const endPoints = {
   createTask: `/tasks`,
   updateTask: (id) => `/tasks/${id}`,
   getAssignedTasks: `/tasks/assigned-me`,
-  getAssignedTasksForUser: (userId) => `/tasks/assigned-user/${userId}`,
-  getMemberTasks:(projectId, assigneeId) => `/tasks/member-tasks?projectId=${projectId}&assigneeId=${assigneeId}`,
   getCreatedTasks: `/tasks/created-by-me`,
   getLogs: (id) => `/tasks/${id}/logs`,
-  getTaskSkills: (id) => `/task-skills/${id}`,
-  updateTaskSkills: (id) => `/task-skills/${id}`,
-  getEventTasks: (eventId) => `tasks/event-tasks?eventId=${eventId}`,
-  addExistingTasksToEvent: (eventId) => `tasks/event-tasks?eventId=${eventId}`,
-  getTasksWithoutEvent: (projectId) => `tasks/without-event?projectId=${projectId}`,
   tasksGantt: "/tasks/gantt",
 };
 
@@ -74,51 +67,9 @@ const TaskService = {
       else throw e;
     }
   },
-  getAssignedTasksForUser: async (id, filter, cb) => {
-    try {
-      const response = await privateClient.get(endPoints.getAssignedTasksForUser(id), {
-        params: filter,
-      });
-      if (response?.data && isFunction(cb)) cb(null, response.data);
-      return response?.data;
-    } catch (e) {
-      if (isFunction(cb)) cb(e);
-      else throw e;
-    }
-  },
-  getMemberTasks: async (projectId, assigneeId, cb) => {
-    try {
-      const response = await privateClient.get(endPoints.getMemberTasks(projectId, assigneeId));
-      if (response?.data && isFunction(cb)) cb(null, response.data);
-      return response?.data;
-    } catch (e) {
-      if (isFunction(cb)) cb(e);
-      else throw e;
-    }
-  },
   getLogs: async (id, cb) => {
     try {
       const response = await privateClient.get(endPoints.getLogs(id));
-      if (response?.data && isFunction(cb)) cb(null, response.data);
-      return response?.data;
-    } catch (e) {
-      if (isFunction(cb)) cb(e);
-      else throw e;
-    }
-  },
-  getTaskSkills: async (id, cb) => {
-    try {
-      const response = await privateClient.get(endPoints.getTaskSkills(id));
-      if (response?.data && isFunction(cb)) cb(null, response.data);
-      return response?.data;
-    } catch (e) {
-      if (isFunction(cb)) cb(e);
-      else throw e;
-    }
-  },
-  updateTaskSkills: async (id, data, cb) => {
-    try {
-      const response = await privateClient.put(endPoints.updateTaskSkills(id), data);
       if (response?.data && isFunction(cb)) cb(null, response.data);
       return response?.data;
     } catch (e) {
@@ -148,43 +99,6 @@ const TaskService = {
       const response = await privateClient.get(endPoints.getCreatedTasks, {
         params: filter,
       });
-      if (response?.data && isFunction(cb)) cb(null, response.data);
-      return response?.data;
-    } catch (e) {
-      if (isFunction(cb)) cb(e);
-      else throw e;
-    }
-  },
-  getEventTasks: async (eventId, cb) => {
-    try {
-      const response = await privateClient.get(
-        endPoints.getEventTasks(eventId)
-      );
-      if (response?.data && isFunction(cb)) cb(null, response.data);
-      return response?.data;
-    } catch (e) {
-      if (isFunction(cb)) cb(e);
-      else throw e;
-    }
-  },
-  addExistingTasksToEvent: async (eventId, data, cb) => {
-    try {
-      const response = await privateClient.put(
-        endPoints.addExistingTasksToEvent(eventId),
-        data
-      );
-      if (response?.data && isFunction(cb)) cb(null, response.data);
-      return response?.data;
-    } catch (e) {
-      if (isFunction(cb)) cb(e);
-      else throw e;
-    }
-  },
-  getTasksWithoutEvent: async (projectId, cb) => {
-    try {
-      const response = await privateClient.get(
-        endPoints.getTasksWithoutEvent(projectId)
-      );
       if (response?.data && isFunction(cb)) cb(null, response.data);
       return response?.data;
     } catch (e) {

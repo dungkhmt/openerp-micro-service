@@ -74,4 +74,4 @@ const CommonManager = () => {
   );
 };
 
-export { CommonManager };
+export default CommonManager;

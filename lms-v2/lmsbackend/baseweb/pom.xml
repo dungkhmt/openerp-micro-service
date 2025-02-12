@@ -21,11 +21,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>vn.edu.hust.soict</groupId>
-            <artifactId>judge0-client</artifactId>
-            <version>0.0.1</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
         </dependency>
@@ -330,6 +325,11 @@
             <artifactId>docker-client</artifactId>
             <version>8.15.2</version>
         </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.pdfbox</groupId>-->
+        <!--            <artifactId>pdfbox</artifactId>-->
+        <!--            <version>1.8.3</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
@@ -369,6 +369,17 @@
             <version>30.1.1-jre</version>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>snapshots</id>
+            <name>nexus</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>

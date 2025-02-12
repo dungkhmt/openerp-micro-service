@@ -1,38 +1,38 @@
 import FileSaver from "file-saver";
-import {errorNoti, infoNoti, successNoti, warningNoti} from "utils/notification";
+import {errorNoti, successNoti, warningNoti} from "utils/notification";
 import JSZip from "jszip";
 
-// export const copyAllTestCases = (testCases) => {
-//   let allTestCases = "";
-//   for (const testCase_ith of testCases) {
-//     allTestCases +=
-//       "------------- \nINPUT: \n" +
-//       testCase_ith.testCase +
-//       "\n\nOUTPUT: \n" +
-//       testCase_ith.correctAns +
-//       "\n\n";
-//   }
-//   if (allTestCases.length > 0)
-//     navigator.clipboard.writeText(allTestCases).then(() => successNoti("Copied", 2000));
-//   else warningNoti("No testcase satisfies the requirement", 2000);
-// };
-
-export const copyTestCasesWithPublicMode = (testCases, t) => {
+export const copyAllTestCases = (testCases) => {
   let allTestCases = "";
-  for (const testCase of testCases) {
+  for (const testCase_ith of testCases) {
     allTestCases +=
-      "------------- \n" + t('input') + ": \n" +
-      testCase.testCase +
-      "\n\n" + t('output') + ": \n" +
-      testCase.correctAns +
+      "------------- \nINPUT: \n" +
+      testCase_ith.testCase +
+      "\n\nOUTPUT: \n" +
+      testCase_ith.correctAns +
+      "\n\n";
+  }
+  if (allTestCases.length > 0)
+    navigator.clipboard.writeText(allTestCases).then(() => successNoti("Copied", 2000));
+  else warningNoti("No testcase satisfies the requirement", 2000);
+};
+
+export const copyTestCasesWithPublicMode = (testCases, publicOnly) => {
+  let allTestCases = "";
+  for (const testCase_ith of testCases) {
+    if (publicOnly && testCase_ith?.isPublic !== "Y") continue;
+
+    allTestCases +=
+      "------------- \nINPUT: \n" +
+      testCase_ith.testCase +
+      "\n\nOUTPUT: \n" +
+      testCase_ith.correctAns +
       "\n\n";
   }
 
-  if (allTestCases.length > 0) {
-    navigator.clipboard.writeText(allTestCases).then(() => successNoti(t("copied")));
-  } else {
-    infoNoti(t('noTestCase'), 3000);
-  }
+  if (allTestCases.length > 0)
+    navigator.clipboard.writeText(allTestCases).then(() => successNoti("Copied", 1000));
+  else warningNoti("No testcase satisfies the requirement", 2000);
 };
 
 // export const downloadAllTestCases = (testcases) => {
@@ -51,16 +51,18 @@ export const copyTestCasesWithPublicMode = (testCases, t) => {
 //   }
 // };
 
-export const downloadAllTestCasesWithPublicMode = (testcases, t) => {
+export const downloadAllTestCasesWithPublicMode = (testcases, publicOnly) => {
   const zip = new JSZip();
   const files = []
 
   for (const testcase of testcases) {
+    if (publicOnly && testcase?.isPublic !== "Y") continue;
+
     files.push(new Blob(
       [
-        t('input') + ": \n" +
+        "INPUT: \n" +
         testcase.testCase +
-        "\n\n" + t('output') + ": \n" +
+        "\n\nOUTPUT: \n" +
         testcase.correctAns,
       ],
       {type: "text/plain;charset=utf-8"}
@@ -69,17 +71,18 @@ export const downloadAllTestCasesWithPublicMode = (testcases, t) => {
 
   if (files.length > 0) {
     files.forEach((file, index) => {
-      zip.file(`TestCase-${index + 1}.txt`, file)
+      zip.file(`Testcase-${index + 1}.txt`, file)
     })
 
     zip.generateAsync({type: 'blob'})
       .then(content => {
+        // successNoti(files.length + " testcases downloaded", 2000);
         FileSaver.saveAs(content, 'testcases.zip');
       })
       .catch(e => {
-        errorNoti(t("common:error"))
+        errorNoti('Error generating archive')
       });
   } else {
-    infoNoti(t('noTestCase'), 3000);
+    warningNoti("No testcase satisfies the requirement", 2000);
   }
 };

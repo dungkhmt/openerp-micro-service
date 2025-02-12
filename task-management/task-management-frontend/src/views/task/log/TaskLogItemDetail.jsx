@@ -42,7 +42,6 @@ const TextState = styled(Typography)({
 
 const FieldComponent = ({ field, value, isOld = false }) => {
   const { members, project } = useSelector((state) => state.project);
-  const { events } = useSelector((state) => state.events);
   const {
     category: categoryStore,
     priority: priorityStore,
@@ -50,7 +49,7 @@ const FieldComponent = ({ field, value, isOld = false }) => {
   } = useSelector((state) => state);
   const { task } = useTaskContext();
 
-  let category, status, priority, assignee, fileName, fileId, subTask, event;
+  let category, status, priority, assignee, fileName, fileId, subTask;
 
   const onDownloadFile = async () => {
     if (!fileId) {
@@ -118,6 +117,7 @@ const FieldComponent = ({ field, value, isOld = false }) => {
       return status && <TaskStatus status={status} />;
     case "assigneeId":
       assignee = members.find((m) => m.member.id === value);
+
       return (
         assignee && (
           <TextHighlight
@@ -126,17 +126,6 @@ const FieldComponent = ({ field, value, isOld = false }) => {
             {`${assignee.member?.firstName ?? ""} ${
               assignee.member?.lastName ?? ""
             }`}
-          </TextHighlight>
-        )
-      );
-    case "eventId":
-      event = events.find((m) => m.id === value);
-      return (
-        event && (
-          <TextHighlight
-            sx={{ textDecoration: isOld ? "line-through" : "none" }}
-          >
-            {event.name}
           </TextHighlight>
         )
       );

@@ -44,7 +44,6 @@ public class PlanGeneralClassService {
         newClass.setCrew(request.getCrew());
         newClass.setQuantityMax(request.getQuantityMax());
         newClass.setLearningWeeks(request.getLearningWeeks());
-        newClass.setDuration(request.getDuration());
         if (request.getClassType() != null && !request.getClassType().isEmpty()) {
             newClass.setClassType(request.getClassType());
         } else {

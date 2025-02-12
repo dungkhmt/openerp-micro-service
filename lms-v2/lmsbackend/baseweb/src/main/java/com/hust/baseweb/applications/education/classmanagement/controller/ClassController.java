@@ -226,7 +226,6 @@ public class ClassController {
 
     @Async
     public void logUserGetRegisteredClasses(String userId){
-        if (true) return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logUserGetRegisteredClasses, userId = " + logM.getUserId());
@@ -246,7 +245,6 @@ public class ClassController {
 
     @Async
     public void logUserGetClassDetailForLearning(String userId, String courseName){
-        if (true) return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logUserGetClassDetailForLearning, userId = " + logM.getUserId());
@@ -788,7 +786,6 @@ public class ClassController {
     @Async
     public void logUserViewCourseMaterial(String userId, String courseName,
                                           String chapterName, String materialName){
-        if (true) return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logUpdateContest, userId = " + logM.getUserId());

@@ -1,6 +1,5 @@
 package com.hust.openerp.taskmanagement.service.implement;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
@@ -87,12 +86,6 @@ public class ProjectServiceImplement implements ProjectService {
             projectToUpdate.setName(project.getName());
         if (project.getDescription() != null && !project.getDescription().equals(""))
             projectToUpdate.setDescription(project.getDescription());
-        if (project.getCode() != null && !project.getCode().equals("")) {
-        	if (projectRepository.existsByCode(project.getCode())) {
-                throw new ApiException(ErrorCode.PROJECT_CODE_EXIST);
-            }
-            projectToUpdate.setCode(project.getCode());
-        }
 
         var updatedProject = projectRepository.save(projectToUpdate);
 
@@ -140,9 +133,4 @@ public class ProjectServiceImplement implements ProjectService {
             return dto;
         });
     }
-
-	@Override
-	public List<String> getProjectsCode() {
-		return projectRepository.findAllProjectCode();
-	}
 }

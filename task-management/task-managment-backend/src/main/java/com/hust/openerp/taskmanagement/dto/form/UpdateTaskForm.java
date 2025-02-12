@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -43,8 +41,4 @@ public class UpdateTaskForm {
     private Integer progress;
     @Nullable
     private String note;
-    @Nullable
-    private List<String> skillIdList;
-    @Nullable
-    private UUID eventId;
 }

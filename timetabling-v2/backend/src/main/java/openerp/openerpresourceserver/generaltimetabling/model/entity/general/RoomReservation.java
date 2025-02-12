@@ -25,9 +25,6 @@ public class RoomReservation {
     private String room;
     private Integer duration;
 
-    //public String toString(){
-    //    return "crew[" + crew + "],start[" + startTime + "],end[" + endTime + "],weekday[" + weekday + "],room[" + room + "],duration[" + duration + "]";
-    //}
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

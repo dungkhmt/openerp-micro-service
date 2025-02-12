@@ -6,9 +6,6 @@ import com.hust.baseweb.applications.programmingcontest.exception.MiniLeetCodeEx
 import com.hust.baseweb.applications.programmingcontest.model.*;
 import com.hust.baseweb.applications.programmingcontest.model.externalapi.ContestProblemModelResponse;
 import com.hust.baseweb.applications.programmingcontest.model.externalapi.SubmissionModelResponse;
-import com.hust.baseweb.model.ProblemFilter;
-import com.hust.baseweb.model.TestCaseFilter;
-import com.hust.baseweb.model.dto.ProblemDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,12 +16,12 @@ import java.util.UUID;
 
 public interface ProblemTestCaseService {
 
-    ProblemEntity createContestProblem(String userID, ModelCreateContestProblem dto, MultipartFile[] files);
+    ProblemEntity createContestProblem(String userID, String json, MultipartFile[] files) throws MiniLeetCodeException;
 
     ProblemEntity updateContestProblem(
         String problemId,
         String userId,
-        ModelUpdateContestProblem dto,
+        String json,
         MultipartFile[] files
     ) throws Exception;
 
@@ -32,15 +29,15 @@ public interface ProblemTestCaseService {
 
     ModelCreateContestProblemResponse getContestProblem(String problemId) throws Exception;
 
-//    ModelGetTestCaseResultResponse getTestCaseResult(
-//        String problemId,
-//        String userName,
-//        ModelGetTestCaseResult modelGetTestCaseResult
-//    ) throws Exception;
+    ModelGetTestCaseResultResponse getTestCaseResult(
+        String problemId,
+        String userName,
+        ModelGetTestCaseResult modelGetTestCaseResult
+    ) throws Exception;
 
     ModelCheckCompileResponse checkCompile(ModelCheckCompile modelCheckCompile, String userName) throws Exception;
 
-//    TestCaseEntity saveTestCase(String problemId, ModelSaveTestcase modelSaveTestcase);
+    TestCaseEntity saveTestCase(String problemId, ModelSaveTestcase modelSaveTestcase);
 
     ContestEntity createContest(ModelCreateContest modelCreateContest, String userName) throws Exception;
 
@@ -90,19 +87,19 @@ public interface ProblemTestCaseService {
     ) throws Exception;
 
 
-//    ModelContestSubmissionResponse submitSolutionOutput(
-//        String solutionOutput,
-//        String contestId,
-//        String problemId,
-//        UUID testCaseId,
-//        String userName
-//    ) throws Exception;
-//
-//    ModelContestSubmissionResponse submitSolutionOutputOfATestCase(
-//        String userId,
-//        String solutionOutput,
-//        ModelSubmitSolutionOutputOfATestCase m
-//    );
+    ModelContestSubmissionResponse submitSolutionOutput(
+        String solutionOutput,
+        String contestId,
+        String problemId,
+        UUID testCaseId,
+        String userName
+    ) throws Exception;
+
+    ModelContestSubmissionResponse submitSolutionOutputOfATestCase(
+        String userId,
+        String solutionOutput,
+        ModelSubmitSolutionOutputOfATestCase m
+    );
 
     ModelStudentRegisterContestResponse studentRegisterContest(
         String contestId,
@@ -151,17 +148,15 @@ public interface ProblemTestCaseService {
         Constants.GetPointForRankingType getPointForRankingType
     );
 
-//    Page<ProblemEntity> getPublicProblemPaging(Pageable pageable);
+    Page<ProblemEntity> getPublicProblemPaging(Pageable pageable);
 
-    Page<ModelGetTestCaseDetail> getTestCaseByProblem(String problemId, TestCaseFilter filter);
+    List<ModelGetTestCase> getTestCaseByProblem(String problemId);
 
-    TestCaseDetailProjection getTestCaseDetail(UUID testCaseId);
+    ModelGetTestCaseDetail getTestCaseDetail(UUID testCaseId) throws MiniLeetCodeException;
 
-//    void editTestCase(UUID testCaseId, ModelSaveTestcase modelSaveTestcase) throws MiniLeetCodeException;
+    void editTestCase(UUID testCaseId, ModelSaveTestcase modelSaveTestcase) throws MiniLeetCodeException;
 
     ModelAddUserToContestResponse addUserToContest(ModelAddUserToContest modelAddUserToContest);
-
-    ModelAddUserToContestResponse updateUserFullnameOfContest(ModelAddUserToContest modelAddUserToContest);
 
     void addUsers2ToContest(String contestId, AddUsers2Contest addUsers2Contest);
 
@@ -219,14 +214,12 @@ public interface ProblemTestCaseService {
     ModelEvaluateBatchSubmissionResponse judgeAllSubmissionsOfContest(String contestId);
 
     void evaluateSubmission(UUID submisionId);
-    void evaluateSubmissions(String contestId, String problemId);
-
 
     void evaluateSubmission(ContestSubmissionEntity sub, ContestEntity contest);
 
     void evaluateSubmissionUsingQueue(ContestSubmissionEntity submission, ContestEntity contest);
 
-//    List<CodePlagiarism> findAllByContestId(String contestId);
+    List<CodePlagiarism> findAllByContestId(String contestId);
 
     List<CodePlagiarism> findAllBy(ModelGetCodeSimilarityParams input);
 
@@ -238,18 +231,20 @@ public interface ProblemTestCaseService {
 
     List<ModelGetContestResponse> getContestsUsingAProblem(String problemId);
 
-    Object addTestcase(
+    ModelUploadTestCaseOutput addTestCase(
         String testCase,
-        ModelProgrammingContestUploadTestCase modelUploadTestCase
-    ) throws Exception;
+        ModelProgrammingContestUploadTestCase modelUploadTestCase,
+        String userName
+    );
 
-    Object reCreateTestcaseCorrectAnswer(String problemId, UUID testCaseId) throws Exception;
+    ModelUploadTestCaseOutput rerunCreateTestCaseSolution(String problemId, UUID testCaseId, String userId);
 
-    Object editTestcase(
+    ModelUploadTestCaseOutput uploadUpdateTestCase(
         UUID testCaseId,
-        String testcaseContent,
-        ModelProgrammingContestUploadTestCase modelUploadTestCase
-    ) throws Exception;
+        String testCase,
+        ModelProgrammingContestUploadTestCase modelUploadTestCase,
+        String userName
+    );
 
     List<ModelUserJudgedProblemSubmissionResponse> getUserJudgedProblemSubmissions(String contestId);
 
@@ -272,24 +267,22 @@ public interface ProblemTestCaseService {
 
     TagEntity addNewTag(ModelTag tag);
 
-//    TagEntity updateTag(Integer tagId, ModelTag tag);
+    TagEntity updateTag(Integer tagId, ModelTag tag);
 
-//    void deleteTag(Integer tagId);
+    void deleteTag(Integer tagId);
 
     void switchAllContestJudgeMode(String judgeMode);
 
     void exportProblem(String id, OutputStream outputStream);
 
-    Page<ProblemDTO> getProblems(String ownerId, ProblemFilter filter, Boolean isPublic);
+    List<ProblemEntity> getOwnerProblems(String ownerId);
 
-    Page<ProblemDTO> getSharedProblems(String userId, ProblemFilter filter);
-
-    Page<ProblemDTO> getPublicProblems(String userId, ProblemFilter filter);
+    List<ProblemEntity> getSharedProblems(String userId);
+    List<ProblemEntity> getPublicProblems(String userId);
 
     List<ProblemEntity> getAllProblems(String userId);
 
     List<ContestProblemModelResponse> extApiGetAllProblems(String userID);
-
     List<SubmissionModelResponse> extApiGetSubmissions(String participantId);
 
 

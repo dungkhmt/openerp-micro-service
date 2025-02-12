@@ -48,7 +48,7 @@ public class ClassTimeScheduleBacktrackingSolver {
         for(int i = 0; i < n; i++) sol[i] = x[i];
         found = true;
         for(int i = 0; i< n; i++){
-            log.info("BacktrackingSolver solution x[" + i + "] = " + x[i]);
+            //log.info("BacktrackingSolver x[" + i + "] = " + x[i]);
         }
 
     }

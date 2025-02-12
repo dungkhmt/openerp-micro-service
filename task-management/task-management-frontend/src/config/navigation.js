@@ -15,19 +15,6 @@ const navigation = [
     ],
   },
   {
-    sectionTitle: "My Profile",
-  },
-  {
-    title: "My Profile",
-    icon: "mdi:account-outline",
-    children: [
-      {
-        title: "My Profile",
-        path: "/my-profile",
-      },
-    ],
-  },
-  {
     sectionTitle: "Projects & Tasks",
   },
   {
@@ -55,19 +42,6 @@ const navigation = [
       {
         title: "Công việc đã tạo",
         path: "/tasks/created-by-me",
-      },
-    ],
-  },
-  {
-    sectionTitle: "User Management",
-  },
-  {
-    title: "Quản lý nhân viên",
-    icon: "mdi:account-cog-outline",
-    children: [
-      {
-        title: "Danh sách nhân viên",
-        path: "/user-management",
       },
     ],
   },

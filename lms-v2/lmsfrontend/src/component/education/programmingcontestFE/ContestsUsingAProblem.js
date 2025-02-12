@@ -2,17 +2,15 @@ import React, {useEffect, useState} from "react";
 import {request} from "api";
 import {Link} from "react-router-dom";
 import StandardTable from "../../table/StandardTable";
-import {Box, Paper, Stack, Typography} from "@mui/material";
+import {Box} from "@mui/material";
 import {defaultDatetimeFormat} from "../../../utils/dateutils";
-import {useTranslation} from "react-i18next";
 
 export default function ContestsUsingAProblem(props) {
-  const {t} = useTranslation(["education/programmingcontest/contest", "education/programmingcontest/problem", 'common']);
   const problemId = props.problemId;
   const [contests, setContests] = useState([]);
   const columns = [
     {
-      title: 'ID',
+      title: "Contest",
       field: "contestId",
       render: (rowData) => (
         <Link
@@ -26,19 +24,15 @@ export default function ContestsUsingAProblem(props) {
       ),
     },
     {
-      title: t("contestName"),
-      field: "contestName",
-    },
-    {
-      title: t('common:manager'),
+      title: "Manager",
       field: "userId",
     },
     {
-      title: t("common:status"),
+      title: "Status",
       field: "statusId",
     },
     {
-      title: t("common:createdTime"),
+      title: "Created At",
       field: "createdAt",
       render: (contest) => defaultDatetimeFormat(contest.createdAt)
     },
@@ -55,22 +49,16 @@ export default function ContestsUsingAProblem(props) {
   }, []);
   return (
     <Box sx={{marginTop: "36px"}}>
-      <Stack direction="row" justifyContent='space-between'>
-        <Typography variant="h6" sx={{mb: 1.5}}>{t("education/programmingcontest/problem:contestUsingProblem")}</Typography>
-      </Stack>
       <StandardTable
+        title={"Contests using this problem"}
         columns={columns}
         data={contests}
         hideCommandBar
-        hideToolBar
         options={{
           selection: false,
           pageSize: 5,
-          search: false,
+          search: true,
           sorting: true,
-        }}
-        components={{
-          Container: (props) => <Paper {...props} elevation={0}/>,
         }}
       />
     </Box>

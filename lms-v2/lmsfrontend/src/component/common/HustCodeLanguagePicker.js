@@ -1,7 +1,6 @@
-import {MenuItem} from "@mui/material";
+import {MenuItem, TextField} from "@mui/material";
 import React from "react";
 import {COMPUTER_LANGUAGES, mapLanguageToDisplayName,} from "../education/programmingcontestFE/Constant";
-import StyledSelect from "../select/StyledSelect";
 
 const HustCodeLanguagePicker = (props) => {
   const {listLanguagesAllowed, language, onChangeLanguage, classRoot, ...remainProps} = props;
@@ -18,21 +17,23 @@ const HustCodeLanguagePicker = (props) => {
   }
 
   return (
-    <StyledSelect
+    <TextField
+      sx={{minWidth: 128}}
       {...remainProps}
       className={`${classRoot}`}
-      fullWidth
-      id="computerLanguages"
+      variant={"outlined"}
+      size={"small"}
       value={getLanguage(language)}
-      sx={{width: 128, mr: 'unset'}}
+      select
+      id="computerLanguages"
       onChange={onChangeLanguage}
     >
-      {Object.values(COMPUTER_LANGUAGES).map((language) => (
-        <MenuItem key={language} value={language} disabled={!isLanguageAvailable(language)}>
-          {mapLanguageToDisplayName(language)}
+      {Object.values(COMPUTER_LANGUAGES).map((item) => (
+        <MenuItem key={item} value={item} disabled={!isLanguageAvailable(item)}>
+          {mapLanguageToDisplayName(item)}
         </MenuItem>
       ))}
-    </StyledSelect>
+    </TextField>
   )
 };
 

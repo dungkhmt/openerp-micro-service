@@ -1,14 +1,14 @@
 import InfoIcon from "@mui/icons-material/Info";
 import ReplayIcon from "@mui/icons-material/Replay";
-import {Box, IconButton, LinearProgress, Typography} from "@mui/material";
-import {request} from "api";
+import { IconButton, LinearProgress, Box, Typography } from "@mui/material"; 
+import { request } from "api";
 import HustCopyCodeBlock from "component/common/HustCopyCodeBlock";
 import HustModal from "component/common/HustModal";
 import StandardTable from "component/table/StandardTable";
-import {forwardRef, useEffect, useImperativeHandle, useState} from "react";
-import {useTranslation} from "react-i18next";
-import {Link, useParams} from "react-router-dom";
-import {localeOption} from "utils/NumberFormat";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link, useParams } from "react-router-dom";
+import { localeOption } from "utils/NumberFormat";
 
 const StudentViewSubmission = forwardRef((props, ref) => {
   const { t } = useTranslation(
@@ -73,7 +73,7 @@ const StudentViewSubmission = forwardRef((props, ref) => {
       field: "status",
       cellStyle: (status) => {
         switch (status) {
-          case "Accepted":
+          case "Accept":
             return { color: "green" };
           case "In Progress":
             return { color: "gold" };

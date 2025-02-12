@@ -1,6 +1,7 @@
 {
-  "contest": "Cuộc thi",
-  "contestName": "Tên cuộc thi",
+  "contest": "Contest",
+  "contestId": "Contest ID",
+  "contestName": "Tên Contest",
   "contestTime": "Contest time",
   "isPublic": "Công khai",
   "submissionActionType": "Action for Submission",

@@ -5,8 +5,6 @@ import { useDispatch } from "react-redux";
 import { fetchCategories } from "../store/category";
 import { fetchPriorities } from "../store/priority";
 import { fetchStatuses } from "../store/status";
-import { fetchSkills } from "../store/skill";
-import { fetchUser } from "../store/my-profile";
 
 function PrivateRoute() {
   const { keycloak } = useKeycloak();
@@ -23,8 +21,6 @@ function PrivateRoute() {
         dispatch(fetchStatuses()),
         dispatch(fetchCategories()),
         dispatch(fetchPriorities()),
-        dispatch(fetchSkills()),
-        dispatch(fetchUser()),
       ]);
 
     fetchData();

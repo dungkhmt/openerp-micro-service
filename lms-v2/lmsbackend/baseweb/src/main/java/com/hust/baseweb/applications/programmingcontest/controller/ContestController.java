@@ -10,7 +10,6 @@ import com.hust.baseweb.applications.programmingcontest.model.*;
 import com.hust.baseweb.applications.programmingcontest.repo.ContestProblemRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.ContestRepo;
 import com.hust.baseweb.applications.programmingcontest.repo.ContestSubmissionRepo;
-import com.hust.baseweb.applications.programmingcontest.repo.ProblemRepo;
 import com.hust.baseweb.applications.programmingcontest.service.ContestService;
 import com.hust.baseweb.applications.programmingcontest.service.ProblemTestCaseService;
 import com.hust.baseweb.service.UserService;
@@ -34,7 +33,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import javax.ws.rs.Path;
 import java.io.InputStream;
 import java.security.Principal;
 import java.util.*;
@@ -51,52 +49,9 @@ public class ContestController {
     ContestSubmissionRepo contestSubmissionRepo;
     ContestProblemRepo contestProblemRepo;
     UserService userService;
-    ProblemRepo problemRepo;
     ContestService contestService;
 
     ApiService apiService;
-
-    @Secured("ROLE_TEACHER")
-    @PostMapping("/map-new-problem-to-submissions-in-contest")
-    public ResponseEntity<?> mapNewProblemToSubmissionsInContest(Principal
-                                                                 principal, @RequestBody ModelInputMapNewProblemToSubmissionsInContest m){
-        int cnt = contestService.mapNewProblemToSubmissionsInContest(m);
-        return ResponseEntity.ok().body(cnt);
-    }
-    @Secured("ROLE_TEACHER")
-    @GetMapping("/teacher-get-problem-detail-in-contest/{contestId}/{problemId}")
-    public ResponseEntity<?> teacherGetProblemDetailInContest(Principal principal, @PathVariable String contestId, @PathVariable String problemId){
-        log.info("teacherGetProblemDetailInContest, contestId  " + contestId + " problemId = " + problemId);
-        ContestEntity contest = contestRepo.findContestByContestId(contestId);
-        ProblemEntity problem = problemRepo.findByProblemId(problemId);
-        ModelRepsonseTeacherGetProblemDetailInContest res = new ModelRepsonseTeacherGetProblemDetailInContest();
-
-        if(problem != null){
-            res.setProblemId(problem.getProblemId());
-            res.setProblemName(problem.getProblemName());
-            res.setProblemDescription(problem.getProblemDescription());
-            res.setSolutionCode(problem.getCorrectSolutionSourceCode());
-        }
-
-        return ResponseEntity.ok().body(res);
-    }
-    @Secured("ROLE_TEACHER")
-    @GetMapping("/teacher-get-submissions-of-problem-in-contest/{contestId}/{problemId}")
-    public ResponseEntity<?> teacherGetSubmissionsOfProblemInContest(Principal principal, @PathVariable String contestId, @PathVariable String problemId){
-        ContestEntity contest = contestRepo.findContestByContestId(contestId);
-
-        List<ContestSubmissionEntity> submissions = contestSubmissionRepo.findAllByContestIdAndProblemId(contestId,problemId);
-        log.info("teacherGetSubmissionsOfProblemInContest, list.sz = " + submissions.size());
-
-        return ResponseEntity.ok().body(submissions);
-    }
-    @Secured("ROLE_TEACHER")
-    @PostMapping("/clone-contest")
-    public ResponseEntity<?> cloneContest(Principal principal, @RequestBody ModelInputCloneContest m){
-        log.info("clone Contest, fromContestId = " + m.getFromContestId() + " toContestId = " + m.getToContestId() + " toContestName = " + m.getToContestName());
-        ModelGetContestResponse res = contestService.cloneContest(principal.getName(),m);
-        return ResponseEntity.ok().body(res);
-    }
     @Secured("ROLE_TEACHER")
     @PostMapping("/contests")
     public ResponseEntity<?> createContest(
@@ -124,7 +79,6 @@ public class ContestController {
 
     @Async
     public void logUpdateContest(String userId, String contestId, ModelUpdateContest modelUpdateContest){
-        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logUpdateContest, userId = " + logM.getUserId());
@@ -186,7 +140,6 @@ public class ContestController {
 
     @Async
     public void logGetContestDetail(String userId, String contestId){
-        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logGetContestDetail, userId = " + logM.getUserId());
@@ -201,7 +154,7 @@ public class ContestController {
     public ResponseEntity<?> getContestDetail(@PathVariable("contestId") String contestId, Principal principal) {
         log.info("getContestDetail constestid {}", contestId);
 
-        //logGetContestDetail(principal.getName(),contestId);
+        logGetContestDetail(principal.getName(),contestId);
 
         ModelGetContestDetailResponse response = problemTestCaseService.getContestDetailByContestIdAndTeacher(
             contestId,
@@ -211,7 +164,6 @@ public class ContestController {
 
     @Async
     public void logStudentGetProblemOfContestForSolving(String userId, String contestId, String problemId){
-        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logStudentGetProblemOfContestForSolving, userId = " + logM.getUserId());
@@ -222,8 +174,6 @@ public class ContestController {
         logM.setDescription("an user get a problem of a contest for solving");
         apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
     }
-
-
     @GetMapping("/contests/{contestId}/problems/{problemId}")
     public ResponseEntity<?> getProblemDetailInContestViewByStudent(Principal principal,
         @PathVariable("problemId") String problemId, @PathVariable("contestId") String contestId
@@ -237,9 +187,6 @@ public class ContestController {
             ContestProblem cp = contestProblemRepo.findByContestIdAndProblemId(contestId, problemId);
             if (cp == null) {
                 return ResponseEntity.ok().body("NOTFOUND");
-            }
-            if(!contestEntity.getStatusId().equals(ContestEntity.CONTEST_STATUS_RUNNING)){
-                return ResponseEntity.ok().body(null);
             }
             ModelCreateContestProblemResponse problemEntity = problemTestCaseService.getContestProblem(problemId);
             ModelStudentViewProblemDetail model = new ModelStudentViewProblemDetail();
@@ -277,7 +224,6 @@ public class ContestController {
     }
     @Async
     public void logStudentGetDetailContest(String userId, String contestId){
-        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logStudentGetDetailContest, userId = " + logM.getUserId());
@@ -381,7 +327,6 @@ public class ContestController {
 
     @Async
     public void logTeacherGetMyContest(String userId){
-        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logTeacherGetMyContest, userId = " + logM.getUserId());
@@ -530,7 +475,6 @@ public class ContestController {
 
     @Async
     public void logStudentGetHisContests(String userId){
-        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logStudentGetHisContests, userId = " + logM.getUserId());
@@ -542,7 +486,7 @@ public class ContestController {
 
     @GetMapping("/students/contests")
     public ResponseEntity<?> getContestRegisteredStudent(Principal principal) {
-        //logStudentGetHisContests(principal.getName());
+        logStudentGetHisContests(principal.getName());
 
         ModelGetContestPageResponse res = problemTestCaseService.getRegisteredContestsByUser (principal.getName());
         List<ModelGetContestResponse> filteredContests = res.getContests().stream()
@@ -574,14 +518,14 @@ public class ContestController {
             .getNotRegisteredContestByUser(pageable, principal.getName());
         return ResponseEntity.status(200).body(modelGetContestPageResponse);
     }
-    @Secured("ROLE_TEACHER")
+
     @Deprecated
     @PostMapping("/contests/users")
     public ResponseEntity<?> addUserContest(@RequestBody ModelAddUserToContest modelAddUserToContest) {
         problemTestCaseService.addUserToContest(modelAddUserToContest);
         return ResponseEntity.status(200).body(null);
     }
-    @Secured("ROLE_TEACHER")
+
     @PostMapping("/contests/{id}/users")
     public ResponseEntity<?> addUsers2Contest(
         @PathVariable(name = "id") String contestId,
@@ -618,22 +562,15 @@ public class ContestController {
         //         .body("This contest size is too big. Contact the contest manager for ranking table");
         // }
 
-        // temporary remove
-        /*
         List<ContestSubmissionsByUser> res = problemTestCaseService.getRankingByContestIdNew(
             contestId,
             getPointForRankingType);
-        */
-        List<ContestSubmissionsByUser> res = new ArrayList<>();
 
         return ResponseEntity.status(200).body(res);
-        //return ResponseEntity.status(200).body(null);
     }
 
     @Async
-
     private void logGetRankingOfContest(String userId, String contestId){
-        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logGetRankingOfContest, userId = " + logM.getUserId());
@@ -644,7 +581,7 @@ public class ContestController {
         apiService.callLogAPI("https://analytics.soict.ai/api/log/create-log",logM);
     }
 
-    @Secured("ROLE_TEACHER")
+
     @GetMapping("/contests/ranking/{contestId}")
     public ResponseEntity<?> getRankingContestNewVersion(
         Principal principal,
@@ -658,7 +595,7 @@ public class ContestController {
             getPointForRankingType);
         return ResponseEntity.status(200).body(res);
     }
-    @Secured("ROLE_TEACHER")
+
     @GetMapping("/contests/group/ranking/{contestId}")
     public ResponseEntity<?> getRankingContestGroupNewVersion(
         Principal principal,
@@ -701,7 +638,6 @@ public class ContestController {
 
     @Async
     private void logGetSubmissionsOfContest(String userId, String contestId){
-        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logGetSubmissionsOfContest, userId = " + logM.getUserId());
@@ -770,7 +706,7 @@ public class ContestController {
             .getUserJudgedProblemSubmissions(contestId);
         return ResponseEntity.ok().body(res);
     }
-    @Secured("ROLE_TEACHER")
+
     @GetMapping("/contests/{contestId}/users/{userId}/roles")
     public ResponseEntity<?> getRolesUserNotApprovedInContest(
         @PathVariable String userId,
@@ -779,7 +715,7 @@ public class ContestController {
         ModelGetRolesOfUserInContestResponse res = problemTestCaseService.getRolesOfUserInContest(userId, contestId);
         return ResponseEntity.ok().body(res);
     }
-    @Secured("ROLE_TEACHER")
+
     @GetMapping("/contests/permissions")
     public ResponseEntity<?> getPermissionsOfMemberOfContest() {
         List<String> perms = UserRegistrationContestEntity.getListPermissions();
@@ -794,59 +730,7 @@ public class ContestController {
 
         return ResponseEntity.status(200).body("ok");
     }
-    @Secured("ROLE_TEACHER")
-    @PostMapping("/contests/students/upload-list-for-update-fullname")
-    public ResponseEntity<?> uploadExcelStudentListForUpdateFullNameOfContest(
-        @RequestParam("inputJson") String inputJson,
-        @RequestParam("file") MultipartFile file
-    ) {
-        Gson gson = new Gson();
-        ModelUploadExcelParticipantToContestInput modelUpload = gson.fromJson(
-            inputJson, ModelUploadExcelParticipantToContestInput.class);
-        List<ModelAddUserToContestResponse> uploadedUsers = new ArrayList<>();
-        String contestId = modelUpload.getContestId();
-        String role = modelUpload.getRole();
-        try (InputStream is = file.getInputStream()) {
-            XSSFWorkbook wb = new XSSFWorkbook(is);
-            XSSFSheet sheet = wb.getSheetAt(0);
-            int lastRowNum = sheet.getLastRowNum();
-            //System.out.println("uploadExcelStudentListOfQuizTest, lastRowNum = " + lastRowNum);
-            for (int i = 1; i <= lastRowNum; i++) {
-                Row row = sheet.getRow(i);
-                Cell c = row.getCell(0);
 
-                if (c == null || c.getStringCellValue().equals("")) {
-                    continue;
-                }
-                String userId = c.getStringCellValue();
-                c = row.getCell(1);
-
-                if (c == null || c.getStringCellValue().equals("")) {
-                    continue;
-                }
-                String fullname = c.getStringCellValue();
-                ModelAddUserToContest m = new ModelAddUserToContest();
-                m.setContestId(contestId);
-                m.setUserId(userId);
-                m.setFullname(fullname);
-                if ("Manager".equalsIgnoreCase(role)) {
-                    m.setRole(UserRegistrationContestEntity.ROLE_MANAGER);
-                } else if ("Owner".equalsIgnoreCase(role)) {
-                    m.setRole(UserRegistrationContestEntity.ROLE_OWNER);
-                } else {
-                    m.setRole(UserRegistrationContestEntity.ROLE_PARTICIPANT);
-                }
-                ModelAddUserToContestResponse response = problemTestCaseService.updateUserFullnameOfContest(m);
-                uploadedUsers.add(response);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return ResponseEntity.ok().body(uploadedUsers);
-    }
-
-    @Secured("ROLE_TEACHER")
     @PostMapping("/contests/students/upload-list")
     public ResponseEntity<?> uploadExcelStudentListOfContest(
         @RequestParam("inputJson") String inputJson,

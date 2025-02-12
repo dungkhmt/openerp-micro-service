@@ -10,14 +10,14 @@ import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.entity.User;
-import openerp.openerpresourceserver.repository.UserRepository;
+import openerp.openerpresourceserver.repository.UserRepo;
 import openerp.openerpresourceserver.service.UserService;
 
 @AllArgsConstructor(onConstructor_ = @Autowired)
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepo;
+    private UserRepo userRepo;
 
     @Override
     public List<User> getAllUsers() {

@@ -14,5 +14,4 @@ public class ModelAddUserToContest {
     private String contestId;
     private String userId;
     private String role;
-    private String fullname;
 }

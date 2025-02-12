@@ -19,5 +19,4 @@ public class MakeGeneralClassRequest {
     private String learningWeeks;
     private String crew;
     private String weekType;
-    private int duration;
 }

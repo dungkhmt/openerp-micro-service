@@ -1,11 +1,5 @@
 import EditIcon from "@mui/icons-material/Edit";
-import { Grid, LinearProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,TextField,
-  Typography,Button,
- } from "@mui/material";
+import { Grid, LinearProgress } from "@mui/material";
 import { request } from "api";
 import PrimaryButton from "component/button/PrimaryButton";
 import HustContainerCard from "component/common/HustContainerCard";
@@ -34,10 +28,7 @@ export function ContestManagerDetail(props) {
   });
 
   const [loading, setLoading] = useState(true);
-  const [openCloneDialog, setOpenCloneDialog] = useState(false);
-  const [newContestId, setNewContestId] = useState("");
-  const [newContestName, setNewContestName] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+
   useEffect(() => {
     const getContestDetail = () => {
       request("get", "/contests/" + contestId, (res) => {
@@ -70,65 +61,7 @@ export function ContestManagerDetail(props) {
     history.push("/programming-contest/contest-edit/" + contestId);
   };
 
-  const hasSpecialCharacterContestId = () => {
-    return !new RegExp(/^[0-9a-zA-Z_-]*$/).test(newContestId); 
-  };
-
-
-
-  const handleCloneDialogOpen = () => {
-    setOpenCloneDialog(true);
-  };
-
-  const handleCloneDialogClose = () => {
-    setOpenCloneDialog(false);
-    setNewContestId("");
-    setNewContestName("");
-    setErrorMessage("");
-    history.push("/programming-contest/contest-manager/"+contestId); // comment this line : not return to list-problems when click cancel
-  };
-
-  const handleClone = () => {
-    if (hasSpecialCharacterContestId()) {
-        setErrorMessage("Contest ID can only contain letters, numbers, underscores, and hyphens.");
-        return;
-    }
-
-
-    const cloneRequest = {
-        fromContestId: contestId,
-        toContestId: newContestId,
-        toContestName: newContestName,
-    };
-
-    request(
-        "post", 
-        "/clone-contest",
-        (res) => { 
-            handleCloneDialogClose();
-            history.push("/programming-contest/contest-manager/"+newContestId);
-        },
-        {
-            onError: (error) => {
-                setErrorMessage("Failed to clone the problem. Please try again.");
-                console.error("Error cloning problem:", error);
-            },
-            400: (error) => {
-                setErrorMessage("Invalid request. Please check your input.");
-            },
-            404: (error) => {
-                setErrorMessage("Original problem not found.");
-            },
-            500: (error) => {
-              setErrorMessage("Original problem already exists.");
-          },
-        },
-        cloneRequest 
-    );
-};
-
   return (
-    <>
     <HustContainerCard
       title={contestId}
       action={
@@ -138,10 +71,9 @@ export function ContestManagerDetail(props) {
           startIcon={<EditIcon />}
         >
           Edit
-        </PrimaryButton>        
-      }      
+        </PrimaryButton>
+      }
     >
-
       {loading && <LinearProgress />}
       <Grid container spacing={2} display={loading ? "none" : ""}>
         {[
@@ -202,49 +134,6 @@ export function ContestManagerDetail(props) {
           </Grid>
         ))}
       </Grid>
-      <PrimaryButton onClick={handleCloneDialogOpen}>
-        Clone
-      </PrimaryButton>
     </HustContainerCard>
-    <Dialog open={openCloneDialog} onClose={handleCloneDialogClose}>
-        <DialogTitle>{"Clone Contest"}</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="New Contest ID"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={newContestId}
-            onChange={(e) => setNewContestId(e.target.value)}
-            error={hasSpecialCharacterContestId()}
-            helperText={hasSpecialCharacterContestId() ? "Invalid characters in Problem ID." : ""}
-          />
-          <TextField
-            margin="dense"
-            label="New Contest Name"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={newContestName}
-            onChange={(e) => setNewContestName(e.target.value)}
-            //error={hasSpecialCharacterProblemName()}
-            //helperText={hasSpecialCharacterProblemName() ? "Invalid characters in Problem Name." : ""}
-            helperText={""}
-          />
-          {errorMessage && <Typography color="error">{errorMessage}</Typography>}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloneDialogClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleClone} color="primary">
-            Create
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-    </>
   );
 }

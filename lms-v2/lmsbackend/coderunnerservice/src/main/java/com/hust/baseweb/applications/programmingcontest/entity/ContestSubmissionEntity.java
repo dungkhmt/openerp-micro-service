@@ -16,41 +16,24 @@ import java.util.UUID;
 @Builder
 @Table(name = "contest_submission_new")
 public class ContestSubmissionEntity {
-
-    public static final String SUBMISSION_STATUS_ACCEPTED = "Accepted";
-
+    public static final String SUBMISSION_STATUS_ACCEPTED = "Accept";
     public static final String SUBMISSION_STATUS_PARTIAL = "Partial";
-
     public static final String SUBMISSION_STATUS_FAILED = "Failed";
-
     public static final String SUBMISSION_STATUS_WRONG = "Wrong Answer";
-
     public static final String SUBMISSION_STATUS_TIME_LIMIT_EXCEEDED = "Time Limit Exceeded";
-
     public static final String SUBMISSION_STATUS_OUTPUT_LIMIT_EXCEEDED = "Output Size Limit Exceeded";
-
     public static final String SEGMENTATION_FAULT = "Memory-related error";
-
-    public static final String SUBMISSION_STATUS_MEMORY_LIMIT_EXCEEDED = "Memory Limit Exceeded";
-
     public static final String SUBMISSION_STATUS_COMPILE_ERROR = "Compile Error";
-
     public static final String SUBMISSION_STATUS_NOT_AVAILABLE = "NA";
-
     public static final String SUBMISSION_STATUS_EVALUATION_IN_PROGRESS = "In Progress";
-
     public static final String SUBMISSION_STATUS_WAIT_FOR_CUSTOM_EVALUATION = "Pending Evaluation";
-
     public static final String SUBMISSION_STATUS_CUSTOM_EVALUATED = "Evaluated";
 
     public static final String LANGUAGE_CPP = "CPP";
-
     public static final String LANGUAGE_JAVA = "JAVA";
-
     public static final String LANGUAGE_PYTHON = "PYTHON3";
 
     public static final String MANAGEMENT_STATUS_ENABLED = "ENABLED";
-
     public static final String MANAGEMENT_STATUS_DISABLED = "DISABLED";
 
     @Id
@@ -103,7 +86,6 @@ public class ContestSubmissionEntity {
     @Column(name = "last_updated_by_user_id")
     private String lastUpdatedByUserId;
 
-    // Bo sung thong tin chi tiet cho status
     @Column(name = "message")
     private String message;
 }

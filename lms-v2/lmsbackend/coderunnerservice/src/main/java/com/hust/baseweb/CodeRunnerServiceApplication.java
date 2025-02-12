@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 
 @EnableAsync
 @EnableCaching
-@SpringBootApplication(scanBasePackages = {"com.hust.baseweb", "vn.edu.hust.soict.judge0client"})
+@SpringBootApplication
 @ConfigurationPropertiesScan()
 public class CodeRunnerServiceApplication {
 

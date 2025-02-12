@@ -67,8 +67,7 @@ public interface EduQuizTestRepo extends JpaRepository<EduQuizTest, String> {
             "select \n" +
             "S1.test_id, \n" +
             "S1.participant_user_login_id as user_login_id, \n" +
-            //"u.first_name || ' ' || u.last_name as full_name, \n" +
-            "S1.fullname as full_name, \n" +
+            "u.first_name || ' ' || u.last_name as full_name, \n" +
             "u.email, \n" +
             "S1.status_id \n" +
             "from edu_test_quiz_participant S1, \n" +

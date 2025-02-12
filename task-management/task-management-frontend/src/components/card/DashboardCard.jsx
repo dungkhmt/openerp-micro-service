@@ -102,8 +102,6 @@ const DashboardCard = forwardRef(function DashboardCard(
     onDialogClose,
     onRefresh,
     action,
-    onEditClick,
-    showEditIcon = false,
     ...props
   },
   ref
@@ -128,24 +126,6 @@ const DashboardCard = forwardRef(function DashboardCard(
             {title}
           </Typography>
         </Tooltip>
-        {showEditIcon && (
-          <IconButton
-            variant="outlined"
-            onClick={onEditClick}
-            sx={{
-              color: "#808080",
-              ml: "auto",
-              p: 1,
-              transition: "background-color 0.5s",
-              "&:hover": {
-                backgroundColor: "#E0E0E0",
-                "& svg": { color: "#4F4F4F" },
-              },
-            }}
-          >
-            <Icon fontSize={22} icon="bx:edit" />
-          </IconButton>
-        )}
         {isDraggable && (
           <Button
             title="Kéo để di chuyển"
@@ -231,8 +211,6 @@ DashboardCard.propTypes = {
   onDialogClose: PropTypes.func,
   onRefresh: PropTypes.func,
   action: PropTypes.elementType,
-  onEditClick: PropTypes.func,
-  showEditIcon: PropTypes.bool,
 };
 
 export { DashboardCard };

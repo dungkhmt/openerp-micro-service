@@ -48,7 +48,6 @@ const ProjectViewTasks = () => {
     tasksCache,
     search: searchStore,
   } = useSelector((state) => state.tasks);
-
   const {
     category: categoryStore,
     priority: priorityStore,
@@ -68,7 +67,7 @@ const ProjectViewTasks = () => {
   /**
    * @type {import("@mui/x-data-grid").GridColDef[]}
    */
-    const columns = [
+  const columns = [
     {
       flex: 0.3,
       field: "name",

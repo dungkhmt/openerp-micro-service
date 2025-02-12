@@ -30,7 +30,7 @@ const HustDropzoneArea = (props) => {
       <Typography
         variant="h6"
         display="block"
-        style={{margin: "24px 0 8px 0px", width: "100%"}}
+        style={{margin: "12px 0 12px 2px", width: "100%"}}
       >
         {title ? title : t("title")}
       </Typography>

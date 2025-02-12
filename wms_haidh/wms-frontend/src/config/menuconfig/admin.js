@@ -4,10 +4,10 @@ export const admin = {
   text: "Inventory Management",
   child: [
     {
-      id: "MENU_WMSv2_ADMIN.INVENTORY",
-      path: "/admin/inventory",
+      id: "MENU_WMSv2_ADMIN.WAREHOUSE",
+      path: "/admin/warehouse",
       isPublic: true,
-      text: "Inventory",
+      text: "Warehouse",
       child: [],
     },
     {
@@ -19,20 +19,20 @@ export const admin = {
       child: [],
     },
     {
-      id: "MENU_WMSv2_ADMIN.PROCESS_RECEIPT",
-      path: "/admin/receipts",
-      isPublic: true,
-      icon: "StarBorder",
-      text: "Receipt",
-      child: [],
-    },
-    {
       id: "MENU_WMSv2_ADMIN.ORDER",
       path: "/admin/orders",
       isPublic: true,
       icon: "StarBorder",
-      text: "Assign Order",
+      text: "Delivery Order",
       child: [],
-    }
+    },
+    {
+      id: "MENU_WMSv2_ADMIN.PROCESS_RECEIPT",
+      path: "/admin/process-receipts",
+      isPublic: true,
+      icon: "StarBorder",
+      text: "Process Receipt",
+      child: [],
+    },
   ],
 };

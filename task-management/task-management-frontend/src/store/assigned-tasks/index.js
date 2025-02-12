@@ -18,7 +18,6 @@ export const fetchAllAssignedTaskCreator = createAsyncThunk(
   }
 );
 
-
 const initialState = {
   tasksCache: {},
   totalCount: 0,

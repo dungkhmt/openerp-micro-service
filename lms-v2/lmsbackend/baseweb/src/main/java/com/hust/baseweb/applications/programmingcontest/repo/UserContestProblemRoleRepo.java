@@ -20,6 +20,14 @@ public interface UserContestProblemRoleRepo extends JpaRepository<UserContestPro
             +
             "(SELECT DISTINCT problem_id FROM user_contest_problem_role WHERE user_id = ?1 AND role_id = 'OWNER')", nativeQuery = true)
     */
+    // updated by PQD
+    @Query(value = "select distinct problem_id from user_contest_problem_role ucpr  \n" +
+                   "where ucpr.user_id  = ?1 and problem_id not in (select problem_id from contest_problem_new cpn where created_by_user_login_id = ?1)", nativeQuery = true)
+    List<String> getProblemIdsShared(String userId);
+
+    @Query(value = "select problem_id from contest_problem_new cpn where is_public  = true", nativeQuery = true)
+    List<String> getProblemIdsPublic(String userId);
+
 
     boolean existsByProblemIdAndUserIdAndRoleId(String problemId, String userId, String roleId);
 

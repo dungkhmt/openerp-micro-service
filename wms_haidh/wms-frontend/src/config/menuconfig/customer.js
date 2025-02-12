@@ -7,7 +7,7 @@ export const customer = {
       id: "MENU_WMSv2_CUSTOMER.PRODUCTS",
       path: "/customer/products",
       isPublic: true,
-      text: "Online Shopping",
+      text: "Shop Online",
       child: [],
     },
     {

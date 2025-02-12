@@ -84,17 +84,11 @@ const styles = {
 
 export default function SideBar(props) {
   const { open, image, color: bgColor } = props;
+
   const { keycloak } = useKeycloak();
 
   useEffect(() => {
-    // Check auth status when component mounts
-    if (!keycloak.authenticated) {
-      keycloak.login({
-        redirectUri: window.location.origin 
-      });
-    } else {
-      fetchMenu();
-    }
+    if (keycloak.authenticated) fetchMenu();
   }, [keycloak.authenticated]);
 
   return (

@@ -3,6 +3,7 @@ import { TabContext, TabPanel } from "@mui/lab";
 import MuiTabList from "@mui/lab/TabList";
 import { Box, Button, Divider, Tab, styled } from "@mui/material";
 import { useEffect, useState } from "react";
+import PerfectScrollbar from "react-perfect-scrollbar";
 import { useNavigate, useParams } from "react-router";
 import { usePreventOverflow } from "../../hooks/usePreventOverflow";
 import { ProjectBreadcrumb } from "./ProjectBreadcrumb";
@@ -13,7 +14,6 @@ import { ProjectViewOverview } from "./overview/ProjectViewOverview";
 import { ProjectViewSetting } from "./setting/ProjectViewSetting";
 import { DialogAddTask } from "./tasks/DialogAddTask";
 import { ProjectViewTasks } from "./tasks/ProjectViewTasks";
-import { ProjectViewEvents } from "./event/ProjectViewEvents";
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   minHeight: "34px",
@@ -124,21 +124,6 @@ const ProjectViewRight = () => {
             }
           />
           <Tab
-            value="event"
-            label={
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  "& svg": { mr: 1, fontSize: "16px" },
-                }}
-              >
-                <Icon fontSize={20} icon="ph:video-conference" />
-                Sự kiện
-              </Box>
-            }
-          />
-          <Tab
             value="timeline"
             label={
               <Box
@@ -224,27 +209,26 @@ const ProjectViewRight = () => {
           mt: 1.5,
         }}
       >
-        <TabPanel sx={{ p: 0 }} value="overview">
-          <ProjectViewOverview />
-        </TabPanel>
-        <TabPanel sx={{ p: 0, pr: 2 }} value="tasks">
-          <ProjectViewTasks />
-        </TabPanel>
-        <TabPanel sx={{ p: 0, pr: 2 }} value="event">
-          <ProjectViewEvents />
-        </TabPanel>
-        <TabPanel sx={{ p: 0, pr: 2 }} value="timeline">
-          <ProjectViewCalendar />
-        </TabPanel>
-        <TabPanel sx={{ p: 0, pr: 2 }} value="gantt-chart">
-          <ProjectViewGanttChart />
-        </TabPanel>
-        <TabPanel sx={{ p: 0, pr: 2 }} value="members">
-          <ProjectViewMembers />
-        </TabPanel>
-        <TabPanel sx={{ p: 0, pr: 2 }} value="setting">
-          <ProjectViewSetting />
-        </TabPanel>
+        <PerfectScrollbar style={{ flex: 1 }}>
+          <TabPanel sx={{ p: 0 }} value="overview">
+            <ProjectViewOverview />
+          </TabPanel>
+          <TabPanel sx={{ p: 0, pr: 2 }} value="tasks">
+            <ProjectViewTasks />
+          </TabPanel>
+          <TabPanel sx={{ p: 0, pr: 2 }} value="timeline">
+            <ProjectViewCalendar />
+          </TabPanel>
+          <TabPanel sx={{ p: 0, pr: 2 }} value="gantt-chart">
+            <ProjectViewGanttChart />
+          </TabPanel>
+          <TabPanel sx={{ p: 0, pr: 2 }} value="members">
+            <ProjectViewMembers />
+          </TabPanel>
+          <TabPanel sx={{ p: 0, pr: 2 }} value="setting">
+            <ProjectViewSetting />
+          </TabPanel>
+        </PerfectScrollbar>
       </Box>
       <DialogAddTask open={openAddTask} setOpen={setOpenAddTask} />
     </TabContext>

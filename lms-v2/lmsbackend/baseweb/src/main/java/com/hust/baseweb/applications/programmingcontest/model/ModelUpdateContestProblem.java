@@ -1,63 +1,38 @@
 package com.hust.baseweb.applications.programmingcontest.model;
 
-import com.hust.baseweb.applications.programmingcontest.entity.ProblemStatus;
-import lombok.AccessLevel;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @ToString
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ModelUpdateContestProblem {
 
-    String problemId;
-
-    String problemName;
-
-    String problemDescription;
-
-    float timeLimit;
-
-    float timeLimitCPP;
-
-    float timeLimitJAVA;
-
-    float timeLimitPYTHON;
-
-    float memoryLimit;
-
-    String levelId;
-
-    String categoryId;
-
-    String correctSolutionSourceCode;
-
-    String correctSolutionLanguage;
-
-    String solutionChecker;
-
-    String solutionCheckerLanguage;
-
-    String solution;
-
-    Boolean isPreloadCode;
-
-    String preloadCode;
-
-    Boolean isPublic;
-
-    String scoreEvaluationType;
-
-    String[] fileId;
-
-    Integer[] tagIds;
-
-    List<String> removedFilesId;
-
-    ProblemStatus status;
-
-    String sampleTestCase;
+    private String problemId;
+    private String problemName;
+    private String problemDescription;
+    private int timeLimit;
+    private int timeLimitCPP;
+    private int timeLimitJAVA;
+    private int timeLimitPYTHON;
+    private int memoryLimit;
+    private String levelId;
+    private String categoryId;
+    private String correctSolutionSourceCode;
+    private String correctSolutionLanguage;
+    private String solutionChecker;
+    private String solutionCheckerLanguage;
+    private String solution;
+    private Boolean isPreloadCode;
+    private String preloadCode;
+    private Boolean isPublic;
+    private String scoreEvaluationType;
+    private String[] fileId;
+    private Integer[] tagIds;
+    private List<String> removedFilesId;
+    private String status;
+    private String sampleTestCase;
 }
