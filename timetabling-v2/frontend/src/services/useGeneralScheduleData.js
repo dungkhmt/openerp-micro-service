@@ -37,25 +37,62 @@ export const useGeneralSchedule = () => {
         
         let generalClasses = [];
         data.forEach((classObj) => {
-          if (classObj.timeSlots) {
+          // Calculate total used duration from timeSlots
+          const usedDuration = classObj.timeSlots?.reduce((total, slot) => {
+            return total + (slot.duration || 0);
+          }, 0) || 0;
+
+          // Calculate remaining duration for parent class
+          const remainingDuration = classObj.duration - usedDuration;
+
+          // Handle child classes (time slots)
+          if (classObj.timeSlots && classObj.timeSlots.length > 0) {
+            // Only add valid child classes (with duration not null)
             classObj.timeSlots.forEach((timeSlot, index) => {
-              const cloneObj = JSON.parse(JSON.stringify({
-                ...classObj,
-                ...timeSlot,
-                classCode: classObj.classCode,
-                roomReservationId: timeSlot.id,
-                id: classObj.id + `-${index + 1}`,
-                crew: classObj.crew,
-              }));
-              delete cloneObj.timeSlots;
-              generalClasses.push(cloneObj);
-            });
-          } else {
-            generalClasses.push({
-              ...classObj,
-              generalClassId: String(classObj.generalClassId || '')
+              if (timeSlot.duration !== null) {
+                const cloneObj = JSON.parse(JSON.stringify({
+                  ...classObj,
+                  ...timeSlot,
+                  classCode: classObj.classCode,
+                  roomReservationId: timeSlot.id,
+                  id: classObj.id + `-${index + 1}`,
+                  crew: classObj.crew,
+                  duration: timeSlot.duration,
+                  isChild: true,
+                  parentId: classObj.id
+                }));
+                delete cloneObj.timeSlots;
+                generalClasses.push(cloneObj);
+              }
             });
           }
+
+          // Only add parent class if it has duration or has no timeSlots
+          if (classObj.duration !== null || !classObj.timeSlots?.length) {
+            generalClasses.push({
+              ...classObj,
+              generalClassId: String(classObj.generalClassId || classObj.id || ''),
+              duration: remainingDuration,
+              isParent: true
+            });
+          }
+        });
+
+        // Sort to group parent-child together
+        generalClasses.sort((a, b) => {
+          // First sort by parent ID to group families together
+          const parentIdA = a.parentId || a.id;
+          const parentIdB = b.parentId || b.id;
+          
+          if (parentIdA !== parentIdB) {
+            return parentIdA - parentIdB;
+          }
+          
+          // Then put parents before children
+          if (a.isParent && !b.isParent) return -1;
+          if (!a.isParent && b.isParent) return 1;
+          
+          return 0;
         });
 
         return generalClasses;

@@ -23,7 +23,7 @@ public class RoomReservation {
     private Integer endTime;
     private Integer weekday;
     private String room;
-    private String duration;
+    private Integer duration;
 
     //public String toString(){
     //    return "crew[" + crew + "],start[" + startTime + "],end[" + endTime + "],weekday[" + weekday + "],room[" + room + "],duration[" + duration + "]";

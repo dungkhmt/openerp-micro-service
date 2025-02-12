@@ -5,9 +5,17 @@ import GeneralGroupAutoComplete from "../common-components/GeneralGroupAutoCompl
 import { Button } from "@mui/material";
 import { FacebookCircularProgress } from "components/common/progressBar/CustomizedCircularProgress";
 import TimeTable from "./components/TimeTable";
+import { useState } from "react";
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
 const GeneralScheduleScreen = () => {
   const { states, setters, handlers } = useGeneralSchedule();
+  const [openResetConfirm, setOpenResetConfirm] = useState(false);
+
+  const handleConfirmReset = () => {
+    handlers.handleResetTimeTabling();
+    setOpenResetConfirm(false);
+  };
 
   return (
     <div className="flex flex-col gap-4 h-[700px]">
@@ -61,7 +69,7 @@ const GeneralScheduleScreen = () => {
               startIcon={states.isResetLoading ? <FacebookCircularProgress /> : null}
               variant="contained"
               color="error"
-              onClick={handlers.handleResetTimeTabling}
+              onClick={() => setOpenResetConfirm(true)}
             >
               Xóa lịch học TKB
             </Button>
@@ -100,6 +108,30 @@ const GeneralScheduleScreen = () => {
           </div>
         </div>
       </div>
+      <Dialog
+        open={openResetConfirm}
+        onClose={() => setOpenResetConfirm(false)}
+      >
+        <DialogTitle>Xác nhận xóa lịch học</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Bạn có chắc chắn muốn xóa {states.selectedRows.length} lịch học đã chọn không?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenResetConfirm(false)}>
+            Hủy
+          </Button>
+          <Button 
+            onClick={handleConfirmReset}
+            color="error"
+            variant="contained"
+            autoFocus
+          >
+            Xóa
+          </Button>
+        </DialogActions>
+      </Dialog>
       <div className="flex flex-row gap-4 w-full overflow-y-hidden h-[550px] border-[1px] border-[#ccc] rounded-[8px]">
         <TimeTable
           selectedSemester={states.selectedSemester}
@@ -107,6 +139,8 @@ const GeneralScheduleScreen = () => {
           selectedGroup={states.selectedGroup}
           onSaveSuccess={handlers.handleRefreshClasses}
           loading={states.loading}
+          selectedRows={states.selectedRows}
+          onSelectedRowsChange={setters.setSelectedRows}
         />
       </div>
     </div>
