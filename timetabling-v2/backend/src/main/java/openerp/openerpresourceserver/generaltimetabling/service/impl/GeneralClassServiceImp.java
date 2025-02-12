@@ -311,6 +311,9 @@ public class GeneralClassServiceImp implements GeneralClassService {
 
             if ((updateRequest.getStartTime() != null && updateRequest.getEndTime() != null ) && updateRequest.getStartTime() > updateRequest.getEndTime()) throw new InvalidFieldException("Tiết BĐ không thể lớn hơn tiết KT");
 
+            int duration = updateRequest.getEndTime() - updateRequest.getStartTime() + 1;
+            updateRoomReservation.setDuration(duration);
+
             List<RoomOccupation> foundRoomOccupations = roomOccupationRepo.findAllBySemesterAndClassCodeAndDayIndexAndStartPeriodAndEndPeriodAndClassRoom(semester,
                     updateRoomReservation.getGeneralClass().getClassCode(),
                     updateRoomReservation.getWeekday(),
@@ -396,10 +399,11 @@ public class GeneralClassServiceImp implements GeneralClassService {
     }
 
     @Override
-    public GeneralClass addRoomReservation(Long generalClassId) {
+    public GeneralClass addRoomReservation(Long generalClassId, Integer duration) {
         GeneralClass foundGeneralClass = gcoRepo.findById(generalClassId).orElse(null);
         if (foundGeneralClass == null) throw new NotFoundException("Không tìm thấy lớp!");
         RoomReservation newRoomReservation = new RoomReservation();
+        newRoomReservation.setDuration(duration);
         foundGeneralClass.addTimeSlot(newRoomReservation);
         newRoomReservation.setGeneralClass(foundGeneralClass);
         gcoRepo.save(foundGeneralClass);

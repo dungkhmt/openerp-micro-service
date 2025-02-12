@@ -5,7 +5,6 @@ const defaultTaskContext = {
   task: null,
   error: null,
   logs: [],
-  skills: [],
   isUpdate: false,
   setIsUpdate: () => {},
 };

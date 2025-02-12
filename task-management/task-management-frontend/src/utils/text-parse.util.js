@@ -11,7 +11,6 @@ const FieldMap = {
   estimatedTime: "Thời gian ước lượng",
   progress: "Tiến độ",
   subtaskId: "Công việc con",
-  eventId: "Sự kiện",
 };
 
 export const parseLogItemDetail = (logItem) => {
@@ -51,18 +50,6 @@ export const parseLogItemDetail = (logItem) => {
             event === "set" ? "được giao cho" : "được cập nhật từ",
             oldValue,
             event === "set" ? "" : "sang",
-            newValue,
-          ];
-        case "eventId":
-          return [
-            FieldMap[field],
-            newValue === ""
-              ? "được gỡ bỏ"
-              : event === "set"
-              ? "được thiết lập thành"
-              : "được cập nhật từ",
-            oldValue,
-            newValue === "" ? "" : event === "set" ? "" : "sang",
             newValue,
           ];
         default:

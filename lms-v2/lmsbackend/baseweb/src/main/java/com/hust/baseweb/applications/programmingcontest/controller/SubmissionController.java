@@ -1,9 +1,13 @@
 package com.hust.baseweb.applications.programmingcontest.controller;
 
 import com.google.gson.Gson;
+import com.hust.baseweb.applications.programmingcontest.entity.*;
 import com.hust.baseweb.applications.programmingcontest.callexternalapi.model.LmsLogModelCreate;
 import com.hust.baseweb.applications.programmingcontest.callexternalapi.service.ApiService;
-import com.hust.baseweb.applications.programmingcontest.entity.*;
+import com.hust.baseweb.applications.programmingcontest.entity.ContestEntity;
+import com.hust.baseweb.applications.programmingcontest.entity.ContestProblem;
+import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
+import com.hust.baseweb.applications.programmingcontest.entity.UserRegistrationContestEntity;
 import com.hust.baseweb.applications.programmingcontest.model.*;
 import com.hust.baseweb.applications.programmingcontest.model.externalapi.ModelInputGetContestSubmissionPageOfPeriod;
 import com.hust.baseweb.applications.programmingcontest.model.externalapi.ModelResponseGetContestSubmissionOfPeriod;
@@ -22,6 +26,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.AccessDeniedException;
@@ -141,7 +147,6 @@ public class SubmissionController {
 
     @Async
     public void logTeacherViewDetailSubmissionOfStudentContest(String userId, String contestId, String problemId, String studentId, UUID submissionId){
-        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logTeacherViewDetailSubmissionOfStudentContest, userId = " + logM.getUserId());
@@ -199,20 +204,9 @@ public class SubmissionController {
         return ResponseEntity.ok().body(sub);
     }
 
-    @Secured("ROLE_TEACHER")
     @PostMapping("/submissions/{submissionId}/evaluation")
     public ResponseEntity<?> evaluateSubmission(@PathVariable UUID submissionId) {
         problemTestCaseService.evaluateSubmission(submissionId);
-        return ResponseEntity.ok().body("ok");
-    }
-    @Secured("ROLE_TEACHER")
-    //@PostMapping("/submissions/{contestId}/{problemId}/evaluation")
-    //public ResponseEntity<?> evaluateSubmissionOfAProblemInContest(@PathVariable String contestId, @PathVariable String problemId) {
-    @PostMapping("/submissions-of-a-problem-in-contest/rejudge")
-    public ResponseEntity<?> evaluateSubmissionOfAProblemInContest(Principal principal, @RequestBody ModelInputRejudgeSubmissionsOfAProblemInContest m){
-        log.info("evaluateSubmissionOfAProblemInContest, contestId = " + m.getContestId() + " and problemId = " + m.getProblemId());
-        problemTestCaseService.evaluateSubmissions(m.getContestId(), m.getProblemId());
-
         return ResponseEntity.ok().body("ok");
     }
 
@@ -234,68 +228,66 @@ public class SubmissionController {
         return ResponseEntity.ok().body(res);
     }
 
-//    @PostMapping("/submissions/testcases/solution-output")
-//    public ResponseEntity<?> submitSolutionOutputOfATestCase(
-//        Principal principale,
-//        @RequestParam("inputJson") String inputJson,
-//        @RequestParam("file") MultipartFile file
-//    ) {
-//        Gson gson = new Gson();
-//        ModelSubmitSolutionOutputOfATestCase model = gson.fromJson(
-//            inputJson,
-//            ModelSubmitSolutionOutputOfATestCase.class);
-//        try {
-//            ByteArrayInputStream stream = new ByteArrayInputStream(file.getBytes());
-//            String solutionOutput = IOUtils.toString(stream, StandardCharsets.UTF_8);
-//            stream.close();
-//
-//            ModelContestSubmissionResponse resp = problemTestCaseService.submitSolutionOutputOfATestCase(
-//                principale.getName(),
-//                solutionOutput,
-//                model
-//            );
-//            log.info("resp {}", resp);
-//            return ResponseEntity.status(200).body(resp);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return ResponseEntity.ok().body("OK");
-//
-//    }
-//
-//    @PostMapping("/submissions/solution-output")
-//    public ResponseEntity<?> submitSolutionOutput(
-//        Principal principale,
-//        @RequestParam("inputJson") String inputJson,
-//        @RequestParam("file") MultipartFile file
-//    ) {
-//        log.info("submitSolutionOutput, inputJson = " + inputJson);
-//        Gson gson = new Gson();
-//        ModelSubmitSolutionOutput model = gson.fromJson(inputJson, ModelSubmitSolutionOutput.class);
-//        try {
-//            ByteArrayInputStream stream = new ByteArrayInputStream(file.getBytes());
-//            String solutionOutput = IOUtils.toString(stream, StandardCharsets.UTF_8);
-//            stream.close();
-//
-//            ModelContestSubmissionResponse resp = problemTestCaseService.submitSolutionOutput(
-//                solutionOutput,
-//                model.getContestId(),
-//                model.getProblemId(),
-//                model.getTestCaseId(),
-//                principale.getName());
-//            return ResponseEntity.status(200).body(resp);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return ResponseEntity.ok().body("OK");
-//    }
+    @PostMapping("/submissions/testcases/solution-output")
+    public ResponseEntity<?> submitSolutionOutputOfATestCase(
+        Principal principale,
+        @RequestParam("inputJson") String inputJson,
+        @RequestParam("file") MultipartFile file
+    ) {
+        Gson gson = new Gson();
+        ModelSubmitSolutionOutputOfATestCase model = gson.fromJson(
+            inputJson,
+            ModelSubmitSolutionOutputOfATestCase.class);
+        try {
+            ByteArrayInputStream stream = new ByteArrayInputStream(file.getBytes());
+            String solutionOutput = IOUtils.toString(stream, StandardCharsets.UTF_8);
+            stream.close();
+
+            ModelContestSubmissionResponse resp = problemTestCaseService.submitSolutionOutputOfATestCase(
+                principale.getName(),
+                solutionOutput,
+                model
+            );
+            log.info("resp {}", resp);
+            return ResponseEntity.status(200).body(resp);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok().body("OK");
+
+    }
+
+    @PostMapping("/submissions/solution-output")
+    public ResponseEntity<?> submitSolutionOutput(
+        Principal principale,
+        @RequestParam("inputJson") String inputJson,
+        @RequestParam("file") MultipartFile file
+    ) {
+        log.info("submitSolutionOutput, inputJson = " + inputJson);
+        Gson gson = new Gson();
+        ModelSubmitSolutionOutput model = gson.fromJson(inputJson, ModelSubmitSolutionOutput.class);
+        try {
+            ByteArrayInputStream stream = new ByteArrayInputStream(file.getBytes());
+            String solutionOutput = IOUtils.toString(stream, StandardCharsets.UTF_8);
+            stream.close();
+
+            ModelContestSubmissionResponse resp = problemTestCaseService.submitSolutionOutput(
+                solutionOutput,
+                model.getContestId(),
+                model.getProblemId(),
+                model.getTestCaseId(),
+                principale.getName());
+            return ResponseEntity.status(200).body(resp);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok().body("OK");
+    }
 
     @Async
     public void logStudentSubmitToAContest(String userId, String contestId,
                                            ModelContestSubmitProgramViaUploadFile model){
-        if(true)return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
-
         logM.setUserId(userId);
         log.info("logStudentSubmitToAContest, userId = " + logM.getUserId());
         logM.setParam1(contestId);

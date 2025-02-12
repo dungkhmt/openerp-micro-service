@@ -44,27 +44,11 @@ export const mapLanguageToDisplayName = (language) => {
     case COMPUTER_LANGUAGES.CPP17:
       return "C++ 17";
     case COMPUTER_LANGUAGES.JAVA:
-      return "Java 13";
+      return "JAVA 17";
     case COMPUTER_LANGUAGES.PYTHON:
-      return "Python 3.7";
+      return "PYTHON 3.7";
     default:
       return language;
-  }
-};
-
-export const mapLanguageToCodeBlockLanguage = (language) => {
-  switch (language) {
-    case COMPUTER_LANGUAGES.C:
-    case COMPUTER_LANGUAGES.CPP11:
-    case COMPUTER_LANGUAGES.CPP14:
-    case COMPUTER_LANGUAGES.CPP17:
-      return "cpp";
-    case COMPUTER_LANGUAGES.JAVA:
-      return "java";
-    case COMPUTER_LANGUAGES.PYTHON:
-      return "python";
-    default:
-      return language?.toLowerCase();
   }
 };
 

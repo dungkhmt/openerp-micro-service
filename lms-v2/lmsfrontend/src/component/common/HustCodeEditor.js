@@ -12,14 +12,13 @@ const HustCodeEditor = (props) => {
   const {
     classRoot,
     title,
-    placeholder = "Write your source code here",
+    placeholder = "Write your Source code here",
     language,
     onChangeLanguage,
     listLanguagesAllowed,
     sourceCode,
     onChangeSourceCode,
     height = "420px",
-    hideLanguagePicker,
     ...remainProps
   } = props;
 
@@ -39,10 +38,10 @@ const HustCodeEditor = (props) => {
     }
   }
   return (
-    <Box {...remainProps} className={`${classRoot}`} sx={{marginTop: "24px"}}>
+    <Box {...remainProps} className={`${classRoot}`} sx={{marginTop: "18px"}}>
       <Box sx={{display: "flex", flexDirection: "row", justifyContent: "space-between", marginBottom: "8px"}}>
-        <Typography variant="h6">{title}</Typography>
-        {language && !hideLanguagePicker && <HustCodeLanguagePicker listLanguagesAllowed={listLanguagesAllowed} language={language} onChangeLanguage={onChangeLanguage}/>}
+        <Typography variant="h5">{title}</Typography>
+        {language && <HustCodeLanguagePicker listLanguagesAllowed={listLanguagesAllowed} language={language} onChangeLanguage={onChangeLanguage}/>}
       </Box>
 
       <AceEditor

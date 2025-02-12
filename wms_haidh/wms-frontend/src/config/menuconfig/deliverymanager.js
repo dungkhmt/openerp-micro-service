@@ -19,7 +19,7 @@ export const deliverymanager = {
     },
     {
       id: "MENU_WMSv2_DELIVERY_MANAGER.DELIVERY_TRIPS",
-      path: "/delivery-manager/delivery-trip",
+      path: "/delivery-manager/delivery-trips",
       isPublic: true,
       text: "Delivery Trips",
       child: [],

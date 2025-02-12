@@ -1,106 +1,72 @@
-import React from "react";
-import {Stack, TextField} from "@mui/material";
+import HustModal from "component/common/HustModal";
+import React, {useState} from "react";
+import {TextField} from "@mui/material";
 import {useTranslation} from "react-i18next";
-import PrimaryButton from "component/button/PrimaryButton";
-import CustomizedDialogs from "component/dialog/CustomizedDialogs";
-import TertiaryButton from "component/button/TertiaryButton";
-import {useForm} from "react-hook-form";
-import {request} from "../../../api";
-import {errorNoti} from "../../../utils/notification";
-import {makeStyles} from "@material-ui/core/styles";
-
-const useStyles = makeStyles((theme) => ({
-  dialogContent: {
-    minWidth: 500,
-    padding: theme.spacing(2),
-  },
-}));
+import {addNewTag} from "./service/TagService";
 
 const ModelAddNewTag = ({isOpen, handleSuccess, handleClose}) => {
-  const classes = useStyles();
 
   const {t} = useTranslation(
     ["education/programmingcontest/problem", "common", "validation"]
   );
 
-  const {
-    register,
-    handleSubmit,
-    errors,
-  } = useForm({
-    defaultValues: {
-      name: null,
-      description: null,
-    }
-  });
+  const [tagName, setTagName] = useState("");
+  const [tagDescription, setTagDescription] = useState("");
 
-  const onSubmit = (data) => {
-    handleClose()
+  const [loading, setLoading] = useState(false);
 
-    request(
-      "post",
-      "/tags/",
+  const handleSubmit = () => {
+    let body = {
+      name: tagName,
+      description: tagDescription,
+    };
+
+    setLoading(true);
+
+    addNewTag(
+      body,
       handleSuccess,
-      {
-        onError: (e) => {
-          errorNoti(t("common:error"))
-        },
+      () => {
+        setLoading(false);
+        handleClose();
       },
-      data
     )
   }
 
-  const content = <form onSubmit={handleSubmit(onSubmit)}>
-    <Stack spacing={2}>
+  return (
+    <HustModal
+      open={isOpen}
+      onOk={handleSubmit}
+      textOk={t("common:save")}
+      onClose={handleClose}
+      isLoading={loading}
+      title={t("common:addNew")}
+    >
       <TextField
-        autoFocus
         fullWidth
+        required
         id="tag-name"
-        label={t("tagName") + " *"}
-        name="name"
-        size="small"
-        error={!!errors.name}
-        helperText={errors.name?.message}
-        inputRef={register({
-          required: t("required", {ns: "validation"})
-        })}
+        label={"Tag"}
+        placeholder="Tag"
+        defaultValue={tagName}
+        value={tagName}
+        onChange={(event) => {
+          setTagName(event.target.value);
+        }}
       />
       <TextField
         fullWidth
         id="tag-description"
         label={t("common:description")}
-        name="description"
-        size="small"
-        error={!!errors.description}
-        helperText={errors.description?.message}
-        inputRef={register()}
+        placeholder={t("common:description")}
+        value={tagDescription}
+        onChange={(event) => {
+          setTagDescription(event.target.value);
+        }}
+        sx={{marginTop: "16px"}}
       />
-    </Stack>
-    <Stack direction="row" spacing={2} justifyContent='center' mt={3}>
-      <TertiaryButton
-        variant="outlined"
-        onClick={handleClose}
-      >
-        {t("common:cancel")}
-      </TertiaryButton>
-      <PrimaryButton
-        type="submit"
-      >
-        {t("common:save")}
-      </PrimaryButton>
-    </Stack>
-  </form>
-
-  return (
-    <CustomizedDialogs
-      open={isOpen}
-      handleClose={handleClose}
-      title={t("common:add", {name: t('tag')})}
-      contentTopDivider
-      content={content}
-      classNames={{content: classes.dialogContent}}
-    />
+    </HustModal>
   );
 }
 
-export default ModelAddNewTag;
+export default React.memo(ModelAddNewTag);

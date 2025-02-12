@@ -42,7 +42,7 @@ public class GccExecutor {
 
     private static final String TIME_LIMIT_ERROR = Constants.TestCaseSubmissionError.TIME_LIMIT.getValue();
     private static final String FILE_LIMIT_ERROR = Constants.TestCaseSubmissionError.FILE_LIMIT.getValue();
-    private static final String MEMORY_LIMIT_ERROR = Constants.TestCaseSubmissionError.MEMORY_ERROR.getValue();
+    private static final String MEMORY_LIMIT_ERROR = Constants.TestCaseSubmissionError.MEMORY_LIMIT.getValue();
     private static final String PROGRAM_ERROR = "timeout: the monitored command dumped core";
 
     private static final int DEFAULT_INITIAL_MEMORY = 10 * 1024;
@@ -86,7 +86,7 @@ public class GccExecutor {
                 "cat <<'" + SOURCECODE_HEREDOC_DELIMITER + "' >> main" + getFileExtension(language),
                 sourceChecker,
                 SOURCECODE_HEREDOC_DELIMITER,
-                "ulimit -f 2097152 && " + getBuildCmd(language), // The maximum size limit of the .o file is 1GB. If it exceeds this limit, the program may require allocating a large variable.
+                getBuildCmd(language),
                 "FILE=main",
                 "if test -f \"$FILE\"; then",
                 genTestCase,
@@ -144,7 +144,7 @@ public class GccExecutor {
                 "cat <<'" + SOURCECODE_HEREDOC_DELIMITER + "' >> main" + getFileExtension(language),
                 source,
                 SOURCECODE_HEREDOC_DELIMITER,
-                "ulimit -f 2097152 && " + getBuildCmd(language), // The maximum size limit of the .o file is 1GB. If it exceeds this limit, the program may require allocating a large variable.
+                getBuildCmd(language),
                 "FILE=main",
                 "if test -f \"$FILE\"; then",
                 genTestCase.toString(),

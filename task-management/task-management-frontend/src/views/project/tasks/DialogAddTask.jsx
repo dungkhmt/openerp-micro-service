@@ -33,101 +33,22 @@ import { TaskStatus } from "../../../components/task/status";
 import { FileService } from "../../../services/api/file.service";
 import { TaskService } from "../../../services/api/task.service";
 import { clearCache } from "../../../store/project/tasks";
-import { SkillChip } from "../../../components/task/skill";
-import ItemSelector from "../../../components/mui/dialog/ItemSelector";
-import { fetchEvents } from "../../../store/project/events";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />;
 });
 
-const DialogAddTask = ({ open, setOpen, defaultEvent }) => {
+const DialogAddTask = ({ open, setOpen }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const { members, project } = useSelector((state) => state.project);
-  const { events } = useSelector((state) => state.events);
-  const { category, priority, status, skill } = useSelector((state) => state);
+  const { category, priority, status } = useSelector((state) => state);
+
   const [files, setFiles] = useState([]);
   const [createLoading, setCreateLoading] = useState(false);
 
   const { register, handleSubmit, errors, setValue, control } = useForm();
-
-  const [selectedSkills, setSelectedSkills] = useState([]);
-  const [filteredSkills, setFilteredSkills] = useState(skill.skills);
-
-  const handleSkillSearch = (search) => {
-    setFilteredSkills(
-      skill.skills.filter((item) =>
-        item.name.toLowerCase().includes(search.toLowerCase())
-      )
-    );
-  };
-
-  const handleSkillChange = (skill) => {
-    setSelectedSkills((prevSelectedSkills) =>
-      prevSelectedSkills.includes(skill)
-        ? prevSelectedSkills.filter(
-            (selected) => selected.skillId !== skill.skillId
-          )
-        : [...prevSelectedSkills, skill]
-    );
-  };
-
-  const [selectedEvents, setSelectedEvents] = useState(
-    defaultEvent ? [defaultEvent] : []
-  );
-  const [filteredEvents, setFilteredEvents] = useState(events);
-
-  const handleEventSearch = (search) => {
-    setFilteredEvents(
-      events.filter((item) =>
-        item.name.toLowerCase().includes(search.toLowerCase())
-      )
-    );
-  };
-
-  const handleEventChange = (event) => {
-    setSelectedEvents((prevSelectedEvents) =>
-      prevSelectedEvents.includes(event)
-        ? prevSelectedEvents.filter(
-            (selected) => selected.eventId !== event.eventId
-          )
-        : [event]
-    );
-  };
-
-  const [selectedAssignees, setSelectedAssignees] = useState([]);
-  const [filteredAssignees, setFilteredAssignees] = useState(members);
-
-  const handleAssigneeSearch = (search) => {
-    setFilteredAssignees(
-      members.filter(
-        ({ member }) =>
-          (member.firstName && member.firstName.toLowerCase().includes(search.toLowerCase())) ||
-          (member.lastName && member.lastName.toLowerCase().includes(search.toLowerCase()))
-      ).filter(
-        ({ member }) =>
-          member.firstName || member.lastName
-      )
-    );
-  };
-  
-
-  const handleAssigneeChange = (member) => {
-    setSelectedAssignees((prevSelectedAssignees) =>
-      prevSelectedAssignees.includes(member)
-        ? prevSelectedAssignees.filter((selected) => selected.id !== member.id)
-        : [member]
-    );
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setSelectedSkills([]);
-    setSelectedEvents([]);
-    setSelectedAssignees([]);
-  };
 
   const onCreate = async (data) => {
     let attachmentPaths = null;
@@ -139,31 +60,22 @@ const DialogAddTask = ({ open, setOpen, defaultEvent }) => {
           ? `${files[0].name},${uploadRes.id}`
           : null;
       }
+
       const res = await TaskService.createTask({
         ...data,
         attachmentPaths,
         projectId: project.id,
-        assigneeId:
-          selectedAssignees.length > 0 ? selectedAssignees[0].id : null,
-        eventId: selectedEvents.length > 0 ? selectedEvents[0].id : null,
-        fromDate: data.fromDate ? data.fromDate.toISOString() : null,
+        fromDate: data.fromDate.toISOString(),
       });
-
-      const skillIdList = selectedSkills.map((skill) => skill.skillId);
-      await TaskService.updateTaskSkills(res.id, skillIdList);
       dispatch(clearCache());
       toast.success("Thêm nhiệm vụ thành công");
       navigate(`/project/${project.id}/task/${res.id}`);
-      if (selectedEvents.length > 0) await dispatch(fetchEvents(project.id));
     } catch (e) {
       console.error(e);
       toast.error("Thêm nhiệm vụ thất bại. Vui lòng thử lại sau.");
     } finally {
       setOpen(false);
       setCreateLoading(false);
-      setSelectedSkills([]);
-      setSelectedAssignees([]);
-      setSelectedEvents([]);
     }
   };
 
@@ -173,7 +85,7 @@ const DialogAddTask = ({ open, setOpen, defaultEvent }) => {
       open={open}
       maxWidth="md"
       scroll="paper"
-      onClose={handleClose}
+      onClose={() => setOpen(false)}
       TransitionComponent={Transition}
       data-color-mode="light"
     >
@@ -207,7 +119,6 @@ const DialogAddTask = ({ open, setOpen, defaultEvent }) => {
                 placeholder="Nhập tên nhiệm vụ"
                 error={!!errors.name}
                 helperText={errors.name && "Tên không được để trống"}
-                autoFocus
               />
             </FormControl>
           </Grid>
@@ -354,125 +265,38 @@ const DialogAddTask = ({ open, setOpen, defaultEvent }) => {
               />
             </FormControl>
           </Grid>
-
-          <Grid item sm={12} xs={12}>
-            <Box
-              sx={{
-                display: "flex",
-                gap: 3,
-                flexWrap: "wrap",
-              }}
-            >
-              <ItemSelector
-                items={filteredAssignees.map(({ member }) => member)}
-                selectedItems={selectedAssignees}
-                onSelectChange={handleAssigneeChange}
-                handleSearch={handleAssigneeSearch}
-                renderItem={(item) => (
-                  <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-                    <UserAvatar user={item} />
-                    <Typography variant="subtitle2">{`${item.firstName ?? ""} ${
-                      item.lastName ?? ""
-                    }`}</Typography>
-                  </Box>
-                )}
-                renderSelectedItem={(items) => (
-                  <Box>
-                    {items.map((member) => (
-                      <Box
-                        key={member.id}
-                        sx={{
-                          display: "flex",
-                          gap: 2,
-                          alignItems: "center",
-                        }}
-                      >
-                        <UserAvatar user={member} />
-                        <Typography variant="subtitle2">{`${
-                          member.firstName ?? ""
-                        } ${member.lastName ?? ""}`}</Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                )}
-                placeholder="Tìm kiếm thành viên"
-                label="Phân công cho"
-                startIcon={<Icon icon="ci:user-02" />}
-                idPopover="assignee-popover"
-              />
-              <ItemSelector
-                items={filteredEvents}
-                selectedItems={selectedEvents}
-                onSelectChange={handleEventChange}
-                handleSearch={handleEventSearch}
-                renderItem={(item) => (
-                  <Typography
-                    sx={{
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
+          <Grid item sm={8} xs={12}>
+            <FormControl fullWidth>
+              <InputLabel id="assignee-select">Phân công cho</InputLabel>
+              <Controller
+                name="assigneeId"
+                control={control}
+                defaultValue={null}
+                as={
+                  <Select
+                    id="select-assignee"
+                    label="Phân công cho"
+                    labelId="assignee-select"
+                    inputProps={{ placeholder: "Phân công cho" }}
                   >
-                    {item.name}
-                  </Typography>
-                )}
-                renderSelectedItem={(items) => (
-                  <Box sx={{ maxWidth: 400 }}>
-                    {items.map((item) => (
-                      <Typography
-                        key={item.id}
-                        sx={{
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      >
-                        {item.name}
-                      </Typography>
+                    <MenuItem value="">Không chọn</MenuItem>
+                    {members.map(({ member }) => (
+                      <MenuItem key={member.id} value={member.id}>
+                        <Box
+                          sx={{ display: "flex", gap: 2, alignItems: "center" }}
+                        >
+                          <UserAvatar user={member} />
+                          <Typography variant="subtitle2">{`${
+                            member.firstName ?? ""
+                          } ${member.lastName ?? ""}`}</Typography>
+                        </Box>
+                      </MenuItem>
                     ))}
-                  </Box>
-                )}
-                placeholder="Tìm kiếm sự kiện"
-                label="Sự kiện"
-                startIcon={<Icon icon="pixelarticons:group" />}
-                idPopover="event-popover"
+                  </Select>
+                }
               />
-              <ItemSelector
-                items={filteredSkills}
-                selectedItems={selectedSkills}
-                onSelectChange={handleSkillChange}
-                handleSearch={handleSkillSearch}
-                renderItem={(item) => (
-                  <Typography
-                    sx={{
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {item.name}
-                  </Typography>
-                )}
-                renderSelectedItem={(items) => (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      gap: "5px",
-                    }}
-                  >
-                    {items.map((value) => (
-                      <SkillChip key={value.skillId} skill={value} />
-                    ))}
-                  </Box>
-                )}
-                placeholder="Tìm kiếm kỹ năng"
-                label="Kỹ năng"
-                startIcon={<Icon icon="gravity-ui:gear" />}
-                idPopover="skill-popover"
-              />
-            </Box>
+            </FormControl>
           </Grid>
-
           <Grid item sm={12} xs={12}>
             <FormControl fullWidth>
               <Typography variant="subtitle2">Tài liệu</Typography>
@@ -481,6 +305,7 @@ const DialogAddTask = ({ open, setOpen, defaultEvent }) => {
           </Grid>
         </Grid>
       </DialogContent>
+
       <DialogActions
         sx={{
           justifyContent: "flex-end",
@@ -499,7 +324,11 @@ const DialogAddTask = ({ open, setOpen, defaultEvent }) => {
         >
           Tạo
         </LoadingButton>
-        <Button variant="outlined" color="secondary" onClick={handleClose}>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={() => setOpen(false)}
+        >
           Hủy
         </Button>
       </DialogActions>
@@ -510,7 +339,6 @@ const DialogAddTask = ({ open, setOpen, defaultEvent }) => {
 DialogAddTask.propTypes = {
   open: PropTypes.bool.isRequired,
   setOpen: PropTypes.func.isRequired,
-  defaultEvent: PropTypes.object,
 };
 
 export { DialogAddTask };

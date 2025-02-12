@@ -26,14 +26,12 @@ const TaskViewLog = () => {
       </Box>
     );
   }
+
   return (
     <Timeline sx={{ my: 0, py: 0, mb: 4 }}>
-      {logs
-        .slice()
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .map((log) => (
-          <TaskLogItem key={log.id} item={log} />
-        ))}
+      {logs.reverse().map((log) => (
+        <TaskLogItem key={log.id} item={log} />
+      ))}
     </Timeline>
   );
 };

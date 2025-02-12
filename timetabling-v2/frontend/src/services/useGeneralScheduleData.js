@@ -37,28 +37,73 @@ export const useGeneralSchedule = () => {
         
         let generalClasses = [];
         data.forEach((classObj) => {
-          if (classObj.timeSlots) {
-            classObj.timeSlots.forEach((timeSlot, index) => {
+          if (classObj.timeSlots && classObj.timeSlots.length > 0) {
+            // If there's only 1 timeSlot, it gets all the duration
+            if (classObj.timeSlots.length === 1) {
               const cloneObj = JSON.parse(JSON.stringify({
                 ...classObj,
-                ...timeSlot,
+                ...classObj.timeSlots[0],
                 classCode: classObj.classCode,
-                roomReservationId: timeSlot.id,
-                id: classObj.id + `-${index + 1}`,
+                roomReservationId: classObj.timeSlots[0].id,
+                id: classObj.id + `-1`,
                 crew: classObj.crew,
+                duration: classObj.duration, // Use parent's full duration
+                isChild: true,
+                parentId: classObj.id
               }));
               delete cloneObj.timeSlots;
               generalClasses.push(cloneObj);
-            });
-          } else {
-            generalClasses.push({
-              ...classObj,
-              generalClassId: String(classObj.generalClassId || '')
-            });
+            } else {
+              // If multiple timeSlots, first one gets remaining duration
+              let usedDuration = classObj.timeSlots.slice(1).reduce((total, slot) => 
+                total + (slot.duration || 0), 0);
+              
+              // Process first timeSlot with remaining duration
+              const firstSlot = classObj.timeSlots[0];
+              const remainingDuration = Math.max(0, (classObj.duration || 0) - usedDuration);
+              
+              // Add first timeSlot with remaining duration
+              const firstCloneObj = JSON.parse(JSON.stringify({
+                ...classObj,
+                ...firstSlot,
+                classCode: classObj.classCode,
+                roomReservationId: firstSlot.id,
+                id: classObj.id + `-1`,
+                crew: classObj.crew,
+                duration: remainingDuration,
+                isChild: true,
+                parentId: classObj.id
+              }));
+              delete firstCloneObj.timeSlots;
+              generalClasses.push(firstCloneObj);
+
+              // Process remaining timeSlots with their original duration
+              classObj.timeSlots.slice(1).forEach((timeSlot, index) => {
+                const cloneObj = JSON.parse(JSON.stringify({
+                  ...classObj,
+                  ...timeSlot,
+                  classCode: classObj.classCode,
+                  roomReservationId: timeSlot.id,
+                  id: classObj.id + `-${index + 2}`,
+                  crew: classObj.crew,
+                  duration: timeSlot.duration,
+                  isChild: true,
+                  parentId: classObj.id
+                }));
+                delete cloneObj.timeSlots;
+                generalClasses.push(cloneObj);
+              });
+            }
           }
         });
 
-        return generalClasses;
+        // Sort by parentId and maintain order of slots
+        return generalClasses.sort((a, b) => {
+          if (a.parentId !== b.parentId) {
+            return a.parentId - b.parentId;
+          }
+          return a.id.localeCompare(b.id);
+        });
       }
     }
   );

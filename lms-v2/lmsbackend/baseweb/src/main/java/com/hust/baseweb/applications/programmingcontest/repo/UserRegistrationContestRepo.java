@@ -11,9 +11,7 @@ import java.util.UUID;
 public interface UserRegistrationContestRepo extends JpaRepository<UserRegistrationContestEntity, UUID> {
 //    UserRegistrationContestEntity findUserRegistrationContestByContestAndUserLogin(ContestEntity contest, UserLogin userLogin);
 
-    List<UserRegistrationContestEntity> findAllByContestId(String contestId);
-
-    List<UserRegistrationContestEntity> findUserRegistrationContestEntityByContestIdAndUserId(
+    UserRegistrationContestEntity findUserRegistrationContestEntityByContestIdAndUserId(
         String contestId,
         String userId
     );

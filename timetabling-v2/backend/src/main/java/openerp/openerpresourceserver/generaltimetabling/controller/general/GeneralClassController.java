@@ -7,6 +7,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.generaltimetabling.exception.*;
+import openerp.openerpresourceserver.generaltimetabling.model.dto.request.RoomReservationDto;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.*;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.ResetScheduleRequest;
 import openerp.openerpresourceserver.generaltimetabling.service.ExcelService;
@@ -143,8 +144,10 @@ public class GeneralClassController {
     }
 
     @PostMapping("/{generalClassId}/room-reservations/")
-    public ResponseEntity<GeneralClass> requestAddRoomReservation(@PathVariable("generalClassId")Long generalClassId) {
-        return ResponseEntity.ok(gService.addRoomReservation(generalClassId));
+    public ResponseEntity<GeneralClass> requestAddRoomReservation(
+            @PathVariable("generalClassId") Long generalClassId,
+            @RequestBody RoomReservationDto request) {
+        return ResponseEntity.ok(gService.addRoomReservation(generalClassId, request.getDuration()));
     }
 
     @DeleteMapping("/delete-by-semester")

@@ -19,7 +19,6 @@ import ExamClassDetail from "../component/examclassaccount/ExamClassDetail";
 import UploadGeneratedUser from "../component/examclassaccount/UploadGeneratedUser";
 
 import ContestManagerRankingPublicV2 from "../component/education/programmingcontestFE/ContestManagerRankingPublicV2";
-import ExamRoute from "./ExamRoute";
 
 const EduRoute = lazy(() => import("./EduRoute"));
 // const UserLoginRoute = lazy(() => import("./UserLoginRoute"));
@@ -67,7 +66,7 @@ function MainAppRoute(props) {
           <PrivateRoute component={WhiteBoardRoute} path="/whiteboard" />
 
           <PrivateRoute component={AdminRoute} path="/admin/data" />
-          <PrivateRoute component={ExamRoute} path="/exam" />
+          {/*<PrivateRoute component={AccountActivationRoute} path="/activation" />*/}
           <PrivateRoute
             component={ProgrammingContestRoutes}
             path="/programming-contest"

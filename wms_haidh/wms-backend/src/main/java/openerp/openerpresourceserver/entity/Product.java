@@ -1,15 +1,14 @@
 package openerp.openerpresourceserver.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,16 +29,18 @@ public class Product {
     private String code;
     private String name;
     private String description;
+
     private BigDecimal height;
     private BigDecimal weight;
     private BigDecimal area;
+
     private String uom;
     private UUID categoryId;
-    private String imageId; 
-    private LocalDateTime dateUpdated;
-    
-    @Transient // Không lưu trường này vào database
-    private String imageUrl;
+
+    private String imageContentType;
+    private Long imageSize;
+    @Lob
+    private byte[] imageData;
 
 }
 
