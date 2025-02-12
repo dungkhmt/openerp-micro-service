@@ -15,158 +15,119 @@ import { DataGrid } from "@mui/x-data-grid";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
 import { usePreventOverflow } from "../../../hooks/usePreventOverflow";
 import { MenuAddMember } from "./MenuAddMember";
-import { DialogMemberTasks } from "./DialogMemberTasks";
-import { fetchTasksForMember } from "../../../store/project/tasks";
-import { deleteMember } from "../../../store/project";
-import { useParams } from "react-router";
-import ConfirmationDialog from "../../../components/mui/dialog/ConfirmationDialog";
 
-const columns = (handleMemberClick, projectId, myRole) => {
-  const baseColumns = [
-    {
-      flex: 0.3,
-      minWidth: 150,
-      field: "id",
-      headerName: "User",
-      renderCell: ({ row }) => {
-        const { firstName, lastName, id } = row.member;
-        const fullName =
-          firstName || lastName
-            ? `${firstName ?? ""} ${lastName ?? ""}`
-            : " - ";
-        return (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <UserAvatar user={row.member} />
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "flex-start",
-                flexDirection: "column",
-              }}
-            >
-              <Tooltip title={`Xem nhiệm vụ được giao cho ${fullName}`}>
-                <Typography
-                  onClick={() => handleMemberClick(projectId, row.member)}
-                  sx={{
-                    fontWeight: 650,
-                    fontSize: "0.9rem",
-                    color: (theme) => theme.palette.text.secondary,
-                    "&:hover": {
-                      color: (theme) => theme.palette.text.primary,
-                      cursor: "pointer",
-                    },
-                  }}
-                >
-                  {fullName}
-                </Typography>
-              </Tooltip>
-              <Typography noWrap variant="caption">
-                {`@${id}`}
-              </Typography>
-            </Box>
-          </Box>
-        );
-      },
-      display: "flex",
-    },
-    {
-      flex: 0.3,
-      minWidth: 150,
-      field: "email",
-      headerName: "Email",
-      renderCell: ({ row }) => {
-        return (
-          <Tooltip title={`Gửi mail tới: ${row.member.email}`}>
-            <Typography
-              noWrap
-              variant="body2"
-              component={Link}
-              href={`mailto:${row.member.email}`}
-              sx={{ textDecoration: "none", color: "text.secondary" }}
-            >
-              {row.member?.email}
-            </Typography>
-          </Tooltip>
-        );
-      },
-      display: "flex",
-    },
-    {
-      flex: 0.15,
-      minWidth: 100,
-      field: "role",
-      headerName: "Role",
-      renderCell: ({ row }) => {
-        return (
+/**
+ * @type {import("@mui/x-data-grid").GridColDef[]}
+ */
+const columns = [
+  {
+    flex: 0.3,
+    minWidth: 150,
+    field: "id",
+    headerName: "User",
+    renderCell: ({ row }) => {
+      const { firstName, lastName, id } = row.member;
+      const fullName =
+        firstName || lastName ? `${firstName ?? ""} ${lastName ?? ""}` : " - ";
+      return (
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <UserAvatar user={row.member} />
           <Box
             sx={{
               display: "flex",
-              alignItems: "center",
-              "& svg": { mr: 3, color: "rgba(255, 0, 0, 0.8)" },
+              alignItems: "flex-start",
+              flexDirection: "column",
             }}
           >
-            <Icon icon="mdi:account" fontSize={20} />
-            <Typography
-              noWrap
-              sx={{ color: "text.secondary", textTransform: "capitalize" }}
-            >
-              {row.roleId}
+            <Tooltip title={fullName}>
+              <Typography
+                sx={{
+                  fontWeight: 650,
+                  fontSize: "0.9rem",
+                  color: (theme) => theme.palette.text.secondary,
+                  "&:hover": {
+                    color: (theme) => theme.palette.text.primary,
+                    cursor: "pointer",
+                  },
+                }}
+              >
+                {fullName}
+              </Typography>
+            </Tooltip>
+            <Typography noWrap variant="caption">
+              {`@${id}`}
             </Typography>
           </Box>
-        );
-      },
-      display: "flex",
+        </Box>
+      );
     },
-  ];
+    display: "flex",
+  },
+  {
+    flex: 0.3,
+    minWidth: 150,
+    field: "email",
+    headerName: "Email",
+    renderCell: ({ row }) => {
+      return (
+        <Tooltip title={`Gửi mail tới: ${row.member.email}`}>
+          <Typography
+            noWrap
+            variant="body2"
+            component={Link}
+            href={`mailto:${row.member.email}`}
+            sx={{ textDecoration: "none", color: "text.secondary" }}
+          >
+            {row.member?.email}
+          </Typography>
+        </Tooltip>
+      );
+    },
+    display: "flex",
+  },
+  {
+    flex: 0.15,
+    minWidth: 100,
+    field: "role",
+    headerName: "Role",
+    renderCell: ({ row }) => {
+      return (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            "& svg": { mr: 3, color: "#f00" },
+          }}
+        >
+          <Icon icon="mdi:account" fontSize={20} />
+          <Typography
+            noWrap
+            sx={{ color: "text.secondary", textTransform: "capitalize" }}
+          >
+            {row.roleId}
+          </Typography>
+        </Box>
+      );
+    },
+    display: "flex",
+  },
+  {
+    flex: 0.1,
+    minWidth: 60,
+    sortable: false,
+    field: "actions",
+    headerName: "Actions",
+    renderCell: ({ row }) => <RowOptions id={row.id} />,
+  },
+];
 
-  // Conditionally add the "Actions" field based on the role
-  if (myRole === "owner" || myRole === "member") {
-    baseColumns.push({
-      flex: 0.1,
-      minWidth: 60,
-      sortable: false,
-      field: "actions",
-      headerName: "Actions",
-      renderCell: ({ row }) => <RowOptions member={row} />,
-    });
-  }
-
-  return baseColumns;
-};
-
-const getContent = (user, member, project) => {
-  const fullName = `${member?.firstName ?? ""} ${
-    member?.lastName ?? ""
-  }`.trim();
-  if (member.roleId === user.id) {
-    return (
-      <>
-        Bạn có chắc chắn muốn rời khỏi dự án{" "}
-        <span style={{ fontWeight: "bold" }}>{project.name}</span>? Hành động
-        này không thể hoàn tác.
-      </>
-    );
-  }
-  return (
-    <>
-      Bạn có chắc chắn muốn xoá{" "}
-      <span style={{ fontWeight: "bold" }}>{fullName}</span> khỏi dự án{" "}
-      <span style={{ fontWeight: "bold" }}>{project.name}</span>? Hành động này
-      không thể hoàn tác.
-    </>
-  );
-};
-
-const RowOptions = ({ member }) => {
-  const { id } = useParams();
-  const dispatch = useDispatch();
-  const { project } = useSelector((state) => state.project);
-  const { user } = useSelector((state) => state.myProfile);
+const RowOptions = ({ id }) => {
   const [anchorEl, setAnchorEl] = useState(null);
+
   const rowOptionsOpen = Boolean(anchorEl);
 
   const handleRowOptionsClick = (event) => {
@@ -176,36 +137,10 @@ const RowOptions = ({ member }) => {
     setAnchorEl(null);
   };
 
-  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-  const [memberToDelete, setMemberToDelete] = useState(null);
-
-  const handleDeleteClick = (member) => {
-    setMemberToDelete(member);
-    setIsConfirmDialogOpen(true);
-  };
-  const handleConfirmDelete = async () => {
-    if (!memberToDelete) return;
-    try {
-      await dispatch(
-        deleteMember({
-          projectId: id,
-          memberId: memberToDelete.id,
-          roleId: memberToDelete.roleId,
-        })
-      );
-      toast.success("Xóa thành viên thành công");
-    } catch (e) {
-      console.log(e);
-      toast.error("Lỗi khi xóa thành viên");
-    } finally {
-      setIsConfirmDialogOpen(false);
-      setMemberToDelete(null);
-      handleRowOptionsClose();
-    }
-  };
-  const handleCancelDelete = () => {
-    setIsConfirmDialogOpen(false);
-    setMemberToDelete(null);
+  const handleDelete = () => {
+    console.log("Delete user with id: ", id);
+    toast.error("Delete user feature is not available yet!");
+    handleRowOptionsClose();
   };
 
   return (
@@ -234,36 +169,23 @@ const RowOptions = ({ member }) => {
           <Icon icon="mdi:pencil-outline" fontSize={20} />
           Sửa quyền
         </MenuItem>
-        <MenuItem
-          onClick={() => handleDeleteClick(member)}
-          sx={{ "& svg": { mr: 2 } }}
-        >
+        <MenuItem onClick={handleDelete} sx={{ "& svg": { mr: 2 } }}>
           <Icon icon="mdi:delete-outline" fontSize={20} />
-          {member.id === user.id ? `Rời dự án` : `Xóa`}
+          Xóa
         </MenuItem>
       </Menu>
-
-      <ConfirmationDialog
-        open={isConfirmDialogOpen}
-        onClose={handleCancelDelete}
-        onConfirm={handleConfirmDelete}
-        title="Xoá thành viên"
-        content={getContent(user, member, project)}
-      />
     </>
   );
 };
 
 const ProjectViewMembers = () => {
-  const { members, myRole} = useSelector((state) => state.project);
-  const { memberTasks } = useSelector((state) => state.tasks);
-  const { id: projectId } = useParams();
+  const { members } = useSelector((state) => state.project);
   const { ref, updateHeight } = usePreventOverflow();
+
   const [filterMembers, setFilterMembers] = useState(members);
+
   const [addMemberAnchorEl, setAddMemberAnchorEl] = useState(null);
   const [search, setSearch] = useState("");
-  const [openDialog, setOpenDialog] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const handleAddMenuClick = (event) => {
     setAddMemberAnchorEl(event.currentTarget);
@@ -273,36 +195,13 @@ const ProjectViewMembers = () => {
     setAddMemberAnchorEl(null);
   };
 
-  const dispatch = useDispatch();
-  const handleMemberClick = async (projectId, member) => {
-    setOpenDialog(true);
-    setLoading(true);
-    const res = await dispatch(
-      fetchTasksForMember({
-        projectId: projectId,
-        assigneeId: member.id,
-      })
-    );
-    if (res.error) {
-      throw res.error;
-    }
-    setLoading(false);
-  };
-
-  const handleDialogClose = () => {
-    setOpenDialog(false);
-  };
-
   useEffect(() => {
     setFilterMembers(
       members.filter((member) => {
-        const firstName = member.member.firstName ?? "";
-        const lastName = member.member.lastName ?? "";
-        if (!firstName && !lastName) {
-          return false;
-        }
-        
-        const fullName = `${firstName} ${lastName}`.toLowerCase();
+        const fullName =
+          `${member.member.firstName ?? ""} ${
+            member.member.lastName ?? ""
+          }`?.toLowerCase() ?? "";
         const id = member.member.id.toLowerCase();
         const email = member.member.email?.toLowerCase() ?? "";
         return (
@@ -313,18 +212,17 @@ const ProjectViewMembers = () => {
       })
     );
   }, [search, members]);
-  
 
   useEffect(() => {
     updateHeight(20);
-  }, [updateHeight]);
+  }, []);
 
   return (
     <Box>
       <Box
         sx={{ display: "flex", justifyContent: "space-between", mb: 2, px: 2 }}
       >
-        <Typography variant="h6">{filterMembers.length} thành viên</Typography>
+        <Typography variant="h6">{members.length} thành viên</Typography>
         <Box
           sx={{
             display: "flex",
@@ -369,28 +267,19 @@ const ProjectViewMembers = () => {
               ...member,
               id: member.member.id,
             }))}
-            columns={columns(handleMemberClick, projectId, myRole)}
+            columns={columns}
             // checkboxSelection
             disableRowSelectionOnClick
             pageSizeOptions={[10, 25, 50]}
           />
         </div>
       </Card>
-      {memberTasks && (
-        <DialogMemberTasks
-          open={openDialog}
-          onClose={handleDialogClose}
-          tasks={memberTasks}
-          projectId={projectId}
-          loading={loading}
-        />
-      )}
     </Box>
   );
 };
 
 RowOptions.propTypes = {
-  member: PropTypes.object.isRequired,
+  id: PropTypes.string.isRequired,
 };
 
 export { ProjectViewMembers };

@@ -37,7 +37,7 @@
 //
 //   const getColor = (status) => {
 //     switch (status) {
-//       case 'Accepted':
+//       case 'Accept':
 //         return 'green';
 //       default:
 //         return 'red';

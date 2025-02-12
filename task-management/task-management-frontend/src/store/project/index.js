@@ -19,6 +19,7 @@ export const updateProject = createAsyncThunk(
   "project/updateProject",
   async ({ id: projectId, data }, { dispatch }) => {
     const project = await ProjectService.updateProject(projectId, data);
+
     await dispatch(fetchProject(projectId));
     return project;
   }
@@ -36,32 +37,16 @@ export const addMember = createAsyncThunk(
   "project/addMember",
   async (data, { dispatch }) => {
     const members = await ProjectService.addMember(data);
+
     await dispatch(fetchMembers(data.projectId));
-    return members;
-  }
-);
 
-export const deleteMember = createAsyncThunk(
-  "project/deleteMember",
-  async ({projectId, memberId, roleId}, { dispatch }) => {
-    const members = await ProjectService.deleteMember(projectId, memberId, roleId);
-    await dispatch(fetchMembers(projectId));
     return members;
-  }
-);
-
-export const fetchMyRole = createAsyncThunk(
-  "project/fetchMyRole",
-  async (projectId) => {
-    const role = await ProjectService.getMyRole(projectId);
-    return role;
   }
 );
 
 const initialState = {
   project: null,
   members: [],
-  myRole: null,
   fetchLoading: false,
   errors: [],
 };
@@ -75,7 +60,6 @@ export const projectSlice = createSlice({
     },
     resetProject: (state) => {
       state.project = initialState.project;
-      state.myRole = initialState.myRole;
       state.members = initialState.members;
       state.fetchLoading = true;
       state.errors = [];
@@ -92,12 +76,7 @@ export const projectSlice = createSlice({
         state.members = action.payload;
         state.fetchLoading = false;
       })
-      .addCase(fetchMembers.rejected, handleRejected)
-      .addCase(fetchMyRole.fulfilled, (state, action) => {
-        state.myRole = action.payload;
-        state.fetchLoading = false;
-      })
-      .addCase(fetchMyRole.rejected, handleRejected);
+      .addCase(fetchMembers.rejected, handleRejected);
   },
 });
 

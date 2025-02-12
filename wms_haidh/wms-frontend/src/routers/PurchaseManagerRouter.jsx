@@ -1,21 +1,34 @@
-import { Routes, Route } from "react-router-dom";
-import ReceiptList from "../views/purchase_manager/ReceiptList";
-import AddReceipt from "../views/purchase_manager/AddReceipt";
-import ReceiptBill from "../views/purchase_manager/ReceiptBill";
-import ReceiptDetail from "../views/purchase_manager/ReceiptDetail";
-import ReceiptApproveList from "../views/purchase_manager/ReceiptApproveList";
-import ReceiptApproveDetail from "../views/purchase_manager/ReceiptApproveDetail";
+// import { Route, Switch, useRouteMatch } from "react-router";
+// import ReceiptRequestForApproval from "../screens/receipt/receipRequestForApproval";
+// import ReceiptRequestForApprovalListing from "../screens/receipt/receiptRequestForApprovalListing";
+// import receiptRequestDetailForPurchaseManager from "../screens/receipt/receiptRequestDetailForPurchaseManager";
+
+// export default function PurchaseManagerRouter () {
+//   let { path } = useRouteMatch();
+//   return (
+//     <div>
+//       <Switch>
+//         <Route
+//           component={ReceiptRequestForApprovalListing}
+//           exact
+//           path={`${path}/receipts`}
+//         ></Route>
+//         <Route
+//           component={ReceiptRequestForApproval}
+//           exact
+//           path={`${path}/receipts/:id`}
+//         ></Route>
+//         <Route
+//           component={receiptRequestDetailForPurchaseManager} 
+//           exact
+//           path={`${path}/create-receipt`}
+//         ></Route>
+//       </Switch>
+//     </div>
+//   );
+// }
 const PurchaseManagerRouter = () => {
-  return (
-    <Routes>
-      <Route path="receipts" element={<ReceiptList />} />
-      <Route path="receipts/add-receipt" element={<AddReceipt />} /> 
-      <Route path="receipts/:receiptId" element={<ReceiptDetail />} /> 
-      <Route path="process-receipts" element={<ReceiptApproveList />} />
-      <Route path="process-receipts/:receiptId" element={<ReceiptApproveDetail/>} />
-      <Route path="receipt-bill" element={<ReceiptBill />} />
-    </Routes>
-  );
+    return <div>Purchase Manager Router</div>;
   };
   
   export default PurchaseManagerRouter;

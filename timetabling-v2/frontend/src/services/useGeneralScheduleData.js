@@ -37,19 +37,16 @@ export const useGeneralSchedule = () => {
         
         let generalClasses = [];
         data.forEach((classObj) => {
-          // Calculate total used duration from timeSlots
+          // Tính tổng duration đã sử dụng bởi các slot
           const usedDuration = classObj.timeSlots?.reduce((total, slot) => {
             return total + (slot.duration || 0);
           }, 0) || 0;
 
-          // Calculate remaining duration for parent class
-          const remainingDuration = classObj.duration - usedDuration;
-
-          // Handle child classes (time slots)
+          // Handle child classes (time slots) first
           if (classObj.timeSlots && classObj.timeSlots.length > 0) {
             // Only add valid child classes (with duration not null)
             classObj.timeSlots.forEach((timeSlot, index) => {
-              if (timeSlot.duration !== null) {
+              if (timeSlot.duration != null) { // Chỉ thêm slot khi duration không null
                 const cloneObj = JSON.parse(JSON.stringify({
                   ...classObj,
                   ...timeSlot,
@@ -57,7 +54,7 @@ export const useGeneralSchedule = () => {
                   roomReservationId: timeSlot.id,
                   id: classObj.id + `-${index + 1}`,
                   crew: classObj.crew,
-                  duration: timeSlot.duration,
+                  duration: timeSlot.duration, // Dùng duration của slot
                   isChild: true,
                   parentId: classObj.id
                 }));
@@ -67,20 +64,17 @@ export const useGeneralSchedule = () => {
             });
           }
 
-          // Only add parent class if it has duration or has no timeSlots
-          if (classObj.duration !== null || !classObj.timeSlots?.length) {
-            generalClasses.push({
-              ...classObj,
-              generalClassId: String(classObj.generalClassId || classObj.id || ''),
-              duration: remainingDuration,
-              isParent: true
-            });
-          }
+          // Add parent class with remaining duration
+          generalClasses.push({
+            ...classObj,
+            generalClassId: String(classObj.generalClassId || classObj.id || ''),
+            duration: classObj.duration === null ? 0 : Math.max(0, classObj.duration - usedDuration), // Trừ duration đã dùng
+            isParent: true
+          });
         });
 
         // Sort to group parent-child together
-        generalClasses.sort((a, b) => {
-          // First sort by parent ID to group families together
+        return generalClasses.sort((a, b) => {
           const parentIdA = a.parentId || a.id;
           const parentIdB = b.parentId || b.id;
           
@@ -88,14 +82,11 @@ export const useGeneralSchedule = () => {
             return parentIdA - parentIdB;
           }
           
-          // Then put parents before children
           if (a.isParent && !b.isParent) return -1;
           if (!a.isParent && b.isParent) return 1;
           
           return 0;
         });
-
-        return generalClasses;
       }
     }
   );

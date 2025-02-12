@@ -46,7 +46,4 @@ public interface ProjectRepository extends JpaRepository<Project, UUID>, JpaSpec
             )
             """)
     List<SearchProjectDTO> search(String userId, String keyword);
-    
-    @Query("SELECT p.code FROM Project p")
-    List<String> findAllProjectCode();
 }

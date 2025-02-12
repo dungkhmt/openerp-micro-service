@@ -18,7 +18,7 @@ public class CorsConfig {
     @Bean
     @SuppressWarnings("unchecked")
     public FilterRegistrationBean<CorsFilter> corsFilterRegistrationBean(
-    		@Value("${app.cors.allowed-origins:http://localhost:3000}")
+            @Value("${app.cors.allowed-origins}")
             List<String> allowedOrigins
     ) {
         final var config = new CorsConfiguration();

@@ -15,7 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @EnableCaching
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
-@SpringBootApplication(scanBasePackages = {"com.hust.baseweb", "vn.edu.hust.soict.judge0client"})
+@SpringBootApplication
 public class BasewebApplication {
 
     public static void main(String[] args) {

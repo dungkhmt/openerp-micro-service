@@ -4,24 +4,17 @@ export const purchasemanager = {
   text: "Purchase Management",
   child: [
     {
-      id: "MENU_WMSv2_PURCHASE_MANAGER.RECEIPT",
+      id: "MENU_WMSv2_PURCHASE_MANAGER.RECEIPTS",
       path: "/purchase-manager/receipts",
       isPublic: true,
+      text: "Receipt Request",
+      child: [],
+    },
+    {
+      id: "MENU_WMSv2_PURCHASE_MANAGER.CREATE_RECEIPTS",
+      path: "/purchase-manager/create-receipt",
+      isPublic: true,
       text: "Create Receipt",
-      child: [],
-    },
-    {
-      id: "MENU_WMSv2_PURCHASE_MANAGER.PROCESS_RECEIPT",
-      path: "/purchase-manager/process-receipts",
-      isPublic: true,
-      text: "Process Receipt",
-      child: [],
-    },
-    {
-      id: "MENU_WMSv2_PURCHASE_MANAGER.BILL_RECEIPT",
-      path: "/purchase-manager/receipt-bill",
-      isPublic: true,
-      text: "Receipt bill",
       child: [],
     }
   ],

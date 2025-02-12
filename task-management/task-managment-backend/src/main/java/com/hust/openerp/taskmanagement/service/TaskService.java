@@ -22,6 +22,8 @@ public interface TaskService {
 
     TaskDTO updateTask(UUID taskId, UpdateTaskForm taskForm, String updateBy);
 
+    void addTaskSkill(UUID taskId, String skillId);
+
     Page<TaskDTO> getTasksAssignedToUser(Pageable pageable, String assignee, @Nullable String search);
 
     Page<TaskDTO> getTasksOfProject(Pageable pageable, UUID projectId, @Nullable String search, String getterId);
@@ -29,12 +31,4 @@ public interface TaskService {
     List<TaskGanttDTO> getTaskGantt(UUID projectId, String from, String to, String q);
 
     Page<TaskDTO> getTasksCreatedByUser(Pageable pageable, String creator, @Nullable String search);
-    
-    List<TaskDTO> getTasksForMemberInProject (UUID projectId, String assigneeId);
-    
-    List<TaskDTO> getEventTasks(String userId, UUID eventId);
-    
-    void addExistingTasksToEvent(String userId, UUID eventId, List<UUID> taskIds);
-    
-    List<TaskDTO> getTasksWithoutEvent(String userId, UUID projectId);
 }
