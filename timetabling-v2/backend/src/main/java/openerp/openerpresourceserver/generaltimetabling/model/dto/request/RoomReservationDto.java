@@ -12,7 +12,6 @@ import lombok.Setter;
 public class RoomReservationDto {
     private Long parentId;
     private Integer duration;
-
     // Getter và Setter
     //public Integer getDuration() {
     //    return duration;

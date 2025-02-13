@@ -2,15 +2,19 @@ import { Delete, SaveAlt } from "@mui/icons-material";
 import { Autocomplete, Box, Button, Input, TextField } from "@mui/material";
 import { request } from "api";
 import { toast } from "react-toastify";
+import { useQueryClient } from "react-query";
 
 export const usePlanTableConfig = (setPlanClasses) => {
+  const queryClient = useQueryClient();
+
   const handleSaveClass = (planClass) => {
     request(
       "post",
       "/plan-general-classes/update-plan-class",
       (res) => {
         toast.success("Cập nhật lớp thành công!");
-        console.log(res);
+        // Force refresh the generalClassesNoSchedule data
+        queryClient.invalidateQueries("generalClassesNoSchedule");
       },
       (error) => {
         if (error.response.status == 410) {
@@ -49,6 +53,8 @@ export const usePlanTableConfig = (setPlanClasses) => {
           );
         });
         toast.success("Xóa lớp thành công!");
+        // Force refresh the generalClassesNoSchedule data
+        queryClient.invalidateQueries("generalClassesNoSchedule");
       },
       (error) => {
         if (error.response.status == 410) {

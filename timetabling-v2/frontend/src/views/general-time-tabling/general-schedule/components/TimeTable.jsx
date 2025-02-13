@@ -53,8 +53,9 @@ const TimeTable = ({
           quantityMax: cls.quantityMax,
           classType: cls.classType,
           mass: cls.mass,
-          duration: cls.duration, 
-          generalClassId: String(cls.id || ''), // Ensure generalClassId is always a string
+          duration: cls.duration,
+          generalClassId: String(cls.id || ""),
+          parentId: cls.parentClassId,
         }))
         .sort((a, b) => {
           if (a.code === b.code) {
@@ -66,7 +67,7 @@ const TimeTable = ({
 
             const idA = getIdNumber(a.generalClassId);
             const idB = getIdNumber(b.generalClassId);
-            
+
             return idB - idA;
           }
           return parseInt(a.code, 10) - parseInt(b.code, 10);
@@ -121,15 +122,19 @@ const TimeTable = ({
         return;
       }
 
+      console.log('Selected class:', selectedClassForSlot); // Add debug log
+
       await handlers.handleAddTimeSlot({
-        generalClassId: selectedClassForSlot.generalClassId.toString(),
-        duration: periodsToAdd
+        generalClassId: selectedClassForSlot.generalClassId,
+        parentId: selectedClassForSlot.roomReservationId,
+        duration: periodsToAdd,
       });
       
       handleCloseAddSlotDialog();
       onSaveSuccess();
     } catch (error) {
       console.error("Error adding time slot:", error);
+      toast.error(error.response?.data || "Thêm ca học thất bại!"); // Add better error handling
     }
   };
 
