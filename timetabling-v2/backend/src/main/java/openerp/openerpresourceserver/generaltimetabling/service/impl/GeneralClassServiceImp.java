@@ -17,6 +17,7 @@ import openerp.openerpresourceserver.generaltimetabling.model.dto.request.genera
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Group;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.general.Room;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 import openerp.openerpresourceserver.generaltimetabling.repo.*;
@@ -45,7 +46,9 @@ public class GeneralClassServiceImp implements GeneralClassService {
 
     private ClassroomRepo classroomRepo;
 
+    private RoomRepo roomRepo;
 
+    private GroupRoomPriorityRepo groupRoomPriorityRepo;
 
     @Override
     public List<GeneralClass> getGeneralClasses(String semester, String groupName) {
@@ -284,6 +287,8 @@ public class GeneralClassServiceImp implements GeneralClassService {
         log.info("autoSchedule START....");
         List<GeneralClass> foundClasses = gcoRepo.findAllBySemesterAndGroupName(semester, groupName);
         List<GeneralClass> autoScheduleClasses = V2ClassScheduler.autoScheduleTimeSlot(foundClasses, timeLimit);
+        List<Room> rooms = roomRepo.findAll();
+
         /*Save the scheduled timeslot of the classes*/
         gcoRepo.saveAll(autoScheduleClasses);
         roomOccupationRepo.deleteAllByClassCodeIn(foundClasses.stream().map(GeneralClass::getClassCode).toList());

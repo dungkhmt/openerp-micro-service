@@ -29,17 +29,21 @@ public class V2ClassScheduler {
     }
 
     class MapDataScheduleTimeSlotRoom{
-        int n;// number ò class-segment
+        int n;// number of class-segments
         int[] d; // d[i] is the duration (so tiet)
+        int[] c; // c[i] is the course of the class-segment i
+        int[] cls; // cls[i]  is the class id of the class-segment i
         int[] vol;// vol[i] is the number of students of class-segment i
         boolean[][] conflict; // conflict[i][j] = true means that class-segment i and j cannot be scheduled in overlapping time durations
         List<Integer>[] D;// D[i] is the domain of class-segment i
         //List<Integer> rooms; // list of indices of rooms sorted in descendant of priority
-        int[] cap; // cap[i] is the capacity of room i
-        int[] p; // priority of room i (high value of p[i] = high priority to be used)
-    }
-    public static void mapData(List<GeneralClass> classes){
+        int m;// number of rooms 0,1,2,... decreasing order of priority (0: highest priority, 1: second-highest priority...)
 
+        int[] cap; // cap[i] is the capacity of room i, length(cap) = m
+        //int[] p; // priority of room i (high value of p[i] = high priority to be used)
+    }
+    public static MapDataScheduleTimeSlotRoom mapData(List<GeneralClass> classes){
+        return null;
     }
     public static List<GeneralClass> autoScheduleTimeSlot(List<GeneralClass> classes, int timeLimit) {
         int n = classes.size();
