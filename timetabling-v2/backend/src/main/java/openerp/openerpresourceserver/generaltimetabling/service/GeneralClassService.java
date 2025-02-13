@@ -33,7 +33,7 @@ public interface GeneralClassService {
 
     GeneralClass deleteClassById(Long generalClassId);
 
-    GeneralClass addRoomReservation(Long generalClassId);
+    GeneralClass addRoomReservation(Long generalClassId, Integer duration);
 
     void deleteRoomReservation(Long generalClassId, Long roomReservationId);
 }

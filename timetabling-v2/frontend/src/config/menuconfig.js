@@ -57,15 +57,15 @@ export const MENUS = [];
 //MENUS.push(schedule);
 MENUS.push(scheduleInformation);
 // MENUS.push(schedulePerformance);
-//MENUS.push(courseTimeTabling);
+MENUS.push(courseTimeTabling);
 MENUS.push(generalTimeTabling);
-//MENUS.push(firstYearTimeTabling);
+MENUS.push(firstYearTimeTabling);
 MENUS.push(computerLabTimeTabling);
 MENUS.push(taRecruitment);
-//MENUS.push(ThesisDefensePlanManagement);
-//MENUS.push(ThesisDefensePlanStudent);
-//MENUS.push(AssetManagementAsset);
-//MENUS.push(TrainingFrogCourse);
+MENUS.push(ThesisDefensePlanManagement);
+MENUS.push(ThesisDefensePlanStudent);
+MENUS.push(AssetManagementAsset);
+MENUS.push(TrainingFrogCourse);
 
 
 export const menuIconMap = new Map();

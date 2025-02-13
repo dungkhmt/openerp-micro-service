@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-
-
+import { Checkbox } from "@mui/material";
 import { useClassrooms } from "views/general-time-tabling/hooks/useClassrooms";
 import { useGeneralSchedule } from "services/useGeneralScheduleData";
-import { Autocomplete, Box, Button, CircularProgress, FormControl, Modal, TablePagination, TextField } from "@mui/material";
+import { Autocomplete, Box, Button, CircularProgress, FormControl, Modal, TablePagination, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
+import {toast} from "react-toastify";
 
 const TimeTable = ({
   classes,
@@ -12,16 +12,22 @@ const TimeTable = ({
   selectedGroup,
   onSaveSuccess,
   loading,
+  selectedRows,
+  onSelectedRowsChange,
 }) => {
   const [classDetails, setClassDetails] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(100);
+  const [isAddSlotDialogOpen, setIsAddSlotDialogOpen] = useState(false);
+  const [selectedPeriods, setSelectedPeriods] = useState("");
+  const [selectedClassForSlot, setSelectedClassForSlot] = useState(null);
 
   const { classrooms } = useClassrooms(selectedGroup?.groupName || "", null);
   const { handlers, states } = useGeneralSchedule();
 
+  console.log(classes);
   useEffect(() => {
     if (classes && classes.length > 0) {
       const transformedClassDetails = classes
@@ -47,12 +53,20 @@ const TimeTable = ({
           quantityMax: cls.quantityMax,
           classType: cls.classType,
           mass: cls.mass,
-          generalClassId: cls.id,
+          duration: cls.duration, 
+          generalClassId: String(cls.id || ''), // Ensure generalClassId is always a string
         }))
         .sort((a, b) => {
           if (a.code === b.code) {
-            const idA = parseInt(a.generalClassId.split("-")[0], 10);
-            const idB = parseInt(b.generalClassId.split("-")[0], 10);
+            // Safely handle splitting by checking if generalClassId exists and contains "-"
+            const getIdNumber = (str) => {
+              if (!str || !str.includes("-")) return parseInt(str, 10);
+              return parseInt(str.split("-")[0], 10);
+            };
+
+            const idA = getIdNumber(a.generalClassId);
+            const idB = getIdNumber(b.generalClassId);
+            
             return idB - idA;
           }
           return parseInt(a.code, 10) - parseInt(b.code, 10);
@@ -97,14 +111,22 @@ const TimeTable = ({
     setOpen(false);
   };
 
-  const handleAddTimeSlot = async (generalClassId) => {
+  const handleAddTimeSlot = async () => {
     try {
-      if (!generalClassId) {
-        throw new Error('Missing generalClassId');
+      if (!selectedClassForSlot || !selectedPeriods) return;
+
+      const periodsToAdd = parseInt(selectedPeriods, 10);
+      if (periodsToAdd > selectedClassForSlot.duration) {
+        toast.error("Số tiết không được lớn hơn số tiết còn lại!");
+        return;
       }
+
       await handlers.handleAddTimeSlot({
-        generalClassId: generalClassId.toString()
+        generalClassId: selectedClassForSlot.generalClassId.toString(),
+        duration: periodsToAdd
       });
+      
+      handleCloseAddSlotDialog();
       onSaveSuccess();
     } catch (error) {
       console.error("Error adding time slot:", error);
@@ -220,19 +242,67 @@ const TimeTable = ({
     setPage(0);
   };
 
+  const handleSelectAll = (event) => {
+    if (event.target.checked) {
+      const newSelected = classDetails.map(row => row.generalClassId);
+      onSelectedRowsChange(newSelected);
+    } else {
+      onSelectedRowsChange([]);
+    }
+  };
+
+  const handleSelectRow = (event, generalClassId) => {
+    const selectedIndex = selectedRows.indexOf(generalClassId);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = [...selectedRows, generalClassId];
+    } else {
+      newSelected = selectedRows.filter(id => id !== generalClassId);
+    }
+
+    onSelectedRowsChange(newSelected);
+  };
+
+  const isSelected = (generalClassId) => selectedRows.indexOf(generalClassId) !== -1;
+
+  const handleOpenAddSlotDialog = (classDetail) => {
+    setSelectedClassForSlot(classDetail);
+    setIsAddSlotDialogOpen(true);
+  };
+
+  const handleCloseAddSlotDialog = () => {
+    setIsAddSlotDialogOpen(false);
+    setSelectedPeriods("");
+    setSelectedClassForSlot(null);
+  };
+
   return (
     <div className="h-full w-full flex flex-col justify-start">
       {loading ? (
         <table
-          className=" overflow-x-auto flex items-center flex-col"
+          className="overflow-x-auto flex items-center flex-col"
           style={{ flex: "1" }}
         >
           <thead>
             <tr>
+              <th className="border border-gray-300 p-2">
+                <Checkbox
+                  indeterminate={
+                    selectedRows.length > 0 &&
+                    selectedRows.length < classDetails.length
+                  }
+                  checked={
+                    classDetails.length > 0 &&
+                    selectedRows.length === classDetails.length
+                  }
+                  onChange={handleSelectAll}
+                />
+              </th>
               <th className="border border-gray-300 p-2">Mã lớp</th>
               <th
                 className="border border-gray-300 p-2"
-                style={{ width: "100px", minWidth: "100px" }}
+                style={{ width: "60px", minWidth: "60px" }}
               >
                 Lớp học
               </th>
@@ -242,7 +312,11 @@ const TimeTable = ({
               >
                 Tuần học
               </th>
-              <th className="border border-gray-300 p-2">Mã học phần</th>
+              <th
+                className="border border-gray-300 p-2"
+              >
+                Mã học phần
+              </th>
               <th
                 className="border border-gray-300 p-2"
                 style={{ width: "120px", minWidth: "120px" }}
@@ -252,6 +326,7 @@ const TimeTable = ({
               <th className="border border-gray-300 p-2">SL MAX</th>
               <th className="border border-gray-300 p-2">Loại lớp</th>
               <th className="border border-gray-300 p-2">Thời lượng</th>
+              <th className="border border-gray-300 p-2">Số tiết</th>
               <th className="border border-gray-300 p-2">Khóa</th>
               <th
                 className="border border-gray-300 p-2"
@@ -276,7 +351,9 @@ const TimeTable = ({
               ))}
             </tr>
             <tr>
-              <td colSpan={12} className="border"></td>
+              <td></td> {/* Empty cell for checkbox column */}
+              <td colSpan={14} className="border"></td>{" "}
+              {/* Updated from 12 to 13 */}
               {days.flatMap((day) =>
                 periods.map((period) => (
                   <td
@@ -294,10 +371,23 @@ const TimeTable = ({
           </div>
         </table>
       ) : (
-        <div className=" overflow-x-auto" style={{ flex: "1" }}>
-          <table className="min-w-full " style={{ tableLayout: "auto" }}>
+        <div className="overflow-x-auto" style={{ flex: "1" }}>
+          <table className="min-w-full" style={{ tableLayout: "auto" }}>
             <thead>
               <tr>
+                <th className="border border-t-0 border-l-0 p-2">
+                  <Checkbox
+                    indeterminate={
+                      selectedRows.length > 0 &&
+                      selectedRows.length < classDetails.length
+                    }
+                    checked={
+                      classDetails.length > 0 &&
+                      selectedRows.length === classDetails.length
+                    }
+                    onChange={handleSelectAll}
+                  />
+                </th>
                 <th className="border border-t-0 border-l-0 p-2">Mã lớp</th>
                 <th
                   className="border border-t-0  p-2"
@@ -322,6 +412,7 @@ const TimeTable = ({
                 <th className="border border-t-0 p-2">SL MAX</th>
                 <th className="border border-t-0 p-2">Loại lớp</th>
                 <th className="border border-t-0 p-2">Thời lượng</th>
+                <th className="border border-t-0 p-2">Số tiết</th>
                 <th className="border border-t-0 p-2">Khóa</th>
                 <th
                   className="border border-t-0  p-2"
@@ -335,18 +426,22 @@ const TimeTable = ({
                     key={day}
                     colSpan={6}
                     className="border border-t-0 p-2 text-center min-w-32"
+                    style={{ padding: "8px 0" }}  // Add consistent padding
                   >
                     {day}
                   </th>
                 ))}
               </tr>
               <tr>
-                <td colSpan={12} className="border"></td>
+                <td></td> {/* Empty cell for checkbox column */}
+                <td colSpan={13} className="border"></td>{" "}
+                {/* Period numbers row - Direct child of tr */}
                 {days.flatMap((day) =>
                   periods.map((period) => (
                     <td
                       key={`${day}-${period}`}
                       className="border border-t-0 text-center"
+                      style={{ width: "40px", padding: "4px" }}  // Fixed width and padding
                     >
                       {period}
                     </td>
@@ -358,73 +453,94 @@ const TimeTable = ({
               {classes && classes.length > 0 ? (
                 classDetails
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((classDetail, index) => (
-                    <tr
-                      key={`${classDetail.code}-${index}`}
-                      style={{ height: "52px" }}
-                    >
-                      <td className="border border-l-0  text-center px-1">
-                        {classDetail.code}
-                      </td>
-                      <td className="border  text-center px-1 w-[120px]">
-                        {classDetail.studyClass}
-                      </td>
-                      <td className="border  text-center px-1">
-                        {classDetail.learningWeeks}
-                      </td>
-                      <td className="border  text-center px-1">
-                        {classDetail.moduleCode}
-                      </td>
-                      <td className="border  text-center px-1">
-                        {classDetail.moduleName}
-                      </td>
-                      <td className="border  text-center px-1">
-                        {classDetail.crew}
-                      </td>
-                      <td className="border  text-center px-1">
-                        {classDetail.quantityMax}
-                      </td>
-                      <td className="border  text-center px-1">
-                        {classDetail.classType}
-                      </td>
-                      <td className="border  text-center px-1">
-                        {classDetail.mass}
-                      </td>
-                      <td className="border  text-center px-1">
-                        {classDetail.batch}
-                      </td>
-                      <td className="border  text-center px-1">
-                        <Button
-                          onClick={() =>
-                            handleAddTimeSlot(classDetail.generalClassId)
-                          }
-                        >
-                          <Add />
-                        </Button>
-                      </td>
-                      <td className="border  text-center px-1">
-                        <Button
-                          onClick={() =>
-                            handleRemoveTimeSlot(
-                              classDetail.generalClassId,
-                              classDetail.roomReservationId
-                            )
-                          }
-                        >
-                          <Remove />
-                        </Button>
-                      </td>
-                      {days.flatMap((day) =>
-                        periods.map((period) =>
-                          renderCellContent(index, day, period)
-                        )
-                      )}
-                    </tr>
-                  ))
+                  .map((classDetail, index) => {
+                    const isItemSelected = isSelected(
+                      classDetail.generalClassId
+                    );
+                    return (
+                      <tr
+                        key={`${classDetail.code}-${index}`}
+                        style={{ height: "52px" }}
+                        className={isItemSelected ? "bg-blue-50" : ""}
+                      >
+                        <td className="border border-l-0 text-center px-1">
+                          <Checkbox
+                            checked={isItemSelected}
+                            onChange={(event) =>
+                              handleSelectRow(event, classDetail.generalClassId)
+                            }
+                          />
+                        </td>
+                        <td className="border text-center px-1">
+                          {classDetail.code}
+                        </td>
+                        <td className="border  text-center px-1 w-[120px]">
+                          {classDetail.studyClass}
+                        </td>
+                        <td className="border  text-center px-1">
+                          {classDetail.learningWeeks}
+                        </td>
+                        <td className="border  text-center px-1">
+                          {classDetail.moduleCode}
+                        </td>
+                        <td className="border  text-center px-1">
+                          {classDetail.moduleName}
+                        </td>
+                        <td className="border  text-center px-1">
+                          {classDetail.crew}
+                        </td>
+                        <td className="border  text-center px-1">
+                          {classDetail.quantityMax}
+                        </td>
+                        <td className="border  text-center px-1">
+                          {classDetail.classType}
+                        </td>
+                        <td className="border  text-center px-1">
+                          {classDetail.mass}
+                        </td>
+                        <td className="border  text-center px-1">
+                          {classDetail.duration}
+                        </td>
+                        <td className="border  text-center px-1">
+                          {classDetail.batch}
+                        </td>
+                        <td className="border  text-center px-1">
+                          {!classDetail.timeSlots && (  // Only show Add button if no timeSlots
+                            <Button
+                              onClick={() => handleOpenAddSlotDialog(classDetail)}
+                              disabled={classDetail.duration <= 0}
+                            >
+                              <Add />
+                            </Button>
+                          )}
+                        </td>
+                        <td className="border  text-center px-1">
+                          {classDetail.roomReservationId && (  // Only show Remove if has roomReservationId
+                            <Button
+                              onClick={() =>
+                                handleRemoveTimeSlot(
+                                  classDetail.generalClassId,
+                                  classDetail.roomReservationId
+                                )
+                              }
+                            >
+                              <Remove />
+                            </Button>
+                          )}
+                        </td>
+                        {days.flatMap((day) =>
+                          periods.map((period) =>
+                            renderCellContent(index, day, period)
+                          )
+                        )}
+                      </tr>
+                    );
+                  })
               ) : (
                 <tr>
+                  <td></td> {/* Empty cell for checkbox column */}
                   <td
-                    colSpan={12 + days.length * periods.length}
+                    colSpan={14 + days.length * periods.length}
                     className="text-center py-4"
                   >
                     <div className="h-full ">Không có dữ liệu</div>
@@ -561,6 +677,35 @@ const TimeTable = ({
           </div>
         </Box>
       </Modal>
+
+      <Dialog 
+        open={isAddSlotDialogOpen} 
+        onClose={handleCloseAddSlotDialog}
+      >
+        <DialogTitle>Thêm ca học</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Nhập số tiết cho ca học mới (Số tiết còn lại: {selectedClassForSlot?.duration || 0})
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Số tiết"
+            type="number"
+            fullWidth
+            value={selectedPeriods}
+            onChange={(e) => setSelectedPeriods(e.target.value)}
+            inputProps={{ 
+              min: 1,
+              max: selectedClassForSlot?.duration || 1
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseAddSlotDialog}>Hủy</Button>
+          <Button onClick={handleAddTimeSlot}>Thêm</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

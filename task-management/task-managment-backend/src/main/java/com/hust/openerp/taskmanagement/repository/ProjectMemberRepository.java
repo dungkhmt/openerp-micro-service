@@ -18,6 +18,4 @@ public interface ProjectMemberRepository
 
     @Query(value = "SELECT COUNT(e.*)\\:\\:int FROM task_management_project_member e WHERE e.project_id = :projectId AND e.user_id = :memberId", nativeQuery = true)
     int isAddedMemberInProject(@Param("memberId") String memberId, @Param("projectId") UUID projectId);
-    
-    ProjectMember findByProjectIdAndUserId(UUID projectId, String userId);
 }

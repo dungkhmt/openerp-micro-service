@@ -14,7 +14,6 @@ import { ProjectViewOverview } from "./overview/ProjectViewOverview";
 import { ProjectViewSetting } from "./setting/ProjectViewSetting";
 import { DialogAddTask } from "./tasks/DialogAddTask";
 import { ProjectViewTasks } from "./tasks/ProjectViewTasks";
-import { ProjectViewEvents } from "./event/ProjectViewEvents";
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   minHeight: "34px",
@@ -125,21 +124,6 @@ const ProjectViewRight = () => {
             }
           />
           <Tab
-            value="event"
-            label={
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  "& svg": { mr: 1, fontSize: "16px" },
-                }}
-              >
-                <Icon fontSize={20} icon="ph:video-conference" />
-                Sự kiện
-              </Box>
-            }
-          />
-          <Tab
             value="timeline"
             label={
               <Box
@@ -231,9 +215,6 @@ const ProjectViewRight = () => {
           </TabPanel>
           <TabPanel sx={{ p: 0, pr: 2 }} value="tasks">
             <ProjectViewTasks />
-          </TabPanel>
-          <TabPanel sx={{ p: 0, pr: 2 }} value="event">
-            <ProjectViewEvents />
           </TabPanel>
           <TabPanel sx={{ p: 0, pr: 2 }} value="timeline">
             <ProjectViewCalendar />

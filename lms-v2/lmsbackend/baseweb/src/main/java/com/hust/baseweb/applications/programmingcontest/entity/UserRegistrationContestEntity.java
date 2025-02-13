@@ -79,6 +79,5 @@ public class UserRegistrationContestEntity {
     @Column(name = "permission_id")
     private String permissionId;
 
-    @Column(name = "fullname")
-    private String fullname;
+
 }

@@ -28,6 +28,7 @@ public class V2ClassScheduler {
         return false;
     }
 
+
     class MapDataScheduleTimeSlotRoom{
         int n;// number of class-segments
         int[] d; // d[i] is the duration (so tiet)
@@ -45,6 +46,7 @@ public class V2ClassScheduler {
     public static MapDataScheduleTimeSlotRoom mapData(List<GeneralClass> classes){
         return null;
     }
+
     public static List<GeneralClass> autoScheduleTimeSlot(List<GeneralClass> classes, int timeLimit) {
         int n = classes.size();
         if (n == 0) {
@@ -52,10 +54,6 @@ public class V2ClassScheduler {
             return null;
         }
         classes.sort(Comparator.comparing(GeneralClass::hasNonNullTimeSlot).reversed());
-        for(int i = 0; i < classes.size(); i++){
-            GeneralClass c = classes.get(i);
-            log.info("autoScheduleTimeSlot, class[" + i + "] = " + c.toString() + " total duration" + MassExtractor.extract(c.getMass()));
-        }
         List<int[]> conflict = new ArrayList<int[]>();
         int[] durations = classes.stream().filter(c -> c.getMass() != null).mapToInt(c -> MassExtractor.extract(c.getMass())).toArray();
         int[] splitDurations = new int[150];
@@ -67,10 +65,7 @@ public class V2ClassScheduler {
         for (int i = 0; i < classes.size(); i++) {
             GeneralClass c = classes.get(i);
             if (c.getTimeSlots().size() > 1) {
-                log.info("autoScheduleTimeSlot, class " + c.getClassCode() + " has " + c.getTimeSlots().size());
-
                 for (RoomReservation rr: c.getTimeSlots()) {
-                    log.info("autoScheduleTimeSlot, roomreservation " + rr.toString());
                     if (!rr.isTimeSlotNotNull()) {
                         throw new InvalidFieldException("Lớp " + c.getClassCode() + " có nhiều 2 hơn ca học và có lịch trống!");
                     }
@@ -168,7 +163,9 @@ public class V2ClassScheduler {
                         }
                     }
                 }
+
             }
+
         }
 
         for (int i = 0; i < totalSessions; i++) {
@@ -177,9 +174,6 @@ public class V2ClassScheduler {
             }
         }
 
-        for(int i = 0; i < splitDurations.length; i++){
-            log.info("autoScheduleTimeSlot, class-segment " + i + " duration = " + splitDurations[i] + " domain = " + domains[i].toArray());
-        }
         ClassTimeScheduleBacktrackingSolver solver = new ClassTimeScheduleBacktrackingSolver(totalSessions, splitDurations, domains, conflict, timeLimit);
         solver.solve();
         if (!solver.hasSolution()) {

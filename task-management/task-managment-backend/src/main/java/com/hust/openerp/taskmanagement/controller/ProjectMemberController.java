@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,19 +35,9 @@ public class ProjectMemberController {
         var entities = projectMemberService.getMembersOfProject(projectId, principal.getName());
         return entities.stream().map(entity -> modelMapper.map(entity, MemberUserDto.class)).toList();
     }
-    
-    @GetMapping("{projectId}/my-role")
-    public String getMyRole(Principal principal, @PathVariable("projectId") UUID projectId) {
-    	return projectMemberService.getMemberRole(principal.getName(), projectId);
-    }
 
     @PostMapping
-    public void addMemberToProject(Principal principal, @RequestBody ProjectMember projectMember) {
+    public void addMember(Principal principal, @RequestBody ProjectMember projectMember) {
         projectMemberService.addMemberToProject(projectMember, principal.getName());
-    }
-    
-    @DeleteMapping("/{projectId}/{memberId}/{roleId}")
-    public void deleteMemberFromProject(Principal principal, @PathVariable UUID projectId, @PathVariable String memberId, @PathVariable String roleId) {
-        projectMemberService.deleteMemberFromProject(principal.getName(), projectId, memberId, roleId);
     }
 }

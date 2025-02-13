@@ -1,75 +1,74 @@
 package com.hust.baseweb.applications.programmingcontest.model;
 
 import com.hust.baseweb.applications.programmingcontest.entity.TagEntity;
-import lombok.AccessLevel;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @ToString
 @NoArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ModelCreateContestProblemResponse {
 
-    String problemId;
+    private String problemId;
 
-    String problemName;
+    private String problemName;
 
-    String problemDescription;
+    private String problemDescription;
 
-    String userId;
+    private String userId;
 
-    float timeLimit;
+    private int timeLimit;
 
-    float timeLimitCPP;
+    private int timeLimitCPP;
 
-    float timeLimitJAVA;
+    private int timeLimitJAVA;
 
-    float timeLimitPYTHON;
+    private int timeLimitPYTHON;
 
-    float memoryLimit;
+    private int memoryLimit;
 
-    String levelId;
+    private String levelId;
 
-    String categoryId;
+    private String categoryId;
 
-    String correctSolutionSourceCode;
+    private String correctSolutionSourceCode;
 
-    String correctSolutionLanguage;
+    private String correctSolutionLanguage;
 
-    String solutionCheckerSourceCode;
+    private String solutionCheckerSourceCode;
 
-    String solutionCheckerSourceLanguage;
+    private String solutionCheckerSourceLanguage;
 
-    String scoreEvaluationType;
+    private String scoreEvaluationType;
 
-    String solution;
+    private String solution;
 
-    Boolean isPreloadCode;
+    private Boolean isPreloadCode;
 
-    String preloadCode;
+    private String preloadCode;
 
-    int levelOrder;
+    private int levelOrder;
 
-    Date createdAt;
+    private Date createdAt;
 
-    boolean isPublicProblem;
+    private boolean isPublicProblem;
 
-    List<byte[]> attachment;
+    private List<byte[]> attachment;
 
-    List<String> attachmentNames;
+    private List<String> attachmentNames;
 
-    List<TagEntity> tags;
+    private List<TagEntity> tags;
 
-    String status;
+    private String status;
 
-    List<String> roles;
+    private List<String> roles;
 
-    String sampleTestCase;
+    private String sampleTestCase;
 }
 

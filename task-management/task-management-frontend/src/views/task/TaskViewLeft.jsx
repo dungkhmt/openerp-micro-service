@@ -23,7 +23,6 @@ import CommentSection from "./comment/CommentSection";
 import { DialogAddSubTask } from "./hierarchy/DialogAddSubTask";
 import { TaskViewHierarchy } from "./hierarchy/TaskViewHierarchy";
 import TaskViewLog from "./log/TaskViewLog";
-import { SkillChip } from "../../components/task/skill";
 
 const TextHighlight = styled(Typography)(({ theme }) => ({
   color: theme.palette.primary.main,
@@ -42,8 +41,7 @@ export const TitleWrapper = styled(Box)(({ theme }) => ({
 }));
 
 const TaskViewLeft = () => {
-  const { task, taskSkills } = useTaskContext();
-
+  const { task } = useTaskContext();
   const [openEdit, setOpenEdit] = useState(false);
   const [openAddSubTask, setOpenAddSubTask] = useState(false);
 
@@ -98,24 +96,17 @@ const TaskViewLeft = () => {
                     ml: 4,
                   }}
                 >
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      textTransform: "capitalize",
-                      wordBreak: "break-word",
-                      whiteSpace: "pre-wrap",
-                    }}
-                  >
+                  <Typography variant="h5" sx={{ textTransform: "capitalize" }}>
                     {task.name}
                   </Typography>
                   <Typography
                     variant="subtitle2"
                     sx={{ fontSize: "0.75rem !important" }}
                   >
-                    Thêm bởi
-                    <TextHighlight component="span">{` ${
+                    Thêm bởi{" "}
+                    <TextHighlight component="span">{`${
                       task.creator?.firstName ?? ""
-                    } ${task.creator?.lastName ?? ""} `}</TextHighlight>
+                    } ${task.creator?.lastName ?? ""}`}</TextHighlight>{" "}
                     cách đây
                     <Tooltip
                       title={dayjs(task.createdStamp).format(
@@ -125,7 +116,7 @@ const TaskViewLeft = () => {
                       <TextHighlight component="span">{` ${getDiffDateWithCurrent(
                         task.createdStamp
                       ).join(" ")}`}</TextHighlight>
-                    </Tooltip>
+                    </Tooltip>{" "}
                     trước.
                     {task.lastUpdatedStamp && (
                       <>
@@ -170,36 +161,6 @@ const TaskViewLeft = () => {
                 </Box>
               </Grid>
             </Grid>
-          </CardContent>
-
-          {/* required skills */}
-          <CardContent>
-            <Divider sx={{ mb: (theme) => `${theme.spacing(4)} !important` }} />
-            <TitleWrapper>
-              <Icon icon="gravity-ui:gear"></Icon>
-              <Typography sx={{ fontWeight: 600, fontSize: "1rem" }}>
-                Kỹ năng yêu cầu
-              </Typography>
-            </TitleWrapper>
-            {taskSkills?.length > 0 ? (
-              <Box
-                sx={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  paddingTop: 3,
-                  rowGap: 2,
-                  columnGap: 2,
-                }}
-              >
-                {taskSkills.map((skill) => (
-                  <SkillChip key={skill.skillId} skill={skill} />
-                ))}
-              </Box>
-            ) : (
-              <Typography variant="body2" sx={{ fontStyle: "italic" }}>
-                Không có kỹ năng yêu cầu
-              </Typography>
-            )}
           </CardContent>
 
           {/* description */}

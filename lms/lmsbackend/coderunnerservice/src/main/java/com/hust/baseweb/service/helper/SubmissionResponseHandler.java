@@ -205,7 +205,6 @@ public class SubmissionResponseHandler {
 
     @Async
     private void logAContestSubmission(ModelCreateContestSubmission m){
-        if (true) return;
         try {
             log.info("logAContestSubmission, submissionId = " + m.getContestSubmissionId());
             apiService.callLogContestSubmissionAPI("https://analytics.soict.ai/api/create-contest-submission", m);

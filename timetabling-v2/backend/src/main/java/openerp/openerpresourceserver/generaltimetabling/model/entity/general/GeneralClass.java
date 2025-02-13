@@ -67,6 +67,7 @@ public class GeneralClass {
     public void addTimeSlot(RoomReservation roomReservation) {
         timeSlots.add(roomReservation);
     }
+
     @Override
     public String toString() {
         return refClassId +"/"+ parentClassId +"/"+ classCode + " " + moduleCode + " " + moduleName + " " + timeSlots.toString();

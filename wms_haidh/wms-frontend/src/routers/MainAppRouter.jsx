@@ -13,7 +13,7 @@ import ApproverRouter from "./ApproverRouter";
 import DeliveryManagerRouter from "./DeliveryManagerRouter";
 import DeliveryPersonRouter from "./DeliveryPersonRouter";
 import PurchaseManagerRouter from "./PurchaseManagerRouter";
-import Dashboard from "../components/Dashboard/Dashboard";
+
 const styles = {
   loadingProgress: {
     position: "fixed",
@@ -48,7 +48,7 @@ function MainAppRouter() {
     <Layout>
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Routes>
-          <Route path="/" element={<Dashboard/>} />
+          <Route path="/" element={<>Welcome back !</>} />
           <Route path="/admin/*" element={renderPrivateRoute(AdminRouter)} />
           <Route path="/sale-manager/*" element={renderPrivateRoute(SaleManagerRouter)} />
           <Route path="/customer/*" element={renderPrivateRoute(CustomerRouter)} />
