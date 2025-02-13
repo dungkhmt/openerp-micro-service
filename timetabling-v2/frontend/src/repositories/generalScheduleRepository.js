@@ -152,17 +152,17 @@ export const generalScheduleRepository = {
   },
 
   addTimeSlot: async (semester, params = {}) => {
-    const { generalClassId, duration } = params;
+    const { generalClassId, parentId, duration } = params;
     if (!generalClassId) {
       throw new Error('generalClassId is required');
     }
     const cleanId = generalClassId.toString().split("-")[0];
     const response = await request(
-      "post", 
+      "post",
       `/general-classes/${cleanId}/room-reservations/`,
       null,
       null,
-      { duration } // Add periods to request body
+      {parentId, duration } 
     );
     invalidateCache(semester);
     return response;
