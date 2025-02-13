@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "timetabling_room")
-public class Room {
+public class TimeTablingRoom {
     @Id
     @Column(name="id")
     private String id;

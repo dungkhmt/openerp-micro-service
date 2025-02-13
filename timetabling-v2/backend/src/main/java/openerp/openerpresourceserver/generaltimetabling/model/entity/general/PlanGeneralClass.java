@@ -30,6 +30,7 @@ public class PlanGeneralClass {
     private String learningWeeks;
     private String crew;
     private String weekType;
+    private int duration;
 
 
     public void setLearningWeeks(String learningWeeks) {

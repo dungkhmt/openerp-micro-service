@@ -24,7 +24,7 @@ public class RoomReservation {
     private Integer weekday;
     private String room;
     private Integer duration;
-
+    private Long parentId;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

@@ -49,7 +49,7 @@ public class PlanGeneralClassExcelHelper {
                 planGeneralClass.setModuleName(value);
                 break;
             case 3:
-                planGeneralClass.setMass(value);
+                planGeneralClass.setMass(value); // khoi luong 3(2-1-0-6)
                 break;
             case 4:
                 if (isNumeric(value)) {
@@ -59,16 +59,6 @@ public class PlanGeneralClassExcelHelper {
                 }else{
                     planGeneralClass.setNumberOfClasses(0);
                 }
-                break;
-            //case 5:
-            case 9:
-                planGeneralClass.setLearningWeeks(value);
-                break;
-            case 10:
-                planGeneralClass.setWeekType(value);
-                break;
-            case 11:
-                planGeneralClass.setCrew(value);
                 break;
             case 5:
                 if (isNumeric(value)) {
@@ -97,16 +87,29 @@ public class PlanGeneralClassExcelHelper {
                     planGeneralClass.setNumberOfClasses(0);
                 }
                 break;
-            //case 11:
-            //    if (isNumeric(value)) {
-            //        double decimalNumber = Double.parseDouble(value);
-            //        Integer intValue = (int) decimalNumber;
-            //        planGeneralClass.setQuantityMax(intValue);
-            //    }
-            //    break;
+
             case 8:
                 planGeneralClass.setProgramName(value);
                 break;
+            case 9:
+                planGeneralClass.setLearningWeeks(value);
+                break;
+            case 10:
+                planGeneralClass.setWeekType(value);
+                break;
+            case 11:
+                planGeneralClass.setCrew(value);
+                break;
+            case 12:
+                if (isNumeric(value)) {
+                    double decimalNumber = Double.parseDouble(value);
+                    Integer intValue = (int) decimalNumber;
+                    planGeneralClass.setDuration(intValue);
+                }else{
+                    planGeneralClass.setDuration(0);
+                }
+                break;
+
         }
         return planGeneralClass;
     }

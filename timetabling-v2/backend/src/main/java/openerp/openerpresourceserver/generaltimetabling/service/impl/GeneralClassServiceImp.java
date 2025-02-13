@@ -17,7 +17,7 @@ import openerp.openerpresourceserver.generaltimetabling.model.dto.request.genera
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Group;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
-import openerp.openerpresourceserver.generaltimetabling.model.entity.general.Room;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.general.TimeTablingRoom;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 import openerp.openerpresourceserver.generaltimetabling.repo.*;
@@ -46,7 +46,7 @@ public class GeneralClassServiceImp implements GeneralClassService {
 
     private ClassroomRepo classroomRepo;
 
-    private RoomRepo roomRepo;
+    private TimeTablingRoomRepo roomRepo;
 
     private GroupRoomPriorityRepo groupRoomPriorityRepo;
 
@@ -287,7 +287,7 @@ public class GeneralClassServiceImp implements GeneralClassService {
         log.info("autoSchedule START....");
         List<GeneralClass> foundClasses = gcoRepo.findAllBySemesterAndGroupName(semester, groupName);
         List<GeneralClass> autoScheduleClasses = V2ClassScheduler.autoScheduleTimeSlot(foundClasses, timeLimit);
-        List<Room> rooms = roomRepo.findAll();
+        List<TimeTablingRoom> rooms = roomRepo.findAll();
 
         /*Save the scheduled timeslot of the classes*/
         gcoRepo.saveAll(autoScheduleClasses);
@@ -404,13 +404,19 @@ public class GeneralClassServiceImp implements GeneralClassService {
     }
 
     @Override
-    public GeneralClass addRoomReservation(Long generalClassId, Integer duration) {
+    public GeneralClass addRoomReservation(Long generalClassId, Long parentId, Integer duration) {
         GeneralClass foundGeneralClass = gcoRepo.findById(generalClassId).orElse(null);
         if (foundGeneralClass == null) throw new NotFoundException("Không tìm thấy lớp!");
+        RoomReservation parentRoomReservation = roomReservationRepo.findById(parentId).orElse(null);
+        if(parentRoomReservation == null) throw new NotFoundException("Không tìm thấy lớp!");
+        if(parentRoomReservation.getDuration() <= duration) throw new NotFoundException("Số tiết ca được tạo mới (" + duration + ") phải nhỏ hơn số tiết ca cha (" + parentRoomReservation.getDuration()+ ") !");
+        parentRoomReservation.setDuration(parentRoomReservation.getDuration() - duration);
+
         RoomReservation newRoomReservation = new RoomReservation();
         newRoomReservation.setDuration(duration);
         foundGeneralClass.addTimeSlot(newRoomReservation);
         newRoomReservation.setGeneralClass(foundGeneralClass);
+        newRoomReservation.setParentId(parentId);
         gcoRepo.save(foundGeneralClass);
         return foundGeneralClass;
     }
@@ -425,8 +431,16 @@ public class GeneralClassServiceImp implements GeneralClassService {
         if (!foundGeneralClass.getTimeSlots().contains(foundRoomReservation)) {
             throw new NotFoundException("Lớp không tồn tại ca học!");
         }
+        if(foundRoomReservation.getParentId() == null)
+            throw new NotFoundException("Lớp không tồn tại ca học cha nên không xóa được!");
         if(foundGeneralClass.getTimeSlots().size() == 1) throw new MinimumTimeSlotPerClassException("Lớp cần tối thiểu 1 ca học!");
-
+        RoomReservation parentRoomReservation = roomReservationRepo.findById(foundRoomReservation.getParentId()).orElse(null);
+        if(parentRoomReservation == null){
+            throw new NotFoundException("Lớp không tồn tại ca học cha nên không xóa được !");
+        }
+        parentRoomReservation.setDuration(parentRoomReservation.getDuration() + foundRoomReservation.getDuration());
+        parentRoomReservation = roomReservationRepo.save(parentRoomReservation);
+        
         if (foundRoomReservation.isScheduleNotNull()) {
             List<RoomOccupation> foundRoomOccupations =  roomOccupationRepo.findAllBySemesterAndClassCodeAndDayIndexAndStartPeriodAndEndPeriodAndClassRoom(
                     foundRoomReservation.getGeneralClass().getSemester(),

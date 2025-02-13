@@ -77,6 +77,16 @@ export const usePlanTableConfig = (setPlanClasses) => {
       width: 100,
     },
     {
+      headerName: "Mã HP",
+      field: "moduleCode",
+      width: 100,
+    },
+    {
+      headerName: "Số Tiết",
+      field: "duration",
+      width: 100,
+    },
+    {
       headerName: "Tổng số lớp",
       field: "numberOfClasses",
       width: 100,
@@ -196,11 +206,7 @@ export const usePlanTableConfig = (setPlanClasses) => {
         />
       ),
     },
-    {
-      headerName: "Mã HP",
-      field: "moduleCode",
-      width: 100,
-    },
+
     {
       headerName: "Tên HP",
       field: "moduleName",

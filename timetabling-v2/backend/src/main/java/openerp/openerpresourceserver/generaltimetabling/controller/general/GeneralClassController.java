@@ -147,7 +147,7 @@ public class GeneralClassController {
     public ResponseEntity<GeneralClass> requestAddRoomReservation(
             @PathVariable("generalClassId") Long generalClassId,
             @RequestBody RoomReservationDto request) {
-        return ResponseEntity.ok(gService.addRoomReservation(generalClassId, request.getDuration()));
+        return ResponseEntity.ok(gService.addRoomReservation(generalClassId, request.getParentId(), request.getDuration()));
     }
 
     @DeleteMapping("/delete-by-semester")
