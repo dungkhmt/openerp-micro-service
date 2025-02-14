@@ -109,7 +109,9 @@ public class PlanGeneralClassExcelHelper {
                     planGeneralClass.setDuration(0);
                 }
                 break;
-
+            case 13:
+                planGeneralClass.setPromotion(value);
+                break;
         }
         return planGeneralClass;
     }

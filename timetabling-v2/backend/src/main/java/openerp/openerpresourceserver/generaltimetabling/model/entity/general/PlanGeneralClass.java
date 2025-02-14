@@ -31,6 +31,7 @@ public class PlanGeneralClass {
     private String crew;
     private String weekType;
     private int duration;
+    private String promotion;
 
 
     public void setLearningWeeks(String learningWeeks) {
