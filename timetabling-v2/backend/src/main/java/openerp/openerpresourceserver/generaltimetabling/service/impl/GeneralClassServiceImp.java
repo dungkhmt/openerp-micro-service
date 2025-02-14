@@ -286,7 +286,10 @@ public class GeneralClassServiceImp implements GeneralClassService {
     public List<GeneralClass> autoSchedule(String semester, String groupName, int timeLimit) {
         log.info("autoSchedule START....");
         List<GeneralClass> foundClasses = gcoRepo.findAllBySemesterAndGroupName(semester, groupName);
-        List<GeneralClass> autoScheduleClasses = V2ClassScheduler.autoScheduleTimeSlot(foundClasses, timeLimit);
+        //List<GeneralClass> autoScheduleClasses = V2ClassScheduler.autoScheduleTimeSlot(foundClasses, timeLimit);
+        V2ClassScheduler optimizer = new V2ClassScheduler();
+        List<GeneralClass> autoScheduleClasses = optimizer.autoScheduleTimeSlotRoom(foundClasses,timeLimit);
+
         List<TimeTablingRoom> rooms = roomRepo.findAll();
 
         /*Save the scheduled timeslot of the classes*/
@@ -426,6 +429,8 @@ public class GeneralClassServiceImp implements GeneralClassService {
     public void deleteRoomReservation(Long generalClassId, Long roomReservationId) {
         GeneralClass foundGeneralClass = gcoRepo.findById(generalClassId)
                 .orElseThrow(()->new NotFoundException("Không tìm thấy lớp!"));
+        List<RoomReservation> lstRoomReservations = roomReservationRepo.findAllByGeneralClass(foundGeneralClass);
+
         RoomReservation foundRoomReservation= roomReservationRepo.findById(roomReservationId)
                 .orElseThrow(()->new NotFoundException("Không tìm thấy ca học!"));
         if (!foundGeneralClass.getTimeSlots().contains(foundRoomReservation)) {
@@ -433,14 +438,27 @@ public class GeneralClassServiceImp implements GeneralClassService {
         }
         if(foundRoomReservation.getParentId() == null)
             throw new NotFoundException("Lớp không tồn tại ca học cha nên không xóa được!");
+
+
         if(foundGeneralClass.getTimeSlots().size() == 1) throw new MinimumTimeSlotPerClassException("Lớp cần tối thiểu 1 ca học!");
-        RoomReservation parentRoomReservation = roomReservationRepo.findById(foundRoomReservation.getParentId()).orElse(null);
-        if(parentRoomReservation == null){
-            throw new NotFoundException("Lớp không tồn tại ca học cha nên không xóa được !");
+
+        int minDuration = Integer.MAX_VALUE;
+        RoomReservation sel = null;
+        for(RoomReservation r: lstRoomReservations){
+            if(r.getId()!= foundRoomReservation.getId() && minDuration > r.getDuration()){
+                sel = r; minDuration = r.getDuration();
+            }
         }
-        parentRoomReservation.setDuration(parentRoomReservation.getDuration() + foundRoomReservation.getDuration());
-        parentRoomReservation = roomReservationRepo.save(parentRoomReservation);
-        
+        sel.setDuration(sel.getDuration() + foundRoomReservation.getDuration());
+        sel = roomReservationRepo.save(sel);
+
+        //RoomReservation parentRoomReservation = roomReservationRepo.findById(foundRoomReservation.getParentId()).orElse(null);
+        //if(parentRoomReservation == null){
+        //    throw new NotFoundException("Lớp không tồn tại ca học cha nên không xóa được !");
+        //}
+        //parentRoomReservation.setDuration(parentRoomReservation.getDuration() + foundRoomReservation.getDuration());
+        //parentRoomReservation = roomReservationRepo.save(parentRoomReservation);
+
         if (foundRoomReservation.isScheduleNotNull()) {
             List<RoomOccupation> foundRoomOccupations =  roomOccupationRepo.findAllBySemesterAndClassCodeAndDayIndexAndStartPeriodAndEndPeriodAndClassRoom(
                     foundRoomReservation.getGeneralClass().getSemester(),

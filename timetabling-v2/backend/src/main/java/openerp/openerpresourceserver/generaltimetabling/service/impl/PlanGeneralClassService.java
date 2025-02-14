@@ -35,18 +35,23 @@ public class PlanGeneralClassService {
     }
     public GeneralClass makeClass(MakeGeneralClassRequest request) {
         GeneralClass newClass = new GeneralClass();
-
+        int maxQty = 0;
+        if(request.getLectureExerciseMaxQuantity()!=null) maxQty = request.getLectureExerciseMaxQuantity();
+        if(request.getExerciseMaxQuantity()!=null) maxQty = request.getExerciseMaxQuantity();
+        if(request.getLectureMaxQuantity()!=null) maxQty = request.getLectureMaxQuantity();
         newClass.setRefClassId(request.getId());
         newClass.setSemester(request.getSemester());
         newClass.setModuleCode(request.getModuleCode());
         newClass.setModuleName(request.getModuleName());
         newClass.setMass(request.getMass());
         newClass.setCrew(request.getCrew());
-        newClass.setQuantityMax(request.getQuantityMax());
+        //newClass.setQuantityMax(request.getQuantityMax());
+        newClass.setQuantityMax(maxQty);
         newClass.setLearningWeeks(request.getLearningWeeks());
         newClass.setDuration(request.getDuration());
         if (request.getClassType() != null && !request.getClassType().isEmpty()) {
             newClass.setClassType(request.getClassType());
+
         } else {
             newClass.setClassType("LT+BT");
         }
@@ -69,6 +74,7 @@ public class PlanGeneralClassService {
         Long nextId = planGeneralClassRepository.getNextReferenceValue();
         newClass.setParentClassId(nextId);
         newClass.setClassCode(nextId.toString());
+        newClass.setCourse(request.getModuleCode());
 
         List<RoomReservation> roomReservations = new ArrayList<>();
         RoomReservation roomReservation =  new RoomReservation();
