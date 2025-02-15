@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.generaltimetabling.service;
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
 import openerp.openerpresourceserver.generaltimetabling.helper.*;
+import openerp.openerpresourceserver.generaltimetabling.model.dto.MakeGeneralClassRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.PlanGeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 import openerp.openerpresourceserver.generaltimetabling.repo.*;
@@ -11,6 +12,7 @@ import openerp.openerpresourceserver.generaltimetabling.model.entity.ClassOpened
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Schedule;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
+import openerp.openerpresourceserver.generaltimetabling.service.impl.PlanGeneralClassService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -48,6 +50,9 @@ public class ExcelService {
 
     @Autowired
     private PlanGeneralClassRepository planGeneralClassRepository;
+
+    @Autowired
+    private PlanGeneralClassService planGeneralClassService;
 
     public InputStream exportGeneralExcel(String semester) {
         List<GeneralClass> classes = gcoRepo.findAllBySemester(semester)
@@ -329,12 +334,39 @@ public class ExcelService {
 
 
     @Transactional
-    public List<PlanGeneralClass> savePlanClasses(MultipartFile file, String semester) {
+    public List<PlanGeneralClass> savePlanClasses(MultipartFile file, String semester, boolean createClass) {
         try {
-            planGeneralClassRepository.deleteAllBySemester(semester);
+            //planGeneralClassRepository.deleteAllBySemester(semester);
             List<PlanGeneralClass> planClasses = PlanGeneralClassExcelHelper
                     .convertExcelToPlanGeneralClasses(file.getInputStream(), semester);
-            return planGeneralClassRepository.saveAll(planClasses);
+            //return planGeneralClassRepository.saveAll(planClasses);
+            planGeneralClassRepository.saveAll(planClasses);
+            if(createClass){
+                // create classes from planClasses
+                for(PlanGeneralClass p: planClasses) {
+                    for(int i = 1;i <= p.getNumberOfClasses();i++) {
+                        MakeGeneralClassRequest req = new MakeGeneralClassRequest();
+                        req.setId(p.getId());
+                        req.setNbClasses(p.getNumberOfClasses());
+                        req.setClassType(p.getClassType());
+                        req.setDuration(p.getDuration());
+                        req.setCrew(p.getCrew());
+                        req.setMass(p.getMass());
+                        req.setLearningWeeks(p.getLearningWeeks());
+                        req.setModuleCode(p.getModuleCode());
+                        req.setSemester(p.getSemester());
+                        req.setModuleName(p.getModuleName());
+                        req.setExerciseMaxQuantity(p.getExerciseMaxQuantity());
+                        req.setLectureMaxQuantity(p.getLectureMaxQuantity());
+                        req.setLectureExerciseMaxQuantity(p.getLectureExerciseMaxQuantity());
+                        req.setProgramName(p.getProgramName());
+                        req.setWeekType(p.getWeekType());
+                        planGeneralClassService.makeClass(req);
+                    }
+                }
+            }
+            planClasses = planGeneralClassRepository.findAllBySemester(semester);
+            return planClasses;
         } catch (IOException e) {
             log.error(e.getMessage());
             return new ArrayList<>();

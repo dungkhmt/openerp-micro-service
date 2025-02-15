@@ -34,6 +34,7 @@ public class PlanGeneralClassService {
         return 0;
     }
     public GeneralClass makeClass(MakeGeneralClassRequest request) {
+
         GeneralClass newClass = new GeneralClass();
         int maxQty = 0;
         if(request.getLectureExerciseMaxQuantity()!=null) maxQty = request.getLectureExerciseMaxQuantity();
@@ -72,7 +73,7 @@ public class PlanGeneralClassService {
         }
 
         Long nextId = planGeneralClassRepository.getNextReferenceValue();
-        newClass.setParentClassId(nextId);
+        //newClass.setParentClassId(nextId);
         newClass.setClassCode(nextId.toString());
         newClass.setCourse(request.getModuleCode());
 

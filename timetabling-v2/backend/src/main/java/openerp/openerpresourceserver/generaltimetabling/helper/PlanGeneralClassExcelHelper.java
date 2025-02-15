@@ -31,8 +31,9 @@ public class PlanGeneralClassExcelHelper {
     /**
      * End column in excel to read class information (End with column M)
      */
-    private final static int END_COL_TO_READ_CLASS_INFO = 12;
+    private final static int END_COL_TO_READ_CLASS_INFO = 13;
     public static boolean isNumeric(String str) {
+        if(str == null || str.equals("")) return false;
         try {
             Double.parseDouble(str);
             return true;

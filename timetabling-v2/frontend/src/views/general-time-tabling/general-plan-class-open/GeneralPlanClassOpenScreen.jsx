@@ -46,7 +46,7 @@ const GeneralPlanClassOpenScreen = () => {
       formData.append("file", selectedFile);
       request(
         "post",
-        `/excel/upload-plan?semester=${selectedSemester?.semester}`,
+        `/excel/upload-plan?semester=${selectedSemester?.semester}&createclass=T`,
         (res) => {
           setImportLoading(false);
           toast.success("Upload file thành công!");

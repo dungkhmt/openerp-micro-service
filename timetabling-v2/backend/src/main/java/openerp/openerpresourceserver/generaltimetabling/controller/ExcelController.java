@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.generaltimetabling.controller;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.generaltimetabling.exception.InvalidFileInputException;
 import openerp.openerpresourceserver.generaltimetabling.helper.ExcelHelper;
 import openerp.openerpresourceserver.generaltimetabling.message.ResponseMessage;
@@ -26,6 +27,7 @@ import java.util.List;
 @Controller
 @AllArgsConstructor
 @RequestMapping("/excel")
+@Log4j2
 public class ExcelController {
 
     private ExcelService fileService;
@@ -85,9 +87,13 @@ public class ExcelController {
 
     @PostMapping(value = "/upload-plan")
     public ResponseEntity requestUploadFilePlanCLass(@RequestParam("file") MultipartFile file,
-                                                       @RequestParam("semester") String semester) {
+                                                       @RequestParam("semester") String semester,
+                                                     @RequestParam("createclass") String createclass) {
+        log.info("requestUploadFilePlanCLass, createclass = " + createclass);
+        boolean createClass = true;
+        if(createclass.equals("F")) createClass = false;
         if (ExcelHelper.hasExcelFormat(file)) {
-            List<PlanGeneralClass> classOpenedConflict = fileService.savePlanClasses(file, semester);
+            List<PlanGeneralClass> classOpenedConflict = fileService.savePlanClasses(file, semester,createClass);
             return ResponseEntity.status(HttpStatus.OK).body(classOpenedConflict);
         } else {
             throw new InvalidFileInputException("File không đúng định dạng! (Yêu cầu: .xlsx)");
