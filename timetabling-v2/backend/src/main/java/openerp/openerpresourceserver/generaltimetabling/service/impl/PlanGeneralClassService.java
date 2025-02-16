@@ -7,6 +7,7 @@ import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundExcept
 import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekExtractor;
 import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekValidator;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.MakeGeneralClassRequest;
+import openerp.openerpresourceserver.generaltimetabling.model.dto.ModelInputCreateSubClass;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.BulkMakeGeneralClassRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.AcademicWeek;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
@@ -34,59 +35,105 @@ public class PlanGeneralClassService {
         planGeneralClassRepository.deleteAllBySemester(semesterId);
         return 0;
     }
-    public GeneralClass makeClass(MakeGeneralClassRequest request) {
+    public List<GeneralClass> makeSubClass(ModelInputCreateSubClass request) {
+        List<GeneralClass> res = new ArrayList<>();
+        GeneralClass parentClass = generalClassRepository.findById(request.getFromParentClassId()).orElse(null);
+        if(parentClass == null) return res;
+        for(int i = 0; i < request.getNumberClasses(); i++){
+            GeneralClass newClass = new GeneralClass();
+            int maxQty = request.getNumberStudents();
+            newClass.setRefClassId(parentClass.getRefClassId());
+            newClass.setSemester(parentClass.getSemester());
+            newClass.setModuleCode(parentClass.getModuleCode());
+            newClass.setModuleName(parentClass.getModuleName());
+            newClass.setMass(parentClass.getMass());
+            newClass.setCrew(parentClass.getCrew());
+            newClass.setQuantityMax(maxQty);
+            newClass.setLearningWeeks(parentClass.getLearningWeeks());
+            newClass.setDuration(request.getDuration());
+            if (request.getClassType() != null && !request.getClassType().isEmpty()) {
+                newClass.setClassType(request.getClassType());
+            } else {
+                newClass.setClassType("BT");
+            }
 
-        GeneralClass newClass = new GeneralClass();
-        int maxQty = 0;
-        if(request.getLectureExerciseMaxQuantity()!=null) maxQty = request.getLectureExerciseMaxQuantity();
-        if(request.getExerciseMaxQuantity()!=null) maxQty = request.getExerciseMaxQuantity();
-        if(request.getLectureMaxQuantity()!=null) maxQty = request.getLectureMaxQuantity();
-        newClass.setRefClassId(request.getId());
-        newClass.setSemester(request.getSemester());
-        newClass.setModuleCode(request.getModuleCode());
-        newClass.setModuleName(request.getModuleName());
-        newClass.setMass(request.getMass());
-        newClass.setCrew(request.getCrew());
-        //newClass.setQuantityMax(request.getQuantityMax());
-        newClass.setQuantityMax(maxQty);
-        newClass.setLearningWeeks(request.getLearningWeeks());
-        newClass.setDuration(request.getDuration());
-        if (request.getClassType() != null && !request.getClassType().isEmpty()) {
-            newClass.setClassType(request.getClassType());
 
-        } else {
-            newClass.setClassType("LT+BT");
+
+            Long nextId = planGeneralClassRepository.getNextReferenceValue();
+            newClass.setClassCode(nextId.toString());
+            newClass.setCourse(parentClass.getCourse());
+
+            List<RoomReservation> roomReservations = new ArrayList<>();
+            RoomReservation roomReservation = new RoomReservation();
+            roomReservation.setGeneralClass(newClass);
+            roomReservation.setDuration(newClass.getDuration());
+            roomReservations.add(roomReservation);
+
+            newClass.setTimeSlots(roomReservations);
+
+            newClass = generalClassRepository.save(newClass);
+            res.add(newClass);
+
         }
-
-
-        if(request.getWeekType().equals("Chẵn")) {
-            List<Integer> weekIntList = LearningWeekExtractor.extractArray(request.getLearningWeeks()).stream().filter(num->num%2==0).toList();
-            String weekListString = weekIntList.stream().map(num -> num + "-" + num)
-                    .collect(Collectors.joining(","));
-            newClass.setLearningWeeks(weekListString);
-        } else if(request.getWeekType().equals("Lẻ")) {
-            List<Integer> weekIntList = LearningWeekExtractor.extractArray(request.getLearningWeeks()).stream().filter(num->num%2!=0).toList();
-            String weekListString = weekIntList.stream().map(num -> num + "-" + num)
-                    .collect(Collectors.joining(","));
-            newClass.setLearningWeeks(weekListString);
-        } else if(request.getWeekType().equals("Chẵn+Lẻ")) {
+        return res;
+    }
+    public List<GeneralClass> makeClass(MakeGeneralClassRequest request) {
+        List<GeneralClass> res = new ArrayList<>();
+        for(int i = 0; i < request.getNbClasses(); i++) {
+            GeneralClass newClass = new GeneralClass();
+            int maxQty = 0;
+            if (request.getLectureExerciseMaxQuantity() != null) maxQty = request.getLectureExerciseMaxQuantity();
+            if (request.getExerciseMaxQuantity() != null) maxQty = request.getExerciseMaxQuantity();
+            if (request.getLectureMaxQuantity() != null) maxQty = request.getLectureMaxQuantity();
+            newClass.setRefClassId(request.getId());
+            newClass.setSemester(request.getSemester());
+            newClass.setModuleCode(request.getModuleCode());
+            newClass.setModuleName(request.getModuleName());
+            newClass.setMass(request.getMass());
+            newClass.setCrew(request.getCrew());
+            //newClass.setQuantityMax(request.getQuantityMax());
+            newClass.setQuantityMax(maxQty);
             newClass.setLearningWeeks(request.getLearningWeeks());
+            newClass.setDuration(request.getDuration());
+            if (request.getClassType() != null && !request.getClassType().isEmpty()) {
+                newClass.setClassType(request.getClassType());
+
+            } else {
+                newClass.setClassType("LT+BT");
+            }
+
+
+            if (request.getWeekType().equals("Chẵn")) {
+                List<Integer> weekIntList = LearningWeekExtractor.extractArray(request.getLearningWeeks()).stream().filter(num -> num % 2 == 0).toList();
+                String weekListString = weekIntList.stream().map(num -> num + "-" + num)
+                        .collect(Collectors.joining(","));
+                newClass.setLearningWeeks(weekListString);
+            } else if (request.getWeekType().equals("Lẻ")) {
+                List<Integer> weekIntList = LearningWeekExtractor.extractArray(request.getLearningWeeks()).stream().filter(num -> num % 2 != 0).toList();
+                String weekListString = weekIntList.stream().map(num -> num + "-" + num)
+                        .collect(Collectors.joining(","));
+                newClass.setLearningWeeks(weekListString);
+            } else if (request.getWeekType().equals("Chẵn+Lẻ")) {
+                newClass.setLearningWeeks(request.getLearningWeeks());
+            }
+
+            Long nextId = planGeneralClassRepository.getNextReferenceValue();
+            //newClass.setParentClassId(nextId);
+            newClass.setClassCode(nextId.toString());
+            newClass.setCourse(request.getModuleCode());
+
+            List<RoomReservation> roomReservations = new ArrayList<>();
+            RoomReservation roomReservation = new RoomReservation();
+            roomReservation.setGeneralClass(newClass);
+            roomReservation.setDuration(newClass.getDuration());
+            roomReservations.add(roomReservation);
+
+            newClass.setTimeSlots(roomReservations);
+
+            newClass = generalClassRepository.save(newClass);
+            res.add(newClass);
         }
-
-        Long nextId = planGeneralClassRepository.getNextReferenceValue();
-        //newClass.setParentClassId(nextId);
-        newClass.setClassCode(nextId.toString());
-        newClass.setCourse(request.getModuleCode());
-
-        List<RoomReservation> roomReservations = new ArrayList<>();
-        RoomReservation roomReservation =  new RoomReservation();
-        roomReservation.setGeneralClass(newClass);
-        roomReservation.setDuration(newClass.getDuration());
-        roomReservations.add(roomReservation);
-
-        newClass.setTimeSlots(roomReservations);
-
-        return generalClassRepository.save(newClass);
+        return res;
     }
 
     @Transactional

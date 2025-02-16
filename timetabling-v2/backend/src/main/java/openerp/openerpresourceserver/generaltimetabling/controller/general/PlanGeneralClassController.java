@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.generaltimetabling.exception.InvalidFieldException;
 import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.MakeGeneralClassRequest;
+import openerp.openerpresourceserver.generaltimetabling.model.dto.ModelInputCreateSubClass;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.UpdateGeneralClassRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.UpdatePlanClassRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.BulkMakeGeneralClassRequest;
@@ -40,9 +41,14 @@ public class PlanGeneralClassController {
 
 
     @PostMapping("/make-class")
-    public ResponseEntity<GeneralClass> requestMakeClass(@RequestBody MakeGeneralClassRequest request) {
+    public ResponseEntity<?> requestMakeClass(@RequestBody MakeGeneralClassRequest request) {
         return ResponseEntity.ok(planClassService.makeClass(request));
     }
+    @PostMapping("/make-subclass")
+    public ResponseEntity<?> requestMakeSubClass(@RequestBody ModelInputCreateSubClass request) {
+        return ResponseEntity.ok(planClassService.makeSubClass(request));
+    }
+
 
     @PostMapping("/make-multiple-classes")
     public ResponseEntity<List<GeneralClass>> requestMakeMultipleClasses(@RequestBody BulkMakeGeneralClassRequest request) {
