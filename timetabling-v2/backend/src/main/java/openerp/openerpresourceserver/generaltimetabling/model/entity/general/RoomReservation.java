@@ -14,7 +14,7 @@ import lombok.*;
 @Entity
 @Builder
 public class RoomReservation {
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "general_class_id")
     @JsonIgnore
     private GeneralClass generalClass;

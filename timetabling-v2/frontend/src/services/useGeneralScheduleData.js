@@ -349,6 +349,19 @@ export const useGeneralSchedule = () => {
     }
   );
 
+  const deleteByIdsMutation = useMutation(
+    (ids) => generalScheduleRepository.deleteByIds(ids),
+    {
+      onSuccess: () => {
+        forceRefetch();
+        toast.success('Xóa các lớp đã chọn thành công!');
+      },
+      onError: (error) => {
+        toast.error(error.response?.data || 'Có lỗi khi xóa các lớp đã chọn!');
+      }
+    }
+  );
+
   const handleRefreshClasses = useCallback(() => {
     forceRefetch();
   }, [forceRefetch]);
@@ -385,6 +398,7 @@ export const useGeneralSchedule = () => {
       classesNoSchedule,
       isClassesNoScheduleLoading,
       isDeletingBySemester: deleteBySemesterMutation.isLoading,
+      isDeletingByIds: deleteByIdsMutation.isLoading,
     },
     setters: {
       setSelectedSemester,
@@ -453,6 +467,13 @@ export const useGeneralSchedule = () => {
           return;
         }
         deleteBySemesterMutation.mutate(selectedSemester.semester);
+      },
+      handleDeleteByIds: (ids) => {
+        if (!ids || ids.length === 0) {
+          toast.error("Vui lòng chọn lớp cần xóa!");
+          return;
+        }
+        deleteByIdsMutation.mutate(ids);
       },
       refreshData,
     },
