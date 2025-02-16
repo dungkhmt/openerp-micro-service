@@ -7,6 +7,7 @@ import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundExcept
 import openerp.openerpresourceserver.generaltimetabling.model.dto.MakeGeneralClassRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.UpdateGeneralClassRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.UpdatePlanClassRequest;
+import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.BulkMakeGeneralClassRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.ClearPlanClassInputModel;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.PlanGeneralClass;
@@ -41,6 +42,11 @@ public class PlanGeneralClassController {
     @PostMapping("/make-class")
     public ResponseEntity<GeneralClass> requestMakeClass(@RequestBody MakeGeneralClassRequest request) {
         return ResponseEntity.ok(planClassService.makeClass(request));
+    }
+
+    @PostMapping("/make-multiple-classes")
+    public ResponseEntity<List<GeneralClass>> requestMakeMultipleClasses(@RequestBody BulkMakeGeneralClassRequest request) {
+        return ResponseEntity.ok(planClassService.makeMultipleClasses(request));
     }
 
     @GetMapping("/")

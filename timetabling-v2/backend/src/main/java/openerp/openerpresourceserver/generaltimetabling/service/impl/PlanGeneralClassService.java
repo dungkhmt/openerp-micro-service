@@ -7,6 +7,7 @@ import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundExcept
 import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekExtractor;
 import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekValidator;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.MakeGeneralClassRequest;
+import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.BulkMakeGeneralClassRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.AcademicWeek;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.PlanGeneralClass;
@@ -87,6 +88,42 @@ public class PlanGeneralClassService {
 
         return generalClassRepository.save(newClass);
     }
+
+    @Transactional
+    public List<GeneralClass> makeMultipleClasses(BulkMakeGeneralClassRequest request) {
+        List<GeneralClass> createdClasses = new ArrayList<>();
+
+        for (int i = 0; i < request.getQuantity(); i++) {
+            GeneralClass newClass = new GeneralClass();
+            int maxQty = Math.max(
+                    request.getClassRequest().getLectureExerciseMaxQuantity() != null ? request.getClassRequest().getLectureExerciseMaxQuantity() : 0,
+                    Math.max(
+                            request.getClassRequest().getExerciseMaxQuantity() != null ? request.getClassRequest().getExerciseMaxQuantity() : 0,
+                            request.getClassRequest().getLectureMaxQuantity() != null ? request.getClassRequest().getLectureMaxQuantity() : 0
+                    )
+            );
+
+            newClass.setRefClassId(request.getClassRequest().getId());
+            newClass.setSemester(request.getClassRequest().getSemester());
+            newClass.setModuleCode(request.getClassRequest().getModuleCode());
+            newClass.setModuleName(request.getClassRequest().getModuleName());
+            newClass.setMass(request.getClassRequest().getMass());
+            newClass.setCrew(request.getClassRequest().getCrew());
+            newClass.setQuantityMax(maxQty);
+            newClass.setLearningWeeks(request.getClassRequest().getLearningWeeks());
+            newClass.setDuration(request.getClassRequest().getDuration());
+            newClass.setClassType(request.getClassType());
+
+            Long nextId = planGeneralClassRepository.getNextReferenceValue();
+            newClass.setClassCode(nextId.toString());
+            newClass.setCourse(request.getClassRequest().getModuleCode());
+
+            createdClasses.add(generalClassRepository.save(newClass));
+        }
+
+        return createdClasses;
+    }
+
 
     public List<PlanGeneralClass> getAllClasses(String semester) {
         return planGeneralClassRepository.findAllBySemester(semester);
