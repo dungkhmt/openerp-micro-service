@@ -25,11 +25,13 @@ export const useGeneralSchedule = () => {
     },
     {
       enabled: !!selectedSemester,
-      staleTime: Infinity, // Keep data fresh indefinitely
-      cacheTime: 30 * 60 * 1000, // Cache for 30 minutes
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
+      staleTime: 5 * 60 * 1000, // Data becomes stale after 5 minutes
+      cacheTime: 5 * 60 * 1000, // Cache for 5 minutes
+      refetchInterval: 30 * 1000, // Poll every 30 seconds
+      refetchIntervalInBackground: true, // Continue polling when tab is in background
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
+      refetchOnReconnect: true,
       retry: 2,
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
       select: (data) => {
@@ -116,11 +118,18 @@ export const useGeneralSchedule = () => {
     ),
     {
       enabled: !!selectedSemester,
-      staleTime: Infinity,
-      cacheTime: 30 * 60 * 1000,
-      refetchOnWindowFocus: false
+      staleTime: 0, // Data becomes stale after 5 minutes
+      cacheTime: 0, // Cache for 5 minutes
+      refetchInterval: 30 * 1000, // Poll every 30 seconds
+      refetchIntervalInBackground: true,
+      refetchOnWindowFocus: true
     }
   );
+
+  const refreshData = useCallback(() => {
+    queryClient.invalidateQueries(["generalClasses", selectedSemester?.semester, selectedGroup?.groupName]);
+    queryClient.invalidateQueries(["generalClassesNoSchedule", selectedSemester?.semester, selectedGroup?.groupName]);
+  }, [queryClient, selectedSemester, selectedGroup]);
 
   const forceRefetch = useCallback(() => {
     setLoading(true);
@@ -133,8 +142,9 @@ export const useGeneralSchedule = () => {
         ["generalClasses", selectedSemester?.semester, selectedGroup?.groupName],
         data
       );
+      refreshData(); // Also refresh related data
     }).finally(() => setLoading(false));
-  }, [selectedSemester, selectedGroup, queryClient]);
+  }, [selectedSemester, selectedGroup, queryClient, refreshData]);
 
   const resetMutation = useMutation(
     ({ semester, ids }) => generalScheduleRepository.resetSchedule(semester, ids),
@@ -444,6 +454,7 @@ export const useGeneralSchedule = () => {
         }
         deleteBySemesterMutation.mutate(selectedSemester.semester);
       },
+      refreshData,
     },
   };
 };
