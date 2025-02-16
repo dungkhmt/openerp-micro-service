@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "timetabling/timetabling-client/**"
+      - "timetabling-v2/timetabling-client/**"
 
 env:
   NODE_OPTIONS: "--max-old-space-size=4096"
@@ -24,9 +24,9 @@ jobs:
         with:
           image: leanhtuan/timetabling-ui
           #         tags: v1, latest
-          directory: "timetabling/timetabling-client/"
+          directory: "timetabling-v2/timetabling-client/"
           registry: docker.io
-          dockerfile: "timetabling/timetabling-client/Dockerfile"
+          dockerfile: "timetabling-v2/timetabling-client/Dockerfile"
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           addLatest: true

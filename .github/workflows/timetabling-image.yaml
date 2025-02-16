@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "timetabling/timetabling-server/**"
+      - "timetabling-v2/timetabling-server/**"
 
 jobs:
   build:
@@ -23,9 +23,9 @@ jobs:
         uses: mr-smithers-excellent/docker-build-push@v5
         with:
           image: leanhtuan/timetabling
-          directory: "timetabling/timetabling-server/"
+          directory: "timetabling-v2/timetabling-server/"
           registry: docker.io
-          dockerfile: "timetabling/timetabling-server/Dockerfile"
+          dockerfile: "timetabling-v2/timetabling-server/Dockerfile"
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           addLatest: true
