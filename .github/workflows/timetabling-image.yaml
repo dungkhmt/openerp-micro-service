@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "timetabling-v2/timetabling-server/**"
+      - "timetabling-v2/backend/**"
 
 jobs:
   build:
@@ -23,13 +23,13 @@ jobs:
         uses: mr-smithers-excellent/docker-build-push@v5
         with:
           image: leanhtuan/timetabling
-          directory: "timetabling-v2/timetabling-server/"
+          directory: "timetabling-v2/backend/"
           registry: docker.io
-          dockerfile: "timetabling-v2/timetabling-server/Dockerfile"
+          dockerfile: "timetabling-v2/backend/Dockerfile"
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           addLatest: true
       # - name: Remove config file
       #   uses: JesseTG/rm@v1.0.2
       #   with:
-      #     path: "./timetabling/timetabling-server/src/main/resources/application.yml"
+      #     path: "./timetabling/timetabling-serve/src/main/resources/application.yml"
