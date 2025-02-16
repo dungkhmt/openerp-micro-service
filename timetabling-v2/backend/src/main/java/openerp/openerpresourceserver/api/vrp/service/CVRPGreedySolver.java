@@ -32,5 +32,6 @@ public class CVRPGreedySolver {
             mPointId2Index.put(v.getDepot().getId(), i);
         }
         List<Point> points = I.getPoints();
+        return null;
     }
 }
