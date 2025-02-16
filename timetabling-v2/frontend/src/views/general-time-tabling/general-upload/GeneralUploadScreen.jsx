@@ -9,6 +9,7 @@ import { useGeneralSchedule } from "services/useGeneralScheduleData";
 
 const GeneralUploadScreen = () => {
   const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
   
   const { 
     states: { 
@@ -16,6 +17,7 @@ const GeneralUploadScreen = () => {
       classesNoSchedule,
       isClassesNoScheduleLoading,
       isDeletingBySemester,
+      isDeletingByIds,
       isUploading 
     },
     setters: { 
@@ -24,7 +26,8 @@ const GeneralUploadScreen = () => {
     },
     handlers: {
       handleDeleteBySemester,
-      handleUploadFile
+      handleUploadFile,
+      handleDeleteByIds
     }
   } = useGeneralSchedule();
 
@@ -34,6 +37,8 @@ const GeneralUploadScreen = () => {
       setSelectedFile(null);
     }
   };
+
+  console.log(selectedIds);
 
   return (
     <LoadingProvider>
@@ -51,7 +56,17 @@ const GeneralUploadScreen = () => {
               setSelectedFile={setSelectedFile}
               submitHandler={handleSubmitFile}
             />
-            <div className="flex">
+            <div className="flex gap-2">
+              <Button
+                startIcon={isDeletingByIds ? <FacebookCircularProgress /> : null}
+                sx={{ width: 290 }}
+                disabled={isDeletingByIds || selectedIds.length === 0}
+                onClick={() => handleDeleteByIds(selectedIds)}
+                variant="contained"
+                color="error"
+              >
+                Xóa các lớp đã chọn ({selectedIds.length})
+              </Button>
               <Button
                 startIcon={isDeletingBySemester ? <FacebookCircularProgress /> : null}
                 sx={{ width: 290 }}
@@ -68,7 +83,8 @@ const GeneralUploadScreen = () => {
         <GeneralUploadTable 
           setClasses={setClassesNoSchedule}
           classes={classesNoSchedule} 
-          dataLoading={isClassesNoScheduleLoading} 
+          dataLoading={isClassesNoScheduleLoading}
+          onSelectionChange={setSelectedIds}
         />
       </div>
     </LoadingProvider>

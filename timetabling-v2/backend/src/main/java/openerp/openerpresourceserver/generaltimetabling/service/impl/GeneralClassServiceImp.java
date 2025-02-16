@@ -226,6 +226,21 @@ public class GeneralClassServiceImp implements GeneralClassService {
         roomOccupationRepo.deleteBySemester(semester);
     }
 
+
+    @Override
+    @Transactional
+    public void deleteClassesByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            throw new IllegalArgumentException("Danh sách ID không được rỗng.");
+        }
+        List<GeneralClass> classesToDelete = gcoRepo.findAllById(ids);
+        if (classesToDelete.isEmpty()) {
+            throw new RuntimeException("Không tìm thấy lớp học nào để xóa với danh sách ID đã cung cấp.");
+        }
+        roomReservationRepo.deleteByGeneralClassIds(ids);
+        gcoRepo.deleteByIds(ids);
+    }
+
     @Transactional
     @Override
     public List<GeneralClass> resetSchedule(List<String> ids, String semester) {

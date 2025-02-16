@@ -143,6 +143,13 @@ public class GeneralClassController {
         return ResponseEntity.ok(gService.deleteClassById(generalClassId));
     }
 
+    @DeleteMapping("/delete-by-ids")
+    public ResponseEntity<String> deleteClassesByIds(@RequestBody List<Long> ids) {
+        gService.deleteClassesByIds(ids);
+        return ResponseEntity.ok("Deleted classes with IDs: " + ids);
+    }
+
+
     @PostMapping("/{generalClassId}/room-reservations/")
     public ResponseEntity<GeneralClass> requestAddRoomReservation(
             @PathVariable("generalClassId") Long generalClassId,

@@ -200,6 +200,22 @@ export const generalScheduleRepository = {
     return response;
   },
 
+  deleteByIds: async (ids) => {
+    try {
+      const response = await request(
+        "delete",
+        `/general-classes/delete-by-ids`,
+        null,
+        null,
+        ids
+      );
+      return response;
+    } catch (error) {
+      console.error('Delete by ids error:', error);
+      throw error;
+    }
+  },
+
   uploadFile: async (semester, file) => {
     const formData = new FormData();
     formData.append("file", file);

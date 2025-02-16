@@ -7,12 +7,13 @@ import openerp.openerpresourceserver.generaltimetabling.model.dto.request.genera
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.UpdateGeneralClassScheduleRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.V2UpdateClassScheduleRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
+import org.springframework.transaction.annotation.Transactional;
 
 
 public interface GeneralClassService {
     public List<GeneralClass> getGeneralClasses(String semester, String groupName);
-    
-    public void deleteAllGeneralClasses();
+
+    void deleteAllGeneralClasses();
 
     public GeneralClass updateGeneralClassSchedule(String semester, UpdateGeneralClassScheduleRequest request);
 
@@ -23,6 +24,8 @@ public interface GeneralClassService {
     List<GeneralClass> addClassesToCreatedGroup(List<String> ids, String groupName) throws Exception;
 
     public void deleteClassesBySemester(String semester);
+
+    void deleteClassesByIds(List<Long> ids);
 
     List<GeneralClass> resetSchedule(List<String> ids, String semester);
 
