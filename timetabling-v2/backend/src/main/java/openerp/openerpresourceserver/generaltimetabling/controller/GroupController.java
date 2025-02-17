@@ -3,7 +3,10 @@ package openerp.openerpresourceserver.generaltimetabling.controller;
 import jakarta.validation.Valid;
 import openerp.openerpresourceserver.generaltimetabling.exception.GroupNotFoundException;
 import openerp.openerpresourceserver.generaltimetabling.exception.GroupUsedException;
+import openerp.openerpresourceserver.generaltimetabling.model.dto.request.GroupDeleteRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.GroupDto;
+import openerp.openerpresourceserver.generaltimetabling.model.dto.request.PriorityGroupUpdateDto;
+import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.UpdateGroupNameRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Group;
 import openerp.openerpresourceserver.generaltimetabling.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +36,9 @@ public class GroupController {
     }
 
     @GetMapping("/get-all")
-    public ResponseEntity<List<Group>> getAllGroup() {
+    public ResponseEntity<List<GroupDto>> getAllPriorityGroup() {
         try {
-            List<Group> groupList = groupService.getGroup();
+            List<GroupDto> groupList = groupService.getGroup();
             if (groupList.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
@@ -45,8 +48,36 @@ public class GroupController {
         }
     }
 
+    @GetMapping("/get-all-group")
+    public ResponseEntity<List<Group>> getAllGroup() {
+        try {
+            List<Group> groupList = groupService.getAllGroup();
+            if (groupList.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(groupList, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/update-group-name")
+    public ResponseEntity<String> updateGroupName(@RequestBody UpdateGroupNameRequest updateGroupNameRequest) {
+        try {
+            groupService.updateGroupName(updateGroupNameRequest.getId(), updateGroupNameRequest.getGroupName());
+            return ResponseEntity.ok("Cập nhật tên nhóm thành công!");
+        } catch (GroupNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getCustomMessage());
+        } catch (GroupUsedException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getCustomMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống khi cập nhật nhóm!");
+        }
+    }
+
+
     @PostMapping("/update")
-    public ResponseEntity<String> updateGroup(@Valid @RequestBody GroupDto requestDto) {
+    public ResponseEntity<String> updateGroup(@Valid @RequestBody PriorityGroupUpdateDto requestDto) {
         try {
             groupService.updateGroup(requestDto);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -60,9 +91,9 @@ public class GroupController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteById(@RequestParam Long id) {
+    public ResponseEntity<String> deletePriorityGroup(@RequestBody GroupDeleteRequest deleteRequest) {
         try {
-            groupService.deleteById(id);
+            groupService.deletePriorityGroup(deleteRequest.getId(), deleteRequest.getRoomId());
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (GroupNotFoundException e) {
             return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
@@ -72,4 +103,19 @@ public class GroupController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @DeleteMapping("/delete-by-id")
+    public ResponseEntity<String> deleteById(@RequestParam Long id) {
+        try {
+            groupService.deleteById(id);
+            return ResponseEntity.ok("Xóa nhóm thành công với ID: " + id);
+        } catch (GroupNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getCustomMessage());
+        } catch (GroupUsedException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getCustomMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống khi xóa nhóm!");
+        }
+    }
+
 }

@@ -11,14 +11,19 @@ export default function ClassroomListScreen() {
   const [selectedClassroom, setSelectedClassroom] = useState(null);
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
-  const [deleteClassroomId, setDeleteClassroomId] = useState(null);
+  const [deleteClassroomCode, setDeleteClassroomCode] = useState(null);
   const [openLoading, setOpenLoading] = useState(false);
 
+  console.log(classrooms);
   const columns = [
     {
-      headerName: "Classroom ID",
-      field: "id",
-      width: 120
+      headerName: "STT",
+      field: "index",
+      width: 120,
+      renderCell: (params) => params.api.getRowIndex(params.row.id) + 1,
+      renderCell: (params) => {
+        return params.id;
+      }
     },
     {
       headerName: "Lớp học",
@@ -28,7 +33,8 @@ export default function ClassroomListScreen() {
     {
       headerName: "Tòa nhà",
       field: "building",
-      width: 120
+      width: 120,
+      valueGetter: (params) => params.row.building?.name
     },
     {
       headerName: "Số lượng chỗ ngồi",
@@ -57,7 +63,7 @@ export default function ClassroomListScreen() {
           <Button
             variant="outlined"
             color="secondary"
-            onClick={() => handleDelete(params.row.id)}
+            onClick={() => handleDelete(params.row.classroom)}
           >
             Xóa
           </Button>
@@ -67,12 +73,12 @@ export default function ClassroomListScreen() {
   ];
 
   const handleConfirmDelete = async () => {
-    if (deleteClassroomId) {
-      await deleteClassroom(deleteClassroomId);
+    if (deleteClassroomCode) {
+      await deleteClassroom(deleteClassroomCode.toString());  // Ensure string type
       await refetchClassrooms();
     }
     setConfirmDeleteOpen(false);
-    setDeleteClassroomId(null);
+    setDeleteClassroomCode(null);
   };
 
   const handleUpdate = (selectedRow) => {
@@ -80,8 +86,8 @@ export default function ClassroomListScreen() {
     setDialogOpen(true);
   };
 
-  const handleDelete = (semesterId) => {
-    setDeleteClassroomId(semesterId);
+  const handleDelete = (classroom) => {
+    setDeleteClassroomCode(classroom.toString());  // Convert to string explicitly
     setConfirmDeleteOpen(true);
   };
 
@@ -114,6 +120,15 @@ export default function ClassroomListScreen() {
     <div style={{ height: 500, width: '100%' }}>
       <DataGrid
         loading={isLoading || isImporting || openLoading}
+        getRowId={(row) => row.id}
+        getRowSpacing={params => ({
+          top: params.isFirstVisible ? 0 : 5,
+          bottom: params.isLastVisible ? 0 : 5,
+        })}
+        rows={classrooms.map((row, index) => ({
+          ...row,
+          id: index + 1
+        }))}
         components={{
           Toolbar: () => (
             <ClassroomToolbar
@@ -122,7 +137,6 @@ export default function ClassroomListScreen() {
             />
           ),
         }}
-        rows={classrooms}
         columns={columns}
         pageSize={10}
       />

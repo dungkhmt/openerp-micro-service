@@ -1,7 +1,9 @@
 package openerp.openerpresourceserver.generaltimetabling.helper;
 
+import openerp.openerpresourceserver.generaltimetabling.model.entity.Building;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.ClassOpened;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
+import openerp.openerpresourceserver.generaltimetabling.repo.BuildingRepo;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +26,7 @@ public class ExcelHelper {
     public static final Integer NUMBER_PERIODS_PER_DAY = 6;
 
     public static final Integer DEFAULT_VALUE_CALCULATE_TIME = 15;
+    private static BuildingRepo buildingRepo;
 
     public static ByteArrayInputStream classOpenedToExcelExport(List<ClassOpened> classOpenedList) {
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
@@ -349,7 +352,16 @@ public class ExcelHelper {
                     switch (cellIdx) {
                         case 0:
                             classroom.setClassroom(cellValue);
-                            classroom.setBuilding(getBuildingFromClassroom(cellValue));
+                            String buildingId = getBuildingFromClassroom(cellValue);
+
+                            Building building = buildingRepo.findById(buildingId).orElseGet(() -> {
+                                Building newBuilding = Building.builder()
+                                        .id(buildingId)
+                                        .name(buildingId) // ID và Name giống nhau
+                                        .build();
+                                return buildingRepo.save(newBuilding);
+                            });
+                            classroom.setBuilding(building);
                             break;
                         case 1:
                             cellValue = cellValue.contains(".") ? cellValue.substring(0, cellValue.indexOf(".")) : cellValue;

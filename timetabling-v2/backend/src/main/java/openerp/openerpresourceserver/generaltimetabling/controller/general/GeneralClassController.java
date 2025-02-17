@@ -171,6 +171,4 @@ public class GeneralClassController {
         gService.deleteRoomReservation(generalClassId, roomReservationId);
         return ResponseEntity.ok("Xóa lớp thành công");
     }
-
-
 }

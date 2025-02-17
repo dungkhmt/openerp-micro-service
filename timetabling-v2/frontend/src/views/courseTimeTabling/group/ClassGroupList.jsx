@@ -5,12 +5,14 @@ import { DataGrid } from "@mui/x-data-grid";
 import GroupToolbar from "./components/GroupToolbar";
 import CreateNewGroupScreen from "./CreateNewGroupScreen";
 import DeleteConfirmDialog from "./components/DeleteConfirmDialog";
+import ManageGroupScreen from './components/ManageGroupScreen';
 
 export default function ClassGroupList() {
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
     const [deleteGroupId, setDeleteGroupId] = useState(null);
+    const [isManageDialogOpen, setManageDialogOpen] = useState(false);
 
     const { groups, isLoading, deleteGroup } = useGroupData();
 
@@ -18,62 +20,77 @@ export default function ClassGroupList() {
         return <div>Loading...</div>;
     }
 
+    console.log(groups);
     const columns = [
-        {
-            headerName: "Group ID",
-            field: "id",
-            width: 150
-        },
-        {
-            headerName: "Tên nhóm",
-            field: "groupName",
-            width: 150
-        },
-        {
-            headerName: "Tòa nhà ưu tiên",
-            field: "priorityBuilding",
-            width: 120
-        },
-        {
-            headerName: "Hành động",
-            field: "actions",
-            width: 200,
-            renderCell: (params) => (
-                <div>
-                    <Button
-                        variant="outlined"
-                        color="primary"
-                        onClick={() => handleEdit(params.row)}
-                        style={{ marginRight: "8px" }}
-                    >
-                        Sửa
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        color="secondary"
-                        onClick={() => handleDeleteClick(params.row.id)}
-                    >
-                        Xóa
-                    </Button>
-                </div>
-            ),
-        },
+      {
+        headerName: "STT",
+        field: "index",
+        width: 120,
+        renderCell: (params) => params.row.index
+      },
+      {
+        headerName: "Tên nhóm",
+        field: "groupName",
+        width: 320,
+      },
+      {
+        headerName: "Phòng học",
+        field: "roomName",
+        width: 150,
+      },
+      {
+        headerName: "Độ ưu tiên",
+        field: "priority",
+        width: 150,
+      },
+      {
+        headerName: "Hành động",
+        field: "actions",
+        width: 200,
+        renderCell: (params) => (
+          <div>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => handleEdit(params.row)}
+              style={{ marginRight: "8px" }}
+            >
+              Sửa
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => handleDeleteClick(params.row)}
+            >
+              Xóa
+            </Button>
+          </div>
+        ),
+      },
     ];
 
     const handleEdit = (group) => {
-        console.log(group)
-        setSelectedGroup(group);
+        setSelectedGroup({
+            ...group,
+            id: group.groupId // Use the original group ID for API
+        });
         setDialogOpen(true);
     };
 
-    const handleDeleteClick = (id) => {    
-        setDeleteGroupId(id);
+    const handleDeleteClick = (row) => {    
+        setDeleteGroupId({
+            id: row.groupId, // Use the original group ID for API
+            roomName: row.roomName
+        });
         setConfirmDeleteOpen(true);
     };
 
     const handleConfirmDelete = async () => {
         if (deleteGroupId) {
-            await deleteGroup(deleteGroupId);
+            await deleteGroup({
+                id: deleteGroupId.id,
+                roomId: deleteGroupId.roomName
+            });
             setConfirmDeleteOpen(false);
             setDeleteGroupId(null);
         }
@@ -83,11 +100,22 @@ export default function ClassGroupList() {
         <div style={{ height: 500, width: '100%' }}>
             <DataGrid
                 loading={isLoading}
-                rows={groups}
+                getRowId={(row) => row.index} // Use index as unique row identifier
+                rows={groups.map((group, index) => ({
+                    ...group,
+                    groupId: group.id, // Store original group ID
+                    index: index + 1, // Use index for unique row identification
+                    id: group.id // Keep original ID
+                }))}
                 columns={columns}
                 pageSize={10}
                 components={{
-                    Toolbar: () => <GroupToolbar onAdd={() => setDialogOpen(true)} />,
+                    Toolbar: () => (
+                        <GroupToolbar 
+                            onAdd={() => setDialogOpen(true)}
+                            onManage={() => setManageDialogOpen(true)}
+                        />
+                    ),
                 }}
             />
 
@@ -104,6 +132,11 @@ export default function ClassGroupList() {
                 open={confirmDeleteOpen}
                 onClose={() => setConfirmDeleteOpen(false)}
                 onConfirm={handleConfirmDelete}
+            />
+
+            <ManageGroupScreen
+                open={isManageDialogOpen}
+                handleClose={() => setManageDialogOpen(false)}
             />
         </div>
     );

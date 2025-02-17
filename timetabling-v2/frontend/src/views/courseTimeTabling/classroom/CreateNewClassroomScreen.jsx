@@ -1,9 +1,9 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useClassroomData } from 'services/useClassroomData';
 
 export default function CreateNewClassroomScreen({ open, handleClose, selectedClassroom }) {
-  const { createClassroom, updateClassroom, refetchClassrooms } = useClassroomData();
+  const { createClassroom, updateClassroom, refetchClassrooms, buildings } = useClassroomData();
   const [newClassroom, setNewClassroom] = useState('');
   const [building, setBuilding] = useState('');
   const [quantityMax, setQuantityMax] = useState('');
@@ -14,7 +14,7 @@ export default function CreateNewClassroomScreen({ open, handleClose, selectedCl
   useEffect(() => {
     if (selectedClassroom) {
       setNewClassroom(selectedClassroom.classroom);
-      setBuilding(selectedClassroom.building);
+      setBuilding(selectedClassroom.building?.id || '');
       setQuantityMax(selectedClassroom.quantityMax);
       setDescription(selectedClassroom.description);
       setId(selectedClassroom.id);
@@ -31,11 +31,11 @@ export default function CreateNewClassroomScreen({ open, handleClose, selectedCl
 
   const handleCreate = async () => {
     const requestData = {
-      id: id,
+      id: newClassroom,
       classroom: newClassroom,
-      building: building,
+      building: building,  
       quantityMax: quantityMax,
-      description: description
+      description: description,
     };
 
     try {
@@ -64,15 +64,23 @@ export default function CreateNewClassroomScreen({ open, handleClose, selectedCl
           fullWidth
           value={newClassroom}
           onChange={(event) => setNewClassroom(event.target.value)}
+          disabled={isUpdate}
         />
         <div style={{ margin: '16px' }} />
-        <TextField
-          margin="dense"
-          label="Tòa nhà"
-          fullWidth
-          value={building}
-          onChange={(event) => setBuilding(event.target.value)}
-        />
+        <FormControl fullWidth>
+          <InputLabel>Tòa nhà</InputLabel>
+          <Select
+            value={building}
+            label="Tòa nhà"
+            onChange={(event) => setBuilding(event.target.value)}
+          >
+            {Array.isArray(buildings) && buildings.map((buildingOption) => (
+              <MenuItem key={buildingOption} value={buildingOption}>
+                {buildingOption}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <div style={{ margin: '16px' }} />
         <TextField
           margin="dense"
