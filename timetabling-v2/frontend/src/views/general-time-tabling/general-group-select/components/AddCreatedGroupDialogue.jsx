@@ -4,10 +4,12 @@ import { toast } from "react-toastify";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import GeneralGroupAutoComplete from "views/general-time-tabling/common-components/GeneralGroupAutoComplete";
 import { FacebookCircularProgress } from "components/common/progressBar/CustomizedCircularProgress";
+import { useGeneralSchedule } from "services/useGeneralScheduleData";
 
 const AddCreatedGroupDialogue = ({ open, setOpen, setClasses, selectedClasses }) => {
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [isLoading, setLoading] = useState(false);
+  const { handlers: { refreshData } } = useGeneralSchedule();
 
   const handleClose = (e) => {
     setOpen(false);
@@ -30,6 +32,7 @@ const AddCreatedGroupDialogue = ({ open, setOpen, setClasses, selectedClasses })
         });
         setClasses(generalClasses);
         setLoading(false);
+        refreshData(); // Add this line to refresh the data
         toast.success("Thêm nhóm thành công!")
         handleClose();
       },
