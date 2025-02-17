@@ -1,40 +1,15 @@
-// import { Route, Switch, useRouteMatch } from "react-router";
-// import PriceConfig from "../screens/product/priceConfig";
-// import ReceiptRequestDetail from "../screens/receipt/receiptRequestDetail";
-// import SaleManagerOrderListing from "../screens/order/saleManagerOrderListing";
-// import OrderApprovalDetail from "../screens/order/orderApprovalDetail";
+import { Routes, Route } from "react-router-dom";
+import SaleOrderList from "../views/sale_manager/SaleOrderList";
+import SaleOrderDetail from "../views/sale_manager/SaleOrderDetail";
 
-// export default function SaleManagerRouter () {
-//   let { path } = useRouteMatch();
-//   return (
-//     <div>
-//       <Switch>
-//         <Route
-//           component={PriceConfig}
-//           exact
-//           path={`${path}/price-config`}
-//         ></Route>
-//         <Route
-//           component={ReceiptRequestDetail}
-//           exact
-//           path={`${path}/receipt-request`}
-//         ></Route>
-//         <Route
-//           component={SaleManagerOrderListing}
-//           exact
-//           path={`${path}/orders`}
-//         ></Route>
-//         <Route
-//           component={OrderApprovalDetail}
-//           exact
-//           path={`${path}/orders/:id`}
-//         ></Route>
-//       </Switch>
-//     </div>
-//   );
-// }
 const SaleManagerRouter = () => {
-    return <div>Sale Manager Router</div>;
+  return (
+    <Routes>
+      <Route path="price-config" element={<div>Price config</div>} />
+      <Route path="sale-order" element={<SaleOrderList/>} />
+      <Route path="sale-order/:orderId" element={<SaleOrderDetail/>} />
+    </Routes>
+  );
   };
   
   export default SaleManagerRouter;
