@@ -1,18 +1,18 @@
 package openerp.openerpresourceserver.generaltimetabling.model.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Builder
 public class ClassroomDto {
 
-    private Long id;
+    private String id;
 
     @NotBlank(message = "Classroom is required not null")
     private String classroom;

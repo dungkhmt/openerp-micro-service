@@ -15,9 +15,9 @@ public interface ClassroomService {
 
     Classroom create(ClassroomDto classroomDto);
 
-    void deleteById(Long id);
+    void deleteById(String id);
 
-    void deleteByIds(List<Long> ids);
+    void deleteByIds(List<String> ids);
 
     void clearAllClassRoom();
 

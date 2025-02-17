@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.generaltimetabling.repo;
 
+import openerp.openerpresourceserver.generaltimetabling.model.dto.request.GroupDto;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Group;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,4 +19,12 @@ public interface GroupRepo extends JpaRepository<Group, Long> {
     List<Group> getAllByGroupName(String groupName);
 
     void deleteById(Long id);
+
+    @Query("SELECT new openerp.openerpresourceserver.generaltimetabling.model.dto.request.GroupDto( " +
+            "g.id, g.groupName, c.classroom, gp.priority) " +
+            "FROM Group g " +
+            "LEFT JOIN GroupRoomPriority gp ON g.id = gp.groupId " +  // Sửa group thành groupId
+            "LEFT JOIN Classroom c ON gp.roomId = c.id")
+    List<GroupDto> getGroupWithRoomAndPriority();
+
 }

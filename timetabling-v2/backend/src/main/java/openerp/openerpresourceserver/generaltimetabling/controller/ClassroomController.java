@@ -93,7 +93,7 @@ public class ClassroomController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteById(@RequestParam Long id) {
+    public ResponseEntity<String> deleteById(@RequestParam String id) {
         try {
             service.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -107,7 +107,7 @@ public class ClassroomController {
     }
 
     @DeleteMapping("/delete-ids")
-    public ResponseEntity<Void> deleteByIds(@RequestParam List<Long> ids) {
+    public ResponseEntity<Void> deleteByIds(@RequestParam List<String> ids) {
         try {
             service.deleteByIds(ids);
             return new ResponseEntity<>(HttpStatus.OK);

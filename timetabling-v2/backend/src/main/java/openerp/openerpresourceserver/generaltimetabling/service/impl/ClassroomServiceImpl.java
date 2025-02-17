@@ -5,9 +5,11 @@ import openerp.openerpresourceserver.generaltimetabling.exception.ClassroomUsedE
 import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
 import openerp.openerpresourceserver.generaltimetabling.mapper.ClassroomMapper;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.ClassroomDto;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.Building;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.ClassOpened;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Group;
+import openerp.openerpresourceserver.generaltimetabling.repo.BuildingRepo;
 import openerp.openerpresourceserver.generaltimetabling.repo.ClassOpenedRepo;
 import openerp.openerpresourceserver.generaltimetabling.repo.ClassroomRepo;
 import openerp.openerpresourceserver.generaltimetabling.repo.GroupRepo;
@@ -30,11 +32,14 @@ public class ClassroomServiceImpl implements ClassroomService {
     private ClassOpenedRepo classOpenedRepo;
 
     @Autowired
+    private BuildingRepo buildingRepo;
+
+    @Autowired
     private ClassroomMapper classroomMapper;
 
     @Override
     public List<Classroom> getClassroom() {
-        return classroomRepo.findAll();
+        return classroomRepo.findAllWithBuilding();
     }
 
     @Override
@@ -44,11 +49,8 @@ public class ClassroomServiceImpl implements ClassroomService {
 
     @Override
     public void updateClassroom(ClassroomDto requestDto) {
-        Long id = requestDto.getId();
+        String id = requestDto.getId();
         Classroom classroom = classroomRepo.findById(id).orElse(null);
-        if (classroom == null) {
-            throw new ClassroomNotFoundException("Không tìm thấy phòng học với ID: " + id);
-        }
         if (!classroom.getClassroom().equals(requestDto.getClassroom())) {
             List<Classroom> classroomList = classroomRepo.getClassroomByClassroom(requestDto.getClassroom());
             if (!classroomList.isEmpty()) {
@@ -60,11 +62,21 @@ public class ClassroomServiceImpl implements ClassroomService {
                         "Phòng học " + classroom.getClassroom() + " đang được sử dụng. Không thể sửa đổi!");
             }
         }
+
+        String buildingName = requestDto.getBuilding();
+        Building building = buildingRepo.findById(buildingName).orElseGet(() -> {
+            Building newBuilding = Building.builder()
+                    .id(buildingName) // Dùng `building name` làm `id`
+                    .name(buildingName) // Dùng `building name` làm `name`
+                    .build();
+            return buildingRepo.save(newBuilding);
+        });
+
+        classroom.setId(requestDto.getClassroom());
         classroom.setClassroom(requestDto.getClassroom());
-        classroom.setBuilding(requestDto.getBuilding());
+        classroom.setBuilding(building);
         classroom.setQuantityMax(Long.parseLong(requestDto.getQuantityMax()));
         classroom.setDescription(requestDto.getDescription());
-        classroom.setBuilding(requestDto.getBuilding());
         classroomRepo.save(classroom);
     }
 
@@ -74,13 +86,17 @@ public class ClassroomServiceImpl implements ClassroomService {
         if (!classroomList.isEmpty()) {
             throw new ClassroomUsedException("Phòng học " + classroomDto.getClassroom() + " đã tồn tại!!");
         }
+        Building building = buildingRepo.findById(classroomDto.getBuilding()).orElseThrow(() ->
+                new NotFoundException("Tòa nhà " + classroomDto.getBuilding() + " không tồn tại!"));
+
         Classroom classroom = classroomMapper.mapDtoToEntity(classroomDto);
+        classroom.setBuilding(building);
         classroomRepo.save(classroom);
         return classroom;
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(String id) {
         Classroom classroom = classroomRepo.findById(id).orElse(null);
         if (classroom == null) {
             throw new ClassroomNotFoundException("Không tồn tại phòng học với ID: " + id);
@@ -93,7 +109,7 @@ public class ClassroomServiceImpl implements ClassroomService {
     }
 
     @Override
-    public void deleteByIds(List<Long> ids) {
+    public void deleteByIds(List<String> ids) {
         ids.forEach(el -> {
             classroomRepo.deleteById(el);
         });
