@@ -25,7 +25,6 @@ import com.hust.baseweb.applications.education.service.*;
 import com.hust.baseweb.applications.notifications.service.NotificationsService;
 import com.hust.baseweb.applications.programmingcontest.callexternalapi.model.LmsLogModelCreate;
 import com.hust.baseweb.applications.programmingcontest.callexternalapi.service.ApiService;
-import com.hust.baseweb.applications.programmingcontest.model.ModelUpdateContest;
 import com.hust.baseweb.config.FileSystemStorageProperties;
 import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.service.UserService;
@@ -226,6 +225,7 @@ public class ClassController {
 
     @Async
     public void logUserGetRegisteredClasses(String userId){
+        if (true) return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logUserGetRegisteredClasses, userId = " + logM.getUserId());
@@ -245,6 +245,7 @@ public class ClassController {
 
     @Async
     public void logUserGetClassDetailForLearning(String userId, String courseName){
+        if (true) return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logUserGetClassDetailForLearning, userId = " + logM.getUserId());
@@ -786,6 +787,7 @@ public class ClassController {
     @Async
     public void logUserViewCourseMaterial(String userId, String courseName,
                                           String chapterName, String materialName){
+        if (true) return;
         LmsLogModelCreate logM = new LmsLogModelCreate();
         logM.setUserId(userId);
         log.info("logUpdateContest, userId = " + logM.getUserId());

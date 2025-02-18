@@ -1,8 +1,8 @@
 package com.hust.baseweb.util.stringhandler;
 
 import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
-import lombok.extern.slf4j.Slf4j;
 import com.hust.baseweb.constants.Constants;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
@@ -47,7 +47,7 @@ public class StringHandler {
         } else if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.FILE_LIMIT.getValue())) {
             status = ContestSubmissionEntity.SUBMISSION_STATUS_OUTPUT_LIMIT_EXCEEDED;
             participantAns = status;
-        } else if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.MEMORY_LIMIT.getValue())) {
+        } else if (participantTestcaseAns.equals(Constants.TestCaseSubmissionError.MEMORY_ERROR.getValue())) {
             status = ContestSubmissionEntity.SEGMENTATION_FAULT;
             participantAns = status;
         } else {
@@ -72,7 +72,7 @@ public class StringHandler {
                 .runtime((long) runtime)
                 .score(score)
                 .status(status)
-                .message(response)
+                .compileOutput(response)
                 .testCasePass(cnt + " / " + 1)
                 .nbTestCasePass(cnt)
                 .participantAns(Collections.singletonList(participantAns))
@@ -97,7 +97,7 @@ public class StringHandler {
             return buildCompileErrorForSubmission(response);
         } else if (status.equals(Constants.TestCaseSubmissionError.TIME_LIMIT.getValue())) {
             status = ContestSubmissionEntity.SUBMISSION_STATUS_TIME_LIMIT_EXCEEDED;
-        } else if (status.equals(Constants.TestCaseSubmissionError.MEMORY_LIMIT.getValue())) {
+        } else if (status.equals(Constants.TestCaseSubmissionError.MEMORY_ERROR.getValue())) {
             status = ContestSubmissionEntity.SEGMENTATION_FAULT;
         } else if (status.equals(Constants.TestCaseSubmissionError.FILE_LIMIT.getValue())) {
             status = ContestSubmissionEntity.SUBMISSION_STATUS_OUTPUT_LIMIT_EXCEEDED;
@@ -110,8 +110,7 @@ public class StringHandler {
             int secondLastNewlineIndex = response.lastIndexOf('\n', lastNewlineIndex - 1);
             try {
                 runtime = Integer.parseInt(response.substring(secondLastNewlineIndex + 1, lastNewlineIndex).trim());
-            }
-            catch (NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 log.error("Submission Response: " + response);
                 throw e;
             }
@@ -148,7 +147,7 @@ public class StringHandler {
                 .runtime((long) runtime)
                 .score(score)
                 .status(status)
-                .message(response)
+                .compileOutput(response)
                 .testCasePass(cnt + " / " + 1)
                 .nbTestCasePass(cnt)
                 .participantAns(Collections.singletonList(participantAns))
@@ -161,7 +160,7 @@ public class StringHandler {
                 .runtime(0L)
                 .testCasePass("0")
                 .status(ContestSubmissionEntity.SUBMISSION_STATUS_COMPILE_ERROR)
-                .message(message)
+                .compileOutput(message)
                 .build();
     }
 

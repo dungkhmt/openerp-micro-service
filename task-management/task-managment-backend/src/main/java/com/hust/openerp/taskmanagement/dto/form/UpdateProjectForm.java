@@ -15,4 +15,6 @@ public class UpdateProjectForm {
     private String name;
     @Nullable
     private String description;
+    @Nullable
+    private String code;
 }

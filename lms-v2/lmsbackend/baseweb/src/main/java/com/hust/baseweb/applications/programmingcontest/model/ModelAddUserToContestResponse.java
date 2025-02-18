@@ -14,5 +14,5 @@ public class ModelAddUserToContestResponse {
     private String userId;
     private String roleId;
     private String status;
-
+    private String fullname;
 }

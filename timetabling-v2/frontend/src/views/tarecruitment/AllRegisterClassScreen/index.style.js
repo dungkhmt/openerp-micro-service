@@ -23,7 +23,7 @@ const styles = {
     height: "65vh",
   },
   dropdown: {
-    width: "10%",
+    width: "120px",
     margin: "0.5%",
   },
   selection: {

@@ -2,8 +2,10 @@ package openerp.openerpresourceserver.generaltimetabling.algorithms;
 
 import com.google.gson.Gson;
 import lombok.extern.log4j.Log4j2;
+
 import openerp.openerpresourceserver.generaltimetabling.algorithms.classschedulingmaxregistrationopportunity.CourseNotOverlapBackTrackingSolver;
 import openerp.openerpresourceserver.generaltimetabling.algorithms.cttt.greedy.GreedySolver;
+
 import openerp.openerpresourceserver.generaltimetabling.exception.InvalidClassStudentQuantityException;
 import openerp.openerpresourceserver.generaltimetabling.exception.InvalidFieldException;
 import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
@@ -34,7 +36,8 @@ public class V2ClassScheduler {
     }
 
 
-    public MapDataScheduleTimeSlotRoom mapData(List<GeneralClass> classes, List<Classroom> rooms){
+
+    public MapDataScheduleTimeSlotRoomWrapper mapData(List<GeneralClass> classes, List<Classroom> rooms){
 
             int n = 0;
             Map<Integer, GeneralClass> mClassSegment2Class = new HashMap();
@@ -155,38 +158,41 @@ public class V2ClassScheduler {
         }
         //MapDataScheduleTimeSlotRoom data = new MapDataScheduleTimeSlotRoom(roomCapacity,n,d,c,cls,groupId,parentClassId,vol,conflict,D,roomPriority,mClassSegment2Class);
         MapDataScheduleTimeSlotRoom data = new MapDataScheduleTimeSlotRoom(roomCapacity,n,d,c,cls,groupId,parentClassId,vol,conflict,D,roomPriority);
+        MapDataScheduleTimeSlotRoomWrapper DW = new MapDataScheduleTimeSlotRoomWrapper(data,mClassSegment2Class);
 
         //data.print();
-        return data;
+        return DW;
     }
     public List<GeneralClass> autoScheduleTimeSlotRoom(List<GeneralClass> classes, List<Classroom> rooms, int timeLimit) {
-        MapDataScheduleTimeSlotRoom data = mapData(classes,rooms);
-
+        MapDataScheduleTimeSlotRoomWrapper D = mapData(classes, rooms);
+        MapDataScheduleTimeSlotRoom data = D.data;
         //data.print();
         Gson gson = new Gson();
         String json = gson.toJson(data);
-        try{
+        try {
             PrintWriter out = new PrintWriter("timetable.json");
             out.print(json);
             out.close();
-        }catch (Exception e){ e.printStackTrace();}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         HashSet<String> courses = new HashSet();
         Map<Integer, String> mClassSegment2Course = new HashMap();
         Map<String, List<Integer>> mCourse2Domain = new HashMap();
         Map<String, Integer> mCourse2Duration = new HashMap();
-        for(int i = 0; i < data.nbClassSegments; i++){
+        for (int i = 0; i < data.nbClassSegments; i++) {
             String courseCode = data.getCourseCode()[i];
             courses.add(courseCode);
-            mClassSegment2Course.put(i,courseCode);
-            mCourse2Domain.put(courseCode,data.getDomains()[i]);
-            mCourse2Duration.put(courseCode,data.nbSlots[i]);
+            mClassSegment2Course.put(i, courseCode);
+            mCourse2Domain.put(courseCode, data.getDomains()[i]);
+            mCourse2Duration.put(courseCode, data.nbSlots[i]);
         }
         //CourseNotOverlapBackTrackingSolver solver = new CourseNotOverlapBackTrackingSolver(courses,mCourse2Domain,mCourse2Duration);
         GreedySolver solver = new GreedySolver(data);
         solver.solve();
-        if(!solver.hasSolution()) {
+        if (!solver.hasSolution()) {
             log.info("autoScheduleTimeSlotRoom, no solution!!!");
-        }else{
+        } else {
             //Map<String, Integer> solutionMap = solver.getSolutionMap();
             //int[] solution = new int[data.nbClassSegments];
             //for(int i = 0; i < data.nbClassSegments; i++){
@@ -195,6 +201,7 @@ public class V2ClassScheduler {
             //}
             int[] solution = solver.getSolutionSlot();
             log.info("FOUND SOLUTION");
+            solver.printSolution();
             for (int i = 0; i < classes.size(); i++) {
                 GeneralClass gClass = classes.get(i);
                 gClass.getTimeSlots().forEach(rr -> rr.setGeneralClass(null));
@@ -207,15 +214,15 @@ public class V2ClassScheduler {
                 int K = t1 / 6; // kip
                 int tietBD = t1 - 6 * K;
                 //GeneralClass gClass = classes.get(scheduleMap.get(i));
-                /*
-                GeneralClass gClass = data.getMClassSegment2Class().get(i);
+
+                GeneralClass gClass = D.getMClassSegment2Class().get(i);
 
                 RoomReservation newRoomReservation = new RoomReservation(gClass.getCrew(), tietBD, tietBD + data.nbSlots[i] - 1, day + 2, null);
 
                 newRoomReservation.setGeneralClass(gClass);
                 gClass.getTimeSlots().add(newRoomReservation);
 
-                 */
+
                 log.info("class[" + i + "] is assigned to slot " + solution[i] + "(" + day + "," + K + "," + tietBD + ")");
             }
 
@@ -229,6 +236,10 @@ public class V2ClassScheduler {
             return null;
         }
         classes.sort(Comparator.comparing(GeneralClass::hasNonNullTimeSlot).reversed());
+        for(int i = 0; i < classes.size(); i++){
+            GeneralClass c = classes.get(i);
+            log.info("autoScheduleTimeSlot, class[" + i + "] = " + c.toString() + " total duration" + MassExtractor.extract(c.getMass()));
+        }
         List<int[]> conflict = new ArrayList<int[]>();
         int[] durations = classes.stream().filter(c -> c.getMass() != null).mapToInt(c -> MassExtractor.extract(c.getMass())).toArray();
         int[] splitDurations = new int[150];
@@ -240,7 +251,10 @@ public class V2ClassScheduler {
         for (int i = 0; i < classes.size(); i++) {
             GeneralClass c = classes.get(i);
             if (c.getTimeSlots().size() > 1) {
+                log.info("autoScheduleTimeSlot, class " + c.getClassCode() + " has " + c.getTimeSlots().size());
+
                 for (RoomReservation rr: c.getTimeSlots()) {
+                    log.info("autoScheduleTimeSlot, roomreservation " + rr.toString());
                     if (!rr.isTimeSlotNotNull()) {
                         throw new InvalidFieldException("Lớp " + c.getClassCode() + " có nhiều 2 hơn ca học và có lịch trống!");
                     }
@@ -338,9 +352,7 @@ public class V2ClassScheduler {
                         }
                     }
                 }
-
             }
-
         }
 
         for (int i = 0; i < totalSessions; i++) {
@@ -349,6 +361,9 @@ public class V2ClassScheduler {
             }
         }
 
+        for(int i = 0; i < splitDurations.length; i++){
+            log.info("autoScheduleTimeSlot, class-segment " + i + " duration = " + splitDurations[i] + " domain = " + domains[i].toArray());
+        }
         ClassTimeScheduleBacktrackingSolver solver = new ClassTimeScheduleBacktrackingSolver(totalSessions, splitDurations, domains, conflict, timeLimit);
         solver.solve();
         if (!solver.hasSolution()) {
@@ -557,6 +572,7 @@ public class V2ClassScheduler {
         return classes;
     }
 
+
     public static void main(String[] args){
         try{
             Gson gson = new Gson();
@@ -570,4 +586,5 @@ public class V2ClassScheduler {
             e.printStackTrace();
         }
     }
+
 }

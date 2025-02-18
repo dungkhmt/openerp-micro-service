@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@AllArgsConstructor(onConstructor_ = @Autowired)
+@AllArgsConstructor(onConstructor_ = {@Autowired})
 @Data
 public class Constants {
 
@@ -16,7 +16,7 @@ public class Constants {
 
     public enum TestCaseSubmissionError {
         FILE_LIMIT("File size limit exceeded"),
-        MEMORY_LIMIT("Segmentation fault"),
+        MEMORY_ERROR("Segmentation fault"),
         TIME_LIMIT("Killed");
 
         private final String value;

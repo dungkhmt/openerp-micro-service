@@ -46,7 +46,8 @@ public class ProjectMember {
     @Column(name = "created_stamp")
     private Date createdStamp;
 
-    @AllArgsConstructor
+    @SuppressWarnings("serial")
+	@AllArgsConstructor
     @NoArgsConstructor
     @Getter
     @Setter

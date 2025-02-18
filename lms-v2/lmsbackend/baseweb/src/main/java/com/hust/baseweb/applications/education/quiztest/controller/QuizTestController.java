@@ -6,37 +6,19 @@ import com.hust.baseweb.applications.education.cache.QuizQuestionServiceCache;
 import com.hust.baseweb.applications.education.classmanagement.entity.EduClassSession;
 import com.hust.baseweb.applications.education.classmanagement.repo.EduClassSessionRepo;
 import com.hust.baseweb.applications.education.classmanagement.service.ClassService;
-import com.hust.baseweb.applications.education.classmanagement.service.EduClassSessionService;
-import com.hust.baseweb.applications.education.entity.EduClass;
-import com.hust.baseweb.applications.education.entity.EduCourseSession;
-import com.hust.baseweb.applications.education.entity.EduCourseSessionInteractiveQuiz;
-import com.hust.baseweb.applications.education.entity.EduCourseSessionInteractiveQuizQuestion;
-import com.hust.baseweb.applications.education.entity.QuizQuestion;
-import com.hust.baseweb.applications.education.entity.QuizTag;
+import com.hust.baseweb.applications.education.entity.*;
 import com.hust.baseweb.applications.education.entity.compositeid.CompositeCourseSessionInteractiveQuizQuestionId;
 import com.hust.baseweb.applications.education.model.quiz.QuizQuestionDetailModel;
-import com.hust.baseweb.applications.education.model.quiz.QuizTagCreateModel;
 import com.hust.baseweb.applications.education.quiztest.UserQuestionQuizExecutionOM;
-import com.hust.baseweb.applications.education.quiztest.entity.EduQuizTest;
-import com.hust.baseweb.applications.education.quiztest.entity.EduQuizTestQuizQuestion;
-import com.hust.baseweb.applications.education.quiztest.entity.EduTestQuizGroup;
-import com.hust.baseweb.applications.education.quiztest.entity.EduTestQuizParticipant;
-import com.hust.baseweb.applications.education.quiztest.entity.EduTestQuizRole;
-import com.hust.baseweb.applications.education.quiztest.entity.InteractiveQuiz;
-import com.hust.baseweb.applications.education.quiztest.entity.InteractiveQuizAnswer;
-import com.hust.baseweb.applications.education.quiztest.entity.InteractiveQuizQuestion;
+import com.hust.baseweb.applications.education.quiztest.entity.*;
 import com.hust.baseweb.applications.education.quiztest.model.*;
 import com.hust.baseweb.applications.education.quiztest.model.edutestquizparticipation.GetQuizTestParticipationExecutionResultInputModel;
+import com.hust.baseweb.applications.education.quiztest.model.edutestquizparticipation.ModelResponseImportExcelUsersToQuizTest;
 import com.hust.baseweb.applications.education.quiztest.model.edutestquizparticipation.QuizTestParticipationExecutionResultOutputModel;
 import com.hust.baseweb.applications.education.quiztest.model.quitestgroupquestion.AutoAssignQuestion2QuizTestGroupInputModel;
 import com.hust.baseweb.applications.education.quiztest.model.quiztestgroup.AutoAssignParticipants2QuizTestGroupInputModel;
 import com.hust.baseweb.applications.education.quiztest.model.quiztestquestion.CopyQuestionFromQuizTest2QuizTestInputModel;
-import com.hust.baseweb.applications.education.quiztest.model.quiztestquestion.CreateQuizTestQuestionInputModel;
-import com.hust.baseweb.applications.education.quiztest.repo.EduTestQuizParticipantRepo;
-import com.hust.baseweb.applications.education.quiztest.repo.EduTestQuizRoleRepo;
-import com.hust.baseweb.applications.education.quiztest.repo.InteractiveQuizQuestionRepo;
-import com.hust.baseweb.applications.education.quiztest.repo.InteractiveQuizRepo;
-import com.hust.baseweb.applications.education.quiztest.repo.QuizGroupQuestionAssignmentRepo;
+import com.hust.baseweb.applications.education.quiztest.repo.*;
 import com.hust.baseweb.applications.education.quiztest.repo.InteractiveQuizRepo.StudentResult;
 import com.hust.baseweb.applications.education.quiztest.repo.InteractiveQuizRepo.StudentSubmission;
 import com.hust.baseweb.applications.education.quiztest.service.*;
@@ -45,7 +27,6 @@ import com.hust.baseweb.applications.education.repo.EduCourseSessionInteractiveQ
 import com.hust.baseweb.applications.education.repo.EduCourseSessionRepo;
 import com.hust.baseweb.applications.education.service.EduCourseSessionInteractiveQuizQuestionService;
 import com.hust.baseweb.applications.education.service.QuizQuestionService;
-import com.hust.baseweb.applications.education.service.QuizTagService;
 import com.hust.baseweb.entity.UserLogin;
 import com.hust.baseweb.service.UserService;
 import lombok.AllArgsConstructor;
@@ -901,11 +882,49 @@ public class QuizTestController {
             ModelUploadExcelStudentListOfQuizTest.class);
         String testId = modelUpload.getTestId();
         log.info("uploadExcelStudentListOfQuizTest, testId = " + testId);
-
+        List<ModelResponseImportExcelUsersToQuizTest> res = new ArrayList<>();
+        try{
+            InputStream is = file.getInputStream();
+            XSSFWorkbook wb = new XSSFWorkbook(is);
+            XSSFSheet sheet = wb.getSheetAt(0);
+            Row r0 = sheet.getRow(0);
+            int nbCol = r0.getLastCellNum();
+            int lastRowNum = sheet.getLastRowNum();
+            for (int i = 1; i <= lastRowNum; i++) {
+                Row row = sheet.getRow(i);
+                //Cell c = row.getCell(0);
+                String userId = "";
+                String fullName = "";
+                String refUserId = "";
+                String email = "";
+                String code = "";
+                for(int j = 0; j < nbCol; j++){
+                    Cell cj = row.getCell(j);
+                    if(r0.getCell(j).getStringCellValue().equals("user_id")){
+                        userId = cj.getStringCellValue();
+                    }else if(r0.getCell(j).getStringCellValue().equals("full_name")){
+                        fullName = cj.getStringCellValue();
+                    }else if(r0.getCell(j).getStringCellValue().equals("ref_user_id")){
+                        refUserId = cj.getStringCellValue();
+                    }else if(r0.getCell(j).getStringCellValue().equals("email")){
+                        email = cj.getStringCellValue();
+                    }else if(r0.getCell(j).getStringCellValue().equals("code")){
+                        code = cj.getStringCellValue();
+                    }
+                }
+                res.add(new ModelResponseImportExcelUsersToQuizTest(userId,fullName,refUserId,email,code));
+            }
+            eduTestQuizParticipantService.addParticipants2QuizTest(testId,res);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok().body(res);
+        /*
         List<String> uploadedUsers = new ArrayList();
         try (InputStream is = file.getInputStream()) {
             XSSFWorkbook wb = new XSSFWorkbook(is);
             XSSFSheet sheet = wb.getSheetAt(0);
+
             int lastRowNum = sheet.getLastRowNum();
             //System.out.println("uploadExcelStudentListOfQuizTest, lastRowNum = " + lastRowNum);
             for (int i = 1; i <= lastRowNum; i++) {
@@ -923,7 +942,7 @@ public class QuizTestController {
             e.printStackTrace();
         }
         return ResponseEntity.ok().body(uploadedUsers);
-
+        */
 
     }
 

@@ -314,7 +314,10 @@ public class DataAdminController {
                 log.info("getAcceptedSubmissions, offset = " + offset + " count = " + count);
                 //List<ContestSubmissionEntity> subs = contestSubmissionRepo.findAllByStatus(ContestSubmissionEntity.SUBMISSION_STATUS_ACCEPTED);
 
-                List<ContestSubmissionEntity> subs = contestSubmissionRepo.getPageContestSubmission(offset,limit,"Accept");
+                List<ContestSubmissionEntity> subs = contestSubmissionRepo.getPageContestSubmission(
+                    offset,
+                    limit,
+                    "Accepted");
 
 
                 for (ContestSubmissionEntity s : subs) {

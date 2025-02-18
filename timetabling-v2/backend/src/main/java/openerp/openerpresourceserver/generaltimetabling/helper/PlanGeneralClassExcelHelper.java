@@ -12,6 +12,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Log4j2
@@ -70,6 +71,8 @@ public class PlanGeneralClassExcelHelper {
                     planGeneralClass.setNumberOfClasses(0);
                 }
                 break;
+
+
             case 6:
                 if (isNumeric(value)) {
                     double decimalNumber = Double.parseDouble(value);
@@ -130,6 +133,7 @@ public class PlanGeneralClassExcelHelper {
             while (sheet.getRow(rowIndex)!= null && sheet.getRow(rowIndex).getCell(START_ROW_TO_READ_CLASS).getCellType() != Cell.CELL_TYPE_BLANK) {
 
                 PlanGeneralClass planGeneralClass = new PlanGeneralClass();
+                planGeneralClass.setCreatedStamp(new Date());
                 for (int colIndex = START_COL_TO_READ_CLASS_INFO; colIndex<=END_COL_TO_READ_CLASS_INFO ; colIndex++) {
                     if(sheet.getRow(rowIndex).getCell(colIndex) == null) {
                         setPlanGeneralClassInfo(

@@ -10,14 +10,14 @@ import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.entity.EntityAuthorization;
-import openerp.openerpresourceserver.repository.EntityAuthorizationRepo;
+import openerp.openerpresourceserver.repository.EntityAuthorizationRepository;
 import openerp.openerpresourceserver.service.EntityAuthorizationService;
 
 @AllArgsConstructor(onConstructor_ = @Autowired)
 @Service
 public class EntityAuthorizationServiceImpl implements EntityAuthorizationService {
 
-    private EntityAuthorizationRepo entityAuthorizationRepo;
+    private EntityAuthorizationRepository entityAuthorizationRepo;
 
     @Override
     public Set<String> getEntityAuthorization(String id, List<String> roleIds) {

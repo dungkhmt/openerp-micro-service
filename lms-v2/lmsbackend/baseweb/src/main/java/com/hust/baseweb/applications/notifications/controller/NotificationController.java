@@ -55,11 +55,11 @@ public class NotificationController {
         subscription = new SseEmitter(600_000L);
 
         subscription.onTimeout(() -> {
-            log.info("onTimeout fired on connection: {}", toUser);
+            log.debug("onTimeout fired on connection: {}", toUser);
             subscription.complete();
         });
         subscription.onCompletion(() -> {
-            log.info("onCompletion fired on connection: {}", toUser);
+            log.debug("onCompletion fired on connection: {}", toUser);
         }); // OK
         subscription.onError((e) -> { // Must consider carefully, but currently OK
             log.error("onError fired on connection {} with exception: {}", toUser, e.getMessage());
@@ -111,16 +111,16 @@ public class NotificationController {
                     iterator.remove();
                     size--;
 //                    log.error("FAILED WHEN SENDING HEARTBEAT SIGNAL TO {}, MAY BE USER CLOSED A CONNECTION", toUser);
-                    log.info("Failed to send heartbeat on connection {} because of error: {}", toUser, e.getMessage());
+                    log.error("Failed to send heartbeat on connection {} because of error: {}", toUser, e.getMessage());
                     try {
                         if (e.getMessage().equals("ResponseBodyEmitter is already set complete")) {
-                            log.info("ResponseBodyEmitter on connection {} is already set complete", toUser);
+//                            log.info("ResponseBodyEmitter on connection {} is already set complete", toUser);
                         } else {
                             emitter.completeWithError(e);
-                            log.info("Marked SseEmitter on connection {} as complete with an error", toUser);
+                            log.debug("Marked SseEmitter on connection {} as complete with an error", toUser);
                         }
                     } catch (Exception completionException) {
-                        log.info(
+                        log.error(
                             "Error occurred when attempting to mark SseEmitter: {}",
                             completionException.getMessage());
                     }
