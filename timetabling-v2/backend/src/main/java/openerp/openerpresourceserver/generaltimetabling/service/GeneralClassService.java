@@ -29,7 +29,9 @@ public interface GeneralClassService {
 
     List<GeneralClass> resetSchedule(List<String> ids, String semester);
 
-    List<GeneralClass> autoSchedule(String semester, String groupName, int timeLimit);
+    List<GeneralClass> autoScheduleGroup(String semester, String groupName, int timeLimit);
+    List<GeneralClass> autoSchedule(String semester, int timeLimit);
+
     List<GeneralClass> autoScheduleRoom(String semester, String groupName, int timeLimit);
 
     List<GeneralClass> v2UpdateClassSchedule(String semester, List<V2UpdateClassScheduleRequest> request);

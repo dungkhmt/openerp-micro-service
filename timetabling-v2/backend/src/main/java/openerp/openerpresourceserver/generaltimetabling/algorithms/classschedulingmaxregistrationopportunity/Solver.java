@@ -1,6 +1,6 @@
 package openerp.openerpresourceserver.generaltimetabling.algorithms.classschedulingmaxregistrationopportunity;
 
-import openerp.openerpresourceserver.generaltimetabling.algorithms.MapDataScheduleTimeSlotRoom;
+import openerp.openerpresourceserver.generaltimetabling.algorithms.MapDataScheduleTimeSlotRoomOneGroup;
 import com.google.gson.Gson;
 
 import java.io.File;
@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class Solver {
     // input data structures
-    MapDataScheduleTimeSlotRoom data;
+    MapDataScheduleTimeSlotRoomOneGroup data;
     int nbClassSegments;// number of class-segments
     int[] nbSlots; // d[i] is the duration (so tiet)
     String[] courseCode; // c[i] is the course of the class-segment i
@@ -27,7 +27,7 @@ public class Solver {
     int[] solution; // solution[i] is the start time-slot of class-segment i
 
 
-    public Solver(MapDataScheduleTimeSlotRoom data){
+    public Solver(MapDataScheduleTimeSlotRoomOneGroup data){
         this.data = data;
         this.nbClassSegments = data.getNbClassSegments();
         this.nbSlots = data.getNbSlots();
@@ -37,20 +37,20 @@ public class Solver {
         this.nbStudents = data.getNbStudents();
         this.conflict = data.getConflict();
         this.domains = data.getDomains();
-        this.nbRooms = data.getNbRooms();
-        this.roomCap = data.getRoomCap();
+        //this.nbRooms = data.getNbRooms();
+        //this.roomCap = data.getRoomCap();
     }
     public void solve(){
         // to be implemented
     }
     public static void main(String[] args){
         try{
-            MapDataScheduleTimeSlotRoom data = new MapDataScheduleTimeSlotRoom();
+            MapDataScheduleTimeSlotRoomOneGroup data = new MapDataScheduleTimeSlotRoomOneGroup();
             Gson gson = new Gson();
             Scanner in = new Scanner(new File("timetable.json"));
             String json = in.nextLine();
             System.out.println("read json = " + json);
-            data = gson.fromJson(json,MapDataScheduleTimeSlotRoom.class);
+            data = gson.fromJson(json, MapDataScheduleTimeSlotRoomOneGroup.class);
             in.close();
             data.print();
             Solver app = new Solver(data);
