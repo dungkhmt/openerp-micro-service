@@ -1,19 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button, Card, Box, IconButton } from "@mui/material";
 import { useHistory } from "react-router-dom";
 import ModalCreateThesisDefensePlan from "components/thesisdefensejury/modal/ModalCreateThesisDefensePlan";
 import { StandardTable } from "erp-hust/lib/StandardTable";
 import PrimaryButton from "components/button/PrimaryButton";
-import { request } from "api";
 import ModalLoading from "components/common/ModalLoading";
 import EditIcon from '@mui/icons-material/Edit';
-// Màn quản lý đợt bảo vệ đồ án
+import { useThesisDefensePlans } from "services/useThesisDefensePlans";
+
 function ThesisDefensePlans() {
   const history = useHistory();
-  const [loading, setLoading] = useState(true);
-  const [plans, setPlans] = useState([]);
-  const [toggle, setToggle] = React.useState(false);
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const { plans, isLoading, refetch } = useThesisDefensePlans();
 
   const columns = [
     { title: "ID", field: "id" },
@@ -29,7 +27,6 @@ function ThesisDefensePlans() {
       field: "endDate",
       render: (rowData) => rowData?.endDate?.split("T")[0],
     },
-
     {
       title: "",
       sorting: false,
@@ -53,22 +50,6 @@ function ThesisDefensePlans() {
       ),
     },
   ];
-  const handleToggle = () => {
-    setToggle(!toggle);
-  };
-
-  async function getAllPlan() {
-    request(
-      "GET",
-      `/thesis-defense-plan/get-all`,
-      (res) => {
-        console.log(res.data);
-        setPlans(res.data);
-        setLoading(false)
-      }
-    );
-
-  }
 
   const handleModalOpen = () => {
     setOpen(true);
@@ -77,14 +58,7 @@ function ThesisDefensePlans() {
   const handleModalClose = () => {
     setOpen(false);
   };
-  const handleClose = () => {
-    setOpen(false);
-  };
 
-  useEffect(() => {
-    setLoading(true);
-    getAllPlan();
-  }, [toggle]);
   return (
     <Card>
       <Box
@@ -97,7 +71,7 @@ function ThesisDefensePlans() {
           Tạo đợt bảo vệ đồ án mới
         </PrimaryButton>
       </Box>
-      {loading && <ModalLoading loading={loading} />}
+      {isLoading && <ModalLoading loading={isLoading} />}
       <StandardTable
         title={"Danh sách đợt bảo vệ"}
         data={plans}
@@ -117,8 +91,8 @@ function ThesisDefensePlans() {
             </Button>
             <ModalCreateThesisDefensePlan
               open={open}
-              handleClose={handleClose}
-              handleToggle={handleToggle}
+              handleClose={handleModalClose}
+              refetchPlans={refetch}
             />
           </div>
         </div>

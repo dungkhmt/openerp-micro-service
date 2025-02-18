@@ -25,6 +25,7 @@ import {
   SUBMISSION_MODE_SOURCE_CODE,
 } from "./Constant";
 import StudentViewSubmission from "./StudentViewSubmission";
+import {useTranslation} from "react-i18next";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -75,6 +76,8 @@ export default function StudentViewProgrammingContestProblemDetail() {
   const params = useParams();
   const problemId = params.problemId;
   const contestId = params.contestId;
+  const {t} = useTranslation(["education/programmingcontest/problem"]);
+
   const [problem, setProblem] = useState(null);
   const [testCases, setTestCases] = useState([]);
   const [file, setFile] = useState(null);
@@ -307,7 +310,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
           editorStyle={editorStyle.editor}
         />
         {/*
-        <Typography variant="h5">Sample Testcase</Typography>
+        <Typography variant="h5">Sample testcase</Typography>
         
         <Editor
           toolbarHidden
@@ -321,7 +324,7 @@ export default function StudentViewProgrammingContestProblemDetail() {
         {/*sampleTestCase*/}
         
         <HustCodeEditor
-        title="Sample TestCase"
+        title={t("sampleTestCase")}
         language={COMPUTER_LANGUAGES.C}
         sourceCode={sampleTestCase}
          /> 

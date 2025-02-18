@@ -1,6 +1,5 @@
 {
   "contest": "Contest",
-  "contestId": "Contest ID",
   "contestName": "Contest name",
   "contestTime": "Contest time",
   "isPublic": "Public",

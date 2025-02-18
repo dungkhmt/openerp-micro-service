@@ -6,6 +6,7 @@ import lombok.Setter;
 import openerp.openerpresourceserver.generaltimetabling.exception.InvalidFieldException;
 import openerp.openerpresourceserver.generaltimetabling.helper.LearningWeekValidator;
 
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -31,8 +32,7 @@ public class PlanGeneralClass {
     private String crew;
     private String weekType;
     private int duration;
-    private String promotion;
-
+    private Date createdStamp;
 
     public void setLearningWeeks(String learningWeeks) {
         if (learningWeeks != null) {

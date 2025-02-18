@@ -12,7 +12,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,8 +29,8 @@ public class RabbitProgrammingContestConfig {
     public static final String JUDGE_PROBLEM_DEAD_LETTER_QUEUE = "judge_problem_dead_letter_queue";
     public static final String JUDGE_CUSTOM_PROBLEM_DEAD_LETTER_QUEUE = "judge_custom_problem_dead_letter_queue";
 
-    @Value("${spring.rabbitmq.listener.simple.auto-startup}")
-    private boolean autoStartup;
+//    @Value("${spring.rabbitmq.listener.simple.auto-startup}")
+//    private boolean autoStartup;
 
     @Autowired
     private RabbitProgrammingContestProperties rabbitConfig;
@@ -57,21 +56,39 @@ public class RabbitProgrammingContestConfig {
     // Configuration setting:
     // https://docs.spring.io/spring-amqp/docs/current/reference/html/#containerAttributes
     @Bean
-    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
+    public SimpleRabbitListenerContainerFactory judgeProblemListenerContainerFactory(ConnectionFactory connectionFactory) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
 
-        factory.setAutoStartup(autoStartup);
+        factory.setAutoStartup(rabbitConfig.getJudgeProblem().isAutoStartup());
         factory.setConnectionFactory(connectionFactory);
         factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
         factory.setMessageConverter(jsonMessageConverter());
-        factory.setConcurrentConsumers(rabbitConfig.getConcurrentConsumers());
-        factory.setMaxConcurrentConsumers(rabbitConfig.getMaxConcurrentConsumers());
-        factory.setPrefetchCount(rabbitConfig.getPrefetchCount());
+        factory.setConcurrentConsumers(rabbitConfig.getJudgeProblem().getConcurrentConsumers());
+        factory.setMaxConcurrentConsumers(rabbitConfig.getJudgeProblem().getMaxConcurrentConsumers());
+        factory.setPrefetchCount(rabbitConfig.getJudgeProblem().getPrefetchCount());
         // factory.setChannelTransacted(true); //try if there are faults, but this will
         // slow down the process
 
         return factory;
     }
+
+    @Bean
+    public SimpleRabbitListenerContainerFactory judgeCustomProblemListenerContainerFactory(ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+
+        factory.setAutoStartup(rabbitConfig.getJudgeCustomProblem().isAutoStartup());
+        factory.setConnectionFactory(connectionFactory);
+        factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
+        factory.setMessageConverter(jsonMessageConverter());
+        factory.setConcurrentConsumers(rabbitConfig.getJudgeCustomProblem().getConcurrentConsumers());
+        factory.setMaxConcurrentConsumers(rabbitConfig.getJudgeCustomProblem().getMaxConcurrentConsumers());
+        factory.setPrefetchCount(rabbitConfig.getJudgeCustomProblem().getPrefetchCount());
+        // factory.setChannelTransacted(true); //try if there are faults, but this will
+        // slow down the process
+
+        return factory;
+    }
+
 
     @Bean
     public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
@@ -126,7 +143,7 @@ public class RabbitProgrammingContestConfig {
         args.put("x-queue-type", "quorum");
         args.put("x-dead-letter-exchange", EXCHANGE);
         args.put("x-dead-letter-routing-key", ProblemContestRoutingKey.JUDGE_PROBLEM);
-        args.put("x-message-ttl", rabbitConfig.getDeadMessageTtl());
+        args.put("x-message-ttl", rabbitConfig.getJudgeProblem().getDeadMessageTtl());
 
         return new Queue(JUDGE_PROBLEM_DEAD_LETTER_QUEUE, true, false, false, args);
     }
@@ -137,7 +154,7 @@ public class RabbitProgrammingContestConfig {
         args.put("x-queue-type", "quorum");
         args.put("x-dead-letter-exchange", EXCHANGE);
         args.put("x-dead-letter-routing-key", ProblemContestRoutingKey.JUDGE_CUSTOM_PROBLEM);
-        args.put("x-message-ttl", rabbitConfig.getDeadMessageTtl());
+        args.put("x-message-ttl", rabbitConfig.getJudgeCustomProblem().getDeadMessageTtl());
 
         return new Queue(JUDGE_CUSTOM_PROBLEM_DEAD_LETTER_QUEUE, true, false, false, args);
     }

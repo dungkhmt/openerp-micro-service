@@ -19,6 +19,7 @@ import { TaskPriority } from "../../components/task/priority";
 import { TaskStatus } from "../../components/task/status";
 import { useTaskContext } from "../../hooks/useTaskContext";
 import { getDueDateColor, getProgressColor } from "../../utils/color.util";
+import { useParams } from "react-router";
 
 const TitleWrapper = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -31,13 +32,14 @@ const TitleWrapper = styled(Box)(({ theme }) => ({
 
 const TaskViewRight = () => {
   const { task } = useTaskContext();
+  const { id: projectId } = useParams();
   const { project } = useSelector((state) => state.project);
   const {
     category: categoryStore,
     priority: priorityStore,
     status: statusStore,
   } = useSelector((state) => state);
-
+  
   const category = categoryStore.categories.find(
     (c) => c.categoryId === task.categoryId
   );
@@ -63,7 +65,7 @@ const TaskViewRight = () => {
           <Typography
             variant="body2"
             component={Link}
-            to={`/project/${project.id}`}
+            to={`/project/${projectId}`}
             sx={{
               color: "text.primary",
               textDecoration: "none",
@@ -75,6 +77,36 @@ const TaskViewRight = () => {
           >
             {project.name ?? "Không xác định"}
           </Typography>
+        </Box>
+
+        {/* event */}
+        <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
+        <Box sx={{ mb: 2 }}>
+          <TitleWrapper>
+            <Icon icon="pixelarticons:group"></Icon>
+            <Typography sx={{ fontWeight: 600, fontSize: "0.875rem" }}>
+              Sự kiện
+            </Typography>
+          </TitleWrapper>
+          {task.event ? (
+            <Typography
+              variant="body2"
+              component={Link}
+              to={`/project/${projectId}/event/${task.event.id}`}
+              sx={{
+                color: "text.primary",
+                textDecoration: "none",
+                "&:hover": {
+                  color: "primary.main",
+                  textDecoration: "underline",
+                },
+              }}
+            >
+              {task.event.name ?? ""}
+            </Typography>
+          ) : (
+            <Typography> - </Typography>
+          )}
         </Box>
 
         {/* assignees */}
@@ -93,7 +125,7 @@ const TaskViewRight = () => {
           }}
         >
           <TitleWrapper>
-            <Icon icon="iwwa:assign"></Icon>
+            <Icon icon="ci:user-02"></Icon>
             <Typography sx={{ mr: 2, fontWeight: 600, fontSize: "0.875rem" }}>
               Phân công cho
             </Typography>

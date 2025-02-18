@@ -12,6 +12,7 @@ export default function GeneralTimeTablingRouter() {
     <div>
       <Switch>
         <Route
+          //component={GeneralPlanClassOpenScreenV2}
           component={GeneralPlanClassOpenScreen}
           exact
           path={`${path}/plan-class-open`}

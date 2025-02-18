@@ -60,7 +60,7 @@ MENUS.push(scheduleInformation);
 //MENUS.push(courseTimeTabling);
 MENUS.push(generalTimeTabling);
 //MENUS.push(firstYearTimeTabling);
-//MENUS.push(computerLabTimeTabling);
+MENUS.push(computerLabTimeTabling);
 MENUS.push(taRecruitment);
 //MENUS.push(ThesisDefensePlanManagement);
 //MENUS.push(ThesisDefensePlanStudent);

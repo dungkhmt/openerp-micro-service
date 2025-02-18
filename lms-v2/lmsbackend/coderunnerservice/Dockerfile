@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:1
 
 # JDK is required to provide compiler
-FROM eclipse-temurin:8-jdk as build
+FROM eclipse-temurin:8-jdk AS build
 WORKDIR /workspace/app
 
 # Split source code into four layers
@@ -13,6 +13,9 @@ RUN chmod +x mvnw
 COPY .mvn .mvn
 COPY pom.xml .
 COPY src src
+
+COPY --from=leanhtuan/judge0-client:latest /root/.m2/repository/vn /root/.m2/repository/vn
+RUN rm -f /root/.m2/repository/vn/edu/hust/soict/judge0-client/0.0.1/_remote.repositories
 
 RUN ./mvnw install -DskipTests
 

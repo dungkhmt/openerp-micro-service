@@ -1,9 +1,7 @@
 package com.hust.baseweb.util.stringhandler;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
@@ -11,14 +9,28 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProblemSubmission {
-    private String status;
-    private String message;
-    private Long runtime;
-    private String testCasePass;
-    private int nbTestCasePass;
-    private int score;
-    private List<String> testCaseAns;
-    private List<String> participantAns;
-    private String scoreEvaluationType;
+
+    String status;
+
+    String compileOutput;
+
+    Long runtime;
+
+    Float memory;
+
+    String testCasePass;
+
+    int nbTestCasePass;
+
+    int score;
+
+    List<String> testCaseAns;
+
+    List<String> participantAns; // List only for judging parallel, but currently only judge sequentially
+
+    String stderr;
+
+    String scoreEvaluationType;
 }

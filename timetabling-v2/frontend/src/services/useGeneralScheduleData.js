@@ -25,13 +25,11 @@ export const useGeneralSchedule = () => {
     },
     {
       enabled: !!selectedSemester,
-      staleTime: 5 * 60 * 1000, // Data becomes stale after 5 minutes
-      cacheTime: 5 * 60 * 1000, // Cache for 5 minutes
-      refetchInterval: 30 * 1000, // Poll every 30 seconds
-      refetchIntervalInBackground: true, // Continue polling when tab is in background
-      refetchOnWindowFocus: true,
-      refetchOnMount: true,
-      refetchOnReconnect: true,
+      staleTime: Infinity, // Keep data fresh indefinitely
+      cacheTime: 30 * 60 * 1000, // Cache for 30 minutes
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
       retry: 2,
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
       select: (data) => {
@@ -39,54 +37,25 @@ export const useGeneralSchedule = () => {
         
         let generalClasses = [];
         data.forEach((classObj) => {
-          if (classObj.timeSlots && classObj.timeSlots.length > 0) {
-            // If there's only 1 timeSlot, it gets all the duration
-            if (classObj.timeSlots.length === 1) {
-              const cloneObj = JSON.parse(JSON.stringify({
-                ...classObj,
-                ...classObj.timeSlots[0],
-                classCode: classObj.classCode,
-                roomReservationId: classObj.timeSlots[0].id,
-                id: classObj.id + `-1`,
-                crew: classObj.crew,
-                duration: classObj.duration, // Use parent's full duration
-                isChild: true,
-                parentId: classObj.id
-              }));
-              delete cloneObj.timeSlots;
-              generalClasses.push(cloneObj);
-            } else {
-              // If multiple timeSlots, first one gets remaining duration
-              let usedDuration = classObj.timeSlots.slice(1).reduce((total, slot) => 
-                total + (slot.duration || 0), 0);
-              
-              // Process first timeSlot with remaining duration
-              const firstSlot = classObj.timeSlots[0];
-              const remainingDuration = Math.max(0, (classObj.duration || 0) - usedDuration);
-              
-              // Add first timeSlot with remaining duration
-              const firstCloneObj = JSON.parse(JSON.stringify({
-                ...classObj,
-                ...firstSlot,
-                classCode: classObj.classCode,
-                roomReservationId: firstSlot.id,
-                id: classObj.id + `-1`,
-                crew: classObj.crew,
-                duration: remainingDuration,
-                isChild: true,
-                parentId: classObj.id
-              }));
-              delete firstCloneObj.timeSlots;
-              generalClasses.push(firstCloneObj);
+          // Calculate total used duration from timeSlots
+          const usedDuration = classObj.timeSlots?.reduce((total, slot) => {
+            return total + (slot.duration || 0);
+          }, 0) || 0;
 
-              // Process remaining timeSlots with their original duration
-              classObj.timeSlots.slice(1).forEach((timeSlot, index) => {
+          // Calculate remaining duration for parent class
+          const remainingDuration = classObj.duration - usedDuration;
+
+          // Handle child classes (time slots)
+          if (classObj.timeSlots && classObj.timeSlots.length > 0) {
+            // Only add valid child classes (with duration not null)
+            classObj.timeSlots.forEach((timeSlot, index) => {
+              if (timeSlot.duration !== null) {
                 const cloneObj = JSON.parse(JSON.stringify({
                   ...classObj,
                   ...timeSlot,
                   classCode: classObj.classCode,
                   roomReservationId: timeSlot.id,
-                  id: classObj.id + `-${index + 2}`,
+                  id: classObj.id + `-${index + 1}`,
                   crew: classObj.crew,
                   duration: timeSlot.duration,
                   isChild: true,
@@ -94,18 +63,39 @@ export const useGeneralSchedule = () => {
                 }));
                 delete cloneObj.timeSlots;
                 generalClasses.push(cloneObj);
-              });
-            }
+              }
+            });
+          }
+
+          // Only add parent class if it has duration or has no timeSlots
+          if (classObj.duration !== null || !classObj.timeSlots?.length) {
+            generalClasses.push({
+              ...classObj,
+              generalClassId: String(classObj.generalClassId || classObj.id || ''),
+              duration: remainingDuration,
+              isParent: true
+            });
           }
         });
 
-        // Sort by parentId and maintain order of slots
-        return generalClasses.sort((a, b) => {
-          if (a.parentId !== b.parentId) {
-            return a.parentId - b.parentId;
+        // Sort to group parent-child together
+        generalClasses.sort((a, b) => {
+          // First sort by parent ID to group families together
+          const parentIdA = a.parentId || a.id;
+          const parentIdB = b.parentId || b.id;
+          
+          if (parentIdA !== parentIdB) {
+            return parentIdA - parentIdB;
           }
-          return a.id.localeCompare(b.id);
+          
+          // Then put parents before children
+          if (a.isParent && !b.isParent) return -1;
+          if (!a.isParent && b.isParent) return 1;
+          
+          return 0;
         });
+
+        return generalClasses;
       }
     }
   );
@@ -118,18 +108,11 @@ export const useGeneralSchedule = () => {
     ),
     {
       enabled: !!selectedSemester,
-      staleTime: 0, // Data becomes stale after 5 minutes
-      cacheTime: 0, // Cache for 5 minutes
-      refetchInterval: 30 * 1000, // Poll every 30 seconds
-      refetchIntervalInBackground: true,
-      refetchOnWindowFocus: true
+      staleTime: Infinity,
+      cacheTime: 30 * 60 * 1000,
+      refetchOnWindowFocus: false
     }
   );
-
-  const refreshData = useCallback(() => {
-    queryClient.invalidateQueries(["generalClasses", selectedSemester?.semester, selectedGroup?.groupName]);
-    queryClient.invalidateQueries(["generalClassesNoSchedule", selectedSemester?.semester, selectedGroup?.groupName]);
-  }, [queryClient, selectedSemester, selectedGroup]);
 
   const forceRefetch = useCallback(() => {
     setLoading(true);
@@ -142,9 +125,8 @@ export const useGeneralSchedule = () => {
         ["generalClasses", selectedSemester?.semester, selectedGroup?.groupName],
         data
       );
-      refreshData(); // Also refresh related data
     }).finally(() => setLoading(false));
-  }, [selectedSemester, selectedGroup, queryClient, refreshData]);
+  }, [selectedSemester, selectedGroup, queryClient]);
 
   const resetMutation = useMutation(
     ({ semester, ids }) => generalScheduleRepository.resetSchedule(semester, ids),
@@ -349,19 +331,6 @@ export const useGeneralSchedule = () => {
     }
   );
 
-  const deleteByIdsMutation = useMutation(
-    (ids) => generalScheduleRepository.deleteByIds(ids),
-    {
-      onSuccess: () => {
-        forceRefetch();
-        toast.success('Xóa các lớp đã chọn thành công!');
-      },
-      onError: (error) => {
-        toast.error(error.response?.data || 'Có lỗi khi xóa các lớp đã chọn!');
-      }
-    }
-  );
-
   const handleRefreshClasses = useCallback(() => {
     forceRefetch();
   }, [forceRefetch]);
@@ -398,7 +367,6 @@ export const useGeneralSchedule = () => {
       classesNoSchedule,
       isClassesNoScheduleLoading,
       isDeletingBySemester: deleteBySemesterMutation.isLoading,
-      isDeletingByIds: deleteByIdsMutation.isLoading,
     },
     setters: {
       setSelectedSemester,
@@ -468,14 +436,6 @@ export const useGeneralSchedule = () => {
         }
         deleteBySemesterMutation.mutate(selectedSemester.semester);
       },
-      handleDeleteByIds: (ids) => {
-        if (!ids || ids.length === 0) {
-          toast.error("Vui lòng chọn lớp cần xóa!");
-          return;
-        }
-        deleteByIdsMutation.mutate(ids);
-      },
-      refreshData,
     },
   };
 };
