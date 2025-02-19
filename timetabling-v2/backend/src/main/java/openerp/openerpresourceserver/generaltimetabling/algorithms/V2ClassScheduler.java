@@ -86,7 +86,8 @@ public class V2ClassScheduler {
                         d[idx] = rr.getDuration();//gc.getDuration();//gc.getQuantityMax();
                         c[idx] = gc.getCourse();
                         cls[idx] = gc.getId();//gc.getClassCode();
-                        vol[idx] = gc.getQuantityMax();
+                        vol[idx] = 0;
+                        if(gc.getQuantityMax() != null) vol[idx] = gc.getQuantityMax();
                         groupId[idx] = mGroupName2Index.get(gc.getGroupName());
                         parentClassId[idx] = gc.getParentClassId();
                         int start = -1;
@@ -218,14 +219,18 @@ public class V2ClassScheduler {
                 GeneralClass gClass = D.getMClassSegment2Class().get(i);
 
                 RoomReservation newRoomReservation = new RoomReservation(gClass.getCrew(), tietBD, tietBD + data.nbSlots[i] - 1, day + 2, null);
-
+                newRoomReservation.setDuration(data.getNbSlots()[i]);
                 newRoomReservation.setGeneralClass(gClass);
                 gClass.getTimeSlots().add(newRoomReservation);
 
+                int idxRoom = solver.getSolutionRoom()[i];
+                newRoomReservation.setRoom(rooms.get(idxRoom).getClassroom());
 
                 log.info("class[" + i + "] is assigned to slot " + solution[i] + "(" + day + "," + K + "," + tietBD + ")");
             }
-
+            //roomReservations.forEach(rr -> {
+            //    rr.setRoom(rooms.get(solver.getSolution()[roomReservations.indexOf(rr)]).getClassroom());
+            //});
         }
         return classes;
     }

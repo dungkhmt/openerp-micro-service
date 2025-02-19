@@ -55,6 +55,13 @@ public class GreedySolver {
     }
     public int[] getSolutionSlot(){ return solutionSlot;}
     public int[] getSolutionRoom(){ return solutionRoom;}
+
+    public void greedy2(){
+        // TO DO by Chau
+    }
+    public void greedy3(){
+        // TODO by Chau
+    }
     public void simpleGreedy(){
         unScheduledClassSegment = new ArrayList<>();
         for(int i = 0; i < I.getNbClassSegments(); i++){

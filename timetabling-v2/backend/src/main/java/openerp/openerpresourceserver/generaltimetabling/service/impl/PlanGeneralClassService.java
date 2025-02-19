@@ -43,7 +43,10 @@ public class PlanGeneralClassService {
         newClass.setModuleName(request.getModuleName());
         newClass.setMass(request.getMass());
         newClass.setCrew(request.getCrew());
-        newClass.setQuantityMax(request.getQuantityMax());
+        //newClass.setQuantityMax(request.getQuantityMax());
+        if(request.getLectureExerciseMaxQuantity()!=null) newClass.setQuantityMax(request.getLectureExerciseMaxQuantity());
+        if(request.getLectureMaxQuantity()!=null)newClass.setQuantityMax(request.getLectureMaxQuantity());
+        if(request.getExerciseMaxQuantity()!=null)newClass.setQuantityMax(request.getExerciseMaxQuantity());
         newClass.setLearningWeeks(request.getLearningWeeks());
         newClass.setDuration(request.getDuration());
         if (request.getClassType() != null && !request.getClassType().isEmpty()) {
@@ -75,7 +78,8 @@ public class PlanGeneralClassService {
         RoomReservation roomReservation =  new RoomReservation();
         roomReservation.setGeneralClass(newClass);
         roomReservations.add(roomReservation);
-
+        roomReservation.setDuration(request.getDuration());
+        roomReservation.setCrew(newClass.getCrew());
         newClass.setTimeSlots(roomReservations);
 
         return generalClassRepository.save(newClass);
