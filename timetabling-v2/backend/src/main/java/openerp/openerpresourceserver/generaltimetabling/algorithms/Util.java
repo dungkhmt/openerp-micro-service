@@ -6,17 +6,17 @@ import openerp.openerpresourceserver.generaltimetabling.model.Constant;
 import java.util.*;
 @Log4j2
 public class Util {
-    public static List<Integer> generateSLotSequence(String crew){
+    public static List<Integer> generateSLotSequence(String crew, int duration){
         int startCrew = 0; int endCrew = 1;
         if(crew != null){
             int fKIP = crew.equals("S") ? 0 : 1;
             startCrew = fKIP; endCrew = fKIP;
         }
-        log.info("generateSLotSequence, crew = " + crew + " start_crew = " + startCrew + " end_crew = " + endCrew);
+        //log.info("generateSLotSequence, crew = " + crew + " start_crew = " + startCrew + " end_crew = " + endCrew);
         List<Integer> res = new ArrayList<>();
         for(int d = 0; d < Constant.daysPerWeek; d++) {
             for(int fKIP = startCrew; fKIP <= endCrew; fKIP++){
-                for(int s = 1; s <= Constant.slotPerCrew; s++){
+                for(int s = 1; s <= Constant.slotPerCrew; s++)if(s + duration - 1 <= Constant.slotPerCrew){
                     int start = Constant.slotPerCrew * 2 * d
                             + Constant.slotPerCrew * fKIP + s;
                     res.add(start);
@@ -25,14 +25,15 @@ public class Util {
         }
         return res;
     }
-    public static List<Integer> toIntList(String s){
+    public static List<Integer> toIntList(String s, int duration){
         List<Integer> res = new ArrayList<>();
         if(s != null){
             String[] as = s.split(",");
             if(as != null && as.length > 0){
                 for(String si: as){
                     try{
-                        int x = Integer.valueOf(si); res.add(x);
+                        int x = Integer.valueOf(si);
+                        if(x + duration - 1 <= Constant.slotPerCrew) res.add(x);
                     }catch (Exception e){
                         return res;
                     }
@@ -41,7 +42,7 @@ public class Util {
         }
         return res;
     }
-    public static List<Integer> generateSlots(String daySeq, String slotSeq, String crew){
+    public static List<Integer> generateSlots(String daySeq, String slotSeq, String crew, int duration){
         int startCrew = 0; int endCrew = 1;
         if(crew != null){
             int fKIP = crew.equals("S") ? 0 : 1;
@@ -54,6 +55,7 @@ public class Util {
         Set<Integer> allSlots = new HashSet();
         for(int d = 2; d <= 8; d++) allDays.add(d);
         for(int sl = 1; sl <= Constant.slotPerCrew;sl++) allSlots.add(sl);
+
         List<Integer> days = new ArrayList();
         if(daySeq != null) {
             String[] sd = daySeq.split(",");
@@ -65,7 +67,7 @@ public class Util {
             }
         }
         for(int di: allDays){
-            if(days.contains(di)) days.add(di);
+            if(!days.contains(di)) days.add(di);
         }
         List<Integer> slots = new ArrayList();
         if(slotSeq != null) {
@@ -77,16 +79,21 @@ public class Util {
                 }
             }
         }
+        //log.info("mapData, slots = " + slots);
         for(int si: allSlots){
             if(!slots.contains(si)) slots.add(si);
         }
+        //log.info("mapData, allSlots = "  + allSlots + " -> slots = " + slots + ", days = " + days);
 
         List<Integer> res = new ArrayList<>();
         for(int d: days){
             for(int fKIP = startCrew; fKIP <= endCrew; fKIP++) {
-                for (int s : slots) {
+                for (int s : slots) if(s + duration - 1 <= Constant.slotPerCrew){
+
                     int start = Constant.slotPerCrew * 2 * (d - 2)
                             + Constant.slotPerCrew * fKIP + s;
+
+                    //log.info("mapData,d = " + d + ", s = " + s + ", duration = " + duration + " -> start = " + start);
                     res.add(start);
                 }
             }

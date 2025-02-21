@@ -37,7 +37,7 @@ public class RoomOccupationMapper {
             for(RoomReservation rr: generalClass.getTimeSlots()){
                 RoomOccupation ro = new RoomOccupation();
                 ro.setClassRoom(rr.getRoom());
-                log.info("mapFromGeneralClassV2, class " + rr.getId() + " has room " + rr.getRoom());
+                //log.info("mapFromGeneralClassV2, class " + rr.getId() + " has room " + rr.getRoom());
                 ro.setCrew(rr.getCrew());
                 ro.setDayIndex(rr.getWeekday());
                 ro.setWeekIndex(w);

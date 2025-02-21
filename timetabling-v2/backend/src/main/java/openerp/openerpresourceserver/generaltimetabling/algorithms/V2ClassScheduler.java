@@ -55,11 +55,11 @@ public class V2ClassScheduler {
             for(int i = 0; i < classes.size(); i++){
                 GeneralClass gc = classes.get(i);
                 String group = gc.getGroupName();
-                log.info("mapData, group " + group);
+                //log.info("mapData, group " + group);
                 if(mGroupName2Index.get(group)==null){
                     groupIdx++;
                     mGroupName2Index.put(group,groupIdx);
-                    log.info("mapData, put(" + group + "," + groupIdx);
+                    //log.info("mapData, put(" + group + "," + groupIdx);
                 }
             }
             int[] indexOfClass = new int[n];// indexOfClass[j] : index of the class of the class-segment (RoomReservation) j
@@ -125,17 +125,19 @@ public class V2ClassScheduler {
                             D[idx].add(s);// time-slot is assigned in advance
                         } else {
                             if(gr != null){
-                                List<Integer> L = Util.generateSlots(gr.getDaySeq(),gr.getSlotSeq(),gc.getCrew());
+                                List<Integer> L = Util.generateSlots(gr.getDaySeq(),gr.getSlotSeq(),gc.getCrew(),d[i]);
+                                //log.info("mapData, compute D[" + i + "], daySeq = " + gr.getDaySeq() + ", slotSeq = " + gr.getSlotSeq() + ", crew = " + gc.getCrew() + " got L= " + L);
                                 TimeTablingCourse crs = mId2Course.get(gc.getCourse());
                                 List<Integer> LP = new ArrayList<>();
                                 if(crs != null){
-                                    LP = Util.toIntList(crs.getSlotPriority());
+                                    LP = Util.toIntList(crs.getSlotPriority(),d[i]);
                                 }
                                 D[i] = Util.shift(L,LP);
+                                //log.info("mapData, compute D[" + i + "], LP = " + LP +", D = " + D);
                             }else{
-                                D[i] = Util.generateSLotSequence(gc.getCrew());
+                                D[i] = Util.generateSLotSequence(gc.getCrew(),d[i]);
                             }
-                            log.info("mapData, class-segment[" + i + "] of class " + gc.getClassCode() + " of course " + gc.getCourse() + " has Domain " + D[i]);
+                            //log.info("mapData, class-segment[" + i + "] of class " + gc.getClassCode() + " of course " + gc.getCourse() + " has Domain " + D[i]);
                             /*
                             int fKIP = gc.getCrew().equals("S") ? 0 : 1;
                             for (int fday : days) {
@@ -240,10 +242,13 @@ public class V2ClassScheduler {
             }
 
             for (int i = 0; i < data.nbClassSegments; i++) {
-                int day = solution[i] / Constant.slotPerCrew*2;//12;
-                int t1 = solution[i] - day * Constant.slotPerCrew;//12;
+                int day = solution[i] / (Constant.slotPerCrew*2);//12;
+                int t1 = solution[i] - day * Constant.slotPerCrew*2;//12;
                 int K = t1 / Constant.slotPerCrew;//6; // kip
                 int tietBD = t1 - Constant.slotPerCrew * K;
+                //log.info("autoScheduleTimeSlotRoom, slot solution[" + i + "] = " + solution[i] + ", day = " + day + ", t1 = " + t1 + " kip = " + K + ", tietDB = " + tietBD);
+
+
                 //GeneralClass gClass = classes.get(scheduleMap.get(i));
 
                 GeneralClass gClass = D.getMClassSegment2Class().get(i);
@@ -256,7 +261,7 @@ public class V2ClassScheduler {
                 int idxRoom = solver.getSolutionRoom()[i];
                 newRoomReservation.setRoom(rooms.get(idxRoom).getClassroom());
 
-                log.info("class[" + i + "] is assigned to slot " + solution[i] + "(" + day + "," + K + "," + tietBD + "), room = " + idxRoom + " - " + newRoomReservation.getRoom());
+                //log.info("class[" + i + "] is assigned to slot " + solution[i] + "(" + day + "," + K + "," + tietBD + "), room = " + idxRoom + " - " + newRoomReservation.getRoom());
             }
             //roomReservations.forEach(rr -> {
             //    rr.setRoom(rooms.get(solver.getSolution()[roomReservations.indexOf(rr)]).getClassroom());
