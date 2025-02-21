@@ -43,12 +43,13 @@ public class ProjectServiceImplement implements ProjectService {
 
     @Override
     public ProjectDTO getProjectById(UUID projectId, String userId) {
+        var project = projectRepository.findById(projectId).orElseThrow(
+                () -> new ApiException(ErrorCode.PROJECT_NOT_FOUND));
+        
         boolean isMember = projectMemberService.checkAddedMemberInProject(userId, projectId);
         if (!isMember) {
             throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_PROJECT);
         }
-        var project = projectRepository.findById(projectId).orElseThrow(
-                () -> new ApiException(ErrorCode.PROJECT_NOT_EXIST));
         // FIXME: add the role to the response (maybe not necessary)
         return mapper.map(project, ProjectDTO.class);
     }
@@ -105,7 +106,7 @@ public class ProjectServiceImplement implements ProjectService {
         var project = projectRepository.findById(id).orElseThrow(
                 () -> new ApiException(ErrorCode.PROJECT_NOT_EXIST));
         if (!project.getCreatedUserId().equals(deleterId)) {
-            throw new ApiException(ErrorCode.NOT_OWNER_OF_PROJECT);
+            throw new ApiException(ErrorCode.INSUFFICIENT_PERMISSIONS);
         }
         projectRepository.deleteById(id);
     }

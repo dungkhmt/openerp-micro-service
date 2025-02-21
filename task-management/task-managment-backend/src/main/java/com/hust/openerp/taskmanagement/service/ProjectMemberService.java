@@ -18,4 +18,6 @@ public interface ProjectMemberService {
     String getMemberRole(String memberId, UUID projectId);
     
     void deleteMemberFromProject(String userId, UUID projectId, String memberId, String roleId);
+    
+    ProjectMember updateMemberRole(String updaterId, ProjectMember projectMemberForm);
 }

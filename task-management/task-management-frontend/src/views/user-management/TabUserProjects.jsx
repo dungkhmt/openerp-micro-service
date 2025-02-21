@@ -175,6 +175,7 @@ const TabUserProjects = (user) => {
                   title="Clear"
                   aria-label="Clear"
                   onClick={() => setSearchValue("")}
+                  sx={{ padding: 0, marginRight: "-4px" }} 
                 >
                   <Icon icon="mdi:close" fontSize={20} />
                 </IconButton>

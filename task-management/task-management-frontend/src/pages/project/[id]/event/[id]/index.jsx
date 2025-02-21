@@ -330,7 +330,7 @@ const Event = () => {
   ) {
     return <CircularProgressLoading />;
   }
-  console.log(event);
+
   return (
     <>
       <Helmet>

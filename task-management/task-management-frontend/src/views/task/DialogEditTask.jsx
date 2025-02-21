@@ -40,6 +40,7 @@ import ItemSelector from "../../components/mui/dialog/ItemSelector";
 import { useDispatch } from "react-redux";
 import { fetchEvents } from "../../store/project/events";
 import { useParams } from "react-router";
+import { clearCache } from "../../store/project/tasks";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />;
@@ -154,8 +155,8 @@ const DialogEditTask = ({ open, setOpen }) => {
       await TaskService.updateTaskSkills(task.id, skillIdList);
 
       const originalEventId = task.event ? task.event.id : null;
-      if (updatedEventId !== originalEventId) await dispatch(fetchEvents(id));
-
+      if (updatedEventId !== originalEventId) dispatch(fetchEvents(id));
+      dispatch(clearCache());
       toast.success("Cập nhật nhiệm vụ thành công");
       setIsUpdate(!isUpdate);
       setOpen(false);

@@ -1,1 +1,9 @@
-{}
+{
+  "Access denied": "Truy cập bị từ chối",
+  "You are not a member of this project, please contact the administrator to be added to the project": 
+    "Bạn không phải là thành viên của dự án này. Vui lòng liên hệ với quản trị viên để được thêm vào dự án",
+  "You are the last owner, please assign a new owner before leaving the project": 
+    "Bạn là chủ sở hữu cuối cùng. Vui lòng chỉ định chủ sở hữu mới trước khi rời dự án",
+  "You do not have sufficient permissions to perform this action": "Bạn không có quyền thực hiện hành động này"
+}
+  

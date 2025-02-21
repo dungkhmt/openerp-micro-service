@@ -249,6 +249,7 @@ const TabUserTasks = (user) => {
                   title="Clear"
                   aria-label="Clear"
                   onClick={() => setSearch("")}
+                  sx={{ padding: 0, marginRight: "-4px" }} 
                 >
                   <Icon icon="mdi:close" fontSize={20} />
                 </IconButton>

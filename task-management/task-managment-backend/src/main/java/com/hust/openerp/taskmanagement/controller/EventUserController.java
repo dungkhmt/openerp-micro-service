@@ -35,10 +35,4 @@ public class EventUserController {
         return eventUserService.getEventUsers(principal.getName(), eventId);
     }
 
-    @PostMapping
-    public void addUserToEvent(Principal principal, 
-    		@RequestBody@Valid EventUserForm eventUsers) {
-        eventUserService.addUserToEvent(principal.getName(), eventUsers);
-    }
-
 }

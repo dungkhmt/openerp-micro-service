@@ -165,7 +165,7 @@ const UserManagementView = () => {
       <Grid
         item
         md={4}
-        xs={12}
+        xs={4}
         sx={{ height: "100%", display: "flex", flexDirection: "column" }}
       >
         <Card
@@ -179,33 +179,40 @@ const UserManagementView = () => {
           <Box
             sx={{
               display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
               justifyContent: "space-between",
+              alignItems: { xs: "flex-start", sm: "center" },
               mb: 3,
               mt: 3,
               px: 2,
+              gap: 2,
             }}
           >
-            <Typography variant="h6" sx={{ ml: 2 }}>
+            {/* Title Section */}
+            <Typography variant="h6" sx={{ ml: { xs: 0, sm: 2 } }}>
               <span>All users</span>
               <span style={{ color: "grey" }}> {filterUsers.length}</span>
             </Typography>
+
+            {/* Search Bar */}
             <Box
               sx={{
                 display: "flex",
-                flexWrap: "wrap",
                 alignItems: "center",
-                gap: 3,
+                width: { xs: "100%", sm: "auto" }, 
               }}
             >
               <TextField
                 size="small"
                 value={search}
                 sx={{
+                  flexGrow: 1, 
+                  maxWidth: { xs: "100%", sm: "250px" }, 
                   "& .MuiInputBase-root": {
                     height: "34px",
                     fontSize: "14px",
-                    width: "160px",
                     borderRadius: "20px",
+                    width: "100%", 
                   },
                 }}
                 placeholder="Search User"
@@ -217,6 +224,7 @@ const UserManagementView = () => {
                       title="Clear"
                       aria-label="Clear"
                       onClick={() => setSearch("")}
+                      sx={{ padding: 0, marginRight: "-4px" }} 
                     >
                       <Icon icon="mdi:close" fontSize={20} />
                     </IconButton>
@@ -225,6 +233,7 @@ const UserManagementView = () => {
               />
             </Box>
           </Box>
+
           <DataGrid
             rows={filterUsers.map((user) => ({
               ...user,
@@ -239,7 +248,7 @@ const UserManagementView = () => {
       <Grid
         item
         md={8}
-        xs={12}
+        xs={8}
         sx={{ height: "100%", display: "flex", flexDirection: "column" }}
       >
         <Card
@@ -278,7 +287,8 @@ const UserManagementView = () => {
                 Select a User
               </Typography>
               <Typography variant="body1" color="textSecondary">
-                Please select a user to display their assigned tasks and projects
+                Please select a user to display their assigned tasks and
+                projects
               </Typography>
             </Box>
           )}

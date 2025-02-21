@@ -124,7 +124,7 @@ const ItemSelector = ({
             },
           }}
         >
-          {selectedItems.length > 0 ? (
+          {selectedItems?.length > 0 ? (
             <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1}}>
               {renderSelectedItem(selectedItems)}
             </Box>
