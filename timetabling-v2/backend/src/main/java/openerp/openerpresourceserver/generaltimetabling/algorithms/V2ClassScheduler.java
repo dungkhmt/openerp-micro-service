@@ -10,7 +10,10 @@ import openerp.openerpresourceserver.generaltimetabling.exception.InvalidClassSt
 import openerp.openerpresourceserver.generaltimetabling.exception.InvalidFieldException;
 import openerp.openerpresourceserver.generaltimetabling.exception.NotFoundException;
 import openerp.openerpresourceserver.generaltimetabling.helper.MassExtractor;
+import openerp.openerpresourceserver.generaltimetabling.model.Constant;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.Group;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.TimeTablingCourse;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.TimeTablingRoom;
@@ -37,7 +40,7 @@ public class V2ClassScheduler {
 
 
 
-    public MapDataScheduleTimeSlotRoomWrapper mapData(List<GeneralClass> classes, List<Classroom> rooms){
+    public MapDataScheduleTimeSlotRoomWrapper mapData(List<GeneralClass> classes, List<Classroom> rooms,List<TimeTablingCourse> ttcourses, List<Group> groups){
 
             int n = 0;
             Map<Integer, GeneralClass> mClassSegment2Class = new HashMap();
@@ -74,8 +77,18 @@ public class V2ClassScheduler {
             int idx = -1;
             //int[] days = {0, 2, 4, 1, 3};
             int[] days = {0, 1, 2, 3, 4, 5};
+            Map<String, Group> mId2Group = new HashMap();
+            for(Group g: groups){
+                mId2Group.put(g.getGroupName(),g);
+            }
+            Map<String, TimeTablingCourse> mId2Course = new HashMap();
+            for(TimeTablingCourse course: ttcourses){
+                mId2Course.put(course.getId(),course);
+            }
             for (int i = 0; i < classes.size(); i++) {
                 GeneralClass gc = classes.get(i);
+                Group gr = mId2Group.get(gc.getGroupName());
+
                 //log.info("mapData, gc[" + i + "] crew = " + gc.getCrew());
                 if (gc.getTimeSlots() != null) {
                     for (int j = 0; j < gc.getTimeSlots().size(); j++) {
@@ -108,19 +121,32 @@ public class V2ClassScheduler {
                             else KIP = 1;
                         }
                         if (start > 0 && end > 0 && day > 0) {
-                            int s = 12 * day + 6 * KIP + start;
+                            int s = Constant.slotPerCrew * day + Constant.slotPerCrew * KIP + start;
                             D[idx].add(s);// time-slot is assigned in advance
                         } else {
+                            if(gr != null){
+                                List<Integer> L = Util.generateSlots(gr.getDaySeq(),gr.getSlotSeq(),gc.getCrew());
+                                TimeTablingCourse crs = mId2Course.get(gc.getCourse());
+                                List<Integer> LP = new ArrayList<>();
+                                if(crs != null){
+                                    LP = Util.toIntList(crs.getSlotPriority());
+                                }
+                                D[i] = Util.shift(L,LP);
+                            }else{
+                                D[i] = Util.generateSLotSequence(gc.getCrew());
+                            }
+                            log.info("mapData, class-segment[" + i + "] of class " + gc.getClassCode() + " of course " + gc.getCourse() + " has Domain " + D[i]);
+                            /*
                             int fKIP = gc.getCrew().equals("S") ? 0 : 1;
-
                             for (int fday : days) {
                                 log.info("fKIP = " + fKIP + " fday =  + fday");
-                                for (int fstart = 1; fstart <= 6 - d[idx] + 1; fstart++) {
-                                    int s = 12 * fday + 6 * fKIP + fstart;
+                                for (int fstart = 1; fstart <= Constant.slotPerCrew - d[idx] + 1; fstart++) {
+                                    int s = Constant.slotPerCrew*2 * fday + Constant.slotPerCrew * fKIP + fstart;
                                     D[idx].add(s);
                                     //log.info("mapData, D[" + idx + "].add(" + s + ")");
                                 }
                             }
+                            */
                         }
                     }
                 }
@@ -164,8 +190,12 @@ public class V2ClassScheduler {
         //data.print();
         return DW;
     }
-    public List<GeneralClass> autoScheduleTimeSlotRoom(List<GeneralClass> classes, List<Classroom> rooms, int timeLimit) {
-        MapDataScheduleTimeSlotRoomWrapper D = mapData(classes, rooms);
+    public List<GeneralClass> autoScheduleTimeSlotRoom(List<GeneralClass> classes, List<Classroom> rooms, List<TimeTablingCourse> ttcourses, List<Group> groups, int timeLimit) {
+        log.info("autoScheduleTimeSlotRoom, START....");
+        for(int i = 0; i < rooms.size(); i++){
+            log.info("autoScheduleTimeSlotRoom, room[" + i + "] = " + rooms.get(i).getClassroom());
+        }
+        MapDataScheduleTimeSlotRoomWrapper D = mapData(classes, rooms,ttcourses,groups);
         MapDataScheduleTimeSlotRoom data = D.data;
         //data.print();
         Gson gson = new Gson();
@@ -210,10 +240,10 @@ public class V2ClassScheduler {
             }
 
             for (int i = 0; i < data.nbClassSegments; i++) {
-                int day = solution[i] / 12;
-                int t1 = solution[i] - day * 12;
-                int K = t1 / 6; // kip
-                int tietBD = t1 - 6 * K;
+                int day = solution[i] / Constant.slotPerCrew*2;//12;
+                int t1 = solution[i] - day * Constant.slotPerCrew;//12;
+                int K = t1 / Constant.slotPerCrew;//6; // kip
+                int tietBD = t1 - Constant.slotPerCrew * K;
                 //GeneralClass gClass = classes.get(scheduleMap.get(i));
 
                 GeneralClass gClass = D.getMClassSegment2Class().get(i);
@@ -226,7 +256,7 @@ public class V2ClassScheduler {
                 int idxRoom = solver.getSolutionRoom()[i];
                 newRoomReservation.setRoom(rooms.get(idxRoom).getClassroom());
 
-                log.info("class[" + i + "] is assigned to slot " + solution[i] + "(" + day + "," + K + "," + tietBD + ")");
+                log.info("class[" + i + "] is assigned to slot " + solution[i] + "(" + day + "," + K + "," + tietBD + "), room = " + idxRoom + " - " + newRoomReservation.getRoom());
             }
             //roomReservations.forEach(rr -> {
             //    rr.setRoom(rooms.get(solver.getSolution()[roomReservations.indexOf(rr)]).getClassroom());

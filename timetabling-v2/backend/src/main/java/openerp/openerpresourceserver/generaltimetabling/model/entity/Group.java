@@ -18,7 +18,15 @@ public class Group {
     @Column(name = "group_id", updatable = false, nullable = false)
     private Long id;
 
+    @Column(name="group_name")
     private String groupName;
 
+    @Column(name="priority_building")
     private String priorityBuilding;
+
+    @Column(name="slot_seq")
+    private String slotSeq;
+
+    @Column(name="day_seq")
+    private String daySeq;
 }

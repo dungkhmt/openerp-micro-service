@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.generaltimetabling.algorithms.cttt.greedy;
 
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
+import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.generaltimetabling.algorithms.MapDataScheduleTimeSlotRoom;
 import openerp.openerpresourceserver.generaltimetabling.algorithms.MapDataScheduleTimeSlotRoomOneGroup;
 
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 
+@Log4j2
 public class GreedySolver {
     MapDataScheduleTimeSlotRoom I;
     int[] solutionSlot;// solutionSlot[i] is the start time-slot assigned to class-segment i
@@ -73,6 +75,7 @@ public class GreedySolver {
                     if(foundSlotRoom) break;
                     if(check(i,s,r)){
                         solutionSlot[i]= s; solutionRoom[i] = r; foundSlotRoom = true;
+                        log.info("simpleGreedy, slot[" + i + "] = " + s + ", duration = " + I.getNbSlots()[i] + ", room[" + i + "] = " + r);
                     }
                 }
             }

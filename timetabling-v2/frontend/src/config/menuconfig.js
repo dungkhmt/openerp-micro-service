@@ -38,6 +38,8 @@ import { scheduleInformation } from "./menuconfig/scheduleInformation";
 // import {schedulePerformance} from "./menuconfig/schedulePerformance"
 import { courseTimeTabling } from "./menuconfig/courseTimeTabling";
 import { generalTimeTabling } from "./menuconfig/generalTimeTabling";
+import { ExamTimeTabling } from "./menuconfig/examTimeTabling";
+
 import { firstYearTimeTabling } from "./menuconfig/firstYearTimeTabling";
 import { computerLabTimeTabling } from "./menuconfig/computerLabTimeTabling";
 import { taRecruitment } from "./menuconfig/taRecruitment";
@@ -49,6 +51,7 @@ import { Schedule } from "@mui/icons-material/";
 import { AssetManagementAsset } from "./menuconfig/assetManagement";
 import {TrainingFrogCourse} from "./menuconfig/trainingprogcourse";
 
+
 export const MENUS = [];
 
 // MENUS.push(general);
@@ -56,9 +59,13 @@ export const MENUS = [];
 // MENUS.push(teacher);
 //MENUS.push(schedule);
 MENUS.push(scheduleInformation);
+
+
 // MENUS.push(schedulePerformance);
 //MENUS.push(courseTimeTabling);
 MENUS.push(generalTimeTabling);
+MENUS.push(ExamTimeTabling);
+
 //MENUS.push(firstYearTimeTabling);
 MENUS.push(computerLabTimeTabling);
 MENUS.push(taRecruitment);

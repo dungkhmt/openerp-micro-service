@@ -5,6 +5,7 @@ import GeneralPlanClassOpenScreen from "views/general-time-tabling/general-plan-
 import GeneralScheduleScreen from "views/general-time-tabling/general-schedule/GeneralScheduleScreen";
 import GeneralUploadScreen from "views/general-time-tabling/general-upload/GeneralUploadScreen";
 import RoomOccupationScreen from "views/general-time-tabling/room-occupation/RoomOccupationScreen";
+import ExamClassList from "views/exam-timetabling/ExamClassList";
 
 export default function GeneralTimeTablingRouter() {
   let { path } = useRouteMatch();
@@ -42,6 +43,13 @@ export default function GeneralTimeTablingRouter() {
           exact
           path={`${path}/find-empty-room`}
         ></Route>
+
+        <Route
+          component={ExamClassList}
+          exact
+          path={`exam-time-tabling/class-list`}
+        ></Route>
+
       </Switch>
     </div>
   );

@@ -16,12 +16,14 @@ import openerp.openerpresourceserver.generaltimetabling.model.dto.request.genera
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.V2UpdateClassScheduleRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Group;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.TimeTablingCourse;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.TimeTablingRoom;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 import openerp.openerpresourceserver.generaltimetabling.repo.*;
 import openerp.openerpresourceserver.generaltimetabling.service.GeneralClassService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,9 +48,16 @@ public class GeneralClassServiceImp implements GeneralClassService {
 
     private ClassroomRepo classroomRepo;
 
+    @Autowired
     private TimeTablingRoomRepo roomRepo;
 
+    @Autowired
     private GroupRoomPriorityRepo groupRoomPriorityRepo;
+
+    @Autowired
+    private TimeTablingCourseRepo timeTablingCourseRepo;
+
+
 
     @Override
     public List<GeneralClass> getGeneralClasses(String semester, String groupName) {
@@ -187,7 +196,7 @@ public class GeneralClassServiceImp implements GeneralClassService {
         if (!groupRepo.getAllByGroupName(groupName).isEmpty()) {
             throw new Exception("Group name has existed!");
         } else {
-            groupRepo.save(new Group(null, groupName, priorityBuilding));
+            groupRepo.save(new Group(null, groupName, priorityBuilding,null,null));
         }
         List<GeneralClass> generalClassList = new ArrayList<>();
         for (String id : ids) {
@@ -251,9 +260,16 @@ public class GeneralClassServiceImp implements GeneralClassService {
             List<GeneralClass> filteredGeneralClassList = new ArrayList<>();
             for (GeneralClass gClass : generalClassList) {
                 for (String idString : ids) {
-
-                    int gId = Integer.parseInt(idString.split("-")[0]);
-                    int timeSlotIndex = Integer.parseInt(idString.split("-")[1]) - 1;
+                    log.info("resetSchedule, idString = " + idString);
+                    int gId = 0; int timeSlotIndex = 0;
+                    if(idString.contains("-")) {
+                        gId = Integer.parseInt(idString.split("-")[0]);
+                        timeSlotIndex = Integer.parseInt(idString.split("-")[1]) - 1;
+                    }else{
+                        gId = Integer.parseInt(idString);
+                        timeSlotIndex = 0;
+                    }
+                    log.info("resetSchedule, gId = " + gId + " timeSlotIndex = " + timeSlotIndex);
                     if (gId == gClass.getId()) {
                         RoomReservation timeSlot = gClass.getTimeSlots().get(timeSlotIndex);
                         if (timeSlot.isScheduleNotNull()) {
@@ -263,12 +279,14 @@ public class GeneralClassServiceImp implements GeneralClassService {
                         timeSlot.setStartTime(null);
                         timeSlot.setEndTime(null);
                         timeSlot.setRoom(null);
+                        log.info("resetSchedule, class-segment " + timeSlot.getId() + " -> set NULL");
                         if (!filteredGeneralClassList.contains(gClass)) {
                             filteredGeneralClassList.add(gClass);
                         }
                     }
                 }
             }
+            log.info("resetSchedule, filterGeneralClassList = " + filteredGeneralClassList.size());
             gcoRepo.saveAll(filteredGeneralClassList);
             ids.forEach(System.out::println);
             filteredGeneralClassList.forEach(System.out::println);
@@ -317,19 +335,28 @@ public class GeneralClassServiceImp implements GeneralClassService {
 
     @Override
     public List<GeneralClass> autoSchedule(String semester, int timeLimit) {
-        log.debug("autoSchedule START....");
+        log.info("autoSchedule START....");
         List<GeneralClass> foundClasses = gcoRepo.findAllBySemester(semester);
         //List<GeneralClass> autoScheduleClasses = V2ClassScheduler.autoScheduleTimeSlot(foundClasses, timeLimit);
         V2ClassScheduler optimizer = new V2ClassScheduler();
         List<Classroom> rooms = classroomRepo.findAll();
-        List<GeneralClass> autoScheduleClasses = optimizer.autoScheduleTimeSlotRoom(foundClasses,rooms,timeLimit);
+        List<TimeTablingCourse> courses = timeTablingCourseRepo.findAll();
+        List<Group> groups = groupRepo.findAll();
+
+        List<GeneralClass> autoScheduleClasses = optimizer.autoScheduleTimeSlotRoom(foundClasses,rooms,courses, groups,timeLimit);
 
         /*Save the scheduled timeslot of the classes*/
         gcoRepo.saveAll(autoScheduleClasses);
         roomOccupationRepo.deleteAllByClassCodeIn(foundClasses.stream().map(GeneralClass::getClassCode).toList());
 
         List<String> classCodes = autoScheduleClasses.stream().map(GeneralClass::getClassCode).toList();
-        List<RoomOccupation> newRoomOccupations = autoScheduleClasses.stream().map(RoomOccupationMapper::mapFromGeneralClass).flatMap(Collection::stream).toList();
+        //List<RoomOccupation> newRoomOccupations = autoScheduleClasses.stream().map(RoomOccupationMapper::mapFromGeneralClass).flatMap(Collection::stream).toList();
+        //List<RoomOccupation> newRoomOccupations = autoScheduleClasses.stream().map(RoomOccupationMapper::mapFromGeneralClassV2).flatMap(Collection::stream).toList();
+        List<RoomOccupation> newRoomOccupations = new ArrayList<>();
+        for(GeneralClass gc: autoScheduleClasses){
+            List<RoomOccupation> RO = RoomOccupationMapper.mapFromGeneralClassV2(gc);
+            for(RoomOccupation ro: RO) newRoomOccupations.add(ro);
+        }
         //roomOccupationRepo.deleteAllByClassCodeIn(classCodes);
         roomOccupationRepo.saveAll(newRoomOccupations);
         //gcoRepo.saveAll(updatedClasses);
