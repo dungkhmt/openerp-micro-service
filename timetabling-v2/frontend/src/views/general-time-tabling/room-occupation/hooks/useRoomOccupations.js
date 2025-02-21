@@ -85,7 +85,10 @@ export const useRoomOccupations = (semester, weekIndex) => {
   }, [semester, weekIndex]);
 
   useEffect(() => {
-    if (!semester) return;
+    if (!semester || weekIndex === undefined) { 
+      setData([]);
+      return;
+    }
     fetchRoomOccupations();
   }, [semester, weekIndex]);
 
