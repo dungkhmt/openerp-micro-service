@@ -65,7 +65,7 @@ const GeneralScheduleScreen = () => {
               </Button>
               <Button
                 loading={states.isAutoSaveLoading}
-                disabled={!(states.selectedSemester !== null && states.selectedGroup !== null) || states.isAutoSaveLoading}
+                disabled={!states.selectedSemester || states.isAutoSaveLoading}
                 startIcon={states.isAutoSaveLoading ? <FacebookCircularProgress /> : null}
                 variant="contained"
                 color="primary"
@@ -75,7 +75,7 @@ const GeneralScheduleScreen = () => {
               </Button>
               <Button
                 loading={states.isAutoSaveLoading}
-                disabled={!(states.selectedSemester !== null && states.selectedGroup !== null) || states.isAutoSaveLoading}
+                disabled={!states.selectedSemester || states.isAutoSaveLoading}
                 startIcon={states.isTimeScheduleLoading ? <FacebookCircularProgress /> : null}
                 variant="contained"
                 color="primary"
@@ -83,11 +83,20 @@ const GeneralScheduleScreen = () => {
               >
                 Tự động xếp phòng học
               </Button>
+              <Button
+                disabled={states.selectedRows.length === 0 || states.isAutoSaveLoading}
+                loading={states.isAutoSaveLoading}
+                startIcon={states.isAutoSaveLoading ? <FacebookCircularProgress /> : null}
+                variant="contained"
+                color="primary"
+                onClick={() => setters.setOpenSelectedDialog(true)}
+              >
+                Tự động xếp lịch học theo lớp đã chọn
+              </Button>
             </div>
-            {/* Auto schedule dialogs below buttons */}
             <div className="flex flex-row justify-end gap-2">
               <AutoScheduleDialog
-                title={"Tự động xếp lịch học"}
+                title={"Tự động xếp lịch học của kì học"}
                 open={states.isOpenTimeslotDialog}
                 closeDialog={() => setters.setOpenTimeslotDialog(false)}
                 timeLimit={states.timeSlotTimeLimit}
@@ -101,6 +110,14 @@ const GeneralScheduleScreen = () => {
                 setTimeLimit={setters.setClassroomTimeLimit}
                 timeLimit={states.classroomTimeLimit}
                 submit={handlers.handleAutoScheduleClassroomTimeTabling}
+              />
+              <AutoScheduleDialog
+                title={"Tự động xếp lịch các lớp đã chọn"}
+                open={states.isOpenSelectedDialog}
+                closeDialog={() => setters.setOpenSelectedDialog(false)}
+                timeLimit={states.selectedTimeLimit}
+                setTimeLimit={setters.setSelectedTimeLimit}
+                submit={handlers.handleAutoScheduleSelected}
               />
             </div>
             <Dialog open={openResetConfirm} onClose={() => setOpenResetConfirm(false)}>
@@ -131,8 +148,11 @@ const GeneralScheduleScreen = () => {
           </div>
         </div>
       ) : (
-        // View By Room tab now uses RoomOccupationScreen
-        <RoomOccupationScreen />
+        // View By Room tab now uses RoomOccupationScreen with shared semester
+        <RoomOccupationScreen 
+          selectedSemester={states.selectedSemester}
+          setSelectedSemester={setters.setSelectedSemester}
+        />
       )}
     </div>
   );

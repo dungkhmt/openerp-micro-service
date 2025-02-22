@@ -1,7 +1,5 @@
 import { Autocomplete, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 
-
-
 const AutoScheduleDialog = ({
   title,
   submit,
