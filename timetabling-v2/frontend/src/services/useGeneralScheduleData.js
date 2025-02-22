@@ -13,9 +13,13 @@ export const useGeneralSchedule = () => {
   const [classroomTimeLimit, setClassroomTimeLimit] = useState(5);
   const [timeSlotTimeLimit, setTimeSlotTimeLimit] = useState(5);
   const [loading, setLoading] = useState(false);
+  const [isOpenSelectedDialog, setOpenSelectedDialog] = useState(false);
+  const [selectedTimeLimit, setSelectedTimeLimit] = useState(5);
 
+  const queryKey = ["generalClasses", selectedSemester?.semester, selectedGroup?.groupName];
+  
   const { data: classes = [], isLoading: isClassesLoading } = useQuery(
-    ["generalClasses", selectedSemester?.semester, selectedGroup?.groupName],
+    queryKey,
     () => {
       setLoading(true);
       return generalScheduleRepository.getClasses(
@@ -67,8 +71,8 @@ export const useGeneralSchedule = () => {
             });
           }
 
-          // Only add parent class if it has duration or has no timeSlots
-          if (classObj.duration !== null || !classObj.timeSlots?.length) {
+          // Only add parent class if it has remaining duration or has no timeSlots
+          if ((remainingDuration > 0) || !classObj.timeSlots?.length) {
             generalClasses.push({
               ...classObj,
               generalClassId: String(classObj.generalClassId || classObj.id || ''),
@@ -153,7 +157,7 @@ export const useGeneralSchedule = () => {
         setLoading(false);
       },
       onSuccess: (response) => {
-        forceRefetch(); // Force reload data instead of manual update
+        forceRefetch();
         setSelectedRows([]);
         setOpenTimeslotDialog(false);
         toast.success("Tự động xếp thời khóa biểu thành công!");
@@ -331,6 +335,30 @@ export const useGeneralSchedule = () => {
     }
   );
 
+  const autoScheduleSelectedMutation = useMutation(
+    ({ classIds, timeLimit, semester }) => 
+      generalScheduleRepository.autoScheduleSelected(classIds, timeLimit, semester),
+    {
+      onMutate: () => {
+        setLoading(true);
+      },
+      onSettled: () => {
+        setLoading(false);
+      },
+      onSuccess: () => {
+        forceRefetch();
+        setSelectedRows([]);
+        setOpenSelectedDialog(false);
+        toast.success('Tự động xếp lịch các lớp đã chọn thành công!');
+      },
+      onError: (error) => {
+        const message = error.response?.status === 410 ? error.response.data 
+          : 'Có lỗi khi tự động xếp lịch các lớp đã chọn!';
+        toast.error(message);
+      }
+    }
+  );
+
   const handleRefreshClasses = useCallback(() => {
     forceRefetch();
   }, [forceRefetch]);
@@ -354,6 +382,7 @@ export const useGeneralSchedule = () => {
       classes,
       isLoading: isClassesLoading,
       isResetLoading: resetMutation.isLoading,
+      refetchSchedule: () => queryClient.refetchQueries(queryKey),
       isAutoSaveLoading:
         autoScheduleTimeMutation.isLoading ||
         autoScheduleRoomMutation.isLoading,
@@ -367,6 +396,8 @@ export const useGeneralSchedule = () => {
       classesNoSchedule,
       isClassesNoScheduleLoading,
       isDeletingBySemester: deleteBySemesterMutation.isLoading,
+      isOpenSelectedDialog,
+      selectedTimeLimit,
     },
     setters: {
       setSelectedSemester,
@@ -377,6 +408,8 @@ export const useGeneralSchedule = () => {
       setClassroomTimeLimit,
       setTimeSlotTimeLimit,
       setClassesNoSchedule,
+      setOpenSelectedDialog,
+      setSelectedTimeLimit,
     },
     handlers: {
       handleResetTimeTabling: () => {
@@ -427,7 +460,10 @@ export const useGeneralSchedule = () => {
           toast.error("Vui lòng chọn file!");
           return;
         }
-        return uploadFileMutation.mutateAsync([selectedSemester.semester, file]);
+        return uploadFileMutation.mutateAsync([
+          selectedSemester.semester,
+          file,
+        ]);
       },
       handleDeleteBySemester: () => {
         if (!selectedSemester?.semester) {
@@ -436,6 +472,13 @@ export const useGeneralSchedule = () => {
         }
         deleteBySemesterMutation.mutate(selectedSemester.semester);
       },
+      handleAutoScheduleSelected: () => {
+        autoScheduleSelectedMutation.mutate({
+          classIds: selectedRows,
+          timeLimit: selectedTimeLimit,
+          semester: selectedSemester?.semester,
+        });
+      }
     },
   };
 };

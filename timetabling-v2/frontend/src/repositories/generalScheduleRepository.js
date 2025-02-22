@@ -101,6 +101,20 @@ export const generalScheduleRepository = {
     );
   },
 
+  autoScheduleSelected: async (classIds, timeLimit, semester) => {
+    return await request(
+      "post",
+      "/general-classes/auto-schedule-timeslot-room",
+      null,
+      null,
+      {
+        classIds,
+        timeLimit,
+        semester,
+      }
+    );
+  },
+
   exportExcel: async (semester) => {
     try {
       const response = await request(

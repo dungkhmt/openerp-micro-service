@@ -3,11 +3,10 @@ import { request } from "api";
 import { useRoomOccupations } from "./hooks/useRoomOccupations";
 import GeneralSemesterAutoComplete from "../common-components/GeneralSemesterAutoComplete";
 import FilterSelectBox from "./components/FilterSelectBox";
-import { Button, TablePagination } from "@mui/material";
+import { Button, TablePagination, Autocomplete, TextField } from "@mui/material";
 import { Refresh } from "@mui/icons-material";
 
-const RoomOccupationScreen = () => {
-  const [selectedSemester, setSelectedSemester] = useState(null);
+const RoomOccupationScreen = ({ selectedSemester, setSelectedSemester }) => {
   const [selectedWeek, setSelectedWeek] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
@@ -100,9 +99,13 @@ const RoomOccupationScreen = () => {
     <div className="flex flex-col gap-2 h-[700px]">
       <div className="flex flex-row justify-between">
         <div className="flex flex-row gap-2">
-          <GeneralSemesterAutoComplete
-            setSelectedSemester={setSelectedSemester}
-            selectedSemester={selectedSemester}
+          <Autocomplete
+            disabled={true}
+            value={selectedSemester}
+            options={[selectedSemester].filter(Boolean)}
+            getOptionLabel={(option) => option && option.semester}
+            sx={{ width: 200 }}
+            renderInput={(params) => <TextField {...params} label="Chọn kỳ" />}
           />
           <FilterSelectBox
             selectedSemester={selectedSemester}
