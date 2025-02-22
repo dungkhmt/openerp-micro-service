@@ -42,9 +42,11 @@ public class GreedySolver {
         // explore all class segment j before i (have been assigned slot and room)
         int duration_i = I.getNbSlots()[i];
         int startSlot_i = s;
+
         for(int j = 0; j <= i-1; j++){
             int duration_j = I.getNbSlots()[j];
             int startSlot_j = solutionSlot[j];
+            if(i == 4)log.info("check(" + i + "," + s + "," + r + " compare class-segment " + j + " having start_slot_j = " + startSlot_j + " duration_j = " + duration_j + " room " + solutionRoom[j]);
             if(conflictClassSegment[i].contains(j)){// class segments i and j conflict
                 if(overLap(startSlot_i,duration_i,startSlot_j,duration_j))
                     return false;
@@ -68,6 +70,7 @@ public class GreedySolver {
         unScheduledClassSegment = new ArrayList<>();
         for(int i = 0; i < I.getNbClassSegments(); i++){
             // try to find a first-fit time-slot and room for class segment i
+            log.info("simpleGreedy, start plan for class-segment " + i + ": list time-slots = " + I.getDomains()[i]);
             boolean foundSlotRoom = false;
             for(int s: I.getDomains()[i]){
                 if(foundSlotRoom) break;

@@ -21,6 +21,7 @@ import openerp.openerpresourceserver.generaltimetabling.model.entity.general.Gen
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.TimeTablingRoom;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
+import openerp.openerpresourceserver.generaltimetabling.model.response.ModelResponseGeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.repo.*;
 import openerp.openerpresourceserver.generaltimetabling.service.GeneralClassService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,21 @@ public class GeneralClassServiceImp implements GeneralClassService {
     private TimeTablingCourseRepo timeTablingCourseRepo;
 
 
+    @Override
+    public ModelResponseGeneralClass getClassDetailWithSubClasses(Long classId) {
+        GeneralClass gc = gcoRepo.findById(classId).orElse(null);
+        if(gc == null)
+            return null;
+        List<GeneralClass> subClasses = gcoRepo.findAllByParentClassId(gc.getId());
+        ModelResponseGeneralClass res = new ModelResponseGeneralClass(gc);
+        List<ModelResponseGeneralClass> resSubClass = new ArrayList<>();
+        for(GeneralClass gci: subClasses){
+            ModelResponseGeneralClass aSubClass = new ModelResponseGeneralClass(gci);
+            resSubClass.add(aSubClass);
+        }
+        res.setSubClasses(resSubClass);
+        return res;
+    }
 
     @Override
     public List<GeneralClass> getGeneralClasses(String semester, String groupName) {
@@ -331,6 +347,39 @@ public class GeneralClassServiceImp implements GeneralClassService {
         return autoScheduleClasses;
         */
         return null;
+    }
+
+    @Override
+    public List<GeneralClass> autoScheduleTimeSlotRoom(List<Long> classIds, int timeLimit) {
+
+        log.info("autoScheduleTimeSlotRoom START....");
+        //List<GeneralClass> foundClasses = gcoRepo.findAllBySemester(semester);
+        List<GeneralClass> foundClasses = gcoRepo.findAllByIdIn(classIds);
+        //List<GeneralClass> autoScheduleClasses = V2ClassScheduler.autoScheduleTimeSlot(foundClasses, timeLimit);
+        V2ClassScheduler optimizer = new V2ClassScheduler();
+        List<Classroom> rooms = classroomRepo.findAll();
+        List<TimeTablingCourse> courses = timeTablingCourseRepo.findAll();
+        List<Group> groups = groupRepo.findAll();
+
+        List<GeneralClass> autoScheduleClasses = optimizer.autoScheduleTimeSlotRoom(foundClasses,rooms,courses, groups,timeLimit);
+
+        /*Save the scheduled timeslot of the classes*/
+        gcoRepo.saveAll(autoScheduleClasses);
+        roomOccupationRepo.deleteAllByClassCodeIn(foundClasses.stream().map(GeneralClass::getClassCode).toList());
+
+        List<String> classCodes = autoScheduleClasses.stream().map(GeneralClass::getClassCode).toList();
+        //List<RoomOccupation> newRoomOccupations = autoScheduleClasses.stream().map(RoomOccupationMapper::mapFromGeneralClass).flatMap(Collection::stream).toList();
+        //List<RoomOccupation> newRoomOccupations = autoScheduleClasses.stream().map(RoomOccupationMapper::mapFromGeneralClassV2).flatMap(Collection::stream).toList();
+        List<RoomOccupation> newRoomOccupations = new ArrayList<>();
+        for(GeneralClass gc: autoScheduleClasses){
+            List<RoomOccupation> RO = RoomOccupationMapper.mapFromGeneralClassV2(gc);
+            for(RoomOccupation ro: RO) newRoomOccupations.add(ro);
+        }
+        //roomOccupationRepo.deleteAllByClassCodeIn(classCodes);
+        roomOccupationRepo.saveAll(newRoomOccupations);
+        //gcoRepo.saveAll(updatedClasses);
+
+        return autoScheduleClasses;
     }
 
     @Override

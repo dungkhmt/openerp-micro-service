@@ -194,9 +194,9 @@ public class V2ClassScheduler {
     }
     public List<GeneralClass> autoScheduleTimeSlotRoom(List<GeneralClass> classes, List<Classroom> rooms, List<TimeTablingCourse> ttcourses, List<Group> groups, int timeLimit) {
         log.info("autoScheduleTimeSlotRoom, START....");
-        for(int i = 0; i < rooms.size(); i++){
-            log.info("autoScheduleTimeSlotRoom, room[" + i + "] = " + rooms.get(i).getClassroom());
-        }
+        //for(int i = 0; i < rooms.size(); i++){
+        //    log.info("autoScheduleTimeSlotRoom, room[" + i + "] = " + rooms.get(i).getClassroom());
+        //}
         MapDataScheduleTimeSlotRoomWrapper D = mapData(classes, rooms,ttcourses,groups);
         MapDataScheduleTimeSlotRoom data = D.data;
         //data.print();
