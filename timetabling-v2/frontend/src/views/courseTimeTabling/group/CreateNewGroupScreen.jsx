@@ -12,7 +12,7 @@ import {
 
 } from "@mui/material";
 
-const CreateNewGroupScreen = React.memo(({ open, handleClose, selectedGroup }) => {
+const CreateNewGroupScreen = React.memo(({ open, handleClose, onSuccess, selectedGroup }) => {
   const [formData, setFormData] = useState({
     id: null,
     groupName: "",
@@ -57,20 +57,20 @@ const CreateNewGroupScreen = React.memo(({ open, handleClose, selectedGroup }) =
     const payload = {
       groupName: formData.groupName,
       roomName: formData.roomName,
-      priority: formData.priority
+      priority: formData.priority,
+      id: selectedGroup?.id // Always include the id (parent groupId for new groups)
     };
 
     try {
-      if (selectedGroup) {
-        // Include id and old roomName when updating
-        await updateGroup({ 
-          ...payload, 
-          id: formData.id,
-          oldRoomName: selectedGroup.roomName // Add original room name
-        });
-      } else {
-        // Don't include id or oldRoomName for new entries
+      if (selectedGroup?.isNewGroup) {
         await createGroup(payload);
+        onSuccess && await onSuccess();
+      } else if (selectedGroup) {
+        await updateGroup({ 
+          ...payload,
+          oldRoomName: selectedGroup.roomName
+        });
+        onSuccess && await onSuccess();
       }
       handleClose();
     } catch (error) {

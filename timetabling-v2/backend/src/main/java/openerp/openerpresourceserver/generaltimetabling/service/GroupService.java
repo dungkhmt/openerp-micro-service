@@ -8,11 +8,13 @@ import java.util.List;
 
 public interface GroupService {
 
-    List<GroupDto> getGroup();
-
     List<Group> getAllGroup();
 
     Group create(GroupDto groupDto);
+
+    Group createGroup(String groupName);
+
+    List<GroupDto> getGroupByGroupId(Long groupId);
 
     void updateGroup(PriorityGroupUpdateDto requestDto);
 
