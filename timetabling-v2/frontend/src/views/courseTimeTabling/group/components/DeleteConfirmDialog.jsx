@@ -1,20 +1,30 @@
+import React from "react";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
-import React from 'react';
-
-const DeleteConfirmDialog = React.memo(({ open, onClose, onConfirm }) => {
+const DeleteConfirmDialog = ({ open, onClose, onConfirm }) => {
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Xác nhận xóa nhóm</DialogTitle>
+      <DialogTitle>Xác nhận xóa</DialogTitle>
       <DialogContent>
-        <Typography>Bạn có chắc chắn muốn xóa nhóm này?</Typography>
+        <DialogContentText>
+          Bạn có chắc chắn muốn xóa nhóm này không?
+        </DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Hủy</Button>
-        <Button onClick={onConfirm} color="error">Xóa</Button>
+        <Button onClick={onConfirm} color="error" autoFocus>
+          Xóa
+        </Button>
       </DialogActions>
     </Dialog>
   );
-});
+};
 
 export default DeleteConfirmDialog;

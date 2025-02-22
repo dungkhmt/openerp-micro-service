@@ -33,9 +33,8 @@ public class GroupServiceImpl implements GroupService {
     @Autowired
     private GroupMapper groupMapper;
 
-    @Override
-    public List<GroupDto> getGroup() {
-        return groupRepo.getGroupWithRoomAndPriority();
+    public List<GroupDto> getGroupByGroupId(Long groupId) {
+        return groupRepo.getGroupWithRoomAndPriorityByGroupId(groupId);
     }
 
     @Override
@@ -44,37 +43,33 @@ public class GroupServiceImpl implements GroupService {
         // Kiểm tra xem groupName đã tồn tại chưa
         Group existingGroup = groupRepo.findByGroupName(groupDto.getGroupName()).orElse(null);
 
-        // Nếu đã tồn tại, lấy id của nhóm và tạo GroupRoomPriority mới
-        if (existingGroup != null) {
-            // Kiểm tra xem cặp (groupId, roomId) đã tồn tại trong GroupRoomPriority chưa
-            List<GroupRoomPriority> existingPriority = groupRoomPriorityRepo.findByGroupIdAndRoomId(existingGroup.getId(), groupDto.getRoomName());
-            if (!existingPriority.isEmpty()) {
-                throw new GroupUsedException("Nhóm " + groupDto.getGroupName() + " với phòng học " + groupDto.getRoomName() + " đã tồn tại!");
-            }
-
-            // Nếu không tồn tại, tạo mới GroupRoomPriority
-            GroupRoomPriority groupRoomPriority = new GroupRoomPriority();
-            groupRoomPriority.setGroupId(existingGroup.getId());
-            groupRoomPriority.setRoomId(groupDto.getRoomName());
-            groupRoomPriority.setPriority(groupDto.getPriority());
-
-            groupRoomPriorityRepo.save(groupRoomPriority);
-            return existingGroup; // Trả về nhóm đã tồn tại
+        // Kiểm tra xem cặp (groupId, roomId) đã tồn tại trong GroupRoomPriority chưa
+        List<GroupRoomPriority> existingPriority = groupRoomPriorityRepo.findByGroupIdAndRoomId(existingGroup.getId(), groupDto.getRoomName());
+        if (!existingPriority.isEmpty()) {
+            throw new GroupUsedException("Nhóm " + groupDto.getGroupName() + " với phòng học " + groupDto.getRoomName() + " đã tồn tại!");
         }
 
-        // Nếu chưa tồn tại, tạo mới Group và GroupRoomPriority
-        Group group = groupMapper.mapDtoToEntity(groupDto);
-        groupRepo.save(group);
-
-        String roomId = groupDto.getRoomName();
-
+        // Nếu không tồn tại, tạo mới GroupRoomPriority
         GroupRoomPriority groupRoomPriority = new GroupRoomPriority();
-        groupRoomPriority.setGroupId(group.getId());
-        groupRoomPriority.setRoomId(roomId);
+        groupRoomPriority.setGroupId(existingGroup.getId());
+        groupRoomPriority.setRoomId(groupDto.getRoomName());
         groupRoomPriority.setPriority(groupDto.getPriority());
 
         groupRoomPriorityRepo.save(groupRoomPriority);
+        return existingGroup; // Trả về nhóm đã tồn tại
+    }
 
+    @Override
+    @Transactional
+    public Group createGroup(String groupName) {
+        Group existingGroup = groupRepo.findByGroupName(groupName).orElse(null);
+        if (existingGroup != null) {
+            return null;
+        }
+
+        Group group = new Group();
+        group.setGroupName(groupName);
+        groupRepo.save(group);
         return group;
     }
 
