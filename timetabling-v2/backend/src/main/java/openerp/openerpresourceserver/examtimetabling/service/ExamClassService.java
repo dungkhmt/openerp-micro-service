@@ -40,6 +40,14 @@ public class ExamClassService {
         examClassRepository.deleteAllById(examClassIds);
     }
 
+    public boolean validateExamClass(String examClassId) {
+        return examClassRepository.existsById(examClassId);
+    }
+
+    public ExamClass createExamClass(ExamClass examClass) {
+        return examClassRepository.save(examClass);
+    }
+
     public ExamClass updateExamClass(ExamClass examClass) {
         // Check if exists
         if (!examClassRepository.existsById(examClass.getExamClassId())) {
@@ -58,7 +66,7 @@ public class ExamClassService {
         List<ExamClass> conflictClasses = new ArrayList<>();
         
         // Skip header row
-        for (int i = 1; i <= 5; i++) {
+        for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
             if (row != null) {
                 try {

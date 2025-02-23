@@ -13,6 +13,14 @@ export const examClassService = {
     });
   },
 
+  createExamClass: async (examClass) => {
+    return await request('post', '/exam-class/create', null, null, examClass, {
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+  },
+
   updateExamClass: async (examClass) => {
     return await request('post', '/exam-class/update', null, null, examClass, {
       headers: {

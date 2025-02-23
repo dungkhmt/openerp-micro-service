@@ -74,6 +74,16 @@ export const useExamClassData = () => {
     }
   });
 
+  const createExamClass = useMutation(examClassService.createExamClass, {
+    onSuccess: () => {
+      refetch();
+      toast.success('Tạo lớp học mới thành công!');
+    },
+    onError: (error) => {
+      toast.error(error.response?.data || 'Có lỗi xảy ra khi tạo lớp học');
+    }
+  });
+
   return {
     examClasses: classOpeneds?.data || [],
     isLoading,
@@ -88,5 +98,6 @@ export const useExamClassData = () => {
     isExportingConflicts: exportConflictsMutation.isLoading,
     isExportingClasses: exportAllClassesMutation.isLoading,
     updateExamClass: updateExamClass.mutateAsync,
+    createExamClass: createExamClass.mutateAsync
   };
 };

@@ -16,8 +16,10 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import { useExamClassData } from "services/useExamClassData"
 import EditExamClassModal from './utils/EditExamClassModal';
+import AddExamClassModal from "./utils/AddExamClassModal"
 
 export default function TimePerformanceScreen() {
+  // const [ examClasses, setExamClasses ] = useState([]);
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
@@ -27,6 +29,7 @@ export default function TimePerformanceScreen() {
   const [selectedDeletedRows, setSelectedDeletedRows] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editFormData, setEditFormData] = useState({
     examClassId: '',
     classId: '',
@@ -41,7 +44,7 @@ export default function TimePerformanceScreen() {
   });
 
   let {
-    examClasses,
+    examClasses: classes,
     isLoading: isLoadingClasses,
     importExcel,
     exportClasses,
@@ -51,40 +54,15 @@ export default function TimePerformanceScreen() {
     deleteExamClasses,
     isClearing,
     updateExamClass,
+    createExamClass,
   } = useExamClassData();
 
-  examClasses = examClasses.map((examClass, index) => ({
+  const examClasses = classes.map((examClass, index) => ({
     ...examClass,
     id: examClass.examClassId
   }));
 
-
-  // Filter examClasses based on keyword using useMemo
-  const filteredExamClasses = useMemo(() => {
-    if (!keyword.trim()) return examClasses;
-    
-    const searchTerm = keyword.toLowerCase().trim();
-    return examClasses.filter(examClass => {
-      // Add all the fields you want to search through
-      const searchableFields = [
-        examClass.examClassId,
-        examClass.classId,
-        examClass.courseId,
-        examClass.courseName,
-        examClass.description,
-      ];
-      
-      return searchableFields.some(field => 
-        String(field).toLowerCase().includes(searchTerm)
-      );
-    });
-  }, [examClasses, keyword]);
-
   const { semesters } = useSemesterData();
-
-  const handledeleteExamClasses = async () => {
-    await deleteExamClasses(selectedDeletedRows);
-  };
 
   const handleImportExcel = () => {
     const input = document.createElement("input");
@@ -193,15 +171,35 @@ export default function TimePerformanceScreen() {
   
   const handleConfirmDelete = async () => {
     try {
+      setIsDeleteConfirmOpen(false); // Close the modal first
       await deleteExamClasses(selectedDeletedRows);
-      setIsDeleteConfirmOpen(false);
+      setSelectedDeletedRows([]); // Clear selection after successful delete
     } catch (error) {
       console.error("Error deleting classes:", error);
+      setIsDeleteConfirmOpen(false); // Still close modal even if error occurs
     }
   };
   
   const handleCancelDelete = () => {
     setIsDeleteConfirmOpen(false);
+  };
+
+  const handleAddClick = () => {
+    setIsAddModalOpen(true);
+  };
+  
+  const handleCloseAddModal = () => {
+    setIsAddModalOpen(false);
+  };
+  
+  const handleAddSubmit = async (formData) => {
+    try {
+      setIsAddModalOpen(false); // Close the modal first
+      await createExamClass(formData);
+    } catch (error) {
+      console.error("Error adding exam class:", error);
+      setIsAddModalOpen(false); // Still close modal even if error occurs
+    }
   };
 
   function DataGridToolbar() {
@@ -226,6 +224,9 @@ export default function TimePerformanceScreen() {
           <Button variant="outlined" color="primary" onClick={handleDeleteClick}>
             Xóa lớp
           </Button>
+          <Button variant="outlined" color="primary" onClick={handleAddClick}>
+            Thêm lớp
+          </Button>
           <Button
             variant="outlined"
             color="primary"
@@ -244,6 +245,12 @@ export default function TimePerformanceScreen() {
             </Button>
           )}
         </Box>
+
+        <AddExamClassModal 
+          open={isAddModalOpen}
+          onClose={handleCloseAddModal}
+          onSubmit={handleAddSubmit}
+        />
 
         <Dialog
           open={isDeleteConfirmOpen}
@@ -309,7 +316,7 @@ export default function TimePerformanceScreen() {
           py: 2
         }}
       >
-        <Typography variant="h5">Danh sách lớp thi</Typography>
+        <Typography variant="h4">Danh Sách Lớp Thi</Typography>
       </Box>
     );
   }
@@ -330,7 +337,7 @@ export default function TimePerformanceScreen() {
             </>
           ),
         }}
-        rows={filteredExamClasses}
+        rows={examClasses}
         columns={COLUMNS}
         pageSize={10}
         onRowClick={handleRowClick}

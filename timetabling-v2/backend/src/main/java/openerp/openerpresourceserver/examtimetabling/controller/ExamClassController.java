@@ -89,4 +89,27 @@ public class ExamClassController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PostMapping("/create")
+    public ResponseEntity<?> createExamClass(@Valid @RequestBody ExamClass examClass) {
+    try {
+        // Check if exam class already exists
+        if (examClassService.validateExamClass(examClass.getExamClassId())) {
+            return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(Map.of(
+                    "message", "Exam class already exists",
+                    "examClassId", examClass.getExamClassId()
+                ));
+        }
+
+        ExamClass createdClass = examClassService.createExamClass(examClass);
+        return ResponseEntity.ok(createdClass);
+        
+    } catch (Exception e) {
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(Map.of("message", "Error creating exam class"));
+    }
+    }
 }
