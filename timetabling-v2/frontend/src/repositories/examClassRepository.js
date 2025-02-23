@@ -5,8 +5,20 @@ export const examClassService = {
     return await request('get', '/exam-class/all');
   },
 
-  clearAll: async () => {
-    return await request('post', '/exam-class/clear-all');
+  deleteExamClasses: async (examClassIds) => {
+    return await request('post', '/exam-class/delete-classes', null, null, examClassIds, {
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+  },
+
+  updateExamClass: async (examClass) => {
+    return await request('post', '/exam-class/update', null, null, examClass, {
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
   },
 
   importExcel: async (formData, semester) => {
@@ -22,14 +34,13 @@ export const examClassService = {
     );
   },
 
-  exportConflicts: async (conflictData) => {
-    console.log(conflictData);
+  exportExcel: async (classExamIds) => {
     return await request(
       'post',
-      '/exam-class/export-conflict-class',
+      '/exam-class/export',
       null,
       null,
-      conflictData,
+      classExamIds,
       {
         responseType: 'arraybuffer',
         headers: {

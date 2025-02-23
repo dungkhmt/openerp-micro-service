@@ -1,10 +1,21 @@
 import { useCallback, useMemo, useState } from "react";
 import { useSemesterData } from "services/useSemesterData";
 import { COLUMNS } from "./utils/gridColumns";
-import { Autocomplete, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from "@mui/material";
+import { 
+  Autocomplete, 
+  Box, 
+  Button, 
+  CircularProgress, 
+  Dialog, 
+  DialogActions, 
+  DialogContent, 
+  DialogTitle, 
+  TextField, 
+  Typography 
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { useExamClassOpenedData } from "services/useExamClassOpenedData"
-
+import { useExamClassData } from "services/useExamClassData"
+import EditExamClassModal from './utils/EditExamClassModal';
 
 export default function TimePerformanceScreen() {
   const [selectedSemester, setSelectedSemester] = useState(null);
@@ -12,30 +23,44 @@ export default function TimePerformanceScreen() {
   const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
   const [conflictList, setConflictList] = useState([]);
   const [keyword, setKeyword] = useState("");
-  
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedDeletedRows, setSelectedDeletedRows] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    examClassId: '',
+    classId: '',
+    courseId: '',
+    courseName: '',
+    description: '',
+    groupId: '',
+    numberOfStudents: '',
+    school: '',
+    period: '',
+    managementCode: '',
+  });
 
   let {
     examClasses,
     isLoading: isLoadingClasses,
     importExcel,
+    exportClasses,
     exportConflicts,
-    isExporting,
-    clearAll,
+    isExportingClasses,
+    isExportingConflicts,
+    deleteExamClasses,
     isClearing,
-  } = useExamClassOpenedData();
+    updateExamClass,
+  } = useExamClassData();
 
   examClasses = examClasses.map((examClass, index) => ({
     ...examClass,
-    id: index
+    id: examClass.examClassId
   }));
 
-  const handleKeywordChange = useCallback((e) => {
-    setKeyword(e.target.value);
-  }, []);
-  
 
-   // Filter examClasses based on keyword using useMemo
-   const filteredExamClasses = useMemo(() => {
+  // Filter examClasses based on keyword using useMemo
+  const filteredExamClasses = useMemo(() => {
     if (!keyword.trim()) return examClasses;
     
     const searchTerm = keyword.toLowerCase().trim();
@@ -57,8 +82,8 @@ export default function TimePerformanceScreen() {
 
   const { semesters } = useSemesterData();
 
-  const handleClearAll = async () => {
-    await clearAll();
+  const handledeleteExamClasses = async () => {
+    await deleteExamClasses(selectedDeletedRows);
   };
 
   const handleImportExcel = () => {
@@ -107,35 +132,139 @@ export default function TimePerformanceScreen() {
     }
   };
 
+  const handleExportExamClasses = async () => {
+    try {
+      await exportClasses(examClasses.map(examClass => examClass.examClassId), );
+    } catch (error) {
+      console.error("Error exporting conflicts:", error);
+    }
+  };
+
+  const handleRowClick = (params) => {
+    setSelectedRow(params.row);
+    setEditFormData({
+      examClassId: params.row.examClassId || '',
+      classId: params.row.classId || '',
+      courseId: params.row.courseId || '',
+      courseName: params.row.courseName || '',
+      description: params.row.description || '',
+      groupId: params.row.groupId || '',
+      numberOfStudents: params.row.numberOfStudents || '',
+      school: params.row.school || '',
+      period: params.row.period || '',
+      managementCode: params.row.managementCode || '',
+    });
+    setIsEditModalOpen(true);
+  };
+  
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedRow(null);
+    setEditFormData({
+      examClassId: '',
+      classId: '',
+      courseId: '',
+      courseName: '',
+      description: '',
+      groupId: '',
+      numberOfStudents: '',
+      school: '',
+      period: '',
+      managementCode: '',
+    });
+  };
+  
+  const handleFormChange = (event) => {
+    const { name, value } = event.target;
+    setEditFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  const handleSubmitEdit = async () => {
+    await updateExamClass(editFormData);
+    handleCloseEditModal();
+  };
+
+  const handleDeleteClick = () => {
+    setIsDeleteConfirmOpen(true);
+  };
+  
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteExamClasses(selectedDeletedRows);
+      setIsDeleteConfirmOpen(false);
+    } catch (error) {
+      console.error("Error deleting classes:", error);
+    }
+  };
+  
+  const handleCancelDelete = () => {
+    setIsDeleteConfirmOpen(false);
+  };
+
   function DataGridToolbar() {
     return (
-      <div>
-        <div style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}>
+      <Box sx={{ p: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+          {/* Semester selection on the right */}
           <Autocomplete
             options={semesters}
             getOptionLabel={(option) => option.semester}
-            style={{ width: 150, margin: "8px" }}
+            style={{ width: 150 }}
             value={selectedSemester}
             onChange={handleSelectSemester}
             renderInput={(params) => (
-              <TextField {...params} label="Chọn kỳ học" variant="outlined" />
+              <TextField {...params} label="Chọn kỳ học" variant="outlined" size="small" />
             )}
           />
-        </div>
-        <div style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}>
-          <Button variant="outlined" color="primary" onClick={handleClearAll}>
-            Xóa danh sách lớp
+        </Box>
+        
+        {/* Buttons aligned to the right */}
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+          <Button variant="outlined" color="primary" onClick={handleDeleteClick}>
+            Xóa lớp
           </Button>
           <Button
             variant="outlined"
             color="primary"
-            style={{ marginRight: "8px" }}
             onClick={handleImportExcel}
             disabled={!selectedSemester}
           >
-            Tải lên danh sách lớp
+            Tải lên DS lớp
           </Button>
-        </div>
+          {examClasses.length > 0 && (
+            <Button 
+              onClick={handleExportExamClasses}
+              color="primary"
+              variant="outlined"
+            >
+              Tải xuống DS lớp
+            </Button>
+          )}
+        </Box>
+
+        <Dialog
+          open={isDeleteConfirmOpen}
+          onClose={handleCancelDelete}
+        >
+          <DialogTitle>Xác nhận xóa</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Bạn có chắc chắn muốn xóa các lớp đã chọn không?
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCancelDelete} color="primary">
+              Hủy
+            </Button>
+            <Button onClick={handleConfirmDelete} color="error" variant="contained" autoFocus>
+              Xóa
+            </Button>
+          </DialogActions>
+        </Dialog>
+        
         <Dialog
           open={successDialogOpen || conflictDialogOpen}
           onClose={handleDialogClose}
@@ -165,18 +294,19 @@ export default function TimePerformanceScreen() {
             )}
           </DialogActions>
         </Dialog>
-      </div>
+      </Box>
     );
   }
 
   function DataGridTitle() {
     return (
       <Box
-        style={{
+        sx={{
           width: "100%",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          py: 2
         }}
       >
         <Typography variant="h5">Danh sách lớp thi</Typography>
@@ -186,7 +316,7 @@ export default function TimePerformanceScreen() {
 
   return (
     <div style={{ height: 600, width: "100%" }}>
-      {(isLoadingClasses || isClearing || isExporting) && (
+      {(isLoadingClasses || isClearing || isExportingConflicts || isExportingClasses) && (
         <CircularProgress
           style={{ position: "absolute", top: "50%", left: "50%" }}
         />
@@ -196,13 +326,24 @@ export default function TimePerformanceScreen() {
           Toolbar: () => (
             <>
               <DataGridTitle />
-              <DataGridToolbar/>
+              <DataGridToolbar />
             </>
           ),
         }}
         rows={filteredExamClasses}
         columns={COLUMNS}
         pageSize={10}
+        onRowClick={handleRowClick}
+        checkboxSelection disableRowSelectionOnClick
+        onRowSelectionModelChange={(ids) => setSelectedDeletedRows(ids)}
+      />
+
+      <EditExamClassModal 
+        open={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        formData={editFormData}
+        onChange={handleFormChange}
+        onSubmit={handleSubmitEdit}
       />
     </div>
   );
