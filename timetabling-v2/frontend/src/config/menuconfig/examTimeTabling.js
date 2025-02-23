@@ -5,18 +5,18 @@ export const ExamTimeTabling = {
     child: [
       {
         id: "MENU_EXAM_TIME_TABLING.CLASS_LIST",
-        path: "/exam-time-tabling/class-list",
-        isPublic: false,
-        text: "DS lớp",
+        path: "/exam-time-tabling/exam-schedule",
+        isPublic: true,
+        text: "Kế hoạch thi",
         child: [],
       },
       {
         id: "MENU_EXAM_TIME_TABLING.CLASS_LIST",
         path: "/exam-time-tabling/class-list",
-        isPublic: false,
-        text: "Xếp lịch thi",
+        isPublic: true,
+        text: "DS lớp",
         child: [],
-      }
+      },
     ],
   };
   

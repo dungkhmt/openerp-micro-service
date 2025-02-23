@@ -19,6 +19,7 @@ import ThesisDefensePlanAssignmentRouter from "./ThesisDefensePlanAssignmentRout
 import MainPage from "views/mainPage";
 import AssetManagementRouter from "./AssetManagementRouter";
 import TrainingFrogCourseRouter from "./TrainingFrogCourseRouter";
+import ExamTimeTablingRouter from "./ExamTimeTablingRouter"
 const styles = {
   loadingProgress: {
     position: "fixed",
@@ -85,6 +86,10 @@ function MainAppRouter(props) {
            <PrivateRoute
             component={TrainingFrogCourseRouter}
             path="/training_course"
+          />
+          <PrivateRoute
+            component={ExamTimeTablingRouter}
+            path="/exam-time-tabling"
           />
           <Route component={NotFound} />
         </Switch>
