@@ -35,7 +35,7 @@ export const useExamClassData = () => {
       });
       const link = document.createElement("a");
       link.href = window.URL.createObjectURL(blob);
-      link.download = "Class_Conflict_List.xlsx";
+      link.download = "Danh_sách_lớp_thi_xung_đột.xlsx";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -53,7 +53,7 @@ export const useExamClassData = () => {
       });
       const link = document.createElement("a");
       link.href = window.URL.createObjectURL(blob);
-      link.download = "Class_List.xlsx";
+      link.download = "Danh_sách_lớp_thi.xlsx";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -84,6 +84,24 @@ export const useExamClassData = () => {
     }
   });
 
+  const downloadSample = useMutation(examClassService.downloadSample, {
+    onSuccess: (response) => {
+      const blob = new Blob([response.data], {
+        type: response.headers["content-type"],
+      });
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = "File_Lớp_thi_mẫu.xlsx";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    },
+    onError: (error) => {
+      console.log(error);
+      toast.error('Có lỗi xảy ra khi tải xuống danh sách lớp');
+    }
+  });
+
   return {
     examClasses: classOpeneds?.data || [],
     isLoading,
@@ -98,6 +116,7 @@ export const useExamClassData = () => {
     isExportingConflicts: exportConflictsMutation.isLoading,
     isExportingClasses: exportAllClassesMutation.isLoading,
     updateExamClass: updateExamClass.mutateAsync,
-    createExamClass: createExamClass.mutateAsync
+    createExamClass: createExamClass.mutateAsync,
+    downloadSample: downloadSample.mutateAsync
   };
 };

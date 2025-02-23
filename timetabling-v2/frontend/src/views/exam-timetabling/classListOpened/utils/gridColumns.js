@@ -12,7 +12,7 @@ export const COLUMNS = [
   {
     headerName: "Mã học phần",
     field: "courseId",
-    width: 100,
+    width: 120,
   },
   {
     headerName: "Ghi chú",

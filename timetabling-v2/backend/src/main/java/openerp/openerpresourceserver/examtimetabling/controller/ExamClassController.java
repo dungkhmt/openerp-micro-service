@@ -35,20 +35,8 @@ public class ExamClassController {
     @PostMapping("/delete-classes")
     public ResponseEntity<?> deleteClasses(@RequestBody List<String> examClassIds) {
         try {
-            List<String> notFoundIds = examClassService.validateExamClasses(examClassIds);
-
-            if (!notFoundIds.isEmpty()) {
-                return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(Map.of(
-                        "message", "Some exam classes not found",
-                        "notFoundIds", notFoundIds
-                    ));
-            }
-
             examClassService.deleteClasses(examClassIds);
             return ResponseEntity.ok().build();
-            
         } catch (Exception e) {
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -92,24 +80,39 @@ public class ExamClassController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createExamClass(@Valid @RequestBody ExamClass examClass) {
-    try {
-        // Check if exam class already exists
-        if (examClassService.validateExamClass(examClass.getExamClassId())) {
-            return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(Map.of(
-                    "message", "Exam class already exists",
-                    "examClassId", examClass.getExamClassId()
-                ));
-        }
+        try {
+            // Check if exam class already exists
+            if (examClassService.validateExamClass(examClass.getExamClassId())) {
+                return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(Map.of(
+                        "message", "Exam class already exists",
+                        "examClassId", examClass.getExamClassId()
+                    ));
+            }
 
-        ExamClass createdClass = examClassService.createExamClass(examClass);
-        return ResponseEntity.ok(createdClass);
-        
-    } catch (Exception e) {
-        return ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(Map.of("message", "Error creating exam class"));
+            ExamClass createdClass = examClassService.createExamClass(examClass);
+            return ResponseEntity.ok(createdClass);
+            
+        } catch (Exception e) {
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "Error creating exam class"));
+        }
     }
+
+    @GetMapping("/download-template")
+        public ResponseEntity<Resource> downloadTemplate() {
+        try {
+            String filename = "exam_class_template.xlsx";
+            InputStreamResource file = new InputStreamResource(examClassService.generateTemplate());
+            
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .body(file);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

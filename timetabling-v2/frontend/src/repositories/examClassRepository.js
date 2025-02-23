@@ -42,6 +42,22 @@ export const examClassService = {
     );
   },
 
+  downloadSample: async () => {
+    return await request(
+      'get',
+      '/exam-class/download-template',
+      null,
+      null,
+      null,
+      {
+        responseType: 'arraybuffer',
+        headers: {
+          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' // Add this for Excel files
+        }
+      }
+    );
+  },
+
   exportExcel: async (classExamIds) => {
     return await request(
       'post',
