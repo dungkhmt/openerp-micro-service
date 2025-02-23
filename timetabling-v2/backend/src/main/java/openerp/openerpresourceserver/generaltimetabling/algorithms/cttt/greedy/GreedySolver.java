@@ -60,11 +60,82 @@ public class GreedySolver {
     public int[] getSolutionSlot(){ return solutionSlot;}
     public int[] getSolutionRoom(){ return solutionRoom;}
 
-    public void greedy2(){
-        // TO DO by Chau
+    public void greedy3() {
+        unScheduledClassSegment = new ArrayList<>();
+        for (int i = 0; i < I.getNbClassSegments(); i++) {
+            boolean foundSlotRoom = false;
+            Integer bestRoom = null;
+            int minExcessCapacity = Integer.MAX_VALUE;
+            for (int s : I.getDomains()[i]) { // Iterate over available time slots
+                if (foundSlotRoom) break;
+                for (int r : I.getRooms()[i]) { // Iterate over rooms in priority order
+                    if (foundSlotRoom) break;
+                    int excessCapacity = I.getRoomCapacity()[r] - I.getNbStudents()[i];
+                    if (excessCapacity >= 0 && check(i, s, r)) {
+                        // If it's the first valid room or a better fit, update bestRoom
+                        if (excessCapacity < minExcessCapacity) {
+                            bestRoom = r;
+                            minExcessCapacity = excessCapacity;
+                        }
+                        // If we find a perfect fit (excessCapacity == 0), assign immediately
+                        if (excessCapacity == 0) {
+                            solutionSlot[i] = s;
+                            solutionRoom[i] = r;
+                            foundSlotRoom = true;
+                            break;
+                        }
+                    }
+                }
+                // If no perfect fit was found, assign the best available room
+                if (!foundSlotRoom && bestRoom != null) {
+                    solutionSlot[i] = s;
+                    solutionRoom[i] = bestRoom;
+                    foundSlotRoom = true;
+                }
+            }
+            if (!foundSlotRoom) {
+                unScheduledClassSegment.add(i);
+            }
+        }
+        foundSolution = unScheduledClassSegment.isEmpty();
     }
-    public void greedy3(){
+    public void greedy2(){
         // TODO by Chau
+        // Try to make use of the rooms that have not been assigned first
+        unScheduledClassSegment = new ArrayList<>();
+        HashSet<Integer> usedRooms = new HashSet<>(); // Track rooms that have been assigned at any time
+        for (int i = 0; i < I.getNbClassSegments(); i++) {
+            boolean foundSlotRoom = false;
+            for (int s : I.getDomains()[i]) { // Iterate over possible time slots
+                if (foundSlotRoom) break;
+                for (int r : I.getRooms()[i]) { // Iterate over possible rooms
+                    if (foundSlotRoom) break;
+                    if (usedRooms.contains(r)) continue;
+                    if (!usedRooms.contains(r) && check(i, s, r)) {
+                        // Found a room that hasn't been assigned to any segment yet
+                        solutionSlot[i] = s;
+                        solutionRoom[i] = r;
+                        usedRooms.add(r); // Mark this room as used
+                        foundSlotRoom = true;
+                    }
+                }
+                // If still no room found, iterate all over again to find the first-fit room
+                if (!foundSlotRoom) {
+                    for (int r : I.getRooms()[i]) {
+                        if (check(i, s, r)) {
+                            solutionSlot[i] = s;
+                            solutionRoom[i] = r;
+                            foundSlotRoom = true;
+                            break; // Stop once we find a valid room
+                        }
+                    }
+                }
+            }
+            if (!foundSlotRoom) {
+                unScheduledClassSegment.add(i); // If no valid assignment, mark it as unscheduled
+            }
+        }
+        foundSolution = unScheduledClassSegment.isEmpty();
     }
     public void simpleGreedy(){
         unScheduledClassSegment = new ArrayList<>();
@@ -78,7 +149,7 @@ public class GreedySolver {
                     if(foundSlotRoom) break;
                     if(check(i,s,r)){
                         solutionSlot[i]= s; solutionRoom[i] = r; foundSlotRoom = true;
-                        log.info("simpleGreedy, slot[" + i + "] = " + s + ", duration = " + I.getNbSlots()[i] + ", room[" + i + "] = " + r);
+                        log.info("simpleGreedy, slot[" + i + "] = " + s + ", duration = " + I.getNbSlots()[i] + ", room[" + i + "] = ");
                     }
                 }
             }
@@ -109,7 +180,9 @@ public class GreedySolver {
         for(int i = 0; i < I.getNbClassSegments(); i++){
             solutionRoom[i] = -1; solutionSlot[i] = -1; // NOT ASSIGNED/SCHEDULED
         }
-        simpleGreedy();
+//        simpleGreedy();
+//        greedy2();
+        greedy3();
         printSolution();
     }
     public void printSolution(){
@@ -118,14 +191,14 @@ public class GreedySolver {
         System.out.println();
         for(int i = 0; i < I.getNbClassSegments(); i++){
             if(solutionSlot[i] > -1){
-                System.out.println("class-segment[" + i + "] slot = " + solutionSlot[i] + " room = " + solutionRoom[i]);
+                System.out.println("class-segment[" + i + "] slot = " + solutionSlot[i] + " number students = " + I.getNbStudents()[i] + " room = " + solutionRoom[i] + " room capacity = " + I.getRoomCapacity()[solutionRoom[i]]);
             }
         }
     }
     public static void main(String[] args){
         try{
             Gson gson = new Gson();
-            Scanner in = new Scanner(new File("timetable.json"));
+            Scanner in = new Scanner(new File("/Users/moctran/Desktop/HUST/2024.2/GraduationResearch/Web/openerp-micro-service/timetabling-v2/backend/timetable.json"));
             String json = in.nextLine();
             in.close();
             MapDataScheduleTimeSlotRoom I = gson.fromJson(json,MapDataScheduleTimeSlotRoom.class);
