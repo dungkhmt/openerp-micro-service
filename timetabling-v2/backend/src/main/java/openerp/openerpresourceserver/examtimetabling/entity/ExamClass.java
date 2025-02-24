@@ -1,8 +1,13 @@
 package openerp.openerpresourceserver.examtimetabling.entity;
 
+import java.util.UUID;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +22,9 @@ import lombok.NoArgsConstructor;
 @Table(name = "exam_timetabling_class")
 public class ExamClass {
     @Id
+    @Column(name="id")
+    private UUID id;
+
     @Column(name="exam_class_id")
     private String examClassId;
 
@@ -46,4 +54,11 @@ public class ExamClass {
 
     @Column(name="school")
     private String school;
+
+    @Column(name="exam_plan_id", nullable = true)
+    private UUID examPlanId;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "exam_plan_id", insertable = false, updatable = false)
+    private ExamPlan examPlan;
 }

@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,27 +27,21 @@ public class ExamClassService {
     private final ExamClassRepository examClassRepository;
     private static final int BATCH_SIZE = 1000;
 
-    public List<ExamClass> getAllClasses() {
-        return examClassRepository.findAll();
-    }
-
-    public List<String> validateExamClasses(List<String> examClassIds) {
-        return examClassIds.stream()
-            .filter(id -> !examClassRepository.existsById(id))
-            .collect(Collectors.toList());
+    public List<ExamClass> getExamClassesByPlanId(UUID examPlanId) {
+        return examClassRepository.findByExamPlanId(examPlanId);
     }
 
     @Transactional
-    public void deleteClasses(List<String> examClassIds) {
-        for (int i = 0; i < examClassIds.size(); i += BATCH_SIZE) {
-            int end = Math.min(i + BATCH_SIZE, examClassIds.size());
-            List<String> batchIds = examClassIds.subList(i, end);
+    public void deleteClasses(List<UUID> ids) {
+        for (int i = 0; i < ids.size(); i += BATCH_SIZE) {
+            int end = Math.min(i + BATCH_SIZE, ids.size());
+            List<UUID> batchIds = ids.subList(i, end);
             examClassRepository.deleteByExamClassIdIn(batchIds);
         }
     }
 
-    public boolean validateExamClass(String examClassId) {
-        return examClassRepository.existsById(examClassId);
+    public boolean validateExamClass(String examClassId, UUID examPlanId) {
+        return examClassRepository.existsByExamClassIdAndExamPlanId(examClassId, examPlanId);
     }
 
     public ExamClass createExamClass(ExamClass examClass) {
@@ -56,21 +50,20 @@ public class ExamClassService {
 
     public ExamClass updateExamClass(ExamClass examClass) {
         // Check if exists
-        if (!examClassRepository.existsById(examClass.getExamClassId())) {
+        if (!examClassRepository.existsById(examClass.getId())) {
             throw new RuntimeException("Exam class not found with id: " + examClass.getExamClassId());
         }
         
         return examClassRepository.save(examClass);
     }
 
-    
-    public List<ExamClass> bulkCreateFromExcel(MultipartFile file) throws IOException, EncryptedDocumentException, InvalidFormatException {
+    public List<ExamClass> bulkCreateFromExcel(MultipartFile file, UUID examPlanId) throws IOException, EncryptedDocumentException, InvalidFormatException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
         
-        // First pass: collect all examClassIds from Excel
-        Set<String> excelExamClassIds = new HashSet<>();
+        // Collect exam class IDs and build objects from Excel
         List<ExamClass> allExcelClasses = new ArrayList<>();
+        Set<String> excelExamClassIds = new HashSet<>();
         
         // Skip header row
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
@@ -78,9 +71,12 @@ public class ExamClassService {
             if (row != null) {
                 try {
                     String examClassId = getStringValue(row.getCell(14));
+                    
+                    // Skip if examClassId is null or empty
                     if (examClassId == null || examClassId.trim().isEmpty()) continue;
                     
                     ExamClass examClass = ExamClass.builder()
+                        .id(UUID.randomUUID())
                         .examClassId(examClassId)
                         .classId(getStringValue(row.getCell(0)))
                         .courseId(getStringValue(row.getCell(2)))
@@ -91,6 +87,7 @@ public class ExamClassService {
                         .period(getStringValue(row.getCell(9)))
                         .managementCode(getStringValue(row.getCell(11)))
                         .school(getStringValue(row.getCell(13)))
+                        .examPlanId(examPlanId)
                         .build();
                     
                     excelExamClassIds.add(examClassId);
@@ -101,35 +98,28 @@ public class ExamClassService {
             }
         }
         workbook.close();
-
-        // Get existing IDs from database in one query
-        List<String> existingIds = examClassRepository.findExamClassIdsByExamClassIdIn(excelExamClassIds);
-        Set<String> existingIdSet = new HashSet<>(existingIds);
-
-        // Separate new and conflict classes
-        List<ExamClass> conflictClasses = new ArrayList<>();
-        List<ExamClass> newClasses = new ArrayList<>();
-
-        for (ExamClass examClass : allExcelClasses) {
-            if (existingIdSet.contains(examClass.getExamClassId())) {
-                conflictClasses.add(examClass);
-            } else {
-                newClasses.add(examClass);
-            }
+        
+        // Skip further processing if no valid records
+        if (excelExamClassIds.isEmpty()) {
+            return new ArrayList<>();
         }
-
-        // If there are conflicts, return them
+    
+        // Direct query to find conflicts in one database call
+        List<ExamClass> conflictClasses = examClassRepository.findByExamPlanIdAndExamClassIdIn(
+            examPlanId, new ArrayList<>(excelExamClassIds));
+        
+        // If conflicts found, return them
         if (!conflictClasses.isEmpty()) {
             return conflictClasses;
         }
-
-        // Otherwise save new classes and return empty list
-        examClassRepository.saveAll(newClasses);
+        
+        // Otherwise save all classes
+        examClassRepository.saveAll(allExcelClasses);
         return new ArrayList<>();
     }
-
-   public ByteArrayInputStream loadExamClasses(List<String> examClassIds) {
-        List<ExamClass> examClasses = examClassRepository.findAllById(examClassIds);
+    
+   public ByteArrayInputStream loadExamClasses(List<UUID> ids) {
+        List<ExamClass> examClasses = examClassRepository.findAllById(ids);
 
         try (Workbook workbook = new XSSFWorkbook()) { // Using XLSX format
             Sheet sheet = workbook.createSheet("Exam Classes");

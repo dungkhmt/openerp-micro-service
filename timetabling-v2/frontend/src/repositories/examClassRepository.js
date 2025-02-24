@@ -1,8 +1,8 @@
 import { request } from 'api';
 
 export const examClassService = {
-  getAllExamClass: async () => {
-    return await request('get', '/exam-class/all');
+  getAllExamClass: async (examPlanId) => {
+    return await request('get', '/exam-class?examPlanId=' + examPlanId);
   },
 
   deleteExamClasses: async (examClassIds) => {
@@ -29,10 +29,10 @@ export const examClassService = {
     });
   },
 
-  importExcel: async (formData, semester) => {
+  importExcel: async (formData, examPlanId) => {
     return await request(
       'POST',
-      `/exam-class/upload`,
+      `/exam-class/upload?examPlanId=${examPlanId}`,
       null,
       null,
       formData,
