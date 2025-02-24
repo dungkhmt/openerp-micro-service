@@ -336,8 +336,16 @@ export const useGeneralSchedule = () => {
   );
 
   const autoScheduleSelectedMutation = useMutation(
-    ({ classIds, timeLimit, semester }) => 
-      generalScheduleRepository.autoScheduleSelected(classIds, timeLimit, semester),
+    ({ classIds, timeLimit, semester }) => {
+      // Clean up classIds by removing the -[number] suffix if it exists
+      const cleanClassIds = classIds.map(id => id.split('-')[0]);
+      
+      return generalScheduleRepository.autoScheduleSelected(
+        cleanClassIds,
+        timeLimit, 
+        semester
+      );
+    },
     {
       onMutate: () => {
         setLoading(true);
