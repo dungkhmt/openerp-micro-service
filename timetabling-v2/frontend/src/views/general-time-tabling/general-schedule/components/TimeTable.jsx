@@ -27,7 +27,8 @@ const TimeTable = ({
   const { classrooms } = useClassrooms(selectedGroup?.groupName || "", null);
   const { handlers, states } = useGeneralSchedule();
 
-  console.log(classes);
+  console.log(classrooms);
+  console.log(selectedGroup?.groupName);
   useEffect(() => {
     if (classes && classes.length > 0) {
       const transformedClassDetails = classes
@@ -122,7 +123,7 @@ const TimeTable = ({
         return;
       }
 
-      console.log('Selected class:', selectedClassForSlot); // Add debug log
+      console.log('Selected class:', selectedClassForSlot); 
 
       await handlers.handleAddTimeSlot({
         generalClassId: selectedClassForSlot.generalClassId,

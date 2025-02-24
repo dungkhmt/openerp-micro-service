@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.generaltimetabling.repo;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -34,4 +35,12 @@ public interface ClassroomRepo extends JpaRepository<Classroom, String> {
     List<Classroom> getClassRoomByBuilding(String priorityBuilding);
 
     List<Classroom> getClassRoomByBuildingIn(List<String> split);
+
+    @Query("SELECT c FROM Classroom c WHERE c.id IN " +
+            "(SELECT grp.roomId FROM GroupRoomPriority grp WHERE grp.groupId = " +
+            "(SELECT g.id FROM Group g WHERE g.groupName = :groupName)) " +
+            "AND (:maxAmount IS NULL OR c.quantityMax >= :maxAmount) " +
+            "ORDER BY c.quantityMax DESC")
+    List<Classroom> findByGroupNameAndOptionalMaxQuantity(@Param("groupName") String groupName,
+                                                          @Param("maxAmount") Integer maxAmount);
 }
