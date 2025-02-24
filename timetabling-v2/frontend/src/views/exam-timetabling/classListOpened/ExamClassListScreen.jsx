@@ -358,7 +358,7 @@ export default function TimePerformanceScreen() {
         <Typography
           variant="h4"
           sx={{
-            fontWeight: 600,
+            fontWeight: 700,
             color: '#1976d2',
             position: 'relative',
           }}
