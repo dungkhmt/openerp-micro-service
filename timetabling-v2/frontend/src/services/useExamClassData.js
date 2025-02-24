@@ -2,13 +2,14 @@ import { useQuery, useMutation } from 'react-query';
 import { toast } from 'react-toastify';
 import { examClassService } from 'repositories/examClassRepository'
 
-export const useExamClassData = () => {
+export const useExamClassData = (examPlanId = null) => {
   const { data: classOpeneds, isLoading, error, refetch } = useQuery(
-    'examClasses',
-    examClassService.getAllExamClass,
+    ['examClasses', examPlanId],
+    () => examClassService.getAllExamClass(examPlanId),
     {
       staleTime: 5 * 60 * 1000,
-      cacheTime: 30 * 60 * 1000
+      cacheTime: 30 * 60 * 1000,
+      enabled: !!examPlanId
     }
   );
 
@@ -22,14 +23,18 @@ export const useExamClassData = () => {
     }
   });
 
-  const importExcelMutation = useMutation(examClassService.importExcel, {
-    onError: (error) => {
-      toast.error(error.response?.data || 'Có lỗi xảy ra khi import danh sách lớp');
+  const importExcelMutation = useMutation(
+    (formData) => examClassService.importExcel(formData,examPlanId),
+    {
+      onError: (error) => {
+        toast.error(error.response?.data || 'Có lỗi xảy ra khi import danh sách lớp');
+      }
     }
-  });
+  );
 
   const exportConflictsMutation = useMutation(examClassService.exportExcel, {
     onSuccess: (response) => {
+      refetch();
       const blob = new Blob([response.data], {
         type: response.headers["content-type"],
       });
@@ -48,6 +53,7 @@ export const useExamClassData = () => {
 
   const exportAllClassesMutation = useMutation(examClassService.exportExcel, {
     onSuccess: (response) => {
+      refetch();
       const blob = new Blob([response.data], {
         type: response.headers["content-type"],
       });
@@ -111,7 +117,7 @@ export const useExamClassData = () => {
     isClearing: deleteExamClassMutation.isLoading,
     isImporting: importExcelMutation.isLoading,
     refetchClassOpeneds: refetch,
-    exportConflict: exportConflictsMutation.mutateAsync,
+    exportConflicts: exportConflictsMutation.mutateAsync,
     exportClasses: exportAllClassesMutation.mutateAsync,
     isExportingConflicts: exportConflictsMutation.isLoading,
     isExportingClasses: exportAllClassesMutation.isLoading,
