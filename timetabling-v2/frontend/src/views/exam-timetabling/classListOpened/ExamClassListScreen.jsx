@@ -110,6 +110,7 @@ export default function TimePerformanceScreen() {
   const handleDialogClose = () => {
     setSuccessDialogOpen(false)
     setConflictDialogOpen(false)
+    window.location.reload()
   }
 
   const handleDownloadConflictList = async () => {
@@ -404,6 +405,9 @@ export default function TimePerformanceScreen() {
             color: '#fff',
             fontSize: '15px',
             fontWeight: 'bold',
+          },
+          '& .MuiDataGrid-row:nth-of-type(even)': {
+            backgroundColor: '#f9f9f9',
           },
           '& .MuiDataGrid-columnHeader': {
             '&:focus': {

@@ -11,6 +11,12 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 public interface ExamClassRepository extends JpaRepository<ExamClass, UUID> {
+    long countByExamPlanId(UUID examPlanId);
+    
+    @Query("SELECT e.school as school, COUNT(e) as count FROM ExamClass e " +
+           "WHERE e.examPlanId = :examPlanId GROUP BY e.school ORDER BY COUNT(e) DESC")
+    List<Object[]> getSchoolDistributionByExamPlanId(UUID examPlanId);
+    
     @Modifying
     @Query("DELETE FROM ExamClass e WHERE e.id IN :ids")
     void deleteByExamClassIdIn(List<UUID> ids);
