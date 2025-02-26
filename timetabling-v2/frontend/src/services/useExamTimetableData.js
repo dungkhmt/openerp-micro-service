@@ -1,61 +1,59 @@
-export const useExamTimetableData = (planId) => {
-  // Mock data for timetables
-  const mockTimetables = [
-    { 
-      id: 1, 
-      name: 'Lịch thi học kỳ 1 (2023-2024)', 
-      createdAt: '2023-12-15T09:30:00', 
-      progress: 100,
-      examPlanId: planId
-    },
-    { 
-      id: 2, 
-      name: 'Lịch thi học kỳ 1 (bản nháp)', 
-      createdAt: '2023-12-12T14:45:00', 
-      progress: 75,
-      examPlanId: planId
-    },
-    { 
-      id: 3, 
-      name: 'Lịch thi học kỳ 1 (phương án dự phòng)', 
-      createdAt: '2023-12-10T11:20:00', 
-      progress: 90,
-      examPlanId: planId
-    },
-    { 
-      id: 4, 
-      name: 'Lịch thi học kỳ 1 (2023-2024)', 
-      createdAt: '2023-12-15T09:30:00', 
-      progress: 100,
-      examPlanId: planId
-    },
-    { 
-      id: 5, 
-      name: 'Lịch thi học kỳ 1 (bản nháp)', 
-      createdAt: '2023-12-12T14:45:00', 
-      progress: 75,
-      examPlanId: planId
-    },
-    { 
-      id: 6, 
-      name: 'Lịch thi học kỳ 1 (phương án dự phòng)', 
-      createdAt: '2023-12-10T11:20:00', 
-      progress: 90,
-      examPlanId: planId
-    },
-    { 
-      id: 7, 
-      name: 'Lịch thi học kỳ 1 (phương án dự phòng)', 
-      createdAt: '2023-12-10T11:20:00', 
-      progress: 90,
-      examPlanId: planId
+import { useQuery, useMutation} from 'react-query';
+import { toast } from 'react-toastify';
+import { examTimetableService } from "repositories/examTimetableRepository";
+import { queryClient } from 'queryClient';
+
+export const useExamTimetableData = (examPlanId = null) => {
+  
+  const { data: examTimetables, isLoading, error } = useQuery(
+    'examTimetables',
+    () => examTimetableService.getAllExamTimetables(examPlanId),
+    {
+      staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+      cacheTime: 30 * 60 * 1000, // Keep cache for 30 minutes
+      enabled: !!examPlanId,
     }
-  ];
+  );
+
+  const createMutation = useMutation(examTimetableService.createExamTimetable, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('examTimetables');
+      toast.success('Tạo kế hoạc thi mới thành công!');
+    },
+    onError: (error) => {
+      toast.error(error.response?.data || 'Có lỗi xảy ra khi tạo kế hoạch thi');
+    }
+  });
+
+  const updateMutation = useMutation(examTimetableService.updateExamTimetable, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('examTimetables');
+      toast.success('Cập nhật kế hoạc thi thành công!');
+    },
+    onError: (error) => {
+      toast.error(error.response?.data || 'Có lỗi xảy ra khi cập nhật kế hoạc thi');
+    }
+  });
+
+  const deleteMutation = useMutation(examTimetableService.deleteExamTimetable, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('examTimetables');
+      toast.success('Xóa kế hoạc thi thành công!');
+    },
+    onError: (error) => {
+      toast.error(error.response?.data || 'Có lỗi xảy ra khi xóa kế hoạc thi');
+    }
+  });
 
   return {
-    examTimetables: mockTimetables,
-    isLoading: false,
-    createTimetable: () => Promise.resolve({}),
-    deleteTimetable: () => Promise.resolve({})
+    examTimetables: examTimetables?.data || [],
+    isLoading,
+    error,
+    createExamTimetable: createMutation.mutateAsync,
+    updateExamTimetable: updateMutation.mutateAsync,
+    deleteExamTimetable: deleteMutation.mutateAsync,
+    isCreating: createMutation.isLoading,
+    isUpdating: updateMutation.isLoading,
+    isDeleting: deleteMutation.isLoading,
   };
 };
