@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AssignedOrderItemCreate {
+public class AssignedOrderItemRequest {
 
 	private UUID warehouseId;
 	private UUID bayId;

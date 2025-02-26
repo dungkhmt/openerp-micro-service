@@ -1,10 +1,9 @@
 package openerp.openerpresourceserver.entity;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -19,18 +18,28 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 @ToString
-@Table(name = "wms_delivery_trip_path")
-public class DeliveryTripPath {
+@Table(name = "wms_delivery_trip_item")
+public class DeliveryTripItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer deliveryTripPathId;
+    private String deliveryTripItemId;
 
     private String deliveryTripId;
+    
+    private int sequence;
 
-    private double longitude;
+    private UUID orderId;
 
-    private double latitude;
+    private UUID assignedOrderItemId;
+
+    private int quantity;
+
+    private boolean isDeleted;
+
+    private String status;
+
+    private LocalDateTime lastUpdatedStamp;
 
     private LocalDateTime createdStamp;
 }
+

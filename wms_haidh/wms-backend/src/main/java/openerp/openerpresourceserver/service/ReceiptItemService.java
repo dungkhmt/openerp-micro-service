@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import openerp.openerpresourceserver.entity.ReceiptItem;
 import openerp.openerpresourceserver.entity.projection.ReceiptItemProjection;
-import openerp.openerpresourceserver.model.request.ReceiptItemCreate;
+import openerp.openerpresourceserver.model.request.ReceiptItemRequest;
 import openerp.openerpresourceserver.repository.ReceiptItemRepository;
 
 @Service
@@ -28,7 +28,7 @@ public class ReceiptItemService {
 		return repository.findByReceiptItemRequestId(receiptItemRequestId);
 	}
 
-	public ReceiptItem createReceiptItem(ReceiptItemCreate request) {
+	public ReceiptItem createReceiptItem(ReceiptItemRequest request) {
 	    // Lấy thông tin cần thiết từ ReceiptItemRequest
 	    UUID receiptId = receiptItemRequestService.getReceiptIdByRequestId(request.getReceiptItemRequestId());
 	    UUID productId = receiptItemRequestService.getProductIdByRequestId(request.getReceiptItemRequestId());

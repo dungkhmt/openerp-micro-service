@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReceiptCreate {
+public class ReceiptRequest {
 
     private String receiptName;
     private String description;

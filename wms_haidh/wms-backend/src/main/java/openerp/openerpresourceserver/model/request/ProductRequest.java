@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductCreate {
+public class ProductRequest {
     private UUID productId;
     private String code;
     private String name;

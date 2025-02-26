@@ -26,13 +26,13 @@ public class DeliveryTrip {
 
     private UUID vehicleId;
 
-    private UUID deliveryPersonId;
+    private String deliveryPersonId;
 
-    private double distance;
+    private Double distance;
 
-    private double totalWeight;
+    private Double totalWeight;
 
-    private int totalLocations;
+    private Integer totalLocations;
 
     private LocalDateTime lastUpdatedStamp;
 
@@ -42,7 +42,7 @@ public class DeliveryTrip {
 
     private boolean isDeleted;
 
-    private UUID shipmentId;
+    private String shipmentId;
 
     private UUID warehouseId;
 

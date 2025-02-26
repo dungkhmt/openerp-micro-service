@@ -1,0 +1,530 @@
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useNavigate, useParams } from 'react-router-dom';
+import Skeleton from "@mui/material/Skeleton";
+import { request } from "../../api";
+import {
+  Box,
+  TextField,
+  Typography,
+  Grid,
+  Button,
+  Paper,
+  IconButton,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TablePagination,
+  TableHead,
+  TableRow,
+  Checkbox
+} from '@mui/material';
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import Map from './Map';
+import fetchRoute from '../../utils/fetchRoute';
+
+const AddTrip = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [description, setDescription] = useState('');
+  const [warehouseId, setWarehouseId] = useState('');
+  const [warehouseOptions, setWarehouseOptions] = useState([]);
+  const [deliveryPersonOptions, setDeliveryPersonOptions] = useState([]);
+  const [deliveryPersonId, setDeliveryPersonId] = useState('');
+  const [shipmentOptions, setShipmentOptions] = useState([]);
+  const [shipmentId, setShipmentId] = useState('');
+  const [assignedItems, setAssignedItems] = useState([]);
+  const [deliverySequence, setDeliverySequence] = useState([]);
+  const [customerInfo, setCustomerInfo] = useState({});
+  const [totalWeight, setTotalWeight] = useState(0);
+  const [details, setDetails] = useState([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(3);
+  const [totalItems, setTotalItems] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [selectedItems, setSelectedItems] = useState(new Set());
+  const [route, setRoute] = useState([]);
+  const [loadingMap, setLoadingMap] = useState(true);
+  const [distance, setDistance] = useState(0);
+  const prevWarehouseId = useRef(warehouseId);
+
+  const selectedWarehouse = useMemo(() =>
+    warehouseOptions.find(wh => wh.warehouseId === warehouseId),
+    [warehouseId, warehouseOptions]
+  );
+
+  const warehouseCoordinates = useMemo(() =>
+    selectedWarehouse ? [selectedWarehouse.longitude, selectedWarehouse.latitude] : null,
+    [selectedWarehouse]
+  );
+
+  const customerCoordinates = useMemo(() =>
+    deliverySequence
+      .map(({ orderId }) => customerInfo[orderId])
+      .filter(info => info)
+      .map(({ longitude, latitude }) => [longitude, latitude]),
+    [deliverySequence, customerInfo]
+  );
+
+  const coordinates = useMemo(() =>
+    warehouseCoordinates ? [warehouseCoordinates, ...customerCoordinates] : [],
+    [warehouseCoordinates, customerCoordinates]
+  );
+
+
+  const prevCoords = useRef([]);
+
+  useEffect(() => {
+    if (coordinates.length < 2 || warehouseId !== prevWarehouseId.current) {
+      setLoadingMap(true);
+      setDistance(0);  // Reset distance khi không có đủ điểm
+      return;
+    }
+    prevCoords.current = coordinates;
+    fetchRoute(coordinates, setRoute, setDistance, setLoadingMap);
+  }, [coordinates, warehouseId]);
+
+
+
+
+
+  useEffect(() => {
+    request("get", "/delivery-manager/warehouse", (res) => {
+      setWarehouseOptions(res.data);
+    }).then();
+  }, []);
+
+  useEffect(() => {
+    request("get", "/delivery-manager/delivery-person", (res) => {
+      setDeliveryPersonOptions(res.data);
+    }).then();
+  }, []);
+  useEffect(() => {
+    request("get", "/delivery-manager/shipment", (res) => {
+      setShipmentOptions(res.data);
+    }).then();
+  }, []);
+
+  useEffect(() => {
+    if (warehouseId !== prevWarehouseId.current) {
+      setTotalWeight(0);
+      setLoadingMap(true);
+      setDistance(0);
+      setRoute([]);
+      setCustomerInfo({});
+      setDeliverySequence([]);
+      setSelectedItems(new Set());
+      prevWarehouseId.current = warehouseId;
+    }
+  }, [warehouseId]);
+
+  useEffect(() => {
+    if (warehouseId) {
+      setLoading(true);
+      request(
+        "get",
+        `/delivery-manager/assignedOrderItems?warehouseId=${warehouseId}&page=${page}&size=${rowsPerPage}`,
+        (res) => {
+          const newDetails = res.data.content;
+          setTimeout(() => {
+            setTotalItems(res.data.totalElements);
+            setDetails(newDetails);
+            setLoading(false);
+          }, 200);
+        }
+      ).catch(() => setLoading(false));
+    }
+  }, [warehouseId, page, rowsPerPage]);
+
+
+  const handleSubmit = async () => {
+
+    const orderSequenceMap = deliverySequence.reduce((acc, item, index) => {
+      acc[item.orderId] = index + 1;
+      return acc;
+    }, {});
+
+    const submittedData = assignedItems.map(item => ({
+      assignedOrderItemId: item.assignedOrderItemId,
+      quantity: item.originalQuantity,
+      orderId: item.orderId,
+      sequence: orderSequenceMap[item.orderId] || null,
+    }));
+
+    const payload = {
+      warehouseId,
+      deliveryPersonId,
+      description,
+      shipmentId,
+      totalWeight,
+      totalLocations : deliverySequence.length,
+      distance,
+      items: submittedData,
+      coordinates,
+      assignedBy: "admin"
+    };
+    // console.log(payload);
+
+    const requestUrl = id ? "/delivery-manager/delivery-trips/update-trip" : "/delivery-manager/delivery-trips/create-trip";
+
+    request("post", requestUrl, (res) => {
+      if (res.status === 200) {
+        navigate(`/delivery-manager/delivery-trip`);
+      }
+    }, {}, payload);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+
+  const fetchCustomerInfo = async (orderId) => {
+    if (customerInfo[orderId]) return;
+    request("get", `/delivery-manager/customer-address/${orderId}`, (res) => {
+      setCustomerInfo((prev) => ({ ...prev, [orderId]: res.data }));
+    }).then();
+  };
+
+  const handleSelect = (item, checked) => {
+    const itemWeight = item.weight * item.originalQuantity;
+    setAssignedItems((prev) => {
+      let updatedItems = checked
+        ? [...prev, item]
+        : prev.filter((i) => i.assignedOrderItemId !== item.assignedOrderItemId);
+
+      let orderExists = deliverySequence.some(d => d.orderId === item.orderId);
+      if (checked && !orderExists) {
+        setDeliverySequence((prevSeq) => [...prevSeq, { orderId: item.orderId }]);
+        fetchCustomerInfo(item.orderId);
+      }
+
+      if (!checked && !updatedItems.some(i => i.orderId === item.orderId)) {
+        setDeliverySequence((prevSeq) => prevSeq.filter(d => d.orderId !== item.orderId));
+      }
+
+      return updatedItems;
+    });
+
+    setTotalWeight((prevWeight) => checked ? prevWeight + itemWeight : prevWeight - itemWeight);
+
+    // Cập nhật trạng thái đã chọn
+    setSelectedItems(prev => {
+      const updated = new Set(prev);
+      if (checked) {
+        updated.add(item.assignedOrderItemId);
+      } else {
+        updated.delete(item.assignedOrderItemId);
+      }
+      return updated;
+    });
+  };
+
+
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+    const reorderedItems = Array.from(deliverySequence);
+    const [movedItem] = reorderedItems.splice(result.source.index, 1);
+    reorderedItems.splice(result.destination.index, 0, movedItem);
+    setDeliverySequence(reorderedItems);
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    };
+    return date.toLocaleString('en-GB', options);
+  };
+
+  const formatPrice = (price) => {
+    return price.toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    });
+  };
+
+  return (
+    <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <IconButton color="primary" onClick={() => navigate('/delivery-manager/delivery-trip')} sx={{ color: 'black' }}>
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
+          {id ? 'Update Delivery Trip' : 'Create New Delivery Trip'}
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{
+            marginLeft: 'auto',
+            backgroundColor: 'black',
+            color: 'white',
+            '&:hover': {
+              backgroundColor: 'black',
+              opacity: 0.75,
+            }
+          }}
+          onClick={handleSubmit}
+        >
+          {id ? 'Update Delivery Trip' : 'Save Trip'}
+        </Button>
+      </Box>
+      <Box sx={{ mt: 4 }}>
+        <Paper elevation={3} sx={{ p: 3 }}>
+          <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+            General information
+          </Typography>
+
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth>
+                <InputLabel>Departure Warehouse</InputLabel>
+                <Select
+                  value={warehouseId}
+                  onChange={(e) => setWarehouseId(e.target.value)}
+                  label="Departure Warehouse"
+                >
+                  {warehouseOptions.map((wh) => (
+                    <MenuItem key={wh.warehouseId} value={wh.warehouseId}>
+                      {wh.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth>
+                <InputLabel>Delivery Person</InputLabel>
+                <Select
+                  value={deliveryPersonId}
+                  onChange={(e) => setDeliveryPersonId(e.target.value)}
+                  label="Delivery Person"
+                >
+                  {deliveryPersonOptions.map((item) => (
+                    <MenuItem key={item.userLoginId} value={item.userLoginId}>
+                      {item.fullName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <TextField
+                  fullWidth
+                  label="Description"
+                  placeholder="Enter trip description"
+                  multiline
+                  rows={2}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth>
+                <InputLabel>Shipment</InputLabel>
+                <Select
+                  value={shipmentId}
+                  onChange={(e) => setShipmentId(e.target.value)}
+                  label="Shipment"
+                >
+                  {shipmentOptions.map((item) => (
+                    <MenuItem key={item.shipmentId} value={item.shipmentId}>
+                      {formatDate(item.expectedDeliveryStamp)}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+        </Paper>
+        <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
+          <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+            Assigned Order Items
+          </Typography>
+          <div className='mb-4'>
+            <Typography variant="h7" gutterBottom className="text-green-500">
+              Total weight : {totalWeight} kg
+            </Typography>
+          </div>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Select</TableCell>
+                  <TableCell>Order Date</TableCell>
+                  <TableCell>Product</TableCell>
+                  <TableCell>Weight</TableCell>
+                  <TableCell>Quantity</TableCell>
+                  <TableCell>Bay Code</TableCell>
+                  <TableCell>Lot ID</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {loading
+                  ? Array.from({ length: rowsPerPage }).map((_, index) => (
+                    <TableRow key={`skeleton-${index}`}>
+                      <TableCell width={50}>
+                        <Checkbox
+                          checked={false}
+                          inputProps={{ "aria-label": "Select product" }}
+                        />
+                      </TableCell>
+                      <TableCell width={150}>
+                        <Skeleton variant="text" />
+                      </TableCell>
+                      <TableCell width={200}>
+                        <Skeleton variant="text" />
+                      </TableCell>
+                      <TableCell width={100}>
+                        <Skeleton variant="text" />
+                      </TableCell>
+                      <TableCell width={100}>
+                        <Skeleton variant="text" />
+                      </TableCell>
+                      <TableCell width={120}>
+                        <Skeleton variant="text" />
+                      </TableCell>
+                      <TableCell width={120}>
+                        <Skeleton variant="text" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                  : details.map((detail) => (
+                    <TableRow key={detail.assignedOrderItemId}>
+                      <TableCell width={50}>
+                        <Checkbox
+                          checked={selectedItems.has(detail.assignedOrderItemId)}
+                          onChange={(e) => handleSelect(detail, e.target.checked)}
+                          inputProps={{ "aria-label": "Select product" }}
+                        />
+                      </TableCell>
+                      <TableCell width={150}>{formatDate(detail.orderDate)}</TableCell>
+                      <TableCell width={200}>{detail.productName}</TableCell>
+                      <TableCell width={100}>{detail.weight}</TableCell>
+                      <TableCell width={100}>{detail.originalQuantity}</TableCell>
+                      <TableCell width={120}>{detail.bayCode}</TableCell>
+                      <TableCell width={120}>{detail.lotId}</TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+
+
+
+
+
+            </Table>
+            {/* Thêm phân trang */}
+            <TablePagination
+              rowsPerPageOptions={[3, 5, 10,]}
+              component="div"
+              count={totalItems}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </TableContainer>
+        </Paper>
+        <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
+          <Typography variant="h6" gutterBottom>
+            Delivery Sequence (Drag & Drop)
+          </Typography>
+          <div className='mb-4'>
+            <Typography variant="h7" gutterBottom className="text-green-500">
+              Total locations : {deliverySequence.length}
+            </Typography>
+          </div>
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="deliverySequence">
+              {(provided) => (
+                <TableContainer ref={provided.innerRef} {...provided.droppableProps}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>#</TableCell>
+                        <TableCell>Customer Name</TableCell>
+                        <TableCell>Customer Address</TableCell>
+                        <TableCell>Total Order Cost</TableCell>
+                        <TableCell>Payment Type</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {deliverySequence && deliverySequence.map((item, index) => (
+                        <Draggable key={item.orderId} draggableId={item.orderId} index={index}>
+                          {(provided) => (
+                            <TableRow ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                              <TableCell>{index + 1}</TableCell>
+                              <TableCell>{customerInfo[item.orderId]?.customerName || 'Loading...'}</TableCell>
+                              <TableCell>{customerInfo[item.orderId]?.addressName || 'Loading...'}</TableCell>
+                              <TableCell>{customerInfo[item.orderId] ? formatPrice(customerInfo[item.orderId].totalOrderCost) : 'Loading...'}</TableCell>
+                              <TableCell>{customerInfo[item.orderId]?.paymentType || 'Loading...'}</TableCell>
+                            </TableRow>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </Droppable>
+          </DragDropContext>
+        </Paper>
+        <Grid container sx={{ mt: 4 }}>
+          {/* Map Container */}
+          <Grid item xs={12}>
+            <Paper elevation={3} sx={{ p: 3, height: 540 }}>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{
+                  textAlign: 'center'
+                }}
+              >
+                Optimized Delivery Route
+              </Typography>
+              <Typography variant="h6" gutterBottom className="text-green-500" sx={{
+                textAlign: 'center',
+                marginBottom: 2,    // Spacing below title
+              }}>
+                Distance : {(distance/1000).toFixed(2)} km
+              </Typography>
+
+              <Box sx={{ height: '100%', borderRadius: 1, overflow: 'hidden' }}>
+                {/* Pass the route data to the Map component */}
+                {loadingMap ? (
+                  <Typography variant="h6" sx={{ textAlign: 'center' }}>
+                    Loading route...
+                  </Typography>
+                ) : (
+                  <Map route={route} />
+                )}
+              </Box>
+            </Paper>
+          </Grid>
+
+        </Grid>
+      </Box>
+    </Box>
+  );
+};
+
+export default AddTrip;

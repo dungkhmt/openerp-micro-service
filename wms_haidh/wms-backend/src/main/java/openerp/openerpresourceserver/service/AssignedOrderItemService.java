@@ -5,13 +5,16 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import openerp.openerpresourceserver.entity.AssignedOrderItem;
 import openerp.openerpresourceserver.entity.InventoryItem;
 import openerp.openerpresourceserver.entity.SaleOrderItem;
 import openerp.openerpresourceserver.entity.projection.AssignedOrderItemProjection;
-import openerp.openerpresourceserver.model.request.AssignedOrderItemCreate;
+import openerp.openerpresourceserver.entity.projection.DeliveryOrderItemProjection;
+import openerp.openerpresourceserver.model.request.AssignedOrderItemRequest;
 import openerp.openerpresourceserver.repository.AssignedOrderItemRepository;
 import openerp.openerpresourceserver.repository.InventoryItemRepository;
 import openerp.openerpresourceserver.repository.SaleOrderItemRepository;
@@ -31,8 +34,12 @@ public class AssignedOrderItemService {
 	public List<AssignedOrderItemProjection> getAssignedOrderItemsBySaleOrderItemId(UUID saleOrderItemId) {
 		return assignedOrderItemRepository.findAssignedOrderItemsBySaleOrderItemId(saleOrderItemId);
 	}
+	
+	public Page<DeliveryOrderItemProjection> getAllDeliveryOrderItems(UUID warehouseId,Pageable pageable) {
+        return assignedOrderItemRepository.findAllDeliveryOrderItemsByWarehouse(warehouseId,pageable);
+    }
 
-	public AssignedOrderItem assignOrderItem(AssignedOrderItemCreate dto) {
+	public AssignedOrderItem assignOrderItem(AssignedOrderItemRequest dto) {
         // Step 1: Retrieve SaleOrderItem
         SaleOrderItem saleOrderItem = saleOrderItemRepository.findById(dto.getSaleOrderItemId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid SaleOrderItemId"));
@@ -75,4 +82,15 @@ public class AssignedOrderItemService {
 
         return assignedOrderItem;
     }
+
+	public void updateAssignedOrderItemStatus(UUID assignedOrderItemId) {
+		AssignedOrderItem assignedOrderItem = assignedOrderItemRepository.findById(assignedOrderItemId)
+                .orElseThrow(() -> new IllegalArgumentException("AssignedOrderItem not found with id: " + assignedOrderItemId));
+        
+        assignedOrderItem.setStatus("DONE");
+        assignedOrderItem.setLastUpdatedStamp(LocalDateTime.now());
+        assignedOrderItemRepository.save(assignedOrderItem);
+		
+	}
+
 }

@@ -15,7 +15,7 @@ import openerp.openerpresourceserver.entity.Receipt;
 import openerp.openerpresourceserver.entity.ReceiptItemRequest;
 import openerp.openerpresourceserver.entity.projection.ReceiptInfoProjection;
 import openerp.openerpresourceserver.entity.projection.ReceiptItemDetailProjection;
-import openerp.openerpresourceserver.model.request.ReceiptCreate;
+import openerp.openerpresourceserver.model.request.ReceiptRequest;
 import openerp.openerpresourceserver.model.request.ReceiptItemRequestCreate;
 import openerp.openerpresourceserver.repository.ReceiptItemRequestRepository;
 import openerp.openerpresourceserver.repository.ReceiptRepository;
@@ -33,7 +33,7 @@ public class ReceiptService {
 		return receiptRepository.findReceiptsByStatus(status, pageable);
 	}
 
-	public Receipt createReceipt(ReceiptCreate request) {
+	public Receipt createReceipt(ReceiptRequest request) {
 
 		if (request.getCreatedBy() == null || request.getCreatedBy().isEmpty()) {
 			throw new IllegalArgumentException("CreatedBy cannot be empty");

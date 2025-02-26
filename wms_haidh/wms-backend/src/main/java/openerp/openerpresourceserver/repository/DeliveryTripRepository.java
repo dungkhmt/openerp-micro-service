@@ -21,6 +21,6 @@ public interface DeliveryTripRepository extends JpaRepository<DeliveryTrip, Stri
            "FROM DeliveryTrip dt " +
            "JOIN DeliveryPerson dp ON dt.deliveryPersonId = dp.userLoginId " +
            "WHERE dt.isDeleted = false " +
-           "AND dt.status = :status")
+           "AND dt.status = :status ORDER BY dt.lastUpdatedStamp DESC")
     Page<DeliveryTripProjection> findFilteredDeliveryTrips(@Param("status") String status, Pageable pageable);
 }

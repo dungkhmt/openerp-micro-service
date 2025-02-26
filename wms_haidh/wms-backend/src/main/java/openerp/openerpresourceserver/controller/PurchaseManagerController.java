@@ -26,7 +26,7 @@ import openerp.openerpresourceserver.entity.projection.ProductNameProjection;
 import openerp.openerpresourceserver.entity.projection.ReceiptBillProjection;
 import openerp.openerpresourceserver.entity.projection.ReceiptInfoProjection;
 import openerp.openerpresourceserver.entity.projection.ReceiptItemDetailProjection;
-import openerp.openerpresourceserver.model.request.ReceiptCreate;
+import openerp.openerpresourceserver.model.request.ReceiptRequest;
 import openerp.openerpresourceserver.service.ProductService;
 import openerp.openerpresourceserver.service.ReceiptBillService;
 import openerp.openerpresourceserver.service.ReceiptService;
@@ -75,7 +75,7 @@ public class PurchaseManagerController {
 	}
 
 	@PostMapping("/receipts/create-receipt")
-	public ResponseEntity<String> createReceipt(@RequestBody ReceiptCreate receiptRequest) {
+	public ResponseEntity<String> createReceipt(@RequestBody ReceiptRequest receiptRequest) {
 	    try {
 	        // Validate item requests
 	        if (receiptRequest.getReceiptItemRequests() == null || receiptRequest.getReceiptItemRequests().isEmpty()) {
