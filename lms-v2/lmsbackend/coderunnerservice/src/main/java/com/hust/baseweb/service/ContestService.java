@@ -1,8 +1,8 @@
 package com.hust.baseweb.service;
 
+import com.hust.baseweb.applications.programmingcontest.entity.ContestEntity;
 import com.hust.baseweb.repo.ContestRepo;
 import lombok.AllArgsConstructor;
-import com.hust.baseweb.applications.programmingcontest.entity.ContestEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;

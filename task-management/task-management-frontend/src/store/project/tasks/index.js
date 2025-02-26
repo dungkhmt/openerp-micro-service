@@ -9,8 +9,17 @@ export const fetchTasks = createAsyncThunk(
   }
 );
 
+export const fetchTasksForMember = createAsyncThunk(
+  "project/fetchTasksForMember",
+  async ({projectId, assigneeId}) => {
+    const tasks = await TaskService.getMemberTasks(projectId, assigneeId);
+    return tasks;
+  }
+);
+
 const initialState = {
   tasksCache: {},
+  memberTasks: [],
   totalCount: 0,
   search: "",
   filters: {
@@ -59,6 +68,7 @@ export const tasksSlice = createSlice({
     },
     resetTasksData: (state) => {
       state.tasksCache = initialState.tasksCache;
+      state.memberTasks = initialState.memberTasks;
       state.totalCount = initialState.totalCount;
       state.filters = initialState.filters;
       state.pagination = initialState.pagination;
@@ -80,7 +90,19 @@ export const tasksSlice = createSlice({
       .addCase(fetchTasks.rejected, (state, action) => {
         state.errors.push(action.error);
         state.fetchLoading = false;
+      })
+      .addCase(fetchTasksForMember.pending, (state) => {
+        state.fetchLoading = true;
+      })
+      .addCase(fetchTasksForMember.fulfilled, (state, action) => {
+        state.memberTasks = action.payload;
+        state.fetchLoading = false;
+      })
+      .addCase(fetchTasksForMember.rejected, (state, action) => {
+        state.errors.push(action.error);
+        state.fetchLoading = false;
       });
+      
   },
 });
 

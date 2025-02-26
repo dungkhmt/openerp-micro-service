@@ -22,7 +22,9 @@ public interface GeneralClassRepository extends JpaRepository<GeneralClass, Long
     @Query("DELETE FROM GeneralClass gc WHERE gc.id IN :ids")
     void deleteByIds(@Param("ids") List<Long> ids);
 
+    List<GeneralClass> findAllByParentClassId(Long parentClassId);
     List<GeneralClass> findAllBySemester(String semester);
+
 
     List<GeneralClass> findAllBySemesterAndGroupName(String semester, String groupName);
 

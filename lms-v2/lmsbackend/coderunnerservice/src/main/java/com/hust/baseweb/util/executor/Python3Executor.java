@@ -15,7 +15,7 @@ public class Python3Executor {
 
     private static final String TIME_LIMIT_ERROR = Constants.TestCaseSubmissionError.TIME_LIMIT.getValue();
     private static final String FILE_LIMIT_ERROR = Constants.TestCaseSubmissionError.FILE_LIMIT.getValue();
-    private static final String MEMORY_LIMIT_ERROR = Constants.TestCaseSubmissionError.MEMORY_LIMIT.getValue();
+    private static final String MEMORY_LIMIT_ERROR = Constants.TestCaseSubmissionError.MEMORY_ERROR.getValue();
 
     private static final int DEFAULT_INITIAL_MEMORY = 10 * 1024;
 

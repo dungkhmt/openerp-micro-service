@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useMemo } from "react";
 import { useParams } from "react-router";
 import { Outlet } from "react-router-dom";
@@ -12,6 +13,7 @@ export const TaskContextProvider = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [logs, setLogs] = useState([]);
+  const [taskSkills, setTaskSkills] = useState([]);
   const [isUpdate, setIsUpdate] = useState(false);
 
   const getTask = useCallback(async () => {
@@ -35,10 +37,20 @@ export const TaskContextProvider = () => {
     }
   }, [tid, isUpdate]);
 
+  const getTaskSkills = useCallback(async () => {
+    try {
+      const skills = await TaskService.getTaskSkills(tid);
+      setTaskSkills(skills);
+    } catch (e) {
+      setError(e);
+    }
+  }, [tid, isUpdate]);
+  
   useEffect(() => {
     getTask();
     getLogs();
-  }, [getTask, getLogs]);
+    getTaskSkills();
+  }, [getTask, getLogs, getTaskSkills]);
 
   const value = useMemo(
     () => ({
@@ -46,10 +58,11 @@ export const TaskContextProvider = () => {
       isLoading,
       error,
       logs,
+      taskSkills,
       isUpdate,
       setIsUpdate,
     }),
-    [task, isLoading, error, logs, isUpdate, setIsUpdate]
+    [task, isLoading, error, logs, taskSkills, isUpdate]
   );
 
   return (

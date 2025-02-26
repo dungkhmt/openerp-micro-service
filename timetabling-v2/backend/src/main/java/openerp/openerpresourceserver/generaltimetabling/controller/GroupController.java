@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.generaltimetabling.controller;
 import jakarta.validation.Valid;
 import openerp.openerpresourceserver.generaltimetabling.exception.GroupNotFoundException;
 import openerp.openerpresourceserver.generaltimetabling.exception.GroupUsedException;
+import openerp.openerpresourceserver.generaltimetabling.model.dto.request.CreateGroupRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.GroupDeleteRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.GroupDto;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.PriorityGroupUpdateDto;
@@ -23,8 +24,8 @@ public class GroupController {
     @Autowired
     private GroupService groupService;
 
-    @PostMapping("/create")
-    public ResponseEntity<String> createNewGroup(@Valid @RequestBody GroupDto groupDto) {
+    @PostMapping("/create-priority")
+    public ResponseEntity<String> createNewGroupPriority(@Valid @RequestBody GroupDto groupDto) {
         try {
             groupService.create(groupDto);
             return new ResponseEntity<>(null, HttpStatus.OK);
@@ -35,10 +36,22 @@ public class GroupController {
         }
     }
 
-    @GetMapping("/get-all")
-    public ResponseEntity<List<GroupDto>> getAllPriorityGroup() {
+    @PostMapping("/create-group")
+    public ResponseEntity<String> createNewGroup(@Valid @RequestBody CreateGroupRequest group) {
         try {
-            List<GroupDto> groupList = groupService.getGroup();
+            groupService.createGroup(group.getGroupName());
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        } catch (GroupUsedException e) {
+            return new ResponseEntity<>(e.getCustomMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/get-by-group-id/{groupId}")
+    public ResponseEntity<List<GroupDto>> getGroupByGroupId(@PathVariable Long groupId) {
+        try {
+            List<GroupDto> groupList = groupService.getGroupByGroupId(groupId);
             if (groupList.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }

@@ -118,7 +118,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         }
         testCaseEntityList = listTestCaseAvailable;
 
-        String tempName = tempDir.createRandomScriptFileName(userId + "-" +
+        String tempName = tempDir.createRandomScriptFileName(userId.replaceAll("[^a-zA-Z0-9]", "") + "-" +
             submission.getContestId() + "-" +
             submission.getProblemId() + "-" +
             Math.random());
@@ -175,7 +175,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
         Map<UUID, String> evaluationResults = new HashMap<>();
         String tempName = tempDir.createRandomScriptFileName(
-            submission.getUserId() + "-" +
+            submission.getUserId().replaceAll("[^a-zA-Z0-9]", "") + "-" +
                 submission.getContestId() + "-" +
                 submission.getProblemId() + "-" +
                 "custom" + "-" +

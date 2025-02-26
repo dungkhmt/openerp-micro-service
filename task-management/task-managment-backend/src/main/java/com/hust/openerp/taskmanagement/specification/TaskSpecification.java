@@ -31,6 +31,7 @@ public class TaskSpecification extends BaseSpecification<Task> {
       case Task_.CATEGORY_ID:
         return this.parseIdField(root, builder);
       case Task_.PROJECT_ID:
+      case Task_.EVENT_ID:
         return this.parseUUIDField(root, builder);
       case Task_.CREATED_DATE:
       case Task_.CREATED_STAMP:

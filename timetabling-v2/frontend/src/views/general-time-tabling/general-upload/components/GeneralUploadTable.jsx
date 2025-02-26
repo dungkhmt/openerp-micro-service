@@ -1,11 +1,15 @@
+import { useState } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { Box } from "@mui/material";
 import { useUploadTableConfig } from "./useUploadTableConfig";
 import { useLoadingContext } from "../contexts/LoadingContext";
-import { Box } from "@mui/material";
+import ViewClassDetailDialog from "./ViewClassDetailDialog";
 
 const GeneralUploadTable = ({ classes, dataLoading, setClasses, onSelectionChange }) => {
   const { loading: uploadLoading } = useLoadingContext();
-  
+  const [openDetailDialog, setOpenDetailDialog] = useState(false);
+  const [selectedClass, setSelectedClass] = useState(null);
+
   const handleOnCellChange = (e, params) => {
     setClasses((prevClasses) => {
       return prevClasses?.map((prevClass) =>
@@ -29,23 +33,9 @@ const GeneralUploadTable = ({ classes, dataLoading, setClasses, onSelectionChang
     });
   };
 
-  const handleSelectionChange = (newSelection) => {
-    console.log('New Selection:', newSelection);
-    console.log('Classes:', classes);
-    
-    // Lấy selected rows data dựa trên selection
-    const selectedRowsData = classes.filter(row => {
-      const rowId = row.generalClassId || row.id;
-      return newSelection.includes(rowId);
-    });
-    
-    // Lấy mảng các ID
-    const selectedIds = selectedRowsData.map(row => Number(row.id));
-    
-    console.log('Selected Rows Data:', selectedRowsData);
-    console.log('Selected IDs:', selectedIds);
-    
-    onSelectionChange?.(selectedIds);
+  const handleRowDoubleClick = (params) => {
+    setSelectedClass(params.row);
+    setOpenDetailDialog(true);
   };
 
   return (
@@ -84,6 +74,12 @@ const GeneralUploadTable = ({ classes, dataLoading, setClasses, onSelectionChang
         onRowSelectionModelChange={(newSelectionModel) => {
           onSelectionChange?.(newSelectionModel);
         }}
+        onRowDoubleClick={handleRowDoubleClick}
+      />
+      <ViewClassDetailDialog
+        isOpen={openDetailDialog}
+        classData={selectedClass}
+        closeDialog={() => setOpenDetailDialog(false)}
       />
     </Box>
   );

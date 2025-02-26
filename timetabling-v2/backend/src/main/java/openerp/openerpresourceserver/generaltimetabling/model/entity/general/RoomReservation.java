@@ -14,7 +14,7 @@ import lombok.*;
 @Entity
 @Builder
 public class RoomReservation {
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "general_class_id")
     @JsonIgnore
     private GeneralClass generalClass;
@@ -25,6 +25,9 @@ public class RoomReservation {
     private String room;
     private Integer duration;
     private Long parentId;
+    //public String toString(){
+    //    return "crew[" + crew + "],start[" + startTime + "],end[" + endTime + "],weekday[" + weekday + "],room[" + room + "],duration[" + duration + "]";
+    //}
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

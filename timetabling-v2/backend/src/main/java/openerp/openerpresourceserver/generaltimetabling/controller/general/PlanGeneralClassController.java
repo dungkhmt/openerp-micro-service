@@ -44,6 +44,7 @@ public class PlanGeneralClassController {
     public ResponseEntity<?> requestMakeClass(@RequestBody MakeGeneralClassRequest request) {
         return ResponseEntity.ok(planClassService.makeClass(request));
     }
+
     @PostMapping("/make-subclass")
     public ResponseEntity<?> requestMakeSubClass(@RequestBody ModelInputCreateSubClass request) {
         return ResponseEntity.ok(planClassService.makeSubClass(request));
@@ -52,7 +53,8 @@ public class PlanGeneralClassController {
 
     @PostMapping("/make-multiple-classes")
     public ResponseEntity<List<GeneralClass>> requestMakeMultipleClasses(@RequestBody BulkMakeGeneralClassRequest request) {
-        return ResponseEntity.ok(planClassService.makeMultipleClasses(request));
+        //return ResponseEntity.ok(planClassService.makeMultipleClasses(request));
+        return null;
     }
 
     @GetMapping("/")

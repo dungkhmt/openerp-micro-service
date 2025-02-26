@@ -2,9 +2,12 @@ import { createBrowserRouter } from "react-router-dom";
 import Layout from "../layout/Layout";
 import Home from "../pages";
 import DashBoard from "../pages/dashboard";
+import MyProfile from "../pages/my-profile";
+import UserManagement from "../pages/user-management";
 import { ProjectWrapper } from "../pages/project/[id]/ProjectWrapper";
 import Project from "../pages/project/[id]/[tab]";
 import Task from "../pages/project/[id]/task/[id]";
+import Event from "../pages/project/[id]/event/[id]";
 import { TaskContextProvider } from "../pages/project/[id]/task/[id]/TaskContextProvider";
 import Projects from "../pages/projects";
 import NewProject from "../pages/projects/new";
@@ -28,6 +31,10 @@ export const router = createBrowserRouter([
           {
             path: "/dashboard",
             element: <DashBoard />,
+          },
+          {
+            path: "/my-profile",
+            element: <MyProfile />,
           },
           {
             path: "/projects",
@@ -61,6 +68,10 @@ export const router = createBrowserRouter([
                       },
                     ],
                   },
+                  {
+                    path: ":id/event/:eid",
+                    element: <Event />,
+                  },
                 ],
               },
               {
@@ -81,6 +92,10 @@ export const router = createBrowserRouter([
                 element: <TaskCreated />,
               },
             ],
+          },
+          {
+            path: "/user-management",
+            element: <UserManagement />,
           },
           {
             path: "*",

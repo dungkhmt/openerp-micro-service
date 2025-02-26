@@ -39,5 +39,16 @@ public class EduTestQuizParticipant {
     @Column(name = "permutation")
     private String permutation;
 
+    @Column(name = "fullname")
+    private String fullname;
+
+    @Column(name="ref_user_id")
+    private String refUserId;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name="code")
+    private String code;
 
 }

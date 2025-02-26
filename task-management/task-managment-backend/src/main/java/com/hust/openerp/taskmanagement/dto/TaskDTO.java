@@ -28,6 +28,7 @@ public class TaskDTO {
   private Date lastUpdatedStamp;
   private User creator;
   private ProjectDTO project;
+  private EventDTO event;
   private User assignee;
   private List<TaskHierarchyDTO> hierarchies;
 }

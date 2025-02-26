@@ -40,6 +40,7 @@ public class ModelResponseGeneralClass {
     private List<RoomReservation> timeSlots = new ArrayList<RoomReservation>();
     private String learningWeeks;
     private String foreignLecturer;
+    private List<ModelResponseGeneralClass> subClasses;
 
     public ModelResponseGeneralClass(GeneralClass gc){
         this.id = gc.getId();

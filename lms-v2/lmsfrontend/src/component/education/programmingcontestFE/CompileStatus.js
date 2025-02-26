@@ -1,32 +1,48 @@
 import {Alert} from "@material-ui/lab";
 import * as React from "react";
-import {Markup} from "interweave";
+import {Typography} from "@mui/material";
+import {useTranslation} from "react-i18next";
 
 export function CompileStatus(props) {
-  const showCompile = props.showCompile;
-  const statusSuccessful = props.statusSuccessful
-  const message = props.message;
+  const {t} = useTranslation([
+    "education/programmingcontest/problem",
+    "common",
+    "validation",
+    "education/programmingcontest/testcase"
+  ]);
+  const {showCompile, statusSuccessful, detail} = props;
+
   if (!showCompile) {
-    return (
-      <div>
-      </div>);
+    return null;
   } else {
-    if (statusSuccessful) {
-      return (
+    return (
+      <>
+        <Typography variant="subtitle1">
+          {t("status")}
+        </Typography>
         <div>
-          <Alert severity="success">Successful</Alert>
+          {
+            statusSuccessful ?
+              <Alert icon={false} severity="success">{t("common:success")}</Alert> :
+              <Alert icon={false} severity="error">{detail.status}</Alert>
+          }
         </div>
-      );
-    } else {
-      return (
-
+        {!statusSuccessful &&
+          <>
+            <Typography variant="subtitle1" sx={{marginTop: "12px"}}>
+              {t("compileOutput", {ns: "education/programmingcontest/testcase"})}
+            </Typography>
         <div>
-          <Alert severity="error">
-            <Markup content={message}/>
-          </Alert>
+          <pre style={{
+            marginTop: 0,
+            padding: 16,
+            borderRadius: 4,
+            background: "#fdeded",
+            color: "#5f2120"
+          }}>{detail.message}</pre>
         </div>
-      );
-    }
-
+          </>}
+      </>
+    );
   }
 }

@@ -38,7 +38,7 @@ const GeneralUploadScreen = () => {
     }
   };
 
-  console.log(selectedIds);
+  console.log(classesNoSchedule);
 
   return (
     <LoadingProvider>

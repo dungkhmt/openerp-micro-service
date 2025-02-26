@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.generaltimetabling.controller.general;
 
+import java.security.Principal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,8 @@ import openerp.openerpresourceserver.generaltimetabling.exception.*;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.RoomReservationDto;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.*;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.ResetScheduleRequest;
+import openerp.openerpresourceserver.generaltimetabling.model.input.ModelInputAutoScheduleTimeSlotRoom;
+import openerp.openerpresourceserver.generaltimetabling.model.response.ModelResponseGeneralClass;
 import openerp.openerpresourceserver.generaltimetabling.service.ExcelService;
 import openerp.openerpresourceserver.generaltimetabling.service.GeneralClassService;
 import org.springframework.core.io.InputStreamResource;
@@ -99,6 +102,11 @@ public class GeneralClassController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @GetMapping("/get-class-detail-with-subclasses/{classId}")
+    public ResponseEntity<?> getClassDetailWithSubClasses(Principal principal, @PathVariable Long classId){
+        ModelResponseGeneralClass cls = gService.getClassDetailWithSubClasses(classId);
+        return ResponseEntity.ok().body(cls);
+    }
 
 
     @PostMapping("/export-excel")
@@ -120,13 +128,18 @@ public class GeneralClassController {
         return ResponseEntity.ok(gService.resetSchedule(request.getIds(), semester));
     }
 
+    @PostMapping("/auto-schedule-timeslot-room")
+    public ResponseEntity<?> autoScheduleTimeSlotRoom(Principal principal, @RequestBody ModelInputAutoScheduleTimeSlotRoom I){
+        return ResponseEntity.ok().body(gService.autoScheduleTimeSlotRoom(I.getClassIds(),I.getTimeLimit()));
+    }
     @PostMapping("/auto-schedule-time")
     public ResponseEntity<List<GeneralClass>> requestAutoScheduleTime(
             @RequestParam("semester") String semester,
             @RequestParam("groupName") String groupName,
             @RequestParam("timeLimit") int timeLimit) {
-        log.info("Controler API -> requestAutoScheduleTime...");
-        return ResponseEntity.ok(gService.autoSchedule(semester, groupName, timeLimit*1000));
+        log.info("Controller API -> requestAutoScheduleTime...");
+        //return ResponseEntity.ok(gService.autoScheduleGroup(semester, groupName, timeLimit*1000));
+        return ResponseEntity.ok(gService.autoSchedule(semester, timeLimit*1000));
     }
 
     @PostMapping("/auto-schedule-room")

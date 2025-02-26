@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import {request} from "api";
 import {PopperComponent} from "../education/programmingcontestFE/AddMember2Contest";
-import {autocompleteClasses, ListItemText} from "@mui/material";
+import {autocompleteClasses} from "@mui/material";
 import {useTranslation} from "react-i18next";
 
 const FilterByTag = (props) => {
@@ -17,7 +17,7 @@ const FilterByTag = (props) => {
   }, []);
 
   useEffect(() => {
-    getTags("/tags/", (data) => {
+    getTags("/tags", (data) => {
       setDefinedTags(data);
     });
   }, [getTags]);

@@ -1,9 +1,9 @@
-import { TableCell } from "@material-ui/core";
+import {TableCell} from "@material-ui/core";
 import TableRow from "@material-ui/core/TableRow";
-import { makeStyles } from "@material-ui/core/styles";
+import {makeStyles} from "@material-ui/core/styles";
 import InputBase from "@mui/material/InputBase";
-import { tableCellClasses } from "@mui/material/TableCell";
-import { alpha, styled } from "@mui/material/styles";
+import {tableCellClasses} from "@mui/material/TableCell";
+import {alpha, styled} from "@mui/material/styles";
 
 export function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -13,13 +13,25 @@ export function getColorLevel(level) {
   // const colors = ['red', 'yellow', 'green']
   switch (level) {
     case "easy":
-      return "green";
+      return "#2e7d32";
     case "medium":
-      return "orange";
+      return "#ed6c02";
     case "hard":
-      return "red";
+      return "#d32f2f";
     default:
-      return "blue";
+      return "#0288d1";
+  }
+}
+
+export function getColorStatus(status) {
+  // const colors = ['red', 'yellow', 'green']
+  switch (status) {
+    case "OPEN":
+      return "#2e7d32";
+    case "HIDDEN":
+      return "#d32f2f";
+    default:
+      return "#0288d1";
   }
 }
 
@@ -73,7 +85,7 @@ export const getStatusColor = (status) => {
   switch (status) {
     case "In Progress":
       return "#1976d2";
-    case "Accept":
+    case "Accepted":
       return "#2e7d32";
     case "Partial":
       return "#ed6c02";

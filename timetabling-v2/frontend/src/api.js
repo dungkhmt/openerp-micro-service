@@ -41,6 +41,23 @@ export async function request(
   config,
   controller
 ) {
+  // Check auth before making request
+  if (!keycloak.authenticated) {
+    keycloak.login({
+      redirectUri: window.location.origin + window.location.pathname
+    });
+    return;
+  }
+
+  // Refresh token if needed
+  try {
+    await keycloak.updateToken(70);
+  } catch (error) {
+    console.error('Failed to refresh token:', error);
+    keycloak.login();
+    return;
+  }
+
   if (config !== undefined && config !== null) {
     axiosInstance.defaults.headers.common["Content-Type"] =
       "multipart/form-data";
@@ -81,6 +98,11 @@ export async function request(
     }
     return res;
   } catch (e) {
+    if (e.response && e.response.status === 401) {
+      // Handle unauthorized
+      keycloak.login();
+      return;
+    }
     // Handling work to do when encountering all kinds of errors, e.g turn off the loading icon.
     if (isFunction(errorHandlers)) {
       errorHandlers(e);
@@ -119,10 +141,6 @@ export async function request(
       // The request was made but no response was received
       // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
       // http.ClientRequest in node.js
-      console.log(
-        "The request was made but no response was received",
-        e.request
-      );
 
       if (isFunction(errorHandlers["noResponse"])) {
         errorHandlers["noResponse"](e);

@@ -77,6 +77,9 @@ public class Task {
 
     @Column(name = "project_id")
     private UUID projectId;
+    
+    @Column(name = "event_id")
+    private UUID eventId;
 
     @Column(name = "priority_id")
     private String priorityId;
@@ -99,6 +102,10 @@ public class Task {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", insertable = false, updatable = false)
     private Project project;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_id", insertable = false, updatable = false)
+    private Event event;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id", insertable = false, updatable = false)

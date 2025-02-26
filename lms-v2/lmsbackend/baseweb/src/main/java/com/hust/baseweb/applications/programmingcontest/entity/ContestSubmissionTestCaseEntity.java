@@ -43,16 +43,25 @@ public class ContestSubmissionTestCaseEntity {
     private int point;
 
     @Column(name = "used_to_grade")
-    private String usedToGrade;
+    private String usedToGrade; // Y/N: means that the point of this is (not) accounted to grade of submission
 
     @Column(name = "status")
     private String status;
 
     @Column(name = "participant_solution_output")
-    private String participantSolutionOtput;
+    private String participantSolutionOutput;
+
+    @Column(name = "stderr")
+    private String stderr;
 
     @Column(name = "runtime")
     private Long runtime;
+
+    @Column(name = "memory_usage")
+    private Float memoryUsage;
+
+    @Column(name = "judge0_submission_token")
+    private UUID judge0SubmissionToken;
 
     @UpdateTimestamp
     @Column(name = "last_updated_stamp")

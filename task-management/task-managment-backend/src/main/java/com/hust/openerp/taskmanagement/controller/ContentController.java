@@ -59,22 +59,32 @@ public class ContentController {
         return new ResponseEntity<>(IOUtils.toByteArray(inputStream), headers, HttpStatus.OK);
     }
 
-    // NOT SECURE
-    @GetMapping("/content/img/{id}")
-    public ResponseEntity<byte[]> getImage(@PathVariable String id) throws IOException {
-        GridFsResource content = mongoContentService.getById(id);
-
-        if (content == null)
-            throw new ApiException(ErrorCode.FILE_NOT_EXIST);
-
-        if (!content.getContentType().startsWith("image"))
-            throw new ApiException(ErrorCode.UNSUPPORTED_MEDIA_TYPE);
-
-        InputStream inputStream = content.getInputStream();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", content.getContentType());
-        headers.add("Content-Disposition", "inline");
-
-        return new ResponseEntity<>(IOUtils.toByteArray(inputStream), headers, HttpStatus.OK);
+    @GetMapping("/content/img/{id}") public ResponseEntity<byte[]> getImage(@PathVariable String id) { 
+    	GridFsResource content; 
+    	try { 
+    		content = mongoContentService.getById(id); 
+    		if (content == null) { 
+    			throw new ApiException(ErrorCode.FILE_NOT_EXIST); 
+    		} 
+    		
+    		if (!content.getContentType().startsWith("image")) { 
+    			throw new ApiException(ErrorCode.UNSUPPORTED_MEDIA_TYPE); 
+    		} 
+    		
+    		InputStream inputStream = content.getInputStream(); 
+    		byte[] imageBytes = IOUtils.toByteArray(inputStream); 
+    		
+    		HttpHeaders headers = new HttpHeaders(); 
+    		headers.add("Content-Type", content.getContentType()); 
+    		headers.add("Content-Disposition", "inline"); 
+    		headers.add("Cache-Control", "public, max-age=15552000"); // cache for 6 months in seconds 
+    		
+    		return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK); 
+    	} 
+    	catch (IOException e) { 
+    		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); 
+    	} catch (ApiException e) { 
+    		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); 
+    	} 
     }
 }

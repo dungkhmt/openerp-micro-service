@@ -302,7 +302,7 @@ function ExamClassDetail() {
           mapUserLogins[idx].randomUserLoginId,
           mapUserLogins[idx].fullname
         );
-        //console.log('reset password ', idx, ' : ', mapUserLogins[idx].randomUserLoginId,':',mapUserLogins[idx].password);
+        console.log('synchronize fullname -> done ', idx, '/',mapUserLogins.length,' : ', mapUserLogins[idx].randomUserLoginId,':',mapUserLogins[idx].password);
         idx++;
       }
     }, 500);
@@ -326,7 +326,7 @@ function ExamClassDetail() {
           mapUserLogins[idx].randomUserLoginId,
           mapUserLogins[idx].password
         );
-        //console.log('reset password ', idx, ' : ', mapUserLogins[idx].randomUserLoginId,':',mapUserLogins[idx].password);
+        console.log('reset password done ', idx, '/', mapUserLogins.length,': ', mapUserLogins[idx].randomUserLoginId,':',mapUserLogins[idx].password);
         idx++;
       }
     }, 500);
