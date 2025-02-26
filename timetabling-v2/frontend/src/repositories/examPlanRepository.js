@@ -13,7 +13,11 @@ class ExamPlanService {
   }
 
   async createExamPlan(data) {
-    return await request("post", API_ENDPOINTS.CREATE, null, null, data);
+    return await request("post", API_ENDPOINTS.CREATE, null, null, data, {
+      headers: {
+        "Content-Type": "application/json"
+      } 
+    });
   }
 
   async updateExamPlan(data) {
@@ -22,6 +26,10 @@ class ExamPlanService {
 
   async deleteExamPlan(id) {
     return await request("delete", `${API_ENDPOINTS.DELETE}?id=${id}`);
+  }
+
+  async getExamPlanById(id) {
+    return await request("get", `${API_ENDPOINTS.GET_ALL}/${id}`);
   }
 }
 

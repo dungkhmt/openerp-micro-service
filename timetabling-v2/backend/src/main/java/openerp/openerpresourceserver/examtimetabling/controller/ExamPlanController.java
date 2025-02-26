@@ -5,6 +5,7 @@ import openerp.openerpresourceserver.examtimetabling.entity.ExamPlan;
 import openerp.openerpresourceserver.examtimetabling.service.ExamPlanService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,16 +14,48 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/exam-plan")
 @RequiredArgsConstructor
 public class ExamPlanController {
     private final ExamPlanService examPlanService;
-    
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ExamPlan> getExamPlanById(@PathVariable UUID id) {
+        try {
+            ExamPlan examPlan = examPlanService.getExamPlanById(id);
+            return ResponseEntity.ok(examPlan);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<ExamPlan> updateExamPlan(
+            @Valid @RequestBody ExamPlan examPlanDetails) {
+        try {
+            ExamPlan updatedPlan = examPlanService.updateExamPlan(examPlanDetails.getId(), examPlanDetails);
+            return ResponseEntity.ok(updatedPlan);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/delete/{id}")
+    public ResponseEntity<?> softDeleteExamPlan(@PathVariable UUID id) {
+        try {
+            examPlanService.softDeleteExamPlan(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping
     public ResponseEntity<List<ExamPlan>> getAllExamPlans() {
-        List<ExamPlan> examPlans = examPlanService.getAllExamPlans();
+        List<ExamPlan> examPlans = examPlanService.findAllActivePlans();
         return ResponseEntity.ok(examPlans);
     }
 

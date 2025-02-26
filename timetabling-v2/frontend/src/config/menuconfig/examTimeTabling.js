@@ -5,7 +5,7 @@ export const ExamTimeTabling = {
     child: [
       {
         id: "MENU_EXAM_TIME_TABLING.CLASS_LIST",
-        path: "/exam-time-tabling/exam-schedule",
+        path: "/exam-time-tabling/exam-plan",
         isPublic: true,
         text: "Kế hoạch thi",
         child: [],

@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { examPlanService } from "repositories/examPlanRepository";
 import { queryClient } from 'queryClient';
 
-export const useExamPlanData = () => {
+export const useExamPlanData = (examPlanId = null) => {
   
   const { data: examPlans, isLoading, error } = useQuery(
     'examPlans',
@@ -20,7 +20,7 @@ export const useExamPlanData = () => {
       toast.success('Tạo kế hoạc thi mới thành công!');
     },
     onError: (error) => {
-      toast.error(error.response?.data || 'Có lỗi xảy ra khi tạo kế hoạc thi');
+      toast.error(error.response?.data || 'Có lỗi xảy ra khi tạo kế hoạch thi');
     }
   });
 
@@ -44,6 +44,20 @@ export const useExamPlanData = () => {
     }
   });
 
+  const {
+    data: examPlan,
+    isLoading: isSingleLoading,
+    error: singleError
+  } = useQuery(
+    ['examPlan', examPlanId],
+    () => examPlanService.getExamPlanById(examPlanId),
+    {
+      enabled: !!examPlanId,
+      staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+      cacheTime: 30 * 60 * 1000 // Keep cache for 30 minutes
+    }
+  );
+
   return {
     examPlans: examPlans?.data || [],
     isLoading,
@@ -53,6 +67,9 @@ export const useExamPlanData = () => {
     deleteExamPlan: deleteMutation.mutateAsync,
     isCreating: createMutation.isLoading,
     isUpdating: updateMutation.isLoading,
-    isDeleting: deleteMutation.isLoading
+    isDeleting: deleteMutation.isLoading,
+    examPlan: examPlan?.data || null,
+    isSingleLoading,
+    singleError,
   };
 };
