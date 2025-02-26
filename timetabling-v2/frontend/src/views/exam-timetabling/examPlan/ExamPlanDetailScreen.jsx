@@ -21,11 +21,19 @@ import StatisticsPanel from './utils/StatisticsPanel';
 import { format } from 'date-fns';
 import EditPlanModal from './utils/UpdateExamPlanModel'
 import DeleteConfirmModal from './utils/DeleteExamPlanModal'
+import { useExamTimetableData } from 'services/useExamTimetableData'
 
 const ExamPlanDetailPage = () => {
   const history = useHistory();
   const { id } = useParams();
   const { examPlan, isLoading, deleteExamPlan, updateExamPlan, planStatistics, isLoadingPlanStatistics } = useExamPlanData(id);
+  const {
+    examTimetables,
+    isLoading: isLoadingTimetables,
+    deleteExamTimetable,
+    createExamTimetable,
+    updateExamTimetable
+  } = useExamTimetableData(id);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -160,7 +168,12 @@ const ExamPlanDetailPage = () => {
 
           {/* Timetable List */}
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%' }}>
-            <TimetableList planId={id} />
+            <TimetableList 
+              planId={id}
+              timetables={examTimetables}
+              isLoading={isLoadingTimetables}
+              onCreateTimetable={createExamTimetable}
+            />
           </Box>
         </Grid>
 

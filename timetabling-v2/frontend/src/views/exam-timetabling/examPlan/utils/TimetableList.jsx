@@ -19,9 +19,13 @@ import { DataGrid } from '@mui/x-data-grid';
 import { format } from 'date-fns';
 import AddTimetableModal from './AddTimeTableModal'
 
-const TimetableList = ({ planId }) => {
+const TimetableList = ({ 
+  planId, 
+  timetables, 
+  isLoading, 
+  onCreateTimetable 
+}) => {
   const history = useHistory();
-  const { examTimetables, isLoading, createTimetable } = useExamTimetableData(planId);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const handleCreateTimetable = () => {
@@ -33,7 +37,7 @@ const TimetableList = ({ planId }) => {
   };
 
   const handleCreateTimetableSubmit = async (data) => {
-    return await createTimetable(data);
+    return await onCreateTimetable(data);
   };
 
   // Columns for timetable list
@@ -72,7 +76,7 @@ const TimetableList = ({ planId }) => {
       )
     },
     { 
-      field: 'progress', 
+      field: 'progressPercentage', 
       headerName: 'Tiến độ', 
       flex: 2,
       renderCell: (params) => (
@@ -118,7 +122,7 @@ const TimetableList = ({ planId }) => {
   return (
     <>
       <Paper elevation={2} sx={{ 
-        height: '100%',  // This makes the paper take full height of its parent
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
         borderRadius: 2, 
@@ -158,9 +162,9 @@ const TimetableList = ({ planId }) => {
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
               <CircularProgress />
             </Box>
-          ) : examTimetables && examTimetables.length > 0 ? (
+          ) : timetables && timetables.length > 0 ? (
             <DataGrid
-              rows={examTimetables}
+              rows={timetables}
               columns={columns}
               rowHeight={40}
               pageSize={5}
@@ -168,13 +172,11 @@ const TimetableList = ({ planId }) => {
               pagination
               density="comfortable"
               disableRowSelectionOnClick
-              autoHeight={false}  // Important: don't use autoHeight
+              autoHeight={false}
               sx={{
-                flex: 1,  // Make the grid take all available space
-                height: '100%',  // Ensure the grid fills the container
+                flex: 1,
+                height: '100%',
                 border: 'none',
-                border: 'none',
-                flex: 1,  // This makes the grid take available space
                 '& .MuiDataGrid-columnHeaders': {
                   backgroundColor: '#f5f5f5',
                   fontWeight: 'bold',
@@ -183,15 +185,15 @@ const TimetableList = ({ planId }) => {
                   backgroundColor: '#f9f9f9',
                 },
                 '& .MuiDataGrid-cell': {
-                  padding: '12px 16px',  // Increase cell padding
+                  padding: '12px 16px',
                 },
                 '& .MuiDataGrid-cell:focus': {
                   outline: 'none'
                 },
                 '& .MuiDataGrid-footerContainer': {
                   borderTop: '1px solid #e0e0e0',
-                  justifyContent: 'flex-end',  // Align pagination to the right
-                  minHeight: '52px'  // Ensure consistent footer height
+                  justifyContent: 'flex-end',
+                  minHeight: '52px'
                 }
               }}
             />
