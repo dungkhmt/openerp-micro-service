@@ -1,4 +1,3 @@
-// ExamPlanDetailPage.jsx
 import { useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { useExamPlanData } from 'services/useExamPlanData';
@@ -15,17 +14,22 @@ import {
 import {
   Delete,
   Edit,
-  CalendarMonth,
   SentimentDissatisfied
 } from '@mui/icons-material';
 import TimetableList from './utils/TimetableList';
 import StatisticsPanel from './utils/StatisticsPanel';
 import { format } from 'date-fns';
+import EditPlanModal from './utils/UpdateExamPlanModel'
+import DeleteConfirmModal from './utils/DeleteExamPlanModal'
 
 const ExamPlanDetailPage = () => {
   const history = useHistory();
   const { id } = useParams();
-  const { examPlan, isLoading, deleteExamPlan } = useExamPlanData(id);
+  const { examPlan, isLoading, deleteExamPlan, updateExamPlan, planStatistics, isLoadingPlanStatistics } = useExamPlanData(id);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   if (isLoading) {
     return (
@@ -52,15 +56,36 @@ const ExamPlanDetailPage = () => {
   }
 
   const handleEditPlan = () => {
-    history.push(`/exam-plans/${id}/edit`);
+    setIsEditModalOpen(true);
   };
-
-  const handleDeletePlan = async () => {
+  
+  const handleDeletePlan = () => {
+    setIsDeleteModalOpen(true);
+  };
+  
+  const handleSavePlan = async (formData) => {
     try {
+      setIsSaving(true);
+      await updateExamPlan(formData);
+      setIsSaving(false);
+      setIsEditModalOpen(false);
+      window.location.reload();
+    } catch (error) {
+      console.error('Error updating plan:', error);
+      setIsSaving(false);
+    }
+  };
+  
+  const handleConfirmDelete = async () => {
+    try {
+      setIsDeleting(true);
       await deleteExamPlan(id);
-      history.push('/exam-plans');
+      setIsDeleting(false);
+      setIsDeleteModalOpen(false);
+      history.push('/exam-time-tabling/exam-plan');
     } catch (error) {
       console.error('Error deleting plan:', error);
+      setIsDeleting(false);
     }
   };
 
@@ -141,9 +166,29 @@ const ExamPlanDetailPage = () => {
 
         {/* Right Column - Statistics Panel */}
         <Grid item xs={12} md={4}>
-          <StatisticsPanel planId={id} />
+          <StatisticsPanel 
+            planId={id} 
+            statistics={planStatistics} 
+            isLoading={isLoadingPlanStatistics} 
+          />
         </Grid>
       </Grid>
+
+      <EditPlanModal
+        open={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={handleSavePlan}
+        examPlan={examPlan}
+        isSaving={isSaving}
+      />
+
+      <DeleteConfirmModal
+        open={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        planName={examPlan?.name}
+        isDeleting={isDeleting}
+      />
     </Container>
   )
 };

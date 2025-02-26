@@ -21,15 +21,23 @@ class ExamPlanService {
   }
 
   async updateExamPlan(data) {
-    return await request("post", API_ENDPOINTS.UPDATE, null, null, data);
+    return await request("post", API_ENDPOINTS.UPDATE, null, null, data, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
   }
 
   async deleteExamPlan(id) {
-    return await request("delete", `${API_ENDPOINTS.DELETE}?id=${id}`);
+    return await request("post", `${API_ENDPOINTS.DELETE}/${id}`);
   }
 
   async getExamPlanById(id) {
     return await request("get", `${API_ENDPOINTS.GET_ALL}/${id}`);
+  }
+
+  async getPlanStatistics(id) {
+    return await request("get", `/exam-plan/${id}/statistics`);
   }
 }
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -17,13 +17,27 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { vi } from 'date-fns/locale';
 
-const AddExamPlanModal = ({ open, onClose, onSave, isSaving }) => {
+const UpdateExamPlanModal = ({ open, onClose, onSave, isSaving, examPlan }) => {
   const [formData, setFormData] = useState({
+    id: '',
     name: '',
     description: '',
     startTime: null,
     endTime: null
   });
+
+
+  useEffect(() => {
+    if (examPlan && open) {
+      setFormData({
+        id: examPlan.id || '',
+        name: examPlan.name || '',
+        description: examPlan.description || '',
+        startTime: examPlan.startTime ? new Date(examPlan.startTime) : null,
+        endTime: examPlan.endTime ? new Date(examPlan.endTime) : null
+      });
+    }
+  }, [examPlan, open]);
 
   const [errors, setErrors] = useState({});
 
@@ -86,6 +100,7 @@ const AddExamPlanModal = ({ open, onClose, onSave, isSaving }) => {
       onSave(formData);
 
       setFormData({
+        id: '',
         name: '',
         description: '',
         startTime: null,
@@ -97,6 +112,7 @@ const AddExamPlanModal = ({ open, onClose, onSave, isSaving }) => {
 
   const handleCloseModal = () => {
     setFormData({
+      id: '',
       name: '',
       description: '',
       startTime: null,
@@ -127,14 +143,14 @@ const AddExamPlanModal = ({ open, onClose, onSave, isSaving }) => {
         color={'white'}
         fontSize={'h5.fontSize'}
       >
-        Tạo Kế Hoạch Thi Mới
+        Cập Nhật Kế Hoạch Thi
         <IconButton
           onClick={handleCloseModal}
           sx={{
             position: 'absolute',
             right: 8,
             top: 8,
-            color: 'white',
+            color:  'white'
           }}
         >
           <Close />
@@ -176,14 +192,14 @@ const AddExamPlanModal = ({ open, onClose, onSave, isSaving }) => {
                   <Grid item xs={6}>
                     <DatePicker
                       label="Ngày bắt đầu"
-                      value={formData.startDate}
-                      onChange={(date) => handleDateChange('startDate', date)}
+                      value={formData.startTime}
+                      onChange={(date) => handleDateChange('startTime', date)}
                       slotProps={{
                         textField: {
                           fullWidth: true,
                           required: true,
-                          error: !!errors.startDate,
-                          helperText: errors.startDate,
+                          error: !!errors.startTime,
+                          helperText: errors.startTime,
                           size: "small"
                         }
                       }}
@@ -192,14 +208,14 @@ const AddExamPlanModal = ({ open, onClose, onSave, isSaving }) => {
                   <Grid item xs={6}>
                     <DatePicker
                       label="Ngày kết thúc"
-                      value={formData.endDate}
-                      onChange={(date) => handleDateChange('endDate', date)}
+                      value={formData.endTime}
+                      onChange={(date) => handleDateChange('endTime', date)}
                       slotProps={{
                         textField: {
                           fullWidth: true,
                           required: true,
-                          error: !!errors.endDate,
-                          helperText: errors.endDate,
+                          error: !!errors.endTime,
+                          helperText: errors.endTime,
                           size: "small"
                         }
                       }}
@@ -230,4 +246,4 @@ const AddExamPlanModal = ({ open, onClose, onSave, isSaving }) => {
   );
 };
 
-export default AddExamPlanModal;
+export default UpdateExamPlanModal;

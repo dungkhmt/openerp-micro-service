@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
 import { useExamPlanData } from "services/useExamPlanData"
 import { COLUMNS } from "./utils/gridColumns"
 import {
@@ -25,7 +24,7 @@ import localText from "./utils/LocalText"
 
 export default function TimePerformanceScreen() {
   // const [ examClasses, setExamClasses ] = useState([]);
-  const [selectedExamPlanId, setSelectedExamPlanId] = useState(null)
+  const [selectedExamPlan, setSelectedExamPlan] = useState(null)
   const [successDialogOpen, setSuccessDialogOpen] = useState(false)
   const [conflictDialogOpen, setConflictDialogOpen] = useState(false)
   const [conflictList, setConflictList] = useState([])
@@ -63,28 +62,15 @@ export default function TimePerformanceScreen() {
     createExamClass,
     downloadSample,
     isImporting,
-  } = useExamClassData(selectedExamPlanId?.id)
+  } = useExamClassData(selectedExamPlan?.id)
 
   const { examPlans } = useExamPlanData();
 
-  const examPlanMap = examPlans.reduce((acc, plan) => {
-    acc[plan.id] = plan;
-    return acc;
-  }, {});
-
-  const { planId } = useParams();
-
   useEffect(() => {
-    console.log('planId', planId)
-    if (planId) {
-      setSelectedExamPlanId(planId);
-
-      return;
+    if (examPlans && examPlans.length > 0 && !selectedExamPlan) {
+      setSelectedExamPlan(examPlans[0]);
     }
-    if (examPlans && examPlans.length > 0 && !selectedExamPlanId) {
-      setSelectedExamPlanId(examPlans[0].id);
-    }
-  }, [examPlans, selectedExamPlanId]);
+  }, [examPlans, selectedExamPlan]);
 
 
   const handleImportExcel = () => {
@@ -94,7 +80,7 @@ export default function TimePerformanceScreen() {
 
     input.onchange = async (e) => {
       const file = e.target.files[0]
-      if (file && selectedExamPlanId) {
+      if (file && selectedExamPlan) {
         const formData = new FormData()
         formData.append("file", file)
 
@@ -116,7 +102,7 @@ export default function TimePerformanceScreen() {
   }
 
   const handleSelectExamPlan = (event, examPlan) => {
-    setSelectedExamPlanId(examPlan.id);
+    setSelectedExamPlan(examPlan);
     // Clear selected rows when changing exam plan
     setSelectedRows([]);
   }
@@ -124,6 +110,7 @@ export default function TimePerformanceScreen() {
   const handleDialogClose = () => {
     setSuccessDialogOpen(false)
     setConflictDialogOpen(false)
+    window.location.reload()
   }
 
   const handleDownloadConflictList = async () => {
@@ -247,9 +234,9 @@ export default function TimePerformanceScreen() {
           {/* ExamPlan selection on the right */}
           <Autocomplete
             options={examPlans}
-            getOptionLabel={(option) => examPlanMap[option]?.name || ""}
+            getOptionLabel={(option) => option.name}
             style={{ width: 230 }}
-            value={selectedExamPlanId}
+            value={selectedExamPlan}
             onChange={handleSelectExamPlan}
             renderInput={(params) => (
               <TextField {...params} label="Chọn kế hoạch thi" variant="outlined" size="small" />
@@ -263,7 +250,7 @@ export default function TimePerformanceScreen() {
             variant="outlined"
             color="primary"
             onClick={handleDeleteClick}
-            disabled={selectedRows.length === 0 || isClearing || isImporting || isExportingClasses || isExportingConflicts || !selectedExamPlanId}
+            disabled={selectedRows.length === 0 || isClearing || isImporting || isExportingClasses || isExportingConflicts || !selectedExamPlan}
           >
             Xóa lớp
           </Button>
@@ -271,7 +258,7 @@ export default function TimePerformanceScreen() {
             variant="outlined"
             color="primary"
             onClick={handleAddClick}
-            disabled={isClearing || isImporting || isExportingClasses || isExportingConflicts || !selectedExamPlanId}
+            disabled={isClearing || isImporting || isExportingClasses || isExportingConflicts || !selectedExamPlan}
           >
             Thêm lớp
           </Button>
@@ -280,7 +267,7 @@ export default function TimePerformanceScreen() {
             onClick={handleExportExamClasses}
             color="primary"
             variant="outlined"
-            disabled={selectedRows.length === 0 || isClearing || isImporting || isExportingClasses || isExportingConflicts || !selectedExamPlanId}
+            disabled={selectedRows.length === 0 || isClearing || isImporting || isExportingClasses || isExportingConflicts || !selectedExamPlan}
           >
             Tải xuống DS lớp
           </Button>
@@ -289,7 +276,7 @@ export default function TimePerformanceScreen() {
               variant="outlined"
               color="primary"
               onClick={handleImportExcel}
-              disabled={!selectedExamPlanId || isClearing || isImporting || isExportingClasses || isExportingConflicts}
+              disabled={!selectedExamPlan || isClearing || isImporting || isExportingClasses || isExportingConflicts}
             >
               Tải lên DS lớp
             </Button>
@@ -448,7 +435,7 @@ export default function TimePerformanceScreen() {
         onSubmit={(editFormData) => {
           handleAddSubmit({
             ...editFormData,
-            examPlanId: selectedExamPlanId.id
+            examPlanId: selectedExamPlan.id
           })
         }}
       />

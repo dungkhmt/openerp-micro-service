@@ -58,6 +58,16 @@ export const useExamPlanData = (examPlanId = null) => {
     }
   );
 
+  const { data: planStatistics, isLoading: isLoadingPlanStatistics } = useQuery(
+    ['planStatistics', examPlanId],
+    () => examPlanService.getPlanStatistics(examPlanId),
+    {
+      enabled: !!examPlanId,
+      staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+      cacheTime: 30 * 60 * 1000 // Keep cache for 30 minutes
+    }
+  );
+
   return {
     examPlans: examPlans?.data || [],
     isLoading,
@@ -71,5 +81,7 @@ export const useExamPlanData = (examPlanId = null) => {
     examPlan: examPlan?.data || null,
     isSingleLoading,
     singleError,
+    planStatistics: planStatistics?.data || null,
+    isLoadingPlanStatistics,
   };
 };
