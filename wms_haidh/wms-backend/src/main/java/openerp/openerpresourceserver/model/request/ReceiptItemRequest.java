@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ReceiptItemCreate {
+public class ReceiptItemRequest {
     private Integer quantity;
     private UUID bayId;
     private String lotId;

@@ -15,18 +15,20 @@ import {
   Select, MenuItem
 } from "@nextui-org/react";
 import { VerticalDotsIcon } from "../../components/icon/VerticalDotsIcon";
+import { PlusIcon } from "../../components/icon/PlusIcon";
 import { Badge } from "../../components/button/badge";
 import { columns, statusOptions } from "../../config/deliverytrip";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../api";
 const statusColorMap = {
-  CREATED: "default",        
-  DELIVERING: "warning",   
-  DONE: "success",    
+  CREATED: "default",
+  DELIVERING: "warning",
+  DONE: "success",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["deliveryTripId", "deliveryPersonName", "distance", "totalLocations", "status", "description","actions"];
+const INITIAL_VISIBLE_COLUMNS = ["deliveryTripId", "deliveryPersonName", "distance", "totalLocations", "status", "description", "actions"];
+const buttonText = "Create New Trip";
 export default function DeliveryTrip() {
 
   const [page, setPage] = useState(1);
@@ -94,6 +96,10 @@ export default function DeliveryTrip() {
     navigate(`/delivery-manager/delivery-trip/${id}`);
   };
 
+  const handleAddTrip = () => {
+    navigate('/delivery-manager/delivery-trip/add-trip');
+  };
+
 
   const topContent = useMemo(() => {
     return (
@@ -102,6 +108,7 @@ export default function DeliveryTrip() {
           {/* Status Select */}
           <div className="flex-shrink-0 w-40">
             <Select
+              aria-label="Select status"
               labelId="status-label"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
@@ -115,9 +122,18 @@ export default function DeliveryTrip() {
               ))}
             </Select>
           </div>
+          {/* Add Button */}
+          <div className="flex-shrink-0">
+            <Button
+              className="bg-foreground text-background"
+              endContent={<PlusIcon />}
+              size="md"
+              onClick={handleAddTrip}
+            >
+              {buttonText}
+            </Button>
+          </div>
         </div>
-
-
 
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">Total {totalItems} items</span>

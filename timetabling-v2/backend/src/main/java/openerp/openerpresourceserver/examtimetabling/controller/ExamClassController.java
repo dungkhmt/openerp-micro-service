@@ -20,7 +20,7 @@ import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/exam-class")
@@ -28,12 +28,24 @@ import java.util.stream.Collectors;
 public class ExamClassController {
     private final ExamClassService examClassService;
 
-    @GetMapping("/all")
-    public ResponseEntity<List<ExamClass>> getAllClasses() {
-        return ResponseEntity.ok(examClassService.getAllClasses());
+    @GetMapping
+    public ResponseEntity<List<ExamClass>> getAllExamClasses(
+        @RequestParam(value = "examPlanId", required = false) UUID examPlanId
+    ) {
+        List<ExamClass> examClasses;
+        
+        if (examPlanId != null) {
+            // Filter by exam plan ID
+            examClasses = examClassService.getExamClassesByPlanId(examPlanId);
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        return ResponseEntity.ok(examClasses);
     }
+
     @PostMapping("/delete-classes")
-    public ResponseEntity<?> deleteClasses(@RequestBody List<String> examClassIds) {
+    public ResponseEntity<?> deleteClasses(@RequestBody List<UUID> examClassIds) {
         try {
             examClassService.deleteClasses(examClassIds);
             return ResponseEntity.ok().build();
@@ -45,9 +57,13 @@ public class ExamClassController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<List<ExamClass>> uploadExcelFile(@RequestParam("file") MultipartFile file) throws EncryptedDocumentException, InvalidFormatException {
+    public ResponseEntity<?> uploadExcelFile(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "examPlanId", required = true) UUID examPlanId) throws EncryptedDocumentException, InvalidFormatException {
         try {
-            List<ExamClass> result = examClassService.bulkCreateFromExcel(file);
+            List<ExamClass> result = examClassService.bulkCreateFromExcel(file, examPlanId);
+
+            System.err.println(result);
             return ResponseEntity.ok(result);
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
@@ -55,9 +71,9 @@ public class ExamClassController {
     }
 
     @PostMapping("/export")
-    public ResponseEntity<Resource> exportToExcel(@Valid @RequestBody List<String> examClassIds) {
+    public ResponseEntity<Resource> exportToExcel(@Valid @RequestBody List<UUID> ids) {
         String filename = "Exam_Classes.xlsx";
-        InputStreamResource file = new InputStreamResource(examClassService.loadExamClasses(examClassIds));
+        InputStreamResource file = new InputStreamResource(examClassService.loadExamClasses(ids));
         
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
@@ -70,7 +86,6 @@ public class ExamClassController {
         @RequestBody ExamClass examClass
     ) {
         try {
-            System.err.println(examClass);
             ExamClass updatedClass = examClassService.updateExamClass(examClass);
             return ResponseEntity.ok(updatedClass);
         } catch (RuntimeException e) {
@@ -82,7 +97,7 @@ public class ExamClassController {
     public ResponseEntity<?> createExamClass(@Valid @RequestBody ExamClass examClass) {
         try {
             // Check if exam class already exists
-            if (examClassService.validateExamClass(examClass.getExamClassId())) {
+            if (examClassService.validateExamClass(examClass.getExamClassId(), examClass.getExamPlanId())) {
                 return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body(Map.of(
@@ -91,10 +106,12 @@ public class ExamClassController {
                     ));
             }
 
+            examClass.setId(UUID.randomUUID());
             ExamClass createdClass = examClassService.createExamClass(examClass);
             return ResponseEntity.ok(createdClass);
             
         } catch (Exception e) {
+            System.err.println(e);
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("message", "Error creating exam class"));

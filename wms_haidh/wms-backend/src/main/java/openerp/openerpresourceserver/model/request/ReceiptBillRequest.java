@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ReceiptBillCreate {
+public class ReceiptBillRequest {
     private String receiptBillId;
     private String description;
     private String createdBy;

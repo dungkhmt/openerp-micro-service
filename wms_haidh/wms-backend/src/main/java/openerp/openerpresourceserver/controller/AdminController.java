@@ -38,10 +38,10 @@ import openerp.openerpresourceserver.entity.projection.ReceiptItemProjection;
 import openerp.openerpresourceserver.entity.projection.ReceiptItemRequestProjection;
 import openerp.openerpresourceserver.entity.projection.SaleOrderItemDetailProjection;
 import openerp.openerpresourceserver.entity.projection.SaleOrderItemProjection;
-import openerp.openerpresourceserver.model.request.AssignedOrderItemCreate;
-import openerp.openerpresourceserver.model.request.ProductCreate;
-import openerp.openerpresourceserver.model.request.ReceiptBillCreate;
-import openerp.openerpresourceserver.model.request.ReceiptItemCreate;
+import openerp.openerpresourceserver.model.request.AssignedOrderItemRequest;
+import openerp.openerpresourceserver.model.request.ProductRequest;
+import openerp.openerpresourceserver.model.request.ReceiptBillRequest;
+import openerp.openerpresourceserver.model.request.ReceiptItemRequest;
 import openerp.openerpresourceserver.service.AssignedOrderItemService;
 import openerp.openerpresourceserver.service.BayService;
 import openerp.openerpresourceserver.service.InventoryService;
@@ -99,7 +99,7 @@ public class AdminController {
 		try {
 			// Deserialize product data
 			ObjectMapper objectMapper = new ObjectMapper();
-			ProductCreate productDto = objectMapper.readValue(productData, ProductCreate.class);
+			ProductRequest productDto = objectMapper.readValue(productData, ProductRequest.class);
 
 			// Tạo mới sản phẩm
 			boolean isCreated = productService.createProduct(productDto, imageFile);
@@ -160,7 +160,7 @@ public class AdminController {
 		try {
 			// Deserialize product data
 			ObjectMapper objectMapper = new ObjectMapper();
-			ProductCreate productDto = objectMapper.readValue(productData, ProductCreate.class);
+			ProductRequest productDto = objectMapper.readValue(productData, ProductRequest.class);
 
 			// Cập nhật sản phẩm
 			boolean isUpdated = productService.updateProduct(productDto, imageFile);
@@ -206,14 +206,14 @@ public class AdminController {
 	}
 
 	@PostMapping("/receipt/bill/create")
-	public ResponseEntity<ReceiptBill> createReceiptBill(@RequestBody ReceiptBillCreate request) {
+	public ResponseEntity<ReceiptBill> createReceiptBill(@RequestBody ReceiptBillRequest request) {
 		ReceiptBill receiptBill = receiptBillService.createReceiptBill(request.getReceiptBillId(),
 				request.getDescription(), request.getCreatedBy(), request.getReceiptItemRequestId());
 		return ResponseEntity.ok(receiptBill);
 	}
 
 	@PostMapping("/receipt/receipt-item/create")
-	public ResponseEntity<?> createReceiptItem(@RequestBody ReceiptItemCreate request) {
+	public ResponseEntity<?> createReceiptItem(@RequestBody ReceiptItemRequest request) {
 		try {
 			ReceiptItem receiptItem = receiptItemService.createReceiptItem(request);
 			return ResponseEntity.ok(receiptItem);
@@ -292,7 +292,7 @@ public class AdminController {
 	}
 
 	@PostMapping("/orders/assign")
-	public ResponseEntity<AssignedOrderItem> assignOrderItem(@RequestBody AssignedOrderItemCreate dto) {
+	public ResponseEntity<AssignedOrderItem> assignOrderItem(@RequestBody AssignedOrderItemRequest dto) {
 		try {
 			AssignedOrderItem assignedOrderItem = assignedOrderItemService.assignOrderItem(dto);
 			return ResponseEntity.ok(assignedOrderItem);

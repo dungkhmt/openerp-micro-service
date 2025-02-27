@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import openerp.openerpresourceserver.entity.Product;
 import openerp.openerpresourceserver.entity.projection.ProductInfoProjection;
 import openerp.openerpresourceserver.entity.projection.ProductNameProjection;
-import openerp.openerpresourceserver.model.request.ProductCreate;
+import openerp.openerpresourceserver.model.request.ProductRequest;
 
 public interface ProductService {
 
@@ -21,9 +21,9 @@ public interface ProductService {
 
 	Product getProductById(UUID productId);
 
-	boolean updateProduct(ProductCreate productDto, MultipartFile imageFile);
+	boolean updateProduct(ProductRequest productDto, MultipartFile imageFile);
 
-	boolean createProduct(ProductCreate productDto, MultipartFile imageFile);
+	boolean createProduct(ProductRequest productDto, MultipartFile imageFile);
 	
 	List<ProductNameProjection> searchProductNames(String searchTerm);
 

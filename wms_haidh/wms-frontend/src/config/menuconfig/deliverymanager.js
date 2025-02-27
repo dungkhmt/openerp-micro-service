@@ -23,13 +23,6 @@ export const deliverymanager = {
       isPublic: true,
       text: "Delivery Trips",
       child: [],
-    },
-    {
-      id: "MENU_WMSv2_DELIVERY_MANAGER.ITEMS",
-      path: "/delivery-manager/items",
-      isPublic: true,
-      text: "Items to Process",
-      child: [],
     }
   ],
 };

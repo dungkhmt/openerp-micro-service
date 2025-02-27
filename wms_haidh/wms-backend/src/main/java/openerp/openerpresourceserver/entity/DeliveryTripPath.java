@@ -23,6 +23,7 @@ import lombok.ToString;
 public class DeliveryTripPath {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer deliveryTripPathId;
 
     private String deliveryTripId;

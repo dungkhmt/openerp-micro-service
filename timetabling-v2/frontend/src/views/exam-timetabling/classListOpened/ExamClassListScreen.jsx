@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useState } from "react"
-import { useSemesterData } from "services/useSemesterData"
+import { useEffect, useState } from "react"
+import { useExamPlanData } from "services/useExamPlanData"
 import { COLUMNS } from "./utils/gridColumns"
 import {
   Autocomplete,
@@ -24,11 +24,10 @@ import localText from "./utils/LocalText"
 
 export default function TimePerformanceScreen() {
   // const [ examClasses, setExamClasses ] = useState([]);
-  const [selectedSemester, setSelectedSemester] = useState(null)
+  const [selectedExamPlan, setSelectedExamPlan] = useState(null)
   const [successDialogOpen, setSuccessDialogOpen] = useState(false)
   const [conflictDialogOpen, setConflictDialogOpen] = useState(false)
   const [conflictList, setConflictList] = useState([])
-  const [keyword, setKeyword] = useState("")
   const [selectedRow, setSelectedRow] = useState(null)
   const [selectedRows, setSelectedRows] = useState([])
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -45,10 +44,12 @@ export default function TimePerformanceScreen() {
     school: '',
     period: '',
     managementCode: '',
+    id: '',
+    examPlanId: '',
   })
 
   let {
-    examClasses: classes,
+    examClasses,
     isLoading: isLoadingClasses,
     importExcel,
     exportClasses,
@@ -61,14 +62,16 @@ export default function TimePerformanceScreen() {
     createExamClass,
     downloadSample,
     isImporting,
-  } = useExamClassData()
+  } = useExamClassData(selectedExamPlan?.id)
 
-  const examClasses = classes.map((examClass, index) => ({
-    ...examClass,
-    id: examClass.examClassId
-  }))
+  const { examPlans } = useExamPlanData();
 
-  const { semesters } = useSemesterData()
+  useEffect(() => {
+    if (examPlans && examPlans.length > 0 && !selectedExamPlan) {
+      setSelectedExamPlan(examPlans[0]);
+    }
+  }, [examPlans, selectedExamPlan]);
+
 
   const handleImportExcel = () => {
     const input = document.createElement("input")
@@ -77,16 +80,16 @@ export default function TimePerformanceScreen() {
 
     input.onchange = async (e) => {
       const file = e.target.files[0]
-      if (file && selectedSemester) {
+      if (file && selectedExamPlan) {
         const formData = new FormData()
         formData.append("file", file)
 
         try {
-          const result = await importExcel(formData, selectedSemester.semester)
+          const result = await importExcel(formData)
           if (result.data.length === 0) {
             setSuccessDialogOpen(true)
           } else {
-            setConflictList(result.data.map(examClass => examClass.examClassId))
+            setConflictList(result.data.map(examClass => examClass.id))
             setConflictDialogOpen(true)
           }
         } catch (error) {
@@ -98,8 +101,10 @@ export default function TimePerformanceScreen() {
     input.click()
   }
 
-  const handleSelectSemester = (event, newValue) => {
-    setSelectedSemester(newValue)
+  const handleSelectExamPlan = (event, examPlan) => {
+    setSelectedExamPlan(examPlan);
+    // Clear selected rows when changing exam plan
+    setSelectedRows([]);
   }
 
   const handleDialogClose = () => {
@@ -111,6 +116,7 @@ export default function TimePerformanceScreen() {
   const handleDownloadConflictList = async () => {
     try {
       await exportConflicts(conflictList)
+      setSuccessDialogOpen(false)
     } catch (error) {
       console.error("Error exporting conflicts:", error)
     }
@@ -127,6 +133,7 @@ export default function TimePerformanceScreen() {
   const handleRowClick = (params) => {
     setSelectedRow(params.row)
     setEditFormData({
+      id: params.row.id || '',
       examClassId: params.row.examClassId || '',
       classId: params.row.classId || '',
       courseId: params.row.courseId || '',
@@ -137,6 +144,7 @@ export default function TimePerformanceScreen() {
       school: params.row.school || '',
       period: params.row.period || '',
       managementCode: params.row.managementCode || '',
+      examPlanId: params.row.examPlanId || '',
     })
     setIsEditModalOpen(true)
   }
@@ -145,6 +153,7 @@ export default function TimePerformanceScreen() {
     setIsEditModalOpen(false)
     setSelectedRow(null)
     setEditFormData({
+      id: '',
       examClassId: '',
       classId: '',
       courseId: '',
@@ -155,6 +164,7 @@ export default function TimePerformanceScreen() {
       school: '',
       period: '',
       managementCode: '',
+      examPlanId: '',
     })
   }
 
@@ -201,6 +211,7 @@ export default function TimePerformanceScreen() {
   const handleAddSubmit = async (formData) => {
     try {
       setIsAddModalOpen(false) // Close the modal first
+
       await createExamClass(formData)
     } catch (error) {
       console.error("Error adding exam class:", error)
@@ -220,15 +231,15 @@ export default function TimePerformanceScreen() {
     return (
       <Box sx={{ px: 2, pb: 2 }}>
         <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-          {/* Semester selection on the right */}
+          {/* ExamPlan selection on the right */}
           <Autocomplete
-            options={semesters}
-            getOptionLabel={(option) => option.semester}
-            style={{ width: 150 }}
-            value={selectedSemester}
-            onChange={handleSelectSemester}
+            options={examPlans}
+            getOptionLabel={(option) => option.name}
+            style={{ width: 230 }}
+            value={selectedExamPlan}
+            onChange={handleSelectExamPlan}
             renderInput={(params) => (
-              <TextField {...params} label="Chọn kỳ học" variant="outlined" size="small" />
+              <TextField {...params} label="Chọn kế hoạch thi" variant="outlined" size="small" />
             )}
           />
         </Box>
@@ -239,7 +250,7 @@ export default function TimePerformanceScreen() {
             variant="outlined"
             color="primary"
             onClick={handleDeleteClick}
-            disabled={selectedRows.length === 0 || isClearing || isImporting || isExportingClasses || isExportingConflicts}
+            disabled={selectedRows.length === 0 || isClearing || isImporting || isExportingClasses || isExportingConflicts || !selectedExamPlan}
           >
             Xóa lớp
           </Button>
@@ -247,7 +258,7 @@ export default function TimePerformanceScreen() {
             variant="outlined"
             color="primary"
             onClick={handleAddClick}
-            disabled={isClearing || isImporting || isExportingClasses || isExportingConflicts}
+            disabled={isClearing || isImporting || isExportingClasses || isExportingConflicts || !selectedExamPlan}
           >
             Thêm lớp
           </Button>
@@ -256,7 +267,7 @@ export default function TimePerformanceScreen() {
             onClick={handleExportExamClasses}
             color="primary"
             variant="outlined"
-            disabled={selectedRows.length === 0 || isClearing || isImporting || isExportingClasses || isExportingConflicts}
+            disabled={selectedRows.length === 0 || isClearing || isImporting || isExportingClasses || isExportingConflicts || !selectedExamPlan}
           >
             Tải xuống DS lớp
           </Button>
@@ -265,7 +276,7 @@ export default function TimePerformanceScreen() {
               variant="outlined"
               color="primary"
               onClick={handleImportExcel}
-              disabled={!selectedSemester}
+              disabled={!selectedExamPlan || isClearing || isImporting || isExportingClasses || isExportingConflicts}
             >
               Tải lên DS lớp
             </Button>
@@ -348,7 +359,7 @@ export default function TimePerformanceScreen() {
         <Typography
           variant="h4"
           sx={{
-            fontWeight: 600,
+            fontWeight: 700,
             color: '#1976d2',
             position: 'relative',
           }}
@@ -395,6 +406,9 @@ export default function TimePerformanceScreen() {
             fontSize: '15px',
             fontWeight: 'bold',
           },
+          '& .MuiDataGrid-row:nth-of-type(even)': {
+            backgroundColor: '#f9f9f9',
+          },
           '& .MuiDataGrid-columnHeader': {
             '&:focus': {
               outline: 'none',
@@ -418,7 +432,12 @@ export default function TimePerformanceScreen() {
       <AddExamClassModal
         open={isAddModalOpen}
         onClose={handleCloseAddModal}
-        onSubmit={handleAddSubmit}
+        onSubmit={(editFormData) => {
+          handleAddSubmit({
+            ...editFormData,
+            examPlanId: selectedExamPlan.id
+          })
+        }}
       />
     </div>
   )

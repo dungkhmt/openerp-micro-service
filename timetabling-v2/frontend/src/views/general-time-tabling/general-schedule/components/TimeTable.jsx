@@ -28,6 +28,7 @@ const TimeTable = ({
   const { handlers, states } = useGeneralSchedule();
 
   console.log(classes);
+  console.log(selectedGroup?.groupName);
   useEffect(() => {
     if (classes && classes.length > 0) {
       const transformedClassDetails = classes
@@ -122,7 +123,7 @@ const TimeTable = ({
         return;
       }
 
-      console.log('Selected class:', selectedClassForSlot); // Add debug log
+      console.log('Selected class:', selectedClassForSlot); 
 
       await handlers.handleAddTimeSlot({
         generalClassId: selectedClassForSlot.generalClassId,
@@ -226,7 +227,7 @@ const TimeTable = ({
         endTime: Number(classInfo.endTime),
         weekday: Number(classDetails[classIndex].weekDay),
         code: classDetails[classIndex].code,
-        numberOfPeriods: Number(classInfo.endTime) - period + 1,
+        numberOfPeriods: classDetails[classIndex].duration,
       });
     } else {
       setSelectedClass({
@@ -236,7 +237,7 @@ const TimeTable = ({
         endTime: undefined,
         weekday: days.indexOf(day) + 2,
         code: classDetails[classIndex].code,
-        numberOfPeriods: undefined,
+        numberOfPeriods: classDetails[classIndex].duration,
       });
     }
     setOpen(true);
@@ -514,8 +515,17 @@ const TimeTable = ({
                             <Button
                               onClick={() => handleOpenAddSlotDialog(classDetail)}
                               disabled={classDetail.duration <= 0}
+                              sx={{ 
+                                minWidth: '32px', 
+                                width: '32px', 
+                                height: '32px', 
+                                padding: '4px',
+                                borderRadius: '4px'
+                              }}
+                              color="primary"
+                              size="small"
                             >
-                              <Add />
+                              <Add fontSize="small" />
                             </Button>
                           )}
                         </td>
@@ -528,8 +538,17 @@ const TimeTable = ({
                                   classDetail.roomReservationId
                                 )
                               }
+                              sx={{ 
+                                minWidth: '32px', 
+                                width: '32px', 
+                                height: '32px', 
+                                padding: '4px',
+                                borderRadius: '4px'
+                              }}
+                              color="error"
+                              size="small"
                             >
-                              <Remove />
+                              <Remove fontSize="small" />
                             </Button>
                           )}
                         </td>
@@ -608,6 +627,7 @@ const TimeTable = ({
                 value={selectedClass.code || ""}
                 onChange={handleInputChange}
                 fullWidth
+                disabled
                 margin="normal"
                 InputProps={{
                   readOnly: true,
@@ -641,6 +661,7 @@ const TimeTable = ({
                 label="Số tiết học"
                 name="numberOfPeriods"
                 type="number"
+                disabled
                 value={selectedClass.numberOfPeriods || ""}
                 onChange={handleInputChange}
                 fullWidth
@@ -662,12 +683,13 @@ const TimeTable = ({
           ) : (
             <p>Không có thông tin lớp học</p>
           )}
-          <div className="flex justify-between mt-[20px]">
+          <div className="flex justify-between mt-[20px] gap-4">
             <Button
               onClick={handleClose}
-              variant="contained"
+              variant="outlined"
               color="secondary"
               disabled={states.isSavingTimeSlot}
+              sx={{ minWidth: '100px', padding: '8px 16px' }}
             >
               Đóng
             </Button>
@@ -676,6 +698,7 @@ const TimeTable = ({
               variant="contained"
               color="primary"
               disabled={states.isSavingTimeSlot}
+              sx={{ minWidth: '100px', padding: '8px 16px' }}
             >
               {states.isSavingTimeSlot ? "Đang lưu..." : "Lưu"}
             </Button>
@@ -706,9 +729,22 @@ const TimeTable = ({
             }}
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseAddSlotDialog}>Hủy</Button>
-          <Button onClick={handleAddTimeSlot}>Thêm</Button>
+        <DialogActions sx={{ padding: '16px', gap: '8px' }}>
+          <Button 
+            onClick={handleCloseAddSlotDialog}
+            variant="outlined" 
+            sx={{ minWidth: '80px', padding: '6px 16px' }}
+          >
+            Hủy
+          </Button>
+          <Button 
+            onClick={handleAddTimeSlot} 
+            variant="contained" 
+            color="primary"
+            sx={{ minWidth: '80px', padding: '6px 16px' }}
+          >
+            Thêm
+          </Button>
         </DialogActions>
       </Dialog>
     </div>

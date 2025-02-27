@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 import openerp.openerpresourceserver.entity.Product;
 import openerp.openerpresourceserver.entity.projection.ProductInfoProjection;
 import openerp.openerpresourceserver.entity.projection.ProductNameProjection;
-import openerp.openerpresourceserver.model.request.ProductCreate;
+import openerp.openerpresourceserver.model.request.ProductRequest;
 import openerp.openerpresourceserver.repository.ProductRepository;
 import openerp.openerpresourceserver.service.ProductService;
 import openerp.openerpresourceserver.service.mongodb.ImageService;
@@ -54,7 +54,7 @@ public class ProductServiceImpl implements ProductService {
 		return product;
 	}
 
-	public boolean createProduct(ProductCreate productDto, MultipartFile imageFile) {
+	public boolean createProduct(ProductRequest productDto, MultipartFile imageFile) {
 		try {
 			Optional<Product> existingProduct = productRepository.findByCode(productDto.getCode());
 			if (existingProduct.isPresent()) {
@@ -85,7 +85,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public boolean updateProduct(ProductCreate productDto, MultipartFile imageFile) {
+	public boolean updateProduct(ProductRequest productDto, MultipartFile imageFile) {
 		try {
 			// Tìm sản phẩm theo productId
 			Optional<Product> existingProductOpt = productRepository.findById(productDto.getProductId());

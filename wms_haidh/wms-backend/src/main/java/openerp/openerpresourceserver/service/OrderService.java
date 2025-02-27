@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import openerp.openerpresourceserver.entity.Order;
+import openerp.openerpresourceserver.entity.projection.CustomerOrderProjection;
 import openerp.openerpresourceserver.entity.projection.OrderProjection;
 import openerp.openerpresourceserver.repository.OrderRepository;
 
@@ -27,6 +29,10 @@ public class OrderService {
     public Order getOrderById(UUID orderId) {
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
+    }
+    
+    public Optional<CustomerOrderProjection> getCustomerOrderById(UUID orderId) {
+        return orderRepository.findCustomerOrderById(orderId);
     }
     
     public Order distributeOrder(UUID orderId) {
