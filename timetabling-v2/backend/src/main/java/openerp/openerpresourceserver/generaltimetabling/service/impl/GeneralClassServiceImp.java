@@ -491,8 +491,6 @@ public class GeneralClassServiceImp implements GeneralClassService {
             roomOccupations.addAll(foundRoomOccupations);
         });
 
-        var isConflict = false;
-        var conflictMsg = "";
         try {
             /*Check conflict*/
             for (RoomReservation roomReservation : roomReservationMap.values()) {
@@ -501,14 +499,11 @@ public class GeneralClassServiceImp implements GeneralClassService {
                 }
             }
         } catch (ConflictScheduleException e) {
-            isConflict = true;
-            conflictMsg = e.getCustomMessage();
+            throw new ConflictScheduleException(e.getCustomMessage());
         }
 
-        /* Persist room reservation and room occupation */
         roomReservationRepo.saveAll(roomReservationMap.values());
         roomOccupationRepo.saveAll(roomOccupations);
-        if(isConflict) throw new ConflictScheduleException(conflictMsg);
         return roomReservationMap.values().stream().map(RoomReservation::getGeneralClass).toList();
     }
 

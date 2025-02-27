@@ -144,23 +144,29 @@ export const generalScheduleRepository = {
     }
   },
 
-  updateTimeSlot: async (semester, saveRequest) => {
+  updateTimeSlot: async (semester, saveRequest, errorCallback) => {
     try {
-      if (!semester) throw new Error('Semester is required');
-      
       const response = await request(
         "post",
         `/general-classes/update-class-schedule-v2?semester=${semester}`,
         null,
         null,
-        { saveRequests: [saveRequest] }
+        { saveRequests: [saveRequest] },
+        {},
+        null,
+        errorCallback
       );
       
       invalidateCache(semester);
-      
       return response;
     } catch (error) {
-      console.error('Update error:', error);
+      console.log('Update error:', error);
+      
+      if (typeof errorCallback === 'function' && error?.response?.status === 410) {
+        errorCallback(error);
+        return error; 
+      }
+      
       throw error;
     }
   },
