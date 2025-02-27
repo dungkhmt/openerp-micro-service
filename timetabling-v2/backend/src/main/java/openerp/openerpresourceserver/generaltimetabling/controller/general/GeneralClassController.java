@@ -7,6 +7,7 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import openerp.openerpresourceserver.generaltimetabling.common.Constants;
 import openerp.openerpresourceserver.generaltimetabling.exception.*;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.RoomReservationDto;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.*;
@@ -128,6 +129,14 @@ public class GeneralClassController {
         return ResponseEntity.ok(gService.resetSchedule(request.getIds(), semester));
     }
 
+    @GetMapping("/get-list-algorithm-names")
+    public ResponseEntity<?> getListAlgorithms(){
+        List<String> res = new ArrayList<>();
+        res.add(Constants.ONE_CLASS_PER_COURSE_GREEDY_FIRST_FIT);
+        res.add(Constants.ONE_CLASS_PER_COURSE_GREEDY_2);
+        res.add(Constants.ONE_CLASS_PER_COURSE_GREEDY_3);
+        return ResponseEntity.ok().body(res);
+    }
     @PostMapping("/auto-schedule-timeslot-room")
     public ResponseEntity<?> autoScheduleTimeSlotRoom(Principal principal, @RequestBody ModelInputAutoScheduleTimeSlotRoom I){
         return ResponseEntity.ok().body(gService.autoScheduleTimeSlotRoom(I.getClassIds(),I.getTimeLimit()));
