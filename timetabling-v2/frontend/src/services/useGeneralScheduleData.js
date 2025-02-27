@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { toast } from 'react-toastify';
-import { generalScheduleRepository } from '../repositories/generalScheduleRepository';
+import { useState, useCallback } from "react";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import { toast } from "react-toastify";
+import { generalScheduleRepository } from "../repositories/generalScheduleRepository";
 
 export const useGeneralSchedule = () => {
   const queryClient = useQueryClient();
@@ -16,16 +16,19 @@ export const useGeneralSchedule = () => {
   const [isOpenSelectedDialog, setOpenSelectedDialog] = useState(false);
   const [selectedTimeLimit, setSelectedTimeLimit] = useState(5);
 
-  const queryKey = ["generalClasses", selectedSemester?.semester, selectedGroup?.groupName];
-  
+  const queryKey = [
+    "generalClasses",
+    selectedSemester?.semester,
+    selectedGroup?.groupName,
+  ];
+
   const { data: classes = [], isLoading: isClassesLoading } = useQuery(
     queryKey,
     () => {
       setLoading(true);
-      return generalScheduleRepository.getClasses(
-        selectedSemester?.semester,
-        selectedGroup?.groupName
-      ).finally(() => setLoading(false));
+      return generalScheduleRepository
+        .getClasses(selectedSemester?.semester, selectedGroup?.groupName)
+        .finally(() => setLoading(false));
     },
     {
       enabled: !!selectedSemester,
@@ -38,13 +41,14 @@ export const useGeneralSchedule = () => {
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
       select: (data) => {
         if (!Array.isArray(data)) return [];
-        
+
         let generalClasses = [];
         data.forEach((classObj) => {
           // Calculate total used duration from timeSlots
-          const usedDuration = classObj.timeSlots?.reduce((total, slot) => {
-            return total + (slot.duration || 0);
-          }, 0) || 0;
+          const usedDuration =
+            classObj.timeSlots?.reduce((total, slot) => {
+              return total + (slot.duration || 0);
+            }, 0) || 0;
 
           // Calculate remaining duration for parent class
           const remainingDuration = classObj.duration - usedDuration;
@@ -54,17 +58,19 @@ export const useGeneralSchedule = () => {
             // Only add valid child classes (with duration not null)
             classObj.timeSlots.forEach((timeSlot, index) => {
               if (timeSlot.duration !== null) {
-                const cloneObj = JSON.parse(JSON.stringify({
-                  ...classObj,
-                  ...timeSlot,
-                  classCode: classObj.classCode,
-                  roomReservationId: timeSlot.id,
-                  id: classObj.id + `-${index + 1}`,
-                  crew: classObj.crew,
-                  duration: timeSlot.duration,
-                  isChild: true,
-                  parentId: classObj.id
-                }));
+                const cloneObj = JSON.parse(
+                  JSON.stringify({
+                    ...classObj,
+                    ...timeSlot,
+                    classCode: classObj.classCode,
+                    roomReservationId: timeSlot.id,
+                    id: classObj.id + `-${index + 1}`,
+                    crew: classObj.crew,
+                    duration: timeSlot.duration,
+                    isChild: true,
+                    parentId: classObj.id,
+                  })
+                );
                 delete cloneObj.timeSlots;
                 generalClasses.push(cloneObj);
               }
@@ -72,12 +78,14 @@ export const useGeneralSchedule = () => {
           }
 
           // Only add parent class if it has remaining duration or has no timeSlots
-          if ((remainingDuration > 0) || !classObj.timeSlots?.length) {
+          if (remainingDuration > 0 || !classObj.timeSlots?.length) {
             generalClasses.push({
               ...classObj,
-              generalClassId: String(classObj.generalClassId || classObj.id || ''),
+              generalClassId: String(
+                classObj.generalClassId || classObj.id || ""
+              ),
               duration: remainingDuration,
-              isParent: true
+              isParent: true,
             });
           }
         });
@@ -87,68 +95,88 @@ export const useGeneralSchedule = () => {
           // First sort by parent ID to group families together
           const parentIdA = a.parentId || a.id;
           const parentIdB = b.parentId || b.id;
-          
+
           if (parentIdA !== parentIdB) {
             return parentIdA - parentIdB;
           }
-          
+
           // Then put parents before children
           if (a.isParent && !b.isParent) return -1;
           if (!a.isParent && b.isParent) return 1;
-          
+
           return 0;
         });
 
         return generalClasses;
-      }
+      },
     }
   );
 
-  const { data: classesNoSchedule = [], isLoading: isClassesNoScheduleLoading } = useQuery(
-    ["generalClassesNoSchedule", selectedSemester?.semester, selectedGroup?.groupName],
-    () => generalScheduleRepository.getClassesNoSchedule(
+  const {
+    data: classesNoSchedule = [],
+    isLoading: isClassesNoScheduleLoading,
+  } = useQuery(
+    [
+      "generalClassesNoSchedule",
       selectedSemester?.semester,
-      selectedGroup?.groupName
-    ),
+      selectedGroup?.groupName,
+    ],
+    () =>
+      generalScheduleRepository.getClassesNoSchedule(
+        selectedSemester?.semester,
+        selectedGroup?.groupName
+      ),
     {
       enabled: !!selectedSemester,
       staleTime: Infinity,
       cacheTime: 30 * 60 * 1000,
-      refetchOnWindowFocus: false
+      refetchOnWindowFocus: false,
     }
   );
 
   const forceRefetch = useCallback(() => {
     setLoading(true);
-    return generalScheduleRepository.getClasses(
-      selectedSemester?.semester,
-      selectedGroup?.groupName,
-      true // Force refresh
-    ).then((data) => {
-      queryClient.setQueryData(
-        ["generalClasses", selectedSemester?.semester, selectedGroup?.groupName],
-        data
-      );
-    }).finally(() => setLoading(false));
+    return generalScheduleRepository
+      .getClasses(
+        selectedSemester?.semester,
+        selectedGroup?.groupName,
+        true // Force refresh
+      )
+      .then((data) => {
+        queryClient.setQueryData(
+          [
+            "generalClasses",
+            selectedSemester?.semester,
+            selectedGroup?.groupName,
+          ],
+          data
+        );
+      })
+      .finally(() => setLoading(false));
   }, [selectedSemester, selectedGroup, queryClient]);
 
   const resetMutation = useMutation(
-    ({ semester, ids }) => generalScheduleRepository.resetSchedule(semester, ids),
+    ({ semester, ids }) =>
+      generalScheduleRepository.resetSchedule(semester, ids),
     {
       onSuccess: () => {
         forceRefetch();
         setSelectedRows([]);
-        toast.success('Reset thời khóa biểu thành công!');
+        toast.success("Reset thời khóa biểu thành công!");
       },
       onError: (error) => {
-        toast.error(error.response?.data || 'Có lỗi khi reset thời khóa biểu!');
-      }
+        toast.error(error.response?.data || "Có lỗi khi reset thời khóa biểu!");
+      },
     }
   );
 
   const autoScheduleTimeMutation = useMutation(
-    ({ semester, groupName, timeLimit }) => 
-      generalScheduleRepository.autoScheduleTime(semester, groupName, timeLimit),
+    ({ semester, groupName, timeLimit }) =>
+      generalScheduleRepository.autoScheduleTime(
+        semester,
+        groupName,
+        timeLimit
+      ),
     {
       onMutate: () => {
         setLoading(true);
@@ -166,37 +194,54 @@ export const useGeneralSchedule = () => {
         if (error.response?.status === 410 || error.response?.status === 420) {
           toast.error(error.response.data);
         } else {
-          console.log('Auto schedule error:', error);
+          console.log("Auto schedule error:", error);
           toast.error("Có lỗi khi tự động thời khóa biểu!");
         }
         setOpenTimeslotDialog(false);
-      }
+      },
     }
   );
 
   const autoScheduleRoomMutation = useMutation(
-    ({ semester, groupName, timeLimit }) => 
-      generalScheduleRepository.autoScheduleRoom(semester, groupName, timeLimit),
+    ({ semester, groupName, timeLimit }) =>
+      generalScheduleRepository.autoScheduleRoom(
+        semester,
+        groupName,
+        timeLimit
+      ),
     {
       onSuccess: () => {
         forceRefetch();
         setSelectedRows([]);
         setOpenClassroomDialog(false);
-        toast.success('Tự động xếp phòng thành công!');
+        toast.success("Tự động xếp phòng thành công!");
       },
       onError: (error) => {
-        const message = error.response?.status === 410 ? error.response.data 
-          : 'Có lỗi khi tự động xếp phòng!';
+        const message =
+          error.response?.status === 410
+            ? error.response.data
+            : "Có lỗi khi tự động xếp phòng!";
         toast.error(message);
-      }
+      },
     }
   );
 
   const saveTimeSlotMutation = useMutation(
-    ([semester, saveRequest]) => generalScheduleRepository.updateTimeSlot(
-      semester, 
-      saveRequest
-    ),
+    ([semester, saveRequest]) => {
+      if (saveRequest.endTime > 6) {
+        toast.error("Thời gian lớp học không hợp lệ!");
+        return ;
+      }
+      return generalScheduleRepository.updateTimeSlot(
+        semester,
+        saveRequest,
+        (error) => {
+          toast.error(
+            error.response?.data || "Lịch học đã thay đổi, không thể cập nhật!"
+          );
+        }
+      );
+    },
     {
       onMutate: () => {
         setLoading(true);
@@ -204,29 +249,23 @@ export const useGeneralSchedule = () => {
       onSettled: () => {
         setLoading(false);
       },
-      onSuccess: () => {
-        forceRefetch();
-        toast.success("Lưu TKB thành công!");
+      onSuccess: (response) => {
+        if (response && response.status === 200) {
+          forceRefetch();
+          toast.success("Lưu TKB thành công!");
+        }
       },
       onError: (error) => {
-        if (error?.response?.status === 410) {
-          forceRefetch(); // Even on error 410, force reload
-          toast.warn(error.response?.data || 'Dữ liệu đã thay đổi');
-        } else if (error?.response?.status === 420) {
-          toast.error(error.response?.data || 'Lỗi xác thực dữ liệu');
-        } else {
-          console.error('Save time slot error:', error);
-          toast.error(error?.response?.data || error?.message || "Có lỗi khi lưu TKB!");
-        }
-      }
+        const message =
+          error?.response?.data || error.message || "Có lỗi khi lưu TKB!";
+        toast.error(message);
+      },
     }
   );
 
   const addTimeSlotMutation = useMutation(
-    (params) => generalScheduleRepository.addTimeSlot(
-      selectedSemester?.semester,
-      params
-    ),
+    (params) =>
+      generalScheduleRepository.addTimeSlot(selectedSemester?.semester, params),
     {
       onMutate: () => {
         setLoading(true);
@@ -244,12 +283,12 @@ export const useGeneralSchedule = () => {
         } else {
           toast.error("Thêm ca học thất bại!");
         }
-      }
+      },
     }
   );
 
   const removeTimeSlotMutation = useMutation(
-    (params) => 
+    (params) =>
       generalScheduleRepository.removeTimeSlot(
         selectedSemester?.semester,
         params
@@ -271,7 +310,7 @@ export const useGeneralSchedule = () => {
         } else {
           toast.error("Xóa ca học thất bại!");
         }
-      }
+      },
     }
   );
 
@@ -280,18 +319,21 @@ export const useGeneralSchedule = () => {
     {
       onSuccess: (response) => {
         const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
+        const link = document.createElement("a");
         link.href = url;
-        link.setAttribute('download', `timetable_${selectedSemester?.semester}.xlsx`);
+        link.setAttribute(
+          "download",
+          `timetable_${selectedSemester?.semester}.xlsx`
+        );
         document.body.appendChild(link);
         link.click();
         link.remove();
         window.URL.revokeObjectURL(url);
-        toast.success('Tải xuống thành công!');
+        toast.success("Tải xuống thành công!");
       },
       onError: (error) => {
-        toast.error(error.response?.data || 'Có lỗi khi tải xuống file!');
-      }
+        toast.error(error.response?.data || "Có lỗi khi tải xuống file!");
+      },
     }
   );
 
@@ -300,11 +342,11 @@ export const useGeneralSchedule = () => {
     {
       onSuccess: () => {
         forceRefetch();
-        toast.success('Xóa danh sách thành công!');
+        toast.success("Xóa danh sách thành công!");
       },
       onError: (error) => {
-        toast.error(error.response?.data || 'Có lỗi khi xóa danh sách!');
-      }
+        toast.error(error.response?.data || "Có lỗi khi xóa danh sách!");
+      },
     }
   );
 
@@ -313,12 +355,12 @@ export const useGeneralSchedule = () => {
     {
       onSuccess: (response) => {
         forceRefetch();
-        toast.success('Upload file thành công!');
+        toast.success("Upload file thành công!");
         return response;
       },
       onError: (error) => {
-        toast.error(error.response?.data || 'Có lỗi khi upload file!');
-      }
+        toast.error(error.response?.data || "Có lỗi khi upload file!");
+      },
     }
   );
 
@@ -326,23 +368,26 @@ export const useGeneralSchedule = () => {
     (semester) => generalScheduleRepository.deleteBySemester(semester),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(["generalClassesNoSchedule", selectedSemester?.semester]);
-        toast.success('Xóa danh sách lớp thành công!');
+        queryClient.invalidateQueries([
+          "generalClassesNoSchedule",
+          selectedSemester?.semester,
+        ]);
+        toast.success("Xóa danh sách lớp thành công!");
       },
       onError: (error) => {
-        toast.error(error.response?.data || 'Xóa danh sách lớp thất bại!');
-      }
+        toast.error(error.response?.data || "Xóa danh sách lớp thất bại!");
+      },
     }
   );
 
   const autoScheduleSelectedMutation = useMutation(
     ({ classIds, timeLimit, semester }) => {
       // Clean up classIds by removing the -[number] suffix if it exists
-      const cleanClassIds = classIds.map(id => id.split('-')[0]);
-      
+      const cleanClassIds = classIds.map((id) => id.split("-")[0]);
+
       return generalScheduleRepository.autoScheduleSelected(
         cleanClassIds,
-        timeLimit, 
+        timeLimit,
         semester
       );
     },
@@ -357,13 +402,15 @@ export const useGeneralSchedule = () => {
         forceRefetch();
         setSelectedRows([]);
         setOpenSelectedDialog(false);
-        toast.success('Tự động xếp lịch các lớp đã chọn thành công!');
+        toast.success("Tự động xếp lịch các lớp đã chọn thành công!");
       },
       onError: (error) => {
-        const message = error.response?.status === 410 ? error.response.data 
-          : 'Có lỗi khi tự động xếp lịch các lớp đã chọn!';
+        const message =
+          error.response?.status === 410
+            ? error.response.data
+            : "Có lỗi khi tự động xếp lịch các lớp đã chọn!";
         toast.error(message);
-      }
+      },
     }
   );
 
@@ -371,12 +418,19 @@ export const useGeneralSchedule = () => {
     forceRefetch();
   }, [forceRefetch]);
 
-  const setClassesNoSchedule = useCallback((newClasses) => {
-    queryClient.setQueryData(
-      ["generalClassesNoSchedule", selectedSemester?.semester, selectedGroup?.groupName],
-      newClasses
-    );
-  }, [selectedSemester, selectedGroup, queryClient]);
+  const setClassesNoSchedule = useCallback(
+    (newClasses) => {
+      queryClient.setQueryData(
+        [
+          "generalClassesNoSchedule",
+          selectedSemester?.semester,
+          selectedGroup?.groupName,
+        ],
+        newClasses
+      );
+    },
+    [selectedSemester, selectedGroup, queryClient]
+  );
 
   return {
     states: {
@@ -486,7 +540,7 @@ export const useGeneralSchedule = () => {
           timeLimit: selectedTimeLimit,
           semester: selectedSemester?.semester,
         });
-      }
+      },
     },
   };
 };
