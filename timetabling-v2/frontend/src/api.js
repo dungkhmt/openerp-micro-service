@@ -44,7 +44,7 @@ export async function request(
   // Check auth before making request
   if (!keycloak.authenticated) {
     keycloak.login({
-      redirectUri: window.location.origin + window.location.pathname
+      redirectUri: window.location.origin + window.location.pathname,
     });
     return;
   }
@@ -53,17 +53,18 @@ export async function request(
   try {
     await keycloak.updateToken(70);
   } catch (error) {
-    console.error('Failed to refresh token:', error);
+    console.error("Failed to refresh token:", error);
     keycloak.login();
     return;
   }
 
-  if (config !== undefined && config !== null) {
+  if (config?.headers?.["Content-Type"] === "multipart/form-data") {
     axiosInstance.defaults.headers.common["Content-Type"] =
       "multipart/form-data";
   } else {
     axiosInstance.defaults.headers.common["Content-Type"] = "application/json";
   }
+
   try {
     let options = {};
     if (controller) {
