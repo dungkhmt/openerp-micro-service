@@ -18,6 +18,7 @@ public class MapDataScheduleTimeSlotRoom {
     String[] courseCode; // courseCode[i] - course code of i-th segment
     Long[] classId; // classId[i] - class code of i-th segment
     int[] groupId; // groupId[i] - group id of i-th segment
+    List<Integer>[] relatedGroupId; // list of group the class-segment involves
     Long[] parentClassId; // parentClassId[i] - id of the parent class (class LT) of the segment i (class BT)
     int[] nbStudents;// nbStudents[i] - number of students of i-th segment
     List<Integer[]> conflict; // conflict[i] = pair [i,j] of 2 class-segments i and j cannot be scheduled in overlapping time durations

@@ -360,12 +360,13 @@ public class GeneralClassServiceImp implements GeneralClassService {
         //List<GeneralClass> foundClasses = gcoRepo.findAllBySemester(semester);
         List<GeneralClass> foundClasses = gcoRepo.findAllByIdIn(classIds);
         //List<GeneralClass> autoScheduleClasses = V2ClassScheduler.autoScheduleTimeSlot(foundClasses, timeLimit);
+
         V2ClassScheduler optimizer = new V2ClassScheduler();
         List<Classroom> rooms = classroomRepo.findAll();
         List<TimeTablingCourse> courses = timeTablingCourseRepo.findAll();
         List<Group> groups = groupRepo.findAll();
-
-        List<GeneralClass> autoScheduleClasses = optimizer.autoScheduleTimeSlotRoom(foundClasses,rooms,courses, groups,timeLimit);
+        List<ClassGroup> classGroups = classGroupRepo.findAllByClassIdIn(classIds);
+        List<GeneralClass> autoScheduleClasses = optimizer.autoScheduleTimeSlotRoom(foundClasses,rooms,courses, groups,classGroups,timeLimit);
 
         /*Save the scheduled timeslot of the classes*/
         gcoRepo.saveAll(autoScheduleClasses);
@@ -395,8 +396,11 @@ public class GeneralClassServiceImp implements GeneralClassService {
         List<Classroom> rooms = classroomRepo.findAll();
         List<TimeTablingCourse> courses = timeTablingCourseRepo.findAll();
         List<Group> groups = groupRepo.findAll();
+        List<Long> classIds = new ArrayList<>();
+        for(GeneralClass gc: foundClasses) classIds.add(gc.getId());
+        List<ClassGroup> classGroups = classGroupRepo.findAllByClassIdIn(classIds);
 
-        List<GeneralClass> autoScheduleClasses = optimizer.autoScheduleTimeSlotRoom(foundClasses,rooms,courses, groups,timeLimit);
+        List<GeneralClass> autoScheduleClasses = optimizer.autoScheduleTimeSlotRoom(foundClasses,rooms,courses, groups, classGroups, timeLimit);
 
         /*Save the scheduled timeslot of the classes*/
         gcoRepo.saveAll(autoScheduleClasses);

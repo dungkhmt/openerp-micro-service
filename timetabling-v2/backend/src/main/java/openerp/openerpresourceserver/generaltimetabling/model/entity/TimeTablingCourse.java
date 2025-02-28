@@ -26,4 +26,6 @@ public class TimeTablingCourse {
     @Column(name="slots_priority")
     private String slotPriority;// 3,2,1
 
+    @Column(name = "max_teacher_in_charge")
+    private Integer maxTeacherInCharge;
 }
