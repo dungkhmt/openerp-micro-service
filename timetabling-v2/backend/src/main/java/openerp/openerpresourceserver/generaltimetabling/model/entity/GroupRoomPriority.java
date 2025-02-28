@@ -25,7 +25,4 @@ public class GroupRoomPriority {
 
     @Column(name = "priority", nullable = false)
     private Integer priority;
-
-
-
 }

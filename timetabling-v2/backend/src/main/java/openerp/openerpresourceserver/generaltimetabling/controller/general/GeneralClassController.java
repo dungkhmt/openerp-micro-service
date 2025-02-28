@@ -102,6 +102,7 @@ public class GeneralClassController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
     @GetMapping("/get-class-detail-with-subclasses/{classId}")
     public ResponseEntity<?> getClassDetailWithSubClasses(Principal principal, @PathVariable Long classId){
         ModelResponseGeneralClass cls = gService.getClassDetailWithSubClasses(classId);
