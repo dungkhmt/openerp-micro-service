@@ -27,8 +27,6 @@ const TimeTable = ({
   const { classrooms } = useClassrooms(selectedGroup?.groupName || "", null);
   const { handlers, states } = useGeneralSchedule();
 
-  console.log(classes);
-  console.log(selectedGroup?.groupName);
   useEffect(() => {
     if (classes && classes.length > 0) {
       const transformedClassDetails = classes

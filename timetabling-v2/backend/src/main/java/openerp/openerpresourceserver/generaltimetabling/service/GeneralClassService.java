@@ -22,9 +22,7 @@ public interface GeneralClassService {
 
     public GeneralClass updateGeneralClass(UpdateGeneralClassRequest request);
 
-    List<GeneralClass> addClassesToNewGroup(List<String> ids, String groupName, String priorityBuilding) throws Exception;
-
-    List<GeneralClass> addClassesToCreatedGroup(List<String> ids, String groupName) throws Exception;
+    List<GeneralClass> addClassesToGroup(List<Long> ids, String groupName) throws Exception;
 
     public void deleteClassesBySemester(String semester);
 

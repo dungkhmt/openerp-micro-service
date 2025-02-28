@@ -11,12 +11,8 @@ import java.util.List;
 @Setter
 public class UpdateClassesToNewGroupRequest {
     @NotEmpty
-    private List<String> ids;
+    private List<Long> ids;
     @NotBlank
     @NotEmpty
     private String groupName;
-    @NotBlank
-    @NotEmpty
-    private String priorityBuilding;
-
 }
