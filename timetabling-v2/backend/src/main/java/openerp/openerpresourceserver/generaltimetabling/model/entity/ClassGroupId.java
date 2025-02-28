@@ -18,7 +18,7 @@ public class ClassGroupId implements Serializable {
     private Long classId;
 
     @Column(name = "group_id", nullable = false)
-    private String groupId;
+    private Long groupId;
 
     @Override
     public boolean equals(Object o) {

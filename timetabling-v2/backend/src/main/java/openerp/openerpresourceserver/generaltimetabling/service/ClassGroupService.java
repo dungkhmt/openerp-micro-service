@@ -6,10 +6,12 @@ import java.util.List;
 
 public interface ClassGroupService {
 
-    List<ClassGroupSummary> getAllClassGroup();
+    List<ClassGroupSummary> getAllClassGroup(Long classId);
 
-    void addClassGroup(Long classId, List<Long> groupIds);
+    void addClassGroup(Long classId, Long groupId);
 
-    void deleteClassGroup(Long classId, List<Long> groupIds);
+    void addClassGroups(Long classId, List<Long> groupIds);
+
+    void deleteClassGroup(Long classId, Long groupId);
 }
 

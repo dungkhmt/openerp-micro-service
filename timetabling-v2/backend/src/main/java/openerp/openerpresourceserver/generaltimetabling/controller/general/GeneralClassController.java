@@ -8,15 +8,18 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.generaltimetabling.exception.*;
+import openerp.openerpresourceserver.generaltimetabling.model.dto.request.ClassGroupSummary;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.RoomReservationDto;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.*;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.ResetScheduleRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.input.ModelInputAutoScheduleTimeSlotRoom;
 import openerp.openerpresourceserver.generaltimetabling.model.response.ModelResponseGeneralClass;
+import openerp.openerpresourceserver.generaltimetabling.service.ClassGroupService;
 import openerp.openerpresourceserver.generaltimetabling.service.ExcelService;
 import openerp.openerpresourceserver.generaltimetabling.service.GeneralClassService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +33,7 @@ import openerp.openerpresourceserver.generaltimetabling.model.entity.general.Gen
 public class GeneralClassController {
     private GeneralClassService gService;
     private ExcelService excelService;
+    private ClassGroupService classGroupService;
     @ExceptionHandler(ConflictScheduleException.class)
     public ResponseEntity resolveScheduleConflict(ConflictScheduleException e) {
         return ResponseEntity.status(410).body(e.getCustomMessage());
@@ -70,7 +74,6 @@ public class GeneralClassController {
             return ResponseEntity.badRequest().body(new ArrayList<>());
         }
     }
-
     
     @PostMapping("/update-class")
     public ResponseEntity<GeneralClass> requestUpdateClass(@RequestBody UpdateGeneralClassRequest request) {
@@ -103,12 +106,37 @@ public class GeneralClassController {
         }
     }
 
+    @PostMapping("/update-class-group")
+    public ResponseEntity<String> updateClassGroup(@RequestParam Long classId, @RequestParam Long groupId) {
+        try {
+            classGroupService.addClassGroup(classId, groupId);
+            return ResponseEntity.ok("Class group updated successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update class group: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/delete-class-group")
+    public ResponseEntity<String> deleteClassGroup(@RequestParam Long classId, @RequestParam Long groupId) {
+        try {
+            classGroupService.deleteClassGroup(classId, groupId);
+            return ResponseEntity.ok("Class group deleted successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete class group: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/get-class-groups")
+    public ResponseEntity<List<ClassGroupSummary>> getClassGroups(Principal principal, @RequestParam Long classId) {
+        List<ClassGroupSummary> classGroups = classGroupService.getAllClassGroup(classId);
+        return ResponseEntity.ok(classGroups);
+    }
+
     @GetMapping("/get-class-detail-with-subclasses/{classId}")
     public ResponseEntity<?> getClassDetailWithSubClasses(Principal principal, @PathVariable Long classId){
         ModelResponseGeneralClass cls = gService.getClassDetailWithSubClasses(classId);
         return ResponseEntity.ok().body(cls);
     }
-
 
     @PostMapping("/export-excel")
     public ResponseEntity requestExportExcel(@RequestParam("semester") String semester) {

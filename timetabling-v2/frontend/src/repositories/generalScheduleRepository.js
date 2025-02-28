@@ -256,6 +256,33 @@ export const generalScheduleRepository = {
     return response;
   },
 
+  getClassGroups: async (classId) => {
+    if (!classId) {
+      throw new Error('classId is required');
+    }
+    const response = await request(
+      "get",
+      `/general-classes/get-class-groups?classId=${classId}`
+    );
+    return response.data;
+  },
+
+  updateClassGroup: async (classId, groupId) => {
+    const response = await request(
+      "post",
+      `/general-classes/update-class-group?classId=${classId}&groupId=${groupId}`
+    );
+    return response.data;
+  },
+
+  deleteClassGroup: async (classId, groupId) => {
+    const response = await request(
+      "delete",
+      `/general-classes/delete-class-group?classId=${classId}&groupId=${groupId}`
+    );
+    return response.data;
+  },
+
   updateClassesGroup: async (semester, params) => {
     const { ids, groupName, priorityBuilding } = params;
     try {
