@@ -82,12 +82,15 @@ export async function request(
     return handleUnauthorized();
   }
 
+  // Ensure config is an object to avoid null.headers access
+  const safeConfig = config || {};
+  
   const headers = {
     authorization: bearerAuth(keycloak.token),
-    ...config.headers,
+    ...(safeConfig.headers || {})
   };
 
-  if (config.headers?.["Content-Type"] === "multipart/form-data") {
+  if (safeConfig.headers?.["Content-Type"] === "multipart/form-data") {
     headers["Content-Type"] = "multipart/form-data";
   }
 
@@ -95,7 +98,7 @@ export async function request(
     method: method.toLowerCase(),
     url,
     data,
-    ...config,
+    ...safeConfig,
     headers,
     signal: controller?.signal,
   };

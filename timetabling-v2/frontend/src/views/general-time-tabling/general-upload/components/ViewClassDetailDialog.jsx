@@ -1,24 +1,58 @@
 import { useState } from "react";
-import { Dialog, DialogTitle, DialogContent, Button, TextField, MenuItem } from "@mui/material";
+import { 
+  Dialog, DialogTitle, DialogContent, Button, TextField, MenuItem,
+  Tabs, Tab, Box, Checkbox
+} from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-// Replace axios import with request from api
 import { request } from "../../../../api";
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ pt: 2 }}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
 
 const ViewClassDetailDialog = ({ classData, isOpen, closeDialog }) => {
   const [subClasses, setSubClasses] = useState([]);
   const [openNewDialog, setOpenNewDialog] = useState(false);
+  const [tabValue, setTabValue] = useState(0);
+  const [groupName, setGroupName] = useState("");
+  const [groups, setGroups] = useState([
+    { id: 1, name: "Nhóm A", selected: false },
+    { id: 2, name: "Nhóm B", selected: false },
+    { id: 3, name: "Nhóm C", selected: false },
+  ]);
+
   const [newSubClass, setNewSubClass] = useState({
     studentCount: "",
     classType: "",
     classCount: ""
   });
 
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
   const handleAddSubClass = async () => {
     const payload = {
       fromParentClassId: classData?.id,
       classType: newSubClass.classType,
       numberStudents: parseInt(newSubClass.studentCount, 10),
-      duration: classData?.duration, // use duration from parent data
+      duration: classData?.duration,
       numberClasses: parseInt(newSubClass.classCount, 10)
     };
     try {
@@ -36,30 +70,109 @@ const ViewClassDetailDialog = ({ classData, isOpen, closeDialog }) => {
     setNewSubClass({ studentCount: "", classType: "", classCount: "" });
   };
 
+  const handleGroupSelectionChange = (id) => {
+    setGroups(groups.map(group => 
+      group.id === id ? { ...group, selected: !group.selected } : group
+    ));
+  };
+
+  const handleUpdateGroups = () => {
+    if (!groupName.trim()) return;
+    
+    // Add new group with the name from input
+    const newGroup = {
+      id: Math.max(...groups.map(g => g.id), 0) + 1,
+      name: groupName,
+      selected: false
+    };
+    
+    setGroups([...groups, newGroup]);
+    setGroupName(""); // Clear input after adding
+  };
+
+  const groupColumns = [
+    {
+      field: 'select',
+      headerName: 'Select',
+      width: 100,
+      renderCell: (params) => (
+        <Checkbox
+          checked={params.row.selected}
+          onChange={() => handleGroupSelectionChange(params.row.id)}
+        />
+      ),
+    },
+    { field: 'name', headerName: 'Nhóm', width: 200 },
+  ];
+
   return (
     <>
       <Dialog open={isOpen} onClose={closeDialog} maxWidth="md" fullWidth>
         <DialogTitle>
-          Thông tin các lớp con của lớp: {classData?.id}
+          Thông tin của lớp: {classData?.id}
         </DialogTitle>
         <DialogContent>
-          <div style={{ margin: "16px 0" }}>
-            <Button variant="contained" onClick={() => setOpenNewDialog(true)}>Thêm mới</Button>
-          </div>
-          <div style={{ height: 300, width: "100%" }}>
-            <DataGrid
-              rows={subClasses}
-              columns={[
-                { field: "id", headerName: "ID", width: 70 },
-                { field: "studentCount", headerName: "Số lượng sinh viên", width: 200 },
-                { field: "classType", headerName: "Loại lớp", width: 150 },
-                { field: "classCount", headerName: "SL lớp", width: 100 },
-              ]}
-              components={{ Toolbar: GridToolbar }}
-              pageSize={5}
-              rowsPerPageOptions={[5]}
-            />
-          </div>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs value={tabValue} onChange={handleTabChange} aria-label="class details tabs">
+              <Tab label="Thông tin lớp con" />
+              <Tab label="Nhóm" />
+            </Tabs>
+          </Box>
+          
+          <TabPanel value={tabValue} index={0}>
+            <div style={{ margin: "16px 0" }}>
+              <Button variant="contained" onClick={() => setOpenNewDialog(true)}>Thêm mới</Button>
+            </div>
+            <div style={{ height: 300, width: "100%" }}>
+              <DataGrid
+                rows={subClasses}
+                columns={[
+                  { field: "id", headerName: "ID", width: 70 },
+                  { field: "studentCount", headerName: "Số lượng sinh viên", width: 200 },
+                  { field: "classType", headerName: "Loại lớp", width: 150 },
+                  { field: "classCount", headerName: "SL lớp", width: 100 },
+                ]}
+                slots={{ toolbar: GridToolbar }}
+                initialState={{
+                  pagination: {
+                    paginationModel: { pageSize: 5 }
+                  }
+                }}
+                pageSizeOptions={[5]}
+              />
+            </div>
+          </TabPanel>
+          
+          <TabPanel value={tabValue} index={1}>
+            <div className="flex flex-row gap-2 mb-3">
+              <TextField 
+                label="Tên nhóm" 
+                value={groupName}
+                onChange={(e) => setGroupName(e.target.value)}
+                size="small"
+              />
+              <Button 
+                variant="contained" 
+                onClick={handleUpdateGroups}
+              >
+                Update
+              </Button>
+            </div>
+            <div style={{ height: 300, width: "100%" }}>
+              <DataGrid
+                rows={groups}
+                columns={groupColumns}
+                slots={{ toolbar: GridToolbar }}
+                initialState={{
+                  pagination: {
+                    paginationModel: { pageSize: 5 }
+                  }
+                }}
+                pageSizeOptions={[5]}
+                disableRowSelectionOnClick
+              />
+            </div>
+          </TabPanel>
         </DialogContent>
       </Dialog>
 
