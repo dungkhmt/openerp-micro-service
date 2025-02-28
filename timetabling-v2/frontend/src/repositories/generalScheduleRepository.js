@@ -221,19 +221,14 @@ export const generalScheduleRepository = {
   },
 
   deleteByIds: async (ids) => {
-    try {
-      const response = await request(
-        "delete",
-        `/general-classes/delete-by-ids`,
-        null,
-        null,
-        ids
-      );
-      return response;
-    } catch (error) {
-      console.error('Delete by ids error:', error);
-      throw error;
-    }
+    const response = await request(
+      "delete",
+      `/general-classes/delete-by-ids`,
+      null,
+      null,
+      ids
+    );
+    return response;
   },
 
   uploadFile: async (semester, file) => {
