@@ -97,14 +97,15 @@ public class GeneralClassController {
     }
 
     @PostMapping("/update-classes-group")
-    public ResponseEntity requestUpdateClassesGroup(@RequestBody UpdateClassesToNewGroupRequest request) {
-        try{
-            if(request.getPriorityBuilding() == null) return ResponseEntity.ok(gService.addClassesToCreatedGroup(request.getIds(), request.getGroupName()));
-            return ResponseEntity.ok(gService.addClassesToNewGroup(request.getIds(),request.getGroupName(),request.getPriorityBuilding()));
+    public ResponseEntity<String> requestUpdateClassesGroup(@RequestBody UpdateClassesToNewGroupRequest request) {
+        try {
+            gService.addClassesToGroup(request.getIds(), request.getGroupName());
+            return ResponseEntity.ok("Updated class groups successfully.");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body("Failed to update class groups: " + e.getMessage());
         }
     }
+
 
     @PostMapping("/update-class-group")
     public ResponseEntity<String> updateClassGroup(@RequestParam Long classId, @RequestParam Long groupId) {

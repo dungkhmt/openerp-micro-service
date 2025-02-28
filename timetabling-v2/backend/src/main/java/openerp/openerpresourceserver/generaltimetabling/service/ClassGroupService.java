@@ -10,8 +10,6 @@ public interface ClassGroupService {
 
     void addClassGroup(Long classId, Long groupId);
 
-    void addClassGroups(Long classId, List<Long> groupIds);
-
     void deleteClassGroup(Long classId, Long groupId);
 }
 

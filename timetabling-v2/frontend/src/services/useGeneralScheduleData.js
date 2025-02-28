@@ -32,13 +32,14 @@ export const useGeneralSchedule = () => {
     },
     {
       enabled: !!selectedSemester,
-      staleTime: Infinity, // Keep data fresh indefinitely
-      cacheTime: 30 * 60 * 1000, // Cache for 30 minutes
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      retry: 2,
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      staleTime: 30 * 1000, // Data becomes stale after 30 seconds
+      cacheTime: 5 * 60 * 1000, // Cache for 5 minutes
+      refetchOnWindowFocus: true, // Refetch when window regains focus
+      refetchOnMount: true,
+      refetchOnReconnect: true,
+      refetchInterval: 60 * 1000, // Poll every 60 seconds
+      retry: 3,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
       select: (data) => {
         if (!Array.isArray(data)) return [];
 
@@ -77,7 +78,6 @@ export const useGeneralSchedule = () => {
             });
           }
 
-          // Only add parent class if it has remaining duration or has no timeSlots
           if (remainingDuration > 0 || !classObj.timeSlots?.length) {
             generalClasses.push({
               ...classObj,
@@ -128,9 +128,14 @@ export const useGeneralSchedule = () => {
       ),
     {
       enabled: !!selectedSemester,
-      staleTime: Infinity,
-      cacheTime: 30 * 60 * 1000,
-      refetchOnWindowFocus: false,
+      staleTime: 30 * 1000, 
+      cacheTime: 5 * 60 * 1000, 
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
+      refetchOnReconnect: true,
+      refetchInterval: 60 * 1000,
+      retry: 3,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
     }
   );
 
@@ -140,7 +145,7 @@ export const useGeneralSchedule = () => {
       .getClasses(
         selectedSemester?.semester,
         selectedGroup?.groupName,
-        true // Force refresh
+        true 
       )
       .then((data) => {
         queryClient.setQueryData(
@@ -160,7 +165,7 @@ export const useGeneralSchedule = () => {
       generalScheduleRepository.resetSchedule(semester, ids),
     {
       onSuccess: () => {
-        forceRefetch();
+        queryClient.invalidateQueries(queryKey); 
         setSelectedRows([]);
         toast.success("Reset thời khóa biểu thành công!");
       },
@@ -185,7 +190,7 @@ export const useGeneralSchedule = () => {
         setLoading(false);
       },
       onSuccess: (response) => {
-        forceRefetch();
+        queryClient.invalidateQueries(queryKey); // Force refetch
         setSelectedRows([]);
         setOpenTimeslotDialog(false);
         toast.success("Tự động xếp thời khóa biểu thành công!");
@@ -211,7 +216,7 @@ export const useGeneralSchedule = () => {
       ),
     {
       onSuccess: () => {
-        forceRefetch();
+        queryClient.invalidateQueries(queryKey); // Force refetch
         setSelectedRows([]);
         setOpenClassroomDialog(false);
         toast.success("Tự động xếp phòng thành công!");
@@ -230,7 +235,7 @@ export const useGeneralSchedule = () => {
     ([semester, saveRequest]) => {
       if (saveRequest.endTime > 6) {
         toast.error("Thời gian lớp học không hợp lệ!");
-        return ;
+        return;
       }
       return generalScheduleRepository.updateTimeSlot(
         semester,
@@ -251,7 +256,7 @@ export const useGeneralSchedule = () => {
       },
       onSuccess: (response) => {
         if (response && response.status === 200) {
-          forceRefetch();
+          queryClient.invalidateQueries(queryKey); // Force refetch
           toast.success("Lưu TKB thành công!");
         }
       },
@@ -274,7 +279,7 @@ export const useGeneralSchedule = () => {
         setLoading(false);
       },
       onSuccess: () => {
-        forceRefetch();
+        queryClient.invalidateQueries(queryKey); // Force refetch
         toast.success("Thêm ca học thành công!");
       },
       onError: (error) => {
@@ -301,7 +306,7 @@ export const useGeneralSchedule = () => {
         setLoading(false);
       },
       onSuccess: () => {
-        forceRefetch();
+        queryClient.invalidateQueries(queryKey); // Force refetch
         toast.success("Xóa ca học thành công!");
       },
       onError: (error) => {
@@ -341,7 +346,7 @@ export const useGeneralSchedule = () => {
     (semester) => generalScheduleRepository.deleteClasses(semester),
     {
       onSuccess: () => {
-        forceRefetch();
+        queryClient.invalidateQueries(queryKey); // Force refetch
         toast.success("Xóa danh sách thành công!");
       },
       onError: (error) => {
@@ -354,7 +359,7 @@ export const useGeneralSchedule = () => {
     ([semester, file]) => generalScheduleRepository.uploadFile(semester, file),
     {
       onSuccess: (response) => {
-        forceRefetch();
+        queryClient.invalidateQueries(queryKey); // Force refetch
         toast.success("Upload file thành công!");
         return response;
       },
@@ -399,7 +404,7 @@ export const useGeneralSchedule = () => {
         setLoading(false);
       },
       onSuccess: () => {
-        forceRefetch();
+        queryClient.invalidateQueries(queryKey); // Force refetch
         setSelectedRows([]);
         setOpenSelectedDialog(false);
         toast.success("Tự động xếp lịch các lớp đã chọn thành công!");
@@ -414,12 +419,31 @@ export const useGeneralSchedule = () => {
     }
   );
 
+  const updateClassesGroupMutation = useMutation(
+    (params) => generalScheduleRepository.updateClassesGroup(selectedSemester?.semester, params),
+    {
+      onMutate: () => {
+        setLoading(true);
+      },
+      onSettled: () => {
+        setLoading(false);
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries(queryKey); // Force refetch
+        toast.success("Thêm nhóm thành công!");
+      },
+      onError: (error) => {
+        toast.error(error.response?.data || "Thêm nhóm lỗi, nhóm đã có hoặc mã lớp không tồn tại!");
+      }
+    }
+  );
+
   const getClassGroups = useCallback(async (classId) => {
     if (!classId) {
       toast.error("Không có ID lớp học!");
       return [];
     }
-    
+
     try {
       const data = await generalScheduleRepository.getClassGroups(classId);
       return data;
@@ -476,6 +500,7 @@ export const useGeneralSchedule = () => {
       isDeletingBySemester: deleteBySemesterMutation.isLoading,
       isOpenSelectedDialog,
       selectedTimeLimit,
+      isUpdatingClassesGroup: updateClassesGroupMutation.isLoading,
     },
     setters: {
       setSelectedSemester,
@@ -559,10 +584,19 @@ export const useGeneralSchedule = () => {
       },
       getClassGroups,
       updateClassGroup: async (classId, groupId) => {
-        return await generalScheduleRepository.updateClassGroup(classId, groupId);
+        return await generalScheduleRepository.updateClassGroup(
+          classId,
+          groupId
+        );
       },
       deleteClassGroup: async (classId, groupId) => {
-        return await generalScheduleRepository.deleteClassGroup(classId, groupId);
+        return await generalScheduleRepository.deleteClassGroup(
+          classId,
+          groupId
+        );
+      },
+      updateClassesGroup: (params) => {
+        return updateClassesGroupMutation.mutateAsync(params);
       },
     },
   };
