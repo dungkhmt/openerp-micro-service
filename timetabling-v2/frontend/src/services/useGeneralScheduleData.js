@@ -414,6 +414,22 @@ export const useGeneralSchedule = () => {
     }
   );
 
+  const getClassGroups = useCallback(async (classId) => {
+    if (!classId) {
+      toast.error("Không có ID lớp học!");
+      return [];
+    }
+    
+    try {
+      const data = await generalScheduleRepository.getClassGroups(classId);
+      return data;
+    } catch (error) {
+      toast.error("Không thể tải danh sách nhóm lớp học!");
+      console.error("Failed to fetch class groups", error);
+      return [];
+    }
+  }, []);
+
   const handleRefreshClasses = useCallback(() => {
     forceRefetch();
   }, [forceRefetch]);
@@ -540,6 +556,13 @@ export const useGeneralSchedule = () => {
           timeLimit: selectedTimeLimit,
           semester: selectedSemester?.semester,
         });
+      },
+      getClassGroups,
+      updateClassGroup: async (classId, groupId) => {
+        return await generalScheduleRepository.updateClassGroup(classId, groupId);
+      },
+      deleteClassGroup: async (classId, groupId) => {
+        return await generalScheduleRepository.deleteClassGroup(classId, groupId);
       },
     },
   };
