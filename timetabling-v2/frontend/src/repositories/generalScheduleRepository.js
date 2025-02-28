@@ -284,14 +284,14 @@ export const generalScheduleRepository = {
   },
 
   updateClassesGroup: async (semester, params) => {
-    const { ids, groupName, priorityBuilding } = params;
+    const { ids, groupName } = params;
     try {
       const response = await request(
         "post",
         "/general-classes/update-classes-group",
         null,
         null,
-        { ids, groupName, priorityBuilding }
+        { ids, groupName }
       );
       invalidateCache(semester);
       return response;

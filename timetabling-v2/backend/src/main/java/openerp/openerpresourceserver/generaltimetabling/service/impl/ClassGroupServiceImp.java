@@ -79,29 +79,6 @@ public class ClassGroupServiceImp implements ClassGroupService {
     }
 
     @Override
-    public void addClassGroups(Long classId, List<Long> groupIds) {
-        try {
-            for (Long groupId : groupIds) {
-                Optional<ClassGroup> existingClassGroup = classGroupRepo.findByClassIdAndGroupId(classId, groupId);
-
-                if (existingClassGroup.isPresent()) {
-                    System.out.println("Class group with classId " + classId + " and groupId " + groupId + " already exists.");
-                    continue;
-                }
-
-                ClassGroup classGroup = new ClassGroup();
-                classGroup.setClassId(classId);
-                classGroup.setGroupId(groupId);
-                classGroupRepo.save(classGroup);
-                System.out.println("Added class group with classId " + classId + " and groupId " + groupId);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to add class groups", e);
-        }
-    }
-
-    @Override
     public void deleteClassGroup(Long classId, Long groupId) {
         try {
             Optional<ClassGroup> classGroupOptional = classGroupRepo.findByClassIdAndGroupId(classId, groupId);
