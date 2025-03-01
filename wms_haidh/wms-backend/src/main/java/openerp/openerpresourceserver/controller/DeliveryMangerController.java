@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.entity.DeliveryPerson;
 import openerp.openerpresourceserver.entity.DeliveryTrip;
 import openerp.openerpresourceserver.entity.Shipment;
 import openerp.openerpresourceserver.entity.Warehouse;
@@ -113,5 +114,25 @@ public class DeliveryMangerController {
 		}
 		
 	}
+	
+	@GetMapping("/delivery-persons")
+    public ResponseEntity<Page<DeliveryPerson>> getAllDeliveryPersons(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(value = "search", required = false) String search) {
+        
+        Page<DeliveryPerson> deliveryPersons = deliveryPersonService.getAllDeliveryPersons(page, size,search);
+        return ResponseEntity.ok(deliveryPersons);
+    }
+	
+	@GetMapping("/shipments")
+	public ResponseEntity<Page<Shipment>> getAllShipments(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false) String search) {
+        
+        Page<Shipment> shipments = shipmentService.getAllShipments(page, size, search);
+        return ResponseEntity.ok(shipments);
+    }
 
 }
