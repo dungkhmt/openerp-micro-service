@@ -20,6 +20,11 @@ const GeneralScheduleScreen = () => {
     setOpenResetConfirm(false);
   };
 
+  // Add a loading state check for scheduling operations
+  const isSchedulingInProgress = states.isAutoSaveLoading || 
+    states.isTimeScheduleLoading || 
+    states.loading;
+
   return (
     <div className="flex flex-col gap-4 h-[700px]">
       <Tabs 
@@ -203,7 +208,7 @@ const GeneralScheduleScreen = () => {
               classes={states.classes}
               selectedGroup={states.selectedGroup}
               onSaveSuccess={handlers.handleRefreshClasses}
-              loading={states.loading}
+              loading={states.loading || isSchedulingInProgress}  // Updated loading state
               selectedRows={states.selectedRows}
               onSelectedRowsChange={setters.setSelectedRows}
             />
