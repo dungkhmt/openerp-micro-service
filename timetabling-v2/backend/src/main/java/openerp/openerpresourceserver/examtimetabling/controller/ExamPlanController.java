@@ -63,6 +63,7 @@ public class ExamPlanController {
     @PostMapping("/create")
     public ResponseEntity<ExamPlan> createExamPlan(@Valid @RequestBody ExamPlan examPlan) {
         try {
+            System.err.println("Creating exam plan" + examPlan);
             ExamPlan createdPlan = examPlanService.createExamPlan(examPlan);
             return ResponseEntity.ok(createdPlan);
         } catch (Exception e) {
