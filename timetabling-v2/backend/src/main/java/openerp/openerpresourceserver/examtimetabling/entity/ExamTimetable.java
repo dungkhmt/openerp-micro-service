@@ -25,10 +25,17 @@ public class ExamTimetable {
     
     @Column(name = "exam_plan_id")
     private UUID examPlanId;
+
+    @Column(name = "exam_timetable_session_collection_id")
+    private UUID examTimetableSessionCollectionId;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exam_plan_id", insertable = false, updatable = false)
     private ExamPlan examPlan;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "exam_timetable_session_collection_id", insertable = false, updatable = false)
+    private ExamTimetableSessionCollection sessionCollection;
     
     @Column(name = "created_at")
     private LocalDateTime createdAt;

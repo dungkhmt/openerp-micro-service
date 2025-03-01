@@ -2,6 +2,7 @@ import ExamClassScreen from "views/exam-timetabling/classListOpened/ExamClassLis
 import { Route, Switch, useRouteMatch } from "react-router";
 import ExamPlanListPage from "views/exam-timetabling/examPlan/ExamPlanScreen"
 import ExamPlanDetailPage from "views/exam-timetabling/examPlan/ExamPlanDetailScreen"
+import TimetableDetailPage from "views/exam-timetabling/examTimetable/ExamTimetableDetail"
 
 export default function ExamTimeTablingRouter() {
   let { path } = useRouteMatch();
@@ -26,6 +27,11 @@ export default function ExamTimeTablingRouter() {
         <Route
           component={ExamPlanDetailPage}
           path={`${path}/exam-plan/:id`}
+          exact
+        ></Route>
+        <Route
+          component={TimetableDetailPage}
+          path={`${path}/exam-timetable/:id`}
           exact
         ></Route>
       </Switch>

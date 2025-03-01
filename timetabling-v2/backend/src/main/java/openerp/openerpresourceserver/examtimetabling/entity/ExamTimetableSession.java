@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -15,46 +14,33 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "exam_timetable_assignment")
-public class ExamTimetableAssignment {
+@Table(name = "exam_timetable_session")
+public class ExamTimetableSession {
     @Id
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
     
-    @Column(name = "exam_timetable_id")
-    private UUID examTimetableId;
+    @Column(name = "name")
+    private String name;
+    
+    @Column(name = "exam_timetable_session_collection_id")
+    private UUID examTimetableSessionCollectionId;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "exam_timetable_id", insertable = false, updatable = false)
-    private ExamTimetable examTimetable;
+    @JoinColumn(name = "exam_timetable_session_collection_id", insertable = false, updatable = false)
+    private ExamTimetableSessionCollection sessionCollection;
     
-    @Column(name = "exam_timtabling_class_id")
-    private UUID examTimetablingClassId;
+    @Column(name = "start_time")
+    private LocalDateTime startTime;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "exam_timtabling_class_id", insertable = false, updatable = false)
-    private ExamClass examClass;
-    
-    @Column(name = "room_id")
-    private String roomId;
-    
-    @Column(name = "exam_session_id")
-    private String examSessionId;
-
-    @Column(name = "week_number", nullable = true)
-    private Integer weekNumber;
-    
-    @Column(name = "date", nullable = true)
-    private LocalDate date;
+    @Column(name = "end_time")
+    private LocalDateTime endTime;
     
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    @Column(name = "deleted_at", nullable = true)
-    private LocalDateTime deletedAt;
     
     @PrePersist
     protected void onCreate() {

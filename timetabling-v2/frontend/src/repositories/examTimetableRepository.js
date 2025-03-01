@@ -4,7 +4,8 @@ const API_ENDPOINTS = {
   GET_ALL: "/exam-timetable/plan",
   CREATE: "/exam-timetable/create",
   UPDATE: "/exam-timetable/update",
-  DELETE: "/exam-timetable/delete"
+  DELETE: "/exam-timetable/delete",
+  GET_BY_ID: "/exam-timetable/detail"
 };
 
 class ExamTimetableService {
@@ -30,6 +31,10 @@ class ExamTimetableService {
 
   async deleteExamTimetable(id) {
     return await request("post", `${API_ENDPOINTS.DELETE}/${id}`);
+  }
+
+  async getExamTimetableById(id) {
+    return await request("get", `${API_ENDPOINTS.GET_BY_ID}/${id}`);
   }
 }
 
