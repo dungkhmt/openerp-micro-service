@@ -5,7 +5,7 @@ import { useUploadTableConfig } from "./useUploadTableConfig";
 import { useLoadingContext } from "../contexts/LoadingContext";
 import ViewClassDetailDialog from "./ViewClassDetailDialog";
 
-const GeneralUploadTable = ({ classes, dataLoading, setClasses, onSelectionChange }) => {
+const GeneralUploadTable = ({ classes, dataLoading, setClasses, onSelectionChange, selectedIds }) => {
   const { loading: uploadLoading } = useLoadingContext();
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
@@ -68,12 +68,9 @@ const GeneralUploadTable = ({ classes, dataLoading, setClasses, onSelectionChang
         disableColumnSelector
         disableDensitySelector
         checkboxSelection
-        getRowId={(row) => {
-          return row.id;
-        }}
-        onRowSelectionModelChange={(newSelectionModel) => {
-          onSelectionChange?.(newSelectionModel);
-        }}
+        getRowId={(row) => row.id}
+        rowSelectionModel={selectedIds}
+        onRowSelectionModelChange={onSelectionChange}
         onRowDoubleClick={handleRowDoubleClick}
       />
       <ViewClassDetailDialog

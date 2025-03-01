@@ -128,8 +128,8 @@ export const useGeneralSchedule = () => {
       ),
     {
       enabled: !!selectedSemester,
-      staleTime: 30 * 1000, 
-      cacheTime: 5 * 60 * 1000, 
+      staleTime: 30 * 1000,
+      cacheTime: 5 * 60 * 1000,
       refetchOnWindowFocus: true,
       refetchOnMount: true,
       refetchOnReconnect: true,
@@ -142,11 +142,7 @@ export const useGeneralSchedule = () => {
   const forceRefetch = useCallback(() => {
     setLoading(true);
     return generalScheduleRepository
-      .getClasses(
-        selectedSemester?.semester,
-        selectedGroup?.groupName,
-        true 
-      )
+      .getClasses(selectedSemester?.semester, selectedGroup?.groupName, true)
       .then((data) => {
         queryClient.setQueryData(
           [
@@ -165,7 +161,7 @@ export const useGeneralSchedule = () => {
       generalScheduleRepository.resetSchedule(semester, ids),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(queryKey); 
+        queryClient.invalidateQueries(queryKey);
         setSelectedRows([]);
         toast.success("Reset thời khóa biểu thành công!");
       },
@@ -358,10 +354,14 @@ export const useGeneralSchedule = () => {
   const uploadFileMutation = useMutation(
     ([semester, file]) => generalScheduleRepository.uploadFile(semester, file),
     {
-      onSuccess: (response) => {
-        queryClient.invalidateQueries(queryKey); // Force refetch
+      onSuccess: async () => {
+        queryClient.invalidateQueries([
+          "generalClassesNoSchedule",
+          selectedSemester?.semester,
+        ]);
+        await forceRefetch();
+        setSelectedRows([]);
         toast.success("Upload file thành công!");
-        return response;
       },
       onError: (error) => {
         toast.error(error.response?.data || "Có lỗi khi upload file!");
@@ -420,7 +420,11 @@ export const useGeneralSchedule = () => {
   );
 
   const updateClassesGroupMutation = useMutation(
-    (params) => generalScheduleRepository.updateClassesGroup(selectedSemester?.semester, params),
+    (params) =>
+      generalScheduleRepository.updateClassesGroup(
+        selectedSemester?.semester,
+        params
+      ),
     {
       onMutate: () => {
         setLoading(true);
@@ -433,8 +437,11 @@ export const useGeneralSchedule = () => {
         toast.success("Thêm nhóm thành công!");
       },
       onError: (error) => {
-        toast.error(error.response?.data || "Thêm nhóm lỗi, nhóm đã có hoặc mã lớp không tồn tại!");
-      }
+        toast.error(
+          error.response?.data ||
+            "Thêm nhóm lỗi, nhóm đã có hoặc mã lớp không tồn tại!"
+        );
+      },
     }
   );
 
@@ -454,20 +461,6 @@ export const useGeneralSchedule = () => {
     }
   }, []);
 
-  const deleteByIdsMutation = useMutation(
-    (ids) => generalScheduleRepository.deleteByIds(ids),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(queryKey);
-        setSelectedRows([]);
-        toast.success("Xóa các lớp đã chọn thành công!");
-      },
-      onError: (error) => {
-        toast.error(error.response?.data || "Có lỗi khi xóa các lớp đã chọn!");
-      },
-    }
-  );
-
   const handleRefreshClasses = useCallback(() => {
     forceRefetch();
   }, [forceRefetch]);
@@ -485,6 +478,49 @@ export const useGeneralSchedule = () => {
     },
     [selectedSemester, selectedGroup, queryClient]
   );
+
+  const handleMutationSuccess = useCallback(async (message) => {
+    await forceRefetch();
+    setSelectedRows([]);
+    toast.success(message);
+  }, [forceRefetch]);
+
+  const deleteByIdsMutation = useMutation(
+    (ids) => generalScheduleRepository.deleteByIds(ids),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(queryKey); // Invalidate main query
+        queryClient.invalidateQueries(["generalClassesNoSchedule", selectedSemester?.semester]); // Invalidate no schedule query
+        setSelectedRows([]);
+        toast.success("Xóa các lớp đã chọn thành công!");
+      },
+      onError: (error) => {
+        toast.error(error.response?.data || "Có lỗi khi xóa các lớp đã chọn!");
+      },
+    }
+  );
+
+  const handleDeleteByIds = useCallback(() => {
+    if (selectedRows.length === 0) {
+      toast.error("Vui lòng chọn lớp cần xóa!");
+      return;
+    }
+
+    const cleanIds = selectedRows.map(id => {
+      if (typeof id === 'number') {
+        return id;
+      }
+      const strId = String(id);
+      return parseInt(strId.includes('-') ? strId.split('-')[0] : strId);
+    }).filter(id => !isNaN(id));
+    
+    if (cleanIds.length === 0) {
+      toast.error("Không tìm thấy ID hợp lệ!");
+      return;
+    }
+
+    deleteByIdsMutation.mutate(cleanIds);
+  }, [selectedRows, deleteByIdsMutation]);
 
   return {
     states: {
@@ -515,6 +551,7 @@ export const useGeneralSchedule = () => {
       isOpenSelectedDialog,
       selectedTimeLimit,
       isUpdatingClassesGroup: updateClassesGroupMutation.isLoading,
+      isDeletingByIds: deleteByIdsMutation.isLoading,
     },
     setters: {
       setSelectedSemester,
@@ -589,15 +626,6 @@ export const useGeneralSchedule = () => {
         }
         deleteBySemesterMutation.mutate(selectedSemester.semester);
       },
-      handleDeleteByIds: () => {
-        if (selectedRows.length === 0) {
-          toast.error("Vui lòng chọn lớp cần xóa!");
-          return;
-        }
-        // Convert string IDs to numbers and remove any child suffixes
-        const cleanIds = selectedRows.map(id => parseInt(id.split('-')[0]));
-        deleteByIdsMutation.mutate(cleanIds);
-      },
       handleAutoScheduleSelected: () => {
         autoScheduleSelectedMutation.mutate({
           classIds: selectedRows,
@@ -621,6 +649,7 @@ export const useGeneralSchedule = () => {
       updateClassesGroup: (params) => {
         return updateClassesGroupMutation.mutateAsync(params);
       },
+      handleDeleteByIds,
     },
   };
 };
