@@ -4,157 +4,110 @@ import keycloak from "config/keycloak";
 import { infoNoti, wifiOffNotify } from "./utils/notification";
 
 export const isFunction = (func) =>
-  func &&
-  (Object.prototype.toString.call(func) === "[object Function]" ||
-    "function" === typeof func ||
-    func instanceof Function);
+  typeof func === "function" || func instanceof Function;
 
 const axiosInstance = axios.create({
   baseURL: config.url.API_URL,
+  headers: { "Content-Type": "application/json" },
 });
-
-// Alter defaults after instance has been created
-axiosInstance.defaults.headers.common["Content-Type"] = "application/json";
 
 const wifiOffNotifyToastId = "cannot connect to server";
 
-export function bearerAuth(token) {
-  return `Bearer ${token}`;
-}
+export const bearerAuth = (token) => `Bearer ${token}`;
 
-/**
- * url, method, and data properties don't need to be specified in config.
- * @param {*} method
- * @param {*} url
- * @param {*} onSuccess: success handler
- * @param {*} onErrors: error handler
- * @param {*} data: body request
- * @param {*} config: using for form-data request
- * @param {optional} token: using for cancle request
- */
+const handleUnauthorized = () => {
+  keycloak.login();
+};
+
+const handleForbidden = (errorHandlers, error) => {
+  if (isFunction(errorHandlers?.[403])) {
+    errorHandlers[403](error);
+  } else {
+    infoNoti("Bạn cần được cấp quyền để thực hiện hành động này.");
+  }
+};
+
+const handleRequestError = (error, errorHandlers) => {
+  console.log(error);
+
+  if (error.response) {
+    const { status } = error.response;
+
+    if (status === 401) return handleUnauthorized();
+    if (status === 403) return handleForbidden(errorHandlers, error);
+
+    // For 410 errors, use the custom handler if provided
+    if (status === 410) {
+      // Always throw the error to ensure it propagates
+      throw error;
+    }
+
+    if (isFunction(errorHandlers?.[status])) {
+      errorHandlers[status](error);
+    } else if (isFunction(errorHandlers?.rest)) {
+      errorHandlers.rest(error);
+    }
+  } else if (error.request) {
+    if (isFunction(errorHandlers?.noResponse)) {
+      errorHandlers.noResponse(error);
+    }
+    wifiOffNotify(wifiOffNotifyToastId);
+  } else {
+    console.error("Request setup error:", error.message);
+  }
+
+
+};
+
 export async function request(
   method,
   url,
   successHandler,
   errorHandlers,
   data,
-  config,
-  controller
+  config = {},
+  controller,
 ) {
-  // Check auth before making request
   if (!keycloak.authenticated) {
     keycloak.login({
-      redirectUri: window.location.origin + window.location.pathname
+      redirectUri: window.location.origin + window.location.pathname,
     });
     return;
   }
 
-  // Refresh token if needed
   try {
     await keycloak.updateToken(70);
   } catch (error) {
-    console.error('Failed to refresh token:', error);
-    keycloak.login();
-    return;
+    console.error("Failed to refresh token:", error);
+    return handleUnauthorized();
   }
 
-  if (config !== undefined && config !== null) {
-    axiosInstance.defaults.headers.common["Content-Type"] =
-      "multipart/form-data";
-  } else {
-    axiosInstance.defaults.headers.common["Content-Type"] = "application/json";
+  // Ensure config is an object to avoid null.headers access
+  const safeConfig = config || {};
+  
+  const headers = {
+    authorization: bearerAuth(keycloak.token),
+    ...(safeConfig.headers || {})
+  };
+
+  if (safeConfig.headers?.["Content-Type"] === "multipart/form-data") {
+    headers["Content-Type"] = "multipart/form-data";
   }
+
+  const options = {
+    method: method.toLowerCase(),
+    url,
+    data,
+    ...safeConfig,
+    headers,
+    signal: controller?.signal,
+  };
+
   try {
-    let options = {};
-    if (controller) {
-      options = {
-        method: method.toLowerCase(),
-        url: url,
-        data: data,
-        signal: controller?.signal,
-        ...config,
-        headers: {
-          authorization: bearerAuth(keycloak.token),
-          ...config?.headers,
-        },
-      };
-    } else {
-      options = {
-        method: method.toLowerCase(),
-        url: url,
-        data: data,
-        ...config,
-        headers: {
-          authorization: bearerAuth(keycloak.token),
-          ...config?.headers,
-        },
-      };
-    }
-
     const res = await axiosInstance.request(options);
-
-    if (isFunction(successHandler)) {
-      successHandler(res);
-    }
+    if (isFunction(successHandler)) successHandler(res);
     return res;
-  } catch (e) {
-    if (e.response && e.response.status === 401) {
-      // Handle unauthorized
-      keycloak.login();
-      return;
-    }
-    // Handling work to do when encountering all kinds of errors, e.g turn off the loading icon.
-    if (isFunction(errorHandlers)) {
-      errorHandlers(e);
-    }
-    if (e.response) {
-      // The request was made and the server responded with a status code that falls out of the range of 2xx.
-      switch (e.response.status) {
-        // case 401:
-        //   if (isFunction(errorHandlers[401])) {
-        //     errorHandlers[401](e);
-        //   } else {
-        //     history.push({ pathname: "/login" });
-        //   }
-        //   break;
-        case 403:
-          if (isFunction(errorHandlers[403])) {
-            errorHandlers[403](e);
-          } else {
-            infoNoti("Bạn cần được cấp quyền để thực hiện hành động này.");
-          }
-          break;
-        default:
-          if (isFunction(errorHandlers[e.response.status])) {
-            console.error(e);
-            errorHandlers[e.response.status](e);
-          } else if (isFunction(errorHandlers["rest"])) {
-            errorHandlers["rest"](e);
-          } else {
-            // unduplicatedErrorNoti(
-            //   "response error",
-            //   "Rất tiếc! Đã có lỗi xảy ra."
-            // );
-          }
-      }
-    } else if (e.request) {
-      // The request was made but no response was received
-      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-      // http.ClientRequest in node.js
-
-      if (isFunction(errorHandlers["noResponse"])) {
-        errorHandlers["noResponse"](e);
-      }
-
-      // , "Không thể kết nối tới máy chủ."
-      wifiOffNotify(wifiOffNotifyToastId);
-    } else {
-      // Something happened in setting up the request that triggered an Error.
-      console.log(
-        "Something happened in setting up the request that triggered an error: ",
-        e.message
-      );
-    }
-    console.log("Request config", e.config);
+  } catch (error) {
+    return handleRequestError(error, errorHandlers);
   }
 }

@@ -144,23 +144,29 @@ export const generalScheduleRepository = {
     }
   },
 
-  updateTimeSlot: async (semester, saveRequest) => {
+  updateTimeSlot: async (semester, saveRequest, errorCallback) => {
     try {
-      if (!semester) throw new Error('Semester is required');
-      
       const response = await request(
         "post",
         `/general-classes/update-class-schedule-v2?semester=${semester}`,
         null,
         null,
-        { saveRequests: [saveRequest] }
+        { saveRequests: [saveRequest] },
+        {},
+        null,
+        errorCallback
       );
       
       invalidateCache(semester);
-      
       return response;
     } catch (error) {
-      console.error('Update error:', error);
+      console.log('Update error:', error);
+      
+      if (typeof errorCallback === 'function' && error?.response?.status === 410) {
+        errorCallback(error);
+        return error; 
+      }
+      
       throw error;
     }
   },
@@ -215,19 +221,14 @@ export const generalScheduleRepository = {
   },
 
   deleteByIds: async (ids) => {
-    try {
-      const response = await request(
-        "delete",
-        `/general-classes/delete-by-ids`,
-        null,
-        null,
-        ids
-      );
-      return response;
-    } catch (error) {
-      console.error('Delete by ids error:', error);
-      throw error;
-    }
+    const response = await request(
+      "delete",
+      `/general-classes/delete-by-ids`,
+      null,
+      null,
+      ids
+    );
+    return response;
   },
 
   uploadFile: async (semester, file) => {
@@ -250,15 +251,42 @@ export const generalScheduleRepository = {
     return response;
   },
 
+  getClassGroups: async (classId) => {
+    if (!classId) {
+      throw new Error('classId is required');
+    }
+    const response = await request(
+      "get",
+      `/general-classes/get-class-groups?classId=${classId}`
+    );
+    return response.data;
+  },
+
+  updateClassGroup: async (classId, groupId) => {
+    const response = await request(
+      "post",
+      `/general-classes/update-class-group?classId=${classId}&groupId=${groupId}`
+    );
+    return response.data;
+  },
+
+  deleteClassGroup: async (classId, groupId) => {
+    const response = await request(
+      "delete",
+      `/general-classes/delete-class-group?classId=${classId}&groupId=${groupId}`
+    );
+    return response.data;
+  },
+
   updateClassesGroup: async (semester, params) => {
-    const { ids, groupName, priorityBuilding } = params;
+    const { ids, groupName } = params;
     try {
       const response = await request(
         "post",
         "/general-classes/update-classes-group",
         null,
         null,
-        { ids, groupName, priorityBuilding }
+        { ids, groupName }
       );
       invalidateCache(semester);
       return response;

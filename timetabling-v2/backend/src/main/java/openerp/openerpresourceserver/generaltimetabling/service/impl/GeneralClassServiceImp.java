@@ -14,11 +14,11 @@ import openerp.openerpresourceserver.generaltimetabling.mapper.RoomOccupationMap
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.UpdateGeneralClassRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.UpdateGeneralClassScheduleRequest;
 import openerp.openerpresourceserver.generaltimetabling.model.dto.request.general.V2UpdateClassScheduleRequest;
+import openerp.openerpresourceserver.generaltimetabling.model.entity.ClassGroup;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Classroom;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.Group;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.TimeTablingCourse;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.GeneralClass;
-import openerp.openerpresourceserver.generaltimetabling.model.entity.general.TimeTablingRoom;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.general.RoomReservation;
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 import openerp.openerpresourceserver.generaltimetabling.model.response.ModelResponseGeneralClass;
@@ -57,6 +57,9 @@ public class GeneralClassServiceImp implements GeneralClassService {
 
     @Autowired
     private TimeTablingCourseRepo timeTablingCourseRepo;
+
+    @Autowired
+    private ClassGroupRepo classGroupRepo;
 
 
     @Override
@@ -207,42 +210,43 @@ public class GeneralClassServiceImp implements GeneralClassService {
         return gcoRepo.save(gClass);
     }
 
+    @Transactional
     @Override
-    public List<GeneralClass> addClassesToNewGroup(List<String> ids, String groupName, String priorityBuilding) throws Exception {
-        if (!groupRepo.getAllByGroupName(groupName).isEmpty()) {
-            throw new Exception("Group name has existed!");
+    public List<GeneralClass> addClassesToGroup(List<Long> ids, String groupName) throws Exception {
+        Long groupId = null;
+
+        List<Group> existingGroups = groupRepo.getAllByGroupName(groupName);
+        if (existingGroups.isEmpty()) {
+            Group group = new Group();
+            group.setGroupName(groupName);
+            groupRepo.save(group);
+            groupId = group.getId();
         } else {
-            groupRepo.save(new Group(null, groupName, priorityBuilding,null,null));
+            groupId = existingGroups.get(0).getId();
         }
+
         List<GeneralClass> generalClassList = new ArrayList<>();
-        for (String id : ids) {
-            GeneralClass generalClass = gcoRepo.findById(Long.valueOf(id)).orElse(null);
+        for (Long id : ids) {
+            GeneralClass generalClass = gcoRepo.findById(id).orElse(null);
             if (generalClass == null) {
                 System.err.println("Class not exist with id =" + id);
                 continue;
             }
+
             generalClass.setGroupName(groupName);
             generalClassList.add(generalClass);
+
+            ClassGroup classGroup = new ClassGroup(id, groupId);
+            classGroupRepo.save(classGroup);
         }
+
+        // Lưu tất cả lớp đã được cập nhật
         gcoRepo.saveAll(generalClassList);
+
+        // Trả về danh sách các lớp đã được cập nhật
         return gcoRepo.findAll();
     }
 
-    @Override
-    public List<GeneralClass> addClassesToCreatedGroup(List<String> ids, String groupName) throws Exception {
-        List<GeneralClass> generalClassList = new ArrayList<>();
-        for (String id : ids) {
-            GeneralClass generalClass = gcoRepo.findById(Long.valueOf(id)).orElse(null);
-            if (generalClass == null) {
-                System.err.println("Class not exist with id =" + id);
-                continue;
-            }
-            generalClass.setGroupName(groupName);
-            generalClassList.add(generalClass);
-        }
-        gcoRepo.saveAll(generalClassList);
-        return gcoRepo.findAll();
-    }
 
     @Transactional
     @Override
@@ -356,12 +360,13 @@ public class GeneralClassServiceImp implements GeneralClassService {
         //List<GeneralClass> foundClasses = gcoRepo.findAllBySemester(semester);
         List<GeneralClass> foundClasses = gcoRepo.findAllByIdIn(classIds);
         //List<GeneralClass> autoScheduleClasses = V2ClassScheduler.autoScheduleTimeSlot(foundClasses, timeLimit);
+
         V2ClassScheduler optimizer = new V2ClassScheduler();
         List<Classroom> rooms = classroomRepo.findAll();
         List<TimeTablingCourse> courses = timeTablingCourseRepo.findAll();
         List<Group> groups = groupRepo.findAll();
-
-        List<GeneralClass> autoScheduleClasses = optimizer.autoScheduleTimeSlotRoom(foundClasses,rooms,courses, groups,timeLimit);
+        List<ClassGroup> classGroups = classGroupRepo.findAllByClassIdIn(classIds);
+        List<GeneralClass> autoScheduleClasses = optimizer.autoScheduleTimeSlotRoom(foundClasses,rooms,courses, groups,classGroups,timeLimit);
 
         /*Save the scheduled timeslot of the classes*/
         gcoRepo.saveAll(autoScheduleClasses);
@@ -391,8 +396,11 @@ public class GeneralClassServiceImp implements GeneralClassService {
         List<Classroom> rooms = classroomRepo.findAll();
         List<TimeTablingCourse> courses = timeTablingCourseRepo.findAll();
         List<Group> groups = groupRepo.findAll();
+        List<Long> classIds = new ArrayList<>();
+        for(GeneralClass gc: foundClasses) classIds.add(gc.getId());
+        List<ClassGroup> classGroups = classGroupRepo.findAllByClassIdIn(classIds);
 
-        List<GeneralClass> autoScheduleClasses = optimizer.autoScheduleTimeSlotRoom(foundClasses,rooms,courses, groups,timeLimit);
+        List<GeneralClass> autoScheduleClasses = optimizer.autoScheduleTimeSlotRoom(foundClasses,rooms,courses, groups, classGroups, timeLimit);
 
         /*Save the scheduled timeslot of the classes*/
         gcoRepo.saveAll(autoScheduleClasses);
@@ -491,8 +499,6 @@ public class GeneralClassServiceImp implements GeneralClassService {
             roomOccupations.addAll(foundRoomOccupations);
         });
 
-        var isConflict = false;
-        var conflictMsg = "";
         try {
             /*Check conflict*/
             for (RoomReservation roomReservation : roomReservationMap.values()) {
@@ -501,14 +507,11 @@ public class GeneralClassServiceImp implements GeneralClassService {
                 }
             }
         } catch (ConflictScheduleException e) {
-            isConflict = true;
-            conflictMsg = e.getCustomMessage();
+            throw new ConflictScheduleException(e.getCustomMessage());
         }
 
-        /* Persist room reservation and room occupation */
         roomReservationRepo.saveAll(roomReservationMap.values());
         roomOccupationRepo.saveAll(roomOccupations);
-        if(isConflict) throw new ConflictScheduleException(conflictMsg);
         return roomReservationMap.values().stream().map(RoomReservation::getGeneralClass).toList();
     }
 

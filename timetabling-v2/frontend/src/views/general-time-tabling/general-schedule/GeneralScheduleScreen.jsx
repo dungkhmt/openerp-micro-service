@@ -22,7 +22,19 @@ const GeneralScheduleScreen = () => {
 
   return (
     <div className="flex flex-col gap-4 h-[700px]">
-      <Tabs value={viewTab} onChange={(e, newVal) => setViewTab(newVal)}>
+      <Tabs 
+        value={viewTab} 
+        onChange={(e, newVal) => setViewTab(newVal)}
+        sx={{
+          '& .MuiTab-root': {
+            minWidth: '140px',
+            fontWeight: 500,
+            textTransform: 'none',
+            fontSize: '15px',
+            py: 1.5,
+          }
+        }}
+      >
         <Tab label="View By Class" />
         <Tab label="View By Room" />
       </Tabs>
@@ -41,60 +53,96 @@ const GeneralScheduleScreen = () => {
           </div>
           {/* Group action buttons and dialogs in one segment */}
           <div className="mt-4 flex flex-col gap-4">
-            <div className="flex flex-row justify-end gap-2">
+            <div className="flex flex-wrap justify-end gap-3">
               <Button
                 disabled={states.selectedSemester === null || states.isExportExcelLoading}
-                startIcon={states.isExportExcelLoading ? <FacebookCircularProgress /> : null}
+                startIcon={states.isExportExcelLoading ? <FacebookCircularProgress size={20} /> : null}
                 variant="contained"
                 color="success"
                 onClick={() => handlers.handleExportTimeTabling(states.selectedSemester?.semester)}
-                loading={states.isExportExcelLoading}
-                sx={{ width: 200 }}
+                sx={{ 
+                  minWidth: '180px', 
+                  height: '40px', 
+                  padding: '8px 16px',
+                  fontWeight: 500,
+                  textTransform: 'none',
+                  boxShadow: 1
+                }}
               >
                 Tải xuống File Excel
               </Button>
               <Button
                 disabled={states.selectedRows.length === 0 || states.isResetLoading}
-                loading={states.isResetLoading}
-                startIcon={states.isResetLoading ? <FacebookCircularProgress /> : null}
+                startIcon={states.isResetLoading ? <FacebookCircularProgress size={20} /> : null}
                 variant="contained"
                 color="error"
                 onClick={() => setOpenResetConfirm(true)}
+                sx={{ 
+                  minWidth: '150px', 
+                  height: '40px', 
+                  padding: '8px 16px',
+                  fontWeight: 500,
+                  textTransform: 'none',
+                  boxShadow: 1
+                }}
               >
                 Xóa lịch học TKB
               </Button>
               <Button
-                loading={states.isAutoSaveLoading}
                 disabled={!states.selectedSemester || states.isAutoSaveLoading}
-                startIcon={states.isAutoSaveLoading ? <FacebookCircularProgress /> : null}
+                startIcon={states.isAutoSaveLoading ? <FacebookCircularProgress size={20} /> : null}
                 variant="contained"
                 color="primary"
                 onClick={() => setters.setOpenTimeslotDialog(true)}
+                sx={{ 
+                  minWidth: '160px', 
+                  height: '40px', 
+                  padding: '8px 16px',
+                  fontWeight: 500,
+                  textTransform: 'none',
+                  boxShadow: 1
+                }}
               >
                 Tự động xếp TKB
               </Button>
               <Button
-                loading={states.isAutoSaveLoading}
                 disabled={!states.selectedSemester || states.isAutoSaveLoading}
-                startIcon={states.isTimeScheduleLoading ? <FacebookCircularProgress /> : null}
+                startIcon={states.isTimeScheduleLoading ? <FacebookCircularProgress size={20} /> : null}
                 variant="contained"
                 color="primary"
                 onClick={() => setters.setOpenClassroomDialog(true)}
+                sx={{ 
+                  minWidth: '160px', 
+                  height: '40px', 
+                  padding: '8px 16px',
+                  fontWeight: 500,
+                  textTransform: 'none',
+                  boxShadow: 1
+                }}
               >
-                Tự động xếp phòng học
+                Tự động xếp phòng
               </Button>
               <Button
                 disabled={states.selectedRows.length === 0 || states.isAutoSaveLoading}
-                loading={states.isAutoSaveLoading}
-                startIcon={states.isAutoSaveLoading ? <FacebookCircularProgress /> : null}
+                startIcon={states.isAutoSaveLoading ? <FacebookCircularProgress size={20} /> : null}
                 variant="contained"
                 color="primary"
                 onClick={() => setters.setOpenSelectedDialog(true)}
+                sx={{ 
+                  minWidth: '200px', 
+                  height: '40px', 
+                  padding: '8px 16px',
+                  fontWeight: 500,
+                  textTransform: 'none',
+                  boxShadow: 1
+                }}
               >
-                Tự động xếp lịch học theo lớp đã chọn
+                Xếp lịch lớp đã chọn
               </Button>
             </div>
-            <div className="flex flex-row justify-end gap-2">
+            
+            {/* Dialog components */}
+            <div>
               <AutoScheduleDialog
                 title={"Tự động xếp lịch học của kì học"}
                 open={states.isOpenTimeslotDialog}
@@ -120,6 +168,8 @@ const GeneralScheduleScreen = () => {
                 submit={handlers.handleAutoScheduleSelected}
               />
             </div>
+            
+            {/* Confirmation dialog */}
             <Dialog open={openResetConfirm} onClose={() => setOpenResetConfirm(false)}>
               <DialogTitle>Xác nhận xóa lịch học</DialogTitle>
               <DialogContent>
@@ -127,9 +177,21 @@ const GeneralScheduleScreen = () => {
                   Bạn có chắc chắn muốn xóa {states.selectedRows.length} lịch học đã chọn không?
                 </DialogContentText>
               </DialogContent>
-              <DialogActions>
-                <Button onClick={() => setOpenResetConfirm(false)}>Hủy</Button>
-                <Button onClick={handleConfirmReset} color="error" variant="contained" autoFocus>
+              <DialogActions sx={{ padding: '16px', gap: '8px' }}>
+                <Button 
+                  onClick={() => setOpenResetConfirm(false)}
+                  variant="outlined"
+                  sx={{ minWidth: '80px', padding: '6px 16px' }}
+                >
+                  Hủy
+                </Button>
+                <Button 
+                  onClick={handleConfirmReset} 
+                  color="error" 
+                  variant="contained" 
+                  autoFocus
+                  sx={{ minWidth: '80px', padding: '6px 16px' }}
+                >
                   Xóa
                 </Button>
               </DialogActions>

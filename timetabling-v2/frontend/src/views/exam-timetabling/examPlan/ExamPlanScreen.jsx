@@ -19,30 +19,48 @@ import {
   SentimentDissatisfied
 } from '@mui/icons-material';
 import ExamPlanRow from './utils/ExamPlanRow';
-import { m } from 'framer-motion'
+import AddExamPlanModal from './utils/AddExamPlanModal';
 
 const ExamPlanListPage = () => {
   const history = useHistory();
-  const { examPlans, isLoading } = useExamPlanData();
+  const { examPlans, isLoading, createExamPlan } = useExamPlanData();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
-    setPage(10);
-  };
-
-  const handlePageChange = (event, newPage) => {
-    setPage(newPage);
+    setPage(1); // Reset to first page when searching
   };
 
   const handleCreatePlan = () => {
-    history.push('/exam-plans/create');
+    setIsAddModalOpen(true);
+  };
+
+  const handleCloseAddModal = () => {
+    setIsAddModalOpen(false);
+  };
+
+  const handleSaveNewPlan = async (formData) => {
+    try {
+      setIsSaving(true);
+      const result = await createExamPlan(formData);
+      setIsSaving(false);
+      setIsAddModalOpen(false);
+
+      if (result && result.data.id) {
+        history.push(`/exam-time-tabling/exam-plan/${result.data.id}`);
+      }
+    } catch (error) {
+      console.error("Error creating exam plan:", error);
+      setIsSaving(false);
+    }
   };
 
   const handlePlanClick = (planId) => {
-    history.push(`/exam-plans/${planId}`);
+    history.push(`/exam-time-tabling/exam-plan/${planId}`);
   };
 
   // Simple filtering by name
@@ -123,11 +141,15 @@ const ExamPlanListPage = () => {
               <Stack spacing={2}>
                 <TablePagination
                   component="div"
-                  count={totalPages}
+                  count={filteredPlans.length}
                   page={page - 1}
-                  onPageChange={handlePageChange}
+                  onPageChange={(e, newPage) => setPage(newPage + 1)}
                   rowsPerPage={rowsPerPage}
-                  onRowsPerPageChange={(e) => setRowsPerPage(e.target.value)}
+                  onRowsPerPageChange={(e) => {
+                    setRowsPerPage(parseInt(e.target.value, 10));
+                    setPage(1);
+                  }}
+                  labelRowsPerPage="Hiển thị:"
                 />
               </Stack>
             </Box>
@@ -142,6 +164,14 @@ const ExamPlanListPage = () => {
           </Box>
         )
       )}
+
+      {/* Add the modal */}
+      <AddExamPlanModal
+        open={isAddModalOpen}
+        onClose={handleCloseAddModal}
+        onSave={handleSaveNewPlan}
+        isSaving={isSaving}
+      />
     </Container>
   );
 };
