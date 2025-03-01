@@ -10,7 +10,7 @@ export const useExamPlanData = (examPlanId = null) => {
     examPlanService.getAllExamPlans,
     {
       staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-      cacheTime: 30 * 60 * 1000 // Keep cache for 30 minutes
+      cacheTime: 30 * 60 * 1000, // Keep cache for 30 minutes
     }
   );
 
@@ -62,7 +62,7 @@ export const useExamPlanData = (examPlanId = null) => {
     ['planStatistics', examPlanId],
     () => examPlanService.getPlanStatistics(examPlanId),
     {
-      enabled: !!examPlanId,
+      // enabled: !!examPlanId,
       staleTime: 5 * 60 * 1000, // Cache for 5 minutes
       cacheTime: 30 * 60 * 1000 // Keep cache for 30 minutes
     }

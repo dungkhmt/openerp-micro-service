@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.examtimetabling.dtos.ExamTimetableDTO;
+import openerp.openerpresourceserver.examtimetabling.dtos.ExamTimetableDetailDTO;
 import openerp.openerpresourceserver.examtimetabling.entity.ExamTimetable;
 import openerp.openerpresourceserver.examtimetabling.service.ExamTimetableService;
 
@@ -30,6 +31,16 @@ public class ExamTimetableController {
             return ResponseEntity.ok(timetables);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<ExamTimetableDetailDTO> getTimetableDetail(@PathVariable UUID id) {
+        try {
+            ExamTimetableDetailDTO detail = examTimetableService.getTimetableDetail(id);
+            return ResponseEntity.ok(detail);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
         }
     }
 

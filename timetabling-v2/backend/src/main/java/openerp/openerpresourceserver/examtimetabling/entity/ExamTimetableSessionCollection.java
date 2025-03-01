@@ -14,32 +14,17 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "exam_plan")
-public class ExamPlan {
+@Table(name = "exam_timetable_session_collection")
+public class ExamTimetableSessionCollection {
     @Id
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
     
     @Column(name = "name")
     private String name;
-
-    @Column(name = "description")
-    private String description;
-    
-    @Column(name = "start_time")
-    private LocalDateTime startTime;
-    
-    @Column(name = "end_time")
-    private LocalDateTime endTime;
-
-    @Column(name = "start_week")
-    private Integer startWeek;
     
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-    
-    @Column(name = "delete_at", nullable = true)
-    private LocalDateTime deleteAt;
     
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
