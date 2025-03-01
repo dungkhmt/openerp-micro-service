@@ -342,28 +342,38 @@ const autoScheduleTimeMutation = useMutation(
   );
 
 const autoScheduleSelectedMutation = useMutation(
-    ({ classIds, timeLimit, semester }) => 
-      generalScheduleRepository.autoScheduleSelected(classIds, timeLimit, semester),
-    {
-      onMutate: () => {
-        setLoading(true);
-      },
-      onSettled: () => {
-        setLoading(false);
-      },
-      onSuccess: () => {
-        forceRefetch();
-        setSelectedRows([]);
-        setOpenSelectedDialog(false);
-        toast.success('Tự động xếp lịch các lớp đã chọn thành công!');
-      },
-      onError: (error) => {
-        const message = error.response?.status === 410 ? error.response.data 
-          : 'Có lỗi khi tự động xếp lịch các lớp đã chọn!';
-        toast.error(message);
-      }
-    }
-  );
+  ({ classIds, timeLimit, semester }) => {
+    // Clean up classIds by removing the -[number] suffix if it exists
+    const cleanClassIds = classIds.map((id) => id.split("-")[0]);
+
+    return generalScheduleRepository.autoScheduleSelected(
+      cleanClassIds,
+      timeLimit,
+      semester
+    );
+  },
+  {
+    onMutate: () => {
+      setLoading(true);
+    },
+    onSettled: () => {
+      setLoading(false);
+    },
+    onSuccess: () => {
+      forceRefetch();
+      setSelectedRows([]);
+      setOpenSelectedDialog(false);
+      toast.success("Tự động xếp lịch các lớp đã chọn thành công!");
+    },
+    onError: (error) => {
+      const message =
+        error.response?.status === 410
+          ? error.response.data
+          : "Có lỗi khi tự động xếp lịch các lớp đã chọn!";
+      toast.error(message);
+    },
+  }
+);
 
   const updateClassesGroupMutation = useMutation(
     (params) =>
