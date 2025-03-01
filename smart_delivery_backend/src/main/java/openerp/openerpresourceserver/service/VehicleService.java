@@ -1,0 +1,11 @@
+package openerp.openerpresourceserver.service;
+
+import openerp.openerpresourceserver.dto.VehicleDto;
+import openerp.openerpresourceserver.entity.Shipper;
+
+import java.util.List;
+import java.util.UUID;
+
+public interface VehicleService {
+    List<VehicleDto> getAllVehicleByHubId(UUID hubId);
+}
