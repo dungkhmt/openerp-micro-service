@@ -15,7 +15,7 @@ const GeneralGroupAutoComplete = ({ selectedGroup, setSelectedGroup }) => {
       }}
       value={selectedGroup}
       options={allGroups}
-      sx={{ width: "100%" }}
+      sx={{ width: 200 }}  
       renderInput={(params) => <TextField {...params} label="Chọn nhóm" />}
       PopperProps={{
         popperOptions: {
