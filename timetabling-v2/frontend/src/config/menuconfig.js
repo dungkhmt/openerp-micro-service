@@ -35,6 +35,11 @@ import { teacher } from "./menuconfig/teacher";
 import { user } from "./menuconfig/user";
 // import {schedule} from "./menuconfig/schedule"
 import { scheduleInformation } from "./menuconfig/scheduleInformation";
+import {wms_purchase} from "./menuconfig/wms_purchase";
+import {wms_sales} from "./menuconfig/wms_sales";
+import {wms_logistics} from "./menuconfig/wms_logistics";
+
+
 // import {schedulePerformance} from "./menuconfig/schedulePerformance"
 import { courseTimeTabling } from "./menuconfig/courseTimeTabling";
 import { generalTimeTabling } from "./menuconfig/generalTimeTabling";
@@ -65,6 +70,12 @@ MENUS.push(scheduleInformation);
 //MENUS.push(courseTimeTabling);
 MENUS.push(generalTimeTabling);
 MENUS.push(ExamTimeTabling);
+MENUS.push(wms_purchase);
+MENUS.push(wms_sales);
+MENUS.push(wms_logistics);
+
+
+
 
 //MENUS.push(firstYearTimeTabling);
 MENUS.push(computerLabTimeTabling);
