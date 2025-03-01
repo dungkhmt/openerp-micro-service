@@ -22,7 +22,8 @@ const GeneralUploadScreen = () => {
     },
     setters: { 
       setSelectedSemester,
-      setClassesNoSchedule
+      setClassesNoSchedule,
+      setSelectedRows // Add this
     },
     handlers: {
       handleDeleteBySemester,
@@ -30,6 +31,12 @@ const GeneralUploadScreen = () => {
       handleDeleteByIds
     }
   } = useGeneralSchedule();
+
+  // Update this function to sync both local and global state
+  const handleSelectionChange = (newSelection) => {
+    setSelectedIds(newSelection);
+    setSelectedRows(newSelection); // Add this line to sync with useGeneralSchedule
+  };
 
   const handleSubmitFile = async () => {
     if (selectedFile) {
@@ -61,7 +68,7 @@ const GeneralUploadScreen = () => {
                 startIcon={isDeletingByIds ? <FacebookCircularProgress /> : null}
                 sx={{ width: 290 }}
                 disabled={isDeletingByIds || selectedIds.length === 0}
-                onClick={() => handleDeleteByIds(selectedIds)}
+                onClick={() => handleDeleteByIds()}
                 variant="contained"
                 color="error"
               >
@@ -84,7 +91,8 @@ const GeneralUploadScreen = () => {
           setClasses={setClassesNoSchedule}
           classes={classesNoSchedule} 
           dataLoading={isClassesNoScheduleLoading}
-          onSelectionChange={setSelectedIds}
+          onSelectionChange={handleSelectionChange} // Update to use new handler
+          selectedIds={selectedIds} // Add this prop
         />
       </div>
     </LoadingProvider>
