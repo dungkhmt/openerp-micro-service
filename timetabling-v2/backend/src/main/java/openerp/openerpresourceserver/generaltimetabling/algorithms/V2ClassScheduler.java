@@ -55,26 +55,44 @@ public class V2ClassScheduler {
             for(Group g: groups){
                 mId2Group.put(g.getId(),g);
             }
+            Map<Long, List<Long>> mClassId2ListGroupIds = new HashMap<>();
+            for(ClassGroup cg: classGroups){
+                if(mClassId2ListGroupIds.get(cg.getClassId())==null){
+                    mClassId2ListGroupIds.put(cg.getClassId(),new ArrayList<>());
+                    mClassId2ListGroupIds.get(cg.getClassId()).add(cg.getGroupId());
+                }
+            }
             int groupIdx = -1;
+            /*
             Map<String, Integer> mGroupName2Index = new HashMap();
             for(int i = 0; i < classes.size(); i++){
                 GeneralClass gc = classes.get(i);
                 String group = gc.getGroupName();
-                //log.info("mapData, group " + group);
+                log.info("mapData, group " + group);
                 if(mGroupName2Index.get(group)==null){
                     groupIdx++;
                     mGroupName2Index.put(group,groupIdx);
-                    //log.info("mapData, put(" + group + "," + groupIdx);
+                    log.info("mapData, put(" + group + "," + groupIdx);
                 }
             }
+             */
+            Map<Long, Integer> mGroupId2GroupIndex = new HashMap<>();
             Map<Long, List<Integer>> mClassId2GroupIndex = new HashMap();
             for(ClassGroup cg: classGroups){
                 if(mClassId2GroupIndex.get(cg.getClassId())==null)
                     mClassId2GroupIndex.put(cg.getClassId(),new ArrayList<>());
                 Group gr = mId2Group.get(cg.getGroupId());
                 if(gr != null) {
-                    int idxG = mGroupName2Index.get(gr.getGroupName());
-                    mClassId2GroupIndex.get(cg.getClassId()).add(idxG);
+                    //log.info("mapData, gr.GroupName = " + gr.getGroupName());
+                    //if(mGroupName2Index.get(gr.getGroupName())==null)
+                    //    log.info("mapData BUT dictionary got " + gr.getGroupName() + " null");
+                    //int idxG = mGroupName2Index.get(gr.getGroupName());
+                    if(mGroupId2GroupIndex.get(cg.getGroupId())==null){
+                        groupIdx+=1;
+                        mGroupId2GroupIndex.put(cg.getGroupId(),groupIdx);
+                    }
+                    //mClassId2GroupIndex.get(cg.getClassId()).add(idxG);
+                    mClassId2GroupIndex.get(cg.getClassId()).add(mGroupId2GroupIndex.get(cg.getGroupId()));
                 }
             }
             List<Integer>[] relatedGroups = new ArrayList[n];
