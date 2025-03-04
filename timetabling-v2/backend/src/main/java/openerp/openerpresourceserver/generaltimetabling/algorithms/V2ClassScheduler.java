@@ -21,6 +21,8 @@ import openerp.openerpresourceserver.generaltimetabling.model.entity.general.Tim
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Log4j2
@@ -137,7 +139,8 @@ public class V2ClassScheduler {
                         cls[idx] = gc.getId();//gc.getClassCode();
                         vol[idx] = 0;
                         if(gc.getQuantityMax() != null) vol[idx] = gc.getQuantityMax();
-                        groupId[idx] = mGroupName2Index.get(gc.getGroupName());
+                        groupId[idx] = 0;// not used, use relatedGroups instead //mGroupName2Index.get(gc.getGroupName());
+                        if(relatedGroups[idx].size() > 0) groupId[idx] = relatedGroups[idx].get(0);
                         parentClassId[idx] = gc.getParentClassId();
                         int start = -1;
                         int end = -1;
@@ -238,8 +241,13 @@ public class V2ClassScheduler {
         //data.print();
         Gson gson = new Gson();
         String json = gson.toJson(data);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        Date now = new Date();
+        String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(now);
+
+
         try {
-            PrintWriter out = new PrintWriter("timetable-" + data.getNbClassSegments() + ".json");
+            PrintWriter out = new PrintWriter("timetable-" + data.getNbClassSegments() + "-cls-" + timeStamp + ".json");
             out.print(json);
             out.close();
         } catch (Exception e) {
