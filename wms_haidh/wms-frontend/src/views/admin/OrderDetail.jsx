@@ -16,6 +16,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useNavigate, useParams } from 'react-router-dom';
 import { request } from "../../api";
+import { formatDate, formatPrice } from '../../utils/utils';
 
 const OrderDetail = () => {
   const navigate = useNavigate();
@@ -27,13 +28,6 @@ const OrderDetail = () => {
       setDetails(res.data);
     });
   }, [id1]);
-
-  const formatPrice = (price) => {
-    return price.toLocaleString("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    });
-  };
 
   return (
     <Box sx={{ p: 3 }}>

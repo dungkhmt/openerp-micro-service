@@ -21,6 +21,7 @@ import { columns, statusOptions } from "../../config/shipment";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../api";
+import { formatDate, formatPrice } from '../../utils/utils';
 
 const INITIAL_VISIBLE_COLUMNS = ["shipmentId","expectedDeliveryStamp","createdBy", "actions"];
 const buttonText = "Add Shipment";
@@ -143,22 +144,6 @@ export default function Shipment() {
     //   { id }
     // );
   };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const options = {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false, // Đảm bảo không sử dụng định dạng giờ AM/PM
-    };
-    return date.toLocaleString('en-GB', options); // Hoặc 'en-US' nếu bạn muốn kiểu định dạng kiểu Mỹ
-  };
-
-
-
 
   const topContent = useMemo(() => {
     return (

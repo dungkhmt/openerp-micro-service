@@ -25,8 +25,9 @@ import {
   Checkbox
 } from '@mui/material';
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import Map from './Map';
+import Map from '../../components/Map';
 import fetchRoute from '../../utils/fetchRoute';
+import { formatDate, formatPrice } from '../../utils/utils';
 
 const AddTrip = () => {
   const navigate = useNavigate();
@@ -170,7 +171,7 @@ const AddTrip = () => {
     };
     // console.log(payload);
 
-    const requestUrl = id ? "/delivery-manager/delivery-trips/update-trip" : "/delivery-manager/delivery-trips/create-trip";
+    const requestUrl = "/delivery-manager/delivery-trips/create-trip";
 
     request("post", requestUrl, (res) => {
       if (res.status === 200) {
@@ -239,25 +240,7 @@ const AddTrip = () => {
     setDeliverySequence(reorderedItems);
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const options = {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    };
-    return date.toLocaleString('en-GB', options);
-  };
 
-  const formatPrice = (price) => {
-    return price.toLocaleString("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    });
-  };
 
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
@@ -266,7 +249,7 @@ const AddTrip = () => {
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
-          {id ? 'Update Delivery Trip' : 'Create New Delivery Trip'}
+          'Create New Delivery Trip'
         </Typography>
         <Button
           variant="contained"

@@ -1,5 +1,7 @@
 package openerp.openerpresourceserver.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -7,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import openerp.openerpresourceserver.entity.DeliveryTrip;
+import openerp.openerpresourceserver.entity.projection.DeliveryTripGeneralProjection;
 import openerp.openerpresourceserver.entity.projection.DeliveryTripProjection;
 
 public interface DeliveryTripRepository extends JpaRepository<DeliveryTrip, String> {
@@ -23,4 +26,22 @@ public interface DeliveryTripRepository extends JpaRepository<DeliveryTrip, Stri
            "WHERE dt.isDeleted = false " +
            "AND dt.status = :status ORDER BY dt.lastUpdatedStamp DESC")
     Page<DeliveryTripProjection> findFilteredDeliveryTrips(@Param("status") String status, Pageable pageable);
+    
+    @Query("""
+            SELECT 
+                dt.distance AS distance, 
+                dt.totalWeight AS totalWeight, 
+                dt.totalLocations AS totalLocations, 
+                dt.status AS status, 
+                dt.description AS description,
+                s.expectedDeliveryStamp AS expectedDeliveryStamp,
+                w.name AS warehouseName,
+                dp.fullName AS deliveryPersonName
+            FROM DeliveryTrip dt
+            JOIN Shipment s ON dt.shipmentId = s.shipmentId
+            JOIN Warehouse w ON dt.warehouseId = w.warehouseId
+            JOIN DeliveryPerson dp ON dt.deliveryPersonId = dp.userLoginId
+            WHERE dt.isDeleted = false AND dt.deliveryTripId = :deliveryTripId
+        """)
+        Optional<DeliveryTripGeneralProjection> findDeliveryTripById(@Param("deliveryTripId") String deliveryTripId);
 }

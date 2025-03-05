@@ -18,6 +18,7 @@ import { columns } from "../../config/receiptbill";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../api";
 import { useNavigate } from "react-router-dom";
+import { formatDate, formatPrice } from '../../utils/utils';
 
 const INITIAL_VISIBLE_COLUMNS = ["receiptBillId", "description", "createdBy", "totalPrice", "receiptName"];
 export default function ReceiptBill() {
@@ -71,13 +72,6 @@ export default function ReceiptBill() {
     setRowsPerPage(Number(e.target.value));
     setPage(1);
   }, []);
-
-  const formatPrice = (price) => {
-    return price.toLocaleString("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    });
-  };
 
 
 

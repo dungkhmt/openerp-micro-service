@@ -24,14 +24,18 @@ import openerp.openerpresourceserver.entity.DeliveryPerson;
 import openerp.openerpresourceserver.entity.DeliveryTrip;
 import openerp.openerpresourceserver.entity.Shipment;
 import openerp.openerpresourceserver.entity.Warehouse;
+import openerp.openerpresourceserver.entity.projection.CustomerDeliveryProjection;
 import openerp.openerpresourceserver.entity.projection.CustomerOrderProjection;
+import openerp.openerpresourceserver.entity.projection.DeliveryItemDetailProjection;
 import openerp.openerpresourceserver.entity.projection.DeliveryOrderItemProjection;
 import openerp.openerpresourceserver.entity.projection.DeliveryPersonProjection;
+import openerp.openerpresourceserver.entity.projection.DeliveryTripGeneralProjection;
 import openerp.openerpresourceserver.entity.projection.DeliveryTripPathProjection;
 import openerp.openerpresourceserver.entity.projection.DeliveryTripProjection;
 import openerp.openerpresourceserver.model.request.DeliveryTripRequest;
 import openerp.openerpresourceserver.service.AssignedOrderItemService;
 import openerp.openerpresourceserver.service.DeliveryPersonService;
+import openerp.openerpresourceserver.service.DeliveryTripItemService;
 import openerp.openerpresourceserver.service.DeliveryTripPathService;
 import openerp.openerpresourceserver.service.DeliveryTripService;
 import openerp.openerpresourceserver.service.OrderService;
@@ -47,6 +51,7 @@ public class DeliveryMangerController {
 	private DeliveryTripService deliveryTripService;
 	private DeliveryTripPathService deliveryTripPathService;
 	private DeliveryPersonService deliveryPersonService;
+	private DeliveryTripItemService deliveryTripItemService;
 	private WarehouseService warehouseService;
 	private AssignedOrderItemService assignedOrderItemService;
 	private OrderService orderService;
@@ -64,12 +69,6 @@ public class DeliveryMangerController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body("An error occurred while fetching delivery trips: " + e.getMessage());
 		}
-	}
-
-	@GetMapping("/delivery-trips/paths/{deliveryTripId}")
-	public ResponseEntity<List<DeliveryTripPathProjection>> getDeliveryTripPaths(@PathVariable String deliveryTripId) {
-		List<DeliveryTripPathProjection> paths = deliveryTripPathService.getDeliveryTripPaths(deliveryTripId);
-		return ResponseEntity.ok(paths);
 	}
 
 	@GetMapping("/warehouse")
@@ -112,27 +111,62 @@ public class DeliveryMangerController {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating trip");
 		}
-		
+
+	}
+
+	@GetMapping("/delivery-persons")
+	public ResponseEntity<Page<DeliveryPerson>> getAllDeliveryPersons(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size,
+			@RequestParam(value = "search", required = false) String search) {
+
+		Page<DeliveryPerson> deliveryPersons = deliveryPersonService.getAllDeliveryPersons(page, size, search);
+		return ResponseEntity.ok(deliveryPersons);
+	}
+
+	@GetMapping("/shipments")
+	public ResponseEntity<Page<Shipment>> getAllShipments(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size, @RequestParam(required = false) String search) {
+
+		Page<Shipment> shipments = shipmentService.getAllShipments(page, size, search);
+		return ResponseEntity.ok(shipments);
+	}
+
+	@GetMapping("/delivery-trip/general-info/{deliveryTripId}")
+	public ResponseEntity<DeliveryTripGeneralProjection> getDeliveryTripDetail(@PathVariable String deliveryTripId) {
+		DeliveryTripGeneralProjection tripDetail = deliveryTripService.getDeliveryTripById(deliveryTripId);
+		return ResponseEntity.ok(tripDetail);
+	}
+
+	@GetMapping("/delivery-trip/customers/{deliveryTripId}")
+	public ResponseEntity<List<CustomerDeliveryProjection>> getCustomers(@PathVariable String deliveryTripId) {
+		List<CustomerDeliveryProjection> customers = deliveryTripItemService
+				.getCustomersByDeliveryTripId(deliveryTripId);
+		return ResponseEntity.ok(customers);
 	}
 	
-	@GetMapping("/delivery-persons")
-    public ResponseEntity<Page<DeliveryPerson>> getAllDeliveryPersons(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(value = "search", required = false) String search) {
-        
-        Page<DeliveryPerson> deliveryPersons = deliveryPersonService.getAllDeliveryPersons(page, size,search);
-        return ResponseEntity.ok(deliveryPersons);
-    }
+	@GetMapping("/delivery-trip/paths/{deliveryTripId}")
+	public ResponseEntity<List<DeliveryTripPathProjection>> getDeliveryTripPaths(@PathVariable String deliveryTripId) {
+		List<DeliveryTripPathProjection> paths = deliveryTripPathService.getDeliveryTripPaths(deliveryTripId);
+		return ResponseEntity.ok(paths);
+	}
+
+	@GetMapping("/delivery-trip/items")
+	public ResponseEntity<Page<DeliveryItemDetailProjection>> getDeliveryItems(@RequestParam String deliveryTripId,
+			@RequestParam UUID orderId, @RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size) {
+		Page<DeliveryItemDetailProjection> items = deliveryTripItemService.getDeliveryItems(deliveryTripId, orderId,
+				page, size);
+		return ResponseEntity.ok(items);
+	}
 	
-	@GetMapping("/shipments")
-	public ResponseEntity<Page<Shipment>> getAllShipments(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(required = false) String search) {
-        
-        Page<Shipment> shipments = shipmentService.getAllShipments(page, size, search);
-        return ResponseEntity.ok(shipments);
+	@PostMapping("/delivery-trip/cancel")
+    public ResponseEntity<String> cancelDeliveryTrip(@RequestParam String deliveryTripId) {
+        boolean cancelled = deliveryTripService.cancelDeliveryTrip(deliveryTripId);
+        if (cancelled) {
+            return ResponseEntity.ok("Delivery trip cancelled successfully.");
+        } else {
+            return ResponseEntity.badRequest().body("Delivery trip can only be cancelled if it is in CREATED status.");
+        }
     }
 
 }

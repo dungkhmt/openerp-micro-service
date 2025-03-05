@@ -22,6 +22,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { CircularProgress } from "@nextui-org/react";
 import { useNavigate, useParams } from 'react-router-dom';
 import { request } from "../../api";
+import { formatDate, formatPrice } from '../../utils/utils';
 
 const OrderItem = () => {
   const navigate = useNavigate();
@@ -99,13 +100,6 @@ const OrderItem = () => {
         alert("Error occcured while assigning order item!");
       }
     }, {}, payload);
-  };
-
-  const formatPrice = (price) => {
-    return price.toLocaleString("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    });
   };
 
   return (

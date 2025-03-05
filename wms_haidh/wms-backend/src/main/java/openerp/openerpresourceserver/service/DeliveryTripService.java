@@ -1,15 +1,19 @@
 package openerp.openerpresourceserver.service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.entity.DeliveryTrip;
 import openerp.openerpresourceserver.entity.DeliveryTripItem;
+import openerp.openerpresourceserver.entity.projection.DeliveryTripGeneralProjection;
 import openerp.openerpresourceserver.entity.projection.DeliveryTripProjection;
 import openerp.openerpresourceserver.model.request.DeliveryTripRequest;
 import openerp.openerpresourceserver.repository.DeliveryTripItemRepository;
@@ -29,6 +33,11 @@ public class DeliveryTripService {
     
     public Page<DeliveryTripProjection> getFilteredDeliveryTrips(String status, Pageable pageable) {
         return deliveryTripRepository.findFilteredDeliveryTrips(status, pageable);
+    }
+    
+    public DeliveryTripGeneralProjection getDeliveryTripById(String deliveryTripId) {
+        return deliveryTripRepository.findDeliveryTripById(deliveryTripId)
+                .orElseThrow(() -> new EntityNotFoundException("DeliveryTrip not found with id: " + deliveryTripId));
     }
      
     private String generateTripId() {
@@ -76,6 +85,23 @@ public class DeliveryTripService {
         deliveryTripPathService.saveRoutePath(tripId, payload.getCoordinates());
 
         return trip;
+    }
+    
+    @Transactional
+    public boolean cancelDeliveryTrip(String deliveryTripId) {
+        Optional<DeliveryTrip> optionalTrip = deliveryTripRepository.findById(deliveryTripId);
+        
+        if (optionalTrip.isPresent()) {
+            DeliveryTrip trip = optionalTrip.get();
+            
+            if ("CREATED".equals(trip.getStatus())) {
+                trip.setStatus("CANCELLED");
+                deliveryTripRepository.save(trip);
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     

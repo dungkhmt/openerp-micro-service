@@ -39,22 +39,6 @@ const ProductForm = () => {
     }).then();
   }, [])
 
-
-
-  // const mockProductData = {
-  //   id: '1',
-  //   image: 'https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2023/1/8/1135972/HD13.JPG',
-  //   name: 'Tủ lạnh Samsung',
-  //   category: '729ab27a-ef0a-11ed-b27c-02420a000304',
-  //   inventory: [{ warehouse: 'Warehouse A', quantity: 10 }],
-  //   code: 'P123',
-  //   weight: '20',
-  //   height: '30',
-  //   area: '50',
-  //   description: 'A great product for your home.',
-  //   uom: 'kg',
-  // };
-
   useEffect(() => {
     if (id) {
       const formData = new FormData();

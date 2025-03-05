@@ -25,6 +25,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { CircularProgress } from "@nextui-org/react";
 import { useNavigate, useParams } from 'react-router-dom';
 import { request } from "../../api";
+import { formatDate, formatPrice } from '../../utils/utils';
 
 const ReceiptPage = () => {
   const navigate = useNavigate();
@@ -104,26 +105,6 @@ const ReceiptPage = () => {
         alert("Error occcured while creating receipt item!");
       }
     }, {}, payload);
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const options = {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false, // Đảm bảo không sử dụng định dạng giờ AM/PM
-    };
-    return date.toLocaleString('en-GB', options); // Hoặc 'en-US' nếu bạn muốn kiểu định dạng kiểu Mỹ
-  };
-
-  const formatPrice = (price) => {
-    return price.toLocaleString("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    });
   };
 
   return (

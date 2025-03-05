@@ -16,6 +16,7 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router-dom';
 import { request } from '../../api';
+import { formatDate, formatPrice } from '../../utils/utils';
 
 const SaleOrderDetail = () => {
   const navigate = useNavigate();
@@ -37,26 +38,6 @@ const SaleOrderDetail = () => {
       setDetails(res.data);
     });
   }, [orderId]);
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const options = {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    };
-    return date.toLocaleString('en-GB', options);
-  };
-
-  const formatPrice = (price) => {
-    return price.toLocaleString("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    });
-  };
 
   const handleApprove = () => {
     request('post', `/sale-manager/orders/approve/${orderId}?approvedBy=admin`, (res) => {

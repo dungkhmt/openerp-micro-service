@@ -21,6 +21,7 @@ import { columns, statusOptions } from "../../config/deliverytrip";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../api";
+
 const statusColorMap = {
   CREATED: "default",
   DELIVERING: "warning",
@@ -75,7 +76,7 @@ export default function DeliveryTrip() {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem onClick={() => handleUpdate(item.deliveryTripId)}>View delivery path</DropdownItem>
+                <DropdownItem onPress={() => handleUpdate(item.deliveryTripId)}>View delivery trip detail</DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
@@ -128,7 +129,7 @@ export default function DeliveryTrip() {
               className="bg-foreground text-background"
               endContent={<PlusIcon />}
               size="md"
-              onClick={handleAddTrip}
+              onPress={handleAddTrip}
             >
               {buttonText}
             </Button>
