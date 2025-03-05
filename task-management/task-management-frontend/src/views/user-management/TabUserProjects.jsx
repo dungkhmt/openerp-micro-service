@@ -169,11 +169,8 @@ const TabUserProjects = (user) => {
             placeholder="Search Project"
             onChange={(e) => setSearchValue(e.target.value)}
             InputProps={{
-              endAdornment: (
+              endAdornment: searchValue && (
                 <IconButton
-                  size="small"
-                  title="Clear"
-                  aria-label="Clear"
                   onClick={() => setSearchValue("")}
                   sx={{ padding: 0, marginRight: "-4px" }} 
                 >

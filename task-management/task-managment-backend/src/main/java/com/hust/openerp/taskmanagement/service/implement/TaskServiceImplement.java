@@ -325,10 +325,9 @@ public class TaskServiceImplement implements TaskService {
     @Transactional
 	public TaskDTO updateTask(UUID taskId, UpdateTaskForm taskForm, String updateBy) {
 		List<TaskLogDetail> taskLogDetails = new ArrayList<>();
-		Task task = taskRepository.findById(taskId).orElse(null);
-		if (task == null) {
-			return null;
-		}
+		Task task = taskRepository.findById(taskId).orElseThrow(
+				() -> new ApiException(ErrorCode.TASK_NOT_EXIST));
+
 		Date updatedTime = new Date();
 		boolean isPushNoti = false;
 

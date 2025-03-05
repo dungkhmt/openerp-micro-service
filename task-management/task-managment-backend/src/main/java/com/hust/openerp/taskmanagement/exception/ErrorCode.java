@@ -25,6 +25,11 @@ public enum ErrorCode {
     EVENT_NOT_EXIST("E1005", "The event does not exist", HttpStatus.BAD_REQUEST),
     PROJECT_MEMBER_NOT_EXIST("E1006", "The project member does not exist", HttpStatus.BAD_REQUEST),
     ROLE_NOT_EXIST("E1007", "The role does not exist", HttpStatus.BAD_REQUEST),
+    SKILL_NOT_EXIST("E1008", "The skill does not exist", HttpStatus.BAD_REQUEST),
+    SKILL_EXIST("E1009", "The skill already exists. Please check the skill list before adding a new one", HttpStatus.BAD_REQUEST),
+    PRIORITY_EXIST("E1010", "The priority already exists. Please check the priority list before adding a new one", HttpStatus.BAD_REQUEST),
+    STATUS_EXIST("E1011", "The status already exists. Please check the status list before adding a new one", HttpStatus.BAD_REQUEST),
+    CATEGORY_EXIST("E1012", "The category already exists. Please check the category list before adding a new one", HttpStatus.BAD_REQUEST),
 
     // 401
 

@@ -1,10 +1,40 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { CategoryService } from "../../services/api/task-category.service";
+import { clearCache } from "../project/tasks";
 
-export const fetchCategories = createAsyncThunk("fetchCategories", async () => {
+export const handleRejected = (state, action) => {
+  state.errors.push(action.payload || action.error);
+  state.fetchLoading = false;
+};
+
+export const fetchCategories = createAsyncThunk(
+  "fetchCategories", async () => {
   const categories = await CategoryService.getCategories();
   return categories;
 });
+
+export const createCategory = createAsyncThunk(
+  "createCategory",
+  async (data, { dispatch, rejectWithValue }) => {
+    try {
+      const categories = await CategoryService.createCategory(data);
+      await dispatch(fetchCategories());
+      return categories;
+    } catch (e) {
+      return rejectWithValue(e.response?.data);
+    }
+  }
+);
+
+export const deleteCategory = createAsyncThunk(
+  "deleteCategory",
+  async ({ categoryId }, { dispatch }) => {
+    const categories = await CategoryService.deleteCategory(categoryId);
+    await dispatch(fetchCategories());
+    dispatch(clearCache());
+    return categories;
+  }
+);
 
 const initialState = {
   categories: [],
@@ -31,10 +61,8 @@ export const categorySlice = createSlice({
         state.categories = action.payload;
         state.fetchLoading = false;
       })
-      .addCase(fetchCategories.rejected, (state, action) => {
-        state.errors.push(action.error);
-        state.fetchLoading = false;
-      });
+      .addCase(fetchCategories.rejected, handleRejected)
+      .addCase(createCategory.rejected, handleRejected);
   },
 });
 

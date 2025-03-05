@@ -23,21 +23,26 @@ import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 import { CircularProgressLoading } from "../../../components/common/loading/CircularProgressLoading";
 import ConfirmationDialog from "../../../components/mui/dialog/ConfirmationDialog";
+import { removeDiacritics } from "../../../utils/stringUtils.js";
 
 const ProjectViewEvents = () => {
   const { id } = useParams();
   const { events, fetchLoading } = useSelector((state) => state.events);
+
   const [createDialog, setCreateDialog] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredEvents, setFilteredEvents] = useState(events);
-  const [sortOption, setSortOption] = useState("latest");
-  const [sortAnchorEl, setSortAnchorEl] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [editedEvent, setEditedEvent] = useState(null);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState(null);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredEvents, setFilteredEvents] = useState(events);
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
+  const [sortOption, setSortOption] = useState("latest");
+  const [sortAnchorEl, setSortAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+
 
   const dispatch = useDispatch();
 
@@ -110,22 +115,30 @@ const ProjectViewEvents = () => {
   };
 
   useEffect(() => {
-    let sortedEvents = [...events];
+    // Debounce search query to optimize performance
+    const timeoutId = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(timeoutId); 
+  }, [searchQuery]);
 
+  useEffect(() => {
+    let sortedEvents = [...events];
+  
     if (sortOption === "latest") {
       sortedEvents.sort((a, b) => new Date(b.dueDate) - new Date(a.dueDate));
     } else {
       sortedEvents.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
     }
-
-    if (searchQuery) {
+  
+    if (debouncedSearchQuery) {
       sortedEvents = sortedEvents.filter((event) =>
-        event.name.toLowerCase().includes(searchQuery.toLowerCase())
+        removeDiacritics(event.name).toLowerCase().includes(debouncedSearchQuery.toLowerCase())
       );
     }
-
+  
     setFilteredEvents(sortedEvents);
-  }, [events, sortOption, searchQuery]);
+  }, [debouncedSearchQuery, events, sortOption]);
 
   return (
     <Box sx={{ overflowY: "none" }}>
@@ -149,6 +162,14 @@ const ProjectViewEvents = () => {
             InputProps={{
               startAdornment: <Icon fontSize={18} icon="ri:search-line" />,
               sx: { height: 40, gap: 2 },
+              endAdornment: searchQuery && (
+                <IconButton
+                  onClick={() => setSearchQuery("")}
+                  sx={{ padding: 0, marginRight: "-4px" }} 
+                >
+                  <Icon icon="mdi:close" fontSize={20} />
+                </IconButton>
+              ),
             }}
             sx={{ ml: 3 }}
           />
@@ -162,7 +183,7 @@ const ProjectViewEvents = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              width: 80,
+              width: { xs: 40, sm: 80 },
               height: 36,
               borderRadius: 15,
               gap: 3,
@@ -174,7 +195,9 @@ const ProjectViewEvents = () => {
             onClick={handleSortClick}
           >
             <Icon fontSize={20} icon="fa-solid:sort" sx={{ color: "grey" }} />
-            Sort
+            <Typography sx={{ display: { xs: "none", sm: "block" } }}>
+              Sort
+            </Typography>
           </Box>
           <Menu
             anchorEl={sortAnchorEl}
@@ -205,9 +228,15 @@ const ProjectViewEvents = () => {
             color="primary"
             variant="contained"
             sx={{ textTransform: "none" }}
-            startIcon={<Icon icon="fluent:add-16-filled" />}
           >
-            Thêm Sự Kiện
+            <Icon
+              icon="fluent:add-16-filled"
+              fontSize={20}
+              sx={{ display: { xs: "block", sm: "none" } }}
+            />
+            <Box component="span" sx={{ display: { xs: "none", sm: "block" } }}>
+              Thêm Sự Kiện
+            </Box>
           </Button>
         </Grid>
       </Grid>

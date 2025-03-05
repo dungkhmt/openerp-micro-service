@@ -26,6 +26,10 @@ public interface EventUserRepository extends JpaRepository<EventUser, EventUser.
 	
 	@Modifying
     @Transactional
+    void deleteByEventIdAndUserId(UUID eventId, String removedId);
+	
+	@Modifying
+    @Transactional
     @Query(value = """
         DELETE FROM task_management_event_user e
         USING task_management_event ev

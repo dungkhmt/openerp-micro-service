@@ -243,11 +243,8 @@ const TabUserTasks = (user) => {
             placeholder="Search Task"
             onChange={(e) => setSearch(e.target.value)}
             InputProps={{
-              endAdornment: (
+              endAdornment: search && (
                 <IconButton
-                  size="small"
-                  title="Clear"
-                  aria-label="Clear"
                   onClick={() => setSearch("")}
                   sx={{ padding: 0, marginRight: "-4px" }} 
                 >

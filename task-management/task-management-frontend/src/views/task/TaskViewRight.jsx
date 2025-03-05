@@ -20,6 +20,7 @@ import { TaskStatus } from "../../components/task/status";
 import { useTaskContext } from "../../hooks/useTaskContext";
 import { getDueDateColor, getProgressColor } from "../../utils/color.util";
 import { useParams } from "react-router";
+import { CircularProgressLoading } from "../../components/common/loading/CircularProgressLoading";
 
 const TitleWrapper = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -33,7 +34,7 @@ const TitleWrapper = styled(Box)(({ theme }) => ({
 const TaskViewRight = () => {
   const { task } = useTaskContext();
   const { id: projectId } = useParams();
-  const { project } = useSelector((state) => state.project);
+  const { project, fetchLoading } = useSelector((state) => state.project);
   const {
     category: categoryStore,
     priority: priorityStore,
@@ -47,6 +48,8 @@ const TaskViewRight = () => {
     (p) => p.priorityId === task.priorityId
   );
   const status = statusStore.statuses.find((s) => s.statusId === task.statusId);
+
+  if(fetchLoading) return <CircularProgressLoading />;
 
   return (
     <Card sx={{ position: "sticky", top: 0, mr: 2 }}>

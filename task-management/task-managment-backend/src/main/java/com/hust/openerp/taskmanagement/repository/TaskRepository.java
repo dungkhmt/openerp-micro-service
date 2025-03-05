@@ -98,6 +98,18 @@ public interface TaskRepository extends JpaRepository<Task, UUID>, JpaSpecificat
     @Modifying
     @Query("UPDATE Task t SET t.assigneeId = NULL WHERE t.assigneeId = :memberId AND t.projectId = :projectId")
     void unassignUserFromTasks(@Param("memberId") String memberId, @Param("projectId") UUID projectId);
+    
+    @Modifying
+    @Query("UPDATE Task t SET t.priorityId = 'NORMAL' WHERE t.priorityId = :priorityId")
+    void updatePriorityToDefault(@Param("priorityId") String priorityId);
+    
+    @Modifying
+    @Query("UPDATE Task t SET t.categoryId = 'REQUEST' WHERE t.categoryId = :categoryId")
+    void updateCategoryToDefault(@Param("categoryId") String categoryId);
+    
+    @Modifying
+    @Query("UPDATE Task t SET t.statusId = 'TASK_OPEN' WHERE t.statusId = :statusId")
+    void updateStatusToDefault(@Param("statusId") String statusId);
 
     
     List<Task> findByEventId(UUID eventId);
@@ -109,4 +121,5 @@ public interface TaskRepository extends JpaRepository<Task, UUID>, JpaSpecificat
 
         Long getCount();
     }
+
 }

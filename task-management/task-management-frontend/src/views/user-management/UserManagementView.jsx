@@ -199,32 +199,29 @@ const UserManagementView = () => {
               sx={{
                 display: "flex",
                 alignItems: "center",
-                width: { xs: "100%", sm: "auto" }, 
+                width: { xs: "100%", sm: "auto" },
               }}
             >
               <TextField
                 size="small"
                 value={search}
                 sx={{
-                  flexGrow: 1, 
-                  maxWidth: { xs: "100%", sm: "250px" }, 
+                  flexGrow: 1,
+                  maxWidth: { xs: "100%", sm: "250px" },
                   "& .MuiInputBase-root": {
                     height: "34px",
                     fontSize: "14px",
                     borderRadius: "20px",
-                    width: "100%", 
+                    width: "100%",
                   },
                 }}
                 placeholder="Search User"
                 onChange={(e) => setSearch(e.target.value)}
                 InputProps={{
-                  endAdornment: (
+                  endAdornment: search && (
                     <IconButton
-                      size="small"
-                      title="Clear"
-                      aria-label="Clear"
                       onClick={() => setSearch("")}
-                      sx={{ padding: 0, marginRight: "-4px" }} 
+                      sx={{ padding: 0, marginRight: "-4px" }}
                     >
                       <Icon icon="mdi:close" fontSize={20} />
                     </IconButton>
@@ -284,11 +281,11 @@ const UserManagementView = () => {
               textAlign="center"
             >
               <Typography variant="h5" color="textPrimary" gutterBottom>
-                Select a User
+                Chọn một người dùng
               </Typography>
               <Typography variant="body1" color="textSecondary">
-                Please select a user to display their assigned tasks and
-                projects
+                Vui lòng chọn một người dùng để hiển thị các nhiệm vụ được giao
+                và dự án của họ
               </Typography>
             </Box>
           )}
