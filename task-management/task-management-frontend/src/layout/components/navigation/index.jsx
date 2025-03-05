@@ -1,6 +1,5 @@
 import { Box, List, styled } from "@mui/material";
 import { useState, useRef } from "react";
-import PerfectScrollbar from "react-perfect-scrollbar";
 import PropTypes from "prop-types";
 import { hexToRGBA } from "../../../components/utils/hex-to-rgba";
 import Drawer from "./Drawer";
@@ -28,7 +27,7 @@ const StyledBoxForShadow = styled(Box)(({ theme }) => ({
 }));
 
 const Navigation = (props) => {
-  const { hidden, navCollapsed } = props;
+  const { navCollapsed } = props;
 
   const [navHover, setNavHover] = useState(false);
   const [groupActive, setGroupActive] = useState([]);
@@ -36,21 +35,9 @@ const Navigation = (props) => {
 
   const shadowRef = useRef(null);
 
-  const handleInfiniteScroll = (ref) => {
-    if (ref) {
-      ref._getBoundingClientRect = ref.getBoundingClientRect;
-
-      ref.getBoundingClientRect = () => {
-        const original = ref._getBoundingClientRect();
-
-        return { ...original, height: Math.floor(original.height) };
-      };
-    }
-  };
-
   const scrollMenu = (container) => {
     if (!beforeNavMenuContent) {
-      container = hidden ? container.target : container;
+      container = container.target;
       if (shadowRef && container.scrollTop > 0) {
         if (!shadowRef.current.classList.contains("scrolled")) {
           shadowRef.current.classList.add("scrolled");
@@ -61,23 +48,24 @@ const Navigation = (props) => {
     }
   };
 
-  const ScrollWrapper = hidden ? Box : PerfectScrollbar;
+  const ScrollWrapper = Box;
 
   return (
     <Drawer {...props} navHover={navHover} setNavHover={setNavHover}>
       <StyledBoxForShadow ref={shadowRef} />
       <Box sx={{ position: "relative", overflow: "hidden", mt: 12 }}>
         <ScrollWrapper
-          {...(hidden
-            ? {
-                onScroll: (container) => scrollMenu(container),
-                sx: { height: "100%", overflowY: "auto", overflowX: "hidden" },
-              }
-            : {
-                options: { wheelPropagation: false },
-                onScrollY: (container) => scrollMenu(container),
-                containerRef: (ref) => handleInfiniteScroll(ref),
-              })}
+          onScroll={(container) => scrollMenu(container)}
+          sx={{
+            height: "100%",
+            overflowY: "auto",
+            overflowX: "hidden",
+            "&::-webkit-scrollbar": {
+              display: "none",
+            },
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          }}
         >
           <List
             className="nav-items"
@@ -104,7 +92,6 @@ const Navigation = (props) => {
 };
 
 Navigation.propTypes = {
-  hidden: PropTypes.bool,
   navCollapsed: PropTypes.bool,
 };
 

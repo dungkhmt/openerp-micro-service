@@ -11,6 +11,7 @@ const endPoints = {
   getMembers: (id) => `/project-members/${id}`,
   addMember: `/project-members`,
   deleteMember: (projectId, memberId, roleId) => `/project-members/${projectId}/${memberId}/${roleId}`,
+  updateMemberRole: `/project-members`,
   getMyRole: (id) => `/project-members/${id}/my-role`,
 };
 
@@ -115,6 +116,16 @@ const ProjectService = {
   deleteMember: async (projectId, memberId, roleId, cb) => {
     try {
       const response = await privateClient.delete(endPoints.deleteMember(projectId, memberId, roleId));
+      if (response?.data && isFunction(cb)) cb(null, response.data);
+      return response?.data;
+    } catch (e) {
+      if (isFunction(cb)) cb(e);
+      else throw e;
+    }
+  },
+  updateMemberRole: async (data, cb) => {
+    try {
+      const response = await privateClient.put(endPoints.updateMemberRole, data);
       if (response?.data && isFunction(cb)) cb(null, response.data);
       return response?.data;
     } catch (e) {

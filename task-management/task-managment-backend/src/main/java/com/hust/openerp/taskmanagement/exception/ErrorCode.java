@@ -24,6 +24,12 @@ public enum ErrorCode {
     FILE_NOT_EXIST("E1004", "The file does not exist", HttpStatus.BAD_REQUEST),
     EVENT_NOT_EXIST("E1005", "The event does not exist", HttpStatus.BAD_REQUEST),
     PROJECT_MEMBER_NOT_EXIST("E1006", "The project member does not exist", HttpStatus.BAD_REQUEST),
+    ROLE_NOT_EXIST("E1007", "The role does not exist", HttpStatus.BAD_REQUEST),
+    SKILL_NOT_EXIST("E1008", "The skill does not exist", HttpStatus.BAD_REQUEST),
+    SKILL_EXIST("E1009", "The skill already exists. Please check the skill list before adding a new one", HttpStatus.BAD_REQUEST),
+    PRIORITY_EXIST("E1010", "The priority already exists. Please check the priority list before adding a new one", HttpStatus.BAD_REQUEST),
+    STATUS_EXIST("E1011", "The status already exists. Please check the status list before adding a new one", HttpStatus.BAD_REQUEST),
+    CATEGORY_EXIST("E1012", "The category already exists. Please check the category list before adding a new one", HttpStatus.BAD_REQUEST),
 
     // 401
 
@@ -36,12 +42,16 @@ public enum ErrorCode {
     NOT_A_MEMBER_OF_PROJECT("E0201",
             "You are not a member of this project, please contact the administrator to be added to the project",
             HttpStatus.FORBIDDEN),
-    NOT_OWNER_OF_PROJECT("E0202", "You are not the owner of this project to perform this action", HttpStatus.FORBIDDEN),
+    INSUFFICIENT_PERMISSIONS("E0202", "You do not have sufficient permissions to perform this action", HttpStatus.FORBIDDEN),
+    LAST_OWNER_CANNOT_LEAVE("E0203", "You are the last owner, please assign a new owner before leaving the project", HttpStatus.FORBIDDEN),
 
     // 404
 
     NO_HANDLER_FOUND("E0300", "No handler found", HttpStatus.NOT_FOUND),
     ITEM_NOT_FOUND("E0301", "Item not found", HttpStatus.NOT_FOUND),
+    PROJECT_NOT_FOUND("E0302", "Project not found", HttpStatus.NOT_FOUND),
+    TASK_NOT_FOUND("E0303", "Task not found", HttpStatus.NOT_FOUND),
+    EVENT_NOT_FOUND("E0304", "Event not found", HttpStatus.NOT_FOUND),
 
     // 405
 

@@ -13,11 +13,13 @@ import java.util.UUID;
 public interface ProjectMemberRepository
     extends JpaRepository<ProjectMember, ProjectMember.ProjectMemberId> {
 
-    @Query(value = "SELECT e.* FROM task_management_project_member e WHERE e.project_id = :projectId", nativeQuery = true)
+    @Query(value = "SELECT e.* FROM task_management_project_member e WHERE e.project_id = :projectId ORDER BY user_id", nativeQuery = true)
     List<ProjectMember> findAllProjectMemberByProjectId(@Param("projectId") UUID projectId);
 
     @Query(value = "SELECT COUNT(e.*)\\:\\:int FROM task_management_project_member e WHERE e.project_id = :projectId AND e.user_id = :memberId", nativeQuery = true)
     int isAddedMemberInProject(@Param("memberId") String memberId, @Param("projectId") UUID projectId);
     
     ProjectMember findByProjectIdAndUserId(UUID projectId, String userId);
+    
+    List<ProjectMember> findByProjectIdAndRoleId(UUID projectId, String roleId);
 }

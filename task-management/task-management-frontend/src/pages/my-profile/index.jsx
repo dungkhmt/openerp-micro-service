@@ -43,13 +43,12 @@ import { getRandomColorSkin } from "../../utils/color.util";
 
 const MyProfile = () => {
   const dispatch = useDispatch();
-  const { skill } = useSelector((state) => state);
-  const { user, userSkills } = useSelector((state) => state.myProfile);
+  const { skill, fetchLoading: skillFetchLoading } = useSelector((state) => state);
+  const { user, userSkills, fetchLoading: userFetchLoading } = useSelector((state) => state.myProfile);
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [firstName, setFirstName] = useState(null);
   const [lastName, setLastName] = useState(null);
   const [email, setEmail] = useState(null);
-  const [loading, setLoading] = useState(true);
   const { handleSubmit, control } = useForm();
   const [updateLoading, setUpdateLoading] = useState(false);
   const inputRef = useRef(null);
@@ -84,13 +83,11 @@ const MyProfile = () => {
 
   const setUserSkills = useCallback(() => {
     if (userSkills.length > 0 && skill.skills.length > 0) {
-      const selectedSkills = userSkills.map((userSkill) => {
-        return (
-          skill.skills.find(
-            (skill) => skill.skillId === userSkill.skill.skillId
-          ) || null
-        );
-      });
+      const selectedSkills = userSkills
+      .map((userSkill) => 
+        skill.skills.find((skill) => skill.skillId === userSkill.skill.skillId) || null
+      )
+      .filter(Boolean);
       setSelectedSkills(selectedSkills);
     }
   }, [userSkills, skill.skills]);
@@ -147,11 +144,10 @@ const MyProfile = () => {
       setLastName(user.lastName);
       setEmail(user.email);
       setUserSkills();
-      setLoading(false);
     }
   }, [setUserSkills, user]);
 
-  if (loading || updateLoading) {
+  if (skillFetchLoading || userFetchLoading || updateLoading) {
     return <CircularProgressLoading />;
   }
 

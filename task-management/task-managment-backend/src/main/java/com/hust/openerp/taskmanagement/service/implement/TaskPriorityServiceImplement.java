@@ -1,19 +1,27 @@
 package com.hust.openerp.taskmanagement.service.implement;
 
-import com.hust.openerp.taskmanagement.entity.TaskPriority;
-import com.hust.openerp.taskmanagement.repository.TaskPriorityRepository;
-import com.hust.openerp.taskmanagement.service.TaskPriorityService;
-import lombok.AllArgsConstructor;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.hust.openerp.taskmanagement.entity.TaskPriority;
+import com.hust.openerp.taskmanagement.exception.ApiException;
+import com.hust.openerp.taskmanagement.exception.ErrorCode;
+import com.hust.openerp.taskmanagement.repository.TaskPriorityRepository;
+import com.hust.openerp.taskmanagement.repository.TaskRepository;
+import com.hust.openerp.taskmanagement.service.TaskPriorityService;
+
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class TaskPriorityServiceImplement implements TaskPriorityService {
 
     private final TaskPriorityRepository taskPriorityRepository;
+    
+    private final TaskRepository taskRepository;
 
     @Override
     public TaskPriority getTaskPriorityById(String taskPriorityId) {
@@ -27,11 +35,22 @@ public class TaskPriorityServiceImplement implements TaskPriorityService {
 
     @Override
     public TaskPriority create(TaskPriority taskPriority) {
+    	if (taskPriorityRepository.existsById(taskPriority.getPriorityId())) {
+    		throw new ApiException(ErrorCode.PRIORITY_EXIST);
+        }
+    	
+    	String name = taskPriority.getPriorityName();
+    	taskPriorityRepository.findByPriorityName(name).ifPresent(existingPriority -> {
+        	throw new ApiException(ErrorCode.PRIORITY_EXIST);
+        });
         return taskPriorityRepository.save(taskPriority);
     }
 
     @Override
+    @Transactional
     public void delete(String priorityId) {
+    	taskRepository.updatePriorityToDefault(priorityId);
+    	
         taskPriorityRepository.deleteById(priorityId);
     }
 }

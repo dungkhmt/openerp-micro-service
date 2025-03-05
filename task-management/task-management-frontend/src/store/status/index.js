@@ -1,10 +1,39 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { StatusService } from "../../services/api/task-status.service";
+import { clearCache } from "../project/tasks";
+
+export const handleRejected = (state, action) => {
+  state.errors.push(action.payload || action.error);
+  state.fetchLoading = false;
+};
 
 export const fetchStatuses = createAsyncThunk(
-  "project/fetchStatuses",
+  "fetchStatuses",
   async () => {
     const statuses = await StatusService.getStatuses();
+    return statuses;
+  }
+);
+
+export const createStatus = createAsyncThunk(
+  "createStatus",
+  async (data, { dispatch, rejectWithValue }) => {
+    try {
+      const statuses = await StatusService.createStatus(data);
+      await dispatch(fetchStatuses());
+      return statuses;
+    } catch (e) {
+      return rejectWithValue(e.response?.data);
+    }
+  }
+);
+
+export const deleteStatus = createAsyncThunk(
+  "deleteStatus",
+  async ({ statusId }, { dispatch }) => {
+    const statuses = await StatusService.deleteStatus(statusId);
+    await dispatch(fetchStatuses());
+    dispatch(clearCache());
     return statuses;
   }
 );
@@ -34,10 +63,8 @@ export const statusSlice = createSlice({
         state.statuses = action.payload;
         state.fetchLoading = false;
       })
-      .addCase(fetchStatuses.rejected, (state, action) => {
-        state.errors.push(action.error);
-        state.fetchLoading = false;
-      });
+      .addCase(fetchStatuses.rejected, handleRejected)
+      .addCase(createStatus.rejected, handleRejected);
   },
 });
 

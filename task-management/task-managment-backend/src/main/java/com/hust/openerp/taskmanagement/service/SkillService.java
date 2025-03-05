@@ -12,4 +12,6 @@ public interface SkillService {
     Skill create(Skill skill);
 
     void delete(String skillId);
+
+	void update(String id, Skill updatedSkill);
 }

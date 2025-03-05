@@ -1,5 +1,9 @@
 package com.hust.openerp.taskmanagement.entity;
 
+import java.util.Date;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -24,5 +28,9 @@ public class Skill {
 
     @Column(name = "description")
     private String description;
+    
+    @CreationTimestamp
+    @Column(name = "created_stamp")
+    private Date createdStamp;
 
 }

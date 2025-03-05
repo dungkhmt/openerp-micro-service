@@ -5,7 +5,8 @@ import { UserService } from "../../services/api/user.service";
 export const fetchUser = createAsyncThunk(
   "fetchUser",
   async () => {
-    return await UserService.getUser();
+    const user = await UserService.getUser();
+    return user;
   }
 );
 
