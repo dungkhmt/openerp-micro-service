@@ -20,6 +20,7 @@ import MainPage from "views/mainPage";
 import AssetManagementRouter from "./AssetManagementRouter";
 import TrainingFrogCourseRouter from "./TrainingFrogCourseRouter";
 import ExamTimeTablingRouter from "./ExamTimeTablingRouter"
+import WMSRouter from "./WMSRouter";
 const styles = {
   loadingProgress: {
     position: "fixed",
@@ -61,6 +62,10 @@ function MainAppRouter(props) {
           <PrivateRoute
             component={GeneralTimeTablingRouter}
             path="/general-time-tabling"
+          />
+          <PrivateRoute
+            component={WMSRouter}
+            path="/wms"
           />
           <PrivateRoute
             component={FirstYearTimeTablingRouter}

@@ -21,6 +21,8 @@ import openerp.openerpresourceserver.generaltimetabling.model.entity.general.Tim
 import openerp.openerpresourceserver.generaltimetabling.model.entity.occupation.RoomOccupation;
 
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Log4j2
@@ -55,26 +57,44 @@ public class V2ClassScheduler {
             for(Group g: groups){
                 mId2Group.put(g.getId(),g);
             }
+            Map<Long, List<Long>> mClassId2ListGroupIds = new HashMap<>();
+            for(ClassGroup cg: classGroups){
+                if(mClassId2ListGroupIds.get(cg.getClassId())==null){
+                    mClassId2ListGroupIds.put(cg.getClassId(),new ArrayList<>());
+                    mClassId2ListGroupIds.get(cg.getClassId()).add(cg.getGroupId());
+                }
+            }
             int groupIdx = -1;
+            /*
             Map<String, Integer> mGroupName2Index = new HashMap();
             for(int i = 0; i < classes.size(); i++){
                 GeneralClass gc = classes.get(i);
                 String group = gc.getGroupName();
-                //log.info("mapData, group " + group);
+                log.info("mapData, group " + group);
                 if(mGroupName2Index.get(group)==null){
                     groupIdx++;
                     mGroupName2Index.put(group,groupIdx);
-                    //log.info("mapData, put(" + group + "," + groupIdx);
+                    log.info("mapData, put(" + group + "," + groupIdx);
                 }
             }
+             */
+            Map<Long, Integer> mGroupId2GroupIndex = new HashMap<>();
             Map<Long, List<Integer>> mClassId2GroupIndex = new HashMap();
             for(ClassGroup cg: classGroups){
                 if(mClassId2GroupIndex.get(cg.getClassId())==null)
                     mClassId2GroupIndex.put(cg.getClassId(),new ArrayList<>());
                 Group gr = mId2Group.get(cg.getGroupId());
                 if(gr != null) {
-                    int idxG = mGroupName2Index.get(gr.getGroupName());
-                    mClassId2GroupIndex.get(cg.getClassId()).add(idxG);
+                    //log.info("mapData, gr.GroupName = " + gr.getGroupName());
+                    //if(mGroupName2Index.get(gr.getGroupName())==null)
+                    //    log.info("mapData BUT dictionary got " + gr.getGroupName() + " null");
+                    //int idxG = mGroupName2Index.get(gr.getGroupName());
+                    if(mGroupId2GroupIndex.get(cg.getGroupId())==null){
+                        groupIdx+=1;
+                        mGroupId2GroupIndex.put(cg.getGroupId(),groupIdx);
+                    }
+                    //mClassId2GroupIndex.get(cg.getClassId()).add(idxG);
+                    mClassId2GroupIndex.get(cg.getClassId()).add(mGroupId2GroupIndex.get(cg.getGroupId()));
                 }
             }
             List<Integer>[] relatedGroups = new ArrayList[n];
@@ -119,7 +139,8 @@ public class V2ClassScheduler {
                         cls[idx] = gc.getId();//gc.getClassCode();
                         vol[idx] = 0;
                         if(gc.getQuantityMax() != null) vol[idx] = gc.getQuantityMax();
-                        groupId[idx] = mGroupName2Index.get(gc.getGroupName());
+                        groupId[idx] = 0;// not used, use relatedGroups instead //mGroupName2Index.get(gc.getGroupName());
+                        if(relatedGroups[idx].size() > 0) groupId[idx] = relatedGroups[idx].get(0);
                         parentClassId[idx] = gc.getParentClassId();
                         int start = -1;
                         int end = -1;
@@ -220,8 +241,13 @@ public class V2ClassScheduler {
         //data.print();
         Gson gson = new Gson();
         String json = gson.toJson(data);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        Date now = new Date();
+        String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(now);
+
+
         try {
-            PrintWriter out = new PrintWriter("timetable-" + data.getNbClassSegments() + ".json");
+            PrintWriter out = new PrintWriter("timetable-" + data.getNbClassSegments() + "-cls-" + timeStamp + ".json");
             out.print(json);
             out.close();
         } catch (Exception e) {

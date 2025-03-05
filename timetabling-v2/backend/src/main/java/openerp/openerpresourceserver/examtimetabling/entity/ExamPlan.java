@@ -31,6 +31,9 @@ public class ExamPlan {
     
     @Column(name = "end_time")
     private LocalDateTime endTime;
+
+    @Column(name = "start_week")
+    private Integer startWeek;
     
     @Column(name = "created_at")
     private LocalDateTime createdAt;

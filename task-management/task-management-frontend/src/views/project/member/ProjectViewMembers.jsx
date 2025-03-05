@@ -1,12 +1,14 @@
 import { Icon } from "@iconify/react";
 import {
   Box,
+  capitalize,
   Card,
   Divider,
   IconButton,
   Link,
   Menu,
   MenuItem,
+  Select,
   TextField,
   Tooltip,
   Typography,
@@ -21,11 +23,12 @@ import { usePreventOverflow } from "../../../hooks/usePreventOverflow";
 import { MenuAddMember } from "./MenuAddMember";
 import { DialogMemberTasks } from "./DialogMemberTasks";
 import { fetchTasksForMember } from "../../../store/project/tasks";
-import { deleteMember } from "../../../store/project";
-import { useParams } from "react-router";
+import { deleteMember, updateMemberRole } from "../../../store/project";
+import { useNavigate, useParams } from "react-router";
 import ConfirmationDialog from "../../../components/mui/dialog/ConfirmationDialog";
+import { CircularProgressLoading } from "../../../components/common/loading/CircularProgressLoading";
 
-const columns = (handleMemberClick, projectId, myRole) => {
+const columns = (handleMemberClick, projectId) => {
   const baseColumns = [
     {
       flex: 0.3,
@@ -100,49 +103,26 @@ const columns = (handleMemberClick, projectId, myRole) => {
       minWidth: 100,
       field: "role",
       headerName: "Role",
-      renderCell: ({ row }) => {
-        return (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              "& svg": { mr: 3, color: "rgba(255, 0, 0, 0.8)" },
-            }}
-          >
-            <Icon icon="mdi:account" fontSize={20} />
-            <Typography
-              noWrap
-              sx={{ color: "text.secondary", textTransform: "capitalize" }}
-            >
-              {row.roleId}
-            </Typography>
-          </Box>
-        );
-      },
-      display: "flex",
+      renderCell: ({ row }) => <RoleSelector member={row} />,
     },
-  ];
-
-  // Conditionally add the "Actions" field based on the role
-  if (myRole === "owner" || myRole === "member") {
-    baseColumns.push({
+    {
       flex: 0.1,
       minWidth: 60,
       sortable: false,
       field: "actions",
       headerName: "Actions",
       renderCell: ({ row }) => <RowOptions member={row} />,
-    });
-  }
+    },
+  ];
 
   return baseColumns;
 };
 
 const getContent = (user, member, project) => {
-  const fullName = `${member?.firstName ?? ""} ${
-    member?.lastName ?? ""
+  const fullName = `${member?.member.firstName ?? ""} ${
+    member?.member.lastName ?? ""
   }`.trim();
-  if (member.roleId === user.id) {
+  if (member.id === user.id) {
     return (
       <>
         Bạn có chắc chắn muốn rời khỏi dự án{" "}
@@ -164,25 +144,30 @@ const getContent = (user, member, project) => {
 const RowOptions = ({ member }) => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { project } = useSelector((state) => state.project);
-  const { user } = useSelector((state) => state.myProfile);
+  const navigate = useNavigate();
+  const { myRole, project } = useSelector((state) => state.project);
+  const { user, fetchLoading } = useSelector((state) => state.myProfile);
+
   const [anchorEl, setAnchorEl] = useState(null);
   const rowOptionsOpen = Boolean(anchorEl);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [memberToDelete, setMemberToDelete] = useState(null);
+
+  if (fetchLoading) return <CircularProgressLoading />;
 
   const handleRowOptionsClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleRowOptionsClose = () => {
     setAnchorEl(null);
   };
-
-  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-  const [memberToDelete, setMemberToDelete] = useState(null);
 
   const handleDeleteClick = (member) => {
     setMemberToDelete(member);
     setIsConfirmDialogOpen(true);
   };
+
   const handleConfirmDelete = async () => {
     if (!memberToDelete) return;
     try {
@@ -192,56 +177,68 @@ const RowOptions = ({ member }) => {
           memberId: memberToDelete.id,
           roleId: memberToDelete.roleId,
         })
-      );
-      toast.success("Xóa thành viên thành công");
+      ).unwrap();
+      if (user.id === memberToDelete.id) navigate(`/projects`);
+
+      if (user.id !== memberToDelete.id)
+        toast.success("Xóa thành viên thành công");
+      else toast.success("Rời dự án thành công");
     } catch (e) {
-      console.log(e);
-      toast.error("Lỗi khi xóa thành viên");
+      console.error(e);
     } finally {
       setIsConfirmDialogOpen(false);
       setMemberToDelete(null);
       handleRowOptionsClose();
     }
   };
+
   const handleCancelDelete = () => {
     setIsConfirmDialogOpen(false);
     setMemberToDelete(null);
   };
 
+  const canDelete = (targetMember) => {
+    if (user.id === targetMember.id) return true; // Everyone can delete themselves
+    if (myRole === "owner") return true; // Owners can delete anyone
+    if (myRole === "maintainer" && targetMember.roleId === "member")
+      return true; // Maintainers can delete members
+    return false;
+  };
+
   return (
     <>
-      <IconButton size="small" onClick={handleRowOptionsClick}>
-        <Icon icon="mdi:dots-vertical" />
-      </IconButton>
-      <Menu
-        keepMounted
-        anchorEl={anchorEl}
-        open={rowOptionsOpen}
-        onClose={handleRowOptionsClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        slotProps={{
-          paper: { style: { minWidth: "8rem" } },
-        }}
-      >
-        <MenuItem onClick={handleRowOptionsClose} sx={{ "& svg": { mr: 2 } }}>
-          <Icon icon="mdi:pencil-outline" fontSize={20} />
-          Sửa quyền
-        </MenuItem>
-        <MenuItem
-          onClick={() => handleDeleteClick(member)}
-          sx={{ "& svg": { mr: 2 } }}
-        >
-          <Icon icon="mdi:delete-outline" fontSize={20} />
-          {member.id === user.id ? `Rời dự án` : `Xóa`}
-        </MenuItem>
-      </Menu>
+      {canDelete(member) && (
+        <>
+          <IconButton size="small" onClick={handleRowOptionsClick}>
+            <Icon icon="mdi:dots-vertical" />
+          </IconButton>
+          <Menu
+            keepMounted
+            anchorEl={anchorEl}
+            open={rowOptionsOpen}
+            onClose={handleRowOptionsClose}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            slotProps={{
+              paper: { style: { minWidth: "8rem" } },
+            }}
+          >
+            <MenuItem
+              onClick={() => handleDeleteClick(member)}
+              sx={{ "& svg": { mr: 2 } }}
+            >
+              <Icon icon="mdi:delete-outline" fontSize={20} />
+              {member.id === user?.id ? `Rời dự án` : `Xoá thành viên`}
+            </MenuItem>
+          </Menu>
+        </>
+      )}
 
       <ConfirmationDialog
         open={isConfirmDialogOpen}
@@ -254,8 +251,95 @@ const RowOptions = ({ member }) => {
   );
 };
 
+const RoleSelector = ({ member }) => {
+  const [role, setRole] = useState(member.roleId);
+  const roles = ["owner", "maintainer", "member"];
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const { myRole } = useSelector((state) => state.project);
+  const { user, fetchLoading } = useSelector((state) => state.myProfile);
+
+  if (fetchLoading) return <CircularProgressLoading />;
+  if (myRole !== "owner" || member.id === user.id) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          height: "100%",
+          cursor: "default",
+        }}
+      >
+        <Typography
+          sx={{
+            color: "text.secondary",
+            textTransform: "capitalize",
+          }}
+        >
+          {role}
+        </Typography>
+      </Box>
+    );
+  }
+
+  const handleRoleChange = async (memberId, newRole) => {
+    try {
+      await dispatch(
+        updateMemberRole({
+          projectId: id,
+          userId: memberId,
+          roleId: newRole,
+        })
+      ).unwrap();
+
+      toast.success("Cập nhật vai trò thành công");
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleChange = (event) => {
+    const newRole = event.target.value;
+    if (newRole === role) return;
+    setRole(newRole);
+    handleRoleChange(member.id, newRole);
+  };
+
+  return (
+    <Select
+      value={role}
+      onChange={handleChange}
+      variant="standard"
+      sx={{
+        "&.MuiInputBase-root::before, &.MuiInputBase-root::after, &.MuiInputBase-root:hover:not(.Mui-disabled)::before":
+          {
+            borderBottom: "none !important",
+          },
+        "& .MuiSelect-select:focus": {
+          backgroundColor: "transparent",
+        },
+        color: "text.secondary",
+        textTransform: "capitalize",
+      }}
+    >
+      {roles.map((roleOption) => {
+        const displayText = capitalize(roleOption);
+        return (
+          <MenuItem
+            key={roleOption}
+            value={roleOption}
+            sx={{ textTransform: "capitalize" }}
+          >
+            {displayText}
+          </MenuItem>
+        );
+      })}
+    </Select>
+  );
+};
+
 const ProjectViewMembers = () => {
-  const { members, myRole} = useSelector((state) => state.project);
+  const { members } = useSelector((state) => state.project);
   const { memberTasks } = useSelector((state) => state.tasks);
   const { id: projectId } = useParams();
   const { ref, updateHeight } = usePreventOverflow();
@@ -301,7 +385,7 @@ const ProjectViewMembers = () => {
         if (!firstName && !lastName) {
           return false;
         }
-        
+
         const fullName = `${firstName} ${lastName}`.toLowerCase();
         const id = member.member.id.toLowerCase();
         const email = member.member.email?.toLowerCase() ?? "";
@@ -313,7 +397,6 @@ const ProjectViewMembers = () => {
       })
     );
   }, [search, members]);
-  
 
   useEffect(() => {
     updateHeight(20);
@@ -369,7 +452,7 @@ const ProjectViewMembers = () => {
               ...member,
               id: member.member.id,
             }))}
-            columns={columns(handleMemberClick, projectId, myRole)}
+            columns={columns(handleMemberClick, projectId)}
             // checkboxSelection
             disableRowSelectionOnClick
             pageSizeOptions={[10, 25, 50]}
@@ -390,6 +473,10 @@ const ProjectViewMembers = () => {
 };
 
 RowOptions.propTypes = {
+  member: PropTypes.object.isRequired,
+};
+
+RoleSelector.propTypes = {
   member: PropTypes.object.isRequired,
 };
 

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -39,6 +40,12 @@ public class ExamTimetableAssignment {
     
     @Column(name = "exam_session_id")
     private String examSessionId;
+
+    @Column(name = "week_number", nullable = true)
+    private Integer weekNumber;
+    
+    @Column(name = "date", nullable = true)
+    private LocalDate date;
     
     @Column(name = "created_at")
     private LocalDateTime createdAt;

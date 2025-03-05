@@ -44,6 +44,14 @@ const GeneralPlanClassOpenScreen = () => {
       setImportLoading(true);
       const formData = new FormData();
       formData.append("file", selectedFile);
+      
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Accept': 'application/json'
+        }
+      };
+
       request(
         "post",
         `/excel/upload-plan?semester=${selectedSemester?.semester}&createclass=T`,
@@ -54,7 +62,7 @@ const GeneralPlanClassOpenScreen = () => {
           setPlanClasses(res?.data);
         },
         (err) => {
-          if(err.response.status === 410) {
+          if(err.response?.status === 410) {
             toast.error(err.response.data);
           } else {
             toast.error("Có lỗi khi upload file!");
@@ -63,9 +71,7 @@ const GeneralPlanClassOpenScreen = () => {
           console.log(err);
         },
         formData,
-        {
-          "Content-Type": "multipart/form-data",
-        }
+        config
       );
     }
   };

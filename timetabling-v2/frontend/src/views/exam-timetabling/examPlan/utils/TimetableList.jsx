@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { useExamTimetableData } from 'services/useExamTimetableData';
 import {
   Box,
   Button,
@@ -59,7 +58,7 @@ const TimetableList = ({
             whiteSpace: 'nowrap',
             maxWidth: '100%'
           }}
-          onClick={() => history.push(`/exam-timetables/${params.row.id}`)}
+          onClick={() => history.push(`/exam-time-tabling/exam-timetable/${params.row.id}`)}
         >
           {params.value}
         </Typography>
@@ -110,7 +109,7 @@ const TimetableList = ({
           <IconButton 
             size="small" 
             color="primary" 
-            onClick={() => history.push(`/exam-timetables/${params.row.id}/view`)}
+            onClick={() => history.push(`/exam-time-tabling/exam-timetable/${params.row.id}`)}
           >
             <Visibility fontSize="small" />
           </IconButton>

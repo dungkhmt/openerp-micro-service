@@ -195,7 +195,7 @@ public class TaskServiceImplement implements TaskService {
 
 	@Override
 	public TaskDTO getTask(UUID taskId, String getterId) {
-		var task = taskRepository.findById(taskId).orElseThrow(() -> new ApiException(ErrorCode.TASK_NOT_EXIST));
+		var task = taskRepository.findById(taskId).orElseThrow(() -> new ApiException(ErrorCode.TASK_NOT_FOUND));
 
 		if (!projectMemberService.checkAddedMemberInProject(getterId, task.getProjectId())) {
 			throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_PROJECT);
@@ -252,7 +252,7 @@ public class TaskServiceImplement implements TaskService {
 	}
 
 	public List<TaskDTO> getEventTasks(String userId, UUID eventId) {
-		var event = eventRepository.findById(eventId).orElseThrow(() -> new ApiException(ErrorCode.EVENT_NOT_EXIST));
+		var event = eventRepository.findById(eventId).orElseThrow(() -> new ApiException(ErrorCode.EVENT_NOT_FOUND));
 		if (!projectMemberService.checkAddedMemberInProject(userId, event.getProjectId())) {
 			throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_PROJECT);
 		}
@@ -325,10 +325,9 @@ public class TaskServiceImplement implements TaskService {
     @Transactional
 	public TaskDTO updateTask(UUID taskId, UpdateTaskForm taskForm, String updateBy) {
 		List<TaskLogDetail> taskLogDetails = new ArrayList<>();
-		Task task = taskRepository.findById(taskId).orElse(null);
-		if (task == null) {
-			return null;
-		}
+		Task task = taskRepository.findById(taskId).orElseThrow(
+				() -> new ApiException(ErrorCode.TASK_NOT_EXIST));
+
 		Date updatedTime = new Date();
 		boolean isPushNoti = false;
 

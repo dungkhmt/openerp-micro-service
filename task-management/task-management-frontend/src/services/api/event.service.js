@@ -7,7 +7,6 @@ const endPoints = {
   createEvent: `/events`,
   updateEvent: (eventId) => `/events/${eventId}`,
   getEventUsers: (eventId) => `/event-users?eventId=${eventId}`,
-  addEventUser: `/event-users`,
   deleteEvent: (eventId) => `/events/${eventId}`,
 };
 

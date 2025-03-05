@@ -95,6 +95,23 @@ public interface TaskRepository extends JpaRepository<Task, UUID>, JpaSpecificat
             and t.due_date between CURRENT_DATE AND DATE_TRUNC('day', CURRENT_DATE + INTERVAL '?1 days') + INTERVAL '1 day' - INTERVAL '1 second'""", nativeQuery = true)
     List<Task> getTasksDueDateIntervalDay(Integer intervalDay);
     
+    @Modifying
+    @Query("UPDATE Task t SET t.assigneeId = NULL WHERE t.assigneeId = :memberId AND t.projectId = :projectId")
+    void unassignUserFromTasks(@Param("memberId") String memberId, @Param("projectId") UUID projectId);
+    
+    @Modifying
+    @Query("UPDATE Task t SET t.priorityId = 'NORMAL' WHERE t.priorityId = :priorityId")
+    void updatePriorityToDefault(@Param("priorityId") String priorityId);
+    
+    @Modifying
+    @Query("UPDATE Task t SET t.categoryId = 'REQUEST' WHERE t.categoryId = :categoryId")
+    void updateCategoryToDefault(@Param("categoryId") String categoryId);
+    
+    @Modifying
+    @Query("UPDATE Task t SET t.statusId = 'TASK_OPEN' WHERE t.statusId = :statusId")
+    void updateStatusToDefault(@Param("statusId") String statusId);
+
+    
     List<Task> findByEventId(UUID eventId);
     
     List<Task> findByProjectIdAndEventIdIsNull(UUID projectId);
@@ -104,4 +121,5 @@ public interface TaskRepository extends JpaRepository<Task, UUID>, JpaSpecificat
 
         Long getCount();
     }
+
 }

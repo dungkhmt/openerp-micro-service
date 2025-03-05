@@ -10,6 +10,7 @@ import TaskViewRight from "../../../../../views/task/TaskViewRight";
 import { usePreventOverflow } from "../../../../../hooks/usePreventOverflow";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import NotFound from "../../../../../views/errors/NotFound";
 
 const LeftLoading = () => (
   <Card sx={{ p: 6 }}>
@@ -78,8 +79,7 @@ const Task = () => {
   }, [window?.innerHeight, ref]);
 
   if (error) {
-    if (error.response?.status === 404)
-      return <h1>Không tìm thấy công việc</h1>;
+    if (error.response?.status === 404) return <NotFound />;
     else {
       toast.error("Có lỗi xảy ra khi tải dữ liệu");
       return null;
@@ -99,7 +99,7 @@ const Task = () => {
           } | ${project?.name ?? ""} | Task management`}
         </title>
       </Helmet>
-      <IconButton onClick={() => navigate(-1)} >
+      <IconButton onClick={() => navigate(-1)}>
         <Icon fontSize={24} icon="mdi:arrow-left" />
       </IconButton>
       <Box

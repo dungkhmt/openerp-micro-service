@@ -14,4 +14,6 @@ public interface UserSkillRepository extends JpaRepository<UserSkill, UUID> {
     List<UserSkill> findByUserId(String userId);
     
     void deleteByUserId(String userId);
+    
+    void deleteBySkillId(String skillId);
 }

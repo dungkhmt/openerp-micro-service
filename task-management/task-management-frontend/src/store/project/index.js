@@ -1,17 +1,23 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ProjectService } from "../../services/api/project.service";
+import { fetchEvents } from "./events";
+import { clearCache } from "./tasks";
 
 export const handleRejected = (state, action) => {
-  state.errors.push(action.error);
+  state.errors.push(action.payload || action.error);
   state.fetchLoading = false;
 };
 
 export const fetchProject = createAsyncThunk(
   "project/fetchProject",
-  async (projectId, { dispatch }) => {
-    dispatch(setLoading(true));
-    const project = await ProjectService.getProject(projectId);
-    return project;
+  async (projectId, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setLoading(true));
+      const project = await ProjectService.getProject(projectId);
+      return project;
+    } catch (e) {
+      return rejectWithValue(e.response?.data);
+    }
   }
 );
 
@@ -26,9 +32,13 @@ export const updateProject = createAsyncThunk(
 
 export const fetchMembers = createAsyncThunk(
   "project/fetchMembers",
-  async (projectId) => {
-    const members = await ProjectService.getMembers(projectId);
-    return members;
+  async (projectId, { rejectWithValue }) => {
+    try {
+      const members = await ProjectService.getMembers(projectId);
+      return members;
+    } catch (e) {
+      return rejectWithValue(e.response?.data);
+    }
   }
 );
 
@@ -43,18 +53,45 @@ export const addMember = createAsyncThunk(
 
 export const deleteMember = createAsyncThunk(
   "project/deleteMember",
-  async ({projectId, memberId, roleId}, { dispatch }) => {
-    const members = await ProjectService.deleteMember(projectId, memberId, roleId);
-    await dispatch(fetchMembers(projectId));
-    return members;
+  async ({ projectId, memberId, roleId }, { dispatch, rejectWithValue }) => {
+    try {
+      const members = await ProjectService.deleteMember(
+        projectId,
+        memberId,
+        roleId
+      );
+      await dispatch(fetchMembers(projectId));
+      await dispatch(fetchEvents(projectId));
+      dispatch(clearCache());
+      return members;
+    } catch (e) {
+      return rejectWithValue(e.response?.data);
+    }
+  }
+);
+
+export const updateMemberRole = createAsyncThunk(
+  "project/updateMemberRole",
+  async (data, { dispatch, rejectWithValue }) => {
+    try {
+      const members = await ProjectService.updateMemberRole(data);
+      await dispatch(fetchMembers(data.projectId));
+      return members;
+    } catch (e) {
+      return rejectWithValue(e.response?.data);
+    }
   }
 );
 
 export const fetchMyRole = createAsyncThunk(
   "project/fetchMyRole",
-  async (projectId) => {
-    const role = await ProjectService.getMyRole(projectId);
-    return role;
+  async (projectId, { rejectWithValue }) => {
+    try {
+      const role = await ProjectService.getMyRole(projectId);
+      return role;
+    } catch (e) {
+      return rejectWithValue(e.response?.data);
+    }
   }
 );
 
@@ -77,7 +114,10 @@ export const projectSlice = createSlice({
       state.project = initialState.project;
       state.myRole = initialState.myRole;
       state.members = initialState.members;
-      state.fetchLoading = true;
+      state.fetchLoading = initialState.fetchLoading;
+      state.errors = initialState.errors;
+    },
+    clearErrors: (state) => {
       state.errors = [];
     },
   },
@@ -87,20 +127,31 @@ export const projectSlice = createSlice({
         state.project = action.payload;
         state.fetchLoading = false;
       })
+      .addCase(fetchProject.pending, (state) => {
+        state.fetchLoading = true;
+      })
       .addCase(fetchProject.rejected, handleRejected)
       .addCase(fetchMembers.fulfilled, (state, action) => {
         state.members = action.payload;
         state.fetchLoading = false;
+      })
+      .addCase(fetchMembers.pending, (state) => {
+        state.fetchLoading = true;
       })
       .addCase(fetchMembers.rejected, handleRejected)
       .addCase(fetchMyRole.fulfilled, (state, action) => {
         state.myRole = action.payload;
         state.fetchLoading = false;
       })
-      .addCase(fetchMyRole.rejected, handleRejected);
+      .addCase(fetchMyRole.pending, (state) => {
+        state.fetchLoading = true;
+      })
+      .addCase(fetchMyRole.rejected, handleRejected)
+      .addCase(deleteMember.rejected, handleRejected)
+      .addCase(updateMemberRole.rejected, handleRejected);
   },
 });
 
-export const { setLoading, resetProject } = projectSlice.actions;
+export const { setLoading, resetProject, clearErrors } = projectSlice.actions;
 
 export default projectSlice.reducer;

@@ -2,16 +2,26 @@ import { useQuery, useMutation} from 'react-query';
 import { toast } from 'react-toastify';
 import { examTimetableService } from "repositories/examTimetableRepository";
 import { queryClient } from 'queryClient';
+import { time } from 'echarts'
 
-export const useExamTimetableData = (examPlanId = null) => {
-  
+export const useExamTimetableData = (examPlanId = null, examTimetableId = null) => {
   const { data: examTimetables, isLoading, error } = useQuery(
     'examTimetables',
     () => examTimetableService.getAllExamTimetables(examPlanId),
     {
-      staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-      cacheTime: 30 * 60 * 1000, // Keep cache for 30 minutes
-      enabled: !!examPlanId,
+      // staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+      // cacheTime: 30 * 60 * 1000, // Keep cache for 30 minutes
+      // enabled: !!examPlanId,
+    }
+  );
+
+  const { data: timetable, isLoading: isLoadingDetail, error: errorDetail } = useQuery(
+    ['examTimetable', examTimetableId],
+    () => examTimetableService.getExamTimetableById(examTimetableId),
+    {
+      // staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+      // cacheTime: 30 * 60 * 1000, // Keep cache for 30 minutes
+      // enabled: !!examTimetableId,
     }
   );
 
@@ -38,7 +48,7 @@ export const useExamTimetableData = (examPlanId = null) => {
   const deleteMutation = useMutation(examTimetableService.deleteExamTimetable, {
     onSuccess: () => {
       queryClient.invalidateQueries('examTimetables');
-      toast.success('Xóa kế hoạc thi thành công!');
+      toast.success('Xóa kế hoạch thi thành công!');
     },
     onError: (error) => {
       toast.error(error.response?.data || 'Có lỗi xảy ra khi xóa kế hoạc thi');
@@ -55,5 +65,13 @@ export const useExamTimetableData = (examPlanId = null) => {
     isCreating: createMutation.isLoading,
     isUpdating: updateMutation.isLoading,
     isDeleting: deleteMutation.isLoading,
+    timetable: timetable?.data || {
+      assignments: [],
+      dates: [],
+      weeks: [],
+      slots: [], 
+    },
+    isLoadingDetail,
+    errorDetail,
   };
 };

@@ -31,7 +31,7 @@ public class TaskSkillServiceImplement implements TaskSkillService {
     @Override
     public List<Skill> getTaskSkills(UUID taskId, String userId) {
     	var task = taskRepository.findById(taskId).orElseThrow(
-                () -> new ApiException(ErrorCode.TASK_NOT_EXIST));
+                () -> new ApiException(ErrorCode.TASK_NOT_FOUND));
 
         if (!projectMemberService.checkAddedMemberInProject(userId, task.getProjectId())) {
             throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_PROJECT);

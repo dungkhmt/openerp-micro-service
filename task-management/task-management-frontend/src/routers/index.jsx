@@ -16,6 +16,7 @@ import TaskCreated from "../pages/tasks/create-by-me";
 import NotFound from "../views/errors/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import Redirect from "./Redirect";
+import { AttributeManager } from "../pages/task-attributes";
 
 export const router = createBrowserRouter([
   {
@@ -96,6 +97,10 @@ export const router = createBrowserRouter([
           {
             path: "/user-management",
             element: <UserManagement />,
+          },
+          {
+            path: "/attribute-management",
+            element: <AttributeManager />,
           },
           {
             path: "*",

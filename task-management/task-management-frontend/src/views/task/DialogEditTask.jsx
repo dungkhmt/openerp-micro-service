@@ -40,6 +40,8 @@ import ItemSelector from "../../components/mui/dialog/ItemSelector";
 import { useDispatch } from "react-redux";
 import { fetchEvents } from "../../store/project/events";
 import { useParams } from "react-router";
+import { clearCache } from "../../store/project/tasks";
+import { removeDiacritics } from "../../utils/stringUtils.js";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />;
@@ -64,7 +66,7 @@ const DialogEditTask = ({ open, setOpen }) => {
   const handleSkillSearch = (search) => {
     setFilteredSkills(
       skill.skills.filter((item) =>
-        item.name.toLowerCase().includes(search.toLowerCase())
+        removeDiacritics(item.name).toLowerCase().includes(search.toLowerCase())
       )
     );
   };
@@ -85,7 +87,7 @@ const DialogEditTask = ({ open, setOpen }) => {
   const handleEventSearch = (search) => {
     setFilteredEvents(
       events.filter((item) =>
-        item.name.toLowerCase().includes(search.toLowerCase())
+        removeDiacritics(item.name).toLowerCase().includes(search.toLowerCase())
       )
     );
   };
@@ -107,8 +109,12 @@ const DialogEditTask = ({ open, setOpen }) => {
     setFilteredAssignees(
       members.filter(
         ({ member }) =>
-          member.firstName.toLowerCase().includes(search.toLowerCase()) ||
-          member.lastName.toLowerCase().includes(search.toLowerCase())
+          removeDiacritics(member.firstName)
+            .toLowerCase()
+            .includes(search.toLowerCase()) ||
+          removeDiacritics(member.lastName)
+            .toLowerCase()
+            .includes(search.toLowerCase())
       )
     );
   };
@@ -154,8 +160,8 @@ const DialogEditTask = ({ open, setOpen }) => {
       await TaskService.updateTaskSkills(task.id, skillIdList);
 
       const originalEventId = task.event ? task.event.id : null;
-      if (updatedEventId !== originalEventId) await dispatch(fetchEvents(id));
-
+      if (updatedEventId !== originalEventId) dispatch(fetchEvents(id));
+      dispatch(clearCache());
       toast.success("Cập nhật nhiệm vụ thành công");
       setIsUpdate(!isUpdate);
       setOpen(false);
@@ -489,11 +495,30 @@ const DialogEditTask = ({ open, setOpen }) => {
                 selectedItems={selectedEvents}
                 onSelectChange={handleEventChange}
                 handleSearch={handleEventSearch}
-                renderItem={(item) => <ListItemText primary={item.name} />}
+                renderItem={(item) => (
+                  <Typography
+                    sx={{
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {item.name}
+                  </Typography>
+                )}
                 renderSelectedItem={(items) => (
-                  <Box>
+                  <Box sx={{ maxWidth: 400 }}>
                     {items.map((item) => (
-                      <ListItemText key={item.skillId} primary={item.name} />
+                      <Typography
+                        key={item.id}
+                        sx={{
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {item.name}
+                      </Typography>
                     ))}
                   </Box>
                 )}

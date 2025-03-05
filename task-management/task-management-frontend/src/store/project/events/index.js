@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { EventService } from "../../../services/api/event.service";
+import { clearCache } from "../tasks";
 
 export const handleRejected = (state, action) => {
   state.errors.push(action.error);
@@ -28,6 +29,7 @@ export const updateEvent = createAsyncThunk(
   async ({ eventId, data, projectId }, { dispatch }) => {
     const res = await EventService.updateEvent(eventId, data);
     await dispatch(fetchEvents(projectId));
+    dispatch(clearCache());
     return res;
   }
 );
@@ -37,6 +39,7 @@ export const deleteEvent = createAsyncThunk(
   async ({ projectId, eventId }, { dispatch }) => {
     const res = await EventService.deleteEvent(eventId);
     await dispatch(fetchEvents(projectId));
+    dispatch(clearCache());
     return res;
   }
 );

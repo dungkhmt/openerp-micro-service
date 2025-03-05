@@ -14,4 +14,6 @@ public interface TaskSkillRepository extends JpaRepository<TaskSkill, UUID> {
 	List<TaskSkill> findByTaskId(UUID taskId);
 	
 	void deleteByTaskId(UUID taskId);
+	
+	void deleteBySkillId(String skillId);
 }

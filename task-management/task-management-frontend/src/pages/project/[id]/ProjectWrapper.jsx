@@ -10,6 +10,7 @@ import {
   fetchProject,
   resetProject,
   setLoading,
+  clearErrors,
 } from "../../../store/project";
 import { resetCalendarData } from "../../../store/project/calendar";
 import { resetGanttData } from "../../../store/project/gantt-chart";
@@ -17,9 +18,13 @@ import { fetchStatisticData } from "../../../store/project/statistic";
 import { resetTasksData } from "../../../store/project/tasks";
 import NotFound from "../../../views/errors/NotFound";
 import { fetchEvents, resetEvents } from "../../../store/project/events";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
+import { CircularProgressLoading } from "../../../components/common/loading/CircularProgressLoading";
 
 const ProjectWrapper = () => {
   const { id } = useParams();
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { fetchLoading, errors } = useSelector((state) => state.project);
   const { period } = useSelector((state) => state.statistic);
@@ -55,18 +60,18 @@ const ProjectWrapper = () => {
     fetchProjectData();
   }, [fetchProjectData]);
 
+  if (fetchLoading) return <CircularProgressLoading />;
+
   if (!fetchLoading && errors?.length > 0) {
-    const is404Or403 =
-      errors[0].message.includes("404") || errors[0].message.includes("403");
-    if (is404Or403)
-      return (
-        <>
-          <Helmet>
-            <title>Project Not Found | Task management</title>
-          </Helmet>
-          <NotFound />
-        </>
-      );
+    const firstError = errors[0];
+
+    if (firstError?.code?.includes("E03")) return <NotFound />;
+
+    if (firstError?.code?.includes("E02")) {
+      toast.error(t(firstError.message));
+      dispatch(clearErrors());
+      return <Outlet />;
+    }
 
     return (
       <>

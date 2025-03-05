@@ -9,6 +9,7 @@ import {
   TextField,
   Typography,
   InputAdornment,
+  IconButton,
 } from "@mui/material";
 import { Icon } from "@iconify/react";
 import PropTypes from "prop-types";
@@ -124,8 +125,8 @@ const ItemSelector = ({
             },
           }}
         >
-          {selectedItems.length > 0 ? (
-            <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1}}>
+          {selectedItems?.length > 0 ? (
+            <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
               {renderSelectedItem(selectedItems)}
             </Box>
           ) : (
@@ -165,6 +166,14 @@ const ItemSelector = ({
                 </InputAdornment>
               ),
               sx: { height: 40 },
+              endAdornment: search && (
+                <IconButton
+                  onClick={() => setSearch("")}
+                  sx={{ padding: 0, marginRight: "-4px" }}
+                >
+                  <Icon icon="mdi:close" fontSize={20} />
+                </IconButton>
+              ),
             }}
           />
         </Box>
@@ -194,7 +203,7 @@ const ItemSelector = ({
                   height: 50,
                 }}
               >
-                <Checkbox checked={selectedItems.includes(item)} />
+                <Checkbox checked={selectedItems?.includes(item) || false} />
                 {renderItem(item)}
               </ListItemButton>
             ))

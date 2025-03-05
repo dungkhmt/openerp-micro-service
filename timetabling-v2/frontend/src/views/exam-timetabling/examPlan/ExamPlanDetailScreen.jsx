@@ -30,9 +30,7 @@ const ExamPlanDetailPage = () => {
   const {
     examTimetables,
     isLoading: isLoadingTimetables,
-    deleteExamTimetable,
     createExamTimetable,
-    updateExamTimetable
   } = useExamTimetableData(id);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);

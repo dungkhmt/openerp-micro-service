@@ -59,15 +59,43 @@ const navigation = [
     ],
   },
   {
-    sectionTitle: "User Management",
+    sectionTitle: "Administration",
   },
   {
     title: "Quản lý nhân viên",
-    icon: "mdi:account-cog-outline",
+    icon: "mdi:users-group-outline",
     children: [
       {
         title: "Danh sách nhân viên",
         path: "/user-management",
+      },
+    ],
+  },
+  {
+    title: "Quản lý lịch họp",
+    icon: "mdi:event-multiple-check",
+    children: [
+      {
+        title: "Kế hoạch cuộc họp",
+        path: "/",
+      },
+      {
+        title: "Đăng ký phiên họp",
+        path: "/",
+      },
+      {
+        title: "Phiên họp của tôi",
+        path: "/",
+      },
+    ],
+  },
+  {
+    title: "Quản lý thuộc tính",
+    icon: "mdi:category-outline",
+    children: [
+      {
+        title: "Danh sách thuộc tính",
+        path: "/attribute-management",
       },
     ],
   },

@@ -1,5 +1,9 @@
 package com.hust.openerp.taskmanagement.entity;
 
+import java.util.Date;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -27,4 +31,8 @@ public class TaskStatus {
 
     @Column(name = "description")
     private String description;
+    
+    @CreationTimestamp
+    @Column(name = "created_stamp")
+    private Date createdStamp;
 }
