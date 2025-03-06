@@ -10,7 +10,7 @@ function DeliveryManagerRouter() {
     <Routes>
       <Route path="delivery-trip" element={<DeliveryTrip />} />
       <Route path="delivery-trip/add-trip" element={<AddTrip />} /> 
-      <Route path="delivery-trip/:id1" element={<DeliveryTripDetail/>} />
+      <Route path="delivery-trip/:id" element={<DeliveryTripDetail/>} />
       <Route path="delivery-trip/:id1/:id2" element={<DeliveryTripItem/>} />   
       <Route path="delivery-person" element={<DeliveryPerson />} />
       <Route path="shipments" element={<Shipment />} />

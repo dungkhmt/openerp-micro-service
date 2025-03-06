@@ -18,27 +18,53 @@ import {
 } from '@mui/material';
 import Map from '../../components/Map';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import fetchRoute from '../../utils/fetchRoute';
-import { formatDate, formatPrice } from '../../utils/utils';
+import { formatDate } from '../../utils/utils';
 
 const DeliveryTripDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [generalInfo, setGeneralInfo] = useState(null);
   const [deliverySequence, setDeliverySequence] = useState([]);
-  const [customerInfo, setCustomerInfo] = useState({});
   const [route, setRoute] = useState([]);
   const [loadingMap, setLoadingMap] = useState(true);
-  const [distance, setDistance] = useState(0);
   const [isMapOpen, setIsMapOpen] = useState(false);
 
+  useEffect(() => {
+    request('get', `/delivery-manager/delivery-trip/general-info/${id}`, (res) => {
+      setGeneralInfo(res.data);
+    });
+
+    request("get", `/delivery-manager/delivery-trip/customers/${id}`, (res) => {
+      setDeliverySequence(res.data);
+    });
+  }, [id]);
 
   const handleSubmit = async () => {
-
+    request("post", `/delivery-manager/delivery-trip/cancel?deliveryTripId=${id}`, (res) => {
+      if (res.status === 200) {
+        alert("Trip cancelled successfully !")
+        navigate(`/delivery-manager/delivery-trip`); // Redirect after success
+      }
+    }, {});
   };
 
   const handleToggleMap = () => {
     setIsMapOpen((prev) => !prev);
   };
+
+  useEffect(() => {
+    if (isMapOpen && id && route.length === 0) {
+      setLoadingMap(true);
+      request('get', `/delivery-manager/delivery-trip/paths/${id}`, (res) => {
+        if (res.status === 200) {
+          setRoute(res.data);
+        } else {
+          alert('Error fetching route data!');
+        }
+        setLoadingMap(false);
+      });
+    }
+  }, [isMapOpen, id, route]);
 
 
 
@@ -51,28 +77,46 @@ const DeliveryTripDetail = () => {
         <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
           Delivery Trip Detail
         </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{
-            marginLeft: 'auto',
-            backgroundColor: 'black',
-            color: 'white',
-            '&:hover': {
+        {
+          generalInfo && generalInfo.status === 'CREATED' &&
+          (<Button
+            variant="contained"
+            color="primary"
+            sx={{
+              marginLeft: 'auto',
               backgroundColor: 'black',
-              opacity: 0.75,
-            }
-          }}
-          onClick={handleSubmit}
-        >
-          Cancel
-        </Button>
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'black',
+                opacity: 0.75,
+              }
+            }}
+            onClick={handleSubmit}
+          >
+            Cancel
+          </Button>)
+        }
       </Box>
       <Box sx={{ mt: 4 }}>
         <Paper elevation={3} sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
             General information
           </Typography>
+          {generalInfo && (
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Typography><strong>Warehouse:</strong> {generalInfo.warehouseName}</Typography>
+                <Typography><strong>Delivery Person:</strong> {generalInfo.deliveryPersonName}</Typography>
+                <Typography><strong>Total Weight:</strong> {generalInfo.totalWeight} kg</Typography>
+                <Typography><strong>Total Locations:</strong> {generalInfo.totalLocations}</Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography><strong>Expected Delivery:</strong> {formatDate(generalInfo.expectedDeliveryStamp)}</Typography>
+                <Typography><strong>Status:</strong> {generalInfo.status}</Typography>
+                <Typography><strong>Description:</strong> {generalInfo.description}</Typography>
+              </Grid>
+            </Grid>
+          )}
 
         </Paper>
         <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
@@ -89,25 +133,25 @@ const DeliveryTripDetail = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>#</TableCell>
-                  <TableCell>Customer Name</TableCell>
-                  <TableCell>Phone Number</TableCell>
+                  <TableCell align="center">Customer Name</TableCell>
+                  <TableCell align="center">Phone Number</TableCell>
                   <TableCell>Customer Address</TableCell>
-                  <TableCell>Actions</TableCell>
+                  <TableCell align="center" >Items</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {deliverySequence &&
-                  deliverySequence.map((item, index) => (
+                  deliverySequence.map(item => (
                     <TableRow key={item.orderId}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{customerInfo[item.orderId]?.customerName || 'Loading...'}</TableCell>
-                      <TableCell>{customerInfo[item.orderId]?.customerPhoneNumber || 'Loading...'}</TableCell>
-                      <TableCell>{customerInfo[item.orderId]?.addressName || 'Loading...'}</TableCell>
+                      <TableCell>{item.sequence}</TableCell>
+                      <TableCell sx={{ textAlign: 'center' }}>{item.customerName}</TableCell>
+                      <TableCell sx={{ textAlign: 'center' }}>{item.customerPhoneNumber}</TableCell>
+                      <TableCell>{item.customerAddress}</TableCell>
                       {/* Action Icon */}
                       <TableCell sx={{ textAlign: 'center' }}>
                         <IconButton
                           color="primary"
-                          onClick={() => navigate(`/delivery-manager/delivery-trip`)}
+                          onClick={() => navigate(`/delivery-manager/delivery-trip/${id}/${item.orderId}`)}
                         >
                           <VisibilityIcon />
                         </IconButton>
@@ -119,7 +163,7 @@ const DeliveryTripDetail = () => {
           </TableContainer>
 
         </Paper>
-        
+
 
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
           <Button
@@ -159,7 +203,7 @@ const DeliveryTripDetail = () => {
                   textAlign: 'center',
                   marginBottom: 2,    // Spacing below title
                 }}>
-                  Distance : {(distance / 1000).toFixed(2)} km
+                  Distance : {(generalInfo.distance / 1000).toFixed(2)} km
                 </Typography>
 
                 <Box sx={{ height: '100%', borderRadius: 1, overflow: 'hidden' }}>

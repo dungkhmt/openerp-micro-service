@@ -284,11 +284,11 @@ const OrderItem = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Warehouse</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Bay Code</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Lot ID</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Quantity</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Status</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Warehouse</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Bay Code</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Lot ID</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

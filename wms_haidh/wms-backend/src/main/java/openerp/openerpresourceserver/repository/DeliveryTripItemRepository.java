@@ -34,6 +34,7 @@ public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripIt
 
 	@Query("""
 			    SELECT
+			        dti.deliveryTripItemId AS id,
 			        p.name AS productName,
 			        p.weight AS weight,
 			        dti.quantity AS quantity,

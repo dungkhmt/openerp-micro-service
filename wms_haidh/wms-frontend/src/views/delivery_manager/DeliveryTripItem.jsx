@@ -8,6 +8,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
+  TablePagination,
   TableHead,
   TableRow,
 } from '@mui/material';
@@ -15,7 +16,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router-dom';
 import { request } from "../../api";
 import Skeleton from "@mui/material/Skeleton";
- 
+
 
 const DeliveryTripItem = () => {
   const navigate = useNavigate();
@@ -25,6 +26,18 @@ const DeliveryTripItem = () => {
   const [rowsPerPage, setRowsPerPage] = useState(3);
   const [loading, setLoading] = useState(false);
   const [totalItems, setTotalItems] = useState(0);
+
+  useEffect(() => {
+    if (id1 && id2) {
+      setLoading(true);
+      request("get", `/delivery-manager/delivery-trip/items?deliveryTripId=${id1}&orderId=${id2}&page=${page}&size=${rowsPerPage}`, (res) => {
+        setDetails(res.data.content);
+        setTotalItems(res.data.totalElements);
+        setLoading(false);
+      }).catch(() => setLoading(false));
+    }
+  }, [id1, id2]);
+
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -88,10 +101,10 @@ const DeliveryTripItem = () => {
                   </TableRow>
                 ))
                 : details.map((detail) => (
-                  <TableRow key={detail.assignedOrderItemId}>
+                  <TableRow key={detail.id}>
                     <TableCell width={200}>{detail.productName}</TableCell>
                     <TableCell width={100}>{detail.weight}</TableCell>
-                    <TableCell width={100}>{detail.originalQuantity}</TableCell>
+                    <TableCell width={100}>{detail.quantity}</TableCell>
                     <TableCell width={120}>{detail.bayCode}</TableCell>
                     <TableCell width={120}>{detail.lotId}</TableCell>
                   </TableRow>

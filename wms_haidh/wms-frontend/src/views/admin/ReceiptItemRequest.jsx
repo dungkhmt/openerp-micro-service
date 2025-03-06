@@ -29,7 +29,7 @@ import { formatDate, formatPrice } from '../../utils/utils';
 
 const ReceiptPage = () => {
   const navigate = useNavigate();
-  const { id1,id2 } = useParams();
+  const { id1, id2 } = useParams();
   const [generalInfo, setGeneralInfo] = useState(null);
   const [bayOptions, setBayOptions] = useState([]);
   const [quantity, setQuantity] = useState('');
@@ -137,7 +137,7 @@ const ReceiptPage = () => {
               aria-label="Loading..."
               classNames={{
                 svg: "w-48 h-48 drop-shadow-lg", // Kích thước vòng tròn
-                indicator: (generalInfo && generalInfo.completed === 100) ? "stroke-green-400" : "stroke-orange-400",   
+                indicator: (generalInfo && generalInfo.completed === 100) ? "stroke-green-400" : "stroke-orange-400",
                 track: "stroke-gray-300",        // Màu nền vòng
               }}
               strokeWidth={2}
@@ -153,7 +153,7 @@ const ReceiptPage = () => {
               }}
             >
               <Typography variant="h4" >
-                {generalInfo ? generalInfo.completed :0}%
+                {generalInfo ? generalInfo.completed : 0}%
               </Typography>
               <Typography variant="subtitle1" >
                 {generalInfo && generalInfo.completed === 100 ? "Completed" : "In progress"}
@@ -327,12 +327,12 @@ const ReceiptPage = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Quantity</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Lot ID</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Bay Code</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Import Price</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Expired Date</TableCell>                  
-                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Receipt Bill ID</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Lot ID</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Bay Code</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Import Price</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Expired Date</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Receipt Bill ID</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -342,7 +342,7 @@ const ReceiptPage = () => {
                     <TableCell>{detail.lotId}</TableCell>
                     <TableCell>{detail.bayCode}</TableCell>
                     <TableCell>{formatPrice(detail.importPrice)}</TableCell>
-                    <TableCell>{formatDate(detail.expiredDate)}</TableCell>                 
+                    <TableCell>{formatDate(detail.expiredDate)}</TableCell>
                     <TableCell>{detail.receiptBillId}</TableCell>
                   </TableRow>
                 ))}

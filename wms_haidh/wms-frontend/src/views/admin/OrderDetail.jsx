@@ -48,11 +48,11 @@ const OrderDetail = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Product Name</TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Quantity</TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Price Unit</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Completed</TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Action</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold'}}>Product Name</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>Price Unit</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Completed</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

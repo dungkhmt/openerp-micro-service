@@ -24,6 +24,7 @@ import { request } from "../../api";
 
 const statusColorMap = {
   CREATED: "default",
+  CANCELLED: "destructive",
   DELIVERING: "warning",
   DONE: "success",
 };

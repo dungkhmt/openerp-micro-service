@@ -18,43 +18,43 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { request } from '../../api';
 
 const ReceiptApproveDetail = () => {
- const navigate = useNavigate();
-   const { receiptId } = useParams();
-   const [receiptDetails, setReceiptDetails] = useState([]);
- 
-   useEffect(() => {
-     request("get", `/purchase-manager/receipts/${receiptId}`, (res) => {
-       setReceiptDetails(res.data);
-     });
-   }, [receiptId]);
- 
-   const handleApprove = () => {
-     request(
-       "post",
-       `/purchase-manager/process-receipts/approve/${receiptId}?approvedBy=admin`,
-       (res) => {
-         if (res.status === 200) {
-           navigate(`/purchase-manager/process-receipts`);
-         } else {
-           alert("Error approving receipt!");
-         }
-       }
-     );
-   };
- 
-   const handleCancel = () => {
-     request(
-       "post",
-       `/purchase-manager/process-receipts/cancel/${receiptId}?cancelledBy=admin`,
-       (res) => {
-         if (res.status === 200) {
-           navigate(`/purchase-manager/process-receipts`);
-         } else {
-           alert("Error rejecting receipt!");
-         }
-       }
-     );
-   };
+  const navigate = useNavigate();
+  const { receiptId } = useParams();
+  const [receiptDetails, setReceiptDetails] = useState([]);
+
+  useEffect(() => {
+    request("get", `/purchase-manager/receipts/${receiptId}`, (res) => {
+      setReceiptDetails(res.data);
+    });
+  }, [receiptId]);
+
+  const handleApprove = () => {
+    request(
+      "post",
+      `/purchase-manager/process-receipts/approve/${receiptId}?approvedBy=admin`,
+      (res) => {
+        if (res.status === 200) {
+          navigate(`/purchase-manager/process-receipts`);
+        } else {
+          alert("Error approving receipt!");
+        }
+      }
+    );
+  };
+
+  const handleCancel = () => {
+    request(
+      "post",
+      `/purchase-manager/process-receipts/cancel/${receiptId}?cancelledBy=admin`,
+      (res) => {
+        if (res.status === 200) {
+          navigate(`/purchase-manager/process-receipts`);
+        } else {
+          alert("Error rejecting receipt!");
+        }
+      }
+    );
+  };
 
   return (
     <Box sx={{ p: 3 }}>
@@ -76,9 +76,9 @@ const ReceiptApproveDetail = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Product Name</TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Quantity</TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Warehouse</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Product Name</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>Warehouse</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

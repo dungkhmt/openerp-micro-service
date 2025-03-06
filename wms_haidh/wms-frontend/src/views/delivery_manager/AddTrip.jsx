@@ -443,10 +443,9 @@ const AddTrip = () => {
                     <TableHead>
                       <TableRow>
                         <TableCell>#</TableCell>
-                        <TableCell>Customer Name</TableCell>
+                        <TableCell align="center">Customer Name</TableCell>
+                        <TableCell align="center">Phone Number</TableCell>
                         <TableCell>Customer Address</TableCell>
-                        <TableCell>Total Order Cost</TableCell>
-                        <TableCell>Payment Type</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -455,10 +454,9 @@ const AddTrip = () => {
                           {(provided) => (
                             <TableRow ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                               <TableCell>{index + 1}</TableCell>
-                              <TableCell>{customerInfo[item.orderId]?.customerName || 'Loading...'}</TableCell>
-                              <TableCell>{customerInfo[item.orderId]?.addressName || 'Loading...'}</TableCell>
-                              <TableCell>{customerInfo[item.orderId] ? formatPrice(customerInfo[item.orderId].totalOrderCost) : 'Loading...'}</TableCell>
-                              <TableCell>{customerInfo[item.orderId]?.paymentType || 'Loading...'}</TableCell>
+                              <TableCell sx={{ textAlign: 'center' }}>{customerInfo[item.orderId]?.customerName || 'Loading...'}</TableCell>
+                              <TableCell sx={{ textAlign: 'center' }}>{customerInfo[item.orderId]?.customerPhoneNumber || 'Loading...'}</TableCell>
+                              <TableCell>{customerInfo[item.orderId]?.addressName || 'Loading...'}</TableCell>                      
                             </TableRow>
                           )}
                         </Draggable>

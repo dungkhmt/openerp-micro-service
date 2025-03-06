@@ -109,9 +109,9 @@ const SaleOrderDetail = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Product Name</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Quantity</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', borderTop: '1px solid rgba(224, 224, 224, 1)' }}>Price Unit</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Product Name</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Price Unit</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

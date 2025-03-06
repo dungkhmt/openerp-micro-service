@@ -33,11 +33,10 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 	@Query("""
 			    SELECT
 			        o.customerName AS customerName,
+			        o.customerPhoneNumber AS customerPhoneNumber,
 			        ca.addressName AS addressName,
 			        ca.longitude AS longitude,
-			        ca.latitude AS latitude,
-			        o.totalOrderCost AS totalOrderCost,
-			        o.paymentType AS paymentType
+			        ca.latitude AS latitude
 			    FROM Order o
 			    JOIN CustomerAddress ca ON o.customerAddressId = ca.customerAddressId
 			    WHERE o.orderId = :orderId

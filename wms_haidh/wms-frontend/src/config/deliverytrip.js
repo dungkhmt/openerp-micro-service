@@ -10,6 +10,7 @@ const columns = [
   
   const statusOptions = [
     { name: "CREATED", uid: "CREATED" },
+    { name: "CANCELLED", uid: "CANCELLED" },
     { name: "DELIVERING", uid: "DELIVERING" },
     { name: "DONE", uid: "DONE" },
   ];

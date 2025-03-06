@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 
 public interface DeliveryItemDetailProjection {
     
+	String getId();
+	
     String getProductName();
 
     BigDecimal getWeight();
