@@ -60,5 +60,29 @@ public enum OrderStatus {
     public static boolean isValidTransition(OrderStatus currentStatus, OrderStatus newStatus) {
         return getAllowedNextStatuses(currentStatus).contains(newStatus);
     }
+    // Get the full lifecycle of a package
+    public static List<OrderStatus> getFullLifecycle() {
+        return Arrays.asList(
+                PENDING,           // Initial order created
+                ASSIGNED,          // Assigned to collector
+                COLLECTED_COLLECTOR, // Picked up by collector
+                COLLECTED_HUB,     // Arrived at origin hub
+                DELIVERING,        // In transit between hubs
+                DELIVERED,         // Arrived at destination hub
+                ASSIGNED_SHIPPER,  // Assigned to shipper for final delivery
+                SHIPPED,           // Out for delivery to recipient
+                COMPLETED          // Successfully delivered to recipient
+        );
+    }
+
+    // Get the third mile statuses
+    public static List<OrderStatus> getThirdMileStatuses() {
+        return Arrays.asList(
+                DELIVERED,         // Ready at destination hub
+                ASSIGNED_SHIPPER,  // Assigned to shipper
+                SHIPPED,           // Out for delivery
+                COMPLETED          // Successfully delivered
+        );
+    }
 }
 
