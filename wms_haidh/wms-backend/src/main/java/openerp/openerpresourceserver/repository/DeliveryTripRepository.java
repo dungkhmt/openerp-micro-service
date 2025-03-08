@@ -44,4 +44,6 @@ public interface DeliveryTripRepository extends JpaRepository<DeliveryTrip, Stri
             WHERE dt.isDeleted = false AND dt.deliveryTripId = :deliveryTripId
         """)
         Optional<DeliveryTripGeneralProjection> findDeliveryTripById(@Param("deliveryTripId") String deliveryTripId);
+    
+    Page<DeliveryTrip> findByShipmentId(String shipmentId, Pageable pageable);
 }

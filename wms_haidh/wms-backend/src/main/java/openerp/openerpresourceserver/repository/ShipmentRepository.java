@@ -13,5 +13,7 @@ import openerp.openerpresourceserver.entity.Shipment;
 public interface ShipmentRepository extends JpaRepository<Shipment, String> {
 
 	List<Shipment> findAllByOrderByExpectedDeliveryStampDesc();
+
 	Page<Shipment> findByShipmentIdContainingIgnoreCase(String shipmentId, Pageable pageable);
+
 }

@@ -249,7 +249,7 @@ const AddTrip = () => {
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
-          'Create New Delivery Trip'
+          Create New Delivery Trip
         </Typography>
         <Button
           variant="contained"
@@ -265,7 +265,7 @@ const AddTrip = () => {
           }}
           onClick={handleSubmit}
         >
-          {id ? 'Update Delivery Trip' : 'Save Trip'}
+          Save Trip
         </Button>
       </Box>
       <Box sx={{ mt: 4 }}>

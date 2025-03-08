@@ -20,7 +20,7 @@ import { columns, statusOptions } from "../../config/receiptadmin";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../api";
-import { formatDate, formatPrice } from '../../utils/utils';
+import { formatDate } from '../../utils/utils';
 const statusColorMap = {
   APPROVED: "secondary",    
   IN_PROGRESS: "warning",   

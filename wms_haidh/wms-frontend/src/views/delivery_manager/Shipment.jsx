@@ -13,17 +13,16 @@ import {
   DropdownMenu,
   DropdownItem,
   Pagination,
+  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter
 } from "@nextui-org/react";
 import { PlusIcon } from "../../components/icon/PlusIcon";
 import { VerticalDotsIcon } from "../../components/icon/VerticalDotsIcon";
 import { SearchIcon } from "../../components/icon/SearchIcon";
-import { columns, statusOptions } from "../../config/shipment";
+import { columns } from "../../config/shipment";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../api";
-import { formatDate, formatPrice } from '../../utils/utils';
-
-const INITIAL_VISIBLE_COLUMNS = ["shipmentId","expectedDeliveryStamp","createdBy", "actions"];
+import { formatDate } from '../../utils/utils';
 const buttonText = "Add Shipment";
 export default function Shipment() {
 
@@ -34,17 +33,16 @@ export default function Shipment() {
   const [pages, setPages] = useState(1);
   const [items, setItems] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDateTime, setSelectedDateTime] = useState("");
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedSearchTerm(filterValue);  // Chỉ cập nhật sau khi người dùng ngừng gõ
-    }, 500); // 1000ms = 1 giây
-
-    // Hủy bỏ timeout nếu người dùng tiếp tục gõ
+      setDebouncedSearchTerm(filterValue);  
+    }, 500); 
     return () => clearTimeout(timer);
   }, [filterValue]);
 
-  // useEffect để gửi request sau khi giá trị tìm kiếm đã debounce
   useEffect(() => {
     request("get", `/delivery-manager/shipments?page=${page - 1}&size=${rowsPerPage}&search=${debouncedSearchTerm}`, (res) => {
       setItems(res.data.content);
@@ -52,27 +50,6 @@ export default function Shipment() {
       setPages(res.data.totalPages);
     }).then();
   }, [page, rowsPerPage, debouncedSearchTerm]);
-
-  const [selectedKeys, setSelectedKeys] = useState(new Set([]));
-  const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
-  const [statusFilter, setStatusFilter] = useState("all");
-
-  const headerColumns = useMemo(() => {
-    if (visibleColumns === "all") return columns;
-
-    return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
-  }, [visibleColumns]);
-
-  const filteredItems = useMemo(() => {
-    let filteredItems = [...items];
-    if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
-      filteredItems = filteredItems.filter((item) =>
-        Array.from(statusFilter).includes(item.status),
-      );
-    }
-
-    return filteredItems;
-  }, [items, statusFilter]);
 
   const renderCell = useCallback((item, columnKey) => {
     const cellValue = item[columnKey];
@@ -88,8 +65,7 @@ export default function Shipment() {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem onClick={() => handleUpdate(item.id)}>Update</DropdownItem>
-                <DropdownItem onClick={() => handleDelete(item.id)}>Delete</DropdownItem>
+                <DropdownItem onPress={() => handleUpdate(item.shipmentId)}>View delivery trips</DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
@@ -115,35 +91,45 @@ export default function Shipment() {
 
   const navigate = useNavigate();
 
-  const handleAddShipment = () => {
-    navigate('/delivery-manager/delivery-person/add-shipment');
-  };
-
   const handleUpdate = (id) => {
-    navigate(`/delivery-manager/delivery-person/${id}`);
+    navigate(`/delivery-manager/shipments/${id}`);
   };
 
-  const handleDelete = (id) => {
-    // request(
-    //   "post", // HTTP method
-    //   "/admin/product/delete-product", // Endpoint for deleting product
-    //   (res) => {
-    //     if (res.status === 200) {
-    //       if (items.length === 1 && page > 1) setPage(page - 1);
-    //       request("get", `/admin/product?page=${page - 1}&size=${rowsPerPage}&search=${debouncedSearchTerm}`, (res) => {
-    //         setItems(res.data.content);
-    //         setTotalItems(res.data.totalElements);
-    //         setPages(res.data.totalPages);
-    //       }).then();
-
-    //     }
-    //   },
-    //   {
-    //     onError: (e) => console.error("Error deleting product:", e),
-    //   },
-    //   { id }
-    // );
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
   };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleConfirm = () => {
+    if (!selectedDateTime) return;
+    const formattedDateTime = `${selectedDateTime}:00`;
+
+    const payload = {
+      expectedDeliveryStamp: formattedDateTime,
+      createdBy: "admin",
+    };
+
+    const requestUrl = "/delivery-manager/shipment/create";
+
+    request("post", requestUrl, (res) => {
+      if (res.status === 200) {
+        request("get", `/delivery-manager/shipments?page=${page - 1}&size=${rowsPerPage}&search=${debouncedSearchTerm}`, (res) => {
+          setItems(res.data.content);
+          setTotalItems(res.data.totalElements);
+          setPages(res.data.totalPages);
+        }).then();
+      } else {
+        alert("Error occured !");
+      }
+    }, {}, payload);
+
+    handleCloseModal();
+  };
+
+
 
   const topContent = useMemo(() => {
     return (
@@ -158,13 +144,8 @@ export default function Shipment() {
             onClear={() => setDebouncedSearchTerm("")}
             onValueChange={onSearchChange}
           />
-          <div className="flex gap-3">            
-            <Button
-              className="bg-foreground text-background"
-              endContent={<PlusIcon />}
-              size="md"
-              onClick={handleAddShipment}
-            >
+          <div className="flex gap-3">
+            <Button className="bg-foreground text-background" endContent={<PlusIcon />} size="md" onPress={handleOpenModal}>
               {buttonText}
             </Button>
           </div>
@@ -207,11 +188,6 @@ export default function Shipment() {
           variant="light"
           onChange={setPage}
         />
-        {/* <span className="text-small text-default-400">
-          {selectedKeys === "all"
-            ? "All items selected"
-            : `${selectedKeys.size} of ${filteredItems.length} selected`}
-        </span> */}
       </div>
     );
   }, [page, pages]);
@@ -236,47 +212,64 @@ export default function Shipment() {
   );
 
   return (
-    <Table
-      isCompact
-      removeWrapper
-      aria-label="Example table with custom cells, pagination and sorting"
-      bottomContent={bottomContent}
-      bottomContentPlacement="outside"
-      checkboxesProps={{
-        classNames: {
-          wrapper: "after:bg-foreground after:text-background text-background",
-        },
-      }}
-      classNames={classNames}
-      selectedKeys={selectedKeys}
-      topContent={topContent}
-      topContentPlacement="outside"
-      onSelectionChange={setSelectedKeys}
-    >
-      <TableHeader columns={headerColumns}>
-        {(column) => (
-          <TableColumn
-            key={column.uid}
-            align={column.uid === "actions" ? "center" : "start"}
-            allowsSorting={column.sortable}
-          >
-            {column.name}
-          </TableColumn>
-        )}
-      </TableHeader>
-      <TableBody emptyContent={"Loading ..."} items={filteredItems}>
-        {(item) => (
-          <TableRow key={item.shipmentId}>
-            {(columnKey) => (
-              <TableCell>
-                {columnKey === "expectedDeliveryStamp"
-                  ? formatDate(item.expectedDeliveryStamp)
-                  : renderCell(item, columnKey)}
-              </TableCell>
-            )}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <>
+      <Table
+        isCompact
+        removeWrapper
+        aria-label="Example table with custom cells, pagination and sorting"
+        bottomContent={bottomContent}
+        bottomContentPlacement="outside"
+        checkboxesProps={{
+          classNames: {
+            wrapper: "after:bg-foreground after:text-background text-background",
+          },
+        }}
+        classNames={classNames}
+        topContent={topContent}
+        topContentPlacement="outside"
+      >
+        <TableHeader columns={columns}>
+          {(column) => (
+            <TableColumn
+              key={column.uid}
+              align={column.uid === "actions" ? "center" : "start"}
+              allowsSorting={column.sortable}
+            >
+              {column.name}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody emptyContent={"Loading ..."} items={items}>
+          {(item) => (
+            <TableRow key={item.shipmentId}>
+              {(columnKey) => (
+                <TableCell>
+                  {columnKey === "expectedDeliveryStamp"
+                    ? formatDate(item.expectedDeliveryStamp)
+                    : renderCell(item, columnKey)}
+                </TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+        <ModalContent>
+          <ModalHeader>Select Expected Delivery Time</ModalHeader>
+          <ModalBody>
+            <input
+              type="datetime-local"
+              value={selectedDateTime}
+              onChange={(e) => setSelectedDateTime(e.target.value)}
+              className="w-full p-2 border rounded"
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button onPress={handleCloseModal} variant="light">Cancel</Button>
+            <Button onPress={handleConfirm} color="primary">Confirm</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   );
 }

@@ -33,6 +33,7 @@ import openerp.openerpresourceserver.entity.projection.DeliveryTripGeneralProjec
 import openerp.openerpresourceserver.entity.projection.DeliveryTripPathProjection;
 import openerp.openerpresourceserver.entity.projection.DeliveryTripProjection;
 import openerp.openerpresourceserver.model.request.DeliveryTripRequest;
+import openerp.openerpresourceserver.model.request.ShipmentRequest;
 import openerp.openerpresourceserver.service.AssignedOrderItemService;
 import openerp.openerpresourceserver.service.DeliveryPersonService;
 import openerp.openerpresourceserver.service.DeliveryTripItemService;
@@ -167,6 +168,22 @@ public class DeliveryMangerController {
         } else {
             return ResponseEntity.badRequest().body("Delivery trip can only be cancelled if it is in CREATED status.");
         }
+    }
+	
+	@PostMapping("/shipment/create")
+    public ResponseEntity<Shipment> createShipment(@RequestBody ShipmentRequest request) {
+        Shipment shipment = shipmentService.createShipment(request);
+        return ResponseEntity.ok(shipment);
+    }
+	
+	@GetMapping("/shipment/delivery-trips")
+    public ResponseEntity<Page<DeliveryTrip>> getDeliveryTrips(
+            @RequestParam int page,
+            @RequestParam int size,
+            @RequestParam String shipmentId) {
+        
+        Page<DeliveryTrip> trips = deliveryTripService.getDeliveryTripsByShipmentId(page, size, shipmentId);
+        return ResponseEntity.ok(trips);
     }
 
 }
