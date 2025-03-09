@@ -39,6 +39,7 @@ import {order} from "./menuconfig/order";
 import {humanResources} from "./menuconfig/humanResources";
 import {statistics} from "./menuconfig/statistics";
 import {confirmOrder} from "./menuconfig/confirmOrder";
+import {middleMile} from "./menuconfig/middleMile";
 
 export const MENUS = [];
 
@@ -47,6 +48,7 @@ MENUS.push(hub);
 MENUS.push(order);
 MENUS.push(humanResources);
 MENUS.push(confirmOrder);
+MENUS.push(middleMile);
 MENUS.push(statistics);
 
 
@@ -56,10 +58,6 @@ menuIconMap.set(
   "Schedule",
   <EventNoteIcon />
   //   <img alt="Task Schedule icon" src={TaskScheduleIcon} height={24} width={24} />
-);
-menuIconMap.set(
-  "Teaching",
-  <img alt="Teaching icon" src={TeachingIcon} height={24} width={24} />
 );
 menuIconMap.set("DashboardIcon", <DashboardRoundedIcon />);
 menuIconMap.set("GiTeacher", <GiTeacher size={24} />);

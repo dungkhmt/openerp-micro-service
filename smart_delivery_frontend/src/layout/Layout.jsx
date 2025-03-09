@@ -32,6 +32,8 @@ const Main = styled("main")(({ theme, isOpen }) => ({
   flexGrow: 1,
   maxWidth: "100%",
   padding: theme.spacing(3),
+  paddingTop: theme.spacing(0), // Added this line for more top padding
+
   transition: theme.transitions.create(["maxWidth", "margin"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,

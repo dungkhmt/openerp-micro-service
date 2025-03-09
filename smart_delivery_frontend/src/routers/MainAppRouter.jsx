@@ -12,6 +12,7 @@ import HubScreen from "../views/HubScreen";
 import HubManagerRouters from "./HubManagerRouters";
 import OrderRouters from "./OrderRouters";
 import HumanManagerRouters from "./HumanManagerRouters";
+import MiddleMileRouter from "./MiddleMileRouter";
 
 const styles = {
   loadingProgress: {
@@ -43,6 +44,7 @@ function MainAppRouter(props) {
           <PrivateRoute  component={HubManagerRouters} path="/hubmanager" />
           <PrivateRoute  component={OrderRouters} path="/order" />
           <PrivateRoute  component={HumanManagerRouters} path="/employee" />
+          <PrivateRoute component={MiddleMileRouter} path="/middle-mile" />
 
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />

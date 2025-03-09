@@ -1,60 +1,31 @@
 import React, {useEffect, useState} from 'react';
 import {request} from "../../api";
 import IconButton from "@mui/material/IconButton";
-import MapIcon from "@mui/icons-material/Map";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import CheckIcon from '@mui/icons-material/Check';
-import SearchIcon from '@mui/icons-material/Search';
-import InputAdornment from '@mui/material/InputAdornment';
 import StandardTable from "../../components/StandardTable";
-import {Box, Button, FormControl, InputLabel, MenuItem, Modal, Select, TextField, Typography} from "@mui/material";
-import Maps from "../../components/map/map";
+import {Box, Button, FormControl, InputLabel, MenuItem, Modal, Select, Typography} from "@mui/material";
 import {useSelector} from "react-redux";
-import SaveIcon from "@mui/icons-material/Save";
 import {errorNoti, successNoti} from "../../utils/notification";
-import Toolbar from "@mui/material/Toolbar";
-import Tooltip from "@mui/material/Tooltip";
-import TableContainer from "@mui/material/TableContainer";
-import Table from "@mui/material/Table";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import TableCell from "@mui/material/TableCell";
-import TableSortLabel from "@mui/material/TableSortLabel";
-import TableBody from "@mui/material/TableBody";
 
-const OutOrder = () =>{
+const OutOrder = () => {
     const [orders, setOrders] = useState([]);
-    const [showAddModal, setShowAddModal] = useState(false);
-    const [selectedHub, setSelectedHub] = useState(null);
+    const [showOrderModal, setShowOrderModal] = useState(false);
     const hubId = useSelector((state) => state.auth.hubId);
     const [vehicles, setVehicles] = useState([]);
-    const [filteredVehicles, setFilteredVehicles] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedVehicle, setSelectedVehicle] = useState('');
     const [selectedOrderIds, setSelectedOrderIds] = useState([]);
+    const [selectedVehicleId, setSelectedVehicleId] = useState(null);
+    const [selectedVehicles, setSelectedVehicles] = useState([]); // This is for StandardTable's selection mechanism
+    const [direction, setDirection] = useState('OUTBOUND'); // Default direction
 
+    // Update selectedVehicleId whenever selectedVehicles changes
     useEffect(() => {
-        request("get", `/smdeli/ordermanager/order/collected-hub/${hubId}`, (res) => {
-            setOrders(res.data);
-        }).then();
-    }, []);
-
-    useEffect(() => {
-        // Filter vehicles when search term changes
-        if (vehicles.length > 0) {
-            const results = vehicles.filter(vehicle =>
-                (vehicle.plateNumber && vehicle.plateNumber.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                (vehicle.vehicleType && vehicle.vehicleType.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                (vehicle.status && vehicle.status.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                (vehicle.manufacturer && vehicle.manufacturer.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                (vehicle.model && vehicle.model.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                (vehicle.driverName && vehicle.driverName.toLowerCase().includes(searchTerm.toLowerCase()))
-            );
-            setFilteredVehicles(results);
+        if (selectedVehicles.length > 0) {
+            setSelectedVehicleId(selectedVehicles[0].vehicleId);
+        } else {
+            setSelectedVehicleId(null);
         }
-    }, [searchTerm, vehicles]);
+    }, [selectedVehicles]);
 
     const columns = [
         {
@@ -69,9 +40,21 @@ const OutOrder = () =>{
             title: "Người nhận",
             field: "recipientName",
         },
+        // {
+        //     title: "Loại hình",
+        //     field: "orderType"
+        // },
         {
-            title: "Loại hình",
-            field: "orderType"
+            title: "Hub đích",
+            field: "hubName",
+            renderCell: (rowData) => {
+                // Check if hubCode exists
+                if (rowData.hubCode) {
+                    return `${rowData.hubName}: ${rowData.hubCode}`;
+                }
+                // Fallback to just hubName if hubCode doesn't exist
+                return rowData.hubName;
+            }
         },
         {
             title: "Trạng thái",
@@ -91,7 +74,7 @@ const OutOrder = () =>{
                         <VisibilityIcon />
                     </IconButton>
                     <IconButton
-                        onClick={() => confirmHandle(rowData.id)}
+                        onClick={() => handleSaveVehicleSelection(rowData.id)}
                         color="success"
                     >
                         <CheckIcon />
@@ -101,69 +84,116 @@ const OutOrder = () =>{
         },
     ];
 
-    const handleShowLocation = (hub) => {
-        setSelectedHub(hub);
+    const vehicleColumns = [
+        {
+            title: "ID",
+            field: "vehicleId",
+        },
+        {
+            title: "Biển số xe",
+            field: "plateNumber",
+        },
+        {
+            title: "Loại xe",
+            field: "vehicleType",
+        },
+        {
+            title: "Tình trạng",
+            field: "status",
+            renderCell: (rowData) => formatVehicleStatus(rowData.status)
+        },
+        {
+            title: "Nhà sản xuất",
+            field: "manufacturer"
+        },
+        {
+            title: "Mẫu xe",
+            field: "model"
+        },
+        {
+            title: "Tài xế",
+            field: "driverName"
+        }
+    ];
+
+    const handleEdit = (order) => {
+        window.location.href = `/hubmanager/hub/update/${order.id}`;
     };
 
-    const handleEdit = (hub) => {
-        window.location.href = `/hubmanager/hub/update/${hub.id}`;
+    useEffect(() => {
+            const fetchVehicles = () => {
+                request(
+                    "get",
+                    `smdeli/vehicle/getAll/${hubId}`,
+                    (res) => {
+                        setVehicles(res.data);
+                    },
+                    {
+                        500: () => errorNoti("Có lỗi xảy ra, vui lòng thử lại sau")
+                    }
+                );
+            }
+            fetchVehicles();
+        }
+        , [hubId]
+    )
+
+    // This function will be called when a vehicle row is clicked in the table
+    const handleVehicleRowClick = (event, selectedRow) => {
+        // If the vehicle is already selected, deselect it
+        if (selectedVehicles.some(v => v.vehicleId === selectedRow.vehicleId)) {
+            setSelectedVehicles([]);
+        } else {
+            // Otherwise select only this vehicle
+            setSelectedVehicles([selectedRow]);
+        }
     };
 
-    const confirmHandle = (selectedIds) => {
-        const ids = Array.isArray(selectedIds) && selectedIds.length > 1
-            ? selectedIds
-            : [selectedIds];
+    // Handle direction change
+    const handleDirectionChange = (event) => {
+        setDirection(event.target.value);
+    };
 
-        setSelectedOrderIds(ids);
-        setShowAddModal(true);
-        setSearchTerm('');
+    const handleFetchOrderForVehicle = () => {
+        if (!selectedVehicleId) {
+            errorNoti("Vui lòng chọn phương tiện vận chuyển");
+            return;
+        }
 
-        request(
-            "get",
-            `smdeli/vehicle/getAll/${hubId}`,
-            (res) => {
-                setVehicles(res.data);
-                setFilteredVehicles(res.data);
+        request("get", `/smdeli/middle-mile/orders/vehicle/${selectedVehicleId}/${hubId}/${direction}`, (res) => {
+                setOrders(res.data);
+                setShowOrderModal(true);
             },
             {
+                400: () => errorNoti("Dữ liệu không hợp lệ"),
                 500: () => errorNoti("Có lỗi xảy ra, vui lòng thử lại sau")
             }
         );
     };
 
-    const handleVehicleChange = (event) => {
-        setSelectedVehicle(event.target.value);
-    };
-
-    const handleSearchChange = (event) => {
-        setSearchTerm(event.target.value);
-    };
-
-    const handleSaveVehicleSelection = () => {
-        if (!selectedVehicle) {
+    const handleSaveVehicleSelection = (selectedIds) => {
+        if (!selectedVehicleId) {
             errorNoti("Vui lòng chọn phương tiện vận chuyển");
             return;
         }
+        const ids = Array.isArray(selectedIds) && selectedIds.length > 1
+            ? selectedIds
+            : [selectedIds];
+
+        setSelectedOrderIds(ids);
+        console.log("selected", selectedIds);
 
         // Gửi yêu cầu để lưu việc chọn phương tiện cho các đơn hàng
         request(
-            "post",
-            "smdeli/ordermanager/order/assign-vehicle",
+            "put",
+            `smdeli/ordermanager/out-hub/complete/${selectedOrderIds}/${selectedVehicleId}`,
             (res) => {
                 successNoti("Đã chọn phương tiện vận chuyển thành công");
-                setShowAddModal(false);
-                // Cập nhật lại danh sách đơn hàng
-                request("get", `/smdeli/ordermanager/order/collected-hub/${hubId}`, (res) => {
-                    setOrders(res.data);
-                }).then();
+                setShowOrderModal(true);
             },
             {
                 400: () => errorNoti("Dữ liệu không hợp lệ"),
                 500: () => errorNoti("Có lỗi xảy ra, vui lòng thử lại sau")
-            },
-            {
-                orderIds: selectedOrderIds,
-                vehicleId: selectedVehicle
             }
         );
     };
@@ -183,29 +213,67 @@ const OutOrder = () =>{
     return (
         <div>
             <StandardTable
-                title="Danh sách đơn hàng đã thu gom"
-                columns={columns}
-                data={orders}
-                rowKey="id"
-                editable={true}
-                deletable={false}
-                actions={[
-                    {
-                        iconOnClickHandle: confirmHandle,
-                        tooltip: "Duyệt xuất",
-                    }
-                ]}
+                title="Danh sách phương tiện vận chuyển"
+                columns={vehicleColumns}
+                data={vehicles}
+                rowKey="vehicleId"
+                onRowClick={handleVehicleRowClick}
+                selectedData={selectedVehicles}
                 options={{
                     selection: true,
-                    pageSize: 20,
+                    selectionProps: {
+                        color: 'primary'
+                    },
+                    pageSize: 5,
                     search: true,
                     sorting: true,
+                    headerStyle: {
+                        backgroundColor: '#f5f5f5',
+                        fontWeight: 'bold'
+                    }
                 }}
             />
 
+            {/* Status message showing selected vehicle */}
+            <Box sx={{mt: 2, p: 2, borderRadius: 1, bgcolor: selectedVehicleId ? '#e8f5e9' : '#f5f5f5'}}>
+                <Typography variant="body1" sx={{fontWeight: 'bold', color: selectedVehicleId ? 'green' : 'gray'}}>
+                    {selectedVehicleId ?
+                        `Phương tiện đã chọn: ${vehicles.find(v => v.vehicleId === selectedVehicleId)?.plateNumber || ''}` :
+                        'Vui lòng chọn phương tiện vận chuyển bằng cách nhấp vào hàng tương ứng'}
+                </Typography>
+            </Box>
+
+            {/* Direction selection */}
+            <Box sx={{mt: 2, display: 'flex', alignItems: 'center', gap: 2}}>
+                <FormControl sx={{minWidth: 200}}>
+                    <InputLabel id="direction-select-label">Hướng vận chuyển</InputLabel>
+                    <Select
+                        labelId="direction-select-label"
+                        id="direction-select"
+                        value={direction}
+                        label="Hướng vận chuyển"
+                        onChange={handleDirectionChange}
+                    >
+                        <MenuItem value="OUTBOUND">Chiều đi (OUTBOUND)</MenuItem>
+                        <MenuItem value="INBOUND">Chiều về (INBOUND)</MenuItem>
+                    </Select>
+                </FormControl>
+            </Box>
+
+            <Box sx={{display: 'flex', justifyContent: 'flex-end', mt: 3}}>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleFetchOrderForVehicle}
+                    disabled={!selectedVehicleId}
+                >
+                    Gán đơn hàng
+                </Button>
+            </Box>
+
             <Modal
-                open={showAddModal}
-                onClose={() => setShowAddModal(false)}
+                open={showOrderModal}
+                onClose={() => setShowOrderModal(false)}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
@@ -214,69 +282,50 @@ const OutOrder = () =>{
                         position: "absolute",
                         top: "50%",
                         left: "50%",
-                        width: "50%",
+                        width: "80%",
+                        maxHeight: "80vh", // Limit the modal height to 80% of viewport height
                         transform: "translate(-50%, -50%)",
                         bgcolor: "background.paper",
                         border: "2px solid #000",
                         boxShadow: 24,
                         p: 4,
+                        overflow: "auto", // Add scrolling to the modal if content exceeds height
                     }}
                 >
-                    <Typography variant="h6" component="h2" mb={3}>
-                        Chọn phương tiện vận chuyển
+                    <Typography variant="h6" component="h2" sx={{mb: 2}}>
+                        {'Danh sách đơn hàng'}
                     </Typography>
 
-                    <TextField
-                        fullWidth
-                        id="vehicle-search"
-                        label="Tìm kiếm phương tiện"
-                        variant="outlined"
-                        value={searchTerm}
-                        onChange={handleSearchChange}
-                        margin="normal"
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon />
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-
-                    <FormControl variant="outlined" fullWidth sx={{ mt: 2 }}>
-                        <InputLabel id="vehicle-select-label">Phương tiện</InputLabel>
-                        <Select
-                            labelId="vehicle-select-label"
-                            id="vehicle-select"
-                            value={selectedVehicle}
-                            label="Phương tiện"
-                            onChange={handleVehicleChange}
-                            variant="outlined"
-                        >
-                            {filteredVehicles && filteredVehicles.map((vehicle) => (
-                                <MenuItem key={vehicle.vehicleId} value={vehicle.vehicleId}>
-                                    {vehicle.plateNumber} - {vehicle.model} - {formatVehicleStatus(vehicle.status)}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={handleSaveVehicleSelection}
-                            startIcon={<SaveIcon />}
-                        >
-                            Lưu
-                        </Button>
-                        <Button
-                            variant="outlined"
-                            onClick={() => setShowAddModal(false)}
-                            sx={{ ml: 2 }}
-                        >
-                            Hủy
-                        </Button>
+                    <Box sx={{ maxHeight: "100vh" }}> {/* Container with max height for the table */}
+                        <StandardTable
+                            title={`Danh sách đơn hàng dành cho xe - ${direction === 'INBOUND' ? 'CHIỀU VỀ' : 'CHIỀU ĐI'}`}
+                            columns={columns}
+                            onRowClick={handleVehicleRowClick}
+                            data={orders}
+                            actions={[
+                                {
+                                    iconOnClickHandle: handleSaveVehicleSelection,
+                                    tooltip: "Duyệt xuất",
+                                }
+                            ]}
+                            options={{
+                                selection: true,
+                                pageSize: 10,
+                                search: true,
+                                sorting: true,
+                                maxBodyHeight: "350px", // Control table body height
+                            }}
+                            rowKey={"id"}
+                        />
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                            <Button
+                                variant="outlined"
+                                onClick={() => setShowOrderModal(false)}
+                                sx={{ ml: 1 }}
+                            >
+                                Đóng
+                            </Button>
+                        </Box>
                     </Box>
                 </Box>
             </Modal>
