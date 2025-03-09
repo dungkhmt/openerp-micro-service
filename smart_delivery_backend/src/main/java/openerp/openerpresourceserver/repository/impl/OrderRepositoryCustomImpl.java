@@ -3,7 +3,9 @@ package openerp.openerpresourceserver.repository.impl;
 import jakarta.ws.rs.NotFoundException;
 import openerp.openerpresourceserver.dto.OrderResponseDto;
 import openerp.openerpresourceserver.dto.OrderSummaryDTO;
+import openerp.openerpresourceserver.dto.OrderSummaryMiddleMileDto;
 import openerp.openerpresourceserver.entity.OrderItem;
+import openerp.openerpresourceserver.entity.enumentity.RouteDirection;
 import openerp.openerpresourceserver.repository.OrderRepositoryCustom;
 import openerp.openerpresourceserver.utils.SqlQueryUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +36,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 
 
     @Override
-    public OrderResponseDto findOrderDetailById(UUID id){
+    public OrderResponseDto findOrderDetailById(UUID id) {
         StringBuilder SQL1 = new StringBuilder();
         SQL1.append("SELECT O.*, ");
         SQL1.append("S.SENDER_ID, S.NAME AS SENDER_NAME, S.PHONE AS SENDER_PHONE, S.EMAIL AS SENDER_EMAIL, S.ADDRESS AS SENDER_ADDRESS, S.LONGITUDE AS SENDER_LONGITUDE, S.LATITUDE AS SENDER_LATITUDE, ");
@@ -64,7 +66,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
     }
 
     @Override
-    public List<OrderSummaryDTO> getCollectedColelctorList(UUID hubId){
+    public List<OrderSummaryDTO> getCollectedColelctorList(UUID hubId) {
         StringBuilder SQL = new StringBuilder();
         SQL.append("SELECT * FROM smartdelivery_order ");
         SQL.append("WHERE status = 'COLLECTED_COLLECTOR' ");
@@ -77,7 +79,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
     }
 
     @Override
-    public List<OrderSummaryDTO> getCollectedHubList(UUID hubId){
+    public List<OrderSummaryDTO> getCollectedHubList(UUID hubId) {
         StringBuilder SQL = new StringBuilder();
         SQL.append("SELECT * FROM smartdelivery_order ");
         SQL.append("WHERE status = 'COLLECTED_HUB' ");
@@ -88,5 +90,35 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 
         return sqlQueryUtil.queryForList(SQL.toString(), params, OrderSummaryDTO.class);
     }
+
+    // Search for available order for vehicle
+    @Override
+    public List<OrderSummaryMiddleMileDto> getCollectedCollectorListVehicle(UUID vehicleId, UUID hubId, RouteDirection routeDirection) {
+        StringBuilder SQL1 = new StringBuilder();
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("vehicleId", vehicleId);
+        params.addValue("hubId", hubId);
+        params.addValue("direction", routeDirection.name());
+
+        //Lấy route của vehicle, sau đó lấy các đơn hàng của hub có final hub nằm trong route và final hub.sequence> origin hub.sequence
+        SQL1.append("SELECT O.*, H_FINAL.code as hub_code, H_FINAL.name as hub_name FROM smartdelivery_vehicle V ");
+        SQL1.append("JOIN smartdelivery_route_vehicle RV ON V.vehicle_id = RV.vehicle_id and RV.direction = :direction ");
+        SQL1.append("JOIN smartdelivery_route_stop RS_CURRENT ON RV.route_id = RS_CURRENT.route_id AND RS_CURRENT.hub_id = :hubId ");
+        SQL1.append("JOIN smartdelivery_route_stop RS_FINAL ON RV.route_id = RS_FINAL.route_id ");
+        SQL1.append("JOIN smartdelivery_order O ON O.final_hub_id = RS_FINAL.hub_id ");
+        SQL1.append("JOIN smartdelivery_hub H_FINAL ON O.final_hub_id = H_FINAL.hub_id ");
+        SQL1.append("WHERE V.vehicle_id = :vehicleId ");
+        SQL1.append("AND O.final_hub_id = RS_FINAL.hub_id ");
+     if(routeDirection == RouteDirection.OUTBOUND){
+         SQL1.append("AND RS_CURRENT.stop_sequence < RS_FINAL.stop_sequence ");
+     }
+     else if(routeDirection == RouteDirection.INBOUND){
+         SQL1.append("AND RS_CURRENT.stop_sequence > RS_FINAL.stop_sequence ");
+     }
+        return sqlQueryUtil.queryForList(SQL1.toString(), params, OrderSummaryMiddleMileDto.class);
+    }
+
+    ;
+
 
 }

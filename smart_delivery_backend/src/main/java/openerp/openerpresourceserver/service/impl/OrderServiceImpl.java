@@ -255,10 +255,24 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public void deleteOrder(UUID orderId) {
-        Order order = orderRepo.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
+        Order order = orderRepo.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
+
+        // Store vehicle ID for load update if order is assigned to a vehicle
+        UUID vehicleId = order.getVehicleId();
+
+        // Delete order items
         orderItemRepo.deleteAllByOrderId(orderId);
+
+        // Delete the order
         orderRepo.deleteById(orderId);
-        logger.info("Deleted Order with ID: {}", orderId);
+
+        // Update vehicle load if order was assigned to a vehicle
+        if (vehicleId != null && order.getStatus() == OrderStatus.DELIVERING) {
+            assignmentService.decreaseVehicleLoad(vehicleId, orderId);
+        }
+
+        log.info("Deleted Order with ID: {}", orderId);
     }
 
     @Override
@@ -405,7 +419,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
     public boolean confirmCollectedHub(UUID[] orderIds) {
         List<UUID> orderIdList = Arrays.asList(orderIds);
         if (orderIdList.isEmpty()) {
@@ -431,10 +444,14 @@ public class OrderServiceImpl implements OrderService {
         }
         orderRepo.saveAll(updatedOrder);
         assignOrderCollectorRepository.saveAll(updatedAssignments);
+
+        assignmentService.assignMultipleOrdersToRoutes(orderIdList);
+
         return true;
     }
 
     @Override
+    @Transactional
     public boolean confirmOutHub(UUID[] orderIds, UUID vehicleId){
         List<UUID> orderIdList = Arrays.asList(orderIds);
         if (orderIdList.isEmpty()) {
@@ -454,6 +471,7 @@ public class OrderServiceImpl implements OrderService {
             order.setDriverName(vehicle.getDriverName());
             updatedOrder.add(order);
         }
+        orderRepo.saveAll(updatedOrder);
         return true;
     }
 
@@ -465,5 +483,35 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderSummaryDTO> getCollectedHubList(UUID hubId){
         return orderRepo.getCollectedHubList(hubId);
     }
+
+// Add this to the OrderServiceImpl class
+
+    @Transactional
+    public boolean markOrderDelivered(UUID orderId) {
+        Order order = orderRepo.findById(orderId)
+                .orElseThrow(() -> new NotFoundException("Order not found: " + orderId));
+
+        // Check if order is in a valid state
+        if (order.getStatus() != OrderStatus.DELIVERING) {
+            log.warn("Order {} is not in DELIVERING state, current status: {}", orderId, order.getStatus());
+            return false;
+        }
+
+        // Store vehicle ID for load update
+        UUID vehicleId = order.getVehicleId();
+
+        // Update order status
+        order.setStatus(OrderStatus.COMPLETED);
+        orderRepo.save(order);
+
+        // Decrease vehicle load
+        if (vehicleId != null) {
+            assignmentService.decreaseVehicleLoad(vehicleId, orderId);
+        }
+
+        return true;
+    }
+
+
 
 }

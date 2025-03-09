@@ -148,6 +148,12 @@ public class OrderController {
     public  ResponseEntity<List<OrderSummaryDTO>> getCollectedHubList(@PathVariable UUID hubId){
         return ResponseEntity.ok(orderService.getCollectedHubList(hubId));
     }
+//    @PreAuthorize("hasAnyRole('HUB_STAFF', 'HUB_MANAGER')")
+//    @GetMapping("/order/collected-hub/{vehicleId}/{hubId}")
+//    public  ResponseEntity<List<OrderSummaryDTO>> getCollectedHubListVehicle(@PathVariable UUID hubId,@PathVariable UUID vehicleId){
+//        return ResponseEntity.ok(orderService.getCollectedHubListVehicle(vehicleId, hubId));
+//    }
+
 
     @PreAuthorize("hasAnyRole('HUB_STAFF', 'HUB_MANAGER')")
     @PutMapping("/collected-hub/complete/{orderIds}")
@@ -157,11 +163,11 @@ public class OrderController {
     }
 
 
-    @PreAuthorize("hasAnyRole('HUB_STAFF', 'HUB_MANAGER')")
-    @PutMapping("/out-hub/complete/{orderIds}/{vehicleId}")
-    public ResponseEntity<String> confirmOutHub(@PathVariable UUID[] orderIds, @PathVariable UUID vehicleId) {
-        return orderService.confirmOutHub(orderIds, vehicleId) ? ResponseEntity.ok("OK") :
-                new ResponseEntity<>("FAIL", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+        @PreAuthorize("hasAnyRole('HUB_STAFF', 'HUB_MANAGER')")
+        @PutMapping("/out-hub/complete/{orderIds}/{vehicleId}")
+        public ResponseEntity<String> confirmOutHub(@PathVariable UUID[] orderIds, @PathVariable UUID vehicleId) {
+            return orderService.confirmOutHub(orderIds, vehicleId) ? ResponseEntity.ok("OK") :
+                    new ResponseEntity<>("FAIL", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
 }

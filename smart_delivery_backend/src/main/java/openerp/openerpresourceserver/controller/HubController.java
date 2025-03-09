@@ -24,7 +24,7 @@ public class HubController {
         this.hubService = hubService;
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'ROUTE_MANAGER')")
     @GetMapping("/hub")
     public ResponseEntity<List<HubGeneral>> getAllHubGeneral(){
         return ResponseEntity.ok(hubService.getAllHubGeneral());

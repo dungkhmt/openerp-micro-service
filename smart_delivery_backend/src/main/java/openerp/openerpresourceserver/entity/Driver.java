@@ -20,14 +20,15 @@ import java.util.UUID;
 @NoArgsConstructor
 @Table(name = "smartdelivery_driver")
 public class Driver extends Employee{
+
     private String licenseNumber;
-    private Enum<EmploymentStatus> employment_status;
+    @Enumerated(EnumType.STRING)
+    private EmploymentStatus employment_status;
 
     private UUID originHubId;
     private String originHubName;
 
     private UUID finalHubId;
     private String finalHubName;
-
 
 }

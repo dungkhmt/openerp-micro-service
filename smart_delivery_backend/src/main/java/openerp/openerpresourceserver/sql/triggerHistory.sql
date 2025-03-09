@@ -1,7 +1,7 @@
 -- auto-generated definition
 create table smartdelivery_order_history
 (
-    id                     uuid not null,
+    id                     uuid         not null,
     approved_by            varchar(255),
     cancelled_by           varchar(255),
     created_at             timestamp(6),
@@ -44,47 +44,51 @@ create table smartdelivery_order_history
     recipient_name         varchar(255),
     sender_name            varchar(255),
     shipper_name           varchar(255),
-    changed_at TIMESTAMP(6) NOT NULL,
-    changed_by VARCHAR(255) NOT NULL,
-    PRIMARY KEY (id, changed_at)  -- Đã thêm changed_at vào khóa chính
+    changed_at             TIMESTAMP(6) NOT NULL,
+    changed_by             VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id, changed_at) -- Đã thêm changed_at vào khóa chính
 
 );
 
 alter table smartdelivery_order_history
     owner to postgres;
 
-CREATE OR REPLACE FUNCTION move_order_to_history()
+CREATE
+OR REPLACE FUNCTION move_order_to_history()
     RETURNS TRIGGER AS $$
 BEGIN
     -- Chèn dữ liệu cũ vào bảng history
-INSERT INTO smartdelivery_order_history (
-    id, approved_by, cancelled_by, created_at, created_by, expected_delivery_date,
-    final_price, ship_price, total_price, updated_at, collector_id, final_hub_id,
-    origin_hub_id, recipient_id, sender_id, shipper_id, order_type, shipping_price,
-    hub_id, destination_address, origin, distance, status, collector_name,
-    final_hub_name, origin_hub_name, recipient_name, sender_name, shipper_name,
-    changed_at, changed_by
-)
-VALUES (
-           OLD.id, OLD.approved_by, OLD.cancelled_by, OLD.created_at, OLD.created_by,
-           OLD.expected_delivery_date, OLD.final_price, OLD.ship_price, OLD.total_price,
-           OLD.updated_at, OLD.collector_id, OLD.final_hub_id, OLD.origin_hub_id,
-           OLD.recipient_id, OLD.sender_id, OLD.shipper_id, OLD.order_type,
-           OLD.shipping_price, OLD.hub_id, OLD.destination_address, OLD.origin,
-           OLD.distance, OLD.status, OLD.collector_name, OLD.final_hub_name,
-           OLD.origin_hub_name, OLD.recipient_name, OLD.sender_name, OLD.shipper_name,
-           NOW(), OLD.created_by  -- Sử dụng NOW() để lấy thời gian hiện tại
+INSERT INTO smartdelivery_order_history (id, approved_by, cancelled_by, created_at, created_by, expected_delivery_date,
+                                         final_price, ship_price, total_price, updated_at, collector_id, final_hub_id,
+                                         origin_hub_id, recipient_id, sender_id, shipper_id, order_type, shipping_price,
+                                         hub_id, destination_address, origin, distance, status, collector_name,
+                                         final_hub_name, origin_hub_name, recipient_name, sender_name, shipper_name,
+                                         changed_at, changed_by)
+VALUES (OLD.id, OLD.approved_by, OLD.cancelled_by, OLD.created_at, OLD.created_by,
+        OLD.expected_delivery_date, OLD.final_price, OLD.ship_price, OLD.total_price,
+        OLD.updated_at, OLD.collector_id, OLD.final_hub_id, OLD.origin_hub_id,
+        OLD.recipient_id, OLD.sender_id, OLD.shipper_id, OLD.order_type,
+        OLD.shipping_price, OLD.hub_id, OLD.destination_address, OLD.origin,
+        OLD.distance, OLD.status, OLD.collector_name, OLD.final_hub_name,
+        OLD.origin_hub_name, OLD.recipient_name, OLD.sender_name, OLD.shipper_name,
+        NOW(), OLD.created_by -- Sử dụng NOW() để lấy thời gian hiện tại
        );
 
 -- Trả về NEW để tiếp tục cập nhật bảng smartdelivery_order
 RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$
+LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_move_order_to_history
-    BEFORE UPDATE ON smartdelivery_order
+CREATE OR REPLACE TRIGGER trigger_move_order_to_history
+    BEFORE UPDATE
+    ON smartdelivery_order
     FOR EACH ROW
     WHEN (OLD.status IS DISTINCT FROM NEW.status OR
           OLD.collector_id IS DISTINCT FROM NEW.collector_id OR
-          OLD.shipper_id IS DISTINCT FROM NEW.shipper_id)  -- Chỉ kích hoạt khi trạng thái thay đổi
+          OLD.shipper_id IS DISTINCT FROM NEW.shipper_id OR
+              OLD.vehicle_id IS DISTINCT FROM NEW.vehicle_id OR
+          OLD.route_id IS DISTINCT FROM NEW.route_id
+
+    )  -- Chỉ kích hoạt khi trạng thái thay đổi
 EXECUTE FUNCTION move_order_to_history();

@@ -3,12 +3,15 @@ package openerp.openerpresourceserver.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import openerp.openerpresourceserver.dto.OrderSummaryDTO;
+import openerp.openerpresourceserver.dto.OrderSummaryMiddleMileDto;
+import openerp.openerpresourceserver.dto.RouteVehicleDetailDto;
+import openerp.openerpresourceserver.dto.RouteVehicleDto;
 import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
-import openerp.openerpresourceserver.service.RouteService;
-import openerp.openerpresourceserver.service.RouteVehicleService;
-import openerp.openerpresourceserver.service.MiddleMileOrderService;
-import openerp.openerpresourceserver.service.ScheduleService;
+import openerp.openerpresourceserver.entity.enumentity.RouteDirection;
+import openerp.openerpresourceserver.service.*;
+import openerp.openerpresourceserver.service.impl.MiddleMileOrderServiceImpl;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,9 +31,10 @@ public class MiddleMileController {
     private final RouteVehicleService routeVehicleService;
     private final MiddleMileOrderService orderService;
     private final ScheduleService scheduleService;
+    private final MiddleMileOrderService middleMileOrderService;
 
     // ===== Route Endpoints =====
-    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'ROUTE_MANAGER')")
     @PostMapping("/routes")
     public ResponseEntity<Route> createRoute(@Valid @RequestBody Map<String, Object> request) {
         Route route = new Route();
@@ -54,7 +58,7 @@ public class MiddleMileController {
         return ResponseEntity.ok(routeService.createRoute(route, stops));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'ROUTE_MANAGER')")
     @PutMapping("/routes/{routeId}")
     public ResponseEntity<Route> updateRoute(
             @PathVariable UUID routeId,
@@ -106,7 +110,7 @@ public class MiddleMileController {
         return ResponseEntity.ok(routeService.getRoutesByHub(hubId));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'ROUTE_MANAGER')")
     @DeleteMapping("/routes/{routeId}")
     public ResponseEntity<Void> deleteRoute(@PathVariable UUID routeId) {
         routeService.deleteRoute(routeId);
@@ -114,7 +118,7 @@ public class MiddleMileController {
     }
 
     // ===== Route Vehicle Endpoints =====
-    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'ROUTE_MANAGER')")
     @PostMapping("/vehicle-assignments")
     public ResponseEntity<RouteVehicle> assignVehicleToRoute(@Valid @RequestBody Map<String, Object> request) {
         UUID routeId = UUID.fromString((String) request.get("routeId"));
@@ -124,7 +128,16 @@ public class MiddleMileController {
         return ResponseEntity.ok(routeVehicleService.assignVehicleToRoute(routeId, vehicleId, direction));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER')")
+    // ===== Route Vehicle Endpoints =====
+    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'ROUTE_MANAGER')")
+    @GetMapping("/vehicle-assignments")
+    public ResponseEntity<List<RouteVehicleDto>> getAllVehicleAssignments() {
+
+        return ResponseEntity.ok(routeVehicleService.getAllVehicleAssignments());
+    }
+
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'ROUTE_MANAGER')")
     @PutMapping("/vehicle-assignments/{id}")
     public ResponseEntity<RouteVehicle> updateRouteVehicle(
             @PathVariable UUID id,
@@ -145,8 +158,9 @@ public class MiddleMileController {
         return ResponseEntity.ok(routeVehicleService.getRouteVehiclesByRoute(routeId));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'ROUTE_MANAGER')")
     @GetMapping("/vehicles/{vehicleId}/routes")
-    public ResponseEntity<List<RouteVehicle>> getRouteVehiclesByVehicle(@PathVariable UUID vehicleId) {
+    public ResponseEntity<List<RouteVehicleDetailDto>> getRouteVehiclesByVehicle(@PathVariable UUID vehicleId) {
         return ResponseEntity.ok(routeVehicleService.getRouteVehiclesByVehicle(vehicleId));
     }
 
@@ -223,4 +237,16 @@ public class MiddleMileController {
             @RequestParam UUID destinationHubId) {
         return ResponseEntity.ok(scheduleService.findSuitableRoutesForOrder(originHubId, destinationHubId));
     }
+
+    @GetMapping("/orders/vehicle/{vehicleId}/{hubId}/{direction}")
+    public ResponseEntity<List<OrderSummaryMiddleMileDto>> findSuitableOrdersForVehicle(
+            @PathVariable UUID vehicleId,
+            @PathVariable UUID hubId,
+            @PathVariable RouteDirection direction
+            ) {
+        return ResponseEntity.ok(middleMileOrderService.getCollectedHubListVehicle(vehicleId, hubId, direction));
+    }
+
+
+
 }

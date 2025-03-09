@@ -47,4 +47,5 @@ public interface OrderService {
     boolean confirmCollectedHub(UUID[] orderId);
 
     boolean confirmOutHub(UUID[] orderIds,  UUID vehicleId);
+
 }

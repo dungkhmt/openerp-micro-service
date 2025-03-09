@@ -19,12 +19,16 @@ public class RouteVehicleDto {
     @NotNull(message = "Route is required")
     private UUID routeId;
 
+    private String routeCode;
+
     private RouteDto route;
+
+    private String routeName;
 
     @NotNull(message = "Vehicle is required")
     private UUID vehicleId;
 
-    private VehicleDto vehicle;
+    private String vehiclePlateNumber;
 
     @NotBlank(message = "Direction is required")
     private String direction;

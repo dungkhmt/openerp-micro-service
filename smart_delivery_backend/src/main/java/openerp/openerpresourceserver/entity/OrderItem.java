@@ -22,7 +22,7 @@ public class OrderItem {
     private UUID orderId;
     @Column(nullable = false)
     private String name;
-    private Long quantity;
+    private Integer quantity;
     @Column(nullable = false)
     private Double weight;
     private Double price;
@@ -30,7 +30,7 @@ public class OrderItem {
     private Double width;
     private Double height;
 
-    public OrderItem(String name, Long quantity, Double weight, Double price, Double length, Double width, Double height) {
+    public OrderItem(String name, Integer quantity, Double weight, Double price, Double length, Double width, Double height) {
         this.name = name;
         this.quantity = quantity;
         this.weight = weight;

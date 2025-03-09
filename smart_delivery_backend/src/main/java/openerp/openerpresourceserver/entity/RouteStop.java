@@ -37,6 +37,9 @@ public class RouteStop {
     @Column(name = "hub_id", nullable = false)
     private UUID hubId;
 
+    @Column(name = "hub_name")
+    private String hubName;
+
     @Column(name = "stop_sequence", nullable = false)
     private Integer stopSequence;
 

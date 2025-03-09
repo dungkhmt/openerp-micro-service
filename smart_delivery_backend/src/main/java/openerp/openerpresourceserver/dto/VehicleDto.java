@@ -22,12 +22,14 @@ public class VehicleDto{
     @NotBlank(message = "Plate number is required")
     private String plateNumber;
 
-    private Long capacity;
+    private Long weightCapacity;
+    private Long volumeCapacity;
     private VehicleStatus status;
     private String manufacturer;
     private String model;
     private String yearOfManufacture;
     private UUID driverId;
+    private String driverCode;
     private String driverName;
 
 }

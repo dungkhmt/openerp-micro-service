@@ -21,8 +21,12 @@ public class RouteVehicle {
 
 
     private UUID routeId;
+    private String routeCode;
+    private String routeName;
 
     private UUID vehicleId;
+    private String vehiclePlateNumber;
+
 
     @Size(max = 50)
     @NotNull

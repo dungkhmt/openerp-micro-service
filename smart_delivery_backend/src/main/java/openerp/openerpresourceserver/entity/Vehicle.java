@@ -25,16 +25,18 @@ public class Vehicle {
     @GenericGenerator(name = "uuid1", strategy = "org.hibernate.id.UUIDGenerator")
     @GeneratedValue(generator = "uuid1")
     private UUID vehicleId;
+    @Enumerated(EnumType.STRING)
     private VehicleType vehicleType;
     private String plateNumber;
-    private Long capacity;
-
+    private Long volumeCapacity;
+    private Long weightCapacity;
     @Enumerated(EnumType.STRING)
     private VehicleStatus status;
     private String manufacturer;
     private String model;
     private String yearOfManufacture;
     private UUID driverId;
+    private String driverCode;
     private String driverName;
 
     @CreatedDate

@@ -17,6 +17,7 @@ public abstract class Employee {
     @GenericGenerator(name = "uuid1", strategy = "org.hibernate.id.UUIDGenerator")
     @GeneratedValue(generator = "uuid1")
     private UUID id;  // Thay thế collectorId, shipperId, driverId bằng id chung
+    private String code;
     private String name;
     private String username;
     private String password;

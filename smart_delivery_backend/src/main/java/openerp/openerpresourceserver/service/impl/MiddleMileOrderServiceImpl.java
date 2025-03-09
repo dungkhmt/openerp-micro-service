@@ -5,10 +5,13 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import openerp.openerpresourceserver.dto.OrderSummaryDTO;
+import openerp.openerpresourceserver.dto.OrderSummaryMiddleMileDto;
 import openerp.openerpresourceserver.entity.Order;
 import openerp.openerpresourceserver.entity.RouteVehicle;
 import openerp.openerpresourceserver.entity.Vehicle;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
+import openerp.openerpresourceserver.entity.enumentity.RouteDirection;
 import openerp.openerpresourceserver.entity.enumentity.VehicleStatus;
 import openerp.openerpresourceserver.repository.OrderRepo;
 import openerp.openerpresourceserver.repository.RouteVehicleRepository;
@@ -153,5 +156,11 @@ public class MiddleMileOrderServiceImpl implements MiddleMileOrderService {
         Vehicle vehicle = vehicleRepo.findById(routeVehicle.getVehicleId()).orElseThrow(()-> new NotFoundException("not found vehicle"));
         vehicle.setStatus(VehicleStatus.AVAILABLE);
         vehicleRepo.save(vehicle);
+    }
+
+    @Override
+    public List<OrderSummaryMiddleMileDto> getCollectedHubListVehicle(UUID vehicleId, UUID hubId, RouteDirection routeDirection){
+        return orderRepo.getCollectedCollectorListVehicle(vehicleId, hubId, routeDirection);
+
     }
 }

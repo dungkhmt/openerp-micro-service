@@ -5,10 +5,13 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import openerp.openerpresourceserver.dto.RouteVehicleDetailDto;
+import openerp.openerpresourceserver.dto.RouteVehicleDto;
 import openerp.openerpresourceserver.entity.Route;
 import openerp.openerpresourceserver.entity.RouteVehicle;
 import openerp.openerpresourceserver.entity.Vehicle;
 import openerp.openerpresourceserver.entity.enumentity.VehicleStatus;
+import openerp.openerpresourceserver.mapper.RouteVehicleMapper;
 import openerp.openerpresourceserver.repository.OrderRepo;
 import openerp.openerpresourceserver.repository.RouteRepository;
 import openerp.openerpresourceserver.repository.RouteVehicleRepository;
@@ -16,6 +19,7 @@ import openerp.openerpresourceserver.repository.VehicleRepository;
 import org.springframework.stereotype.Service;
 import openerp.openerpresourceserver.service.RouteVehicleService;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,7 +32,7 @@ public class RouteVehicleServiceImpl implements RouteVehicleService {
     private final RouteRepository routeRepository;
     private final VehicleRepository vehicleRepo;
     private final OrderRepo orderRepo;
-
+    private final RouteVehicleMapper routeVehicleMapper = RouteVehicleMapper.INSTANCE;
     /**
      * Phân công xe cho tuyến đường
      */
@@ -54,7 +58,7 @@ public class RouteVehicleServiceImpl implements RouteVehicleService {
         routeVehicle.setUpdatedAt(Instant.now());
 
         // Cập nhật trạng thái xe
-        vehicle.setStatus(VehicleStatus.ASSIGNED);
+
         vehicleRepo.save(vehicle);
 
         return routeVehicleRepository.save(routeVehicle);
@@ -116,11 +120,11 @@ public class RouteVehicleServiceImpl implements RouteVehicleService {
      * Lấy tất cả phân công theo xe
      */
     @Override
-    public List<RouteVehicle> getRouteVehiclesByVehicle(UUID vehicleId) {
+    public List<RouteVehicleDetailDto> getRouteVehiclesByVehicle(UUID vehicleId) {
         if (!vehicleRepo.existsById(vehicleId)) {
             throw new NotFoundException("Vehicle not found");
         }
-        return routeVehicleRepository.findByVehicleId(vehicleId);
+         return routeVehicleRepository.findDetailByVehicleId(vehicleId);
     }
 
     /**
@@ -147,4 +151,18 @@ public class RouteVehicleServiceImpl implements RouteVehicleService {
         return routeVehicleRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Route vehicle assignment not found"));
     }
+    /**
+     * Lấy thông tin tất cả chuyến xe đã gán
+     */
+    @Override
+    public List<RouteVehicleDto> getAllVehicleAssignments() {
+        List<RouteVehicle> routeVehicles =  routeVehicleRepository.findAll();
+        if(routeVehicles.isEmpty()) throw new NotFoundException("Not found any routeVehicles");
+        List<RouteVehicleDto> routeVehicleDtos = new ArrayList<>();
+        for(RouteVehicle routeVehicle : routeVehicles){
+            routeVehicleDtos.add(routeVehicleMapper.routeVehicleToRouteVehicleDto(routeVehicle));
+        }
+        return routeVehicleDtos;
+    }
+
 }
