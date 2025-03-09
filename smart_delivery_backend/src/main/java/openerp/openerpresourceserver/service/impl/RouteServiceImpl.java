@@ -5,9 +5,13 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import openerp.openerpresourceserver.dto.RouteDto;
+import openerp.openerpresourceserver.dto.RouteStopDto;
 import openerp.openerpresourceserver.entity.Hub;
 import openerp.openerpresourceserver.entity.Route;
 import openerp.openerpresourceserver.entity.RouteStop;
+import openerp.openerpresourceserver.mapper.RouteMapper;
+import openerp.openerpresourceserver.mapper.RouteStopMapper;
 import openerp.openerpresourceserver.repository.HubRepo;
 import openerp.openerpresourceserver.repository.RouteRepository;
 import openerp.openerpresourceserver.repository.RouteStopRepository;
@@ -17,6 +21,7 @@ import openerp.openerpresourceserver.utils.DistanceCalculator.HaversineDistanceC
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,30 +34,56 @@ public class RouteServiceImpl implements RouteService {
     private final RouteStopRepository routeStopRepository;
     private final HubRepo hubRepo;
     private final RouteVehicleRepository routeVehicleRepository;
+    private final RouteMapper routeMapper = RouteMapper.INSTANCE;
 
     /**
      * Tạo tuyến đường mới
      */
     @Override
     @Transactional
-    public Route createRoute(Route route, List<RouteStop> stops) {
-        if (routeRepository.findByRouteCode(route.getRouteCode()).isPresent()) {
-            throw new IllegalArgumentException("Route code already exists: " + route.getRouteCode());
-        }
+    public RouteDto createRoute(RouteDto routeDto) {
+        System.out.println("routeid" + routeDto.getRouteId());
+        if (routeDto.getRouteId() != null) {
 
-        Route savedRoute = routeRepository.save(route);
+            Route updatedRoute = routeRepository.save(routeMapper.routeDtoToRoute(routeDto));
+            System.out.println("routeid1 " + routeDto.getRouteId());
 
-        for (RouteStop stop : stops) {
-            if (!hubRepo.existsById(stop.getHubId())) {
-                throw new NotFoundException("Hub not found with ID: " + stop.getHubId());
+            // Xóa các điểm dừng cũ
+            routeStopRepository.deleteByRouteId(routeDto.getRouteId());
+            routeStopRepository.flush();
+            // Thêm các điểm dừng mới
+            List<RouteStop> routeStops = new ArrayList<>();
+            for (RouteStopDto stop : routeDto.getStops()) {
+                RouteStop routeStop = RouteStopMapper.INSTANCE.routeDtoToRoute(stop);
+                routeStop.setRouteId(routeDto.getRouteId());
+                routeStops.add(routeStop);
             }
-            stop.setRouteId(savedRoute.getRouteId());
-            routeStopRepository.save(stop);
-        }
+            routeStopRepository.saveAll(routeStops);
 
-        updateRouteMetrics(savedRoute.getRouteId());
-        return routeRepository.findById(savedRoute.getRouteId())
-                .orElseThrow(() -> new NotFoundException("Route not found"));
+            updateRouteMetrics(routeDto.getRouteId());
+            return RouteMapper.INSTANCE.routeToRouteDto(updatedRoute);
+        } else {
+            if (routeRepository.findByRouteCode(routeDto.getRouteCode()).isPresent()) {
+                throw new IllegalArgumentException("Route code already exists: " + routeDto.getRouteCode());
+            }
+
+            Route savedRoute = routeRepository.save(RouteMapper.INSTANCE.routeDtoToRoute(routeDto));
+            routeStopRepository.deleteByRouteId(routeDto.getRouteId());
+
+            for (RouteStopDto stop : routeDto.getStops()) {
+                if (!hubRepo.existsById(stop.getHubId())) {
+                    throw new NotFoundException("Hub not found with ID: " + stop.getHubId());
+                }
+                RouteStop newStop = RouteStopMapper.INSTANCE.routeDtoToRoute(stop);
+                newStop.setRouteId(savedRoute.getRouteId());
+                routeStopRepository.save(newStop);
+            }
+
+            updateRouteMetrics(savedRoute.getRouteId());
+            Route newRoute = routeRepository.findById(savedRoute.getRouteId())
+                    .orElseThrow(() -> new NotFoundException("Route not found"));
+            return RouteMapper.INSTANCE.routeToRouteDto(newRoute);
+        }
     }
 
     /**

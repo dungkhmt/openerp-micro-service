@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.service;
 
 import jakarta.transaction.Transactional;
+import openerp.openerpresourceserver.dto.RouteDto;
 import openerp.openerpresourceserver.entity.Route;
 import openerp.openerpresourceserver.entity.RouteStop;
 
@@ -9,7 +10,7 @@ import java.util.UUID;
 
 public interface RouteService {
     @Transactional
-    Route createRoute(Route route, List<RouteStop> stops);
+    RouteDto createRoute(RouteDto routeDto);
 
     @Transactional
     Route updateRoute(UUID routeId, Route routeDetails, List<RouteStop> stops);
@@ -28,4 +29,5 @@ public interface RouteService {
     void deleteRoute(UUID routeId);
 
     void updateRouteMetrics(UUID routeId);
+
 }

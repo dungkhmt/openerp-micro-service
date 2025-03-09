@@ -4,7 +4,7 @@ import {
     Box, Grid, Typography, TextField, Button, Card, CardContent,
     FormControl, InputLabel, Select, MenuItem, IconButton,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-    Paper, CircularProgress, Snackbar, Alert, Divider
+    Paper, CircularProgress, Snackbar, Alert, Divider, InputAdornment
 } from '@mui/material';
 import { request } from 'api';
 import { errorNoti, successNoti } from 'utils/notification';
@@ -62,7 +62,8 @@ const CreateRoute = () => {
                             routeName: res.data?.routeName,
                             description: res.data?.description || '',
                             notes: res.data?.notes || '',
-                            status: res.data?.status || 'ACTIVE'
+                            status: res.data?.status || 'ACTIVE',
+                            routeId: res.data.routeId
                         }),
                         {
                             401: () => errorNoti("Unauthorized access"),
@@ -82,8 +83,8 @@ const CreateRoute = () => {
                         (res) => {
                             const formattedStops = res.data.map(stop => ({
                                 hubId: stop.id,
-                                hubName: stop.name,
-                                hubCode: stop.code,
+                                hubName: stop.hubName,
+                                hubCode: stop.hubCode,
                                 stopSequence: stop.stopSequence,
                                 estimatedWaitTime: stop.estimatedWaitTime
                             }));
@@ -182,6 +183,7 @@ const CreateRoute = () => {
 
         try {
             const requestData = {
+                routeId:routeData.routeId,
                 routeCode: routeData.routeCode,
                 routeName: routeData.routeName,
                 description: routeData.description,
@@ -193,6 +195,7 @@ const CreateRoute = () => {
                     estimatedWaitTime: stop.estimatedWaitTime
                 }))
             };
+            console.log("request",requestData)
 
             // Both create and edit use the same endpoint but with different methods
             const endpoint = "/smdeli/middle-mile/routes";
@@ -418,8 +421,8 @@ const CreateRoute = () => {
                                                         <TableRow>
                                                             <TableCell width="10%"></TableCell>
                                                             <TableCell width="10%">Seq</TableCell>
-                                                            <TableCell width="50%">Hub</TableCell>
-                                                            <TableCell width="20%">Wait Time</TableCell>
+                                                            <TableCell width="40%">Hub</TableCell>
+                                                            <TableCell width="30%">Wait Time</TableCell>
                                                             <TableCell width="10%">Actions</TableCell>
                                                         </TableRow>
                                                     </TableHead>
@@ -438,7 +441,7 @@ const CreateRoute = () => {
                                                                         <TableCell>{stop.hubName}</TableCell>
                                                                         <TableCell>
                                                                             <TextField
-                                                                                type="number"
+                                                                                type="number"  // Change from "text" to "number"
                                                                                 value={stop.estimatedWaitTime}
                                                                                 onChange={(e) => {
                                                                                     const newStops = [...stops];
@@ -447,7 +450,7 @@ const CreateRoute = () => {
                                                                                 }}
                                                                                 InputProps={{
                                                                                     inputProps: { min: 0 },
-                                                                                    endAdornment: "min"
+                                                                                    endAdornment: <Typography variant="caption" sx={{ ml: 1 }}>min</Typography>
                                                                                 }}
                                                                                 size="small"
                                                                             />

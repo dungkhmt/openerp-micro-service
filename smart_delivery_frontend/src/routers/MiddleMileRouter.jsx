@@ -2,11 +2,12 @@ import {Route, Switch, useRouteMatch} from "react-router-dom";
 import RoutesList from "../screens/middle-mile/RoutesList";
 import RouteDetail from "../screens/middle-mile/RouteDetail";
 import CreateRoute from "../screens/middle-mile/CreateRoute";
-import VehicleAssignments from "../screens/middle-mile/VehicleAssignments";
+import VehicleAssignments from "../screens/middle-mile/VehicleAssignmentsDetail";
 import ScheduleView from "../screens/middle-mile/ScheduleView";
 import TripManagement from "../screens/middle-mile/TripManagement";
 import OrderAssignment from "../screens/middle-mile/OrderAssignment";
 import VehicleDetail from "../screens/middle-mile/VehicleDetail";
+import VehicleAssignmentsDetail from "../screens/middle-mile/VehicleAssignmentsDetail";
 
 export default function MiddleMileRouter() {
     let {path} = useRouteMatch();
@@ -18,7 +19,8 @@ export default function MiddleMileRouter() {
                 <Route exact path={`${path}/routes/create`} component={CreateRoute}/>
                 <Route exact path={`${path}/routes/edit/:routeId`} component={CreateRoute}/>
                 <Route exact path={`${path}/routes/:routeId`} component={RouteDetail}/>
-                <Route exact path={`${path}/vehicle-assignments`} component={VehicleAssignments}/>
+                <Route exact path={`${path}/vehicle-assignments/:assignmentId`} component={VehicleAssignmentsDetail}/>
+
                 <Route
                     exact path={`${path}/vehicles/:id`} component={VehicleDetail}
                 />

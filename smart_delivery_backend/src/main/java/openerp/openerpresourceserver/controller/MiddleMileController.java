@@ -3,10 +3,7 @@ package openerp.openerpresourceserver.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import openerp.openerpresourceserver.dto.OrderSummaryDTO;
-import openerp.openerpresourceserver.dto.OrderSummaryMiddleMileDto;
-import openerp.openerpresourceserver.dto.RouteVehicleDetailDto;
-import openerp.openerpresourceserver.dto.RouteVehicleDto;
+import openerp.openerpresourceserver.dto.*;
 import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
 import openerp.openerpresourceserver.entity.enumentity.RouteDirection;
@@ -36,26 +33,9 @@ public class MiddleMileController {
     // ===== Route Endpoints =====
     @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'ROUTE_MANAGER')")
     @PostMapping("/routes")
-    public ResponseEntity<Route> createRoute(@Valid @RequestBody Map<String, Object> request) {
-        Route route = new Route();
-        route.setRouteCode((String) request.get("routeCode"));
-        route.setRouteName((String) request.get("routeName"));
-        route.setDescription((String) request.get("description"));
-        route.setNotes((String) request.get("notes"));
+    public ResponseEntity<RouteDto> createRoute(@Valid @RequestBody RouteDto routeDto) {
 
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> stopsData = (List<Map<String, Object>>) request.get("stops");
-        List<RouteStop> stops = stopsData.stream()
-                .map(stopData -> {
-                    RouteStop stop = new RouteStop();
-                    stop.setHubId(UUID.fromString((String) stopData.get("hubId")));
-                    stop.setStopSequence((Integer) stopData.get("stopSequence"));
-                    stop.setEstimatedWaitTime((Integer) stopData.get("estimatedWaitTime"));
-                    return stop;
-                })
-                .toList();
-
-        return ResponseEntity.ok(routeService.createRoute(route, stops));
+        return ResponseEntity.ok(routeService.createRoute(routeDto));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'ROUTE_MANAGER')")

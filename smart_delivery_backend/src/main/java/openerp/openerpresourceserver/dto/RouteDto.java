@@ -16,6 +16,7 @@ import java.util.UUID;
 public class RouteDto {
     private UUID routeId;
 
+
     @NotBlank(message = "Route code is required")
     private String routeCode;
 
