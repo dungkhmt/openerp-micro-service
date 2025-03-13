@@ -17,14 +17,8 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { useNavigate, useParams } from 'react-router-dom';
 import { request } from "../../api";
+import debounce from '../../utils/utils';
 
-const debounce = (func, delay) => {
-  let timer;
-  return (...args) => {
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(() => func(...args), delay);
-  };
-};
 
 const AddReceipt = () => {
   const navigate = useNavigate();

@@ -13,18 +13,17 @@ import {
   DropdownMenu,
   DropdownItem,
   Pagination,
+  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter
 } from "@nextui-org/react";
 import { PlusIcon } from "../../components/icon/PlusIcon";
 import { VerticalDotsIcon } from "../../components/icon/VerticalDotsIcon";
 import { SearchIcon } from "../../components/icon/SearchIcon";
-import { columns, statusOptions } from "../../config/deliveryperson";
-import { useNavigate } from 'react-router-dom';
+import { columns } from "../../config/deliveryperson";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../api";
-import { formatDate, formatPrice } from '../../utils/utils';
+import { formatDate } from '../../utils/utils';
 
-const INITIAL_VISIBLE_COLUMNS = ["fullName", "phoneNumber", "actions"];
-const buttonText = "Add Delivery Staff";
+const buttonText = "Add New Staff";
 export default function DeliveryPerson() {
 
   const [page, setPage] = useState(1);
@@ -34,17 +33,23 @@ export default function DeliveryPerson() {
   const [pages, setPages] = useState(1);
   const [items, setItems] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [staffInfo, setStaffInfo] = useState({
+    userLoginId: '',
+    fullName: '',
+    phoneNumber: '',
+    email: '' // Thêm email vào state
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedSearchTerm(filterValue);  // Chỉ cập nhật sau khi người dùng ngừng gõ
-    }, 500); // 1000ms = 1 giây
+      setDebouncedSearchTerm(filterValue);
+    }, 500);
 
-    // Hủy bỏ timeout nếu người dùng tiếp tục gõ
     return () => clearTimeout(timer);
   }, [filterValue]);
 
-  // useEffect để gửi request sau khi giá trị tìm kiếm đã debounce
   useEffect(() => {
     request("get", `/delivery-manager/delivery-persons?page=${page - 1}&size=${rowsPerPage}&search=${debouncedSearchTerm}`, (res) => {
       setItems(res.data.content);
@@ -54,25 +59,6 @@ export default function DeliveryPerson() {
   }, [page, rowsPerPage, debouncedSearchTerm]);
 
   const [selectedKeys, setSelectedKeys] = useState(new Set([]));
-  const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
-  const [statusFilter, setStatusFilter] = useState("all");
-
-  const headerColumns = useMemo(() => {
-    if (visibleColumns === "all") return columns;
-
-    return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
-  }, [visibleColumns]);
-
-  const filteredItems = useMemo(() => {
-    let filteredItems = [...items];
-    if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
-      filteredItems = filteredItems.filter((item) =>
-        Array.from(statusFilter).includes(item.status),
-      );
-    }
-
-    return filteredItems;
-  }, [items, statusFilter]);
 
   const renderCell = useCallback((item, columnKey) => {
     const cellValue = item[columnKey];
@@ -88,8 +74,7 @@ export default function DeliveryPerson() {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem onClick={() => handleUpdate(item.id)}>Update</DropdownItem>
-                <DropdownItem onClick={() => handleDelete(item.id)}>Delete</DropdownItem>
+                <DropdownItem onPress={() => handleUpdate(item.userLoginId)}>Update</DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
@@ -113,38 +98,56 @@ export default function DeliveryPerson() {
     }
   }, []);
 
-  const navigate = useNavigate();
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
 
-  const handleAddDeliveryPerson = () => {
-    navigate('/delivery-manager/delivery-person/add-delivery-person');
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setStaffInfo((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleAdd = () => {
+    setStaffInfo({ userLoginId: '', fullName: '', phoneNumber: '', email: '' });
+    handleOpenModal();
   };
 
   const handleUpdate = (id) => {
-    navigate(`/delivery-manager/delivery-person/${id}`);
+    handleOpenModal();
+    request('get', `/delivery-manager/delivery-persons/${id}`, (res) => {
+      setStaffInfo({ ...res.data, email: '' }); // Khi cập nhật, không cần email
+    });
   };
 
-  const handleDelete = (id) => {
-    // request(
-    //   "post", // HTTP method
-    //   "/admin/product/delete-product", // Endpoint for deleting product
-    //   (res) => {
-    //     if (res.status === 200) {
-    //       if (items.length === 1 && page > 1) setPage(page - 1);
-    //       request("get", `/admin/product?page=${page - 1}&size=${rowsPerPage}&search=${debouncedSearchTerm}`, (res) => {
-    //         setItems(res.data.content);
-    //         setTotalItems(res.data.totalElements);
-    //         setPages(res.data.totalPages);
-    //       }).then();
+  const handleConfirm = () => {
+    const requestUrl = staffInfo.userLoginId
+      ? "/delivery-manager/delivery-persons/update"
+      : "/delivery-manager/delivery-persons/create";
 
-    //     }
-    //   },
-    //   {
-    //     onError: (e) => console.error("Error deleting product:", e),
-    //   },
-    //   { id }
-    // );
+    const payload = { ...staffInfo };
+    if (staffInfo.userLoginId) delete payload.email;
+
+    request("post", requestUrl, (res) => {
+      if (res.status === 200) {
+        request("get", `/delivery-manager/delivery-persons?page=${page - 1}&size=${rowsPerPage}`, (res) => {
+          setItems(res.data.content);
+          setTotalItems(res.data.totalElements);
+          setPages(res.data.totalPages);
+        });
+      } else {
+        alert("Error occurred!");
+      }
+    }, {}, payload);
+
+    handleCloseModal();
   };
-
 
   const topContent = useMemo(() => {
     return (
@@ -159,12 +162,12 @@ export default function DeliveryPerson() {
             onClear={() => setDebouncedSearchTerm("")}
             onValueChange={onSearchChange}
           />
-          <div className="flex gap-3">            
+          <div className="flex gap-3">
             <Button
               className="bg-foreground text-background"
               endContent={<PlusIcon />}
               size="md"
-              onClick={handleAddDeliveryPerson}
+              onPress={handleAdd}
             >
               {buttonText}
             </Button>
@@ -208,11 +211,6 @@ export default function DeliveryPerson() {
           variant="light"
           onChange={setPage}
         />
-        {/* <span className="text-small text-default-400">
-          {selectedKeys === "all"
-            ? "All items selected"
-            : `${selectedKeys.size} of ${filteredItems.length} selected`}
-        </span> */}
       </div>
     );
   }, [page, pages]);
@@ -237,47 +235,97 @@ export default function DeliveryPerson() {
   );
 
   return (
-    <Table
-      isCompact
-      removeWrapper
-      aria-label="Example table with custom cells, pagination and sorting"
-      bottomContent={bottomContent}
-      bottomContentPlacement="outside"
-      checkboxesProps={{
-        classNames: {
-          wrapper: "after:bg-foreground after:text-background text-background",
-        },
-      }}
-      classNames={classNames}
-      selectedKeys={selectedKeys}
-      topContent={topContent}
-      topContentPlacement="outside"
-      onSelectionChange={setSelectedKeys}
-    >
-      <TableHeader columns={headerColumns}>
-        {(column) => (
-          <TableColumn
-            key={column.uid}
-            align={column.uid === "actions" ? "center" : "start"}
-            allowsSorting={column.sortable}
-          >
-            {column.name}
-          </TableColumn>
-        )}
-      </TableHeader>
-      <TableBody emptyContent={"Loading ..."} items={filteredItems}>
-        {(item) => (
-          <TableRow key={item.userLoginId}>
-            {(columnKey) => (
-              <TableCell>
-                {columnKey === "dateUpdated"
-                  ? formatDate(item.dateUpdated)
-                  : renderCell(item, columnKey)}
-              </TableCell>
-            )}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <>
+      <Table
+        isCompact
+        removeWrapper
+        aria-label="Example table with custom cells, pagination and sorting"
+        bottomContent={bottomContent}
+        bottomContentPlacement="outside"
+        checkboxesProps={{
+          classNames: {
+            wrapper: "after:bg-foreground after:text-background text-background",
+          },
+        }}
+        classNames={classNames}
+        selectedKeys={selectedKeys}
+        topContent={topContent}
+        topContentPlacement="outside"
+        onSelectionChange={setSelectedKeys}
+      >
+        <TableHeader columns={columns}>
+          {(column) => (
+            <TableColumn
+              key={column.uid}
+              align={column.uid === "actions" ? "center" : "start"}
+              allowsSorting={column.sortable}
+            >
+              {column.name}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody emptyContent={"Loading ..."} items={items}>
+          {(item) => (
+            <TableRow key={item.userLoginId}>
+              {(columnKey) => (
+                <TableCell>
+                  {columnKey === "dateUpdated"
+                    ? formatDate(item.dateUpdated)
+                    : renderCell(item, columnKey)}
+                </TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+        <ModalContent>
+          <ModalHeader>Staff Information</ModalHeader>
+          <ModalBody>
+            <div className="space-y-4">
+              {!staffInfo.userLoginId && (
+                <div>
+                  <label className="block text-sm font-medium">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={staffInfo.email}
+                    onChange={handleChange}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+              )}
+              <div>
+                <label className="block text-sm font-medium">Full Name</label>
+                <input
+                  type="text"
+                  name="fullName"
+                  value={staffInfo.fullName}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Phone Number</label>
+                <input
+                  type="text"
+                  name="phoneNumber"
+                  value={staffInfo.phoneNumber}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button onPress={handleCloseModal} variant="light">Cancel</Button>
+            <Button onPress={() => handleConfirm()} color="primary">
+              Confirm
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+    </>
   );
 }

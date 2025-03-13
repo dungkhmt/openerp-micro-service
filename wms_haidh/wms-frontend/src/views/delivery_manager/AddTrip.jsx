@@ -27,7 +27,7 @@ import {
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import Map from '../../components/Map';
 import fetchRoute from '../../utils/fetchRoute';
-import { formatDate, formatPrice } from '../../utils/utils';
+import { formatDate } from '../../utils/utils';
 
 const AddTrip = () => {
   const navigate = useNavigate();

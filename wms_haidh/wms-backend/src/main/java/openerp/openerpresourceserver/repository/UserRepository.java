@@ -1,9 +1,12 @@
 package openerp.openerpresourceserver.repository;
 
 
-import openerp.openerpresourceserver.entity.User;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<User, String> {
+import openerp.openerpresourceserver.entity.User;
 
+public interface UserRepository extends JpaRepository<User, String> {
+	Optional<User> findByEmail(String email);
 }

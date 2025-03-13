@@ -32,6 +32,7 @@ import openerp.openerpresourceserver.entity.projection.DeliveryPersonProjection;
 import openerp.openerpresourceserver.entity.projection.DeliveryTripGeneralProjection;
 import openerp.openerpresourceserver.entity.projection.DeliveryTripPathProjection;
 import openerp.openerpresourceserver.entity.projection.DeliveryTripProjection;
+import openerp.openerpresourceserver.model.request.DeliveryPersonRequest;
 import openerp.openerpresourceserver.model.request.DeliveryTripRequest;
 import openerp.openerpresourceserver.model.request.ShipmentRequest;
 import openerp.openerpresourceserver.service.AssignedOrderItemService;
@@ -58,6 +59,58 @@ public class DeliveryMangerController {
 	private OrderService orderService;
 	private ShipmentService shipmentService;
 
+	@GetMapping("/shipments")
+	public ResponseEntity<Page<Shipment>> getAllShipments(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size, @RequestParam(required = false) String search) {
+
+		Page<Shipment> shipments = shipmentService.getAllShipments(page, size, search);
+		return ResponseEntity.ok(shipments);
+	}
+
+	@PostMapping("/shipment/create")
+    public ResponseEntity<Shipment> createShipment(@RequestBody ShipmentRequest request) {
+        Shipment shipment = shipmentService.createShipment(request);
+        return ResponseEntity.ok(shipment);
+    }
+	
+	@GetMapping("/shipment/delivery-trips")
+    public ResponseEntity<Page<DeliveryTrip>> getDeliveryTrips(
+            @RequestParam int page,
+            @RequestParam int size,
+            @RequestParam String shipmentId) {
+        
+        Page<DeliveryTrip> trips = deliveryTripService.getDeliveryTripsByShipmentId(page, size, shipmentId);
+        return ResponseEntity.ok(trips);
+    }
+	
+	@GetMapping("/delivery-persons")
+	public ResponseEntity<Page<DeliveryPerson>> getAllDeliveryPersons(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size,
+			@RequestParam(value = "search", required = false) String search) {
+
+		Page<DeliveryPerson> deliveryPersons = deliveryPersonService.getAllDeliveryPersons(page, size, search);
+		return ResponseEntity.ok(deliveryPersons);
+	}
+	
+	@PostMapping("/delivery-persons/create")
+    public ResponseEntity<Boolean> createDeliveryPerson(@RequestBody DeliveryPersonRequest request) {
+		boolean success = deliveryPersonService.createDeliveryPerson(request);
+        return ResponseEntity.ok(success);
+    }
+	
+	@GetMapping("/delivery-persons/{userLoginId}")
+    public ResponseEntity<DeliveryPerson> getDeliveryPersonById(@PathVariable String userLoginId) {
+        return deliveryPersonService.getDeliveryPersonById(userLoginId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+	
+	@PostMapping("/delivery-persons/update")
+    public ResponseEntity<Boolean> updateDeliveryPerson(@RequestBody DeliveryPerson updatedPerson) {
+        boolean success = deliveryPersonService.updateDeliveryPerson(updatedPerson);
+        return ResponseEntity.ok(success);
+    }
+	
 	@GetMapping("/delivery-trips")
 	public ResponseEntity<?> getDeliveryTrips(@RequestParam(defaultValue = "CREATED") String status,
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
@@ -114,24 +167,7 @@ public class DeliveryMangerController {
 		}
 
 	}
-
-	@GetMapping("/delivery-persons")
-	public ResponseEntity<Page<DeliveryPerson>> getAllDeliveryPersons(@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "5") int size,
-			@RequestParam(value = "search", required = false) String search) {
-
-		Page<DeliveryPerson> deliveryPersons = deliveryPersonService.getAllDeliveryPersons(page, size, search);
-		return ResponseEntity.ok(deliveryPersons);
-	}
-
-	@GetMapping("/shipments")
-	public ResponseEntity<Page<Shipment>> getAllShipments(@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "5") int size, @RequestParam(required = false) String search) {
-
-		Page<Shipment> shipments = shipmentService.getAllShipments(page, size, search);
-		return ResponseEntity.ok(shipments);
-	}
-
+	
 	@GetMapping("/delivery-trip/general-info/{deliveryTripId}")
 	public ResponseEntity<DeliveryTripGeneralProjection> getDeliveryTripDetail(@PathVariable String deliveryTripId) {
 		DeliveryTripGeneralProjection tripDetail = deliveryTripService.getDeliveryTripById(deliveryTripId);
@@ -168,22 +204,6 @@ public class DeliveryMangerController {
         } else {
             return ResponseEntity.badRequest().body("Delivery trip can only be cancelled if it is in CREATED status.");
         }
-    }
-	
-	@PostMapping("/shipment/create")
-    public ResponseEntity<Shipment> createShipment(@RequestBody ShipmentRequest request) {
-        Shipment shipment = shipmentService.createShipment(request);
-        return ResponseEntity.ok(shipment);
-    }
-	
-	@GetMapping("/shipment/delivery-trips")
-    public ResponseEntity<Page<DeliveryTrip>> getDeliveryTrips(
-            @RequestParam int page,
-            @RequestParam int size,
-            @RequestParam String shipmentId) {
-        
-        Page<DeliveryTrip> trips = deliveryTripService.getDeliveryTripsByShipmentId(page, size, shipmentId);
-        return ResponseEntity.ok(trips);
     }
 
 }

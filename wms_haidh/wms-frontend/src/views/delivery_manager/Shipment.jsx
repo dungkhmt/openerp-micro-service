@@ -23,7 +23,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../api";
 import { formatDate } from '../../utils/utils';
-const buttonText = "Add Shipment";
+const buttonText = "Create Shipment";
 export default function Shipment() {
 
   const [page, setPage] = useState(1);

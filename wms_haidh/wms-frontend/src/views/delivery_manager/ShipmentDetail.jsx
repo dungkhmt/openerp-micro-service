@@ -36,7 +36,7 @@ const ShipmentDetail = () => {
                 setLoading(false);
             }).catch(() => setLoading(false));
         }
-    }, [id]);
+    }, [id,page,rowsPerPage]);
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
