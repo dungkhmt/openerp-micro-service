@@ -1,6 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.code_generator;
 
-import openerp.openerpresourceserver.application.port.in.port.ICodeGeneratorPort;
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.ICodeGeneratorPort;
 import org.apache.commons.lang3.StringUtils;
 
 public abstract class CodeGeneratorService implements ICodeGeneratorService {

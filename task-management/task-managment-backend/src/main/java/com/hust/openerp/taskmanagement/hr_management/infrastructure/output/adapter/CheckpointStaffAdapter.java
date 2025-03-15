@@ -1,18 +1,18 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.adapter;
 
 import lombok.RequiredArgsConstructor;
-import openerp.openerpresourceserver.application.port.in.port.ICheckpointStaffPort;
-import openerp.openerpresourceserver.application.port.out.checkpoint_staff.filter.ICheckpointStaffFilter;
-import openerp.openerpresourceserver.constant.CheckpointPeriodConfigureStatus;
-import openerp.openerpresourceserver.domain.model.CheckpointConfigureModel;
-import openerp.openerpresourceserver.domain.model.CheckpointPeriodConfigureDetailsModel;
-import openerp.openerpresourceserver.domain.model.CheckpointStaffDetailsModel;
-import openerp.openerpresourceserver.domain.model.CheckpointStaffModel;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.CheckpointStaffEntity;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.CheckpointStaffId;
-import openerp.openerpresourceserver.infrastructure.output.persistence.projection.CheckpointStaffProjection;
-import openerp.openerpresourceserver.infrastructure.output.persistence.repository.CheckpointStaffRepo;
-import openerp.openerpresourceserver.infrastructure.output.persistence.specification.CheckpointStaffSpecification;
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.ICheckpointStaffPort;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_staff.filter.ICheckpointStaffFilter;
+import com.hust.openerp.taskmanagement.hr_management.constant.CheckpointPeriodConfigureStatus;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointConfigureModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodConfigureDetailsModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointStaffDetailsModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointStaffModel;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.CheckpointStaffEntity;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.CheckpointStaffId;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.projection.CheckpointStaffProjection;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository.CheckpointStaffRepo;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.specification.CheckpointStaffSpecification;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;

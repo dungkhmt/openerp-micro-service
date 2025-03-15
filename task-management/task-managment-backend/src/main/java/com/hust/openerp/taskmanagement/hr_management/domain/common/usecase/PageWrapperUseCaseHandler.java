@@ -1,7 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.domain.common.usecase;
-import openerp.openerpresourceserver.domain.common.model.UseCase;
-import openerp.openerpresourceserver.domain.model.PageWrapper;
-
+import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
 import java.util.Collection;
 
 

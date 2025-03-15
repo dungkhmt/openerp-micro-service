@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import openerp.openerpresourceserver.constant.StaffStatus;
-import openerp.openerpresourceserver.domain.model.StaffModel;
+import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffModel;
 
 import java.time.LocalDate;
 

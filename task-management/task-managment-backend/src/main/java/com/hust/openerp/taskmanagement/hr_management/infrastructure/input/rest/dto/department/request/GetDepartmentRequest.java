@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.application.port.out.department.usecase_data.GetDepartment;
-import openerp.openerpresourceserver.constant.DepartmentStatus;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.PageableRequest;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.department.usecase_data.GetDepartment;
+import com.hust.openerp.taskmanagement.hr_management.constant.DepartmentStatus;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.PageableRequest;
 
 @Getter
 @Setter

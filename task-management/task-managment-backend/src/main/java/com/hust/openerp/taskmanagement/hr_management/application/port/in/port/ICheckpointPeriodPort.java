@@ -1,9 +1,9 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.in.port;
 
-import openerp.openerpresourceserver.application.port.out.checkpoint_period.filter.ICheckpointPeriodFilter;
-import openerp.openerpresourceserver.domain.model.CheckpointPeriodModel;
-import openerp.openerpresourceserver.domain.model.IPageableRequest;
-import openerp.openerpresourceserver.domain.model.PageWrapper;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_period.filter.ICheckpointPeriodFilter;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.IPageableRequest;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
 
 import java.util.List;
 import java.util.UUID;

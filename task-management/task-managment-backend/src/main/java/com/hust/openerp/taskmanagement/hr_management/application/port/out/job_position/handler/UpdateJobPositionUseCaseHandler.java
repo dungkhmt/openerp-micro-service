@@ -2,12 +2,12 @@ package com.hust.openerp.taskmanagement.hr_management.application.port.out.job_p
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import openerp.openerpresourceserver.application.port.in.port.IJobPositionPort;
-import openerp.openerpresourceserver.application.port.out.job_position.service.JobPositionValidator;
-import openerp.openerpresourceserver.application.port.out.job_position.usecase_data.UpdateJobPosition;
-import openerp.openerpresourceserver.domain.common.DomainComponent;
-import openerp.openerpresourceserver.domain.common.usecase.ObservableUseCasePublisher;
-import openerp.openerpresourceserver.domain.common.usecase.VoidUseCaseHandler;
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IJobPositionPort;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.job_position.service.JobPositionValidator;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.job_position.usecase_data.UpdateJobPosition;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.VoidUseCaseHandler;
 
 @DomainComponent
 @Slf4j

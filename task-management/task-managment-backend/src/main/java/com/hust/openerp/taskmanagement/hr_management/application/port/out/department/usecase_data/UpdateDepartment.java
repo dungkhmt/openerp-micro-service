@@ -4,9 +4,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.constant.DepartmentStatus;
-import openerp.openerpresourceserver.domain.common.model.UseCase;
-import openerp.openerpresourceserver.domain.model.DepartmentModel;
+import com.hust.openerp.taskmanagement.hr_management.constant.DepartmentStatus;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.DepartmentModel;
 
 @Data
 @Builder

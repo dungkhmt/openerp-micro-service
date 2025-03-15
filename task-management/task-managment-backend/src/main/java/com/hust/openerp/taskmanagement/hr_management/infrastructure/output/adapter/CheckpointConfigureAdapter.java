@@ -1,17 +1,17 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.adapter;
 
 import lombok.RequiredArgsConstructor;
-import openerp.openerpresourceserver.application.port.in.port.ICheckpointConfigurePort;
-import openerp.openerpresourceserver.application.port.out.checkpoint_configure.filter.ICheckpointConfigureFilter;
-import openerp.openerpresourceserver.domain.exception.ApplicationException;
-import openerp.openerpresourceserver.domain.model.CheckpointConfigureModel;
-import openerp.openerpresourceserver.domain.model.IPageableRequest;
-import openerp.openerpresourceserver.domain.model.PageWrapper;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.CheckpointConfigureEntity;
-import openerp.openerpresourceserver.infrastructure.output.persistence.repository.CheckpointConfigureRepo;
-import openerp.openerpresourceserver.infrastructure.output.persistence.specification.CheckpointConfigureSpecification;
-import openerp.openerpresourceserver.infrastructure.output.persistence.utils.PageableUtils;
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.ICheckpointConfigurePort;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_configure.filter.ICheckpointConfigureFilter;
+import com.hust.openerp.taskmanagement.hr_management.domain.exception.ApplicationException;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointConfigureModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.IPageableRequest;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.CheckpointConfigureEntity;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository.CheckpointConfigureRepo;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.specification.CheckpointConfigureSpecification;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.utils.PageableUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;

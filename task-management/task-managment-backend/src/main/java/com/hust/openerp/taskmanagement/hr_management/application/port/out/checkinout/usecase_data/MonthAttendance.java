@@ -4,12 +4,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.application.port.out.checkinout.filter.IAttendancesFilter;
-import openerp.openerpresourceserver.application.port.out.checkinout.filter.ICheckinoutFilter;
-import openerp.openerpresourceserver.constant.CheckinoutType;
-import openerp.openerpresourceserver.domain.common.model.UseCase;
-import openerp.openerpresourceserver.domain.model.CheckinoutModel;
-import openerp.openerpresourceserver.processor.AutoMapped;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkinout.filter.IAttendancesFilter;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkinout.filter.ICheckinoutFilter;
+import com.hust.openerp.taskmanagement.hr_management.constant.CheckinoutType;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckinoutModel;
+import com.hust.openerp.taskmanagement.hr_management.processor.AutoMapped;
 
 import java.time.LocalDate;
 import java.time.MonthDay;

@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import openerp.openerpresourceserver.domain.model.IPageableRequest;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.IPageableRequest;
 
 @Getter
 @Setter

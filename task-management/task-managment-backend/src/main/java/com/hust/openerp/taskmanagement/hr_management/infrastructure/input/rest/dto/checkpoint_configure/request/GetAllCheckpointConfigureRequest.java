@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.application.port.out.checkpoint_configure.usecase_data.GetAllCheckpointConfigure;
-import openerp.openerpresourceserver.constant.CheckpointConfigureStatus;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.PageableRequest;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_configure.usecase_data.GetAllCheckpointConfigure;
+import com.hust.openerp.taskmanagement.hr_management.constant.CheckpointConfigureStatus;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.PageableRequest;
 
 @Getter
 @Setter

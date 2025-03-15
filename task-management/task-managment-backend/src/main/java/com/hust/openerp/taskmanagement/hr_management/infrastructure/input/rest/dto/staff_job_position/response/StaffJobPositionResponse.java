@@ -6,8 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.domain.model.StaffJobPositionModel;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.job_position.response.JobPositionResponse;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffJobPositionModel;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.job_position.response.JobPositionResponse;
 
 import java.time.LocalDate;
 

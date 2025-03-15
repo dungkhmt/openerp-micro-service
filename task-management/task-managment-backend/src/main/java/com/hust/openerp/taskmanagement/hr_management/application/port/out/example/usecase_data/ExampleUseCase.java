@@ -1,8 +1,8 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.example.usecase_data;
 
 import lombok.*;
-import openerp.openerpresourceserver.domain.common.model.UseCase;
-import openerp.openerpresourceserver.domain.model.ExampleModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.ExampleModel;
 
 @Data
 @Builder

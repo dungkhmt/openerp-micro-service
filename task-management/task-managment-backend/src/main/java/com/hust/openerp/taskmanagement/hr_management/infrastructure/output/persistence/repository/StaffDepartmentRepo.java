@@ -1,8 +1,8 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository;
 
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.StaffDepartmentEntity;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.StaffDepartmentId;
-import openerp.openerpresourceserver.infrastructure.output.persistence.projection.StaffDepartmentProjection;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.StaffDepartmentEntity;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.StaffDepartmentId;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.projection.StaffDepartmentProjection;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 

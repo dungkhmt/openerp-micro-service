@@ -1,8 +1,8 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository;
 
 
-import openerp.openerpresourceserver.application.port.in.port.IEntityAuthorizationPort;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.EntityAuthorization;
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IEntityAuthorizationPort;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.EntityAuthorization;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.constant.CheckpointPeriodConfigureStatus;
-import openerp.openerpresourceserver.domain.model.CheckpointPeriodConfigureModel;
+import com.hust.openerp.taskmanagement.hr_management.constant.CheckpointPeriodConfigureStatus;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodConfigureModel;
 
 import java.math.BigDecimal;
 import java.util.List;

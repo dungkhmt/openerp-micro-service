@@ -2,11 +2,11 @@ package com.hust.openerp.taskmanagement.hr_management.application.port.out.check
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import openerp.openerpresourceserver.application.port.in.port.ICheckpointConfigurePort;
-import openerp.openerpresourceserver.application.port.out.checkpoint_configure.usecase_data.UpdateCheckpointConfigure;
-import openerp.openerpresourceserver.domain.common.DomainComponent;
-import openerp.openerpresourceserver.domain.common.usecase.ObservableUseCasePublisher;
-import openerp.openerpresourceserver.domain.common.usecase.VoidUseCaseHandler;
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.ICheckpointConfigurePort;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_configure.usecase_data.UpdateCheckpointConfigure;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.VoidUseCaseHandler;
 
 @DomainComponent
 @Slf4j

@@ -1,14 +1,14 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
 import jakarta.validation.Valid;
-import openerp.openerpresourceserver.domain.common.usecase.BeanAwareUseCasePublisher;
-import openerp.openerpresourceserver.domain.model.CheckpointConfigureModel;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_configure.request.CreateCheckpointConfigureRequest;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_configure.request.DeleteCheckpointConfigureRequest;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_configure.request.GetAllCheckpointConfigureRequest;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_configure.request.UpdateCheckpointConfigureRequest;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_configure.response.CheckpointConfigureResponse;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.Resource;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointConfigureModel;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_configure.request.CreateCheckpointConfigureRequest;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_configure.request.DeleteCheckpointConfigureRequest;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_configure.request.GetAllCheckpointConfigureRequest;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_configure.request.UpdateCheckpointConfigureRequest;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_configure.response.CheckpointConfigureResponse;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

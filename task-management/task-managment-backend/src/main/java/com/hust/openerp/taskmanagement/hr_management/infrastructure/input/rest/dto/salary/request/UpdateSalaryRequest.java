@@ -6,8 +6,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.application.port.out.staff_salary.usecase_data.UpdateStaffSalary;
-import openerp.openerpresourceserver.constant.SalaryType;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff_salary.usecase_data.UpdateStaffSalary;
+import com.hust.openerp.taskmanagement.hr_management.constant.SalaryType;
 
 @Getter
 @Setter

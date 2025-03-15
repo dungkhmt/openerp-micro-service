@@ -3,7 +3,7 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
-import openerp.openerpresourceserver.domain.model.CheckpointStaffModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointStaffModel;
 import java.math.BigDecimal;
 import java.util.List;
 

@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.domain.common.model.UseCase;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
 
 @Data
 @Builder

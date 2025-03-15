@@ -1,6 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.department.filter;
 
-import openerp.openerpresourceserver.constant.DepartmentStatus;
+import com.hust.openerp.taskmanagement.hr_management.constant.DepartmentStatus;
 
 public interface IDepartmentFilter {
     String getDepartmentCode();

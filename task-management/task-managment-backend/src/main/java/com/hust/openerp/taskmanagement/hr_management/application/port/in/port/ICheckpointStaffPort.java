@@ -1,8 +1,8 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.in.port;
 
-import openerp.openerpresourceserver.application.port.out.checkpoint_staff.filter.ICheckpointStaffFilter;
-import openerp.openerpresourceserver.domain.model.CheckpointStaffDetailsModel;
-import openerp.openerpresourceserver.domain.model.CheckpointStaffModel;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_staff.filter.ICheckpointStaffFilter;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointStaffDetailsModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointStaffModel;
 
 import java.util.List;
 import java.util.UUID;

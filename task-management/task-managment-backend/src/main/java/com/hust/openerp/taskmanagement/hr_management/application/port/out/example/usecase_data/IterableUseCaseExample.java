@@ -4,9 +4,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.application.port.out.example.filter.IExampleFilter;
-import openerp.openerpresourceserver.domain.common.model.UseCase;
-import openerp.openerpresourceserver.domain.model.ExampleModel;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.example.filter.IExampleFilter;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.ExampleModel;
 
 @Data
 @Builder

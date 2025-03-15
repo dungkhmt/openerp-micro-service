@@ -5,8 +5,8 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
-import openerp.openerpresourceserver.application.port.out.job_position.filter.IJobPositionFilter;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.JobPositionEntity;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.job_position.filter.IJobPositionFilter;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.JobPositionEntity;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;

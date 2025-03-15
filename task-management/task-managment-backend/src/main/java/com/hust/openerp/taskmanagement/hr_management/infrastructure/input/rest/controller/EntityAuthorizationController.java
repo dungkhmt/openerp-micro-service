@@ -2,7 +2,7 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import openerp.openerpresourceserver.application.port.out.EntityAuthorizationUseCase;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.EntityAuthorizationUseCase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;

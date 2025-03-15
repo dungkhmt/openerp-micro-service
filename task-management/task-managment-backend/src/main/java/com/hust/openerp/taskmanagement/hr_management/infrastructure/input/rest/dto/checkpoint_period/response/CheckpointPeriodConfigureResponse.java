@@ -7,12 +7,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import openerp.openerpresourceserver.constant.CheckpointPeriodConfigureStatus;
-import openerp.openerpresourceserver.constant.CheckpointPeriodStatus;
-import openerp.openerpresourceserver.domain.model.CheckpointConfigureModel;
-import openerp.openerpresourceserver.domain.model.CheckpointPeriodConfigureDetailsModel;
-import openerp.openerpresourceserver.domain.model.CheckpointPeriodModel;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_configure.response.CheckpointConfigureResponse;
+import com.hust.openerp.taskmanagement.hr_management.constant.CheckpointPeriodConfigureStatus;
+import com.hust.openerp.taskmanagement.hr_management.constant.CheckpointPeriodStatus;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointConfigureModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodConfigureDetailsModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodModel;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_configure.response.CheckpointConfigureResponse;
 
 import java.math.BigDecimal;
 import java.util.List;

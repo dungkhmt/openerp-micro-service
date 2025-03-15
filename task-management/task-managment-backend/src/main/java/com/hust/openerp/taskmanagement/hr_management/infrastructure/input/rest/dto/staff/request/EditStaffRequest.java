@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.application.port.out.staff.usecase_data.EditStaff;
-import openerp.openerpresourceserver.constant.StaffStatus;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.EditStaff;
+import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
 
 @Getter
 @Setter

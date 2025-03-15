@@ -7,8 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import openerp.openerpresourceserver.domain.model.PageInfo;
-import openerp.openerpresourceserver.domain.model.PageWrapper;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.PageInfo;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
 
 import java.util.List;
 

@@ -2,8 +2,8 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.pers
 
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
-import openerp.openerpresourceserver.application.port.out.department.filter.IDepartmentFilter;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.DepartmentEntity;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.department.filter.IDepartmentFilter;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.DepartmentEntity;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;

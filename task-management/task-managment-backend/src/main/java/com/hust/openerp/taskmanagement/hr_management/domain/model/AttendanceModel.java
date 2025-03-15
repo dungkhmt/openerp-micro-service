@@ -3,8 +3,8 @@ package com.hust.openerp.taskmanagement.hr_management.domain.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.constant.AttendanceConfig;
-import openerp.openerpresourceserver.constant.AttendanceType;
+import com.hust.openerp.taskmanagement.hr_management.constant.AttendanceConfig;
+import com.hust.openerp.taskmanagement.hr_management.constant.AttendanceType;
 
 import java.time.Duration;
 import java.time.LocalDate;

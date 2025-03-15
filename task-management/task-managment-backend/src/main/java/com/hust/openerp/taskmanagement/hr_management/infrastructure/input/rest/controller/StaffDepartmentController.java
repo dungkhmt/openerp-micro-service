@@ -1,11 +1,11 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
 import jakarta.validation.Valid;
-import openerp.openerpresourceserver.domain.common.usecase.BeanAwareUseCasePublisher;
-import openerp.openerpresourceserver.domain.model.StaffDepartmentModel;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.Resource;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.staff_department.request.GetDepartmentHistoryRequest;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.staff_department.response.StaffDepartmentResponse;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffDepartmentModel;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.staff_department.request.GetDepartmentHistoryRequest;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.staff_department.response.StaffDepartmentResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

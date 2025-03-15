@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.application.port.out.checkpoint_period.usecase_data.CreateCheckpointPeriod;
-import openerp.openerpresourceserver.constant.CheckpointPeriodStatus;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_period.usecase_data.CreateCheckpointPeriod;
+import com.hust.openerp.taskmanagement.hr_management.constant.CheckpointPeriodStatus;
 
 import java.util.List;
 

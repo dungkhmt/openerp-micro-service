@@ -2,11 +2,11 @@ package com.hust.openerp.taskmanagement.hr_management.application.port.out.examp
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import openerp.openerpresourceserver.application.port.out.example.usecase_data.ExampleUseCase;
-import openerp.openerpresourceserver.domain.common.DomainComponent;
-import openerp.openerpresourceserver.domain.common.usecase.ObservableUseCasePublisher;
-import openerp.openerpresourceserver.domain.common.usecase.UseCaseHandler;
-import openerp.openerpresourceserver.domain.model.ExampleModel;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.example.usecase_data.ExampleUseCase;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.UseCaseHandler;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.ExampleModel;
 
 @DomainComponent
 @Slf4j

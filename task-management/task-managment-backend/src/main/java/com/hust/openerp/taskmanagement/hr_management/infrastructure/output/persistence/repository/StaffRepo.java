@@ -1,7 +1,7 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository;
 
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.StaffEntity;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.User;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.StaffEntity;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 

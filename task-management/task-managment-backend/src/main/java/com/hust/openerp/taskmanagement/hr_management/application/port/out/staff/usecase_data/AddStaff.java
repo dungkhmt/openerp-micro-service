@@ -5,9 +5,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import openerp.openerpresourceserver.constant.StaffStatus;
-import openerp.openerpresourceserver.domain.common.model.UseCase;
-import openerp.openerpresourceserver.domain.model.StaffModel;
+import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffModel;
 
 @Data
 @Builder

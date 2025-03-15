@@ -1,7 +1,7 @@
 package com.hust.openerp.taskmanagement.hr_management.domain.model;
 
 import lombok.*;
-import openerp.openerpresourceserver.constant.SalaryType;
+import com.hust.openerp.taskmanagement.hr_management.constant.SalaryType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

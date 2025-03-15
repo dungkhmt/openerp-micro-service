@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.domain.model.CheckpointStaffModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointStaffModel;
 import java.math.BigDecimal;
 import java.util.List;
 

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.application.port.out.checkpoint_configure.usecase_data.CreateCheckpointConfigure;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_configure.usecase_data.CreateCheckpointConfigure;
 
 
 @Getter

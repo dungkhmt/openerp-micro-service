@@ -1,14 +1,14 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.adapter;
 
 import lombok.RequiredArgsConstructor;
-import openerp.openerpresourceserver.application.port.in.port.IStaffJobPositionPort;
-import openerp.openerpresourceserver.constant.JobPositionStatus;
-import openerp.openerpresourceserver.domain.model.JobPositionModel;
-import openerp.openerpresourceserver.domain.model.StaffJobPositionModel;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.StaffJobPositionEntity;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.StaffJobPositionId;
-import openerp.openerpresourceserver.infrastructure.output.persistence.projection.StaffJobPositionProjection;
-import openerp.openerpresourceserver.infrastructure.output.persistence.repository.StaffJobPositionRepo;
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IStaffJobPositionPort;
+import com.hust.openerp.taskmanagement.hr_management.constant.JobPositionStatus;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.JobPositionModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffJobPositionModel;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.StaffJobPositionEntity;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.StaffJobPositionId;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.projection.StaffJobPositionProjection;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository.StaffJobPositionRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

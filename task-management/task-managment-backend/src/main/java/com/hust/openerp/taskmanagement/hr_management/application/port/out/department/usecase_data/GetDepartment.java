@@ -4,10 +4,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.application.port.out.department.filter.IDepartmentFilter;
-import openerp.openerpresourceserver.constant.DepartmentStatus;
-import openerp.openerpresourceserver.domain.common.model.UseCase;
-import openerp.openerpresourceserver.domain.model.IPageableRequest;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.department.filter.IDepartmentFilter;
+import com.hust.openerp.taskmanagement.hr_management.constant.DepartmentStatus;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.IPageableRequest;
 
 @Data
 @Builder

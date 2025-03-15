@@ -1,17 +1,17 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.adapter;
 
 import lombok.RequiredArgsConstructor;
-import openerp.openerpresourceserver.application.port.in.port.ICheckpointPeriodPort;
-import openerp.openerpresourceserver.application.port.out.checkpoint_period.filter.ICheckpointPeriodFilter;
-import openerp.openerpresourceserver.domain.exception.ApplicationException;
-import openerp.openerpresourceserver.domain.model.CheckpointPeriodModel;
-import openerp.openerpresourceserver.domain.model.IPageableRequest;
-import openerp.openerpresourceserver.domain.model.PageWrapper;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.CheckpointPeriodEntity;
-import openerp.openerpresourceserver.infrastructure.output.persistence.repository.CheckpointPeriodRepo;
-import openerp.openerpresourceserver.infrastructure.output.persistence.specification.CheckpointPeriodSpecification;
-import openerp.openerpresourceserver.infrastructure.output.persistence.utils.PageableUtils;
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.ICheckpointPeriodPort;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_period.filter.ICheckpointPeriodFilter;
+import com.hust.openerp.taskmanagement.hr_management.domain.exception.ApplicationException;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.IPageableRequest;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.CheckpointPeriodEntity;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository.CheckpointPeriodRepo;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.specification.CheckpointPeriodSpecification;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.utils.PageableUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;

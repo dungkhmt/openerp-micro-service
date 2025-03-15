@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.domain.model.PageInfo;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.PageInfo;
 
 @Getter
 @Setter

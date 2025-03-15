@@ -7,11 +7,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import openerp.openerpresourceserver.constant.StaffStatus;
-import openerp.openerpresourceserver.domain.model.DepartmentModel;
-import openerp.openerpresourceserver.domain.model.JobPositionModel;
-import openerp.openerpresourceserver.domain.model.StaffDetailModel;
-import openerp.openerpresourceserver.domain.model.StaffModel;
+import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.DepartmentModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.JobPositionModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffDetailModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffModel;
 
 @AllArgsConstructor
 @Getter

@@ -1,8 +1,8 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository;
 
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.CheckpointStaffEntity;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.CheckpointStaffId;
-import openerp.openerpresourceserver.infrastructure.output.persistence.projection.CheckpointStaffProjection;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.CheckpointStaffEntity;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.CheckpointStaffId;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.projection.CheckpointStaffProjection;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 

@@ -1,10 +1,10 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_staff.service;
 
-import openerp.openerpresourceserver.application.port.out.checkpoint_period_configure.usecase_data.GetCheckpointPeriodConfigure;
-import openerp.openerpresourceserver.constant.CheckpointPeriodConfigureStatus;
-import openerp.openerpresourceserver.domain.common.usecase.ObservableUseCasePublisher;
-import openerp.openerpresourceserver.domain.model.CheckpointPeriodConfigureModel;
-import openerp.openerpresourceserver.domain.model.CheckpointStaffModel;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_period_configure.usecase_data.GetCheckpointPeriodConfigure;
+import com.hust.openerp.taskmanagement.hr_management.constant.CheckpointPeriodConfigureStatus;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodConfigureModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointStaffModel;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;

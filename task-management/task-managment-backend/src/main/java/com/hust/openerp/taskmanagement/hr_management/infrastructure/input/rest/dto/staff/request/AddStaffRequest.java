@@ -6,8 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.application.port.out.staff.usecase_data.AddStaff;
-import openerp.openerpresourceserver.constant.StaffStatus;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.AddStaff;
+import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
 
 @Getter
 @Setter

@@ -1,6 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.in.port;
 
-import openerp.openerpresourceserver.domain.model.StaffJobPositionModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffJobPositionModel;
 
 import java.util.List;
 

@@ -1,9 +1,9 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.in.port;
 
-import openerp.openerpresourceserver.application.port.out.job_position.filter.IJobPositionFilter;
-import openerp.openerpresourceserver.domain.model.IPageableRequest;
-import openerp.openerpresourceserver.domain.model.JobPositionModel;
-import openerp.openerpresourceserver.domain.model.PageWrapper;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.job_position.filter.IJobPositionFilter;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.IPageableRequest;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.JobPositionModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
 
 import java.util.List;
 

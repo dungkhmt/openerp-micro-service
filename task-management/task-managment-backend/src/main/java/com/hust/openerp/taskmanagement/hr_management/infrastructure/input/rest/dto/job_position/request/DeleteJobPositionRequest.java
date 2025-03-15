@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.application.port.out.job_position.usecase_data.UpdateJobPosition;
-import openerp.openerpresourceserver.constant.JobPositionStatus;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.job_position.usecase_data.UpdateJobPosition;
+import com.hust.openerp.taskmanagement.hr_management.constant.JobPositionStatus;
 
 @Getter
 @Setter

@@ -2,12 +2,12 @@ package com.hust.openerp.taskmanagement.hr_management.application.port.out.staff
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import openerp.openerpresourceserver.application.port.in.port.IStaffDepartmentPort;
-import openerp.openerpresourceserver.application.port.out.staff_department.usecase_data.GetAllCurrentStaffDepartment;
-import openerp.openerpresourceserver.domain.common.DomainComponent;
-import openerp.openerpresourceserver.domain.common.usecase.CollectionUseCaseHandler;
-import openerp.openerpresourceserver.domain.common.usecase.ObservableUseCasePublisher;
-import openerp.openerpresourceserver.domain.model.StaffDepartmentModel;
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IStaffDepartmentPort;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff_department.usecase_data.GetAllCurrentStaffDepartment;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.CollectionUseCaseHandler;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffDepartmentModel;
 
 import java.util.Collection;
 

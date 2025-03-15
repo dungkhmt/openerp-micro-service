@@ -1,13 +1,13 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
 import jakarta.validation.Valid;
-import openerp.openerpresourceserver.domain.common.usecase.BeanAwareUseCasePublisher;
-import openerp.openerpresourceserver.domain.model.CheckpointPeriodDetailsModel;
-import openerp.openerpresourceserver.domain.model.CheckpointPeriodModel;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_period.request.*;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_period.response.CheckpointPeriodDetailsResponse;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.checkpoint_period.response.CheckpointPeriodResponse;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.Resource;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodDetailsModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodModel;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_period.request.*;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_period.response.CheckpointPeriodDetailsResponse;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_period.response.CheckpointPeriodResponse;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

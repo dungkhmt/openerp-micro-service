@@ -2,8 +2,8 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.domain.model.PageInfo;
-import openerp.openerpresourceserver.domain.model.PageWrapper;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.PageInfo;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
 
 @Getter
 @Setter

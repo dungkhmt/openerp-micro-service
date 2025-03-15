@@ -5,8 +5,8 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
-import openerp.openerpresourceserver.application.port.out.checkpoint_period_configure.filter.ICheckpointPeriodConfigureFilter;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.CheckpointPeriodConfigureEntity;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_period_configure.filter.ICheckpointPeriodConfigureFilter;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.CheckpointPeriodConfigureEntity;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;

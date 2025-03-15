@@ -1,13 +1,13 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
 import jakarta.validation.Valid;
-import openerp.openerpresourceserver.domain.common.usecase.BeanAwareUseCasePublisher;
-import openerp.openerpresourceserver.domain.model.StaffDetailModel;
-import openerp.openerpresourceserver.domain.model.StaffModel;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.Resource;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.staff.request.*;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.staff.response.StaffDetailResponse;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.staff.response.StaffResponse;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffDetailModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffModel;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.staff.request.*;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.staff.response.StaffDetailResponse;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.staff.response.StaffResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

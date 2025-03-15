@@ -1,9 +1,9 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.in.port;
 
-import openerp.openerpresourceserver.application.port.out.staff.filter.IStaffFilter;
-import openerp.openerpresourceserver.domain.model.PageWrapper;
-import openerp.openerpresourceserver.domain.model.StaffModel;
-import openerp.openerpresourceserver.domain.model.IPageableRequest;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.filter.IStaffFilter;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.IPageableRequest;
 
 import java.util.List;
 

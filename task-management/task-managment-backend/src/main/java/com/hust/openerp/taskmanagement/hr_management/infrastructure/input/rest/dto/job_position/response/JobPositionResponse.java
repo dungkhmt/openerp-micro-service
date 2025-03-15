@@ -6,9 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.constant.DepartmentStatus;
-import openerp.openerpresourceserver.domain.model.DepartmentModel;
-import openerp.openerpresourceserver.domain.model.JobPositionModel;
+import com.hust.openerp.taskmanagement.hr_management.constant.DepartmentStatus;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.DepartmentModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.JobPositionModel;
 
 @AllArgsConstructor
 @Getter

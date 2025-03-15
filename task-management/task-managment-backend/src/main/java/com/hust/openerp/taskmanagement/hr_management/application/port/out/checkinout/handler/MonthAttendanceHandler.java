@@ -2,12 +2,12 @@ package com.hust.openerp.taskmanagement.hr_management.application.port.out.check
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import openerp.openerpresourceserver.application.port.in.port.ICheckinoutPort;
-import openerp.openerpresourceserver.application.port.out.checkinout.usecase_data.MonthAttendance;
-import openerp.openerpresourceserver.domain.common.DomainComponent;
-import openerp.openerpresourceserver.domain.common.usecase.CollectionUseCaseHandler;
-import openerp.openerpresourceserver.domain.common.usecase.ObservableUseCasePublisher;
-import openerp.openerpresourceserver.domain.model.AttendanceModel;
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.ICheckinoutPort;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkinout.usecase_data.MonthAttendance;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.CollectionUseCaseHandler;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.AttendanceModel;
 
 import java.util.Collection;
 

@@ -1,9 +1,9 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository;
 
 
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.StaffJobPositionEntity;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.StaffJobPositionId;
-import openerp.openerpresourceserver.infrastructure.output.persistence.projection.StaffJobPositionProjection;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.StaffJobPositionEntity;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.StaffJobPositionId;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.projection.StaffJobPositionProjection;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 

@@ -1,8 +1,8 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.exception.handler;
 
-import openerp.openerpresourceserver.domain.exception.ApplicationException;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.Resource;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
+import com.hust.openerp.taskmanagement.hr_management.domain.exception.ApplicationException;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

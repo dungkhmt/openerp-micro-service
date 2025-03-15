@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.application.port.out.staff_job_position.usecase_data.StaffJobPositionHistory;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff_job_position.usecase_data.StaffJobPositionHistory;
 
 @Getter
 @Setter

@@ -1,14 +1,14 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.adapter;
 
 import lombok.RequiredArgsConstructor;
-import openerp.openerpresourceserver.application.port.in.port.IStaffDepartmentPort;
-import openerp.openerpresourceserver.constant.DepartmentStatus;
-import openerp.openerpresourceserver.domain.model.DepartmentModel;
-import openerp.openerpresourceserver.domain.model.StaffDepartmentModel;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.StaffDepartmentEntity;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.StaffDepartmentId;
-import openerp.openerpresourceserver.infrastructure.output.persistence.projection.StaffDepartmentProjection;
-import openerp.openerpresourceserver.infrastructure.output.persistence.repository.StaffDepartmentRepo;
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IStaffDepartmentPort;
+import com.hust.openerp.taskmanagement.hr_management.constant.DepartmentStatus;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.DepartmentModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffDepartmentModel;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.StaffDepartmentEntity;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.StaffDepartmentId;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.projection.StaffDepartmentProjection;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository.StaffDepartmentRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

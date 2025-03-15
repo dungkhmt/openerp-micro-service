@@ -1,6 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.checkinout.filter;
 
-import openerp.openerpresourceserver.constant.CheckinoutType;
+import com.hust.openerp.taskmanagement.hr_management.constant.CheckinoutType;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -1,10 +1,9 @@
 package com.hust.openerp.taskmanagement.hr_management.domain.exception;
 
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
 
 @AllArgsConstructor
 @Getter

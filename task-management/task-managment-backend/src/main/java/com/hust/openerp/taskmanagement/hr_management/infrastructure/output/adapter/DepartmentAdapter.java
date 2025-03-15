@@ -1,18 +1,18 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.adapter;
 
 import lombok.RequiredArgsConstructor;
-import openerp.openerpresourceserver.application.port.in.port.IDepartmentPort;
-import openerp.openerpresourceserver.application.port.out.department.filter.IDepartmentFilter;
-import openerp.openerpresourceserver.constant.DepartmentStatus;
-import openerp.openerpresourceserver.domain.exception.ApplicationException;
-import openerp.openerpresourceserver.domain.model.DepartmentModel;
-import openerp.openerpresourceserver.domain.model.IPageableRequest;
-import openerp.openerpresourceserver.domain.model.PageWrapper;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.DepartmentEntity;
-import openerp.openerpresourceserver.infrastructure.output.persistence.repository.DepartmentRepo;
-import openerp.openerpresourceserver.infrastructure.output.persistence.specification.DepartmentSpecification;
-import openerp.openerpresourceserver.infrastructure.output.persistence.utils.PageableUtils;
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IDepartmentPort;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.department.filter.IDepartmentFilter;
+import com.hust.openerp.taskmanagement.hr_management.constant.DepartmentStatus;
+import com.hust.openerp.taskmanagement.hr_management.domain.exception.ApplicationException;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.DepartmentModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.IPageableRequest;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.DepartmentEntity;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository.DepartmentRepo;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.specification.DepartmentSpecification;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.utils.PageableUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;

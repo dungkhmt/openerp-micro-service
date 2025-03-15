@@ -1,14 +1,14 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
 import jakarta.validation.Valid;
-import openerp.openerpresourceserver.domain.common.usecase.BeanAwareUseCasePublisher;
-import openerp.openerpresourceserver.domain.model.JobPositionModel;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.Resource;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.job_position.request.CreateJobPositionRequest;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.job_position.request.DeleteJobPositionRequest;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.job_position.request.GetJobPositionRequest;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.job_position.request.UpdateJobPositionRequest;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.job_position.response.JobPositionResponse;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.JobPositionModel;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.job_position.request.CreateJobPositionRequest;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.job_position.request.DeleteJobPositionRequest;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.job_position.request.GetJobPositionRequest;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.job_position.request.UpdateJobPositionRequest;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.job_position.response.JobPositionResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

@@ -3,7 +3,7 @@ package com.hust.openerp.taskmanagement.hr_management.domain.model;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.constant.CheckinoutType;
+import com.hust.openerp.taskmanagement.hr_management.constant.CheckinoutType;
 
 import java.time.LocalDateTime;
 

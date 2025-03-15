@@ -2,16 +2,16 @@ package com.hust.openerp.taskmanagement.hr_management.application.port.out.check
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import openerp.openerpresourceserver.application.port.in.port.ICheckpointPeriodPort;
-import openerp.openerpresourceserver.application.port.out.checkpoint_period.usecase_data.UpdateCheckpointPeriod;
-import openerp.openerpresourceserver.application.port.out.checkpoint_period_configure.usecase_data.UpdateCheckpointPeriodConfigure;
-import openerp.openerpresourceserver.application.port.out.checkpoint_staff.usecase_data.ExistsCheckpointStaff;
-import openerp.openerpresourceserver.domain.common.DomainComponent;
-import openerp.openerpresourceserver.domain.common.usecase.ObservableUseCasePublisher;
-import openerp.openerpresourceserver.domain.common.usecase.VoidUseCaseHandler;
-import openerp.openerpresourceserver.domain.exception.ApplicationException;
-import openerp.openerpresourceserver.domain.model.CheckpointPeriodConfigureModel;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.ICheckpointPeriodPort;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_period.usecase_data.UpdateCheckpointPeriod;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_period_configure.usecase_data.UpdateCheckpointPeriodConfigure;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_staff.usecase_data.ExistsCheckpointStaff;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.VoidUseCaseHandler;
+import com.hust.openerp.taskmanagement.hr_management.domain.exception.ApplicationException;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodConfigureModel;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
 
 import java.util.List;
 import java.util.UUID;

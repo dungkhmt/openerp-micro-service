@@ -6,8 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.domain.model.StaffDepartmentModel;
-import openerp.openerpresourceserver.infrastructure.input.rest.dto.department.response.DepartmentResponse;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffDepartmentModel;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.department.response.DepartmentResponse;
 
 import java.time.LocalDate;
 

@@ -4,8 +4,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.application.port.out.checkpoint_staff.filter.ICheckpointStaffFilter;
-import openerp.openerpresourceserver.domain.common.model.UseCase;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_staff.filter.ICheckpointStaffFilter;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
 
 import java.util.List;
 import java.util.UUID;

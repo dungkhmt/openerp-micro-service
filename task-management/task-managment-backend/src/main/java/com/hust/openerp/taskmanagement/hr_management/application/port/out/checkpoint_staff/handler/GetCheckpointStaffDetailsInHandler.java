@@ -2,12 +2,12 @@ package com.hust.openerp.taskmanagement.hr_management.application.port.out.check
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import openerp.openerpresourceserver.application.port.in.port.ICheckpointStaffPort;
-import openerp.openerpresourceserver.application.port.out.checkpoint_staff.usecase_data.GetCheckpointStaffDetailsIn;
-import openerp.openerpresourceserver.domain.common.DomainComponent;
-import openerp.openerpresourceserver.domain.common.usecase.CollectionUseCaseHandler;
-import openerp.openerpresourceserver.domain.common.usecase.ObservableUseCasePublisher;
-import openerp.openerpresourceserver.domain.model.CheckpointStaffDetailsModel;
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.ICheckpointStaffPort;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_staff.usecase_data.GetCheckpointStaffDetailsIn;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.CollectionUseCaseHandler;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointStaffDetailsModel;
 
 import java.util.Collection;
 

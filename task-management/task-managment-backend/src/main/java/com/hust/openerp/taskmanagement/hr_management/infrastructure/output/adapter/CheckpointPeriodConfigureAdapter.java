@@ -1,18 +1,18 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.adapter;
 
 import lombok.RequiredArgsConstructor;
-import openerp.openerpresourceserver.application.port.in.port.ICheckpointPeriodConfigurePort;
-import openerp.openerpresourceserver.application.port.out.checkpoint_period_configure.filter.ICheckpointPeriodConfigureFilter;
-import openerp.openerpresourceserver.constant.CheckpointConfigureStatus;
-import openerp.openerpresourceserver.constant.CheckpointPeriodConfigureStatus;
-import openerp.openerpresourceserver.domain.model.CheckpointConfigureModel;
-import openerp.openerpresourceserver.domain.model.CheckpointPeriodConfigureDetailsModel;
-import openerp.openerpresourceserver.domain.model.CheckpointPeriodConfigureModel;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.CheckpointPeriodConfigureEntity;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.CheckpointPeriodConfigureId;
-import openerp.openerpresourceserver.infrastructure.output.persistence.projection.CheckpointPeriodConfigureProjection;
-import openerp.openerpresourceserver.infrastructure.output.persistence.repository.CheckpointPeriodConfigureRepo;
-import openerp.openerpresourceserver.infrastructure.output.persistence.specification.CheckpointPeriodConfigureSpecification;
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.ICheckpointPeriodConfigurePort;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_period_configure.filter.ICheckpointPeriodConfigureFilter;
+import com.hust.openerp.taskmanagement.hr_management.constant.CheckpointConfigureStatus;
+import com.hust.openerp.taskmanagement.hr_management.constant.CheckpointPeriodConfigureStatus;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointConfigureModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodConfigureDetailsModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodConfigureModel;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.CheckpointPeriodConfigureEntity;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.CheckpointPeriodConfigureId;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.projection.CheckpointPeriodConfigureProjection;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository.CheckpointPeriodConfigureRepo;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.specification.CheckpointPeriodConfigureSpecification;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;

@@ -2,8 +2,8 @@ package com.hust.openerp.taskmanagement.hr_management.reflection.enumBinding;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import openerp.openerpresourceserver.reflection.ReflectionBindingException;
-import openerp.openerpresourceserver.reflection.ReflectionHelper;
+import com.hust.openerp.taskmanagement.hr_management.reflection.ReflectionBindingException;
+import com.hust.openerp.taskmanagement.hr_management.reflection.ReflectionHelper;
 
 import java.util.HashMap;
 import java.util.Map;

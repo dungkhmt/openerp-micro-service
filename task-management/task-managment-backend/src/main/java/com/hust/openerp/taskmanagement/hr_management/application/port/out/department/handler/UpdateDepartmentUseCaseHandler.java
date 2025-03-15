@@ -2,12 +2,12 @@ package com.hust.openerp.taskmanagement.hr_management.application.port.out.depar
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import openerp.openerpresourceserver.application.port.in.port.IDepartmentPort;
-import openerp.openerpresourceserver.application.port.out.department.service.DepartmentValidator;
-import openerp.openerpresourceserver.application.port.out.department.usecase_data.UpdateDepartment;
-import openerp.openerpresourceserver.domain.common.DomainComponent;
-import openerp.openerpresourceserver.domain.common.usecase.ObservableUseCasePublisher;
-import openerp.openerpresourceserver.domain.common.usecase.VoidUseCaseHandler;
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IDepartmentPort;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.department.service.DepartmentValidator;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.department.usecase_data.UpdateDepartment;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.VoidUseCaseHandler;
 
 @DomainComponent
 @Slf4j

@@ -1,7 +1,7 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import openerp.openerpresourceserver.domain.exception.InvalidParameterException;
+import com.hust.openerp.taskmanagement.hr_management.domain.exception.InvalidParameterException;
 
 @Slf4j
 public class NameValidatorUtils {

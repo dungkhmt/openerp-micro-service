@@ -2,17 +2,17 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.adap
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import openerp.openerpresourceserver.application.port.in.port.ICheckinoutPort;
-import openerp.openerpresourceserver.application.port.out.checkinout.filter.IAttendancesFilter;
-import openerp.openerpresourceserver.application.port.out.checkinout.filter.ICheckinoutFilter;
-import openerp.openerpresourceserver.application.port.out.checkinout.usecase_data.Checkinout;
-import openerp.openerpresourceserver.constant.CheckinoutType;
-import openerp.openerpresourceserver.domain.model.CheckinoutModel;
-import openerp.openerpresourceserver.infrastructure.output.persistence.entity.CheckinoutEntity;
-import openerp.openerpresourceserver.infrastructure.output.persistence.repository.ICheckinoutRepo;
-import openerp.openerpresourceserver.infrastructure.output.persistence.specification.AttendanceSpecification;
-import openerp.openerpresourceserver.infrastructure.output.persistence.specification.CheckinoutSpecification;
-import openerp.openerpresourceserver.application.port.out.checkinout.filter.impl.CheckinoutFilter;
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.ICheckinoutPort;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkinout.filter.IAttendancesFilter;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkinout.filter.ICheckinoutFilter;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkinout.usecase_data.Checkinout;
+import com.hust.openerp.taskmanagement.hr_management.constant.CheckinoutType;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckinoutModel;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.CheckinoutEntity;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository.ICheckinoutRepo;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.specification.AttendanceSpecification;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.specification.CheckinoutSpecification;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkinout.filter.impl.CheckinoutFilter;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 

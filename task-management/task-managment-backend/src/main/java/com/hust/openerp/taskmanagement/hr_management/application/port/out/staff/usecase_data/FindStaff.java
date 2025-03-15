@@ -2,10 +2,10 @@ package com.hust.openerp.taskmanagement.hr_management.application.port.out.staff
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import openerp.openerpresourceserver.application.port.out.staff.filter.IStaffFilter;
-import openerp.openerpresourceserver.constant.StaffStatus;
-import openerp.openerpresourceserver.domain.common.model.UseCase;
-import openerp.openerpresourceserver.domain.model.IPageableRequest;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.filter.IStaffFilter;
+import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.IPageableRequest;
 
 @Data
 @SuperBuilder

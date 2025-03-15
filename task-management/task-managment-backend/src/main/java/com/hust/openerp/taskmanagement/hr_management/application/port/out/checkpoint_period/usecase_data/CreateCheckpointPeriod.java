@@ -4,10 +4,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.constant.CheckpointPeriodStatus;
-import openerp.openerpresourceserver.domain.common.model.UseCase;
-import openerp.openerpresourceserver.domain.model.CheckpointPeriodConfigureModel;
-import openerp.openerpresourceserver.domain.model.CheckpointPeriodModel;
+import com.hust.openerp.taskmanagement.hr_management.constant.CheckpointPeriodStatus;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodConfigureModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodModel;
 
 import java.util.List;
 import java.util.UUID;

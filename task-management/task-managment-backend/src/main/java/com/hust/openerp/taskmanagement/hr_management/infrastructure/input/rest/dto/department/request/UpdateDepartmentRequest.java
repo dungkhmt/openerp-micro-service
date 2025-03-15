@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.application.port.out.department.usecase_data.UpdateDepartment;
-import openerp.openerpresourceserver.constant.DepartmentStatus;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.department.usecase_data.UpdateDepartment;
+import com.hust.openerp.taskmanagement.hr_management.constant.DepartmentStatus;
 
 @Getter
 @Setter

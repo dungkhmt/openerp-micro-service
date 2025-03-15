@@ -3,7 +3,7 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.pers
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import openerp.openerpresourceserver.constant.SalaryType;
+import com.hust.openerp.taskmanagement.hr_management.constant.SalaryType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

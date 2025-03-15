@@ -1,5 +1,5 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.service;
-import openerp.openerpresourceserver.application.port.out.code_generator.CodeGeneratorService;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.code_generator.CodeGeneratorService;
 import org.springframework.stereotype.Component;
 
 @Component
