@@ -78,15 +78,15 @@
   .search-filters {
     display: flex;
     gap: 1rem;
-    align-items: center;
     flex-wrap: wrap;
     justify-content: space-between;
+    align-items: center;
   }
   
   .filter-item, .search-bar {
     flex: 1 1 100%;
-    min-width: 250px;
-    max-width: 250px;
+    min-width: 200px;
+    max-width: 200px;
   }
   
   .employee-table {
@@ -143,10 +143,10 @@
   
 
   .icon-button {
-    color: #007bff; /* Màu xanh cho biểu tượng */
+    color: #007bff; 
     transition: transform 0.3s;
   }
   
   .icon-button:hover {
-    transform: scale(1.2); /* Phóng to nhẹ khi hover */
+    transform: scale(1.2);
   }

@@ -13,6 +13,7 @@ import DeleteConfirmationModal from "./modals/DeleteConfirmationModal";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useHistory } from "react-router-dom";
 import { CSVLink } from "react-csv";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -35,6 +36,14 @@ const CheckpointPeriodScreen = () => {
   const [deletePeriod, setDeletePeriod] = useState(null);
   const [dropdownVisible, setDropdownVisible] = useState(null);
   const dropdownRefs = useRef([]);
+  const history = useHistory();
+  
+  const handleRowClick = (period) => {
+    history.push({
+      pathname: `/checkpoint-evaluation`,
+      state: { period }, 
+    });
+  };
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -317,7 +326,12 @@ const CheckpointPeriodScreen = () => {
           {rows.map((row) => {
             prepareRow(row);
             return (
-              <tr {...row.getRowProps()} key={row.id}>
+              <tr
+                {...row.getRowProps()}
+                key={row.id}
+                onClick={() => handleRowClick(row.original)} 
+                style={{ cursor: "pointer" }} 
+              >
                 {row.cells.map((cell) => (
                   <td {...cell.getCellProps()} key={cell.column.id}>
                     {cell.render("Cell")}

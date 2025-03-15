@@ -10,7 +10,7 @@ public class DepartmentValidator {
 
     public void validateDepartmentName(String name) {
         if (!name.matches("^[a-zA-Z0-9]+(\\s[a-zA-Z0-9]+)*$")) {
-            log.error("Staff name contains invalid characters or invalid spacing");
+            log.error("Department name contains invalid characters or invalid spacing");
             throw new InvalidParameterException("Department name contains invalid characters or invalid spacing." +
                     " Only letters, numbers, and single spaces between words are allowed.");
         }

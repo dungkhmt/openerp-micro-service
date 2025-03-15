@@ -79,7 +79,7 @@ const DepartmentTable = () => {
   }, [itemsPerPage, searchTerm]);
 
   useEffect(() => {
-    // Handle click outside of dropdowns to close them
+   
     const handleOutsideClick = (event) => {
       if (
         dropdownVisible !== null &&

@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.infrastructure.input.rest.dto.salary.reque
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import openerp.openerpresourceserver.constant.SalaryType;
 public class UpdateSalaryRequest {
     @NotNull
     private String userLoginId;
+    @Min(value = 0)
     private Integer salary;
     private SalaryType salaryType;
 

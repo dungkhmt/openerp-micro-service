@@ -1,15 +1,15 @@
 .dialog-container {
   text-align: center;
-  padding: 10px; /* Reduced padding */
-  border-radius: 12px; /* Rounded corners */
+  padding: 10px; 
+  border-radius: 12px; 
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
-  min-width: 500px; /* Fixed width for compact layout */
+  min-width: 500px; 
   margin: auto;
   position: fixed;
-  top: 40%; /* Centered vertically */
-  left: 50%; /* Centered horizontally */
+  top: 40%; 
+  left: 50%; 
   transform: translate(-50%, -40%);
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); 
   background-color: #fff; 
@@ -48,7 +48,7 @@
 }
 
 .dialog-actions .cancel-button:hover {
-  background-color: #007bff; /* Blue hover effect */
+  background-color: #007bff; 
   color: white;
   
 }
@@ -66,5 +66,5 @@
 }
 
 .dialog-actions .delete-button:hover {
-  background-color: #e20000; /* Darker red on hover */
+  background-color: #e20000; 
 }

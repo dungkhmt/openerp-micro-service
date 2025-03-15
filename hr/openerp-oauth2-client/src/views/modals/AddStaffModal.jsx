@@ -30,10 +30,9 @@ const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
   const [searchDepartment, setSearchDepartment] = useState("");
   const [searchJob, setSearchJob] = useState("");
 
-  const [loading, setLoading] = useState(false); // Submit button loading state
-  const [error, setError] = useState(null); // Error state for Snackbar
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null); 
 
-  // Load initial values and fetch data when modal opens
   useEffect(() => {
     if (open) {
       setFormValues({
@@ -48,7 +47,7 @@ const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
     }
   }, [open, initialValues]);
 
-  // Fetch departments
+
   const fetchDepartments = async (searchValue, defaultCode = null) => {
     setLoadingDepartments(true);
     try {
@@ -66,7 +65,7 @@ const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
             const data = res.data.data || [];
             setDepartments(data);
 
-            // Set default value if department_code exists in initialValues
+
             if (defaultCode) {
               const defaultDepartment = data.find(
                   (dept) => dept.department_code === defaultCode
@@ -89,7 +88,7 @@ const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
     }
   };
 
-  // Fetch job positions
+
   const fetchJobPositions = async (searchValue, defaultCode = null) => {
     setLoadingJobPositions(true);
     try {
@@ -107,7 +106,6 @@ const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
             const data = res.data.data || [];
             setJobPositions(data);
 
-            // Set default value if job_position_code exists in initialValues
             if (defaultCode) {
               const defaultJob = data.find((job) => job.code === defaultCode);
               if (defaultJob) {
@@ -189,7 +187,7 @@ const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
               }
             },
           },
-          { ...payload, staff_code: initialValues?.staff_code } // Send staff_code if editing
+          { ...payload, staff_code: initialValues?.staff_code }
       );
     } catch (error) {
       console.error("API request failed:", error);
@@ -226,7 +224,7 @@ const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
                     setFormValues((prev) => ({ ...prev, email: e.target.value }))
                 }
                 margin="normal"
-                disabled={!!initialValues} // Disable the field during editing
+                disabled={!!initialValues}
                 InputProps={{
                   style: !!initialValues ? { color: "#8c8c8c", backgroundColor: "#f5f5f5" } : {}, // Add grayed-out style
                 }}

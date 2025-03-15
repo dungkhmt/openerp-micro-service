@@ -38,7 +38,7 @@ public class EntityAuthorizationController {
                     return roleId;
                 })
                 .collect(Collectors.toList());
-
+        roleIds.add("ADMIN");
         return ResponseEntity.ok().body(entityAuthorizationUseCase.getEntityAuthorization(id, roleIds));
     }
 }

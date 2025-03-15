@@ -1,0 +1,20 @@
+package com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_period_configure.usecase_data;
+
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import openerp.openerpresourceserver.domain.common.model.UseCase;
+import openerp.openerpresourceserver.domain.model.CheckpointPeriodConfigureModel;
+
+import java.util.List;
+import java.util.UUID;
+
+@Data
+@Builder
+@Getter
+@Setter
+public class UpdateCheckpointPeriodConfigure implements UseCase {
+    private UUID periodId;
+    List<CheckpointPeriodConfigureModel> configures;
+}

@@ -17,7 +17,7 @@ import GradeModal from "./modals/GradeModal";
 import "jspdf-autotable";
 import { request } from "../api";
 import "../assets/css/CheckpointEvaluation.css";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import GradeIcon from "@mui/icons-material/BorderColor";
 
 const CheckpointEvaluation = () => {
@@ -40,6 +40,14 @@ const CheckpointEvaluation = () => {
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const location = useLocation();
+  const period = location.state?.period;
+
+  useEffect(() => {
+    if (period) {
+      setSelectedPeriod(period); 
+    }
+  }, [period]);
 
   const fetchStaffData = async (pageIndex, pageSize) => {
     setLoading(true);
@@ -283,8 +291,11 @@ const CheckpointEvaluation = () => {
         <Autocomplete
           options={periods}
           getOptionLabel={(option) => option.name || ""}
+          value={selectedPeriod} 
           onChange={(e, value) => setSelectedPeriod(value)}
-          renderInput={(params) => <TextField {...params} label="Select Period" size="small" />}
+          renderInput={(params) => (
+            <TextField {...params} label="Select Period" size="small" />
+          )}
         />
       </div>
 

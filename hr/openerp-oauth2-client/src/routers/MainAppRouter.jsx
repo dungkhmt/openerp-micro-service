@@ -8,6 +8,7 @@ import NotFound from "views/errors/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import TeacherRouter from "./TeacherRouter";
 import EmployeeRouter from "./EmployeeRouter";
+import CheckpointEvaluationRouter from "./CheckpointEvaluationRouter";
 import DemoScreen from "views/DemoScreen";
 import EmployeeDetailsRouter from "./EmployeeDetailsRouter";
 import DepartmentScreen from "views/DepartmentScreen";
@@ -42,12 +43,15 @@ function MainAppRouter(props) {
     <Layout>
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Switch>
-          <Route component={StaffScreen} exact path="/" />
+          <Route component={CheckpointPeriodScreen} exact path="/" />
           
-          <PrivateRoute component={CheckpointEvaluationScreen} exact path="/demo" />
-          <PrivateRoute component={JobPositionScreen} exact path="/job" />
-          <PrivateRoute component={TeacherRouter} path="/teacher" />
+          <PrivateRoute component={DepartmentScreen} exact path="/department" />
+          <PrivateRoute component={JobPositionScreen} exact path="/job-position" />
+          <PrivateRoute component={CheckpointConfigureScreen} exact path="/checkpoint/configure" />
+          <PrivateRoute component={CheckpointPeriodScreen} exact path="/checkpoint/period" />
+          <PrivateRoute component={StaffScreen} exact path="/staff" />
           <Route component={EmployeeDetailsRouter} path="/employee" />
+          <PrivateRoute component={CheckpointEvaluationRouter} path="/checkpoint-evaluation" />
           
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />

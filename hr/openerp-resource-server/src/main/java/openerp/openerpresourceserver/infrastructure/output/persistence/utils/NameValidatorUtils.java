@@ -6,9 +6,9 @@ import openerp.openerpresourceserver.domain.exception.InvalidParameterException;
 @Slf4j
 public class NameValidatorUtils {
     public static void validateName(String name) {
-        if (!name.matches("^[a-zA-Z]+(\\s[a-zA-Z]+)*$")) {
+        if (!name.matches("^[\\p{L}]+(\\s[\\p{L}]+)*$")) {
             log.error("Staff name contains invalid characters or invalid spacing");
-            throw new InvalidParameterException("Department name contains invalid characters or invalid spacing." +
+            throw new InvalidParameterException("Staff name contains invalid characters or invalid spacing." +
                     " Only letters and single spaces between words are allowed.");
         }
     }

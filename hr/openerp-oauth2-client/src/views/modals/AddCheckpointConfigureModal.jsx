@@ -19,10 +19,10 @@ const AddCheckpointConfigureModal = ({ open, onClose, onSubmit, initialValues })
     name: "",
     description: "",
   });
-  const [error, setError] = useState(null); // Error state for Snackbar
-  const [loading, setLoading] = useState(false); // Loading state for submit button
+  const [error, setError] = useState(null); 
+  const [loading, setLoading] = useState(false); 
 
-  // Populate form values if editing
+ 
   useEffect(() => {
     if (initialValues) {
       setFormValues({
@@ -34,7 +34,6 @@ const AddCheckpointConfigureModal = ({ open, onClose, onSubmit, initialValues })
     }
   }, [initialValues]);
 
-  // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormValues({
@@ -43,7 +42,7 @@ const AddCheckpointConfigureModal = ({ open, onClose, onSubmit, initialValues })
     });
   };
 
-  // Handle form submission
+
   const handleSubmit = async () => {
     setLoading(true);
 
@@ -52,23 +51,22 @@ const AddCheckpointConfigureModal = ({ open, onClose, onSubmit, initialValues })
       description: formValues.description,
     };
 
-    // If editing, include additional properties
     if (initialValues) {
       payload.code = initialValues.code;
     }
 
     try {
       const endpoint = initialValues
-        ? "/checkpoint/update-configure" // Edit checkpoint
-        : "/checkpoint/create-configure"; // Add checkpoint
+        ? "/checkpoint/update-configure" 
+        : "/checkpoint/create-configure"; 
 
       request(
         "post",
         endpoint,
         (response) => {
-          onSubmit(); // Refresh parent data
-          onClose(); // Close the modal
-          setFormValues({ name: "", description: "" }); // Reset form
+          onSubmit(); 
+          onClose(); 
+          setFormValues({ name: "", description: "" }); 
         },
         {
           onError: (err) => {
@@ -76,7 +74,7 @@ const AddCheckpointConfigureModal = ({ open, onClose, onSubmit, initialValues })
               const { meta, data } = err.response.data;
 
               if (meta && meta.code) {
-                // Handle validation or other API errors
+             
                 console.error("Validation error:", meta.message, data);
                 setError({
                   title: meta.message || "Validation Error",
@@ -122,7 +120,7 @@ const AddCheckpointConfigureModal = ({ open, onClose, onSubmit, initialValues })
     <>
       <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" className="custom-modal">
         <DialogTitle>
-          {initialValues ? "Edit Checkpoint" : "Add Checkpoint"}
+          {initialValues ? "Edit Configure" : "Add Configure"}
           <IconButton
             aria-label="close"
             onClick={onClose}
@@ -161,7 +159,6 @@ const AddCheckpointConfigureModal = ({ open, onClose, onSubmit, initialValues })
         </DialogActions>
       </Dialog>
 
-      {/* Snackbar for error notifications */}
       <Snackbar
         open={!!error}
         autoHideDuration={6000}

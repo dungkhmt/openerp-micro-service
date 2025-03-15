@@ -14,16 +14,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/checkpoint/")
 public class CheckpointController extends BeanAwareUseCasePublisher {
     @PostMapping("checkpoint-staff")
     public ResponseEntity<?> checkpointStaff(
-            //Principal principal,
+            Principal principal,
             @Valid @RequestBody CheckpointStaffRequest request
     ){
-        //TODO REMOVE
-        request.setCheckedByUserId("phanhieu2443");
+        request.setCheckedByUserId(principal.getName());
         var model = publish(CheckpointModel.class, request.toUseCase());
         var response = CheckpointResponse.fromModel(model);
         return ResponseEntity.ok().body(

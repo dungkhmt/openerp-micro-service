@@ -166,7 +166,7 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues }) => {
 
   const handleSubmit = async () => {
     setLoading(true);
-
+  
     const payload = {
       name: formValues.name,
       description: formValues.description,
@@ -177,14 +177,23 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues }) => {
         coefficient: parseFloat(config.coefficient),
       })),
     };
-
+  
+    // Add ID for update if editing
+    if (initialValues?.id) {
+      payload.id = initialValues.id;
+    }
+  
     try {
+      const endpoint = initialValues?.id
+        ? "/checkpoint/update-period"
+        : "/checkpoint/create-period";
+  
       await request(
         "post",
-        "/checkpoint/create-period",
+        endpoint,
         () => {
-          onSubmit();
-          onClose();
+          onSubmit(); // Callback to refresh parent data
+          onClose();  // Close the modal
         },
         {
           onError: (err) =>
@@ -193,7 +202,7 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues }) => {
         payload
       );
     } catch (error) {
-      console.error("Error creating period:", error);
+      console.error("Error saving period:", error);
       setError("Failed to save the period.");
     } finally {
       setLoading(false);

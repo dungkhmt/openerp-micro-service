@@ -14,16 +14,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/checkpoint/")
 public class CheckpointPeriodController extends BeanAwareUseCasePublisher {
     @PostMapping("create-period")
     public ResponseEntity<?> createCheckpointPeriod(
-            //Principal principal,
+            Principal principal,
             @Valid @RequestBody CreateCheckpointPeriodRequest request
     ){
-        //TODO REMOVE
-        request.setCreatedByUserId("phanhieu2443");
+        request.setCreatedByUserId(principal.getName());
         publish(request.toUseCase());
         return ResponseEntity.ok().body(
                 new Resource()

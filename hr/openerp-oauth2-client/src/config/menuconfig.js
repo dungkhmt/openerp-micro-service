@@ -20,24 +20,23 @@ import PersonIcon from "@mui/icons-material/Person";
 import StarBorder from "@mui/icons-material/StarBorder";
 import StoreMallDirectorySharpIcon from "@mui/icons-material/StoreMallDirectorySharp";
 import TeachingIcon from "assets/icons/mathematics.svg";
+import Groups from "@mui/icons-material/Groups";
 import { CiEdit } from "react-icons/ci";
 import { GiTeacher } from "react-icons/gi";
 import { buildMapPathMenu } from "utils/MenuUtils";
-import { general } from "./menuconfig/general";
-import { student } from "./menuconfig/student";
-import { teacher } from "./menuconfig/teacher";
-import { admin } from "./menuconfig/admin";
-import { user } from "./menuconfig/user";
-import {demo} from "./menuconfig/demo";
+import { department } from "./menuconfig/department";
+import { jobPostion } from "./menuconfig/jobPosition";
+import { staff } from "./menuconfig/staff";
+import { checkpoint } from "./menuconfig/checkpoint";
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import WorkIcon from '@mui/icons-material/Work';
 
 export const MENUS = [];
 
-MENUS.push(general);
-MENUS.push(user);
-MENUS.push(admin)
-MENUS.push(teacher);
-MENUS.push(student);
-MENUS.push(demo);
+MENUS.push(staff)
+MENUS.push(department)
+MENUS.push(jobPostion)
+MENUS.push(checkpoint)
 
 export const menuIconMap = new Map();
 
@@ -72,5 +71,9 @@ menuIconMap.set("LocalLibraryIcon", <LocalLibraryIcon />);
 menuIconMap.set("AssignmentOutlinedIcon", <AssignmentOutlinedIcon />);
 menuIconMap.set("ManageAccountsIcon", <ManageAccountsIcon />);
 menuIconMap.set("CiEdit", <CiEdit />);
+menuIconMap.set("Groups", <Groups height={21} width={21} />);
+menuIconMap.set("AssignmentTurnedInIcon", <AssignmentTurnedInIcon />);
+menuIconMap.set("WorkIcon", <WorkIcon />);
+
 
 export const mapPathMenu = buildMapPathMenu(MENUS);
