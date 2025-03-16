@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/v1/")
+@RequestMapping("/")
 public class CheckinoutController extends BeanAwareUseCasePublisher {
 
     @PostMapping("checkinout")

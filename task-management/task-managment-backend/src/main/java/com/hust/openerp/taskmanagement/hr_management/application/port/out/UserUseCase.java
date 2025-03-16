@@ -1,6 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out;
 
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.User;
+import com.hust.openerp.taskmanagement.entity.User;
 
 import java.util.List;
 

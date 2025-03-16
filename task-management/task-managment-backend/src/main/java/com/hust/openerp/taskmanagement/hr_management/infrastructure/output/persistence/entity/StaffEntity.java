@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity;
 
+import com.hust.openerp.taskmanagement.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
