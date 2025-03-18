@@ -32,6 +32,12 @@ export const middleMile = {
             path: "/middle-mile/trips",
             text: "Quản lý chuyến",
             child: [],
-        }
+        },
+        {
+            id: "MENU_ROUTE.DRIVER_VEHICLE",
+            path: "/middle-mile/driver-vehicle/manage",
+            text: "Quản lý đội xe",
+            child: [],
+        },
     ],
 };
