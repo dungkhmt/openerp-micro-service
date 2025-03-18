@@ -103,9 +103,8 @@ public class MiddleMileController {
     public ResponseEntity<RouteVehicle> assignVehicleToRoute(@Valid @RequestBody Map<String, Object> request) {
         UUID routeId = UUID.fromString((String) request.get("routeId"));
         UUID vehicleId = UUID.fromString((String) request.get("vehicleId"));
-        String direction = (String) request.get("direction");
 
-        return ResponseEntity.ok(routeVehicleService.assignVehicleToRoute(routeId, vehicleId, direction));
+        return ResponseEntity.ok(routeVehicleService.assignVehicleToRoute(routeId, vehicleId));
     }
 
     // ===== Route Vehicle Endpoints =====
@@ -122,8 +121,7 @@ public class MiddleMileController {
     public ResponseEntity<RouteVehicle> updateRouteVehicle(
             @PathVariable UUID id,
             @Valid @RequestBody Map<String, String> request) {
-        String direction = request.get("direction");
-        return ResponseEntity.ok(routeVehicleService.updateRouteVehicle(id, direction));
+        return ResponseEntity.ok(routeVehicleService.updateRouteVehicle(id));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER')")
@@ -224,7 +222,7 @@ public class MiddleMileController {
             @PathVariable UUID hubId,
             @PathVariable RouteDirection direction
             ) {
-        return ResponseEntity.ok(middleMileOrderService.getCollectedHubListVehicle(vehicleId, hubId, direction));
+        return ResponseEntity.ok(middleMileOrderService.getCollectedHubListVehicle(vehicleId, hubId));
     }
 
 

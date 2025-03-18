@@ -30,6 +30,8 @@ public class EntityAuthorizationController {
      */
     @GetMapping("/entity-authorization/{id}")
     public ResponseEntity<Set<String>> getEntityAuthorization(@PathVariable String id, JwtAuthenticationToken token) {
+        System.out.println("idda2" + token.getAuthorities());
+
         List<String> roleIds = token
                 .getAuthorities()
                 .stream()
@@ -42,7 +44,7 @@ public class EntityAuthorizationController {
                 })
                 .collect(Collectors.toList());
 
-        System.out.println("idda" + id);
+        System.out.println("idda" + roleIds);
         return ResponseEntity.ok().body(entityAuthorizationService.getEntityAuthorization(id, roleIds));
     }
 }

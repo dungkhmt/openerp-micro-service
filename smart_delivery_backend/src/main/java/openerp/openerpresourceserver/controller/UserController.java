@@ -48,9 +48,9 @@ public class UserController {
         return ResponseEntity.ok().body(user);
     }
 
-    @GetMapping("get-collector/{email}")
-    public ResponseEntity<?> getCollectorByEmail(@PathVariable String email) {
-        Collector collector = collectorRepo.findByEmail(email);
+    @GetMapping("get-collector/{username}")
+    public ResponseEntity<?> getCollectorByUsername(@PathVariable String username) {
+        Collector collector = collectorRepo.findByUsername(username);
         return ResponseEntity.ok().body(collector);
     }
 

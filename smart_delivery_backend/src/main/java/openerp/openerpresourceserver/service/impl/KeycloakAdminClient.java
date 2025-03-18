@@ -29,9 +29,10 @@ public class KeycloakAdminClient implements openerp.openerpresourceserver.servic
 
     @Override
     public Keycloak getKeycloakInstance() {
+        System.out.println("Keycloak server URL: " + keycloakServerUrl + clientId + realm);
         return KeycloakBuilder.builder()
                 .serverUrl(keycloakServerUrl)
-                .realm("smart_delivery")
+                .realm(realm)
                 .clientId(clientId)
                 .username("peter_nguyen74")
                 .password("123456")

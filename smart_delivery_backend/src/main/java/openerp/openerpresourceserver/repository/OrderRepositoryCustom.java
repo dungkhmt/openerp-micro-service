@@ -19,6 +19,6 @@ public interface OrderRepositoryCustom {
     List<OrderSummaryDTO> getCollectedHubList(UUID hubId);
 
     // Search for available order for vehicle
-    List<OrderSummaryMiddleMileDto> getCollectedCollectorListVehicle(UUID vehicleId, UUID hubId, RouteDirection routeDirection);
+    List<OrderSummaryMiddleMileDto> getCollectedCollectorListVehicle(UUID vehicleId, UUID hubId);
 
 }

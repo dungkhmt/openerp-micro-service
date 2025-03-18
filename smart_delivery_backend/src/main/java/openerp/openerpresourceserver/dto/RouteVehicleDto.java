@@ -30,7 +30,6 @@ public class RouteVehicleDto {
 
     private String vehiclePlateNumber;
 
-    @NotBlank(message = "Direction is required")
     private String direction;
 
     private Instant createdAt;

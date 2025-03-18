@@ -22,7 +22,7 @@ function DriverList() {
 
     useEffect(() => {
         let url = "/smdeli/humanresource/driver"
-        if(role !== "ADMIN") {
+        if(role === "HUB_MANAGER") {
             url += "/hub/" + hubId;
         }
         request("get", url, (res) => {

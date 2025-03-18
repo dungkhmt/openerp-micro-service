@@ -31,12 +31,12 @@ public class Jwt2AuthoritiesConverter implements Converter<Jwt, Collection<Grant
         final var resourceAccess = (Map<String, Object>) jwt
                 .getClaims()
                 .getOrDefault("resource_access", Collections.emptyMap());
-        System.out.println(resourceAccess);
+//        System.out.println(resourceAccess);
 
 
         // Retrieve roles from the "smart_delivery" client
         final var smartDeliveryClientAccess = (Map<String, Object>) resourceAccess
-                .getOrDefault("smart", Collections.emptyMap());
+                .getOrDefault("smart_delivery", Collections.emptyMap());
         final var smartDeliveryClientRoles = (Collection<String>) smartDeliveryClientAccess.getOrDefault("roles", Collections.emptyList());
 
 //        System.out.println(Stream

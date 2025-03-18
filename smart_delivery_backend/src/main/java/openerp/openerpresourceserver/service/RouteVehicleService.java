@@ -13,10 +13,10 @@ public interface RouteVehicleService {
     List<RouteVehicleDto> getAllVehicleAssignments();
 
     @Transactional
-    RouteVehicle assignVehicleToRoute(UUID routeId, UUID vehicleId, String direction);
+    RouteVehicle assignVehicleToRoute(UUID routeId, UUID vehicleId);
 
     @Transactional
-    RouteVehicle updateRouteVehicle(UUID id, String direction);
+    RouteVehicle updateRouteVehicle(UUID id);
 
     @Transactional
     void unassignVehicle(UUID routeVehicleId);

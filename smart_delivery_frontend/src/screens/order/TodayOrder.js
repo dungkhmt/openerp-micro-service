@@ -19,7 +19,7 @@ import {API_PATH} from "../apiPaths";
 const TodayOrder = (props) => {
     const history = useHistory();
     const {path} = useRouteMatch();
-    const email = useSelector((state) => state.auth.email);
+    const username = useSelector((state) => state.auth.username);
     const orderId = props.match?.params?.id;
     const classes = useStyles();
     const [selectPosition, setSelectPosition] = useState(null);
@@ -38,7 +38,7 @@ const TodayOrder = (props) => {
             var productIds;
             await request(
                 "get",
-                `/user/get-collector/${email}`
+                `/user/get-collector/${username}`
         ,
             (res) => {
                 console.log(res.data.id);

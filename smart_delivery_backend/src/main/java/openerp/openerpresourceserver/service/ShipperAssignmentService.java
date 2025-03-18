@@ -15,12 +15,10 @@ public interface ShipperAssignmentService {
      * Get orders that are ready for delivery at a specific hub
      */
     List<OrderSummaryDTO> getPendingDeliveryOrders(UUID hubId);
-
     /**
      * Auto-assign orders to available shippers
      */
     List<OrderResponseCollectorShipperDto> assignOrdersToShippers(UUID hubId, List<OrderRequestDto> orders, List<EmployeeDTO> shippers);
-
     /**
      * Get all current assignments for a specific shipper
      */

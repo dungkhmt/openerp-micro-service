@@ -159,8 +159,8 @@ public class MiddleMileOrderServiceImpl implements MiddleMileOrderService {
     }
 
     @Override
-    public List<OrderSummaryMiddleMileDto> getCollectedHubListVehicle(UUID vehicleId, UUID hubId, RouteDirection routeDirection){
-        return orderRepo.getCollectedCollectorListVehicle(vehicleId, hubId, routeDirection);
+    public List<OrderSummaryMiddleMileDto> getCollectedHubListVehicle(UUID vehicleId, UUID hubId){
+        return orderRepo.getCollectedCollectorListVehicle(vehicleId, hubId);
 
     }
 }

@@ -8,8 +8,8 @@ import java.util.UUID;
 
 public interface VehicleService {
     List<VehicleDto> getAllVehicleByHubId(UUID hubId);
-
     List<VehicleDto> getAll();
-
     VehicleDto getVehicleById(UUID vehicleId);
+    VehicleDto createOrUpdateVehicle(VehicleDto vehicleDto);
+    void deleteVehicle(UUID vehicleId);
 }

@@ -16,9 +16,10 @@ const authSlice = createSlice({
 
             try {
                 const decodedToken = jwtDecode(token);
-                state.hubId = decodedToken?.hubId || null; // Lấy hubId từ token
+                state.hubId = decodedToken?.hub_id || null; // Lấy hubId từ token
                 state.role = decodedToken?.resource_access?.smart?.roles[0];
                 state.email = decodedToken?.email;
+                state.username = decodedToken?.preferred_username;
                 console.log("Role",state.role);
 
             } catch (error) {

@@ -38,7 +38,7 @@ public class RouteVehicleServiceImpl implements RouteVehicleService {
      */
     @Transactional
     @Override
-    public RouteVehicle assignVehicleToRoute(UUID routeId, UUID vehicleId, String direction) {
+    public RouteVehicle assignVehicleToRoute(UUID routeId, UUID vehicleId) {
         Route route = routeRepository.findById(routeId)
                 .orElseThrow(() -> new NotFoundException("Route not found"));
 
@@ -53,7 +53,6 @@ public class RouteVehicleServiceImpl implements RouteVehicleService {
         RouteVehicle routeVehicle = new RouteVehicle();
         routeVehicle.setRouteId(route.getRouteId());
         routeVehicle.setVehicleId(vehicle.getVehicleId());
-        routeVehicle.setDirection(direction);
         routeVehicle.setCreatedAt(Instant.now());
         routeVehicle.setUpdatedAt(Instant.now());
 
@@ -69,11 +68,10 @@ public class RouteVehicleServiceImpl implements RouteVehicleService {
      */
     @Transactional
     @Override
-    public RouteVehicle updateRouteVehicle(UUID id, String direction) {
+    public RouteVehicle updateRouteVehicle(UUID id) {
         RouteVehicle routeVehicle = routeVehicleRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Route vehicle assignment not found"));
 
-        routeVehicle.setDirection(direction);
         routeVehicle.setUpdatedAt(Instant.now());
 
         return routeVehicleRepository.save(routeVehicle);

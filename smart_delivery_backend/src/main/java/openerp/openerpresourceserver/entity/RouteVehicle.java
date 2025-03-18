@@ -27,12 +27,6 @@ public class RouteVehicle {
     private UUID vehicleId;
     private String vehiclePlateNumber;
 
-
-    @Size(max = 50)
-    @NotNull
-    @Column(name = "direction", nullable = false, length = 50)
-    private String direction;
-
     @NotNull
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
