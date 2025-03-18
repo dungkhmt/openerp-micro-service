@@ -75,12 +75,15 @@ public class OrderServiceImpl implements OrderService {
             sender = new Sender(orderREQ.getSenderName(), orderREQ.getSenderPhone(), orderREQ.getSenderEmail(), orderREQ.getSenderAddress());
             sender.setLatitude(orderREQ.getSenderLatitude());
             sender.setLongitude(orderREQ.getSenderLongitude());
+            sender = senderRepo.save(sender);
+
         }
 
         if (recipient == null) {
             recipient = new Recipient(orderREQ.getRecipientName(), orderREQ.getRecipientPhone(), orderREQ.getRecipientEmail(), orderREQ.getRecipientAddress());
-            recipient.setLatitude(orderREQ.getSenderLatitude());
+            recipient.setLatitude(orderREQ.getRecipientLatitude());
             recipient.setLongitude(orderREQ.getRecipientLongitude());
+            recipient = recipientRepo.save(recipient);
         }
 
         orderEntity.setStatus(OrderStatus.PENDING);
@@ -106,8 +109,10 @@ public class OrderServiceImpl implements OrderService {
         logger.info("Created Order: {}", orderEntity);
 
         assignmentService.assignOrderToHub(orderEntity);
+        Order savedOrder = orderRepo.save(orderEntity);
+        assignmentService.assignOrderToRoute(savedOrder.getId());
 
-        return orderRepo.save(orderEntity);
+        return savedOrder;
     }
 
     // Get all orders method
@@ -467,8 +472,6 @@ public class OrderServiceImpl implements OrderService {
             order.setVehicleId(vehicleId);
             order.setVehicleType(vehicle.getVehicleType());
             order.setVehicleLicensePlate(vehicle.getPlateNumber());
-            order.setDriverId(vehicle.getDriverId());
-            order.setDriverName(vehicle.getDriverName());
             updatedOrder.add(order);
         }
         orderRepo.saveAll(updatedOrder);

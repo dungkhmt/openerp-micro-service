@@ -40,6 +40,7 @@ public class OrderController {
     // Create an order
     @PostMapping("/order/add")
     public ResponseEntity<Order> createOrder(Principal principal, @Valid @RequestBody OrderRequestDto orderRequest) {
+        System.out.println("OrderController.createOrder: " + orderRequest);
         Order createdOrder = orderService.createOrder(principal, orderRequest);
         return ResponseEntity.ok(createdOrder);
     }

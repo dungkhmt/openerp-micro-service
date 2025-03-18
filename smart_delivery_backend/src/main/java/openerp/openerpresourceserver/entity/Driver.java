@@ -24,11 +24,6 @@ public class Driver extends Employee{
     private String licenseNumber;
     @Enumerated(EnumType.STRING)
     private EmploymentStatus employment_status;
-
-    private UUID originHubId;
-    private String originHubName;
-
-    private UUID finalHubId;
-    private String finalHubName;
+    
 
 }

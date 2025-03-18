@@ -8,17 +8,18 @@ import openerp.openerpresourceserver.dto.DriverVehicleAssignmentDto;
 import openerp.openerpresourceserver.dto.VehicleDto;
 import openerp.openerpresourceserver.entity.Driver;
 import openerp.openerpresourceserver.entity.Vehicle;
+import openerp.openerpresourceserver.entity.VehicleDriver;
 import openerp.openerpresourceserver.entity.enumentity.VehicleStatus;
 import openerp.openerpresourceserver.mapper.VehicleMapper;
 import openerp.openerpresourceserver.repository.DriverRepo;
+import openerp.openerpresourceserver.repository.VehicleDriverRepository;
 import openerp.openerpresourceserver.repository.VehicleRepository;
 import openerp.openerpresourceserver.service.DriverVehicleAssignmentService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 public class DriverVehicleAssignmentServiceImpl implements DriverVehicleAssignmentService {
 
     private final VehicleRepository vehicleRepo;
+    private final VehicleDriverRepository vehicleDriverRepository;
     private final DriverRepo driverRepo;
     private final VehicleMapper vehicleMapper = VehicleMapper.INSTANCE;
 
@@ -42,25 +44,26 @@ public class DriverVehicleAssignmentServiceImpl implements DriverVehicleAssignme
                 .orElseThrow(() -> new NotFoundException("Vehicle not found with id: " + vehicleId));
 
         // Check if vehicle already has a driver
-        if (vehicle.getDriverId() != null) {
+        if (vehicleDriverRepository.existsByVehicleIdAndUnassignedAtIsNull(vehicleId)) {
             throw new IllegalStateException("Vehicle already has a driver assigned. Please unassign first.");
         }
 
         // Check if driver is already assigned to another vehicle
-        boolean isDriverAssigned = vehicleRepo.findAll().stream()
-                .anyMatch(v -> driverId.equals(v.getDriverId()));
+        boolean isDriverAssigned = vehicleDriverRepository.existsByDriverIdAndUnassignedAtIsNull(driverId);
 
         if (isDriverAssigned) {
             throw new IllegalStateException("Driver is already assigned to another vehicle. Please unassign first.");
         }
 
         // Assign driver to vehicle
-        vehicle.setDriverId(driver.getId());
-        vehicle.setDriverName(driver.getName());
-        vehicle.setDriverCode(driver.getCode());
+        VehicleDriver vehicleDriver = new VehicleDriver();
+        vehicleDriver.setVehicleId(vehicleId);
+        vehicleDriver.setDriverId(driverId);
+
         vehicle.setUpdatedAt(new Date());
 
         vehicleRepo.save(vehicle);
+        vehicleDriverRepository.save(vehicleDriver);
         log.info("Driver {} assigned to vehicle {}", driverId, vehicleId);
     }
 
@@ -77,13 +80,11 @@ public class DriverVehicleAssignmentServiceImpl implements DriverVehicleAssignme
             throw new IllegalStateException("Cannot unassign driver from vehicle that is currently in transit");
         }
 
-        // Unassign driver
-        vehicle.setDriverId(null);
-        vehicle.setDriverName(null);
-        vehicle.setDriverCode(null);
-        vehicle.setUpdatedAt(new Date());
+        VehicleDriver vehicleDriver = vehicleDriverRepository.findByVehicleIdAndUnassignedAtIsNull(vehicleId);
+        if (vehicleDriver == null) throw new IllegalStateException("Vehicle does not have a driver assigned");
+        vehicleDriver.setUnassignedAt(Timestamp.valueOf(LocalDateTime.now()));
 
-        vehicleRepo.save(vehicle);
+        vehicleDriverRepository.save(vehicleDriver);
         log.info("Driver unassigned from vehicle {}", vehicleId);
     }
 
@@ -95,22 +96,23 @@ public class DriverVehicleAssignmentServiceImpl implements DriverVehicleAssignme
         if (!driverRepo.existsById(driverId)) {
             throw new NotFoundException("Driver not found with id: " + driverId);
         }
-
-        Vehicle vehicle = vehicleRepo.findAll().stream()
-                .filter(v -> driverId.equals(v.getDriverId()))
-                .findFirst()
-                .orElse(null);
-
-        return vehicle != null ? vehicleMapper.vehicleToVehicleDto(vehicle) : null;
+        VehicleDriver vehicleDriver = vehicleDriverRepository.findByDriverIdAndUnassignedAtIsNull(driverId);
+        if (vehicleDriver == null) throw new IllegalStateException("Driver does not have a vehicle assigned");
+        Vehicle vehicle = vehicleRepo.findById(vehicleDriver.getVehicleId()).orElseThrow(()-> new NotFoundException("not found vehicle"));
+        return vehicleMapper.vehicleToVehicleDto(vehicle);
     }
 
     @Override
     public List<VehicleDto> getUnassignedVehicles() {
         log.info("Getting all unassigned vehicles");
-
+        List<VehicleDriver> assigned = vehicleDriverRepository.findByUnassignedAtIsNull();
+        if(assigned.isEmpty())
+            return vehicleRepo.findAll().stream()
+                .map(vehicleMapper::vehicleToVehicleDto).toList();
+        Set<UUID> assignedVehicles = assigned.stream().map(v-> v.getVehicleId()).collect(Collectors.toSet());
         List<Vehicle> unassignedVehicles = vehicleRepo.findAll().stream()
-                .filter(v -> v.getDriverId() == null)
-                .collect(Collectors.toList());
+                .filter(v -> !assignedVehicles.contains(v.getVehicleId()))
+                .toList();
 
         return unassignedVehicles.stream()
                 .map(vehicleMapper::vehicleToVehicleDto)
@@ -119,35 +121,6 @@ public class DriverVehicleAssignmentServiceImpl implements DriverVehicleAssignme
 
     @Override
     public List<DriverVehicleAssignmentDto> getAllDriverVehicleAssignments() {
-        log.info("Getting all driver-vehicle assignments");
-
-        List<DriverVehicleAssignmentDto> assignments = new ArrayList<>();
-
-        List<Vehicle> vehicles = vehicleRepo.findAll().stream()
-                .filter(v -> v.getDriverId() != null)
-                .collect(Collectors.toList());
-
-        for (Vehicle vehicle : vehicles) {
-            Driver driver = driverRepo.findById(vehicle.getDriverId()).orElse(null);
-
-            if (driver != null) {
-                DriverVehicleAssignmentDto assignment = DriverVehicleAssignmentDto.builder()
-                        .vehicleId(vehicle.getVehicleId())
-                        .plateNumber(vehicle.getPlateNumber())
-                        .vehicleType(vehicle.getVehicleType())
-                        .model(vehicle.getModel())
-                        .manufacturer(vehicle.getManufacturer())
-                        .status(vehicle.getStatus())
-                        .driverId(driver.getId())
-                        .driverName(driver.getName())
-                        .driverCode(driver.getCode())
-                        .driverPhone(driver.getPhone())
-                        .build();
-
-                assignments.add(assignment);
-            }
-        }
-
-        return assignments;
+        return vehicleDriverRepository.getAllDriverVehicleAssignments();
     }
 }

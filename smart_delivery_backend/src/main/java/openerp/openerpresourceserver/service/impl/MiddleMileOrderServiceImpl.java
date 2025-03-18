@@ -64,8 +64,6 @@ public class MiddleMileOrderServiceImpl implements MiddleMileOrderService {
             order.setVehicleId(routeVehicle.getVehicleId());
             order.setVehicleType(vehicle.getVehicleType());
             order.setVehicleLicensePlate(vehicle.getPlateNumber());
-            order.setDriverId(vehicle.getDriverId());
-            order.setDriverName(vehicle.getDriverName());
             order.setStatus(OrderStatus.DELIVERING);
 
             orderRepo.save(order);

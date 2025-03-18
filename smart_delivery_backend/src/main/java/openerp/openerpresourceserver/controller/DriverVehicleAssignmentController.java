@@ -30,7 +30,7 @@ public class DriverVehicleAssignmentController {
     /**
      * Assign a driver to a vehicle
      */
-    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER_MANAGER')")
     @PostMapping("/assign")
     public ResponseEntity<Void> assignDriverToVehicle(@RequestBody Map<String, String> request) {
         UUID driverId = UUID.fromString(request.get("driverId"));
@@ -47,7 +47,7 @@ public class DriverVehicleAssignmentController {
     /**
      * Unassign a driver from a vehicle
      */
-    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER_MANAGER')")
     @PostMapping("/unassign/{vehicleId}")
     public ResponseEntity<Void> unassignDriverFromVehicle(@PathVariable UUID vehicleId) {
         driverVehicleAssignmentService.unassignDriverFromVehicle(vehicleId);

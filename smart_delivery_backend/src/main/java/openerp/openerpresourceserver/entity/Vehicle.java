@@ -35,9 +35,6 @@ public class Vehicle {
     private String manufacturer;
     private String model;
     private String yearOfManufacture;
-    private UUID driverId;
-    private String driverCode;
-    private String driverName;
 
     @CreatedDate
     private Date createdAt;

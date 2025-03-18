@@ -136,7 +136,6 @@ public class HumanResourceServiceImpl implements HumanResourceService {
             newDriver.setName(employeeRequestDto.getName());
             newDriver.setEmail(employeeRequestDto.getEmail());
             newDriver.setPhone(employeeRequestDto.getPhone());
-            newDriver.setOriginHubId(hub.getHubId());
             newDriver.setAddress(employeeRequestDto.getAddress());
             newDriver.setCity(employeeRequestDto.getCity());
             newDriver.setDistrict(employeeRequestDto.getDistrict());
@@ -201,7 +200,6 @@ public class HumanResourceServiceImpl implements HumanResourceService {
                 newDriver.setName(employeeRequestDto.getName());
                 newDriver.setEmail(employeeRequestDto.getEmail());
                 newDriver.setPhone(employeeRequestDto.getPhone());
-                newDriver.setOriginHubId(hub.getHubId());
                 newDriver.setAddress(employeeRequestDto.getAddress());
                 newDriver.setCity(employeeRequestDto.getCity());
                 newDriver.setDistrict(employeeRequestDto.getDistrict());
@@ -276,7 +274,6 @@ public class HumanResourceServiceImpl implements HumanResourceService {
                 .orElseThrow(() -> new RuntimeException("Driver not found with id: " + driverId));
         Hub hub = hubRepo.findById(hubId)
                 .orElseThrow(() -> new RuntimeException("Hub not found with id: " + hubId));
-        driver.setOriginHubId(hubId);
         return driverRepo.save(driver);
     }
 
@@ -286,7 +283,6 @@ public class HumanResourceServiceImpl implements HumanResourceService {
                 .orElseThrow(() -> new RuntimeException("Driver not found with id: " + driverId));
         Hub hub = hubRepo.findById(hubId)
                 .orElseThrow(() -> new RuntimeException("Hub not found with id: " + hubId));
-        driver.setFinalHubId(hubId);
         return driverRepo.save(driver);
     }
 
@@ -294,7 +290,6 @@ public class HumanResourceServiceImpl implements HumanResourceService {
     public void removeDriverFromOriginHub(UUID driverId, UUID hubId){
         Driver driver = driverRepo.findById(driverId)
                 .orElseThrow(() -> new RuntimeException("Driver not found with id: " + driverId));
-        driver.setOriginHubId(null);
         driverRepo.save(driver);
     }
 
@@ -302,7 +297,6 @@ public class HumanResourceServiceImpl implements HumanResourceService {
     public void removeDriverFromFinalHub(UUID driverId, UUID hubId){
         Driver driver = driverRepo.findById(driverId)
                 .orElseThrow(() -> new RuntimeException("Driver not found with id: " + driverId));
-        driver.setFinalHubId(null);
         driverRepo.save(driver);
     }
 
@@ -376,8 +370,8 @@ public class HumanResourceServiceImpl implements HumanResourceService {
                 collector.getCity(),
                 collector.getDistrict(),
                 collector.getWard(),
-                collector.getOriginHubId(),
-                collector.getOriginHubName()
+                null,
+                null
         );
     }
 

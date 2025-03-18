@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.service.impl;
 
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
+import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.entity.enumentity.CollectorAssignmentStatus;
@@ -26,6 +27,8 @@ public class AssignmentServiceImpl implements AssignmentService {
     @Autowired
     private SenderRepo senderRepo;
     @Autowired
+    private RecipientRepo recipientRepo;
+    @Autowired
     private OrderRepo orderRepo;
     @Autowired
     private AssignOrderCollectorRepository assignOrderCollectorRepository;
@@ -41,6 +44,10 @@ public class AssignmentServiceImpl implements AssignmentService {
     private OrderItemRepo orderItemRepo;
     @Autowired
     private VehicleLoadRepository vehicleLoadRepository;
+    @Autowired
+    private VehicleDriverRepository vehicleDriverRepository;
+    @Autowired
+    private DriverRepo driverRepo;
 
     private static final double WEIGHT_CAPACITY_FACTOR = 0.6;
     private static final double DISTANCE_FACTOR = 0.3;
@@ -50,25 +57,38 @@ public class AssignmentServiceImpl implements AssignmentService {
         Sender sender = senderRepo.findById(order.getSenderId()).orElseThrow(() -> new NotFoundException("sender not found"));
         Double x1 = sender.getLatitude();
         Double y1 = sender.getLongitude();
-
+        Recipient recipient = recipientRepo.findById(order.getRecipientId()).orElseThrow(() -> new NotFoundException("sender not found"));
+        Double x2 = recipient.getLatitude();
+        Double y2 = recipient.getLongitude();
         List<Hub> hubs = hubRepo.findAll();
 
-        Double min = Double.MAX_VALUE;
-        Hub assignedHub = null;
+        Double min1 = Double.MAX_VALUE;
+        Double min2 = Double.MAX_VALUE;
+        Hub assignedHub1 = null;
+        Hub assignedHub2 = null;
         for(Hub hub : hubs){
             // tính khoảng cách kinh độ/vĩ độ trên bản đồ
-            Double distance = HaversineDistanceCalculator.calculateDistance(x1,y1, hub.getLatitude(), hub.getLongitude() );
+            Double distance1 = HaversineDistanceCalculator.calculateDistance(x1,y1, hub.getLatitude(), hub.getLongitude() );
+            Double distance2 = HaversineDistanceCalculator.calculateDistance(x2,y2, hub.getLatitude(), hub.getLongitude() );
 
-            if (distance < min)
+            if (distance1 < min1)
             {
-                min = distance;
-                assignedHub = hub;
+                min1 = distance1;
+                assignedHub1 = hub;
+            }
+            if (distance2 < min2)
+            {
+                min2 = distance2;
+                assignedHub2 = hub;
             }
         }
-        if(min > 7)
-            throw new NotFoundException("Không có hub khả dụng trong phạm vi xung quanh!");
-        order.setOriginHubId(assignedHub.getHubId());
-        order.setDistance(min);
+        if(min1 > 1000)
+            throw new NotFoundException("Không có hub nguồn khả dụng trong phạm vi xung quanh!");
+        if(min2 > 1000)
+            throw new NotFoundException("Không có hub nguồn khả dụng trong phạm vi xung quanh!");
+        order.setOriginHubId(assignedHub1.getHubId());
+        order.setFinalHubId(assignedHub2.getHubId());
+        order.setDistance(min1);
 
     }
 
@@ -90,10 +110,10 @@ public class AssignmentServiceImpl implements AssignmentService {
                 .orElseThrow(() -> new NotFoundException("Order not found with ID: " + orderId));
 
         // Check if order is in a valid state for auto-assignment
-        if (order.getStatus() != OrderStatus.COLLECTED_HUB) {
-            log.warn("Order {} is not ready for route assignment. Current status: {}", orderId, order.getStatus());
-            return false;
-        }
+//        if (order.getStatus() != OrderStatus.COLLECTED_HUB) {
+//            log.warn("Order {} is not ready for route assignment. Current status: {}", orderId, order.getStatus());
+//            return false;
+//        }
 
         // Calculate order metrics (weight, volume, etc.)
         OrderMetrics orderMetrics = calculateOrderMetrics(order);
@@ -200,8 +220,7 @@ public class AssignmentServiceImpl implements AssignmentService {
                     order.setVehicleId(vehicle.getVehicleId());
                     order.setVehicleType(vehicle.getVehicleType());
                     order.setVehicleLicensePlate(vehicle.getPlateNumber());
-                    order.setDriverId(vehicle.getDriverId());
-                    order.setDriverName(vehicle.getDriverName());
+
 
                     // Update vehicle status
                     updateVehicleStatus(vehicle.getVehicleId(), orderMetricsMap.get(order.getId()));
@@ -299,13 +318,17 @@ public class AssignmentServiceImpl implements AssignmentService {
 
                 if (score > bestScore) {
                     bestScore = score;
+                    VehicleDriver vehicleDriver = vehicleDriverRepository.findByVehicleId(vehicle.getVehicleId());
+                    if(vehicleDriver == null) throw  new NotFoundException("not found vehicle driver with vehicle id: " + vehicle.getVehicleId() + " in route vehicle assignment service");
+                    Driver driver = driverRepo.findById(vehicleDriver.getDriverId()).orElseThrow(() -> new NotFoundException("not found driver with id: " + vehicleDriver.getDriverId() + " in route vehicle assignment service"));
+
                     bestAssignment = new RouteVehicleAssignment(
                             route.getRouteId(),
                             vehicle.getVehicleId(),
                             vehicle.getVehicleType(),
                             vehicle.getPlateNumber(),
-                            vehicle.getDriverId(),
-                            vehicle.getDriverName(),
+                            driver.getId(),
+                            driver.getName(),
                             score
                     );
                 }

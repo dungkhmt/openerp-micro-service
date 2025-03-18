@@ -17,7 +17,7 @@ public interface RouteVehicleRepository extends JpaRepository<RouteVehicle, UUID
 
     List<RouteVehicle> findByVehicleId(UUID vehicleId);
 
-    @Query("SELECT rv FROM RouteVehicle rv join Vehicle v WHERE v.driverId = :driverId")
+    @Query("SELECT rv FROM RouteVehicle rv join Vehicle v join VehicleDriver vd on v.vehicleId = vd.vehicleId join Driver d on d.id = vd.driverId WHERE d.id = :driverId")
     List<RouteVehicle> findByDriverId(@Param("driverId") UUID driverId);
 
     @Query("SELECT rv FROM RouteVehicle rv WHERE rv.createdAt BETWEEN :startDate AND :endDate")
