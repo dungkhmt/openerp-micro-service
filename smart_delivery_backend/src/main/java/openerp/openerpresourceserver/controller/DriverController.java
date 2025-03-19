@@ -7,8 +7,10 @@ import openerp.openerpresourceserver.dto.RouteVehicleDetailDto;
 import openerp.openerpresourceserver.dto.VehicleDto;
 import openerp.openerpresourceserver.entity.Order;
 import openerp.openerpresourceserver.entity.RouteVehicle;
+import openerp.openerpresourceserver.entity.Trip;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
 import openerp.openerpresourceserver.service.DriverService;
+import openerp.openerpresourceserver.service.TripService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -26,6 +28,7 @@ import java.util.UUID;
 public class DriverController {
 
     private final DriverService driverService;
+    private final TripService tripService;
 
     /**
      * Get the driver's assigned vehicle
@@ -131,12 +134,33 @@ public class DriverController {
      * Complete a trip (mark all orders as delivered and vehicle as available)
      */
     @PreAuthorize("hasRole('DRIVER')")
-    @PostMapping("/trips/{routeVehicleId}/complete")
+    @PostMapping("/trips/{tripId}/complete")
     public ResponseEntity<Void> completeTrip(
-            @PathVariable UUID routeVehicleId,
+            @PathVariable UUID tripId,
+            Principal principal) {
+        tripService.completeTrip(tripId);
+        return ResponseEntity.ok().build();
+    }
+
+
+    @PreAuthorize("hasRole('DRIVER')")
+    @PostMapping("/trips/start")
+    public ResponseEntity<Trip> startTrip(
+            @RequestBody Map<String, String> request,
             Principal principal) {
         String username = principal.getName();
-        driverService.completeTrip(username, routeVehicleId);
-        return ResponseEntity.ok().build();
+        UUID routeVehicleId = UUID.fromString(request.get("routeVehicleId"));
+
+        Trip trip = tripService.createTripForToday(routeVehicleId, username);
+        return ResponseEntity.ok(trip);
+    }
+
+    @PreAuthorize("hasRole('DRIVER')")
+    @PutMapping("/trips/{tripId}/advance-stop")
+    public ResponseEntity<Trip> advanceToNextStop(
+            @PathVariable UUID tripId,
+            Principal principal) {
+        Trip trip = tripService.advanceToNextStop(tripId);
+        return ResponseEntity.ok(trip);
     }
 }

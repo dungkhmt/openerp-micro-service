@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.repository;
 
 import openerp.openerpresourceserver.dto.OrderResponseDto;
 import openerp.openerpresourceserver.entity.Order;
+import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,4 +24,5 @@ public interface OrderRepo extends JpaRepository<Order, UUID>, OrderRepositoryCu
 
     List<Order> findByOriginHubIdOrderByCreatedAtDesc(UUID hubId);
 
+    List<Order> findAllByOriginHubIdAndStatusAndVehicleId(UUID hubId, OrderStatus orderStatus, UUID vehicleId);
 }

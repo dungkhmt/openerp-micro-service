@@ -6,6 +6,7 @@ import openerp.openerpresourceserver.dto.RouteVehicleDetailDto;
 import openerp.openerpresourceserver.dto.VehicleDto;
 import openerp.openerpresourceserver.entity.Order;
 import openerp.openerpresourceserver.entity.RouteVehicle;
+import openerp.openerpresourceserver.entity.Trip;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
 
 import java.util.List;
@@ -56,8 +57,6 @@ public interface DriverService {
      */
     List<OrderSummaryDTO> getCurrentOrdersForDriver(String username);
 
-    /**
-     * Complete a trip
-     */
-    void completeTrip(String username, UUID routeVehicleId);
+
+
 }

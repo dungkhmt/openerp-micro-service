@@ -30,7 +30,7 @@ public class HubController {
         return ResponseEntity.ok(hubService.getAllHubGeneral());
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'COLLECTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'COLLECTOR','DRIVER')")
     @GetMapping("/hub/{id}")
     public ResponseEntity<HubWithBaysDto> getHubById(@PathVariable String id){
         return ResponseEntity.ok(hubService.getHubById(id));

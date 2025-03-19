@@ -1,5 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Card, CardContent, Button, CircularProgress, Chip, Divider, Paper, List, ListItem, ListItemText, IconButton, Grid } from '@mui/material';
+import {
+    Box,
+    Typography,
+    Card,
+    CardContent,
+    Button,
+    CircularProgress,
+    Chip,
+    Divider,
+    Paper,
+    List,
+    ListItem,
+    ListItemText,
+    IconButton,
+    Grid,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle
+} from '@mui/material';
 import { useParams, useHistory } from 'react-router-dom';
 import { request } from 'api';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -10,6 +30,8 @@ import DateRangeIcon from '@mui/icons-material/DateRange';
 import MapIcon from '@mui/icons-material/Map';
 import DirectionsIcon from '@mui/icons-material/Directions';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { errorNoti, successNoti } from 'utils/notification';
 
 // Import the map component from your codebase
@@ -27,8 +49,12 @@ const DriverRouteMap = () => {
     const [hub, setHub] = useState(null);
     const [nextOrder, setNextOrder] = useState(null);
     const [currentLocation, setCurrentLocation] = useState(null);
+    const [currentStop, setCurrentStop] = useState(null);
+    const [confirmArrivalDialog, setConfirmArrivalDialog] = useState(false);
+    const [selectedHub, setSelectedHub] = useState(null);
+    const [operationType, setOperationType] = useState(null);
 
-    // Convert stop sequence to map points
+    // Map points and assignments
     const [mapPoints, setMapPoints] = useState([]);
     const [assignments, setAssignments] = useState([]);
 
@@ -52,13 +78,24 @@ const DriverRouteMap = () => {
 
                                 // Create map points from stops
                                 const points = stopsRes.data.map(stop => ({
-                                    lat: stop.latitude || stop.hubLatitude,
-                                    lng: stop.longitude || stop.hubLongitude,
+                                    lat: stop.hubLatitude,
+                                    lng: stop.hubLongitude,
                                     name: stop.hubName,
                                     hubId: stop.hubId
                                 }));
 
                                 setMapPoints(points);
+
+                                // Determine current stop
+                                // In a real app, this would be stored in the database
+                                // For now, we'll just assume it's the first or second stop
+                                // depending on route status
+                                if (res.data.status === 'IN_PROGRESS') {
+                                    // Find the minimum stop sequence that has orders awaiting pickup
+                                    setCurrentStop(2); // Example: second stop
+                                } else {
+                                    setCurrentStop(1); // First stop
+                                }
                             });
                         });
                     }
@@ -78,11 +115,7 @@ const DriverRouteMap = () => {
                     const assignments = res.data.map(order => ({
                         id: order.id,
                         orderId: order.id,
-                        senderName: order.senderName,
-                        senderPhone: order.senderPhone,
-                        senderAddress: order.senderAddress,
-                        status: order.status,
-                        orderCreatedAt: order.createdAt
+                        status: order.status
                     }));
 
                     setAssignments(assignments);
@@ -156,14 +189,6 @@ const DriverRouteMap = () => {
         history.push(`/driver/orders/${routeVehicleId}`);
     };
 
-    const getNextStop = () => {
-        if (!nextOrder || !stopSequence.length) return null;
-
-        // Find the destination hub for the next order
-        const destinationHubId = nextOrder.destinationHubId;
-        return stopSequence.find(stop => stop.hubId === destinationHubId);
-    };
-
     const handleCompleteTrip = () => {
         if (window.confirm("Are you sure you want to complete this trip? This will mark all orders as delivered.")) {
             request(
@@ -179,6 +204,41 @@ const DriverRouteMap = () => {
                 }
             );
         }
+    };
+
+    // New function to handle arrival at a hub
+    const handleArrivalAtHub = (hubId, stopNumber) => {
+        // Find the hub details
+        const hub = stopSequence.find(stop => stop.hubId === hubId);
+
+        if (!hub) {
+            errorNoti("Hub information not found");
+            return;
+        }
+
+        setSelectedHub(hub);
+
+        // Determine if this is a pickup or delivery hub
+        // In a real app, this would depend on the route direction and order data
+        // For simplicity, we'll consider the first stop as pickup, others as delivery
+        const isPickup = stopNumber === 1;
+        setOperationType(isPickup ? 'pickup' : 'delivery');
+
+        setConfirmArrivalDialog(true);
+    };
+
+    // Proceed to hub operations
+    const proceedToHubOperations = () => {
+        if (!selectedHub || !operationType) {
+            errorNoti("Missing hub information");
+            return;
+        }
+
+        // Close dialog
+        setConfirmArrivalDialog(false);
+
+        // Navigate to the hub operations page
+        history.push(`/middle-mile/driver/hub/${selectedHub.hubId}/${operationType}?routeVehicleId=${routeVehicleId}`);
     };
 
     if (loading) {
@@ -275,14 +335,6 @@ const DriverRouteMap = () => {
                                         size="small"
                                     />
                                 </Grid>
-                                <Grid item xs={12}>
-                                    <Typography variant="subtitle2" color="text.secondary">
-                                        Scheduled Departure
-                                    </Typography>
-                                    <Typography variant="body1" gutterBottom>
-                                        {routeVehicle?.scheduledDepartureTime ? new Date(routeVehicle?.scheduledDepartureTime).toLocaleString() : 'Not scheduled'}
-                                    </Typography>
-                                </Grid>
                             </Grid>
                         </CardContent>
                     </Card>
@@ -299,16 +351,24 @@ const DriverRouteMap = () => {
 
                             <List sx={{ maxHeight: 400, overflow: 'auto' }}>
                                 {stopSequence.map((stop, index) => {
-                                    const isNextStop = nextOrder && getNextStop()?.hubId === stop.hubId;
+                                    // Determine stop status
+                                    const stopNumber = stop.stopSequence;
+                                    const isCurrent = currentStop === stopNumber;
+                                    const isCompleted = currentStop > stopNumber;
+                                    const isPending = currentStop < stopNumber;
+
+                                    // Determine if this is a pickup or delivery hub
+                                    // For simplicity, we'll consider first stop as origin hub
+                                    const isOriginHub = stopNumber === 1;
 
                                     return (
                                         <Paper
                                             key={stop.id || index}
-                                            elevation={isNextStop ? 3 : 1}
+                                            elevation={isCurrent ? 3 : 1}
                                             sx={{
                                                 mb: 1,
                                                 p: 1,
-                                                border: isNextStop ? '2px solid #4caf50' : 'none',
+                                                border: isCurrent ? '2px solid #4caf50' : 'none',
                                                 position: 'relative'
                                             }}
                                         >
@@ -319,7 +379,7 @@ const DriverRouteMap = () => {
                                                         width: 24,
                                                         height: 24,
                                                         borderRadius: '50%',
-                                                        bgcolor: isNextStop ? 'success.main' : 'primary.main',
+                                                        bgcolor: isCurrent ? 'success.main' : isCompleted ? 'success.light' : 'primary.main',
                                                         color: 'white',
                                                         display: 'flex',
                                                         alignItems: 'center',
@@ -328,7 +388,7 @@ const DriverRouteMap = () => {
                                                         fontSize: '0.875rem'
                                                     }}
                                                 >
-                                                    {index + 1}
+                                                    {stopNumber}
                                                 </Typography>
                                                 <Box sx={{ flexGrow: 1 }}>
                                                     <Typography variant="subtitle2">
@@ -341,18 +401,49 @@ const DriverRouteMap = () => {
                                                         </Typography>
                                                     </Box>
                                                 </Box>
-                                                {isNextStop && (
+                                                {isCurrent && (
                                                     <Chip
-                                                        label="NEXT STOP"
+                                                        label="CURRENT STOP"
                                                         color="success"
                                                         size="small"
                                                         sx={{ ml: 1 }}
                                                     />
                                                 )}
                                             </Box>
-                                            <Typography variant="caption" color="text.secondary">
-                                                Est. Wait Time: {stop.estimatedWaitTime} min
-                                            </Typography>
+
+                                            {/* Add action buttons for hub operations */}
+                                            {isCurrent && (
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    fullWidth
+                                                    sx={{ mt: 1 }}
+                                                    startIcon={isOriginHub ? <LocalShippingIcon /> : <CheckCircleIcon />}
+                                                    onClick={() => handleArrivalAtHub(stop.hubId, stopNumber)}
+                                                >
+                                                    {isOriginHub
+                                                        ? "I've arrived - Pickup Orders"
+                                                        : "I've arrived - Deliver Orders"}
+                                                </Button>
+                                            )}
+
+                                            {/* Show status indicator */}
+                                            {isCompleted && (
+                                                <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <CheckCircleIcon color="success" sx={{ mr: 1 }} />
+                                                    <Typography variant="body2" color="success.main">
+                                                        Completed
+                                                    </Typography>
+                                                </Box>
+                                            )}
+
+                                            {isPending && (
+                                                <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        Upcoming stop
+                                                    </Typography>
+                                                </Box>
+                                            )}
                                         </Paper>
                                     );
                                 })}
@@ -386,6 +477,36 @@ const DriverRouteMap = () => {
                     </Card>
                 </Grid>
             </Grid>
+
+            {/* Arrival confirmation dialog */}
+            <Dialog
+                open={confirmArrivalDialog}
+                onClose={() => setConfirmArrivalDialog(false)}
+            >
+                <DialogTitle>
+                    {operationType === 'pickup' ? 'Pickup Orders' : 'Deliver Orders'}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        You've arrived at {selectedHub?.hubName}.
+                        {operationType === 'pickup'
+                            ? ' Ready to pick up orders from this hub?'
+                            : ' Ready to deliver orders to this hub?'
+                        }
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setConfirmArrivalDialog(false)}>Cancel</Button>
+                    <Button
+                        onClick={proceedToHubOperations}
+                        variant="contained"
+                        color="primary"
+                        startIcon={operationType === 'pickup' ? <LocalShippingIcon /> : <CheckCircleIcon />}
+                    >
+                        Proceed
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 };

@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.service.impl;
 
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,11 +9,7 @@ import openerp.openerpresourceserver.dto.OrderResponseDto;
 import openerp.openerpresourceserver.dto.OrderSummaryDTO;
 import openerp.openerpresourceserver.dto.RouteVehicleDetailDto;
 import openerp.openerpresourceserver.dto.VehicleDto;
-import openerp.openerpresourceserver.entity.Driver;
-import openerp.openerpresourceserver.entity.Order;
-import openerp.openerpresourceserver.entity.RouteVehicle;
-import openerp.openerpresourceserver.entity.Vehicle;
-import openerp.openerpresourceserver.entity.VehicleDriver;
+import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
 import openerp.openerpresourceserver.entity.enumentity.VehicleStatus;
 import openerp.openerpresourceserver.mapper.OrderMapper;
@@ -37,9 +34,10 @@ public class DriverServiceImpl implements DriverService {
     private final VehicleDriverRepository vehicleDriverRepo;
     private final VehicleRepository vehicleRepo;
     private final RouteVehicleRepository routeVehicleRepo;
+    private final RouteStopRepository routeStopRepository;
     private final OrderRepo orderRepo;
     private final OrderService orderService;
-
+    private final RouteRepository routeRepository;
     private final MiddleMileOrderService middleMileOrderService;
     private final VehicleMapper vehicleMapper = VehicleMapper.INSTANCE;
 
@@ -106,13 +104,7 @@ public class DriverServiceImpl implements DriverService {
 
         // Get orders at the hub that are ready for pickup (COLLECTED_HUB status)
         // and are not already assigned to a vehicle
-        List<Order> pendingOrders = orderRepo.findAll().stream()
-                .filter(order ->
-                        order.getOriginHubId() != null &&
-                                order.getOriginHubId().equals(hubId) &&
-                                order.getStatus() == OrderStatus.COLLECTED_HUB &&
-                                order.getVehicleId() == null)
-                .collect(Collectors.toList());
+        List<Order> pendingOrders = orderRepo.findAllByOriginHubIdAndStatusAndVehicleId(hubId, OrderStatus.COLLECTED_HUB, vehicleDriver.getVehicleId());
 
         return pendingOrders.stream()
                 .map(OrderSummaryDTO::new)
@@ -257,31 +249,4 @@ public class DriverServiceImpl implements DriverService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    @Transactional
-    public void completeTrip(String username, UUID routeVehicleId) {
-        // Find driver
-        Driver driver = driverRepo.findByUsername(username);
-        if (driver == null) {
-            throw new NotFoundException("Driver not found with username: " + username);
-        }
-
-        // Find vehicle assigned to driver
-        VehicleDriver vehicleDriver = vehicleDriverRepo.findByDriverIdAndUnassignedAtIsNull(driver.getId());
-        if (vehicleDriver == null) {
-            throw new NotFoundException("No vehicle assigned to driver: " + username);
-        }
-
-        // Find route vehicle
-        RouteVehicle routeVehicle = routeVehicleRepo.findById(routeVehicleId)
-                .orElseThrow(() -> new NotFoundException("Route vehicle assignment not found with ID: " + routeVehicleId));
-
-        // Verify route vehicle is assigned to driver's vehicle
-        if (!routeVehicle.getVehicleId().equals(vehicleDriver.getVehicleId())) {
-            throw new IllegalStateException("Route vehicle is not assigned to driver's vehicle");
-        }
-
-        // Complete the trip
-        middleMileOrderService.completeTrip(routeVehicleId);
-    }
 }

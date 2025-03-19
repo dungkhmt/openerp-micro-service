@@ -18,8 +18,7 @@ public class RouteVehicle {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
     private UUID id;
-
-
+    private Integer currentStopSequence = 1;
     private UUID routeId;
     private String routeCode;
     private String routeName;
