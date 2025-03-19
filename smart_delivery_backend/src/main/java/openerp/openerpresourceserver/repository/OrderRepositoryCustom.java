@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.repository;
 import openerp.openerpresourceserver.dto.OrderResponseDto;
 import openerp.openerpresourceserver.dto.OrderSummaryDTO;
 import openerp.openerpresourceserver.dto.OrderSummaryMiddleMileDto;
+import openerp.openerpresourceserver.entity.Order;
 import openerp.openerpresourceserver.entity.enumentity.RouteDirection;
 
 import java.util.List;
@@ -20,5 +21,5 @@ public interface OrderRepositoryCustom {
 
     // Search for available order for vehicle
     List<OrderSummaryMiddleMileDto> getCollectedCollectorListVehicle(UUID vehicleId, UUID hubId);
-
+    List<Order> findAllByRouteVehicleId(UUID routeVehicleId);
 }

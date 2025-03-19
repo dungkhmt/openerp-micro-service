@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import openerp.openerpresourceserver.dto.OrderResponseDto;
 import openerp.openerpresourceserver.dto.OrderSummaryDTO;
 import openerp.openerpresourceserver.dto.OrderSummaryMiddleMileDto;
 import openerp.openerpresourceserver.entity.Order;
@@ -17,6 +18,7 @@ import openerp.openerpresourceserver.repository.OrderRepo;
 import openerp.openerpresourceserver.repository.RouteVehicleRepository;
 import openerp.openerpresourceserver.repository.VehicleRepository;
 import openerp.openerpresourceserver.service.MiddleMileOrderService;
+import openerp.openerpresourceserver.service.OrderService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ public class MiddleMileOrderServiceImpl implements MiddleMileOrderService {
     private final OrderRepo orderRepo;
     private final RouteVehicleRepository routeVehicleRepository;
     private final VehicleRepository vehicleRepo;
+    private final OrderService orderService;
 
     /**
      * Gán đơn hàng cho một chuyến
@@ -104,14 +107,10 @@ public class MiddleMileOrderServiceImpl implements MiddleMileOrderService {
      * Lấy danh sách đơn hàng theo chuyến
      */
     @Override
-    public List<Order> getOrdersByTrip(UUID routeVehicleId) {
+    public List<OrderResponseDto> getOrdersByTrip(UUID routeVehicleId) {
         RouteVehicle routeVehicle = routeVehicleRepository.findById(routeVehicleId)
                 .orElseThrow(() -> new NotFoundException("Route vehicle assignment not found"));
-
-        return orderRepo.findAll().stream()
-                .filter(order -> routeVehicle.getRouteId().equals(order.getRouteId()) &&
-                        routeVehicle.getVehicleId().equals(order.getVehicleId()))
-                .collect(Collectors.toList());
+        return orderRepo.findAllByRouteVehicleId(routeVehicleId).stream().map(o-> orderService.getOrderById(o.getId())).toList();
     }
 
     /**
@@ -138,7 +137,7 @@ public class MiddleMileOrderServiceImpl implements MiddleMileOrderService {
     @Transactional
     @Override
     public void completeTrip(UUID routeVehicleId) {
-        List<Order> orders = getOrdersByTrip(routeVehicleId);
+        List<Order> orders = orderRepo.findAllByRouteVehicleId(routeVehicleId);
 
         for (Order order : orders) {
             // Chỉ cập nhật đơn hàng đang ở trạng thái SHIPPING

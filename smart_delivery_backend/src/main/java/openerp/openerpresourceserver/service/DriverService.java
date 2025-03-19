@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.service;
 
+import openerp.openerpresourceserver.dto.OrderResponseDto;
 import openerp.openerpresourceserver.dto.OrderSummaryDTO;
 import openerp.openerpresourceserver.dto.RouteVehicleDetailDto;
 import openerp.openerpresourceserver.dto.VehicleDto;
@@ -28,7 +29,7 @@ public interface DriverService {
     /**
      * Get orders for a specific route vehicle
      */
-    List<Order> getOrdersForRouteVehicle(UUID routeVehicleId);
+    List<OrderResponseDto> getOrdersForRouteVehicle(UUID routeVehicleId);
 
     /**
      * Get pending pickup orders for a driver at a specific hub

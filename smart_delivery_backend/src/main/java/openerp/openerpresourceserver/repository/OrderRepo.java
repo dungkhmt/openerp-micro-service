@@ -23,5 +23,4 @@ public interface OrderRepo extends JpaRepository<Order, UUID>, OrderRepositoryCu
 
     List<Order> findByOriginHubIdOrderByCreatedAtDesc(UUID hubId);
 
-
 }

@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.controller;
 
 import lombok.RequiredArgsConstructor;
+import openerp.openerpresourceserver.dto.OrderResponseDto;
 import openerp.openerpresourceserver.dto.OrderSummaryDTO;
 import openerp.openerpresourceserver.dto.RouteVehicleDetailDto;
 import openerp.openerpresourceserver.dto.VehicleDto;
@@ -33,6 +34,7 @@ public class DriverController {
     @GetMapping("/vehicle")
     public ResponseEntity<VehicleDto> getAssignedVehicle(Principal principal) {
         String username = principal.getName();
+        System.out.println("DriverController.getAssignedVehicle: " + principal);
         VehicleDto vehicle = driverService.getDriverVehicleByUsername(username);
         return ResponseEntity.ok(vehicle);
     }
@@ -44,6 +46,8 @@ public class DriverController {
     @GetMapping("/routes")
     public ResponseEntity<List<RouteVehicleDetailDto>> getAssignedRoutes(Principal principal) {
         String username = principal.getName();
+        System.out.println("DriverController.getAssignedVehicle: " + principal);
+
         List<RouteVehicleDetailDto> routes = driverService.getDriverRoutesByUsername(username);
         return ResponseEntity.ok(routes);
     }
@@ -53,9 +57,9 @@ public class DriverController {
      */
     @PreAuthorize("hasRole('DRIVER')")
     @GetMapping("/routes/{routeVehicleId}/orders")
-    public ResponseEntity<List<Order>> getOrdersForRouteVehicle(@PathVariable UUID routeVehicleId) {
-        List<Order> orders = driverService.getOrdersForRouteVehicle(routeVehicleId);
-        return ResponseEntity.ok(orders);
+    public ResponseEntity<List<OrderResponseDto>> getOrdersForRouteVehicle(@PathVariable UUID routeVehicleId) {
+        List<OrderResponseDto> orderDtos = driverService.getOrdersForRouteVehicle(routeVehicleId);
+        return ResponseEntity.ok(orderDtos);
     }
 
     /**
@@ -67,6 +71,8 @@ public class DriverController {
             Principal principal,
             @PathVariable UUID hubId) {
         String username = principal.getName();
+        System.out.println("DriverController.getAssignedVehicle: " + principal);
+
         List<OrderSummaryDTO> orders = driverService.getPendingPickupOrdersForDriver(username, hubId);
         return ResponseEntity.ok(orders);
     }
@@ -78,8 +84,10 @@ public class DriverController {
     @PutMapping("/pickup-orders")
     public ResponseEntity<Void> pickupOrders(@RequestBody List<UUID> orderIds, Principal principal) {
         String username = principal.getName();
-        driverService.pickupOrders(username, orderIds);
+        driverService.pickupOrders(username, orderIds);        System.out.println("DriverController.getAssignedVehicle: " + principal);
+
         return ResponseEntity.ok().build();
+
     }
 
     /**

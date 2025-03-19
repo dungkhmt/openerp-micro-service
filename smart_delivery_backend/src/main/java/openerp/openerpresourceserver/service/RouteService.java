@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.service;
 
 import jakarta.transaction.Transactional;
 import openerp.openerpresourceserver.dto.RouteDto;
+import openerp.openerpresourceserver.dto.RouteStopDto;
 import openerp.openerpresourceserver.entity.Route;
 import openerp.openerpresourceserver.entity.RouteStop;
 
@@ -17,7 +18,7 @@ public interface RouteService {
 
     Route getRouteById(UUID routeId);
 
-    List<RouteStop> getRouteStops(UUID routeId);
+    List<RouteStopDto> getRouteStops(UUID routeId);
 
     List<Route> getAllRoutes();
 

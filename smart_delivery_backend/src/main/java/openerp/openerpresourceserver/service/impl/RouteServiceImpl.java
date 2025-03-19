@@ -135,11 +135,20 @@ public class RouteServiceImpl implements RouteService {
      * Lấy danh sách các điểm dừng của tuyến đường
      */
     @Override
-    public List<RouteStop> getRouteStops(UUID routeId) {
+    public List<RouteStopDto> getRouteStops(UUID routeId) {
         if (!routeRepository.existsById(routeId)) {
             throw new NotFoundException("Route not found");
         }
-        return routeStopRepository.findByRouteIdOrderByStopSequence(routeId);
+        List<RouteStop> routeStops = routeStopRepository.findByRouteIdOrderByStopSequence(routeId);
+        List<RouteStopDto> routeStopDtos = routeStops.stream().map(RouteStopMapper.INSTANCE::routeStopToRouteStopDto).toList();
+        for(RouteStopDto routeStopDto : routeStopDtos){
+            Hub hub = hubRepo.findById(routeStopDto.getHubId()).orElseThrow(()-> new NotFoundException("not found hub"));
+            routeStopDto.setHubName(hub.getName());
+            routeStopDto.setHubLatitude(hub.getLatitude());
+            routeStopDto.setHubLongitude(hub.getLongitude());
+        }
+
+        return routeStopDtos;
     }
 
     /**

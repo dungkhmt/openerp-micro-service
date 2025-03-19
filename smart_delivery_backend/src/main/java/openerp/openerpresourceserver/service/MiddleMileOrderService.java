@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.service;
 
 import jakarta.transaction.Transactional;
+import openerp.openerpresourceserver.dto.OrderResponseDto;
 import openerp.openerpresourceserver.dto.OrderSummaryMiddleMileDto;
 import openerp.openerpresourceserver.entity.Order;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
@@ -15,7 +16,7 @@ public interface MiddleMileOrderService {
     @Transactional
     void unassignOrderFromTrip(UUID orderId);
 
-    List<Order> getOrdersByTrip(UUID routeVehicleId);
+    List<OrderResponseDto> getOrdersByTrip(UUID routeVehicleId);
 
     @Transactional
     void updateOrderStatus(UUID orderId, OrderStatus status);

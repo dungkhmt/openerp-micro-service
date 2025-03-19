@@ -3,18 +3,14 @@ export const middleMile = {
     icon: "AirportShuttleIcon",
     text: "Vận chuyển trung gian",
     child: [
-        {
-            id: "MENU_ROUTE.DRIVER_INFO",
-            path: "/middle-mile/driver/info",
-            text: "Thông tin tài xế",
-            child: [],
-        },
+
         {
             id: "MENU_ROUTE.DRIVER_TIMETABLE",
-            path: "/middle-mile/driver/timetable",
-            text: "Lịch trình chuyến",
+            path: "/middle-mile/driver/dashboard",
+            text: "Dashboard",
             child: [],
         },
+
         // {
         //     id: "MENU_ROUTE.VEHICLE_ASSIGNMENTS",
         //     path: "/middle-mile/vehicle-assignments",

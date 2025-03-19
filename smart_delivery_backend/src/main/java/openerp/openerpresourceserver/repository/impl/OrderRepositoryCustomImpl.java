@@ -4,6 +4,7 @@ import jakarta.ws.rs.NotFoundException;
 import openerp.openerpresourceserver.dto.OrderResponseDto;
 import openerp.openerpresourceserver.dto.OrderSummaryDTO;
 import openerp.openerpresourceserver.dto.OrderSummaryMiddleMileDto;
+import openerp.openerpresourceserver.entity.Order;
 import openerp.openerpresourceserver.entity.OrderItem;
 import openerp.openerpresourceserver.entity.enumentity.RouteDirection;
 import openerp.openerpresourceserver.repository.OrderRepositoryCustom;
@@ -112,7 +113,35 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
         return sqlQueryUtil.queryForList(SQL1.toString(), params, OrderSummaryMiddleMileDto.class);
     }
 
-    ;
+    @Override
+    public List<Order> findAllByRouteVehicleId(UUID routeVehicleId){
+        StringBuilder SQL1 = new StringBuilder();
+        SQL1.append("SELECT O.*, ");
+        SQL1.append("S.SENDER_ID, S.NAME AS SENDER_NAME, S.PHONE AS SENDER_PHONE, S.EMAIL AS SENDER_EMAIL, S.ADDRESS AS SENDER_ADDRESS, S.LONGITUDE AS SENDER_LONGITUDE, S.LATITUDE AS SENDER_LATITUDE, ");
+        SQL1.append("R.RECIPIENT_ID, R.NAME AS RECIPIENT_NAME, R.PHONE AS RECIPIENT_PHONE, R.EMAIL AS RECIPIENT_EMAIL, R.ADDRESS AS RECIPIENT_ADDRESS, R.LONGITUDE AS RECIPIENT_LONGITUDE, R.LATITUDE AS RECIPIENT_LATITUDE ");
+        SQL1.append("FROM smartdelivery_order o ");
+        SQL1.append("JOIN smartdelivery_sender S ON O.SENDER_ID = S.SENDER_ID ");
+        SQL1.append("JOIN smartdelivery_recipient R ON O.RECIPIENT_ID = R.RECIPIENT_ID ");
+        SQL1.append("where o.route_vehicle_id = :routeVehicleId ");
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("routeVehicleId", routeVehicleId);
+
+        List<Order> orders = sqlQueryUtil.queryForList(SQL1.toString(), params, Order.class);
+
+        return orders;
+
+    };
+
+    public List<OrderItem> findAllByOrderId(UUID orderId){
+        StringBuilder SQL1 = new StringBuilder();
+        SQL1.append("SELECT * FROM smartdelivery_order_item ");
+        SQL1.append("WHERE ORDER_ID = :id ");
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", orderId);
+        return sqlQueryUtil.queryForList(SQL1.toString(), params, OrderItem.class);
+    }
+
 
 
 }

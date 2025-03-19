@@ -2,8 +2,10 @@ package openerp.openerpresourceserver.controller;
 
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.entity.Collector;
+import openerp.openerpresourceserver.entity.Driver;
 import openerp.openerpresourceserver.entity.User;
 import openerp.openerpresourceserver.repository.CollectorRepo;
+import openerp.openerpresourceserver.repository.DriverRepo;
 import openerp.openerpresourceserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +20,8 @@ import java.util.List;
 public class UserController {
 
     private UserService userService;
-
     private CollectorRepo collectorRepo;
+    private DriverRepo driverRepo;
 
     @Autowired
     public UserController(UserService userService, CollectorRepo collectorRepo) {
@@ -52,6 +54,11 @@ public class UserController {
     public ResponseEntity<?> getCollectorByUsername(@PathVariable String username) {
         Collector collector = collectorRepo.findByUsername(username);
         return ResponseEntity.ok().body(collector);
+    }
+    @GetMapping("get-driver/{username}")
+    public ResponseEntity<?> getDriverByUsername(@PathVariable String username) {
+        Driver driver = driverRepo.findByUsername(username);
+        return ResponseEntity.ok().body(driver);
     }
 
     @GetMapping("/get-all")

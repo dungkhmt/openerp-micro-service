@@ -71,7 +71,7 @@ public class MiddleMileController {
     }
 
     @GetMapping("/routes/{routeId}/stops")
-    public ResponseEntity<List<RouteStop>> getRouteStops(@PathVariable UUID routeId) {
+    public ResponseEntity<List<RouteStopDto>> getRouteStops(@PathVariable UUID routeId) {
         return ResponseEntity.ok(routeService.getRouteStops(routeId));
     }
 
@@ -170,7 +170,7 @@ public class MiddleMileController {
     }
 
     @GetMapping("/trips/{routeVehicleId}/orders")
-    public ResponseEntity<List<Order>> getOrdersByTrip(@PathVariable UUID routeVehicleId) {
+    public ResponseEntity<List<OrderResponseDto>> getOrdersByTrip(@PathVariable UUID routeVehicleId) {
         return ResponseEntity.ok(orderService.getOrdersByTrip(routeVehicleId));
     }
 

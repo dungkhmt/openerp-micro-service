@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import openerp.openerpresourceserver.dto.OrderResponseDto;
 import openerp.openerpresourceserver.dto.OrderSummaryDTO;
 import openerp.openerpresourceserver.dto.RouteVehicleDetailDto;
 import openerp.openerpresourceserver.dto.VehicleDto;
@@ -14,10 +15,12 @@ import openerp.openerpresourceserver.entity.Vehicle;
 import openerp.openerpresourceserver.entity.VehicleDriver;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
 import openerp.openerpresourceserver.entity.enumentity.VehicleStatus;
+import openerp.openerpresourceserver.mapper.OrderMapper;
 import openerp.openerpresourceserver.mapper.VehicleMapper;
 import openerp.openerpresourceserver.repository.*;
 import openerp.openerpresourceserver.service.DriverService;
 import openerp.openerpresourceserver.service.MiddleMileOrderService;
+import openerp.openerpresourceserver.service.OrderService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -35,6 +38,8 @@ public class DriverServiceImpl implements DriverService {
     private final VehicleRepository vehicleRepo;
     private final RouteVehicleRepository routeVehicleRepo;
     private final OrderRepo orderRepo;
+    private final OrderService orderService;
+
     private final MiddleMileOrderService middleMileOrderService;
     private final VehicleMapper vehicleMapper = VehicleMapper.INSTANCE;
 
@@ -78,11 +83,12 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public List<Order> getOrdersForRouteVehicle(UUID routeVehicleId) {
+    public List<OrderResponseDto> getOrdersForRouteVehicle(UUID routeVehicleId) {
         RouteVehicle routeVehicle = routeVehicleRepo.findById(routeVehicleId)
                 .orElseThrow(() -> new NotFoundException("Route vehicle assignment not found with ID: " + routeVehicleId));
 
-        return middleMileOrderService.getOrdersByTrip(routeVehicleId);
+        List<Order> orders = orderRepo.findAllByRouteVehicleId(routeVehicleId);
+        return orders.stream().map(o-> orderService.getOrderById(o.getId())).toList();
     }
 
     @Override

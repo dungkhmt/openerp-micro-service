@@ -63,7 +63,7 @@ public class Order {
     private Double distance;
     private UUID finalHubId;
     private String finalHubName;
-
+    private UUID routeVehicleId;
     @CreatedBy
     private String createdBy;
     private String approvedBy;

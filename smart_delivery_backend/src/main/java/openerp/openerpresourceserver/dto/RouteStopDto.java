@@ -18,6 +18,9 @@ public class RouteStopDto {
     private UUID hubId;
 
     private String hubName;
+    private String hubAddress;
+    private Double hubLatitude;
+    private Double hubLongitude;
 
     @NotNull(message = "Stop sequence is required")
     @Min(value = 1, message = "Sequence must be at least 1")
