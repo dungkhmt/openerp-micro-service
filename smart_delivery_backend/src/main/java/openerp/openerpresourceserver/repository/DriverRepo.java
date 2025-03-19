@@ -10,4 +10,6 @@ import java.util.UUID;
 public interface DriverRepo extends JpaRepository<Driver, UUID> {
     @Query("SELECT d FROM Driver d")
     List<Driver> getAllByHubId(UUID hubId);
+
+    Driver findByUsername(String username);
 }
