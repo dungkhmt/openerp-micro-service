@@ -25,4 +25,8 @@ public interface OrderRepo extends JpaRepository<Order, UUID>, OrderRepositoryCu
     List<Order> findByOriginHubIdOrderByCreatedAtDesc(UUID hubId);
 
     List<Order> findAllByOriginHubIdAndStatusAndVehicleId(UUID hubId, OrderStatus orderStatus, UUID vehicleId);
+
+    List<Order> findByRouteVehicleId(UUID routeVehicleId);
+
+    List<Order> findByRouteVehicleIdAndStatus(UUID routeVehicleId, OrderStatus orderStatus);
 }

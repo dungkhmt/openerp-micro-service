@@ -41,6 +41,7 @@ const DriverRouteMap = () => {
     const { routeVehicleId } = useParams();
     const history = useHistory();
 
+    // State variables
     const [loading, setLoading] = useState(true);
     const [routeVehicle, setRouteVehicle] = useState(null);
     const [route, setRoute] = useState(null);
@@ -50,6 +51,7 @@ const DriverRouteMap = () => {
     const [nextOrder, setNextOrder] = useState(null);
     const [currentLocation, setCurrentLocation] = useState(null);
     const [currentStop, setCurrentStop] = useState(null);
+    const [activeTrip, setActiveTrip] = useState(null);
     const [confirmArrivalDialog, setConfirmArrivalDialog] = useState(false);
     const [selectedHub, setSelectedHub] = useState(null);
     const [operationType, setOperationType] = useState(null);
@@ -58,145 +60,181 @@ const DriverRouteMap = () => {
     const [mapPoints, setMapPoints] = useState([]);
     const [assignments, setAssignments] = useState([]);
 
+    // Load data on component mount
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-
-                // Get route vehicle details
-                await request('get', `/smdeli/middle-mile/vehicle-assignments/${routeVehicleId}`, (res) => {
-                    setRouteVehicle(res.data);
-
-                    // Get route details and stops
-                    if (res.data?.routeId) {
-                        request('get', `/smdeli/middle-mile/routes/${res.data.routeId}`, (routeRes) => {
-                            setRoute(routeRes.data);
-
-                            // Get route stops
-                            request('get', `/smdeli/middle-mile/routes/${res.data.routeId}/stops`, (stopsRes) => {
-                                setStopSequence(stopsRes.data || []);
-
-                                // Create map points from stops
-                                const points = stopsRes.data.map(stop => ({
-                                    lat: stop.hubLatitude,
-                                    lng: stop.hubLongitude,
-                                    name: stop.hubName,
-                                    hubId: stop.hubId
-                                }));
-
-                                setMapPoints(points);
-
-                                // Determine current stop
-                                // In a real app, this would be stored in the database
-                                // For now, we'll just assume it's the first or second stop
-                                // depending on route status
-                                if (res.data.status === 'IN_PROGRESS') {
-                                    // Find the minimum stop sequence that has orders awaiting pickup
-                                    setCurrentStop(2); // Example: second stop
-                                } else {
-                                    setCurrentStop(1); // First stop
-                                }
-                            });
-                        });
-                    }
-                });
-
-                // Get orders for this route vehicle
-                await request('get', `/smdeli/driver/routes/${routeVehicleId}/orders`, (res) => {
-                    setOrders(res.data || []);
-
-                    // Find next order to be delivered (first DELIVERING order)
-                    const nextToDeliver = res.data?.find(order => order.status === 'DELIVERING');
-                    if (nextToDeliver) {
-                        setNextOrder(nextToDeliver);
-                    }
-
-                    // Create assignments for map component
-                    const assignments = res.data.map(order => ({
-                        id: order.id,
-                        orderId: order.id,
-                        status: order.status
-                    }));
-
-                    setAssignments(assignments);
-                });
-
-                // Get driver's hub
-                const hubId = localStorage.getItem('hubId');
-                if (hubId) {
-                    request('get', `/smdeli/hubmanager/hub/${hubId}`, (res) => {
-                        setHub({
-                            name: res.data.name,
-                            address: res.data.address,
-                            latitude: res.data.latitude,
-                            longitude: res.data.longitude
-                        });
-                    });
-                }
-
-                // Get current location if available
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            setCurrentLocation({
-                                lat: position.coords.latitude,
-                                lng: position.coords.longitude
-                            });
-                        },
-                        (error) => {
-                            console.error("Error getting location:", error);
-                        }
-                    );
-                }
-
-                setLoading(false);
-            } catch (error) {
-                console.error("Error fetching route data:", error);
-                errorNoti("Failed to load route data");
-                setLoading(false);
-            }
-        };
-
-        fetchData();
+        fetchRouteData();
 
         // Set up periodic location updates
-        const locationInterval = setInterval(() => {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        setCurrentLocation({
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude
-                        });
-                    },
-                    (error) => {
-                        console.error("Error updating location:", error);
-                    }
-                );
-            }
-        }, 30000); // Update every 30 seconds
+        const locationInterval = setInterval(updateCurrentLocation, 30000); // Update every 30 seconds
 
         return () => {
             clearInterval(locationInterval);
         };
     }, [routeVehicleId]);
 
+    // Update current location
+    const updateCurrentLocation = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    setCurrentLocation({
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    });
+                },
+                (error) => {
+                    console.error("Error updating location:", error);
+                }
+            );
+        }
+    };
+
+    // Fetch route data
+    const fetchRouteData = async () => {
+        try {
+            setLoading(true);
+
+            // Get route vehicle details
+            await request('get', `/smdeli/middle-mile/vehicle-assignments/${routeVehicleId}`, (res) => {
+                setRouteVehicle(res.data);
+
+                // Get route details and stops if route ID exists
+                if (res.data?.routeId) {
+                    fetchRouteDetails(res.data.routeId);
+                }
+            });
+
+            // Check for active trip
+            await request('get', `/smdeli/driver/trip/active/${routeVehicleId}`, (res) => {
+                    if (res.data) {
+                        setActiveTrip(res.data);
+                        // If we have an active trip, use its current stop index
+                        setCurrentStop(res.data.currentStopIndex + 1); // Convert to 1-based index
+                    } else {
+                        // No active trip, default to first stop
+                        setCurrentStop(1);
+                    }
+                },
+                {
+                    // Handle not found case (no active trip)
+                    404: () => setCurrentStop(1)
+                });
+
+            // Get orders for this route vehicle
+            await fetchOrdersForVehicle();
+
+            // Get driver's hub
+            fetchDriverHub();
+
+            // Get current location
+            updateCurrentLocation();
+
+            setLoading(false);
+        } catch (error) {
+            console.error("Error fetching route data:", error);
+            errorNoti("Failed to load route data");
+            setLoading(false);
+        }
+    };
+
+    // Fetch route details and stops
+    const fetchRouteDetails = async (routeId) => {
+        try {
+            // Get route details
+            await request('get', `/smdeli/middle-mile/routes/${routeId}`, (routeRes) => {
+                setRoute(routeRes.data);
+
+                // Get route stops
+                request('get', `/smdeli/middle-mile/routes/${routeId}/stops`, (stopsRes) => {
+                    const stops = stopsRes.data || [];
+                    setStopSequence(stops);
+
+                    // Create map points from stops
+                    const points = stops.map(stop => ({
+                        lat: stop.hubLatitude,
+                        lng: stop.hubLongitude,
+                        name: stop.hubName,
+                        hubId: stop.hubId,
+                        sequence: stop.stopSequence
+                    }));
+
+                    setMapPoints(points);
+                });
+            });
+        } catch (error) {
+            console.error("Error fetching route details:", error);
+        }
+    };
+
+    // Fetch orders for vehicle
+    const fetchOrdersForVehicle = async () => {
+        try {
+            await request('get', `/smdeli/driver/routes/${routeVehicleId}/orders`, (res) => {
+                const orderData = res.data || [];
+                setOrders(orderData);
+
+                // Find next order to be delivered (first DELIVERING order)
+                const nextToDeliver = orderData.find(order => order.status === 'DELIVERING');
+                if (nextToDeliver) {
+                    setNextOrder(nextToDeliver);
+                }
+
+                // Create assignments for map component
+                const orderAssignments = orderData.map(order => ({
+                    id: order.id,
+                    orderId: order.id,
+                    status: order.status
+                }));
+
+                setAssignments(orderAssignments);
+            });
+        } catch (error) {
+            console.error("Error fetching orders:", error);
+        }
+    };
+
+    // Fetch driver's hub
+    const fetchDriverHub = async () => {
+        try {
+            const hubId = localStorage.getItem('hubId');
+            if (hubId) {
+                await request('get', `/smdeli/hubmanager/hub/${hubId}`, (res) => {
+                    setHub({
+                        id: res.data.id,
+                        name: res.data.name,
+                        address: res.data.address,
+                        latitude: res.data.latitude,
+                        longitude: res.data.longitude
+                    });
+                });
+            }
+        } catch (error) {
+            console.error("Error fetching driver's hub:", error);
+        }
+    };
+
+    // Navigation handlers
     const handleBack = () => {
-        history.push('/driver/dashboard');
+        history.push('/middle-mile/driver/dashboard');
     };
 
     const handleViewOrders = () => {
-        history.push(`/driver/orders/${routeVehicleId}`);
+        history.push(`/middle-mile/driver/orders/${routeVehicleId}`);
     };
 
+    // Complete trip
     const handleCompleteTrip = () => {
         if (window.confirm("Are you sure you want to complete this trip? This will mark all orders as delivered.")) {
+            const endpoint = activeTrip
+                ? `/smdeli/driver/trip/${activeTrip.id}/complete`
+                : `/smdeli/driver/trip/${routeVehicleId}/complete`;
+
             request(
                 'post',
-                `/smdeli/driver/trips/${routeVehicleId}/complete`,
+                endpoint,
                 () => {
                     successNoti("Trip completed successfully");
-                    history.push('/driver/dashboard');
+                    history.push('/middle-mile/driver/dashboard');
                 },
                 {
                     401: () => errorNoti("Unauthorized action"),
@@ -206,7 +244,47 @@ const DriverRouteMap = () => {
         }
     };
 
-    // New function to handle arrival at a hub
+    // Start a new trip
+    const handleStartTrip = () => {
+        request(
+            'post',
+            `/smdeli/driver/trip/start`,
+            (res) => {
+                successNoti("Trip started successfully");
+                setActiveTrip(res.data);
+                setCurrentStop(1);
+            },
+            {
+                401: () => errorNoti("Unauthorized action"),
+                400: () => errorNoti("Unable to start trip")
+            },
+            { routeVehicleId }
+        );
+    };
+
+    // Advance to next stop
+    const handleAdvanceToNextStop = () => {
+        if (!activeTrip) {
+            errorNoti("No active trip found");
+            return;
+        }
+
+        request(
+            'put',
+            `/smdeli/driver/trip/${activeTrip.id}/advance-stop`,
+            (res) => {
+                successNoti("Advanced to next stop successfully");
+                setActiveTrip(res.data);
+                setCurrentStop(res.data.currentStopIndex + 1); // Convert to 1-based index
+            },
+            {
+                401: () => errorNoti("Unauthorized action"),
+                400: () => errorNoti("Unable to advance to next stop")
+            }
+        );
+    };
+
+    // Handle arrival at a hub
     const handleArrivalAtHub = (hubId, stopNumber) => {
         // Find the hub details
         const hub = stopSequence.find(stop => stop.hubId === hubId);
@@ -219,8 +297,7 @@ const DriverRouteMap = () => {
         setSelectedHub(hub);
 
         // Determine if this is a pickup or delivery hub
-        // In a real app, this would depend on the route direction and order data
-        // For simplicity, we'll consider the first stop as pickup, others as delivery
+        // For simplicity, first stop is pickup, others are delivery
         const isPickup = stopNumber === 1;
         setOperationType(isPickup ? 'pickup' : 'delivery');
 
@@ -238,13 +315,15 @@ const DriverRouteMap = () => {
         setConfirmArrivalDialog(false);
 
         // Navigate to the hub operations page
-        history.push(`/middle-mile/driver/hub/${selectedHub.hubId}/${operationType}?routeVehicleId=${routeVehicleId}`);
+        const tripParam = activeTrip ? `&tripId=${activeTrip.id}` : '';
+        history.push(`/middle-mile/driver/hub/${selectedHub.hubId}/${operationType}?routeVehicleId=${routeVehicleId}${tripParam}`);
     };
 
+    // Show loading indicator
     if (loading) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" height="80vh">
-                <CircularProgress />
+                <CircularProgress size={60} />
             </Box>
         );
     }
@@ -273,7 +352,7 @@ const DriverRouteMap = () => {
                         View Orders
                     </Button>
 
-                    {routeVehicle?.status === 'IN_PROGRESS' && (
+                    {activeTrip ? (
                         <Button
                             variant="contained"
                             color="success"
@@ -281,9 +360,50 @@ const DriverRouteMap = () => {
                         >
                             Complete Trip
                         </Button>
+                    ) : (
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleStartTrip}
+                        >
+                            Start Trip
+                        </Button>
                     )}
                 </Box>
             </Box>
+
+            {/* Trip information banner */}
+            {activeTrip && (
+                <Paper
+                    sx={{
+                        p: 2,
+                        mb: 3,
+                        bgcolor: 'primary.light',
+                        color: 'white',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                    }}
+                >
+                    <Box>
+                        <Typography variant="h6">
+                            Active Trip - Stop {currentStop} of {stopSequence.length}
+                        </Typography>
+                        <Typography variant="body2">
+                            Started: {new Date(activeTrip.startTime).toLocaleString()}
+                        </Typography>
+                    </Box>
+
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleAdvanceToNextStop}
+                        disabled={currentStop >= stopSequence.length}
+                    >
+                        Next Stop
+                    </Button>
+                </Paper>
+            )}
 
             <Grid container spacing={3}>
                 <Grid item xs={12} md={4}>
@@ -327,13 +447,21 @@ const DriverRouteMap = () => {
                                         Status
                                     </Typography>
                                     <Chip
-                                        label={routeVehicle?.status || 'UNKNOWN'}
+                                        label={activeTrip ? 'IN_PROGRESS' : (routeVehicle?.status || 'PLANNED')}
                                         color={
-                                            routeVehicle?.status === 'IN_PROGRESS' ? 'warning' :
+                                            activeTrip ? 'warning' :
                                                 routeVehicle?.status === 'COMPLETED' ? 'success' : 'primary'
                                         }
                                         size="small"
                                     />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Typography variant="subtitle2" color="text.secondary">
+                                        Orders
+                                    </Typography>
+                                    <Typography variant="body1">
+                                        {orders.length} total ({orders.filter(o => o.status === 'DELIVERING').length} in transit)
+                                    </Typography>
                                 </Grid>
                             </Grid>
                         </CardContent>
@@ -350,7 +478,7 @@ const DriverRouteMap = () => {
                             <Divider sx={{ mb: 2 }} />
 
                             <List sx={{ maxHeight: 400, overflow: 'auto' }}>
-                                {stopSequence.map((stop, index) => {
+                                {stopSequence.map((stop) => {
                                     // Determine stop status
                                     const stopNumber = stop.stopSequence;
                                     const isCurrent = currentStop === stopNumber;
@@ -358,12 +486,11 @@ const DriverRouteMap = () => {
                                     const isPending = currentStop < stopNumber;
 
                                     // Determine if this is a pickup or delivery hub
-                                    // For simplicity, we'll consider first stop as origin hub
                                     const isOriginHub = stopNumber === 1;
 
                                     return (
                                         <Paper
-                                            key={stop.id || index}
+                                            key={stop.id}
                                             elevation={isCurrent ? 3 : 1}
                                             sx={{
                                                 mb: 1,
@@ -401,9 +528,9 @@ const DriverRouteMap = () => {
                                                         </Typography>
                                                     </Box>
                                                 </Box>
-                                                {isCurrent && (
+                                                {isCurrent && activeTrip && (
                                                     <Chip
-                                                        label="CURRENT STOP"
+                                                        label="CURRENT"
                                                         color="success"
                                                         size="small"
                                                         sx={{ ml: 1 }}
@@ -411,8 +538,8 @@ const DriverRouteMap = () => {
                                                 )}
                                             </Box>
 
-                                            {/* Add action buttons for hub operations */}
-                                            {isCurrent && (
+                                            {/* Add action buttons for hub operations when at current stop */}
+                                            {isCurrent && activeTrip && (
                                                 <Button
                                                     variant="contained"
                                                     color="primary"
@@ -462,6 +589,8 @@ const DriverRouteMap = () => {
                                     onNextOrder={(order) => setNextOrder(order)}
                                     nextOrder={nextOrder}
                                     hub={hub}
+                                    currentLocation={currentLocation}
+                                    currentStop={currentStop}
                                 />
                             ) : (
                                 <Box
@@ -482,6 +611,8 @@ const DriverRouteMap = () => {
             <Dialog
                 open={confirmArrivalDialog}
                 onClose={() => setConfirmArrivalDialog(false)}
+                maxWidth="sm"
+                fullWidth
             >
                 <DialogTitle>
                     {operationType === 'pickup' ? 'Pickup Orders' : 'Deliver Orders'}

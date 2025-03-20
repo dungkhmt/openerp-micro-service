@@ -1,65 +1,98 @@
 package openerp.openerpresourceserver.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import openerp.openerpresourceserver.entity.enumentity.TripStatus;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
-import java.sql.Timestamp;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Data
 @Table(name = "smartdelivery_trip")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Trip {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
 
-    @Column(nullable = false)
-    private UUID routeVehicleId;  // Reference to the route-vehicle assignment
+    @Column(name = "route_vehicle_id", nullable = false)
+    private UUID routeVehicleId;
 
-    @Column(nullable = false)
-    private LocalDate tripDate;  // The day of this specific trip
+    @Column(name = "driver_id", nullable = false)
+    private UUID driverId;
 
-    @Column
-    private UUID driverId;  // The driver assigned to this trip
+    @Column(name = "start_time", nullable = true)
+    private Instant startTime;
 
-    @Column
-    private String driverName;  // For quick reference
+    @Column(name = "end_time")
+    private Instant endTime;
 
-    @Column
-    private Timestamp departureTime;  // When the trip actually started
+    @Column(name = "status", nullable = false)
+    private String status; // "PLANNED", "IN_PROGRESS", "COMPLETED", "CANCELLED"
 
-    @Column
-    private Timestamp completionTime;  // When the trip was completed
+    /**
+     * Current position in the route stop sequence
+     * e.g., 0 means at first stop, 1 means at second stop, etc.
+     */
+    @Column(name = "current_stop_index")
+    private Integer currentStopIndex = 1;
 
-    @Column(nullable = false)
-    private Integer currentStopSequence = 1;  // Current stop in the route
+    /**
+     * Time of arrival at the current stop
+     */
+    @Column(name = "last_stop_arrival_time")
+    private Instant lastStopArrivalTime;
 
-    @Enumerated(EnumType.STRING)
-    private TripStatus status = TripStatus.PENDING;  // PENDING, IN_PROGRESS, COMPLETED, etc.
+    /**
+     * Total distance traveled during this trip (in km)
+     */
+    @Column(name = "distance_traveled")
+    private Double distanceTraveled;
 
-    @Column
-    private String notes;  // Any notes about this specific trip
+    /**
+     * Notes provided when completing the trip
+     */
+    @Column(name = "completion_notes", length = 500)
+    private String completionNotes;
 
-    // For monitoring and metrics
-    @Column
-    private Integer totalOrders;  // Total orders handled in this trip
+    /**
+     * Total number of orders picked up during this trip
+     */
+    @Column(name = "orders_picked_up")
+    private Integer ordersPickedUp;
 
-    @Column
-    private Double totalWeight;  // Total weight transported
+    /**
+     * Total number of orders delivered during this trip
+     */
+    @Column(name = "orders_delivered")
+    private Integer ordersDelivered;
 
-    @Column
-    private Integer completedStops;  // Number of stops completed
+    /**
+     * JSON array of delay events
+     * e.g., traffic, vehicle issues, weather
+     */
+    @Column(name = "delay_events", columnDefinition = "TEXT")
+    private String delayEvents;
 
-    @CreationTimestamp
-    private Timestamp createdAt;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
 
-    @UpdateTimestamp
-    private Timestamp updatedAt;
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
 
-    // Getters and setters...
+    @PrePersist
+    protected void onCreate() {
+        createdAt = Instant.now();
+        updatedAt = Instant.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = Instant.now();
+    }
 }
