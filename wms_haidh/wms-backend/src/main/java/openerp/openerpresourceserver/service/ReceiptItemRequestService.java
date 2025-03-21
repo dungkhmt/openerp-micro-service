@@ -32,8 +32,8 @@ public class ReceiptItemRequestService {
 		return bayService.getBaysByWarehouseId(warehouseId);
 	}
     
-    public List<ReceiptItemRequestProjection> getAllReceiptItemRequests(UUID id) {
-        return receiptItemRequestRepository.findAllWithDetails(id);
+    public List<ReceiptItemRequestProjection> getAllReceiptItemRequests(UUID receiptId) {
+        return receiptItemRequestRepository.findAllWithDetails(receiptId);
     }
     
     public Optional<ReceiptItemRequestProjection> getReceiptItemRequestDetail(UUID receiptItemRequestId) {

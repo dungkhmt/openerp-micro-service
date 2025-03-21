@@ -41,7 +41,7 @@ export default function SaleOrderList() {
   const [statusFilter, setStatusFilter] = useState("CREATED");
 
   useEffect(() => {
-    request("get", `/sale-manager/orders?status=${statusFilter}&page=${page - 1}&size=${rowsPerPage}`, (res) => {
+    request("get", `/orders?status=${statusFilter}&page=${page - 1}&size=${rowsPerPage}`, (res) => {
       setItems(res.data.content);
       setTotalItems(res.data.totalElements);
       setPages(res.data.totalPages);
@@ -87,7 +87,7 @@ export default function SaleOrderList() {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem onClick={() => handleUpdate(item.orderId)}>Update order</DropdownItem>
+                <DropdownItem onPress={() => handleUpdate(item.orderId)}>Update order</DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>

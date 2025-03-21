@@ -10,16 +10,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import openerp.openerpresourceserver.entity.SaleOrderItem;
-import openerp.openerpresourceserver.entity.projection.OrderDetailProjection;
 import openerp.openerpresourceserver.entity.projection.SaleOrderItemDetailProjection;
 import openerp.openerpresourceserver.entity.projection.SaleOrderItemProjection;
 
 @Repository
 public interface SaleOrderItemRepository extends JpaRepository<SaleOrderItem, UUID> {
-	@Query("SELECT p.name AS productName, i.quantity AS quantity, i.priceUnit AS priceUnit "
-			+ "FROM SaleOrderItem i JOIN Product p ON i.productId = p.productId " + "WHERE i.orderId = :orderId")
-	List<OrderDetailProjection> findOrderDetailsByOrderId(@Param("orderId") UUID orderId);
-
 	@Query("""
 			    SELECT soi.saleOrderItemId AS saleOrderItemId,
 			           p.name AS productName,

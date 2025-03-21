@@ -12,11 +12,11 @@ import {
   Pagination,
 } from "@nextui-org/react";
 import { VerticalDotsIcon } from "../../components/icon/VerticalDotsIcon";
-import { columns, statusOptions } from "../../config/receiptbill";
+import { columns } from "../../config/receiptbill";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../api";
-import { formatDate, formatPrice } from '../../utils/utils';
+import { formatPrice } from '../../utils/utils';
 
 const INITIAL_VISIBLE_COLUMNS = ["receiptBillId", "description", "createdBy", "totalPrice", "receiptName"];
 export default function ReceiptBill() {
@@ -29,7 +29,7 @@ export default function ReceiptBill() {
 
   // useEffect để gửi request sau khi giá trị tìm kiếm đã debounce
   useEffect(() => {
-    request("get", `/purchase-manager/receipt-bill?page=${page - 1}&size=${rowsPerPage}`, (res) => {
+    request("get", `/receipt-bills?page=${page - 1}&size=${rowsPerPage}`, (res) => {
       setItems(res.data.content);
       setTotalItems(res.data.totalElements);
       setPages(res.data.totalPages);

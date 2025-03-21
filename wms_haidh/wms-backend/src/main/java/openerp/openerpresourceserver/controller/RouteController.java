@@ -20,7 +20,7 @@ public class RouteController {
 	@Qualifier("orsRouteService")
     private final RouteService routeService;
 
-    @PostMapping
+    @PostMapping("/fetch")
     public ResponseEntity<String> getRoute(@RequestBody Map<String, Object> requestBody) {
     	ResponseEntity<String> response = routeService.fetchRoute(requestBody);
     	return ResponseEntity.ok(response.getBody());

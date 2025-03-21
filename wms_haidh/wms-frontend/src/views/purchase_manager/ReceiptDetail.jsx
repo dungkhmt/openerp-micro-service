@@ -17,21 +17,49 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router-dom';
 import { request } from '../../api';
 
-const ReceiptApproveDetail = () => {
+const ReceiptDetail = () => {
   const navigate = useNavigate();
   const { receiptId } = useParams();
   const [receiptDetails, setReceiptDetails] = useState([]);
 
   useEffect(() => {
-    request("get", `/purchase-manager/receipts/${receiptId}`, (res) => {
+    request("get", `/receipts/${receiptId}`, (res) => {
       setReceiptDetails(res.data);
     });
   }, [receiptId]);
 
+  const handleApprove = () => {
+    request(
+      "post",
+      `/receipts/${receiptId}/approve?approvedBy=admin`,
+      (res) => {
+        if (res.status === 200) {
+          navigate(`/purchase-manager/process-receipts`);
+        } else {
+          alert("Error approving receipt!");
+        }
+      }
+    );
+  };
+
+  const handleCancel = () => {
+    request(
+      "post",
+      `/receipts/${receiptId}/cancel?cancelledBy=admin`,
+      (res) => {
+        if (res.status === 200) {
+          navigate(`/purchase-manager/process-receipts`);
+        } else {
+          alert("Error rejecting receipt!");
+        }
+      }
+    );
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <IconButton color="primary" onClick={() => navigate('/purchase-manager/receipts')} sx={{ color: 'black' }}>
+        <IconButton color="primary" onClick={() => navigate('/purchase-manager/process-receipts')} sx={{ color: 'black' }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>
@@ -66,8 +94,17 @@ const ReceiptApproveDetail = () => {
           </TableContainer>
         </Paper>
       </Box>
+
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+        <Button variant="contained" color="error" onClick={handleCancel} sx={{ mr: 2 }}>
+          Cancel
+        </Button>
+        <Button variant="contained" color="primary" onClick={handleApprove}>
+          Approve
+        </Button>
+      </Box>
     </Box>
   );
 };
 
-export default ReceiptApproveDetail;
+export default ReceiptDetail;

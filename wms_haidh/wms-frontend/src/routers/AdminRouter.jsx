@@ -1,14 +1,14 @@
 import { Routes, Route } from "react-router-dom";
-import ProductList from "../views/admin/ProductList";
-import AddProduct from "../views/admin/AddProduct";
-import ReceiptBill from "../views/admin/ReceiptBill";
-import ReceiptList from "../views/admin/ReceiptList";
-import ReceiptItemRequest from "../views/admin/ReceiptItemRequest";
-import InventoryList from "../views/admin/InventoryList";
-import OrderList from "../views/admin/OrderList";
-import OrderItem from "../views/admin/OrderItem";
-import ReceiptDetail from "../views/admin/ReceiptDetail"
-import OrderDetail from "../views/admin/OrderDetail";
+import ProductList from "../views/admin/product/ProductList";
+import AddProduct from "../views/admin/product/AddProduct";
+import ReceiptBill from "../views/admin/receipt/ReceiptBill";
+import ReceiptList from "../views/admin/receipt/ReceiptList";
+import ReceiptItem from "../views/admin/receipt/ReceiptItem";
+import ReceiptDetail from "../views/admin/receipt/ReceiptDetail"
+import InventoryList from "../views/admin/inventory/InventoryList";
+import OrderList from "../views/admin/order/OrderList";
+import OrderItem from "../views/admin/order/OrderItem";
+import OrderDetail from "../views/admin/order/OrderDetail";
 function AdminRouter() {
   return (
     <Routes>
@@ -21,7 +21,7 @@ function AdminRouter() {
       <Route path="orders/:id1/:id2" element={<OrderItem />} />
       <Route path="receipts" element={<ReceiptList />} />
       <Route path="receipts/:id1" element={<ReceiptDetail />} />
-      <Route path="receipts/:id1/:id2" element={<ReceiptItemRequest />} />
+      <Route path="receipts/:id1/:id2" element={<ReceiptItem />} />
       <Route path="receipts/receipt-bill" element={<ReceiptBill />} />
     </Routes>
   );

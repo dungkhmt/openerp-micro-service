@@ -15,7 +15,7 @@ import openerp.openerpresourceserver.service.mongodb.ImageService;
 public class ImageController {
 
 	@Autowired
-	private ImageService imageService; // Dịch vụ truy cập MongoDB
+	private ImageService imageService; 
 
 	@GetMapping("/{imageId}")
 	public ResponseEntity<byte[]> getImage(@PathVariable String imageId) {

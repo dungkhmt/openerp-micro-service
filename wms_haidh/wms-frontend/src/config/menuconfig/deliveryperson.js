@@ -5,7 +5,7 @@ export const deliveryperson = {
   child: [
     {
       id: "MENU_WMSv2_DELIVERY_PERSON.DELIVERY_TRIP",
-      path: "/delivery-person/trip",
+      path: "/delivery-staff/delivery-trip",
       isPublic: true,
       text: "Today's Delivery Trips",
       child: [],

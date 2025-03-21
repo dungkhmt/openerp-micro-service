@@ -14,14 +14,13 @@ import {
   Pagination,
   Select, MenuItem
 } from "@nextui-org/react";
-import { PlusIcon } from "../../components/icon/PlusIcon";
-import { Badge } from "../../components/button/badge";
 import { VerticalDotsIcon } from "../../components/icon/VerticalDotsIcon";
-import { columns, statusOptions } from "../../config/purchase";
+import { Badge } from "../../components/button/badge";
+import { columns, statusOptions } from "../../config/receipt";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../api";
-import { formatDate, formatPrice } from '../../utils/utils';
+import { formatDate } from '../../utils/utils';
 const statusColorMap = {
   CREATED: "default",
   CANCELLED: "destructive",
@@ -30,9 +29,7 @@ const statusColorMap = {
   COMPLETED: "success",
 };
 
-
-const INITIAL_VISIBLE_COLUMNS = ["receiptName", "createdReason", "description", "expectedReceiptDate", "status", "createdBy", "actions"];
-const buttonText = "Add Receipt";
+const INITIAL_VISIBLE_COLUMNS = ["receiptName", "createdReason", "description", "expectedReceiptDate", "status", "approvedBy", "cancelledBy", "actions"];
 export default function ReceiptList() {
 
   const [page, setPage] = useState(1);
@@ -43,14 +40,27 @@ export default function ReceiptList() {
   const [statusFilter, setStatusFilter] = useState("CREATED");
 
   useEffect(() => {
-    request("get", `/purchase-manager/receipts?status=${statusFilter}&page=${page - 1}&size=${rowsPerPage}`, (res) => {
+    request("get", `/receipts?status=${statusFilter}&page=${page - 1}&size=${rowsPerPage}`, (res) => {
       setItems(res.data.content);
       setTotalItems(res.data.totalElements);
       setPages(res.data.totalPages);
     }).then();
   }, [page, rowsPerPage, statusFilter]);
 
-  const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
+  const visibleColumns = useMemo(() => {
+    const updatedColumns = new Set(INITIAL_VISIBLE_COLUMNS);
+
+    if (statusFilter === "CREATED") {
+      updatedColumns.delete("approvedBy");
+      updatedColumns.delete("cancelledBy");
+    } else if (statusFilter === "CANCELLED") {
+      updatedColumns.delete("approvedBy");
+    } else {
+      updatedColumns.delete("cancelledBy");
+    }
+
+    return updatedColumns;
+  }, [statusFilter]);
 
   const headerColumns = useMemo(() => {
     if (visibleColumns === "all") return columns;
@@ -76,7 +86,7 @@ export default function ReceiptList() {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem onClick={() => handleUpdate(item.receiptId)}>View receipt</DropdownItem>
+                <DropdownItem onPress={() => handleUpdate(item.receiptId)}>View receipt</DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
@@ -102,12 +112,8 @@ export default function ReceiptList() {
 
   const navigate = useNavigate();
 
-  const handleAddReceipt = () => {
-    navigate('/purchase-manager/receipts/add-receipt');
-  };
-
   const handleUpdate = (id) => {
-    navigate(`/purchase-manager/receipts/${id}`);
+    navigate(`/purchase-manager/process-receipts/${id}`);
   };
 
   const topContent = useMemo(() => {
@@ -129,18 +135,6 @@ export default function ReceiptList() {
                 </MenuItem>
               ))}
             </Select>
-          </div>
-
-          {/* Add Button */}
-          <div className="flex-shrink-0">
-            <Button
-              className="bg-foreground text-background"
-              endContent={<PlusIcon />}
-              size="md"
-              onClick={handleAddReceipt}
-            >
-              {buttonText}
-            </Button>
           </div>
         </div>
 
@@ -183,6 +177,11 @@ export default function ReceiptList() {
           variant="light"
           onChange={setPage}
         />
+        {/* <span className="text-small text-default-400">
+          {selectedKeys === "all"
+            ? "All items selected"
+            : `${selectedKeys.size} of ${items.length} selected`}
+        </span> */}
       </div>
     );
   }, [page, pages]);

@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import openerp.openerpresourceserver.entity.projection.OrderDetailProjection;
 import openerp.openerpresourceserver.entity.projection.SaleOrderItemDetailProjection;
 import openerp.openerpresourceserver.entity.projection.SaleOrderItemProjection;
 import openerp.openerpresourceserver.repository.SaleOrderItemRepository;
@@ -16,10 +15,6 @@ public class SaleOrderItemService {
 
     public SaleOrderItemService(SaleOrderItemRepository saleOrderItemRepository) {
         this.saleOrderItemRepository = saleOrderItemRepository;
-    }
-
-    public List<OrderDetailProjection> getOrderDetailsByOrderId(UUID orderId) {
-        return saleOrderItemRepository.findOrderDetailsByOrderId(orderId);
     }
     
     public List<SaleOrderItemProjection> getSaleOrderItems(UUID id) {

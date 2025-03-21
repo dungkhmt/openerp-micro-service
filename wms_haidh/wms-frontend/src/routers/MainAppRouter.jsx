@@ -13,6 +13,7 @@ import ApproverRouter from "./ApproverRouter";
 import DeliveryManagerRouter from "./DeliveryManagerRouter";
 import DeliveryPersonRouter from "./DeliveryPersonRouter";
 import PurchaseManagerRouter from "./PurchaseManagerRouter";
+import PurchaseStaffRouter from "./PurchaseStaffRouter";
 import Dashboard from "../components/Dashboard/Dashboard";
 const styles = {
   loadingProgress: {
@@ -54,7 +55,8 @@ function MainAppRouter() {
           <Route path="/customer/*" element={renderPrivateRoute(CustomerRouter)} />
           <Route path="/approver/*" element={renderPrivateRoute(ApproverRouter)} />
           <Route path="/delivery-manager/*" element={renderPrivateRoute(DeliveryManagerRouter)} />
-          <Route path="/delivery-person/*" element={renderPrivateRoute(DeliveryPersonRouter)} />
+          <Route path="/delivery-staff/*" element={renderPrivateRoute(DeliveryPersonRouter)} />
+          <Route path="/purchase-staff/*" element={renderPrivateRoute(PurchaseStaffRouter)} />
           <Route path="/purchase-manager/*" element={renderPrivateRoute(PurchaseManagerRouter)} />
           <Route path="*" element={<NotFound />} />
         </Routes>

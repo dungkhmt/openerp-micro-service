@@ -3,7 +3,7 @@ const fetchRoute = async (coordinates, setRoute, setDistance, setLoadingMap) => 
   setLoadingMap(true);
 
   try {
-    const response = await axios.post("http://localhost:8082/api/routes", { coordinates });
+    const response = await axios.post("http://localhost:8082/api/routes/fetch", { coordinates });
 
     const data = response.data;
     const routeCoordinates = data.features[0].geometry.coordinates.map(([lng, lat]) => ({

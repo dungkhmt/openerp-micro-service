@@ -26,21 +26,21 @@ const SaleOrderDetail = () => {
   const [details, setDetails] = useState([]);
 
   useEffect(() => {
-    request('get', `/sale-manager/orders/${orderId}`, (res) => {
+    request('get', `/orders/${orderId}`, (res) => {
       setGeneralInfo(res.data);
     });
 
-    request('get', `/sale-manager/orders/customer-address/${orderId}`, (res) => {
+    request('get', `/orders/${orderId}/customer-address`, (res) => {
       setCustomerInfo(res.data);
     });
 
-    request('get', `/sale-manager/orders/order-item/${orderId}`, (res) => {
+    request('get', `/order-items?orderId=${orderId}`, (res) => {
       setDetails(res.data);
     });
   }, [orderId]);
 
   const handleApprove = () => {
-    request('post', `/sale-manager/orders/approve/${orderId}?approvedBy=admin`, (res) => {
+    request('post', `/orders/${orderId}/approve?approvedBy=admin`, (res) => {
       if (res.status === 200) {
         alert('Order approved successfully!');
         navigate('/sale-manager/sale-order');
@@ -51,7 +51,7 @@ const SaleOrderDetail = () => {
   };
 
   const handleCancel = () => {
-    request('post', `/sale-manager/orders/cancel/${orderId}?cancelledBy=admin`, (res) => {
+    request('post', `/orders/${orderId}/cancel?cancelledBy=admin`, (res) => {
       if (res.status === 200) {
         alert('Order cancelled successfully!');
         navigate('/sale-manager/sale-order');

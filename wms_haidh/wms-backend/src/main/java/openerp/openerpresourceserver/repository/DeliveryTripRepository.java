@@ -11,39 +11,41 @@ import org.springframework.data.repository.query.Param;
 import openerp.openerpresourceserver.entity.DeliveryTrip;
 import openerp.openerpresourceserver.entity.projection.DeliveryTripGeneralProjection;
 import openerp.openerpresourceserver.entity.projection.DeliveryTripProjection;
+import openerp.openerpresourceserver.entity.projection.TodayDeliveryTripProjection;
 
 public interface DeliveryTripRepository extends JpaRepository<DeliveryTrip, String> {
 
-    @Query("SELECT " +
-           "dt.deliveryTripId AS deliveryTripId, " +
-           "dp.fullName AS deliveryPersonName, " +
-           "dt.distance AS distance, " +
-           "dt.totalLocations AS totalLocations, " +
-           "dt.status AS status, " +
-           "dt.description AS description " +
-           "FROM DeliveryTrip dt " +
-           "JOIN DeliveryPerson dp ON dt.deliveryPersonId = dp.userLoginId " +
-           "WHERE dt.isDeleted = false " +
-           "AND dt.status = :status ORDER BY dt.lastUpdatedStamp DESC")
-    Page<DeliveryTripProjection> findFilteredDeliveryTrips(@Param("status") String status, Pageable pageable);
-    
-    @Query("""
-            SELECT 
-                dt.distance AS distance, 
-                dt.totalWeight AS totalWeight, 
-                dt.totalLocations AS totalLocations, 
-                dt.status AS status, 
-                dt.description AS description,
-                s.expectedDeliveryStamp AS expectedDeliveryStamp,
-                w.name AS warehouseName,
-                dp.fullName AS deliveryPersonName
-            FROM DeliveryTrip dt
-            JOIN Shipment s ON dt.shipmentId = s.shipmentId
-            JOIN Warehouse w ON dt.warehouseId = w.warehouseId
-            JOIN DeliveryPerson dp ON dt.deliveryPersonId = dp.userLoginId
-            WHERE dt.isDeleted = false AND dt.deliveryTripId = :deliveryTripId
-        """)
-        Optional<DeliveryTripGeneralProjection> findDeliveryTripById(@Param("deliveryTripId") String deliveryTripId);
-    
-    Page<DeliveryTrip> findByShipmentId(String shipmentId, Pageable pageable);
+	@Query("SELECT " + "dt.deliveryTripId AS deliveryTripId, " + "dp.fullName AS deliveryPersonName, "
+			+ "dt.distance AS distance, " + "dt.totalLocations AS totalLocations, " + "dt.status AS status, "
+			+ "dt.description AS description " + "FROM DeliveryTrip dt "
+			+ "JOIN DeliveryPerson dp ON dt.deliveryPersonId = dp.userLoginId " + "WHERE dt.isDeleted = false "
+			+ "AND dt.status = :status")
+	Page<DeliveryTripProjection> findFilteredDeliveryTrips(@Param("status") String status, Pageable pageable);
+
+	@Query("SELECT d.deliveryTripId AS deliveryTripId, " + "d.distance AS distance, "
+			+ "d.totalLocations AS totalLocations, " + "d.status AS status, " + "d.description AS description "
+			+ "FROM DeliveryTrip d " + "WHERE d.deliveryPersonId = :deliveryPersonId " + "AND d.isDeleted = false "
+			+ "AND DATE(d.createdStamp) = CURRENT_DATE " + "AND d.status = :status")
+	Page<TodayDeliveryTripProjection> findTodayTripsByDeliveryPerson(@Param("deliveryPersonId") String deliveryPersonId,
+			@Param("status") String status, Pageable pageable);
+
+	@Query("""
+			    SELECT
+			        dt.distance AS distance,
+			        dt.totalWeight AS totalWeight,
+			        dt.totalLocations AS totalLocations,
+			        dt.status AS status,
+			        dt.description AS description,
+			        s.expectedDeliveryStamp AS expectedDeliveryStamp,
+			        w.name AS warehouseName,
+			        dp.fullName AS deliveryPersonName
+			    FROM DeliveryTrip dt
+			    JOIN Shipment s ON dt.shipmentId = s.shipmentId
+			    JOIN Warehouse w ON dt.warehouseId = w.warehouseId
+			    JOIN DeliveryPerson dp ON dt.deliveryPersonId = dp.userLoginId
+			    WHERE dt.isDeleted = false AND dt.deliveryTripId = :deliveryTripId
+			""")
+	Optional<DeliveryTripGeneralProjection> findDeliveryTripById(@Param("deliveryTripId") String deliveryTripId);
+
+	Page<DeliveryTrip> findByShipmentId(String shipmentId, Pageable pageable);
 }

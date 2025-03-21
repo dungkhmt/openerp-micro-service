@@ -37,11 +37,13 @@ import { customer } from "./menuconfig/customer";
 import { approver } from "./menuconfig/approver";
 import { deliverymanager } from "./menuconfig/deliverymanager";
 import { deliveryperson } from "./menuconfig/deliveryperson";
+import { purchasestaff } from "./menuconfig/purchasestaff";
 import { purchasemanager } from "./menuconfig/purchasemanager";
 export const MENUS = [];
 MENUS.push(general);
 MENUS.push(admin);
 MENUS.push(salemanager);
+MENUS.push(purchasestaff);
 MENUS.push(purchasemanager);
 MENUS.push(approver);
 MENUS.push(deliverymanager);
@@ -57,6 +59,7 @@ menuIconMap.set("DeliveryManagerIcon",<LocalShipping />);
 menuIconMap.set("DeliveryPersonIcon",<DeliveryDining />);
 menuIconMap.set("DashboardIconIcon", <DashboardRoundedIcon />);
 menuIconMap.set("PurchaseManagerIcon",<ReceiptLong />);
+menuIconMap.set("PurchaseStaffIcon",<ReceiptLong />);
 menuIconMap.set("SaleManagerIcon",<MonetizationOnIcon />);
 
 
