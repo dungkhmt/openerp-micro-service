@@ -2,11 +2,7 @@ package openerp.openerpresourceserver.service;
 
 import openerp.openerpresourceserver.dto.OrderResponseDto;
 import openerp.openerpresourceserver.dto.OrderSummaryDTO;
-import openerp.openerpresourceserver.dto.RouteVehicleDetailDto;
 import openerp.openerpresourceserver.dto.VehicleDto;
-import openerp.openerpresourceserver.entity.Order;
-import openerp.openerpresourceserver.entity.RouteVehicle;
-import openerp.openerpresourceserver.entity.Trip;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
 
 import java.util.List;
@@ -22,15 +18,7 @@ public interface DriverService {
      */
     VehicleDto getDriverVehicleByUsername(String username);
 
-    /**
-     * Get the routes assigned to a driver's vehicle by username
-     */
-    List<RouteVehicleDetailDto> getDriverRoutesByUsername(String username);
 
-    /**
-     * Get orders for a specific route vehicle
-     */
-    List<OrderResponseDto> getOrdersForRouteVehicle(UUID routeVehicleId);
 
     /**
      * Get pending pickup orders for a driver at a specific hub

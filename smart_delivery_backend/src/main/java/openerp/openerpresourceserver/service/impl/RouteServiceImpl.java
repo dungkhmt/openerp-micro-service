@@ -15,7 +15,6 @@ import openerp.openerpresourceserver.mapper.RouteStopMapper;
 import openerp.openerpresourceserver.repository.HubRepo;
 import openerp.openerpresourceserver.repository.RouteRepository;
 import openerp.openerpresourceserver.repository.RouteStopRepository;
-import openerp.openerpresourceserver.repository.RouteVehicleRepository;
 import openerp.openerpresourceserver.service.RouteService;
 import openerp.openerpresourceserver.utils.DistanceCalculator.HaversineDistanceCalculator;
 
@@ -33,7 +32,6 @@ public class RouteServiceImpl implements RouteService {
     private final RouteRepository routeRepository;
     private final RouteStopRepository routeStopRepository;
     private final HubRepo hubRepo;
-    private final RouteVehicleRepository routeVehicleRepository;
     private final RouteMapper routeMapper = RouteMapper.INSTANCE;
 
     /**
@@ -189,7 +187,6 @@ public class RouteServiceImpl implements RouteService {
         }
 
         routeStopRepository.deleteByRouteId(routeId);
-        routeVehicleRepository.deleteByRouteId(routeId);
         routeRepository.deleteById(routeId);
     }
 

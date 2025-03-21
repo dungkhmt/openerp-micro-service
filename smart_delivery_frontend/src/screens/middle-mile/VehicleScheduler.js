@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { request } from "../../api";
 import IconButton from "@mui/material/IconButton";
-import MapIcon from "@mui/icons-material/Map";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -20,8 +19,8 @@ const VehicleScheduler = () => {
     const [schedules, setSchedules] = useState([]);
     const [openModal, setOpenModal] = useState(false);
     const [selectedSchedule, setSelectedSchedule] = useState(null);
-    const [routeVehicles, setRouteVehicles] = useState([]);
-    const [selectedRouteVehicle, setSelectedRouteVehicle] = useState('');
+    const [routeSchedules, setRouteSchedules] = useState([]);
+    const [selectedRouteSchedule, setSelectedRouteSchedule] = useState('');
     const [daysOfWeek, setDaysOfWeek] = useState([
         { value: 'MONDAY', label: 'Thứ Hai', selected: false },
         { value: 'TUESDAY', label: 'Thứ Ba', selected: false },
@@ -37,19 +36,19 @@ const VehicleScheduler = () => {
     const userId = useSelector((state) => state.auth.userId);
 
     useEffect(() => {
-        // Fetch route-vehicle combinations
-        request("get", `/smdeli/middle-mile/vehicle-assignments`, (res) => {
-            setRouteVehicles(res.data);
+        // Fetch route-schedule combinations
+        request("get", `/smdeli/scheduler/route-schedules`, (res) => {
+            setRouteSchedules(res.data);
         }).catch(err => {
-            errorNoti("Không thể tải danh sách phương tiện và tuyến đường");
+            errorNoti("Không thể tải danh sách lịch trình tuyến đường");
         });
 
-        // Fetch existing schedules
+        // Fetch existing vehicle schedule assignments
         fetchSchedules();
     }, []);
 
     const fetchSchedules = () => {
-        request("get", `/smdeli/scheduler/schedules`, (res) => {
+        request("get", `/smdeli/scheduler/vehicle-assignments`, (res) => {
             setSchedules(res.data);
         }).catch(err => {
             errorNoti("Không thể tải lịch trình");
@@ -143,7 +142,7 @@ const VehicleScheduler = () => {
         if (window.confirm("Bạn có chắc chắn muốn xóa lịch trình này?")) {
             request(
                 "delete",
-                `/smdeli/scheduler/${scheduleId}`,
+                `/smdeli/scheduler/vehicle-assignments/${scheduleId}`,
                 (res) => {
                     successNoti("Xóa lịch trình thành công");
                     fetchSchedules(); // Refresh data
@@ -158,14 +157,14 @@ const VehicleScheduler = () => {
     const handleCreateSchedule = () => {
         const selectedDays = daysOfWeek.filter(day => day.selected).map(day => day.value);
 
-        if (!selectedRouteVehicle || selectedDays.length === 0) {
-            errorNoti("Vui lòng chọn phương tiện, tuyến đường và ít nhất một ngày trong tuần");
+        if (!selectedRouteSchedule || selectedDays.length === 0) {
+            errorNoti("Vui lòng chọn lịch trình tuyến đường và ít nhất một ngày trong tuần");
             return;
         }
 
         request(
             "post",
-            `/smdeli/scheduler/weekly-schedule`,
+            `/smdeli/scheduler/vehicle-assignments`,
             (res) => {
                 successNoti("Tạo lịch trình thành công");
                 fetchSchedules(); // Refresh data
@@ -176,7 +175,7 @@ const VehicleScheduler = () => {
                 500: () => errorNoti("Có lỗi xảy ra, vui lòng thử lại sau")
             },
             {
-                routeVehicleId: selectedRouteVehicle,
+                routeScheduleId: selectedRouteSchedule,
                 days: selectedDays,
                 tripsPerDay: tripsPerDay,
                 startTime: startTime,
@@ -201,7 +200,7 @@ const VehicleScheduler = () => {
     const handleCloseModal = () => {
         setOpenModal(false);
         setSelectedSchedule(null);
-        setSelectedRouteVehicle('');
+        setSelectedRouteSchedule('');
         setDaysOfWeek(daysOfWeek.map(day => ({ ...day, selected: false })));
         setTripsPerDay(2);
         setStartTime('08:00');
@@ -295,16 +294,16 @@ const VehicleScheduler = () => {
                         // Create schedule form
                         <Box component="form" sx={{ mt: 3 }}>
                             <FormControl fullWidth sx={{ mb: 3 }}>
-                                <InputLabel id="route-vehicle-label">Phương tiện & Tuyến đường</InputLabel>
+                                <InputLabel id="route-schedule-label">Lịch trình tuyến đường</InputLabel>
                                 <Select
-                                    labelId="route-vehicle-label"
-                                    value={selectedRouteVehicle}
-                                    onChange={(e) => setSelectedRouteVehicle(e.target.value)}
-                                    label="Phương tiện & Tuyến đường"
+                                    labelId="route-schedule-label"
+                                    value={selectedRouteSchedule}
+                                    onChange={(e) => setSelectedRouteSchedule(e.target.value)}
+                                    label="Lịch trình tuyến đường"
                                 >
-                                    {routeVehicles.map((rv) => (
-                                        <MenuItem key={rv.id} value={rv.id}>
-                                            {rv.vehiclePlateNumber} - {rv.routeName}
+                                    {routeSchedules.map((rs) => (
+                                        <MenuItem key={rs.id} value={rs.id}>
+                                            {rs.vehiclePlateNumber} - {rs.routeName}
                                         </MenuItem>
                                     ))}
                                 </Select>

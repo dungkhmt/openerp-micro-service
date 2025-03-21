@@ -6,16 +6,12 @@ import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.dto.OrderResponseDto;
-import openerp.openerpresourceserver.dto.OrderSummaryDTO;
 import openerp.openerpresourceserver.dto.OrderSummaryMiddleMileDto;
 import openerp.openerpresourceserver.entity.Order;
-import openerp.openerpresourceserver.entity.RouteVehicle;
 import openerp.openerpresourceserver.entity.Vehicle;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
-import openerp.openerpresourceserver.entity.enumentity.RouteDirection;
 import openerp.openerpresourceserver.entity.enumentity.VehicleStatus;
 import openerp.openerpresourceserver.repository.OrderRepo;
-import openerp.openerpresourceserver.repository.RouteVehicleRepository;
 import openerp.openerpresourceserver.repository.VehicleRepository;
 import openerp.openerpresourceserver.service.MiddleMileOrderService;
 import openerp.openerpresourceserver.service.OrderService;
@@ -24,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -32,7 +27,6 @@ import java.util.stream.Collectors;
 public class MiddleMileOrderServiceImpl implements MiddleMileOrderService {
 
     private final OrderRepo orderRepo;
-    private final RouteVehicleRepository routeVehicleRepository;
     private final VehicleRepository vehicleRepo;
     private final OrderService orderService;
 
@@ -42,35 +36,36 @@ public class MiddleMileOrderServiceImpl implements MiddleMileOrderService {
     @Transactional
     @Override
     public void assignOrdersToTrip(UUID routeVehicleId, List<UUID> orderIds) {
-        RouteVehicle routeVehicle = routeVehicleRepository.findById(routeVehicleId)
-                .orElseThrow(() -> new NotFoundException("Route vehicle assignment not found"));
-        Vehicle vehicle = vehicleRepo.findById(routeVehicle.getVehicleId()).orElseThrow(()-> new NotFoundException("not found vehicle"));
-
-
-        List<Order> orders = new ArrayList<>();
-
-        for (UUID orderId : orderIds) {
-            Order order = orderRepo.findById(orderId)
-                    .orElseThrow(() -> new NotFoundException("Order not found with ID: " + orderId));
-
-            // Kiểm tra đơn hàng có ở trạng thái hợp lệ không
-            if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.ASSIGNED) {
-                throw new IllegalStateException("Order is not in a valid state for assignment: " + orderId);
-            }
-
-            orders.add(order);
-        }
-
-        // Gán đơn hàng cho chuyến
-        for (Order order : orders) {
-            order.setRouteId(routeVehicle.getRouteId());
-            order.setVehicleId(routeVehicle.getVehicleId());
-            order.setVehicleType(vehicle.getVehicleType());
-            order.setVehicleLicensePlate(vehicle.getPlateNumber());
-            order.setStatus(OrderStatus.DELIVERING);
-
-            orderRepo.save(order);
-        }
+//        RouteVehicle routeVehicle = routeVehicleRepository.findById(routeVehicleId)
+//                .orElseThrow(() -> new NotFoundException("Route vehicle assignment not found"));
+//        Vehicle vehicle = vehicleRepo.findById(routeVehicle.getVehicleId()).orElseThrow(()-> new NotFoundException("not found vehicle"));
+//
+//
+//        List<Order> orders = new ArrayList<>();
+//
+//        for (UUID orderId : orderIds) {
+//            Order order = orderRepo.findById(orderId)
+//                    .orElseThrow(() -> new NotFoundException("Order not found with ID: " + orderId));
+//
+//            // Kiểm tra đơn hàng có ở trạng thái hợp lệ không
+//            if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.ASSIGNED) {
+//                throw new IllegalStateException("Order is not in a valid state for assignment: " + orderId);
+//            }
+//
+//            orders.add(order);
+//        }
+//
+//        // Gán đơn hàng cho chuyến
+//        for (Order order : orders) {
+//            order.setRouteId(routeVehicle.getRouteId());
+//            order.setVehicleId(routeVehicle.getVehicleId());
+//            order.setVehicleType(vehicle.getVehicleType());
+//            order.setVehicleLicensePlate(vehicle.getPlateNumber());
+//            order.setStatus(OrderStatus.DELIVERING);
+//
+//            orderRepo.save(order);
+//        }
+        return;
     }
 
     /**
@@ -108,9 +103,10 @@ public class MiddleMileOrderServiceImpl implements MiddleMileOrderService {
      */
     @Override
     public List<OrderResponseDto> getOrdersByTrip(UUID routeVehicleId) {
-        RouteVehicle routeVehicle = routeVehicleRepository.findById(routeVehicleId)
-                .orElseThrow(() -> new NotFoundException("Route vehicle assignment not found"));
-        return orderRepo.findAllByRouteVehicleId(routeVehicleId).stream().map(o-> orderService.getOrderById(o.getId())).toList();
+//        RouteVehicle routeVehicle = routeVehicleRepository.findById(routeVehicleId)
+//                .orElseThrow(() -> new NotFoundException("Route vehicle assignment not found"));
+//        return orderRepo.findAllByRouteVehicleId(routeVehicleId).stream().map(o-> orderService.getOrderById(o.getId())).toList();
+        return null;
     }
 
     /**
@@ -147,12 +143,12 @@ public class MiddleMileOrderServiceImpl implements MiddleMileOrderService {
             }
         }
 
-        // Cập nhật trạng thái xe
-        RouteVehicle routeVehicle = routeVehicleRepository.findById(routeVehicleId)
-                .orElseThrow(() -> new NotFoundException("Route vehicle assignment not found"));
-        Vehicle vehicle = vehicleRepo.findById(routeVehicle.getVehicleId()).orElseThrow(()-> new NotFoundException("not found vehicle"));
-        vehicle.setStatus(VehicleStatus.AVAILABLE);
-        vehicleRepo.save(vehicle);
+//        // Cập nhật trạng thái xe
+//        RouteVehicle routeVehicle = routeVehicleRepository.findById(routeVehicleId)
+//                .orElseThrow(() -> new NotFoundException("Route vehicle assignment not found"));
+//        Vehicle vehicle = vehicleRepo.findById(routeVehicle.getVehicleId()).orElseThrow(()-> new NotFoundException("not found vehicle"));
+//        vehicle.setStatus(VehicleStatus.AVAILABLE);
+//        vehicleRepo.save(vehicle);
     }
 
     @Override

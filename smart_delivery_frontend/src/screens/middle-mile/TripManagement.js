@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
     Box, Typography, Card, CardContent, Grid, Button, Tabs, Tab,
     Dialog, DialogTitle, DialogContent, DialogActions, TextField,
-    FormControl, InputLabel, Select, MenuItem, Chip
+    FormControl, InputLabel, Select, MenuItem, Chip, FormGroup, FormControlLabel, Checkbox, Modal
 } from '@mui/material';
 import { request } from 'api';
 import StandardTable from 'components/StandardTable';
@@ -22,42 +22,35 @@ import {useHistory} from "react-router-dom";
 const TripManagement = () => {
     const [tabValue, setTabValue] = useState(0);
     const [routes, setRoutes] = useState([]);
+    const [selectedRoute, setSelectedRoute] = useState();
     const [vehicles, setVehicles] = useState([]);
     const [drivers, setDrivers] = useState([]);
-    const [routeVehicles, setRouteVehicles] = useState([]);
+    const [routeSchedules, setRouteSchedules] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [openAssignDialog, setOpenAssignDialog] = useState(false);
+    const [openModal, setOpenModal] = useState(false);
     const [openRouteDialog, setOpenRouteDialog] = useState(false);
     const [hubs, setHubs] = useState([]);
     const [hubId, setHubId] = useState(null);
+    const [startTime, setStartTime] = useState();
+    const [endTime, setEndTime] = useState();
     const history = useHistory();
-    // Form state for new route vehicle assignment
+
+    // Form state for new route schedule assignment
     const [assignmentForm, setAssignmentForm] = useState({
         routeId: '',
         vehicleId: '',
-        direction: 'OUTBOUND'
+        scheduleType: 'WEEKLY',
+        days: []
     });
-    const loadRoutes = () => {
-        setLoading(true);
-        request(
-            "get",
-            "/smdeli/middle-mile/routes",
-            (res) => {
-                setRoutes(res.data);
-                setLoading(false);
-            },
-            {
-                401: () => {
-                    errorNoti("Không có quyền truy cập");
-                    setLoading(false);
-                },
-                500: () => {
-                    errorNoti("Có lỗi xảy ra khi tải dữ liệu");
-                    setLoading(false);
-                }
-            }
-        );
-    };
+    const [daysOfWeek, setDaysOfWeek] = useState([
+        { value: 'MONDAY', label: 'Thứ Hai', selected: false },
+        { value: 'TUESDAY', label: 'Thứ Ba', selected: false },
+        { value: 'WEDNESDAY', label: 'Thứ Tư', selected: false },
+        { value: 'THURSDAY', label: 'Thứ Năm', selected: false },
+        { value: 'FRIDAY', label: 'Thứ Sáu', selected: false },
+        { value: 'SATURDAY', label: 'Thứ Bảy', selected: false },
+        { value: 'SUNDAY', label: 'Chủ Nhật', selected: false }
+    ]);
     // Form state for new route
     const [routeForm, setRouteForm] = useState({
         routeCode: '',
@@ -66,7 +59,11 @@ const TripManagement = () => {
         notes: '',
         stops: [{ hubId: '', stopSequence: 1, estimatedWaitTime: 15 }]
     });
-
+    const handleDayChange = (day) => {
+        setDaysOfWeek(daysOfWeek.map(d =>
+            d.value === day.value ? { ...d, selected: !d.selected } : d
+        ));
+    };
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -90,9 +87,9 @@ const TripManagement = () => {
                     setVehicles(res.data);
                 });
 
-                // Fetch route vehicles
-                await request('get', '/smdeli/middle-mile/vehicle-assignments', (res) => {
-                    setRouteVehicles(res.data || []);
+                // Fetch route schedules
+                await request('get', '/smdeli/scheduler/route-schedules', (res) => {
+                    setRouteSchedules(res.data || []);
                 });
 
                 // Fetch drivers
@@ -109,6 +106,65 @@ const TripManagement = () => {
 
         fetchData();
     }, [hubId]);
+
+    const handleOpenModal = (e) => {
+        setOpenModal(true);
+    }
+
+    const handleCreateSchedule = (e) => {
+        const selectedDays = daysOfWeek.filter(d => d.selected).map(d => d.value);
+
+        if(!selectedDays || !selectedRoute){
+            errorNoti("Vui lòng chọn lịch trình tuyến đường và ít nhất một ngày trong tuần");
+            return;
+        }
+        request(
+            "post",
+            `/smdeli/scheduler/vehicle-assignments`,
+            (res) => {
+                successNoti("Tạo lịch trình thành công");
+                // fetchSchedules(); // Refresh data
+                handleCloseModal();
+            },
+            {
+                400: () => errorNoti("Dữ liệu không hợp lệ"),
+                500: () => errorNoti("Có lỗi xảy ra, vui lòng thử lại sau")
+            },
+            {
+                routeId: selectedRoute.routeId,
+                routeCode: selectedRoute.routeCode,
+                routeName: selectedRoute.routeName,
+                startTime: startTime,
+                endTime: endTime
+            }
+        );
+    }
+
+    const handleCloseModal = (e) => {
+        setOpenModal(false);
+    }
+    const loadRoutes = () => {
+        setLoading(true);
+        request(
+            "get",
+            "/smdeli/middle-mile/routes",
+            (res) => {
+                setRoutes(res.data);
+                setLoading(false);
+            },
+            {
+                401: () => {
+                    errorNoti("Không có quyền truy cập");
+                    setLoading(false);
+                },
+                500: () => {
+                    errorNoti("Có lỗi xảy ra khi tải dữ liệu");
+                    setLoading(false);
+                }
+            }
+        );
+    };
+
     const handleView = (route) => {
         history.push(`/middle-mile/routes/${route.routeId}`);
     };
@@ -133,22 +189,13 @@ const TripManagement = () => {
             );
         }
     };
+
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
     };
 
-    const handleOpenAssignDialog = () => {
-        setOpenAssignDialog(true);
-    };
 
-    const handleCloseAssignDialog = () => {
-        setOpenAssignDialog(false);
-        setAssignmentForm({
-            routeId: '',
-            vehicleId: '',
-            direction: 'OUTBOUND'
-        });
-    };
+
 
     const handleOpenRouteDialog = () => {
         setOpenRouteDialog(true);
@@ -170,6 +217,13 @@ const TripManagement = () => {
         setAssignmentForm({
             ...assignmentForm,
             [name]: value
+        });
+    };
+
+    const handleDaysChange = (e) => {
+        setAssignmentForm({
+            ...assignmentForm,
+            days: e.target.value
         });
     };
 
@@ -195,6 +249,10 @@ const TripManagement = () => {
 
     const handleViewVehicle = (vehicle) => {
         history.push(`/middle-mile/vehicles/${vehicle.vehicleId}`);
+    }
+
+    const handleViewSchedule = (schedule) => {
+        history.push(`/scheduler/schedule/${schedule.id}`);
     }
 
     const addStop = () => {
@@ -228,13 +286,14 @@ const TripManagement = () => {
     };
 
     const handleSubmitAssignment = () => {
+        // Create a new route schedule
         request(
             'post',
-            '/smdeli/middle-mile/vehicle-assignments',
+            '/smdeli/scheduler/route-schedules',
             (res) => {
-                successNoti('Vehicle assigned to route successfully!');
-                setRouteVehicles([...routeVehicles, res.data]);
-                handleCloseAssignDialog();
+                successNoti('Route schedule created successfully!');
+                setRouteSchedules([...routeSchedules, res.data]);
+                handleCloseModal();
             },
             {
                 400: () => errorNoti('Invalid data. Please check your inputs.'),
@@ -267,56 +326,39 @@ const TripManagement = () => {
         );
     };
 
-    const handleDeleteRouteVehicle = (id) => {
-        if (window.confirm('Are you sure you want to unassign this vehicle?')) {
+    const handleDeleteRouteSchedule = (id) => {
+        if (window.confirm('Are you sure you want to delete this route schedule?')) {
             request(
                 'delete',
-                `/smdeli/middle-mile/vehicle-assignments/${id}`,
+                `/smdeli/scheduler/route-schedules/${id}`,
                 () => {
-                    successNoti('Vehicle unassigned successfully!');
-                    setRouteVehicles(routeVehicles.filter(rv => rv.id !== id));
+                    successNoti('Route schedule deleted successfully!');
+                    setRouteSchedules(routeSchedules.filter(rs => rs.id !== id));
                 },
                 {
-                    400: () => errorNoti('Error unassigning vehicle.'),
+                    400: () => errorNoti('Error deleting route schedule.'),
                     500: () => errorNoti('Server error occurred.')
                 }
             );
         }
     };
-    const vehiclesColumn = [
-        {
-            title: "Loại xe",
-            field: "vehicleType",
-        },
-        {
-            title: "Biển số xe",
-            field: "plateNumber",
-        },
-        {
-            title: "Tài xế",
-            field: "driverName"
-        },
-        {
-            title: "Tình trạng",
-            field: "status",
-        },
-        {
-            title: "Nhà sản xuất",
-            field: "manufacturer"
-        },
-        {
-            title: "Mẫu xe",
-            field: "model",
-        },
+
+    const vehiclesColumns = [
+        { title: "Loại xe", field: "vehicleType" },
+        { title: "Biển số xe", field: "plateNumber" },
+        { title: "Tài xế", field: "driverName" },
+        { title: "Tình trạng", field: "status" },
+        { title: "Nhà sản xuất", field: "manufacturer" },
+        { title: "Mẫu xe", field: "model" },
         {
             title: "Thao tác",
             field: "actions",
             sorting: false,
             renderCell: (rowData) => (
-                <div style={{ alignItems:'center',display: 'flex', gap: '5px' }}>
+                <div style={{ alignItems:'center', display: 'flex', gap: '5px' }}>
                     <IconButton
                         style={{ padding: '5px' }}
-                         onClick={() => handleViewVehicle(rowData)}
+                        onClick={() => handleViewVehicle(rowData)}
                         color="primary"
                     >
                         <VisibilityIcon />
@@ -324,8 +366,8 @@ const TripManagement = () => {
                 </div>
             ),
         },
+    ];
 
-    ]
     const routeColumns = [
         { title: "Route Code", field: "routeCode" },
         { title: "Route Name", field: "routeName" },
@@ -340,7 +382,6 @@ const TripManagement = () => {
                 />
             )
         },
-        // { title: "Notes", field: "notes" }
         {
             title: "Thao tác",
             field: "actions",
@@ -374,26 +415,31 @@ const TripManagement = () => {
         },
     ];
 
-    const vehicleAssignmentColumns = [
+    const routeScheduleColumns = [
+        { title: "Route Code", field: "routeCode" },
+        { title: "Route Name", field: "routeName" },
+        { title: "Vehicle", field: "vehiclePlateNumber" },
+        { title: "Schedule Type", field: "scheduleType" },
         {
-            title: "Route",
-            field: "routeCode",
-
+            title: "Days",
+            field: "days",
+            render: (rowData) => (
+                <div>
+                    {rowData.days && rowData.days.map(day => (
+                        <Chip key={day} label={day} size="small" sx={{ mr: 0.5, mb: 0.5 }} />
+                    ))}
+                </div>
+            )
         },
         {
-            title: "Tên Route",
-            field: "routeName",
-
-        },
-        {
-            title: "Biển số phương tiện",
-            field: "vehiclePlateNumber",
-
-        },
-        {
-            title: "Hướng đi",
-            field: "direction",
-
+            title: "Status",
+            field: "status",
+            render: (rowData) => (
+                <Chip
+                    label={rowData.status}
+                    color={rowData.status === "ACTIVE" ? "success" : "default"}
+                />
+            )
         },
         {
             title: "Thao tác",
@@ -401,10 +447,10 @@ const TripManagement = () => {
             centerHeader: false,
             sorting: false,
             renderCell: (rowData) => (
-                <div >
+                <div>
                     <IconButton
                         style={{ padding: '5px' }}
-                        onClick={() => handleView(rowData)}
+                        onClick={() => handleViewSchedule(rowData)}
                         color="primary"
                     >
                         <VisibilityIcon />
@@ -418,7 +464,7 @@ const TripManagement = () => {
                     </IconButton>
                     <IconButton
                         style={{ padding: '5px' }}
-                        onClick={() => handleDelete(rowData)}
+                        onClick={() => handleDeleteRouteSchedule(rowData.id)}
                         color="error"
                     >
                         <DeleteIcon />
@@ -475,13 +521,13 @@ const TripManagement = () => {
                     <Card>
                         <CardContent>
                             <Box display="flex" alignItems="center">
-                                <DirectionsBusIcon fontSize="large" color="primary" sx={{ mr: 2 }} />
+                                <ScheduleIcon fontSize="large" color="primary" sx={{ mr: 2 }} />
                                 <Box>
                                     <Typography variant="body2" color="textSecondary">
-                                        Active Trips
+                                        Active Schedules
                                     </Typography>
                                     <Typography variant="h5">
-                                        {routeVehicles.length}
+                                        {routeSchedules.length}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -511,8 +557,8 @@ const TripManagement = () => {
             <Box sx={{ mb: 3 }}>
                 <Tabs value={tabValue} onChange={handleTabChange}>
                     <Tab label="Routes" icon={<RouteIcon />} iconPosition="start" />
-                    <Tab label="Vehicle" icon={<LocalShippingIcon />} iconPosition="start" />
-                    <Tab label="Vehicle Assignments" icon={<DirectionsBusIcon />} iconPosition="start" />
+                    {/*<Tab label="Vehicles" icon={<LocalShippingIcon />} iconPosition="start" />*/}
+                    <Tab label="Route Schedules" icon={<ScheduleIcon />} iconPosition="start" />
                 </Tabs>
             </Box>
 
@@ -542,41 +588,38 @@ const TripManagement = () => {
                 </Box>
             )}
 
+            {/*{tabValue === 1 && (*/}
+            {/*    <Box>*/}
+            {/*        <StandardTable*/}
+            {/*            title="Vehicles"*/}
+            {/*            columns={vehiclesColumns}*/}
+            {/*            data={vehicles}*/}
+            {/*            options={{*/}
+            {/*                selection: false,*/}
+            {/*                search: true,*/}
+            {/*                sorting: true,*/}
+            {/*                pageSize: 10*/}
+            {/*            }}*/}
+            {/*        />*/}
+            {/*    </Box>*/}
+            {/*)}*/}
+
             {tabValue === 1 && (
-                <Box>
-                    <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
-
-                    </Box>
-
-                    <StandardTable
-                        title="Vehicles"
-                        columns={vehiclesColumn}
-                        data={vehicles}
-                        options={{
-                            selection: false,
-                            search: true,
-                            sorting: true,
-                            pageSize: 10
-                        }}
-                    />
-                </Box>
-            )}
-            {tabValue === 2 && (
                 <Box>
                     <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
                         <Button
                             variant="contained"
                             startIcon={<AddIcon />}
-                            onClick={handleOpenAssignDialog}
+                            onClick={handleOpenModal}
                         >
-                            Assign Vehicle to Route
+                            Create New Route Schedule
                         </Button>
                     </Box>
 
                     <StandardTable
-                        title="Vehicle Assignments"
-                        columns={vehicleAssignmentColumns}
-                        data={routeVehicles}
+                        title="Route Schedules"
+                        columns={routeScheduleColumns}
+                        data={routeSchedules}
                         options={{
                             selection: false,
                             search: true,
@@ -586,69 +629,224 @@ const TripManagement = () => {
                     />
                 </Box>
             )}
-            {/* Vehicle Assignment Dialog */}
-            <Dialog open={openAssignDialog} onClose={handleCloseAssignDialog} maxWidth="sm" fullWidth>
-                <DialogTitle>Assign Vehicle to Route</DialogTitle>
-                <DialogContent>
-                    <Box sx={{ mt: 2 }}>
-                        <FormControl fullWidth sx={{ mb: 2 }}>
-                            <InputLabel>Route</InputLabel>
-                            <Select
-                                name="routeId"
-                                value={assignmentForm.routeId}
-                                onChange={handleAssignmentFormChange}
-                                label="Route"
-                            >
-                                {routes.map((route) => (
-                                    <MenuItem key={route.routeId} value={route.routeId}>
-                                        {route.routeCode} - {route.routeName}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
 
-                        <FormControl fullWidth sx={{ mb: 2 }}>
-                            <InputLabel>Vehicle</InputLabel>
-                            <Select
-                                name="vehicleId"
-                                value={assignmentForm.vehicleId}
-                                onChange={handleAssignmentFormChange}
-                                label="Vehicle"
-                            >
-                                {vehicles.map((vehicle) => (
-                                    <MenuItem key={vehicle.vehicleId} value={vehicle.vehicleId}>
-                                        {vehicle.plateNumber} ({vehicle.vehicleType}) - {vehicle.status}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+            {/* Route Schedule Dialog */}
+            {/*<Dialog open={openAssignDialog} onClose={handleCloseAssignDialog} maxWidth="sm" fullWidth>*/}
+            {/*    <DialogTitle>Create New Route Schedule</DialogTitle>*/}
+            {/*    <DialogContent>*/}
+            {/*        <Box sx={{ mt: 2 }}>*/}
+            {/*            <FormControl fullWidth sx={{ mb: 2 }}>*/}
+            {/*                <InputLabel>Route</InputLabel>*/}
+            {/*                <Select*/}
+            {/*                    name="routeId"*/}
+            {/*                    value={assignmentForm.routeId}*/}
+            {/*                    onChange={handleAssignmentFormChange}*/}
+            {/*                    label="Route"*/}
+            {/*                >*/}
+            {/*                    {routes.map((route) => (*/}
+            {/*                        <MenuItem key={route.routeId} value={route.routeId}>*/}
+            {/*                            {route.routeCode} - {route.routeName}*/}
+            {/*                        </MenuItem>*/}
+            {/*                    ))}*/}
+            {/*                </Select>*/}
+            {/*            </FormControl>*/}
 
-                        <FormControl fullWidth>
-                            <InputLabel>Direction</InputLabel>
-                            <Select
-                                name="direction"
-                                value={assignmentForm.direction}
-                                onChange={handleAssignmentFormChange}
-                                label="Direction"
-                            >
-                                <MenuItem value="OUTBOUND">Outbound</MenuItem>
-                                <MenuItem value="INBOUND">Inbound</MenuItem>
-                                <MenuItem value="LOOP">Loop</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseAssignDialog}>Cancel</Button>
-                    <Button
-                        onClick={handleSubmitAssignment}
-                        variant="contained"
-                        disabled={!assignmentForm.routeId || !assignmentForm.vehicleId}
-                    >
-                        Assign
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            {/*            /!*<FormControl fullWidth sx={{ mb: 2 }}>*!/*/}
+            {/*            /!*    <InputLabel>Vehicle</InputLabel>*!/*/}
+            {/*            /!*    <Select*!/*/}
+            {/*            /!*        name="vehicleId"*!/*/}
+            {/*            /!*        value={assignmentForm.vehicleId}*!/*/}
+            {/*            /!*        onChange={handleAssignmentFormChange}*!/*/}
+            {/*            /!*        label="Vehicle"*!/*/}
+            {/*            /!*    >*!/*/}
+            {/*            /!*        {vehicles.map((vehicle) => (*!/*/}
+            {/*            /!*            <MenuItem key={vehicle.vehicleId} value={vehicle.vehicleId}>*!/*/}
+            {/*            /!*                {vehicle.plateNumber} ({vehicle.vehicleType}) - {vehicle.status}*!/*/}
+            {/*            /!*            </MenuItem>*!/*/}
+            {/*            /!*        ))}*!/*/}
+            {/*            /!*    </Select>*!/*/}
+            {/*            /!*</FormControl>*!/*/}
+
+            {/*            <FormControl fullWidth sx={{ mb: 2 }}>*/}
+            {/*                <InputLabel>Schedule Type</InputLabel>*/}
+            {/*                <Select*/}
+            {/*                    name="scheduleType"*/}
+            {/*                    value={assignmentForm.scheduleType}*/}
+            {/*                    onChange={handleAssignmentFormChange}*/}
+            {/*                    label="Schedule Type"*/}
+            {/*                >*/}
+            {/*                    <MenuItem value="DAILY">Daily</MenuItem>*/}
+            {/*                    <MenuItem value="WEEKLY">Weekly</MenuItem>*/}
+            {/*                </Select>*/}
+            {/*            </FormControl>*/}
+
+            {/*            {assignmentForm.scheduleType === 'WEEKLY' && (*/}
+            {/*                <FormControl fullWidth sx={{ mb: 2 }}>*/}
+            {/*                    <InputLabel>Days of Week</InputLabel>*/}
+            {/*                    <Select*/}
+            {/*                        multiple*/}
+            {/*                        name="days"*/}
+            {/*                        value={assignmentForm.days}*/}
+            {/*                        onChange={handleDaysChange}*/}
+            {/*                        label="Days of Week"*/}
+            {/*                        renderValue={(selected) => (*/}
+            {/*                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>*/}
+            {/*                                {selected.map((value) => (*/}
+            {/*                                    <Chip key={value} label={value} />*/}
+            {/*                                ))}*/}
+            {/*                            </Box>*/}
+            {/*                        )}*/}
+            {/*                    >*/}
+            {/*                        <MenuItem value="MONDAY">Monday</MenuItem>*/}
+            {/*                        <MenuItem value="TUESDAY">Tuesday</MenuItem>*/}
+            {/*                        <MenuItem value="WEDNESDAY">Wednesday</MenuItem>*/}
+            {/*                        <MenuItem value="THURSDAY">Thursday</MenuItem>*/}
+            {/*                        <MenuItem value="FRIDAY">Friday</MenuItem>*/}
+            {/*                        <MenuItem value="SATURDAY">Saturday</MenuItem>*/}
+            {/*                        <MenuItem value="SUNDAY">Sunday</MenuItem>*/}
+            {/*                    </Select>*/}
+            {/*                </FormControl>*/}
+            {/*            )}*/}
+            {/*        </Box>*/}
+            {/*    </DialogContent>*/}
+            {/*    <DialogActions>*/}
+            {/*        <Button onClick={handleCloseAssignDialog}>Cancel</Button>*/}
+            {/*        <Button*/}
+            {/*            onClick={handleSubmitAssignment}*/}
+            {/*            variant="contained"*/}
+            {/*            disabled={!assignmentForm.routeId || !assignmentForm.vehicleId ||*/}
+            {/*                (assignmentForm.scheduleType === 'WEEKLY' && assignmentForm.days.length === 0)}*/}
+            {/*        >*/}
+            {/*            Create*/}
+            {/*        </Button>*/}
+            {/*    </DialogActions>*/}
+            {/*</Dialog>*/}
+            <Modal
+                open={openModal}
+                 onClose={handleCloseModal}
+                aria-labelledby="modal-title"
+                aria-describedby="modal-description"
+            >
+                <Box sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: 600,
+                    bgcolor: 'background.paper',
+                    boxShadow: 24,
+                    p: 4,
+                    borderRadius: 2
+                }}>
+                    <Typography id="modal-title" variant="h6" component="h2" sx={{ mb: 3 }}>
+                        {"Tạo lịch trình mới"}
+                    </Typography>
+
+                    {/*{selectedSchedule ? (*/}
+                    {/*    // View schedule details*/}
+                    {/*    <Box>*/}
+                    {/*        <Typography variant="body1" sx={{ mb: 2 }}>*/}
+                    {/*            <strong>Phương tiện:</strong> {selectedSchedule.vehiclePlateNumber}*/}
+                    {/*        </Typography>*/}
+                    {/*        <Typography variant="body1" sx={{ mb: 2 }}>*/}
+                    {/*            <strong>Tuyến đường:</strong> {selectedSchedule.routeName}*/}
+                    {/*        </Typography>*/}
+                    {/*        <Typography variant="body1" sx={{ mb: 2 }}>*/}
+                    {/*            <strong>Ngày trong tuần:</strong> {*/}
+                    {/*            columns.find(c => c.field === 'dayOfWeek').lookup[selectedSchedule.dayOfWeek]*/}
+                    {/*        }*/}
+                    {/*        </Typography>*/}
+                    {/*        <Typography variant="body1" sx={{ mb: 2 }}>*/}
+                    {/*            <strong>Thời gian:</strong> {selectedSchedule.startTime} - {selectedSchedule.endTime}*/}
+                    {/*        </Typography>*/}
+                    {/*        <Typography variant="body1" sx={{ mb: 2 }}>*/}
+                    {/*            <strong>Số chuyến mỗi ngày:</strong> {selectedSchedule.numberOfTrips}*/}
+                    {/*        </Typography>*/}
+                    {/*        <Typography variant="body1" sx={{ mb: 2 }}>*/}
+                    {/*            <strong>Trạng thái:</strong> {*/}
+                    {/*            selectedSchedule.isActive ? 'Đang hoạt động' : 'Tạm dừng'*/}
+                    {/*        }*/}
+                    {/*        </Typography>*/}
+                    {/*    </Box>*/}
+                    {/*) : (*/}
+                        // Create schedule form
+                        <Box component="form" sx={{ mt: 3 }}>
+                            <FormControl fullWidth sx={{ mb: 3 }}>
+                                <InputLabel id="route-schedule-label">Lịch trình tuyến đường</InputLabel>
+                                <Select
+                                    labelId="route-schedule-label"
+                                    value={selectedRoute}
+                                    onChange={(e) => setSelectedRoute(e.target.value)}
+                                    label="Lịch trình tuyến đường"
+                                >
+                                    {routes.map((r) => (
+                                        <MenuItem key={r.id} value={r.id}>
+                                            {r.code} - {r.routeName}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+
+                            <Typography variant="subtitle1" sx={{ mb: 1 }}>Chọn ngày trong tuần:</Typography>
+                            <FormGroup row sx={{ mb: 3 }}>
+                                {daysOfWeek.map((day) => (
+                                    <FormControlLabel
+                                        key={day.value}
+                                        control={
+                                            <Checkbox
+                                                checked={day.selected}
+                                                onChange={() => handleDayChange(day)}
+                                            />
+                                        }
+                                        label={day.label}
+                                    />
+                                ))}
+                            </FormGroup>
+
+
+                            <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+                                <TextField
+                                    label="Giờ bắt đầu"
+                                    type="time"
+                                    value={startTime}
+                                    onChange={(e) => setStartTime(e.target.value)}
+                                    fullWidth
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                    inputProps={{
+                                        step: 300, // 5 min
+                                    }}
+                                />
+                                <TextField
+                                    label="Giờ kết thúc"
+                                    type="time"
+                                    value={endTime}
+                                    onChange={(e) => setEndTime(e.target.value)}
+                                    fullWidth
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                    inputProps={{
+                                        step: 300, // 5 min
+                                    }}
+                                />
+                            </Box>
+
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
+                                <Button variant="outlined" onClick={handleCloseModal}>Hủy</Button>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={handleCreateSchedule}
+                                >
+                                    Tạo lịch trình
+                                </Button>
+                            </Box>
+                        </Box>
+                    {/*)}*/}
+                </Box>
+            </Modal>
 
             {/* Create Route Dialog */}
             <Dialog open={openRouteDialog} onClose={handleCloseRouteDialog} maxWidth="md" fullWidth>

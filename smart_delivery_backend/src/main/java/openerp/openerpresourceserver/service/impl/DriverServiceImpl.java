@@ -1,18 +1,15 @@
 package openerp.openerpresourceserver.service.impl;
 
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.dto.OrderResponseDto;
 import openerp.openerpresourceserver.dto.OrderSummaryDTO;
-import openerp.openerpresourceserver.dto.RouteVehicleDetailDto;
 import openerp.openerpresourceserver.dto.VehicleDto;
 import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
 import openerp.openerpresourceserver.entity.enumentity.VehicleStatus;
-import openerp.openerpresourceserver.mapper.OrderMapper;
 import openerp.openerpresourceserver.mapper.VehicleMapper;
 import openerp.openerpresourceserver.repository.*;
 import openerp.openerpresourceserver.service.DriverService;
@@ -33,7 +30,6 @@ public class DriverServiceImpl implements DriverService {
     private final DriverRepo driverRepo;
     private final VehicleDriverRepository vehicleDriverRepo;
     private final VehicleRepository vehicleRepo;
-    private final RouteVehicleRepository routeVehicleRepo;
     private final RouteStopRepository routeStopRepository;
     private final OrderRepo orderRepo;
     private final OrderService orderService;
@@ -62,32 +58,7 @@ public class DriverServiceImpl implements DriverService {
         return vehicleMapper.vehicleToVehicleDto(vehicle);
     }
 
-    @Override
-    public List<RouteVehicleDetailDto> getDriverRoutesByUsername(String username) {
-        // Find driver by username
-        Driver driver = driverRepo.findByUsername(username);
-        if (driver == null) {
-            throw new NotFoundException("Driver not found with username: " + username);
-        }
 
-        // Find vehicle assigned to driver
-        VehicleDriver vehicleDriver = vehicleDriverRepo.findByDriverIdAndUnassignedAtIsNull(driver.getId());
-        if (vehicleDriver == null) {
-            throw new NotFoundException("No vehicle assigned to driver: " + username);
-        }
-
-        // Get routes assigned to this vehicle
-        return routeVehicleRepo.findDetailByVehicleId(vehicleDriver.getVehicleId());
-    }
-
-    @Override
-    public List<OrderResponseDto> getOrdersForRouteVehicle(UUID routeVehicleId) {
-        RouteVehicle routeVehicle = routeVehicleRepo.findById(routeVehicleId)
-                .orElseThrow(() -> new NotFoundException("Route vehicle assignment not found with ID: " + routeVehicleId));
-
-        List<Order> orders = orderRepo.findAllByRouteVehicleId(routeVehicleId);
-        return orders.stream().map(o-> orderService.getOrderById(o.getId())).toList();
-    }
 
     @Override
     public List<OrderSummaryDTO> getPendingPickupOrdersForDriver(String username, UUID hubId) {

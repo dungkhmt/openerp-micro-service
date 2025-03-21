@@ -2,16 +2,12 @@ package openerp.openerpresourceserver.controller;
 
 import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.dto.*;
-import openerp.openerpresourceserver.entity.Order;
-import openerp.openerpresourceserver.entity.RouteVehicle;
 import openerp.openerpresourceserver.entity.Trip;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
 import openerp.openerpresourceserver.service.DriverService;
 import openerp.openerpresourceserver.service.TripService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -39,28 +35,8 @@ public class DriverController {
         return ResponseEntity.ok(vehicle);
     }
 
-    /**
-     * Get all routes assigned to the driver's vehicle
-     */
-    @PreAuthorize("hasRole('DRIVER')")
-    @GetMapping("/routes")
-    public ResponseEntity<List<RouteVehicleDetailDto>> getAssignedRoutes(Principal principal) {
-        String username = principal.getName();
-        System.out.println("DriverController.getAssignedVehicle: " + principal);
 
-        List<RouteVehicleDetailDto> routes = driverService.getDriverRoutesByUsername(username);
-        return ResponseEntity.ok(routes);
-    }
 
-    /**
-     * Get orders assigned to a specific route vehicle
-     */
-    @PreAuthorize("hasRole('DRIVER')")
-    @GetMapping("/routes/{routeVehicleId}/orders")
-    public ResponseEntity<List<OrderResponseDto>> getOrdersForRouteVehicle(@PathVariable UUID routeVehicleId) {
-        List<OrderResponseDto> orderDtos = driverService.getOrdersForRouteVehicle(routeVehicleId);
-        return ResponseEntity.ok(orderDtos);
-    }
 
     /**
      * Get pending collection orders for the driver's vehicle at a specific hub
