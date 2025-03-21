@@ -108,7 +108,7 @@ public class MiddleMileController {
     }
 
     // ===== Route Vehicle Endpoints =====
-    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'ROUTE_MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'ROUTE_MANAGER', 'SCHEDULER')")
     @GetMapping("/vehicle-assignments")
     public ResponseEntity<List<RouteVehicleDto>> getAllVehicleAssignments() {
 
