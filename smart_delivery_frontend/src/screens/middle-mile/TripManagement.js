@@ -22,7 +22,7 @@ import {useHistory} from "react-router-dom";
 const TripManagement = () => {
     const [tabValue, setTabValue] = useState(0);
     const [routes, setRoutes] = useState([]);
-    const [selectedRoute, setSelectedRoute] = useState();
+    const [selectedRoute, setSelectedRoute] = useState(null);
     const [vehicles, setVehicles] = useState([]);
     const [drivers, setDrivers] = useState([]);
     const [routeSchedules, setRouteSchedules] = useState([]);
@@ -31,8 +31,8 @@ const TripManagement = () => {
     const [openRouteDialog, setOpenRouteDialog] = useState(false);
     const [hubs, setHubs] = useState([]);
     const [hubId, setHubId] = useState(null);
-    const [startTime, setStartTime] = useState();
-    const [endTime, setEndTime] = useState();
+    const [startTime, setStartTime] = useState('');
+    const [endTime, setEndTime] = useState('');
     const history = useHistory();
 
     // Form state for new route schedule assignment
@@ -88,7 +88,7 @@ const TripManagement = () => {
                 });
 
                 // Fetch route schedules
-                await request('get', '/smdeli/scheduler/route-schedules', (res) => {
+                await request('get', '/smdeli/route-scheduler/schedules', (res) => {
                     setRouteSchedules(res.data || []);
                 });
 
@@ -107,42 +107,57 @@ const TripManagement = () => {
         fetchData();
     }, [hubId]);
 
-    const handleOpenModal = (e) => {
+    const handleOpenModal = () => {
         setOpenModal(true);
     }
 
-    const handleCreateSchedule = (e) => {
+    const handleCreateSchedule = () => {
         const selectedDays = daysOfWeek.filter(d => d.selected).map(d => d.value);
 
-        if(!selectedDays || !selectedRoute){
+        if(!selectedDays.length || !selectedRoute){
             errorNoti("Vui lòng chọn lịch trình tuyến đường và ít nhất một ngày trong tuần");
             return;
         }
+
+        const timeSlots = [{
+            start: startTime,
+            end: endTime
+        }];
+
         request(
             "post",
-            `/smdeli/scheduler/vehicle-assignments`,
+            `/smdeli/route-scheduler/schedule`,
             (res) => {
                 successNoti("Tạo lịch trình thành công");
-                // fetchSchedules(); // Refresh data
+                loadRouteSchedules(); // Refresh data
                 handleCloseModal();
             },
             {
                 400: () => errorNoti("Dữ liệu không hợp lệ"),
-                500: () => errorNoti("Có lỗi xảy ra, vui lòng thử lại sau")
+                500: (e) => errorNoti("Có lỗi xảy ra, vui lòng thử lại sau" + e.message)
             },
             {
-                routeId: selectedRoute.routeId,
-                routeCode: selectedRoute.routeCode,
-                routeName: selectedRoute.routeName,
-                startTime: startTime,
-                endTime: endTime
+                routeId: selectedRoute,
+                days: selectedDays,
+                timeSlots: timeSlots
             }
         );
     }
 
-    const handleCloseModal = (e) => {
-        setOpenModal(false);
+    const loadRouteSchedules = () => {
+        request('get', '/smdeli/route-scheduler/schedules', (res) => {
+            setRouteSchedules(res.data || []);
+        });
     }
+
+    const handleCloseModal = () => {
+        setOpenModal(false);
+        setSelectedRoute(null);
+        setStartTime('');
+        setEndTime('');
+        setDaysOfWeek(daysOfWeek.map(d => ({ ...d, selected: false })));
+    }
+
     const loadRoutes = () => {
         setLoading(true);
         request(
@@ -193,9 +208,6 @@ const TripManagement = () => {
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
     };
-
-
-
 
     const handleOpenRouteDialog = () => {
         setOpenRouteDialog(true);
@@ -252,7 +264,7 @@ const TripManagement = () => {
     }
 
     const handleViewSchedule = (schedule) => {
-        history.push(`/scheduler/schedule/${schedule.id}`);
+        history.push(`/route-scheduler/schedule/${schedule.id}`);
     }
 
     const addStop = () => {
@@ -285,24 +297,6 @@ const TripManagement = () => {
         });
     };
 
-    const handleSubmitAssignment = () => {
-        // Create a new route schedule
-        request(
-            'post',
-            '/smdeli/scheduler/route-schedules',
-            (res) => {
-                successNoti('Route schedule created successfully!');
-                setRouteSchedules([...routeSchedules, res.data]);
-                handleCloseModal();
-            },
-            {
-                400: () => errorNoti('Invalid data. Please check your inputs.'),
-                500: () => errorNoti('Server error occurred.')
-            },
-            assignmentForm
-        );
-    };
-
     const handleSubmitRoute = () => {
         // Check if all stops have hubId
         if (routeForm.stops.some(stop => !stop.hubId)) {
@@ -330,10 +324,10 @@ const TripManagement = () => {
         if (window.confirm('Are you sure you want to delete this route schedule?')) {
             request(
                 'delete',
-                `/smdeli/scheduler/route-schedules/${id}`,
+                `/smdeli/route-scheduler/schedule/${id}`,
                 () => {
                     successNoti('Route schedule deleted successfully!');
-                    setRouteSchedules(routeSchedules.filter(rs => rs.id !== id));
+                    loadRouteSchedules();
                 },
                 {
                     400: () => errorNoti('Error deleting route schedule.'),
@@ -418,26 +412,16 @@ const TripManagement = () => {
     const routeScheduleColumns = [
         { title: "Route Code", field: "routeCode" },
         { title: "Route Name", field: "routeName" },
-        { title: "Vehicle", field: "vehiclePlateNumber" },
-        { title: "Schedule Type", field: "scheduleType" },
-        {
-            title: "Days",
-            field: "days",
-            render: (rowData) => (
-                <div>
-                    {rowData.days && rowData.days.map(day => (
-                        <Chip key={day} label={day} size="small" sx={{ mr: 0.5, mb: 0.5 }} />
-                    ))}
-                </div>
-            )
-        },
+        { title: "Day of Week", field: "dayOfWeek" },
+        { title: "Start Time", field: "startTime" },
+        { title: "End Time", field: "endTime" },
         {
             title: "Status",
-            field: "status",
+            field: "isActive",
             render: (rowData) => (
                 <Chip
-                    label={rowData.status}
-                    color={rowData.status === "ACTIVE" ? "success" : "default"}
+                    label={rowData.isActive ? "Active" : "Inactive"}
+                    color={rowData.isActive ? "success" : "default"}
                 />
             )
         },
@@ -457,13 +441,6 @@ const TripManagement = () => {
                     </IconButton>
                     <IconButton
                         style={{ padding: '5px' }}
-                        onClick={() => handleEdit(rowData)}
-                        color="secondary"
-                    >
-                        <EditIcon />
-                    </IconButton>
-                    <IconButton
-                        style={{ padding: '5px' }}
                         onClick={() => handleDeleteRouteSchedule(rowData.id)}
                         color="error"
                     >
@@ -480,84 +457,83 @@ const TripManagement = () => {
                 Transport Management
             </Typography>
 
-            <Grid container spacing={3} sx={{ mb: 3 }}>
-                <Grid item xs={12} md={6} lg={3}>
-                    <Card>
-                        <CardContent>
-                            <Box display="flex" alignItems="center">
-                                <RouteIcon fontSize="large" color="primary" sx={{ mr: 2 }} />
-                                <Box>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Total Routes
-                                    </Typography>
-                                    <Typography variant="h5">
-                                        {routes.length}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        </CardContent>
-                    </Card>
-                </Grid>
+            {/*<Grid container spacing={3} sx={{ mb: 3 }}>*/}
+            {/*    <Grid item xs={12} md={6} lg={3}>*/}
+            {/*        <Card>*/}
+            {/*            <CardContent>*/}
+            {/*                <Box display="flex" alignItems="center">*/}
+            {/*                    <RouteIcon fontSize="large" color="primary" sx={{ mr: 2 }} />*/}
+            {/*                    <Box>*/}
+            {/*                        <Typography variant="body2" color="textSecondary">*/}
+            {/*                            Total Routes*/}
+            {/*                        </Typography>*/}
+            {/*                        <Typography variant="h5">*/}
+            {/*                            {routes.length}*/}
+            {/*                        </Typography>*/}
+            {/*                    </Box>*/}
+            {/*                </Box>*/}
+            {/*            </CardContent>*/}
+            {/*        </Card>*/}
+            {/*    </Grid>*/}
 
-                <Grid item xs={12} md={6} lg={3}>
-                    <Card>
-                        <CardContent>
-                            <Box display="flex" alignItems="center">
-                                <LocalShippingIcon fontSize="large" color="primary" sx={{ mr: 2 }} />
-                                <Box>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Total Vehicles
-                                    </Typography>
-                                    <Typography variant="h5">
-                                        {vehicles.length}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        </CardContent>
-                    </Card>
-                </Grid>
+            {/*    <Grid item xs={12} md={6} lg={3}>*/}
+            {/*        <Card>*/}
+            {/*            <CardContent>*/}
+            {/*                <Box display="flex" alignItems="center">*/}
+            {/*                    <LocalShippingIcon fontSize="large" color="primary" sx={{ mr: 2 }} />*/}
+            {/*                    <Box>*/}
+            {/*                        <Typography variant="body2" color="textSecondary">*/}
+            {/*                            Total Vehicles*/}
+            {/*                        </Typography>*/}
+            {/*                        <Typography variant="h5">*/}
+            {/*                            {vehicles.length}*/}
+            {/*                        </Typography>*/}
+            {/*                    </Box>*/}
+            {/*                </Box>*/}
+            {/*            </CardContent>*/}
+            {/*        </Card>*/}
+            {/*    </Grid>*/}
 
-                <Grid item xs={12} md={6} lg={3}>
-                    <Card>
-                        <CardContent>
-                            <Box display="flex" alignItems="center">
-                                <ScheduleIcon fontSize="large" color="primary" sx={{ mr: 2 }} />
-                                <Box>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Active Schedules
-                                    </Typography>
-                                    <Typography variant="h5">
-                                        {routeSchedules.length}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        </CardContent>
-                    </Card>
-                </Grid>
+            {/*    <Grid item xs={12} md={6} lg={3}>*/}
+            {/*        <Card>*/}
+            {/*            <CardContent>*/}
+            {/*                <Box display="flex" alignItems="center">*/}
+            {/*                    <ScheduleIcon fontSize="large" color="primary" sx={{ mr: 2 }} />*/}
+            {/*                    <Box>*/}
+            {/*                        <Typography variant="body2" color="textSecondary">*/}
+            {/*                            Active Schedules*/}
+            {/*                        </Typography>*/}
+            {/*                        <Typography variant="h5">*/}
+            {/*                            {routeSchedules.length}*/}
+            {/*                        </Typography>*/}
+            {/*                    </Box>*/}
+            {/*                </Box>*/}
+            {/*            </CardContent>*/}
+            {/*        </Card>*/}
+            {/*    </Grid>*/}
 
-                <Grid item xs={12} md={6} lg={3}>
-                    <Card>
-                        <CardContent>
-                            <Box display="flex" alignItems="center">
-                                <PersonIcon fontSize="large" color="primary" sx={{ mr: 2 }} />
-                                <Box>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Drivers
-                                    </Typography>
-                                    <Typography variant="h5">
-                                        {drivers.length}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        </CardContent>
-                    </Card>
-                </Grid>
-            </Grid>
+            {/*    <Grid item xs={12} md={6} lg={3}>*/}
+            {/*        <Card>*/}
+            {/*            <CardContent>*/}
+            {/*                <Box display="flex" alignItems="center">*/}
+            {/*                    <PersonIcon fontSize="large" color="primary" sx={{ mr: 2 }} />*/}
+            {/*                    <Box>*/}
+            {/*                        <Typography variant="body2" color="textSecondary">*/}
+            {/*                            Drivers*/}
+            {/*                        </Typography>*/}
+            {/*                        <Typography variant="h5">*/}
+            {/*                            {drivers.length}*/}
+            {/*                        </Typography>*/}
+            {/*                    </Box>*/}
+            {/*                </Box>*/}
+            {/*            </CardContent>*/}
+            {/*        </Card>*/}
+            {/*    </Grid>*/}
+            {/*</Grid>*/}
 
             <Box sx={{ mb: 3 }}>
                 <Tabs value={tabValue} onChange={handleTabChange}>
                     <Tab label="Routes" icon={<RouteIcon />} iconPosition="start" />
-                    {/*<Tab label="Vehicles" icon={<LocalShippingIcon />} iconPosition="start" />*/}
                     <Tab label="Route Schedules" icon={<ScheduleIcon />} iconPosition="start" />
                 </Tabs>
             </Box>
@@ -588,22 +564,6 @@ const TripManagement = () => {
                 </Box>
             )}
 
-            {/*{tabValue === 1 && (*/}
-            {/*    <Box>*/}
-            {/*        <StandardTable*/}
-            {/*            title="Vehicles"*/}
-            {/*            columns={vehiclesColumns}*/}
-            {/*            data={vehicles}*/}
-            {/*            options={{*/}
-            {/*                selection: false,*/}
-            {/*                search: true,*/}
-            {/*                sorting: true,*/}
-            {/*                pageSize: 10*/}
-            {/*            }}*/}
-            {/*        />*/}
-            {/*    </Box>*/}
-            {/*)}*/}
-
             {tabValue === 1 && (
                 <Box>
                     <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
@@ -630,100 +590,9 @@ const TripManagement = () => {
                 </Box>
             )}
 
-            {/* Route Schedule Dialog */}
-            {/*<Dialog open={openAssignDialog} onClose={handleCloseAssignDialog} maxWidth="sm" fullWidth>*/}
-            {/*    <DialogTitle>Create New Route Schedule</DialogTitle>*/}
-            {/*    <DialogContent>*/}
-            {/*        <Box sx={{ mt: 2 }}>*/}
-            {/*            <FormControl fullWidth sx={{ mb: 2 }}>*/}
-            {/*                <InputLabel>Route</InputLabel>*/}
-            {/*                <Select*/}
-            {/*                    name="routeId"*/}
-            {/*                    value={assignmentForm.routeId}*/}
-            {/*                    onChange={handleAssignmentFormChange}*/}
-            {/*                    label="Route"*/}
-            {/*                >*/}
-            {/*                    {routes.map((route) => (*/}
-            {/*                        <MenuItem key={route.routeId} value={route.routeId}>*/}
-            {/*                            {route.routeCode} - {route.routeName}*/}
-            {/*                        </MenuItem>*/}
-            {/*                    ))}*/}
-            {/*                </Select>*/}
-            {/*            </FormControl>*/}
-
-            {/*            /!*<FormControl fullWidth sx={{ mb: 2 }}>*!/*/}
-            {/*            /!*    <InputLabel>Vehicle</InputLabel>*!/*/}
-            {/*            /!*    <Select*!/*/}
-            {/*            /!*        name="vehicleId"*!/*/}
-            {/*            /!*        value={assignmentForm.vehicleId}*!/*/}
-            {/*            /!*        onChange={handleAssignmentFormChange}*!/*/}
-            {/*            /!*        label="Vehicle"*!/*/}
-            {/*            /!*    >*!/*/}
-            {/*            /!*        {vehicles.map((vehicle) => (*!/*/}
-            {/*            /!*            <MenuItem key={vehicle.vehicleId} value={vehicle.vehicleId}>*!/*/}
-            {/*            /!*                {vehicle.plateNumber} ({vehicle.vehicleType}) - {vehicle.status}*!/*/}
-            {/*            /!*            </MenuItem>*!/*/}
-            {/*            /!*        ))}*!/*/}
-            {/*            /!*    </Select>*!/*/}
-            {/*            /!*</FormControl>*!/*/}
-
-            {/*            <FormControl fullWidth sx={{ mb: 2 }}>*/}
-            {/*                <InputLabel>Schedule Type</InputLabel>*/}
-            {/*                <Select*/}
-            {/*                    name="scheduleType"*/}
-            {/*                    value={assignmentForm.scheduleType}*/}
-            {/*                    onChange={handleAssignmentFormChange}*/}
-            {/*                    label="Schedule Type"*/}
-            {/*                >*/}
-            {/*                    <MenuItem value="DAILY">Daily</MenuItem>*/}
-            {/*                    <MenuItem value="WEEKLY">Weekly</MenuItem>*/}
-            {/*                </Select>*/}
-            {/*            </FormControl>*/}
-
-            {/*            {assignmentForm.scheduleType === 'WEEKLY' && (*/}
-            {/*                <FormControl fullWidth sx={{ mb: 2 }}>*/}
-            {/*                    <InputLabel>Days of Week</InputLabel>*/}
-            {/*                    <Select*/}
-            {/*                        multiple*/}
-            {/*                        name="days"*/}
-            {/*                        value={assignmentForm.days}*/}
-            {/*                        onChange={handleDaysChange}*/}
-            {/*                        label="Days of Week"*/}
-            {/*                        renderValue={(selected) => (*/}
-            {/*                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>*/}
-            {/*                                {selected.map((value) => (*/}
-            {/*                                    <Chip key={value} label={value} />*/}
-            {/*                                ))}*/}
-            {/*                            </Box>*/}
-            {/*                        )}*/}
-            {/*                    >*/}
-            {/*                        <MenuItem value="MONDAY">Monday</MenuItem>*/}
-            {/*                        <MenuItem value="TUESDAY">Tuesday</MenuItem>*/}
-            {/*                        <MenuItem value="WEDNESDAY">Wednesday</MenuItem>*/}
-            {/*                        <MenuItem value="THURSDAY">Thursday</MenuItem>*/}
-            {/*                        <MenuItem value="FRIDAY">Friday</MenuItem>*/}
-            {/*                        <MenuItem value="SATURDAY">Saturday</MenuItem>*/}
-            {/*                        <MenuItem value="SUNDAY">Sunday</MenuItem>*/}
-            {/*                    </Select>*/}
-            {/*                </FormControl>*/}
-            {/*            )}*/}
-            {/*        </Box>*/}
-            {/*    </DialogContent>*/}
-            {/*    <DialogActions>*/}
-            {/*        <Button onClick={handleCloseAssignDialog}>Cancel</Button>*/}
-            {/*        <Button*/}
-            {/*            onClick={handleSubmitAssignment}*/}
-            {/*            variant="contained"*/}
-            {/*            disabled={!assignmentForm.routeId || !assignmentForm.vehicleId ||*/}
-            {/*                (assignmentForm.scheduleType === 'WEEKLY' && assignmentForm.days.length === 0)}*/}
-            {/*        >*/}
-            {/*            Create*/}
-            {/*        </Button>*/}
-            {/*    </DialogActions>*/}
-            {/*</Dialog>*/}
             <Modal
                 open={openModal}
-                 onClose={handleCloseModal}
+                onClose={handleCloseModal}
                 aria-labelledby="modal-title"
                 aria-describedby="modal-description"
             >
@@ -742,109 +611,79 @@ const TripManagement = () => {
                         {"Tạo lịch trình mới"}
                     </Typography>
 
-                    {/*{selectedSchedule ? (*/}
-                    {/*    // View schedule details*/}
-                    {/*    <Box>*/}
-                    {/*        <Typography variant="body1" sx={{ mb: 2 }}>*/}
-                    {/*            <strong>Phương tiện:</strong> {selectedSchedule.vehiclePlateNumber}*/}
-                    {/*        </Typography>*/}
-                    {/*        <Typography variant="body1" sx={{ mb: 2 }}>*/}
-                    {/*            <strong>Tuyến đường:</strong> {selectedSchedule.routeName}*/}
-                    {/*        </Typography>*/}
-                    {/*        <Typography variant="body1" sx={{ mb: 2 }}>*/}
-                    {/*            <strong>Ngày trong tuần:</strong> {*/}
-                    {/*            columns.find(c => c.field === 'dayOfWeek').lookup[selectedSchedule.dayOfWeek]*/}
-                    {/*        }*/}
-                    {/*        </Typography>*/}
-                    {/*        <Typography variant="body1" sx={{ mb: 2 }}>*/}
-                    {/*            <strong>Thời gian:</strong> {selectedSchedule.startTime} - {selectedSchedule.endTime}*/}
-                    {/*        </Typography>*/}
-                    {/*        <Typography variant="body1" sx={{ mb: 2 }}>*/}
-                    {/*            <strong>Số chuyến mỗi ngày:</strong> {selectedSchedule.numberOfTrips}*/}
-                    {/*        </Typography>*/}
-                    {/*        <Typography variant="body1" sx={{ mb: 2 }}>*/}
-                    {/*            <strong>Trạng thái:</strong> {*/}
-                    {/*            selectedSchedule.isActive ? 'Đang hoạt động' : 'Tạm dừng'*/}
-                    {/*        }*/}
-                    {/*        </Typography>*/}
-                    {/*    </Box>*/}
-                    {/*) : (*/}
-                        // Create schedule form
-                        <Box component="form" sx={{ mt: 3 }}>
-                            <FormControl fullWidth sx={{ mb: 3 }}>
-                                <InputLabel id="route-schedule-label">Lịch trình tuyến đường</InputLabel>
-                                <Select
-                                    labelId="route-schedule-label"
-                                    value={selectedRoute}
-                                    onChange={(e) => setSelectedRoute(e.target.value)}
-                                    label="Lịch trình tuyến đường"
-                                >
-                                    {routes.map((r) => (
-                                        <MenuItem key={r.id} value={r.id}>
-                                            {r.code} - {r.routeName}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-
-                            <Typography variant="subtitle1" sx={{ mb: 1 }}>Chọn ngày trong tuần:</Typography>
-                            <FormGroup row sx={{ mb: 3 }}>
-                                {daysOfWeek.map((day) => (
-                                    <FormControlLabel
-                                        key={day.value}
-                                        control={
-                                            <Checkbox
-                                                checked={day.selected}
-                                                onChange={() => handleDayChange(day)}
-                                            />
-                                        }
-                                        label={day.label}
-                                    />
+                    <Box component="form" sx={{ mt: 3 }}>
+                        <FormControl fullWidth sx={{ mb: 3 }}>
+                            <InputLabel id="route-schedule-label">Route</InputLabel>
+                            <Select
+                                labelId="route-schedule-label"
+                                value={selectedRoute || ''}
+                                onChange={(e) => setSelectedRoute(e.target.value)}
+                                label="Route"
+                            >
+                                {routes.map((route) => (
+                                    <MenuItem key={route.routeId} value={route.routeId}>
+                                        {route.routeCode} - {route.routeName}
+                                    </MenuItem>
                                 ))}
-                            </FormGroup>
+                            </Select>
+                        </FormControl>
 
-
-                            <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-                                <TextField
-                                    label="Giờ bắt đầu"
-                                    type="time"
-                                    value={startTime}
-                                    onChange={(e) => setStartTime(e.target.value)}
-                                    fullWidth
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                    inputProps={{
-                                        step: 300, // 5 min
-                                    }}
+                        <Typography variant="subtitle1" sx={{ mb: 1 }}>Chọn ngày trong tuần:</Typography>
+                        <FormGroup row sx={{ mb: 3 }}>
+                            {daysOfWeek.map((day) => (
+                                <FormControlLabel
+                                    key={day.value}
+                                    control={
+                                        <Checkbox
+                                            checked={day.selected}
+                                            onChange={() => handleDayChange(day)}
+                                        />
+                                    }
+                                    label={day.label}
                                 />
-                                <TextField
-                                    label="Giờ kết thúc"
-                                    type="time"
-                                    value={endTime}
-                                    onChange={(e) => setEndTime(e.target.value)}
-                                    fullWidth
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                    inputProps={{
-                                        step: 300, // 5 min
-                                    }}
-                                />
-                            </Box>
+                            ))}
+                        </FormGroup>
 
-                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
-                                <Button variant="outlined" onClick={handleCloseModal}>Hủy</Button>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={handleCreateSchedule}
-                                >
-                                    Tạo lịch trình
-                                </Button>
-                            </Box>
+                        <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+                            <TextField
+                                label="Giờ bắt đầu"
+                                type="time"
+                                value={startTime}
+                                onChange={(e) => setStartTime(e.target.value)}
+                                fullWidth
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                                inputProps={{
+                                    step: 300, // 5 min
+                                }}
+                            />
+                            <TextField
+                                label="Giờ kết thúc"
+                                type="time"
+                                value={endTime}
+                                onChange={(e) => setEndTime(e.target.value)}
+                                fullWidth
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                                inputProps={{
+                                    step: 300, // 5 min
+                                }}
+                            />
                         </Box>
-                    {/*)}*/}
+
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
+                            <Button variant="outlined" onClick={handleCloseModal}>Hủy</Button>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleCreateSchedule}
+                            >
+                                Tạo lịch trình
+                            </Button>
+                        </Box>
+                    </Box>
                 </Box>
             </Modal>
 

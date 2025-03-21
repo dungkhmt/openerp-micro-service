@@ -7,6 +7,9 @@ import org.hibernate.annotations.GenericGenerator;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * Updated Trip entity to better support driver trip management
+ */
 @Entity
 @Table(name = "smartdelivery_trip")
 @Data
@@ -20,27 +23,44 @@ public class Trip {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
 
+    /**
+     * Reference to the route this trip is on
+     * Note: This now references the Route directly, not RouteVehicle
+     */
     @Column(name = "route_vehicle_id", nullable = false)
     private UUID routeVehicleId;
 
+    /**
+     * The driver assigned to this trip
+     */
     @Column(name = "driver_id", nullable = false)
     private UUID driverId;
 
+    /**
+     * When the trip started
+     */
     @Column(name = "start_time", nullable = true)
     private Instant startTime;
 
+    /**
+     * When the trip was completed
+     */
     @Column(name = "end_time")
     private Instant endTime;
 
+    /**
+     * Current status of the trip
+     * Possible values: "PLANNED", "IN_PROGRESS", "COMPLETED", "CANCELLED"
+     */
     @Column(name = "status", nullable = false)
-    private String status; // "PLANNED", "IN_PROGRESS", "COMPLETED", "CANCELLED"
+    private String status;
 
     /**
      * Current position in the route stop sequence
      * e.g., 0 means at first stop, 1 means at second stop, etc.
      */
     @Column(name = "current_stop_index")
-    private Integer currentStopIndex = 1;
+    private Integer currentStopIndex;
 
     /**
      * Time of arrival at the current stop

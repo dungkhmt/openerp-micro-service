@@ -9,49 +9,65 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import RouteIcon from '@mui/icons-material/Route';
+import SearchIcon from '@mui/icons-material/Search';
 
 import StandardTable from "../../components/StandardTable";
-import { Box, Button, Modal, Typography, FormControl, InputLabel, Select, MenuItem, TextField, FormGroup, FormControlLabel, Checkbox } from "@mui/material";
+import {
+    Box,
+    Button,
+    Modal,
+    Typography,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    TextField,
+    FormGroup,
+    FormControlLabel,
+    Checkbox,
+    InputAdornment,
+    Autocomplete
+} from "@mui/material";
 import { useSelector } from "react-redux";
 import { errorNoti, successNoti } from "../../utils/notification";
+import { useHistory } from "react-router-dom";
 
 const VehicleScheduler = () => {
-    const [schedules, setSchedules] = useState([]);
+    const [assignments, setAssignments] = useState([]);
     const [openModal, setOpenModal] = useState(false);
-    const [selectedSchedule, setSelectedSchedule] = useState(null);
+    const [selectedAssignment, setSelectedAssignment] = useState(null);
     const [routeSchedules, setRouteSchedules] = useState([]);
-    const [selectedRouteSchedule, setSelectedRouteSchedule] = useState('');
-    const [daysOfWeek, setDaysOfWeek] = useState([
-        { value: 'MONDAY', label: 'Thứ Hai', selected: false },
-        { value: 'TUESDAY', label: 'Thứ Ba', selected: false },
-        { value: 'WEDNESDAY', label: 'Thứ Tư', selected: false },
-        { value: 'THURSDAY', label: 'Thứ Năm', selected: false },
-        { value: 'FRIDAY', label: 'Thứ Sáu', selected: false },
-        { value: 'SATURDAY', label: 'Thứ Bảy', selected: false },
-        { value: 'SUNDAY', label: 'Chủ Nhật', selected: false }
-    ]);
-    const [tripsPerDay, setTripsPerDay] = useState(2);
-    const [startTime, setStartTime] = useState('08:00');
-    const [endTime, setEndTime] = useState('17:00');
+    const [selectedRouteSchedule, setSelectedRouteSchedule] = useState(null);
+    const [vehicles, setVehicles] = useState([]);
+    const [selectedVehicle, setSelectedVehicle] = useState(null);
+    const [assignmentDate, setAssignmentDate] = useState(new Date().toISOString().split('T')[0]);
     const userId = useSelector((state) => state.auth.userId);
+    const history = useHistory();
 
     useEffect(() => {
-        // Fetch route-schedule combinations
-        request("get", `/smdeli/scheduler/route-schedules`, (res) => {
-            setRouteSchedules(res.data);
+        // Fetch route schedules
+        request("get", `/smdeli/route-scheduler/schedules`, (res) => {
+            setRouteSchedules(res.data || []);
         }).catch(err => {
             errorNoti("Không thể tải danh sách lịch trình tuyến đường");
         });
 
-        // Fetch existing vehicle schedule assignments
-        fetchSchedules();
+        // Fetch vehicles
+        request("get", `/smdeli/vehicle/getAll`, (res) => {
+            setVehicles(res.data);
+        }).catch(err => {
+            errorNoti("Không thể tải danh sách phương tiện");
+        });
+
+        // Fetch existing vehicle assignments
+        fetchAssignments();
     }, []);
 
-    const fetchSchedules = () => {
-        request("get", `/smdeli/scheduler/vehicle-assignments`, (res) => {
-            setSchedules(res.data);
+    const fetchAssignments = () => {
+        request("get", `/smdeli/schedule-assignments/active`, (res) => {
+            setAssignments(res.data || []);
         }).catch(err => {
-            errorNoti("Không thể tải lịch trình");
+            errorNoti("Không thể tải lịch trình phân công");
         });
     };
 
@@ -65,27 +81,17 @@ const VehicleScheduler = () => {
             field: "routeName",
         },
         {
-            title: "Ngày trong tuần",
-            field: "dayOfWeek",
-            lookup: {
-                'MONDAY': 'Thứ Hai',
-                'TUESDAY': 'Thứ Ba',
-                'WEDNESDAY': 'Thứ Tư',
-                'THURSDAY': 'Thứ Năm',
-                'FRIDAY': 'Thứ Sáu',
-                'SATURDAY': 'Thứ Bảy',
-                'SUNDAY': 'Chủ Nhật'
-            }
+            title: "Tài xế",
+            field: "driverName",
         },
         {
-            title: "Thời gian",
-            field: "timeRange",
-            render: (rowData) => `${rowData.startTime} - ${rowData.endTime}`
+            title: "Ngày phân công",
+            field: "assignmentDate",
         },
         {
-            title: "Số chuyến mỗi ngày",
-            field: "numberOfTrips",
-            type: "numeric"
+            title: "Lịch trình",
+            field: "routeScheduleInfo",
+            render: (rowData) => `${rowData.dayOfWeek} (${rowData.startTime} - ${rowData.endTime})`
         },
         {
             title: "Trạng thái",
@@ -100,19 +106,13 @@ const VehicleScheduler = () => {
             renderCell: (rowData) => (
                 <div>
                     <IconButton
-                        onClick={() => handleViewSchedule(rowData)}
+                        onClick={() => handleViewAssignment(rowData)}
                         color="primary"
                     >
                         <VisibilityIcon />
                     </IconButton>
                     <IconButton
-                        onClick={() => handleEditSchedule(rowData)}
-                        color="primary"
-                    >
-                        <EditIcon />
-                    </IconButton>
-                    <IconButton
-                        onClick={() => handleDeleteSchedule(rowData.id)}
+                        onClick={() => handleDeleteAssignment(rowData.id)}
                         color="error"
                     >
                         <DeleteIcon />
@@ -122,30 +122,19 @@ const VehicleScheduler = () => {
         },
     ];
 
-    const handleDayChange = (day) => {
-        setDaysOfWeek(daysOfWeek.map(d =>
-            d.value === day.value ? { ...d, selected: !d.selected } : d
-        ));
-    };
-
-    const handleViewSchedule = (schedule) => {
-        setSelectedSchedule(schedule);
+    const handleViewAssignment = (assignment) => {
+        setSelectedAssignment(assignment);
         setOpenModal(true);
     };
 
-    const handleEditSchedule = (schedule) => {
-        // Redirect to edit page or open edit modal
-        window.location.href = `/scheduler/edit/${schedule.id}`;
-    };
-
-    const handleDeleteSchedule = (scheduleId) => {
-        if (window.confirm("Bạn có chắc chắn muốn xóa lịch trình này?")) {
+    const handleDeleteAssignment = (assignmentId) => {
+        if (window.confirm("Bạn có chắc chắn muốn xóa phân công này?")) {
             request(
                 "delete",
-                `/smdeli/scheduler/vehicle-assignments/${scheduleId}`,
+                `/smdeli/schedule-assignments/${assignmentId}`,
                 (res) => {
-                    successNoti("Xóa lịch trình thành công");
-                    fetchSchedules(); // Refresh data
+                    successNoti("Xóa phân công thành công");
+                    fetchAssignments(); // Refresh data
                 },
                 {
                     500: () => errorNoti("Có lỗi xảy ra, vui lòng thử lại sau")
@@ -154,20 +143,18 @@ const VehicleScheduler = () => {
         }
     };
 
-    const handleCreateSchedule = () => {
-        const selectedDays = daysOfWeek.filter(day => day.selected).map(day => day.value);
-
-        if (!selectedRouteSchedule || selectedDays.length === 0) {
-            errorNoti("Vui lòng chọn lịch trình tuyến đường và ít nhất một ngày trong tuần");
+    const handleCreateAssignment = () => {
+        if (!selectedRouteSchedule || !selectedVehicle) {
+            errorNoti("Vui lòng chọn lịch trình tuyến đường và phương tiện");
             return;
         }
 
         request(
             "post",
-            `/smdeli/scheduler/vehicle-assignments`,
+            `/smdeli/schedule-assignments/assign`,
             (res) => {
-                successNoti("Tạo lịch trình thành công");
-                fetchSchedules(); // Refresh data
+                successNoti("Phân công phương tiện thành công");
+                fetchAssignments(); // Refresh data
                 handleCloseModal();
             },
             {
@@ -175,11 +162,9 @@ const VehicleScheduler = () => {
                 500: () => errorNoti("Có lỗi xảy ra, vui lòng thử lại sau")
             },
             {
-                routeScheduleId: selectedRouteSchedule,
-                days: selectedDays,
-                tripsPerDay: tripsPerDay,
-                startTime: startTime,
-                endTime: endTime
+                scheduleId: selectedRouteSchedule.id,
+                vehicleId: selectedVehicle.vehicleId,
+                assignmentDate: assignmentDate
             }
         );
     };
@@ -187,7 +172,7 @@ const VehicleScheduler = () => {
     const handleGenerateTrips = () => {
         request(
             "post",
-            `/smdeli/scheduler/generate-trips/today`,
+            `/smdeli/route-scheduler/generate-trips/today`,
             (res) => {
                 successNoti(`Đã tạo ${res.data} chuyến xe cho hôm nay theo lịch trình`);
             },
@@ -199,12 +184,20 @@ const VehicleScheduler = () => {
 
     const handleCloseModal = () => {
         setOpenModal(false);
-        setSelectedSchedule(null);
-        setSelectedRouteSchedule('');
-        setDaysOfWeek(daysOfWeek.map(day => ({ ...day, selected: false })));
-        setTripsPerDay(2);
-        setStartTime('08:00');
-        setEndTime('17:00');
+        setSelectedAssignment(null);
+        setSelectedRouteSchedule(null);
+        setSelectedVehicle(null);
+        setAssignmentDate(new Date().toISOString().split('T')[0]);
+    };
+
+    // Get route schedule option label
+    const getRouteScheduleLabel = (option) => {
+        return `${option.routeCode} - ${option.routeName} (${option.dayOfWeek}: ${option.startTime}-${option.endTime})`;
+    };
+
+    // Get vehicle option label
+    const getVehicleLabel = (option) => {
+        return `${option.plateNumber} - ${option.vehicleType} (${option.status})`;
     };
 
     return (
@@ -216,7 +209,7 @@ const VehicleScheduler = () => {
                     startIcon={<AddIcon />}
                     onClick={() => setOpenModal(true)}
                 >
-                    Tạo lịch trình mới
+                    Phân công phương tiện mới
                 </Button>
                 <Button
                     variant="contained"
@@ -229,14 +222,14 @@ const VehicleScheduler = () => {
             </Box>
 
             <StandardTable
-                title="Danh sách lịch trình xe"
+                title="Danh sách phân công phương tiện"
                 columns={columns}
-                data={schedules}
+                data={assignments}
                 rowKey="id"
                 editable={false}
                 deletable={false}
                 options={{
-                    selection: true,
+                    selection: false,
                     pageSize: 20,
                     search: true,
                     sorting: true,
@@ -261,123 +254,124 @@ const VehicleScheduler = () => {
                     borderRadius: 2
                 }}>
                     <Typography id="modal-title" variant="h6" component="h2" sx={{ mb: 3 }}>
-                        {selectedSchedule ? "Chi tiết lịch trình" : "Tạo lịch trình mới"}
+                        {selectedAssignment ? "Chi tiết phân công" : "Phân công phương tiện mới"}
                     </Typography>
 
-                    {selectedSchedule ? (
-                        // View schedule details
+                    {selectedAssignment ? (
+                        // View assignment details
                         <Box>
                             <Typography variant="body1" sx={{ mb: 2 }}>
-                                <strong>Phương tiện:</strong> {selectedSchedule.vehiclePlateNumber}
+                                <strong>Phương tiện:</strong> {selectedAssignment.vehiclePlateNumber}
                             </Typography>
                             <Typography variant="body1" sx={{ mb: 2 }}>
-                                <strong>Tuyến đường:</strong> {selectedSchedule.routeName}
+                                <strong>Tuyến đường:</strong> {selectedAssignment.routeName}
                             </Typography>
                             <Typography variant="body1" sx={{ mb: 2 }}>
-                                <strong>Ngày trong tuần:</strong> {
-                                columns.find(c => c.field === 'dayOfWeek').lookup[selectedSchedule.dayOfWeek]
-                            }
+                                <strong>Tài xế:</strong> {selectedAssignment.driverName || "Chưa phân công"}
                             </Typography>
                             <Typography variant="body1" sx={{ mb: 2 }}>
-                                <strong>Thời gian:</strong> {selectedSchedule.startTime} - {selectedSchedule.endTime}
+                                <strong>Ngày phân công:</strong> {selectedAssignment.assignmentDate}
                             </Typography>
                             <Typography variant="body1" sx={{ mb: 2 }}>
-                                <strong>Số chuyến mỗi ngày:</strong> {selectedSchedule.numberOfTrips}
+                                <strong>Ngày trong tuần:</strong> {selectedAssignment.dayOfWeek}
+                            </Typography>
+                            <Typography variant="body1" sx={{ mb: 2 }}>
+                                <strong>Thời gian:</strong> {selectedAssignment.startTime} - {selectedAssignment.endTime}
                             </Typography>
                             <Typography variant="body1" sx={{ mb: 2 }}>
                                 <strong>Trạng thái:</strong> {
-                                selectedSchedule.isActive ? 'Đang hoạt động' : 'Tạm dừng'
+                                selectedAssignment.isActive ? 'Đang hoạt động' : 'Tạm dừng'
                             }
                             </Typography>
                         </Box>
                     ) : (
-                        // Create schedule form
+                        // Create assignment form
                         <Box component="form" sx={{ mt: 3 }}>
                             <FormControl fullWidth sx={{ mb: 3 }}>
-                                <InputLabel id="route-schedule-label">Lịch trình tuyến đường</InputLabel>
-                                <Select
-                                    labelId="route-schedule-label"
+                                <Autocomplete
+                                    id="route-schedule-autocomplete"
+                                    options={routeSchedules}
+                                    getOptionLabel={getRouteScheduleLabel}
                                     value={selectedRouteSchedule}
-                                    onChange={(e) => setSelectedRouteSchedule(e.target.value)}
-                                    label="Lịch trình tuyến đường"
-                                >
-                                    {routeSchedules.map((rs) => (
-                                        <MenuItem key={rs.id} value={rs.id}>
-                                            {rs.vehiclePlateNumber} - {rs.routeName}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
+                                    onChange={(event, newValue) => {
+                                        setSelectedRouteSchedule(newValue);
+                                    }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Lịch trình tuyến đường"
+                                            InputProps={{
+                                                ...params.InputProps,
+                                                startAdornment: (
+                                                    <>
+                                                        <InputAdornment position="start">
+                                                            <RouteIcon />
+                                                        </InputAdornment>
+                                                        {params.InputProps.startAdornment}
+                                                    </>
+                                                )
+                                            }}
+                                        />
+                                    )}
+                                />
                             </FormControl>
 
-                            <Typography variant="subtitle1" sx={{ mb: 1 }}>Chọn ngày trong tuần:</Typography>
-                            <FormGroup row sx={{ mb: 3 }}>
-                                {daysOfWeek.map((day) => (
-                                    <FormControlLabel
-                                        key={day.value}
-                                        control={
-                                            <Checkbox
-                                                checked={day.selected}
-                                                onChange={() => handleDayChange(day)}
-                                            />
-                                        }
-                                        label={day.label}
-                                    />
-                                ))}
-                            </FormGroup>
-
-                            <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-                                <FormControl fullWidth>
-                                    <InputLabel id="trips-label">Số chuyến mỗi ngày</InputLabel>
-                                    <Select
-                                        labelId="trips-label"
-                                        value={tripsPerDay}
-                                        onChange={(e) => setTripsPerDay(e.target.value)}
-                                        label="Số chuyến mỗi ngày"
-                                    >
-                                        {[1, 2, 3, 4, 5].map((num) => (
-                                            <MenuItem key={num} value={num}>{num} chuyến</MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Box>
-
-                            <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-                                <TextField
-                                    label="Giờ bắt đầu"
-                                    type="time"
-                                    value={startTime}
-                                    onChange={(e) => setStartTime(e.target.value)}
-                                    fullWidth
-                                    InputLabelProps={{
-                                        shrink: true,
+                            <FormControl fullWidth sx={{ mb: 3 }}>
+                                <Autocomplete
+                                    id="vehicle-autocomplete"
+                                    options={vehicles}
+                                    getOptionLabel={getVehicleLabel}
+                                    value={selectedVehicle}
+                                    onChange={(event, newValue) => {
+                                        setSelectedVehicle(newValue);
                                     }}
-                                    inputProps={{
-                                        step: 300, // 5 min
-                                    }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Phương tiện"
+                                            InputProps={{
+                                                ...params.InputProps,
+                                                startAdornment: (
+                                                    <>
+                                                        <InputAdornment position="start">
+                                                            <DirectionsCarIcon />
+                                                        </InputAdornment>
+                                                        {params.InputProps.startAdornment}
+                                                    </>
+                                                )
+                                            }}
+                                        />
+                                    )}
                                 />
-                                <TextField
-                                    label="Giờ kết thúc"
-                                    type="time"
-                                    value={endTime}
-                                    onChange={(e) => setEndTime(e.target.value)}
-                                    fullWidth
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                    inputProps={{
-                                        step: 300, // 5 min
-                                    }}
-                                />
-                            </Box>
+                            </FormControl>
+
+                            <TextField
+                                label="Ngày phân công"
+                                type="date"
+                                value={assignmentDate}
+                                onChange={(e) => setAssignmentDate(e.target.value)}
+                                fullWidth
+                                sx={{ mb: 3 }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <CalendarTodayIcon />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                            />
 
                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
                                 <Button variant="outlined" onClick={handleCloseModal}>Hủy</Button>
                                 <Button
                                     variant="contained"
                                     color="primary"
-                                    onClick={handleCreateSchedule}
+                                    onClick={handleCreateAssignment}
                                 >
-                                    Tạo lịch trình
+                                    Phân công
                                 </Button>
                             </Box>
                         </Box>

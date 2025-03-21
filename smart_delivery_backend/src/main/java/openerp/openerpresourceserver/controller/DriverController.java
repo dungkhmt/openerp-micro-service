@@ -24,6 +24,71 @@ public class DriverController {
     private final TripService tripService;
 
     /**
+     * Get all trips (active, scheduled, and completed) for the logged-in driver
+     */
+    @PreAuthorize("hasRole('DRIVER')")
+    @GetMapping("/trips")
+    public ResponseEntity<DriverTripsDTO> getAllDriverTrips(Principal principal) {
+        String username = principal.getName();
+        DriverTripsDTO tripsDTO = tripService.getAllTripsForDriver(username);
+        return ResponseEntity.ok(tripsDTO);
+    }
+
+    /**
+     * Get a specific trip with all details (including stops and orders)
+     */
+    @PreAuthorize("hasRole('DRIVER')")
+    @GetMapping("/trips/{tripId}")
+    public ResponseEntity<TripDetailsDTO> getTripDetails(
+            @PathVariable UUID tripId,
+            Principal principal) {
+        String username = principal.getName();
+        TripDetailsDTO tripDetails = tripService.getTripDetailsForDriver(tripId, username);
+        return ResponseEntity.ok(tripDetails);
+    }
+
+    /**
+     * Start a scheduled trip
+     */
+    @PreAuthorize("hasRole('DRIVER')")
+    @PostMapping("/trips/{tripId}/start")
+    public ResponseEntity<TripDetailsDTO> startTrip(
+            @PathVariable UUID tripId,
+            Principal principal) {
+        String username = principal.getName();
+        TripDetailsDTO updatedTrip = tripService.startTrip(tripId, username);
+        return ResponseEntity.ok(updatedTrip);
+    }
+
+    /**
+     * Advance to the next stop in a trip
+     */
+    @PreAuthorize("hasRole('DRIVER')")
+    @PostMapping("/trips/{tripId}/advance")
+    public ResponseEntity<TripDetailsDTO> advanceToNextStop(
+            @PathVariable UUID tripId,
+            Principal principal) {
+        String username = principal.getName();
+        TripDetailsDTO updatedTrip = tripService.advanceToNextStop(tripId, username);
+        return ResponseEntity.ok(updatedTrip);
+    }
+
+    /**
+     * Mark a trip as completed
+     */
+    @PreAuthorize("hasRole('DRIVER')")
+    @PostMapping("/trips/{tripId}/complete")
+    public ResponseEntity<TripSummaryDTO> completeTrip(
+            @PathVariable UUID tripId,
+            @RequestBody(required = false) Map<String, String> notes,
+            Principal principal) {
+        String username = principal.getName();
+        String completionNotes = notes != null ? notes.getOrDefault("notes", "") : "";
+        TripSummaryDTO summary = tripService.completeTrip(tripId, username, completionNotes);
+        return ResponseEntity.ok(summary);
+    }
+
+    /**
      * Get the driver's assigned vehicle
      */
     @PreAuthorize("hasRole('DRIVER')")
@@ -34,8 +99,6 @@ public class DriverController {
         VehicleDto vehicle = driverService.getDriverVehicleByUsername(username);
         return ResponseEntity.ok(vehicle);
     }
-
-
 
 
     /**
@@ -60,7 +123,8 @@ public class DriverController {
     @PutMapping("/pickup-orders")
     public ResponseEntity<Void> pickupOrders(@RequestBody List<UUID> orderIds, Principal principal) {
         String username = principal.getName();
-        driverService.pickupOrders(username, orderIds);        System.out.println("DriverController.getAssignedVehicle: " + principal);
+        driverService.pickupOrders(username, orderIds);
+        System.out.println("DriverController.getAssignedVehicle: " + principal);
 
         return ResponseEntity.ok().build();
 
@@ -104,7 +168,6 @@ public class DriverController {
     }
 
 
-
     /**
      * Create a new trip for today
      */
@@ -120,42 +183,6 @@ public class DriverController {
         return ResponseEntity.ok(trip);
     }
 
-    /**
-     * Get active trip for a route vehicle
-     */
-    @PreAuthorize("hasRole('DRIVER')")
-    @GetMapping("/trip/active/{routeVehicleId}")
-    public ResponseEntity<Trip> getActiveTripForRouteVehicle(
-            @PathVariable UUID routeVehicleId,
-            Principal principal) {
-        String username = principal.getName();
-        Trip trip = tripService.getActiveTripForRouteVehicle(routeVehicleId, username);
-        return ResponseEntity.ok(trip);
-    }
-
-    /**
-     * Get all active trips for driver
-     */
-    @PreAuthorize("hasRole('DRIVER')")
-    @GetMapping("/trip/active")
-    public ResponseEntity<List<Trip>> getActiveTripsForDriver(Principal principal) {
-        String username = principal.getName();
-        List<Trip> trips = tripService.getActiveTripsForDriver(username);
-        return ResponseEntity.ok(trips);
-    }
-
-    /**
-     * Advance to next stop in the trip
-     */
-    @PreAuthorize("hasRole('DRIVER')")
-    @PutMapping("/trip/{tripId}/advance-stop")
-    public ResponseEntity<Trip> advanceToNextStop(
-            @PathVariable UUID tripId,
-            Principal principal) {
-        String username = principal.getName();
-        Trip trip = tripService.advanceToNextStop(tripId, username);
-        return ResponseEntity.ok(trip);
-    }
 
     /**
      * Get all stops for a trip
@@ -170,34 +197,4 @@ public class DriverController {
         return ResponseEntity.ok(stops);
     }
 
-    /**
-     * Get trip details with current stop information
-     */
-    @PreAuthorize("hasRole('DRIVER')")
-    @GetMapping("/trip/{tripId}")
-    public ResponseEntity<Map<String, Object>> getTripDetails(
-            @PathVariable UUID tripId,
-            Principal principal) {
-        String username = principal.getName();
-        Map<String, Object> tripDetails = tripService.getTripDetails(tripId, username);
-        return ResponseEntity.ok(tripDetails);
-    }
-
-    /**
-     * Complete a trip (mark all orders as delivered and vehicle as available)
-     */
-    @PreAuthorize("hasRole('DRIVER')")
-    @PostMapping("/trip/{tripId}/complete")
-    public ResponseEntity<Map<String, Object>> completeTrip(
-            @PathVariable UUID tripId,
-            @RequestBody(required = false) Map<String, String> request,
-            Principal principal) {
-        String username = principal.getName();
-
-        // Optional completion notes
-        String notes = request != null ? request.getOrDefault("notes", "") : "";
-
-        Map<String, Object> result = tripService.completeTripWithSummary(tripId, username, notes);
-        return ResponseEntity.ok(result);
-    }
 }
