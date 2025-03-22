@@ -225,7 +225,7 @@ public class RouteScheduleServiceImpl implements RouteScheduleService {
             // For each vehicle assignment, create trips
             for (ScheduleVehicleAssignment assignment : vehicleAssignments) {
                 // Check if we already have trips for this vehicle and route for the target date
-                List<Trip> existingTrips = tripRepository.findByRouteVehicleIdAndDateRange(
+                List<Trip> existingTrips = tripRepository.findByRouteScheduleIdAndDateRange(
                         assignment.getId(), // Using assignment ID directly instead of RouteVehicle
                         targetDate.atStartOfDay().toInstant(ZoneOffset.UTC),
                         targetDate.plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC));
@@ -242,7 +242,7 @@ public class RouteScheduleServiceImpl implements RouteScheduleService {
 
                     // Create a new trip
                     Trip trip = Trip.builder()
-                            .routeVehicleId(assignment.getId()) // Using assignment ID directly
+                            .routeScheduleId(assignment.getId()) // Using assignment ID directly
                             .driverId(assignment.getDriverId())
                             .startTime(tripStartInstant)
                             .status("PLANNED")

@@ -4,15 +4,10 @@ import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.dto.ScheduleVehicleAssignmentDto;
-import openerp.openerpresourceserver.entity.RouteSchedule;
-import openerp.openerpresourceserver.entity.ScheduleVehicleAssignment;
-import openerp.openerpresourceserver.entity.Vehicle;
+import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.entity.enumentity.VehicleStatus;
 import openerp.openerpresourceserver.mapper.ScheduleVehicleAssignmentMapper;
-import openerp.openerpresourceserver.repository.DriverRepo;
-import openerp.openerpresourceserver.repository.RouteScheduleRepository;
-import openerp.openerpresourceserver.repository.ScheduleVehicleAssignmentRepository;
-import openerp.openerpresourceserver.repository.VehicleRepository;
+import openerp.openerpresourceserver.repository.*;
 import openerp.openerpresourceserver.service.ScheduleVehicleAssignmentService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +29,7 @@ public class ScheduleVehicleAssignmentServiceImpl implements ScheduleVehicleAssi
     private final VehicleRepository vehicleRepository;
     private final DriverRepo driverRepository;
     private final ScheduleVehicleAssignmentMapper mapper = ScheduleVehicleAssignmentMapper.INSTANCE;
+    private final VehicleDriverRepository vehicleDriverRepository;
 
     @Override
     @Transactional
@@ -48,10 +44,6 @@ public class ScheduleVehicleAssignmentServiceImpl implements ScheduleVehicleAssi
         Vehicle vehicle = vehicleRepository.findById(vehicleId)
                 .orElseThrow(() -> new NotFoundException("Vehicle not found with ID: " + vehicleId));
 
-        // Check if vehicle is available
-        if (vehicle.getStatus() != VehicleStatus.AVAILABLE) {
-            throw new IllegalStateException("Vehicle is not available. Current status: " + vehicle.getStatus());
-        }
 
         // Check if vehicle is already assigned to this schedule on this date
         assignmentRepository.findByRouteScheduleIdAndVehicleIdAndIsActiveTrue(scheduleId, vehicleId)
@@ -135,6 +127,18 @@ public class ScheduleVehicleAssignmentServiceImpl implements ScheduleVehicleAssi
         // Save and return
         ScheduleVehicleAssignment updatedAssignment = assignmentRepository.save(assignment);
         return enrichAssignmentDto(mapper.assignmentToDto(updatedAssignment));
+    }
+
+    @Override
+    public List<ScheduleVehicleAssignmentDto> getAssignmentsByDriverUsername(String username){
+        Driver driver = driverRepository.findByUsername(username);
+        if(driver == null){throw new NotFoundException("Driver not found with username: " + username);}
+
+        VehicleDriver vehicleDriver = vehicleDriverRepository.findByDriverIdAndUnassignedAtIsNull(driver.getId());
+
+        List<ScheduleVehicleAssignment> assignments = assignmentRepository.findAllByVehicleId(vehicleDriver.getVehicleId());
+
+        return assignments.stream().map(mapper::assignmentToDto).collect(Collectors.toList());
     }
 
     @Override

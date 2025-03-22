@@ -1,9 +1,6 @@
 package openerp.openerpresourceserver.service;
 
-import openerp.openerpresourceserver.dto.DriverTripsDTO;
-import openerp.openerpresourceserver.dto.RouteStopDto;
-import openerp.openerpresourceserver.dto.TripDetailsDTO;
-import openerp.openerpresourceserver.dto.TripSummaryDTO;
+import openerp.openerpresourceserver.dto.*;
 import openerp.openerpresourceserver.entity.Trip;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,7 +10,7 @@ import java.util.UUID;
 
 public interface TripService {
 
-    DriverTripsDTO getAllTripsForDriver(String username);
+    List<TripDTO> getAllTripsForDriver(String username);
 
     TripDetailsDTO getTripDetailsForDriver(UUID tripId, String username);
 

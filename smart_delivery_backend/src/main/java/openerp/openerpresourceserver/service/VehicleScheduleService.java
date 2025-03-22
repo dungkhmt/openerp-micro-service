@@ -1,7 +1,6 @@
 package openerp.openerpresourceserver.service;
 
 import openerp.openerpresourceserver.dto.VehicleScheduleDto;
-import openerp.openerpresourceserver.entity.VehicleSchedule;
 
 import java.time.DayOfWeek;
 import java.util.List;

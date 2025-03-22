@@ -29,12 +29,12 @@ public class TripServiceImpl implements TripService {
     private final HubRepo hubRepo;
     private final VehicleRepository vehicleRepository;
     private final VehicleDriverRepository vehicleDriverRepository;
-
+    private final TripOrderRepository tripOrderRepository;
     /**
      * Get all trips for a driver categorized as active, scheduled, or completed
      */
     @Override
-    public DriverTripsDTO getAllTripsForDriver(String username) {
+    public List<TripDTO> getAllTripsForDriver(String username) {
         // Find driver by username
         Driver driver = driverRepo.findByUsername(username);
         if (driver == null) {
@@ -42,31 +42,11 @@ public class TripServiceImpl implements TripService {
         }
 
         // Get all trips assigned to this driver
-        List<Trip> allTrips = tripRepository.findAll().stream()
-                .filter(trip -> trip.getDriverId().equals(driver.getId()))
-                .collect(Collectors.toList());
+        List<Trip> allTrips = tripRepository.findByDriverId(driver.getId());
 
         // Convert and categorize trips
-        List<TripDTO> activeTrips = allTrips.stream()
-                .filter(trip -> "IN_PROGRESS".equals(trip.getStatus()))
-                .map(this::convertToTripDTO)
+        return allTrips.stream().map(this::convertToTripDTO)
                 .collect(Collectors.toList());
-
-        List<TripDTO> scheduledTrips = allTrips.stream()
-                .filter(trip -> "PLANNED".equals(trip.getStatus()))
-                .map(this::convertToTripDTO)
-                .collect(Collectors.toList());
-
-        List<TripDTO> completedTrips = allTrips.stream()
-                .filter(trip -> "COMPLETED".equals(trip.getStatus()))
-                .map(this::convertToTripDTO)
-                .collect(Collectors.toList());
-
-        return DriverTripsDTO.builder()
-                .activeTrips(activeTrips)
-                .scheduledTrips(scheduledTrips)
-                .completedTrips(completedTrips)
-                .build();
     }
 
     /**
@@ -90,7 +70,7 @@ public class TripServiceImpl implements TripService {
         }
 
         // Find the route for this trip
-        UUID routeId = trip.getRouteVehicleId(); // This now represents the route ID directly
+        UUID routeId = trip.getRouteScheduleId(); // This now represents the route ID directly
         Route route = routeRepository.findById(routeId)
                 .orElseThrow(() -> new NotFoundException("Route not found"));
 
@@ -116,7 +96,7 @@ public class TripServiceImpl implements TripService {
             // Count orders for this stop
             int orderCount = 0;
             if (i > 0) { // First stop is usually the starting hub with 0 pickups
-                List<Order> stopOrders = orderRepo.findByRouteVehicleId(trip.getRouteVehicleId()).stream()
+                List<Order> stopOrders = orderRepo.findByRouteVehicleId(trip.getRouteScheduleId()).stream()
                         .filter(order -> {
                             // For pickup stops, count orders with origin hub matching this stop
                             // For delivery stops, count orders with destination hub matching this stop
@@ -148,7 +128,7 @@ public class TripServiceImpl implements TripService {
         }
 
         // Get all orders for this trip
-        List<Order> tripOrders = orderRepo.findByRouteVehicleId(trip.getRouteVehicleId());
+        List<Order> tripOrders = orderRepo.findByRouteVehicleId(trip.getRouteScheduleId());
         List<OrderSummaryDTO> orderDTOs = tripOrders.stream()
                 .map(OrderSummaryDTO::new)
                 .collect(Collectors.toList());
@@ -252,7 +232,7 @@ public class TripServiceImpl implements TripService {
         }
 
         // Get route stops to check if we're at the last stop
-        List<RouteStop> stops = routeStopRepository.findByRouteIdOrderByStopSequence(trip.getRouteVehicleId());
+        List<RouteStop> stops = routeStopRepository.findByRouteIdOrderByStopSequence(trip.getRouteScheduleId());
 
         // Check if already at last stop
         if (trip.getCurrentStopIndex() >= stops.size() - 1) {
@@ -264,7 +244,7 @@ public class TripServiceImpl implements TripService {
         RouteStop nextStop = stops.get(trip.getCurrentStopIndex() + 1);
 
         // For orders that are picked up at this stop, update status
-        List<Order> ordersToUpdate = orderRepo.findByRouteVehicleId(trip.getRouteVehicleId()).stream()
+        List<Order> ordersToUpdate = orderRepo.findByRouteVehicleId(trip.getRouteScheduleId()).stream()
                 .filter(order -> {
                     // If this is a pickup stop for the order
                     return order.getOriginHubId() != null &&
@@ -279,7 +259,7 @@ public class TripServiceImpl implements TripService {
         }
 
         // For orders that are being delivered to this stop, update status
-        List<Order> deliveredOrders = orderRepo.findByRouteVehicleId(trip.getRouteVehicleId()).stream()
+        List<Order> deliveredOrders = orderRepo.findByRouteVehicleId(trip.getRouteScheduleId()).stream()
                 .filter(order -> {
                     // If this is a delivery stop for the order
                     return order.getFinalHubId() != null &&
@@ -339,7 +319,7 @@ public class TripServiceImpl implements TripService {
         }
 
         // Update any remaining orders
-        List<Order> remainingOrders = orderRepo.findByRouteVehicleId(trip.getRouteVehicleId()).stream()
+        List<Order> remainingOrders = orderRepo.findByRouteVehicleId(trip.getRouteScheduleId()).stream()
                 .filter(order -> order.getStatus() == OrderStatus.DELIVERING)
                 .collect(Collectors.toList());
 
@@ -365,7 +345,7 @@ public class TripServiceImpl implements TripService {
         trip.setStatus("COMPLETED");
         trip.setEndTime(endTime);
         trip.setCompletionNotes(completionNotes);
-        trip.setOrdersDelivered(orderRepo.findByRouteVehicleId(trip.getRouteVehicleId()).size());
+        trip.setOrdersDelivered(orderRepo.findByRouteVehicleId(trip.getRouteScheduleId()).size());
 
         Trip completedTrip = tripRepository.save(trip);
 
@@ -376,7 +356,7 @@ public class TripServiceImpl implements TripService {
         }
 
         // Get route stops
-        List<RouteStop> stops = routeStopRepository.findByRouteIdOrderByStopSequence(trip.getRouteVehicleId());
+        List<RouteStop> stops = routeStopRepository.findByRouteIdOrderByStopSequence(trip.getRouteScheduleId());
 
         // Count failed orders if any
         int ordersFailed = 0; // In a real implementation, track failed deliveries
@@ -399,7 +379,7 @@ public class TripServiceImpl implements TripService {
      */
     @Transactional
     @Override
-    public Trip createTripForToday(UUID routeVehicleId, String username) {
+    public Trip createTripForToday(UUID routeScheduleId, String username) {
         // Find driver by username
         Driver driver = driverRepo.findByUsername(username);
         if (driver == null) {
@@ -407,14 +387,14 @@ public class TripServiceImpl implements TripService {
         }
 
         // Check if there's already an active trip for this route vehicle
-        Optional<Trip> existingTrip = tripRepository.findActiveByRouteVehicleId(routeVehicleId);
+        Optional<Trip> existingTrip = tripRepository.findActiveByRouteScheduleId(routeScheduleId);
         if (existingTrip.isPresent()) {
             return existingTrip.get();
         }
 
         // Create new trip
         Trip trip = Trip.builder()
-                .routeVehicleId(routeVehicleId)
+                .routeScheduleId(routeScheduleId)
                 .driverId(driver.getId())
                 .status("PLANNED")
                 .currentStopIndex(0)
@@ -432,22 +412,25 @@ public class TripServiceImpl implements TripService {
      * Convert Trip entity to TripDTO
      */
     private TripDTO convertToTripDTO(Trip trip) {
-        UUID routeId = trip.getRouteVehicleId();
+        UUID routeId = trip.getRouteScheduleId();
         Route route = routeRepository.findById(routeId).orElse(null);
 
         List<RouteStop> routeStops = routeStopRepository.findByRouteIdOrderByStopSequence(routeId);
 
-        List<Order> tripOrders = orderRepo.findByRouteVehicleId(trip.getRouteVehicleId());
-
+        List<TripOrder> tripOrders = tripOrderRepository.findByTripId(trip.getId());
+        List<Optional<Order>> orders = tripOrders.stream().map(tripOrder -> orderRepo.findById(tripOrder.getOrderId())).toList();
+        if(orders.size() != tripOrders.size()) {
+            throw new IllegalStateException("Trip order IDs do not match order IDs in the order table");
+        }
         // Count delivered orders
-        int ordersDelivered = (int) tripOrders.stream()
-                .filter(order -> order.getStatus() == OrderStatus.DELIVERED ||
-                        order.getStatus() == OrderStatus.COMPLETED)
+        int ordersDelivered = (int) orders.stream()
+                .filter(order -> order.get().getStatus() == OrderStatus.DELIVERED ||
+                        order.get().getStatus() == OrderStatus.COMPLETED)
                 .count();
 
         return TripDTO.builder()
                 .id(trip.getId())
-                .routeId(routeId)
+                .routeScheduleId(routeId)
                 .routeName(route != null ? route.getRouteName() : "Unknown Route")
                 .status(trip.getStatus())
                 .startTime(trip.getStartTime())

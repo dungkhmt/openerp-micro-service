@@ -43,4 +43,6 @@ public interface ScheduleVehicleAssignmentRepository extends JpaRepository<Sched
 
     // Find all active assignments with unassignedAt = null
     List<ScheduleVehicleAssignment> findByIsActiveTrueAndUnassignedAtIsNull();
+
+    List<ScheduleVehicleAssignment> findAllByVehicleId(UUID vehicleId);
 }

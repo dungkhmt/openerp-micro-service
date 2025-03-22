@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.DayOfWeek;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -14,8 +15,9 @@ import java.util.UUID;
 @AllArgsConstructor
 public class TripDTO {
     private UUID id;
-    private UUID routeId;
+    private UUID routeScheduleId;
     private String routeName;
+    private DayOfWeek dayOfWeek;
     private String status; // "PLANNED", "IN_PROGRESS", "COMPLETED", "CANCELLED"
     private Instant startTime;
     private Instant endTime;

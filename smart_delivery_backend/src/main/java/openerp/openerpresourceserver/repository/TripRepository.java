@@ -13,15 +13,17 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface TripRepository extends JpaRepository<Trip, UUID> {
-    List<Trip> findByRouteVehicleId(UUID routeVehicleId);
-
-    Optional<Trip> findActiveByRouteVehicleId(UUID routeVehicleId);
+    List<Trip> findByRouteScheduleId(UUID routeVehicleId);
 
     List<Trip> findActiveByDriverId(UUID id);
 
-    @Query("SELECT t FROM Trip t WHERE t.routeVehicleId = :routeVehicleId AND t.startTime >= :startTime AND t.startTime < :endTime")
-    List<Trip> findByRouteVehicleIdAndDateRange(
-            @Param("routeVehicleId") UUID routeVehicleId,
+    @Query("SELECT t FROM Trip t WHERE t.routeScheduleId = :routeScheduleId AND t.startTime >= :startTime AND t.startTime < :endTime")
+    List<Trip> findByRouteScheduleIdAndDateRange(
+            @Param("routeScheduleId") UUID routeScheduleId,
             @Param("startTime") Instant startTime,
             @Param("endTime") Instant endTime);
+
+    Optional<Trip> findActiveByRouteScheduleId(UUID routeScheduleId);
+
+    List<Trip> findByDriverId(UUID id);
 }

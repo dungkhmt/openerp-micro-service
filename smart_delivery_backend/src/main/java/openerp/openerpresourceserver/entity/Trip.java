@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.time.DayOfWeek;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -27,15 +28,17 @@ public class Trip {
      * Reference to the route this trip is on
      * Note: This now references the Route directly, not RouteVehicle
      */
-    @Column(name = "route_vehicle_id", nullable = false)
-    private UUID routeVehicleId;
+    @Column(name = "route_schelude_id", nullable = false)
+    private UUID routeScheduleId;
 
     /**
      * The driver assigned to this trip
      */
     @Column(name = "driver_id", nullable = false)
     private UUID driverId;
-
+    @Column(name = "day_of_week")
+    @Enumerated(EnumType.STRING)
+    private DayOfWeek dayOfWeek;
     /**
      * When the trip started
      */

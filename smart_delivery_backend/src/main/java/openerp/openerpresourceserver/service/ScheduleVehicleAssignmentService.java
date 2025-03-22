@@ -61,4 +61,6 @@ public interface ScheduleVehicleAssignmentService {
      * Get assignments for a route by day of week
      */
     List<ScheduleVehicleAssignmentDto> getAssignmentsByRouteAndDay(UUID routeId, String dayOfWeek);
+
+    List<ScheduleVehicleAssignmentDto> getAssignmentsByDriverUsername(String name);
 }

@@ -28,11 +28,12 @@ public class DriverController {
      */
     @PreAuthorize("hasRole('DRIVER')")
     @GetMapping("/trips")
-    public ResponseEntity<DriverTripsDTO> getAllDriverTrips(Principal principal) {
+    public ResponseEntity<List<TripDTO>> getAllDriverTrips(Principal principal) {
         String username = principal.getName();
-        DriverTripsDTO tripsDTO = tripService.getAllTripsForDriver(username);
+        List<TripDTO> tripsDTO = tripService.getAllTripsForDriver(username);
         return ResponseEntity.ok(tripsDTO);
     }
+
 
     /**
      * Get a specific trip with all details (including stops and orders)

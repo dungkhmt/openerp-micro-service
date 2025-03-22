@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.repository;
 
+import openerp.openerpresourceserver.entity.Order;
 import openerp.openerpresourceserver.entity.TripOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -47,4 +48,6 @@ public interface TripOrderRepository extends JpaRepository<TripOrder, UUID> {
      * Delete all TripOrder entities for a specific order
      */
     void deleteByOrderId(UUID orderId);
+
+    List<TripOrder> findByTripId(UUID id);
 }

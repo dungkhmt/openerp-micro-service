@@ -112,7 +112,7 @@ public class TripAssignmentServiceImpl implements TripAssignmentService {
 
             // Create a new trip
             Trip newTrip = Trip.builder()
-                    .routeVehicleId(selectedRoute.getRouteId())
+                    .routeScheduleId(selectedRoute.getRouteId())
                     .driverId(vehicleDriver.getDriverId())
                     .startTime(scheduledInstant)
                     .status("PLANNED")
@@ -303,7 +303,7 @@ public class TripAssignmentServiceImpl implements TripAssignmentService {
             tripOrderRepository.save(tripOrder);
 
             // Update order with trip/vehicle info
-            order.setRouteId(trip.getRouteVehicleId());
+            order.setRouteId(trip.getRouteScheduleId());
             order.setDriverId(trip.getDriverId());
 
             // Find driver name
@@ -348,7 +348,7 @@ public class TripAssignmentServiceImpl implements TripAssignmentService {
         tripOrderRepository.save(tripOrder);
 
         // Update order with trip/vehicle info (same as in assignClusterToTrip)
-        order.setRouteId(trip.getRouteVehicleId());
+        order.setRouteId(trip.getRouteScheduleId());
         order.setDriverId(trip.getDriverId());
 
         // Find driver name
@@ -485,7 +485,7 @@ public class TripAssignmentServiceImpl implements TripAssignmentService {
 
             // Update order status
             order.setStatus(OrderStatus.DELIVERING);
-            order.setRouteId(trip.getRouteVehicleId());
+            order.setRouteId(trip.getRouteScheduleId());
             order.setDriverId(trip.getDriverId());
             orderRepo.save(order);
         }

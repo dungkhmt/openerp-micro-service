@@ -1,25 +1,15 @@
 package openerp.openerpresourceserver.controller;
 
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.dto.RouteScheduleDto;
-import openerp.openerpresourceserver.dto.RouteScheduleRequestDto;
 import openerp.openerpresourceserver.dto.StartEndTimeDto;
-import openerp.openerpresourceserver.dto.VehicleScheduleDto;
-import openerp.openerpresourceserver.entity.Route;
-import openerp.openerpresourceserver.entity.RouteSchedule;
-import openerp.openerpresourceserver.entity.VehicleSchedule;
 import openerp.openerpresourceserver.service.RouteScheduleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.DayOfWeek;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;

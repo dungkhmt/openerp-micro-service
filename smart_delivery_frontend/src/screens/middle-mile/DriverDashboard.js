@@ -6,6 +6,7 @@ import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import RouteIcon from '@mui/icons-material/Route';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import PersonIcon from '@mui/icons-material/Person';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { useHistory } from 'react-router-dom';
 import { errorNoti, successNoti } from 'utils/notification';
 
@@ -13,29 +14,53 @@ const DriverDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [vehicle, setVehicle] = useState(null);
     const username = useSelector((state) => state.auth.username);
-    const [routes, setRoutes] = useState([]);
+    const [assignments, setAssignments] = useState([]);
     const [currentOrders, setCurrentOrders] = useState([]);
     const [pendingOrders, setPendingOrders] = useState([]);
     const [hubDetails, setHubDetails] = useState({});
     const [driverId, setDriverId] = useState(null);
     const history = useHistory();
     const authState = useSelector((state) => state.auth);
+
+    // New state for weekday selection
+    const [selectedDay, setSelectedDay] = useState(new Date().getDay() || 7); // Default to today or Sunday if today is 0
+    const [filteredAssignments, setFilteredAssignments] = useState([]);
+
+    // Map numeric day of week to string
+    const dayOfWeekMap = {
+        1: 'MONDAY',
+        2: 'TUESDAY',
+        3: 'WEDNESDAY',
+        4: 'THURSDAY',
+        5: 'FRIDAY',
+        6: 'SATURDAY',
+        7: 'SUNDAY'
+    };
+
+    // Map for displaying proper names
+    const dayDisplayNames = {
+        1: 'Monday',
+        2: 'Tuesday',
+        3: 'Wednesday',
+        4: 'Thursday',
+        5: 'Friday',
+        6: 'Saturday',
+        7: 'Sunday'
+    };
+
     useEffect(() => {
         async function fetchId() {
             await request(
                 "get",
-                `/user/get-driver/${username}`
-                ,
+                `/user/get-driver/${username}`,
                 (res) => {
                     setDriverId(res.data.id);
                 }
             )
-
-
         }
-
         fetchId();
     }, []);
+
     useEffect(() => {
         const fetchDriverData = async () => {
             try {
@@ -45,8 +70,8 @@ const DriverDashboard = () => {
                     setVehicle(res.data);
                 });
                 // Get routes assigned to the driver
-                await request('get', `/smdeli/driver/routes`, (res) => {
-                    setRoutes(res.data || []);
+                await request('get', `/smdeli/schedule-assignments/driver/get`, (res) => {
+                    setAssignments(res.data || []);
                 });
                 // Get current orders being delivered
                 await request('get', `/smdeli/driver/current-orders`, (res) => {
@@ -71,6 +96,28 @@ const DriverDashboard = () => {
         };
         fetchDriverData();
     }, [authState.hubId]);
+
+    // Effect to filter assignments by selected day of week
+    useEffect(() => {
+        if (assignments.length > 0) {
+            const selectedDayString = dayOfWeekMap[selectedDay];
+            const filtered = assignments.filter(
+                assignment => assignment.dayOfWeek === selectedDayString
+            );
+            setFilteredAssignments(filtered);
+        }
+    }, [selectedDay, assignments]);
+
+    // Get assignment count for a day of week
+    const getAssignmentCountForDay = (day) => {
+        const dayString = dayOfWeekMap[day];
+        return assignments.filter(assignment => assignment.dayOfWeek === dayString).length;
+    };
+
+    // Check if day has assignments
+    const hasAssignmentsForDay = (day) => {
+        return getAssignmentCountForDay(day) > 0;
+    };
 
     const handleViewOrders = (routeVehicleId) => {
         history.push(`/middle-mile/driver/orders/${routeVehicleId}`);
@@ -125,7 +172,7 @@ const DriverDashboard = () => {
     return (
         <Box sx={{ p: 3 }}>
             <Typography variant="h4" gutterBottom>
-                Driver Dashboard
+                 Dashboard
             </Typography>
             <Grid container spacing={3}>
                 {/* Vehicle Information */}
@@ -240,212 +287,149 @@ const DriverDashboard = () => {
                         </CardContent>
                     </Card>
                 </Grid>
-                {/* Active Routes */}
+
+                {/* Weekly Assignment View - New section that replaces "Assigned Assignments" */}
                 <Grid item xs={12}>
                     <Card>
                         <CardContent>
                             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                <RouteIcon fontSize="large" color="primary" sx={{ mr: 2 }} />
+                                <CalendarTodayIcon fontSize="large" color="primary" sx={{ mr: 2 }} />
                                 <Typography variant="h6">
-                                    Assigned Routes
+                                    Weekly Assignments
                                 </Typography>
                             </Box>
                             <Divider sx={{ mb: 2 }} />
-                            {routes.length > 0 ? (
-                                <Grid container spacing={2}>
-                                    {routes.map((route) => (
-                                        <Grid item xs={12} md={6} key={route.routeVehicleDto?.id}>
-                                            <Card variant="outlined">
-                                                <CardContent>
-                                                    <Typography variant="h6" gutterBottom>
-                                                        {route.routeName} ({route.routeCode})
-                                                    </Typography>
-                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                                        <Typography variant="body2" color="text.secondary">
-                                                            Direction:
-                                                        </Typography>
-                                                        <Typography variant="body2" fontWeight="bold">
-                                                            {route.routeVehicleDto?.direction}
-                                                        </Typography>
-                                                    </Box>
-                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                                        <Typography variant="body2" color="text.secondary">
-                                                            Status:
-                                                        </Typography>
-                                                        <Chip
-                                                            label={route.routeVehicleDto?.status || 'PLANNED'}
-                                                            color={
-                                                                route.routeVehicleDto?.status === 'IN_PROGRESS' ? 'warning' :
-                                                                    route.routeVehicleDto?.status === 'COMPLETED' ? 'success' : 'primary'
-                                                            }
-                                                            size="small"
-                                                        />
-                                                    </Box>
-                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                                        <Typography variant="body2" color="text.secondary">
-                                                            Created:
-                                                        </Typography>
-                                                        <Typography variant="body2">
-                                                            {new Date(route.routeVehicleDto?.createdAt).toLocaleString()}
-                                                        </Typography>
-                                                    </Box>
-                                                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
-                                                        <Button
-                                                            variant="outlined"
-                                                            size="small"
-                                                            onClick={() => handleViewRoute(route.routeVehicleDto?.id)}
-                                                        >
-                                                            View Route
-                                                        </Button>
-                                                        <Button
-                                                            variant="outlined"
-                                                            size="small"
-                                                            onClick={() => handleViewOrders(route.routeVehicleDto?.id)}
-                                                        >
-                                                            View Orders
-                                                        </Button>
-                                                        {route.routeVehicleDto?.status === 'PLANNED' && (
-                                                            <Button
-                                                                variant="contained"
-                                                                color="primary"
-                                                                size="small"
-                                                                onClick={() => handleStartTrip(route.routeVehicleDto?.id)}
-                                                            >
-                                                                Start Trip
-                                                            </Button>
-                                                        )}
-                                                        {route.routeVehicleDto?.status === 'IN_PROGRESS' && (
-                                                            <Button
-                                                                variant="contained"
-                                                                color="success"
-                                                                size="small"
-                                                                onClick={() => handleCompleteTrip(route.routeVehicleDto?.id)}
-                                                            >
-                                                                Complete Trip
-                                                            </Button>
-                                                        )}
-                                                    </Box>
-                                                </CardContent>
-                                            </Card>
+
+                            {/* Simple 7 day of week selector */}
+                            <Box sx={{ mb: 3 }}>
+                                <Grid container spacing={1}>
+                                    {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+                                        <Grid item xs={12/7} key={day}>
+                                            <Button
+                                                fullWidth
+                                                variant={selectedDay === day ? "contained" : "outlined"}
+                                                color="primary"
+                                                sx={{
+                                                    height: 60,
+                                                    position: 'relative',
+                                                    borderWidth: hasAssignmentsForDay(day) ? 2 : 1,
+                                                    borderColor: hasAssignmentsForDay(day) ? 'primary.main' : undefined
+                                                }}
+                                                onClick={() => setSelectedDay(day)}
+                                            >
+                                                <Typography>{dayDisplayNames[day]}</Typography>
+                                                {hasAssignmentsForDay(day) && (
+                                                    <Chip
+                                                        label={getAssignmentCountForDay(day)}
+                                                        size="small"
+                                                        color="primary"
+                                                        sx={{
+                                                            position: 'absolute',
+                                                            top: 5,
+                                                            right: 5,
+                                                            height: 16,
+                                                            minWidth: 16,
+                                                            fontSize: '0.6rem',
+                                                            p: 0,
+                                                            bgcolor: selectedDay === day ? 'primary.light' : 'primary.main',
+                                                            color: selectedDay === day ? 'primary.main' : 'primary.contrastText',
+                                                        }}
+                                                    />
+                                                )}
+                                            </Button>
                                         </Grid>
                                     ))}
                                 </Grid>
-                            ) : (
-                                <Typography variant="body1" color="text.secondary" align="center">
-                                    No routes assigned
-                                </Typography>
-                            )}
-                        </CardContent>
-                    </Card>
-                </Grid>
-                {/* Current Orders */}
-                <Grid item xs={12} md={6}>
-                    <Card>
-                        <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                <InventoryIcon fontSize="large" color="primary" sx={{ mr: 2 }} />
-                                <Typography variant="h6">
-                                    Current Orders ({currentOrders.length})
-                                </Typography>
                             </Box>
-                            <Divider sx={{ mb: 2 }} />
-                            {currentOrders.length > 0 ? (
-                                <Box sx={{ maxHeight: 400, overflow: 'auto' }}>
-                                    {currentOrders.map((order) => (
-                                        <Card variant="outlined" sx={{ mb: 1, p: 1 }} key={order.id}>
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <Typography variant="subtitle2" noWrap>
-                                                    Order #{order.id.substring(0, 8)}...
-                                                </Typography>
-                                                <Chip
-                                                    label={order.status}
-                                                    color={order.status === 'DELIVERING' ? 'warning' : 'primary'}
-                                                    size="small"
-                                                />
-                                            </Box>
-                                            <Box sx={{ mt: 1 }}>
-                                                <Typography variant="body2" color="text.secondary">
-                                                    From: {order.senderName} ({order.senderAddress})
-                                                </Typography>
-                                                <Typography variant="body2" color="text.secondary">
-                                                    To: {order.recipientName} ({order.recipientAddress})
-                                                </Typography>
-                                            </Box>
-                                        </Card>
-                                    ))}
-                                </Box>
-                            ) : (
-                                <Typography variant="body1" color="text.secondary" align="center">
-                                    No orders in transit
+
+                            {/* Selected day assignments */}
+                            <Box>
+                                <Typography variant="h6" gutterBottom>
+                                    Assignments for {dayDisplayNames[selectedDay]}
                                 </Typography>
-                            )}
-                            {currentOrders.length > 0 && (
-                                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                                    <Button
-                                        variant="contained"
-                                        onClick={() => history.push('/driver/current-orders')}
-                                    >
-                                        View All Current Orders
-                                    </Button>
-                                </Box>
-                            )}
-                        </CardContent>
-                    </Card>
-                </Grid>
-                {/* Pending Pickups */}
-                <Grid item xs={12} md={6}>
-                    <Card>
-                        <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                <InventoryIcon fontSize="large" color="primary" sx={{ mr: 2 }} />
-                                <Typography variant="h6">
-                                    Pending Pickups at Hub ({pendingOrders.length})
-                                </Typography>
+                                <Divider sx={{ mb: 2 }} />
+
+                                {filteredAssignments.length > 0 ? (
+                                    <Grid container spacing={2}>
+                                        {filteredAssignments.map((assignment) => (
+                                            <Grid item xs={12} md={6} key={assignment.id}>
+                                                <Card variant="outlined">
+                                                    <CardContent>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                                            <LocalShippingIcon color="primary" sx={{ mr: 1 }} fontSize="small" />
+                                                            <Typography variant="subtitle1">
+                                                                Vehicle: {assignment.vehiclePlateNumber}
+                                                            </Typography>
+                                                        </Box>
+
+                                                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                                                            Assignment ID: {assignment.id.substring(0, 8)}...
+                                                        </Typography>
+
+                                                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                                                            Route Schedule: {assignment.routeScheduleId.substring(0, 8)}...
+                                                        </Typography>
+
+                                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                                            <Typography variant="body2" color="text.secondary">
+                                                                Status:
+                                                            </Typography>
+                                                            <Chip
+                                                                label={assignment.active ? "Active" : "Inactive"}
+                                                                color={assignment.active ? "success" : "default"}
+                                                                size="small"
+                                                            />
+                                                        </Box>
+
+                                                        {assignment.startTime && assignment.endTime && (
+                                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                                                <Typography variant="body2" color="text.secondary">
+                                                                    Time:
+                                                                </Typography>
+                                                                <Typography variant="body2">
+                                                                    {assignment.startTime} - {assignment.endTime}
+                                                                </Typography>
+                                                            </Box>
+                                                        )}
+
+                                                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+                                                            <Button
+                                                                variant="outlined"
+                                                                size="small"
+                                                                onClick={() => handleViewRoute(assignment.routeScheduleId)}
+                                                            >
+                                                                View Route
+                                                            </Button>
+                                                            <Button
+                                                                variant="contained"
+                                                                size="small"
+                                                                color="primary"
+                                                            >
+                                                                View Details
+                                                            </Button>
+                                                        </Box>
+                                                    </CardContent>
+                                                </Card>
+                                            </Grid>
+                                        ))}
+                                    </Grid>
+                                ) : (
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 4 }}>
+                                        <CalendarTodayIcon sx={{ fontSize: 60, color: 'text.disabled', mb: 2 }} />
+                                        <Typography variant="h6" color="text.secondary">
+                                            No assignments for {dayDisplayNames[selectedDay]}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Select a different day or check back later
+                                        </Typography>
+                                    </Box>
+                                )}
                             </Box>
-                            <Divider sx={{ mb: 2 }} />
-                            {pendingOrders.length > 0 ? (
-                                <Box sx={{ maxHeight: 400, overflow: 'auto' }}>
-                                    {pendingOrders.map((order) => (
-                                        <Card variant="outlined" sx={{ mb: 1, p: 1 }} key={order.id}>
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <Typography variant="subtitle2" noWrap>
-                                                    Order #{order.id.substring(0, 8)}...
-                                                </Typography>
-                                                <Chip
-                                                    label={order.status}
-                                                    color="info"
-                                                    size="small"
-                                                />
-                                            </Box>
-                                            <Box sx={{ mt: 1 }}>
-                                                <Typography variant="body2" color="text.secondary">
-                                                    Destination: {order.recipientName} ({order.recipientAddress})
-                                                </Typography>
-                                                <Typography variant="body2" color="text.secondary">
-                                                    Created: {new Date(order.createdAt).toLocaleString()}
-                                                </Typography>
-                                            </Box>
-                                        </Card>
-                                    ))}
-                                </Box>
-                            ) : (
-                                <Typography variant="body1" color="text.secondary" align="center">
-                                    No orders waiting for pickup
-                                </Typography>
-                            )}
-                            {pendingOrders.length > 0 && (
-                                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                                    <Button
-                                        variant="contained"
-                                        onClick={() => history.push('/driver/pending-pickups')}
-                                    >
-                                        View All Pending Pickups
-                                    </Button>
-                                </Box>
-                            )}
                         </CardContent>
                     </Card>
                 </Grid>
+
+
             </Grid>
         </Box>
     );

@@ -10,6 +10,12 @@ export const middleMile = {
             text: "Dashboard",
             child: [],
         },
+        {
+            id: "MENU_ROUTE.DRIVER_TRIPS",
+            path: "/middle-mile/driver/schedule",
+            text: "Lịch trình",
+            child: [],
+        },
 
         {
             id: "MENU_ROUTE.SCHEDULE",

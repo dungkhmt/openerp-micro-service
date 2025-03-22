@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -85,10 +86,11 @@ public class ScheduleVehicleAssignmentController {
     /**
      * Get all assignments for a driver
      */
-    @GetMapping("/driver/{driverId}")
+    @GetMapping("/driver/get")
     public ResponseEntity<List<ScheduleVehicleAssignmentDto>> getAssignmentsByDriver(
-            @PathVariable UUID driverId) {
-        return ResponseEntity.ok(assignmentService.getAssignmentsByDriver(driverId));
+            Principal principal) {
+
+        return ResponseEntity.ok(assignmentService.getAssignmentsByDriverUsername(principal.getName()));
     }
 
     /**
