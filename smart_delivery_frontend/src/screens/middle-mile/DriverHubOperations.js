@@ -99,7 +99,7 @@ const DriverHubOperations = () => {
 
             // Get trip details if tripId is provided
             if (tripId) {
-                await request('get', `/smdeli/driver/trip/${tripId}`, (res) => {
+                await request('get', `/smdeli/driver/trips/${tripId}`, (res) => {
                     setTripDetails(res.data);
                 });
             }
@@ -122,14 +122,26 @@ const DriverHubOperations = () => {
             if (operationType === 'pickup') {
                 endpoint = `/smdeli/driver/hub/${hubId}/pending-pickups`;
             } else if (operationType === 'delivery') {
-                endpoint = `/smdeli/driver/hub/${hubId}/pending-deliveries`;
+                // Since there's no specific endpoint for pending deliveries in the backend,
+                // we'll use the current orders and filter them client-side
+                endpoint = `/smdeli/driver/current-orders`;
             } else {
                 showNotification("Invalid operation type", "error");
                 return;
             }
 
             await request('get', endpoint, (res) => {
-                const orders = res.data || [];
+                let orders = res.data || [];
+
+                // If we're in delivery mode, filter for orders that should be delivered to this hub
+                if (operationType === 'delivery') {
+                    orders = orders.filter(order => {
+                        // Add your delivery filtering logic here based on your business rules
+                        // For example, orders with DELIVERING status that match this hub
+                        return order.status === 'DELIVERING';
+                    });
+                }
+
                 setPendingOrders(orders);
 
                 if (orders.length === 0) {
@@ -235,28 +247,24 @@ const DriverHubOperations = () => {
                     'put',
                     '/smdeli/driver/pickup-orders',
                     (res) => {
-                        if (res.data && res.data.success) {
-                            showNotification(`${res.data.orderCount || selectedOrders.length} orders picked up successfully`, "success");
+                        showNotification(`${selectedOrders.length} orders picked up successfully`, "success");
 
-                            // Update orders in state by removing the processed ones
-                            setPendingOrders(pendingOrders.filter(order => !selectedOrders.includes(order.id)));
+                        // Update orders in state by removing the processed ones
+                        setPendingOrders(pendingOrders.filter(order => !selectedOrders.includes(order.id)));
 
-                            // Check if all orders have been processed
-                            const remainingOrders = pendingOrders.filter(order => !selectedOrders.includes(order.id));
-                            if (remainingOrders.length === 0) {
-                                setProcessingComplete(true);
+                        // Check if all orders have been processed
+                        const remainingOrders = pendingOrders.filter(order => !selectedOrders.includes(order.id));
+                        if (remainingOrders.length === 0) {
+                            setProcessingComplete(true);
+                        }
+
+                        setSelectedOrders([]);
+
+                        // If this is part of a trip and all orders were processed, offer to advance
+                        if (tripId && remainingOrders.length === 0) {
+                            if (window.confirm("All orders processed. Advance to next stop?")) {
+                                handleAdvanceToNextStop();
                             }
-
-                            setSelectedOrders([]);
-
-                            // If this is part of a trip and all orders were processed, offer to advance
-                            if (tripId && remainingOrders.length === 0) {
-                                if (window.confirm("All orders processed. Advance to next stop?")) {
-                                    handleAdvanceToNextStop();
-                                }
-                            }
-                        } else {
-                            showNotification(res.data?.message || "Failed to pickup orders", "error");
                         }
                     },
                     {
@@ -271,43 +279,33 @@ const DriverHubOperations = () => {
 
                 await request(
                     'put',
-                    '/smdeli/driver/orders/bulk-deliver',
+                    '/smdeli/driver/deliver-orders',
                     (res) => {
-                        if (res.data && res.data.success) {
-                            showNotification(`${res.data.deliveredOrderCount || selectedOrders.length} orders delivered successfully`, "success");
+                        showNotification(`${selectedOrders.length} orders delivered successfully`, "success");
 
-                            // Update orders in state by removing the processed ones
-                            setPendingOrders(pendingOrders.filter(order => !selectedOrders.includes(order.id)));
+                        // Update orders in state by removing the processed ones
+                        setPendingOrders(pendingOrders.filter(order => !selectedOrders.includes(order.id)));
 
-                            // Check if all orders have been processed
-                            const remainingOrders = pendingOrders.filter(order => !selectedOrders.includes(order.id));
-                            if (remainingOrders.length === 0) {
-                                setProcessingComplete(true);
+                        // Check if all orders have been processed
+                        const remainingOrders = pendingOrders.filter(order => !selectedOrders.includes(order.id));
+                        if (remainingOrders.length === 0) {
+                            setProcessingComplete(true);
+                        }
+
+                        setSelectedOrders([]);
+
+                        // If this is part of a trip and all orders were processed, offer to advance
+                        if (tripId && remainingOrders.length === 0) {
+                            if (window.confirm("All orders processed. Advance to next stop?")) {
+                                handleAdvanceToNextStop();
                             }
-
-                            setSelectedOrders([]);
-
-                            // If this is part of a trip and all orders were processed, offer to advance
-                            if (tripId && remainingOrders.length === 0) {
-                                if (window.confirm("All orders processed. Advance to next stop?")) {
-                                    handleAdvanceToNextStop();
-                                }
-                            }
-                        } else {
-                            showNotification(res.data?.message || "Failed to deliver orders", "error");
                         }
                     },
                     {
                         401: () => showNotification("Unauthorized action", "error"),
                         400: () => showNotification("Unable to deliver orders", "error")
                     },
-                    {
-                        orderIds: selectedOrders,
-                        hubId: hubId,
-                        signatureData: signatureDataURL,
-                        notes: notes,
-                        recipientName: recipientName
-                    }
+                    selectedOrders
                 );
             }
         } catch (error) {
@@ -339,8 +337,8 @@ const DriverHubOperations = () => {
         try {
             setOperationLoading(true);
             await request(
-                'put',
-                `/smdeli/driver/trip/${tripId}/advance-stop`,
+                'post',
+                `/smdeli/driver/trips/${tripId}/advance`,
                 (res) => {
                     showNotification("Advanced to next stop", "success");
                     // Navigate back to the trip view
@@ -478,7 +476,7 @@ const DriverHubOperations = () => {
                         <CardContent>
                             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                                 <LocalShippingIcon sx={{ mr: 2, fontSize: 28 }} />
-                                <Typography variant="h6">Active Trip - Stop {tripDetails.trip?.currentStopIndex + 1} of {tripDetails.stops?.length}</Typography>
+                                <Typography variant="h6">Active Trip - Stop {tripDetails.currentStopIndex + 1} of {tripDetails.stops?.length}</Typography>
                             </Box>
                             <Divider sx={{ mb: 2, borderColor: 'rgba(255,255,255,0.3)' }} />
 
@@ -486,13 +484,13 @@ const DriverHubOperations = () => {
                                 <Grid item xs={12} md={6}>
                                     <Typography variant="body2" sx={{ opacity: 0.8 }}>Current Stop:</Typography>
                                     <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                        {tripDetails.currentStop?.hubName}
+                                        {tripDetails.stops?.[tripDetails.currentStopIndex]?.hubName || 'Unknown'}
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={12} md={6}>
                                     <Typography variant="body2" sx={{ opacity: 0.8 }}>Next Stop:</Typography>
                                     <Typography variant="body1">
-                                        {tripDetails.nextStop?.hubName || 'End of Route'}
+                                        {tripDetails.stops?.[tripDetails.currentStopIndex + 1]?.hubName || 'End of Route'}
                                     </Typography>
                                 </Grid>
                             </Grid>
@@ -502,7 +500,7 @@ const DriverHubOperations = () => {
                                 color="secondary"
                                 sx={{ mt: 2 }}
                                 onClick={handleAdvanceToNextStop}
-                                disabled={!tripDetails.nextStop || !processingComplete}
+                                disabled={!tripDetails.stops?.[tripDetails.currentStopIndex + 1] || !processingComplete}
                             >
                                 Advance to Next Stop
                             </Button>

@@ -30,6 +30,8 @@ public class TripServiceImpl implements TripService {
     private final VehicleRepository vehicleRepository;
     private final VehicleDriverRepository vehicleDriverRepository;
     private final TripOrderRepository tripOrderRepository;
+    private final RouteScheduleRepository routeScheduleRepository;
+
     /**
      * Get all trips for a driver categorized as active, scheduled, or completed
      */
@@ -70,12 +72,13 @@ public class TripServiceImpl implements TripService {
         }
 
         // Find the route for this trip
-        UUID routeId = trip.getRouteScheduleId(); // This now represents the route ID directly
-        Route route = routeRepository.findById(routeId)
+        UUID routeScheduleId = trip.getRouteScheduleId(); // This now represents the route ID directly
+        RouteSchedule routeSchedule = routeScheduleRepository.findById(routeScheduleId)
                 .orElseThrow(() -> new NotFoundException("Route not found"));
 
+        Route route = routeRepository.findById(routeSchedule.getRouteId()).orElseThrow(()-> new NotFoundException());
         // Get route stops
-        List<RouteStop> routeStops = routeStopRepository.findByRouteIdOrderByStopSequence(routeId);
+        List<RouteStop> routeStops = routeStopRepository.findByRouteIdOrderByStopSequence(routeSchedule.getRouteId());
 
         // Convert to DTOs and set status based on current stop index
         List<TripStopDTO> stopDTOs = new ArrayList<>();
@@ -141,7 +144,7 @@ public class TripServiceImpl implements TripService {
 
         return TripDetailsDTO.builder()
                 .id(trip.getId())
-                .routeId(routeId)
+                .routeScheduleId(routeScheduleId)
                 .routeName(route.getRouteName())
                 .status(trip.getStatus())
                 .startTime(trip.getStartTime())
@@ -221,6 +224,8 @@ public class TripServiceImpl implements TripService {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new NotFoundException("Trip not found with ID: " + tripId));
 
+        RouteSchedule routeSchedule = routeScheduleRepository.findById(trip.getRouteScheduleId()).orElseThrow(()-> new NotFoundException("Route not found"));
+
         // Verify driver is assigned to this trip
         if (!trip.getDriverId().equals(driver.getId())) {
             throw new IllegalArgumentException("Driver is not assigned to this trip");
@@ -232,7 +237,7 @@ public class TripServiceImpl implements TripService {
         }
 
         // Get route stops to check if we're at the last stop
-        List<RouteStop> stops = routeStopRepository.findByRouteIdOrderByStopSequence(trip.getRouteScheduleId());
+        List<RouteStop> stops = routeStopRepository.findByRouteIdOrderByStopSequence(routeSchedule.getRouteId());
 
         // Check if already at last stop
         if (trip.getCurrentStopIndex() >= stops.size() - 1) {

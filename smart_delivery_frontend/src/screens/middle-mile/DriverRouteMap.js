@@ -20,7 +20,7 @@ import {
     DialogContentText,
     DialogTitle
 } from '@mui/material';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useHistory, useLocation } from 'react-router-dom';
 import { request } from 'api';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import RouteIcon from '@mui/icons-material/Route';
@@ -39,6 +39,9 @@ import { EnhancedMap } from 'components/map/EnhancedMap';
 
 const DriverRouteMap = () => {
     const { routeVehicleId } = useParams();
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const tripId = queryParams.get('tripId');
     const history = useHistory();
 
     // State variables
@@ -70,7 +73,7 @@ const DriverRouteMap = () => {
         return () => {
             clearInterval(locationInterval);
         };
-    }, [routeVehicleId]);
+    }, [routeVehicleId, tripId]);
 
     // Update current location
     const updateCurrentLocation = () => {
@@ -94,37 +97,16 @@ const DriverRouteMap = () => {
         try {
             setLoading(true);
 
-            // Get route vehicle details
-            await request('get', `/smdeli/middle-mile/vehicle-assignments/${routeVehicleId}`, (res) => {
-                setRouteVehicle(res.data);
-
-                // Get route details and stops if route ID exists
-                if (res.data?.routeId) {
-                    fetchRouteDetails(res.data.routeId);
-                }
-            });
-
-            // Check for active trip
-            await request('get', `/smdeli/driver/trip/active/${routeVehicleId}`, (res) => {
-                    if (res.data) {
-                        setActiveTrip(res.data);
-                        // If we have an active trip, use its current stop index
-                        setCurrentStop(res.data.currentStopIndex + 1); // Convert to 1-based index
-                    } else {
-                        // No active trip, default to first stop
-                        setCurrentStop(1);
-                    }
-                },
-                {
-                    // Handle not found case (no active trip)
-                    404: () => setCurrentStop(1)
-                });
-
-            // Get orders for this route vehicle
-            await fetchOrdersForVehicle();
+            // If we have tripId, fetch trip details directly
+            if (tripId) {
+                await fetchTripDetails();
+            } else {
+                // Get route vehicle details from schedule-assignments
+                await fetchRouteVehicleAssignment();
+            }
 
             // Get driver's hub
-            fetchDriverHub();
+            await fetchDriverHub();
 
             // Get current location
             updateCurrentLocation();
@@ -134,6 +116,112 @@ const DriverRouteMap = () => {
             console.error("Error fetching route data:", error);
             errorNoti("Failed to load route data");
             setLoading(false);
+        }
+    };
+
+    // Fetch trip details
+    const fetchTripDetails = async () => {
+        try {
+            await request('get', `/smdeli/driver/trips/${tripId}`, (tripRes) => {
+                setActiveTrip(tripRes.data);
+
+                // Set current stop from trip data
+                if (tripRes.data && tripRes.data.currentStopIndex !== undefined) {
+                    setCurrentStop(tripRes.data.currentStopIndex + 1); // Convert to 1-based for display
+                }
+
+                // Extract stop sequence
+                if (tripRes.data && tripRes.data.stops) {
+                    setStopSequence(tripRes.data.stops);
+
+                    // Create map points from stops
+                    const points = tripRes.data.stops.map(stop => ({
+                        lat: stop.latitude || 0,
+                        lng: stop.longitude || 0,
+                        name: stop.hubName,
+                        hubId: stop.hubId,
+                        sequence: stop.stopSequence
+                    }));
+                    setMapPoints(points);
+                }
+
+                // Set orders from trip
+                if (tripRes.data && tripRes.data.orders) {
+                    setOrders(tripRes.data.orders);
+
+                    // Find next order to be delivered (first DELIVERING order)
+                    const nextToDeliver = tripRes.data.orders.find(order => order.status === 'DELIVERING');
+                    if (nextToDeliver) {
+                        setNextOrder(nextToDeliver);
+                    }
+
+                    // Create assignments for map component
+                    const orderAssignments = tripRes.data.orders.map(order => ({
+                        id: order.id,
+                        orderId: order.id,
+                        status: order.status
+                    }));
+                    setAssignments(orderAssignments);
+                }
+
+                // Set route info if available
+                if (tripRes.data && tripRes.data.routeId) {
+                    fetchRouteDetails(tripRes.data.routeId);
+                }
+            });
+        } catch (error) {
+            console.error("Error fetching trip details:", error);
+        }
+    };
+
+    // Fetch route vehicle assignment
+    const fetchRouteVehicleAssignment = async () => {
+        try {
+            // First try to use schedule assignments endpoint
+            await request('get', `/smdeli/schedule-assignments/driver/get`, (res) => {
+                const assignments = res.data || [];
+
+                // Find the specific assignment
+                const assignment = assignments.find(a =>
+                    a.id === routeVehicleId || a.routeScheduleId === routeVehicleId);
+
+                if (assignment) {
+                    setRouteVehicle(assignment);
+
+                    // Get route details if route ID exists
+                    if (assignment.routeId) {
+                        fetchRouteDetails(assignment.routeId);
+                    } else if (assignment.routeScheduleId) {
+                        // If we have scheduleId instead, we can try to get route info from it
+                        fetchScheduleDetails(assignment.routeScheduleId);
+                    }
+                } else {
+                    errorNoti("Vehicle assignment not found");
+                }
+            });
+        } catch (error) {
+            console.error("Error fetching route vehicle assignment:", error);
+
+            // Fallback to check if the routeVehicleId is actually a scheduleId
+            try {
+                fetchScheduleDetails(routeVehicleId);
+            } catch (secondError) {
+                console.error("Failed fallback fetching schedule details:", secondError);
+            }
+        }
+    };
+
+    // Fetch schedule details
+    const fetchScheduleDetails = async (scheduleId) => {
+        try {
+            await request('get', `/smdeli/route-scheduler/schedule/${scheduleId}`, (res) => {
+                // If we have a route in the schedule, get its details
+                if (res.data && res.data.routeId) {
+                    fetchRouteDetails(res.data.routeId);
+                }
+            });
+        } catch (error) {
+            console.error("Error fetching schedule details:", error);
         }
     };
 
@@ -147,49 +235,36 @@ const DriverRouteMap = () => {
                 // Get route stops
                 request('get', `/smdeli/middle-mile/routes/${routeId}/stops`, (stopsRes) => {
                     const stops = stopsRes.data || [];
-                    setStopSequence(stops);
 
-                    // Create map points from stops
-                    const points = stops.map(stop => ({
-                        lat: stop.hubLatitude,
-                        lng: stop.hubLongitude,
-                        name: stop.hubName,
-                        hubId: stop.hubId,
-                        sequence: stop.stopSequence
-                    }));
+                    // If we don't already have stops from a trip, use these
+                    if (stopSequence.length === 0) {
+                        setStopSequence(stops);
 
-                    setMapPoints(points);
+                        // Create map points from stops
+                        const points = stops.map(stop => ({
+                            lat: stop.hubLatitude,
+                            lng: stop.hubLongitude,
+                            name: stop.hubName,
+                            hubId: stop.hubId,
+                            sequence: stop.stopSequence
+                        }));
+
+                        setMapPoints(points);
+                    }
+
+                    // Try to get orders using the trip assignment controller endpoint
+                    if (tripId) {
+                        request('get', `/smdeli/trip-assignments/trips/${tripId}/orders`, (ordersRes) => {
+                            const orderData = ordersRes.data || [];
+                            if (orders.length === 0) {
+                                setOrders(orderData);
+                            }
+                        });
+                    }
                 });
             });
         } catch (error) {
             console.error("Error fetching route details:", error);
-        }
-    };
-
-    // Fetch orders for vehicle
-    const fetchOrdersForVehicle = async () => {
-        try {
-            await request('get', `/smdeli/driver/routes/${routeVehicleId}/orders`, (res) => {
-                const orderData = res.data || [];
-                setOrders(orderData);
-
-                // Find next order to be delivered (first DELIVERING order)
-                const nextToDeliver = orderData.find(order => order.status === 'DELIVERING');
-                if (nextToDeliver) {
-                    setNextOrder(nextToDeliver);
-                }
-
-                // Create assignments for map component
-                const orderAssignments = orderData.map(order => ({
-                    id: order.id,
-                    orderId: order.id,
-                    status: order.status
-                }));
-
-                setAssignments(orderAssignments);
-            });
-        } catch (error) {
-            console.error("Error fetching orders:", error);
         }
     };
 
@@ -225,9 +300,9 @@ const DriverRouteMap = () => {
     // Complete trip
     const handleCompleteTrip = () => {
         if (window.confirm("Are you sure you want to complete this trip? This will mark all orders as delivered.")) {
-            const endpoint = activeTrip
-                ? `/smdeli/driver/trip/${activeTrip.id}/complete`
-                : `/smdeli/driver/trip/${routeVehicleId}/complete`;
+            const endpoint = tripId
+                ? `/smdeli/driver/trips/${tripId}/complete`
+                : `/smdeli/driver/trips/${tripId}/complete`;
 
             request(
                 'post',
@@ -246,36 +321,49 @@ const DriverRouteMap = () => {
 
     // Start a new trip
     const handleStartTrip = () => {
+        // Determine which ID to use - routeScheduleId from route vehicle, or the routeVehicleId param
+        const scheduleIdToUse = routeVehicle?.routeScheduleId || routeVehicleId;
+
         request(
             'post',
             `/smdeli/driver/trip/start`,
             (res) => {
                 successNoti("Trip started successfully");
-                setActiveTrip(res.data);
-                setCurrentStop(1);
+
+                // If we got a trip ID back, navigate to the trip with ID
+                if (res.data && res.data.id) {
+                    const newTripId = res.data.id;
+                    history.push(`/middle-mile/driver/route/${routeVehicleId}?tripId=${newTripId}`);
+                } else {
+                    setActiveTrip(res.data);
+                    setCurrentStop(1);
+                }
             },
             {
                 401: () => errorNoti("Unauthorized action"),
                 400: () => errorNoti("Unable to start trip")
             },
-            { routeVehicleId }
+            { routeVehicleId: scheduleIdToUse }
         );
     };
 
     // Advance to next stop
     const handleAdvanceToNextStop = () => {
-        if (!activeTrip) {
+        if (!tripId) {
             errorNoti("No active trip found");
             return;
         }
 
         request(
-            'put',
-            `/smdeli/driver/trip/${activeTrip.id}/advance-stop`,
+            'post',
+            `/smdeli/driver/trips/${tripId}/advance`,
             (res) => {
                 successNoti("Advanced to next stop successfully");
                 setActiveTrip(res.data);
                 setCurrentStop(res.data.currentStopIndex + 1); // Convert to 1-based index
+
+                // Refresh the full trip data
+                fetchTripDetails();
             },
             {
                 401: () => errorNoti("Unauthorized action"),
@@ -315,7 +403,7 @@ const DriverRouteMap = () => {
         setConfirmArrivalDialog(false);
 
         // Navigate to the hub operations page
-        const tripParam = activeTrip ? `&tripId=${activeTrip.id}` : '';
+        const tripParam = tripId ? `&tripId=${tripId}` : '';
         history.push(`/middle-mile/driver/hub/${selectedHub.hubId}/${operationType}?routeVehicleId=${routeVehicleId}${tripParam}`);
     };
 
@@ -352,7 +440,7 @@ const DriverRouteMap = () => {
                         View Orders
                     </Button>
 
-                    {activeTrip ? (
+                    {tripId ? (
                         <Button
                             variant="contained"
                             color="success"
@@ -524,7 +612,7 @@ const DriverRouteMap = () => {
                                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                         <PlaceIcon fontSize="small" color="action" sx={{ mr: 0.5 }} />
                                                         <Typography variant="body2" color="text.secondary" noWrap>
-                                                            {stop.hubAddress || 'No address available'}
+                                                            {stop.address || stop.hubAddress || 'No address available'}
                                                         </Typography>
                                                     </Box>
                                                 </Box>

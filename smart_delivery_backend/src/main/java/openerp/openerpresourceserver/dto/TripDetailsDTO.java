@@ -19,6 +19,7 @@ public class TripDetailsDTO {
     private String routeName;
     private String status;
     private Instant startTime;
+    private UUID routeScheduleId;
     private Instant endTime;
     private Integer currentStopIndex;
     private Integer totalStops;

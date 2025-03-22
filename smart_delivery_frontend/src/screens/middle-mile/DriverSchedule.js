@@ -71,7 +71,19 @@ const DriverSchedule = () => {
         try {
             // Get all trips for the driver
             await request('get', '/smdeli/driver/trips', (res) => {
-                setTrips(res.data || { activeTrips: [], scheduledTrips: [], completedTrips: [] });
+                // If the backend returns a structured object with trip categories
+                if (res.data && typeof res.data === 'object' && (res.data.activeTrips || res.data.scheduledTrips)) {
+                    setTrips(res.data);
+                } else {
+                    // If the backend returns a flat list of trips, categorize them here
+                    const allTrips = res.data || [];
+                    const categorizedTrips = {
+                        activeTrips: allTrips.filter(trip => trip.status === 'IN_PROGRESS'),
+                        scheduledTrips: allTrips.filter(trip => trip.status === 'PLANNED'),
+                        completedTrips: allTrips.filter(trip => trip.status === 'COMPLETED')
+                    };
+                    setTrips(categorizedTrips);
+                }
             });
 
             // Get assigned vehicle
@@ -166,8 +178,9 @@ const DriverSchedule = () => {
         }
     };
 
+    // Navigate to hub operations for pickup/delivery
     const handleHubOperation = (tripId, hubId, operationType) => {
-        history.push(`/driver/hub/${hubId}/${operationType}?tripId=${tripId}`);
+        history.push(`/middle-mile/driver/hub/${hubId}/${operationType}?tripId=${tripId}`);
     };
 
     // If user wants to create a trip for today
@@ -192,7 +205,7 @@ const DriverSchedule = () => {
                     401: () => errorNoti("Unauthorized action"),
                     400: () => errorNoti("Unable to create trip")
                 },
-                { routeScheduleId }
+                { routeVehicleId: routeScheduleId }
             );
         } catch (error) {
             console.error("Error creating trip:", error);
@@ -263,31 +276,31 @@ const DriverSchedule = () => {
                                                                     size="small"
                                                                 />
                                                             </Box>
-                                                        {trip.dayOfWeek && (
-                                                            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                                                        Day: {formatDayOfWeek(trip.dayOfWeek)}
-                                                    </Typography>
-                                                    )}
-                                                    }
-                                                    secondary={
-                                                        <Box sx={{ mt: 1 }}>
-                                                            <Typography variant="body2" color="text.secondary">
-                                                                Stop {trip.currentStopIndex + 1} of {trip.totalStops}
-                                                            </Typography>
-                                                            <Typography variant="body2" color="text.secondary">
-                                                                Orders: {trip.ordersDelivered}/{trip.ordersCount}
-                                                            </Typography>
-                                                            {trip.startTime && (
+                                                        }
+                                                        secondary={
+                                                            <Box sx={{ mt: 1 }}>
+                                                                {trip.dayOfWeek && (
+                                                                    <Typography variant="body2" color="text.secondary">
+                                                                        Day: {formatDayOfWeek(trip.dayOfWeek)}
+                                                                    </Typography>
+                                                                )}
                                                                 <Typography variant="body2" color="text.secondary">
-                                                                    Started: {new Date(trip.startTime).toLocaleTimeString()}
+                                                                    Stop {trip.currentStopIndex + 1} of {trip.totalStops}
                                                                 </Typography>
-                                                            )}
-                                                        </Box>
-                                                    }
-                                                />
-                                            </ListItem>
+                                                                <Typography variant="body2" color="text.secondary">
+                                                                    Orders: {trip.ordersDelivered}/{trip.ordersCount}
+                                                                </Typography>
+                                                                {trip.startTime && (
+                                                                    <Typography variant="body2" color="text.secondary">
+                                                                        Started: {new Date(trip.startTime).toLocaleTimeString()}
+                                                                    </Typography>
+                                                                )}
+                                                            </Box>
+                                                        }
+                                                    />
+                                                </ListItem>
                                             </Paper>
-                                            ))}
+                                        ))}
                                     </List>
                                 </>
                             )}
@@ -325,26 +338,26 @@ const DriverSchedule = () => {
                                                                     size="small"
                                                                 />
                                                             </Box>
-                                                        {trip.dayOfWeek && (
-                                                            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                                                        Day: {formatDayOfWeek(trip.dayOfWeek)}
-                                                    </Typography>
-                                                    )}
-                                                    }
-                                                    secondary={
-                                                        <Box sx={{ mt: 1 }}>
-                                                            <Typography variant="body2" color="text.secondary">
-                                                                Stops: {trip.totalStops}
-                                                            </Typography>
-                                                            <Typography variant="body2" color="text.secondary">
-                                                                Orders: {trip.ordersCount}
-                                                            </Typography>
-                                                        </Box>
-                                                    }
-                                                />
-                                            </ListItem>
+                                                        }
+                                                        secondary={
+                                                            <Box sx={{ mt: 1 }}>
+                                                                {trip.dayOfWeek && (
+                                                                    <Typography variant="body2" color="text.secondary">
+                                                                        Day: {formatDayOfWeek(trip.dayOfWeek)}
+                                                                    </Typography>
+                                                                )}
+                                                                <Typography variant="body2" color="text.secondary">
+                                                                    Stops: {trip.totalStops}
+                                                                </Typography>
+                                                                <Typography variant="body2" color="text.secondary">
+                                                                    Orders: {trip.ordersCount}
+                                                                </Typography>
+                                                            </Box>
+                                                        }
+                                                    />
+                                                </ListItem>
                                             </Paper>
-                                            ))}
+                                        ))}
                                     </List>
                                 </>
                             )}
@@ -382,26 +395,26 @@ const DriverSchedule = () => {
                                                                     size="small"
                                                                 />
                                                             </Box>
-                                                        {trip.dayOfWeek && (
-                                                            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                                                        Day: {formatDayOfWeek(trip.dayOfWeek)}
-                                                    </Typography>
-                                                    )}
-                                                    }
-                                                    secondary={
-                                                        <Box sx={{ mt: 1 }}>
-                                                            <Typography variant="body2" color="text.secondary">
-                                                                Completed at: {new Date(trip.endTime).toLocaleTimeString()}
-                                                            </Typography>
-                                                            <Typography variant="body2" color="text.secondary">
-                                                                Orders: {trip.ordersDelivered}/{trip.ordersCount}
-                                                            </Typography>
-                                                        </Box>
-                                                    }
-                                                />
-                                            </ListItem>
+                                                        }
+                                                        secondary={
+                                                            <Box sx={{ mt: 1 }}>
+                                                                {trip.dayOfWeek && (
+                                                                    <Typography variant="body2" color="text.secondary">
+                                                                        Day: {formatDayOfWeek(trip.dayOfWeek)}
+                                                                    </Typography>
+                                                                )}
+                                                                <Typography variant="body2" color="text.secondary">
+                                                                    Completed at: {new Date(trip.endTime).toLocaleTimeString()}
+                                                                </Typography>
+                                                                <Typography variant="body2" color="text.secondary">
+                                                                    Orders: {trip.ordersDelivered}/{trip.ordersCount}
+                                                                </Typography>
+                                                            </Box>
+                                                        }
+                                                    />
+                                                </ListItem>
                                             </Paper>
-                                            ))}
+                                        ))}
                                     </List>
                                 </>
                             )}
@@ -427,58 +440,6 @@ const DriverSchedule = () => {
                         </CardContent>
                     </Card>
 
-                    {/* Vehicle Information Card */}
-                    {vehicle && !selectedTrip && (
-                        <Card sx={{ mt: 3 }}>
-                            <CardHeader
-                                title={
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <LocalShippingIcon sx={{ mr: 1 }} />
-                                        <Typography variant="h6">Your Vehicle</Typography>
-                                    </Box>
-                                }
-                            />
-                            <Divider />
-                            <CardContent>
-                                <Grid container spacing={2}>
-                                    <Grid item xs={6}>
-                                        <Typography variant="subtitle2" color="text.secondary">
-                                            Plate Number
-                                        </Typography>
-                                        <Typography variant="body1" gutterBottom fontWeight="bold">
-                                            {vehicle.plateNumber}
-                                        </Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="subtitle2" color="text.secondary">
-                                            Type
-                                        </Typography>
-                                        <Typography variant="body1" gutterBottom>
-                                            {vehicle.vehicleType}
-                                        </Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="subtitle2" color="text.secondary">
-                                            Status
-                                        </Typography>
-                                        <Chip
-                                            label={vehicle.status}
-                                            color={vehicle.status === 'AVAILABLE' ? 'success' : 'warning'}
-                                            size="small"
-                                        />
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="subtitle2" color="text.secondary">
-                                            Model
-                                        </Typography>
-                                        <Typography variant="body1" gutterBottom>
-                                            {vehicle.manufacturer} {vehicle.model}
-                                        </Typography>
-                                    </Grid>
-                                </Grid>
-                            </CardContent>
-                        </Card>
-                    )}
                 </Grid>
 
                 {/* Trip Details Section */}
