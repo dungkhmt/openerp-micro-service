@@ -11,8 +11,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ModelResponseCreatePurchaseOrder {
-    PurchaseOrder po;
-    List<SalesHistoryItem> predict;
-
+public class PurchaseOrder {
+    private String date;
+    List<OrderItem> orderItems;
 }
