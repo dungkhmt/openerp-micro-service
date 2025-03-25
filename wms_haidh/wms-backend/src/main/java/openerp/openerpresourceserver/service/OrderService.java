@@ -9,8 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import openerp.openerpresourceserver.entity.Order;
-import openerp.openerpresourceserver.entity.projection.CustomerOrderProjection;
-import openerp.openerpresourceserver.entity.projection.OrderProjection;
+import openerp.openerpresourceserver.projection.CustomerOrderProjection;
+import openerp.openerpresourceserver.projection.OrderProjection;
 import openerp.openerpresourceserver.repository.OrderRepository;
 
 @Service

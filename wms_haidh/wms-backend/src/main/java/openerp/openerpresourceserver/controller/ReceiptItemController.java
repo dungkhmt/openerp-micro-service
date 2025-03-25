@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.dto.request.ReceiptItemCreateRequest;
 import openerp.openerpresourceserver.entity.ReceiptItem;
-import openerp.openerpresourceserver.entity.projection.ReceiptItemProjection;
-import openerp.openerpresourceserver.model.request.ReceiptItemRequest;
+import openerp.openerpresourceserver.projection.ReceiptItemProjection;
 import openerp.openerpresourceserver.service.ReceiptItemService;
 
 @RestController
@@ -35,7 +35,7 @@ public class ReceiptItemController {
 	}
 
 	@PostMapping
-	public ResponseEntity<?> createReceiptItem(@RequestBody ReceiptItemRequest request) {
+	public ResponseEntity<?> createReceiptItem(@RequestBody ReceiptItemCreateRequest request) {
 		try {
 			ReceiptItem receiptItem = receiptItemService.createReceiptItem(request);
 			return ResponseEntity.ok(receiptItem);

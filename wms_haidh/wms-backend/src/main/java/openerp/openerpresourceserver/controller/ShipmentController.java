@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.dto.request.ShipmentCreateRequest;
 import openerp.openerpresourceserver.entity.Shipment;
-import openerp.openerpresourceserver.model.request.ShipmentRequest;
 import openerp.openerpresourceserver.service.ShipmentService;
 
 @RestController
@@ -42,7 +42,7 @@ public class ShipmentController {
 	}
 
 	@PostMapping
-    public ResponseEntity<Shipment> createShipment(@RequestBody ShipmentRequest request) {
+    public ResponseEntity<Shipment> createShipment(@RequestBody ShipmentCreateRequest request) {
         Shipment shipment = shipmentService.createShipment(request);
         return ResponseEntity.ok(shipment);
     }

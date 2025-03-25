@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.dto.request.DeliveryPersonCreateRequest;
 import openerp.openerpresourceserver.entity.DeliveryPerson;
-import openerp.openerpresourceserver.entity.projection.DeliveryPersonProjection;
-import openerp.openerpresourceserver.model.request.DeliveryPersonRequest;
+import openerp.openerpresourceserver.projection.DeliveryPersonProjection;
 import openerp.openerpresourceserver.service.DeliveryPersonService;
 
 @RestController
@@ -50,7 +50,7 @@ public class DeliveryPersonController {
     }
 	
 	@PostMapping
-    public ResponseEntity<Boolean> createDeliveryPerson(@RequestBody DeliveryPersonRequest request) {
+    public ResponseEntity<Boolean> createDeliveryPerson(@RequestBody DeliveryPersonCreateRequest request) {
 		boolean success = deliveryPersonService.createDeliveryPerson(request);
         return ResponseEntity.ok(success);
     }

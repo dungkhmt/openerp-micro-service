@@ -1,25 +1,24 @@
 package openerp.openerpresourceserver.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.dto.request.DeliveryTripCreateRequest;
 import openerp.openerpresourceserver.entity.DeliveryTrip;
 import openerp.openerpresourceserver.entity.DeliveryTripItem;
-import openerp.openerpresourceserver.entity.projection.DeliveryTripGeneralProjection;
-import openerp.openerpresourceserver.entity.projection.DeliveryTripProjection;
-import openerp.openerpresourceserver.entity.projection.TodayDeliveryTripProjection;
-import openerp.openerpresourceserver.model.request.DeliveryTripRequest;
-import openerp.openerpresourceserver.repository.DeliveryTripItemRepository;
+import openerp.openerpresourceserver.projection.DeliveryTripGeneralProjection;
+import openerp.openerpresourceserver.projection.DeliveryTripProjection;
+import openerp.openerpresourceserver.projection.TodayDeliveryTripProjection;
 import openerp.openerpresourceserver.repository.DeliveryTripRepository;
 
 @Service
@@ -27,10 +26,8 @@ import openerp.openerpresourceserver.repository.DeliveryTripRepository;
 public class DeliveryTripService {
 
 	private static final String TRIP_PREFIX = "TRP_";
-	private static final String TRIP_ITEM_PREFIX = "TRP_ITEM_";
-
 	private DeliveryTripRepository deliveryTripRepository;
-	private DeliveryTripItemRepository deliveryTripItemRepository;
+	private final DeliveryTripItemService deliveryTripItemService;
 	private DeliveryTripPathService deliveryTripPathService;
 	private AssignedOrderItemService assignedOrderItemService;
 
@@ -53,12 +50,9 @@ public class DeliveryTripService {
 		return String.format(TRIP_PREFIX + "%05d", count);
 	}
 
-	private String generateTripItemId() {
-		long count = deliveryTripItemRepository.count() + 1;
-		return String.format(TRIP_ITEM_PREFIX + "%05d", count);
-	}
+	@Transactional
+	public DeliveryTrip createDeliveryTrip(DeliveryTripCreateRequest payload) {
 
-	public DeliveryTrip createDeliveryTrip(DeliveryTripRequest payload) {
 		String tripId = generateTripId();
 		DeliveryTrip trip = DeliveryTrip.builder().deliveryTripId(tripId).warehouseId(payload.getWarehouseId())
 				.deliveryPersonId(payload.getDeliveryPersonId()).description(payload.getDescription())
@@ -69,17 +63,18 @@ public class DeliveryTripService {
 
 		deliveryTripRepository.save(trip);
 
-		for (DeliveryTripItem item : payload.getItems()) {
-			item.setDeliveryTripItemId(generateTripItemId());
-			item.setDeliveryTripId(tripId);
-			item.setCreatedStamp(LocalDateTime.now());
-			item.setLastUpdatedStamp(LocalDateTime.now());
-			item.setDeleted(false);
-			item.setStatus("CREATED");
-			deliveryTripItemRepository.save(item);
-			assignedOrderItemService.updateAssignedOrderItemStatus(item.getAssignedOrderItemId());
+		List<DeliveryTripItem> items = payload.getItems().stream()
+				.map(item -> DeliveryTripItem.builder().deliveryTripItemId(deliveryTripItemService.generateTripItemId())
+						.deliveryTripId(tripId).orderId(item.getOrderId())
+						.assignedOrderItemId(item.getAssignedOrderItemId()).sequence(item.getSequence())
+						.quantity(item.getQuantity()).status("CREATED").isDeleted(false)
+						.createdStamp(LocalDateTime.now()).lastUpdatedStamp(LocalDateTime.now()).build())
+				.toList();
 
-		}
+		deliveryTripItemService.saveAllItems(items);
+
+		List<UUID> assignedOrderItemIds = items.stream().map(DeliveryTripItem::getAssignedOrderItemId).toList();
+		assignedOrderItemService.updateAssignedOrderItemsStatus(assignedOrderItemIds, "DONE");
 
 		deliveryTripPathService.saveRoutePath(tripId, payload.getCoordinates());
 
@@ -94,17 +89,22 @@ public class DeliveryTripService {
 			DeliveryTrip trip = optionalTrip.get();
 
 			if ("CREATED".equals(trip.getStatus())) {
+
+				deliveryTripItemService.markItemsAsDeleted(deliveryTripId);
+				List<UUID> assignedOrderItemIds = deliveryTripItemService.findIdsByDeliveryTripId(deliveryTripId);
+
+				assignedOrderItemService.updateAssignedOrderItemsStatus(assignedOrderItemIds, "CREATED");
+
 				trip.setStatus("CANCELLED");
 				deliveryTripRepository.save(trip);
+
 				return true;
 			}
 		}
-
 		return false;
 	}
 
-	public Page<DeliveryTrip> getDeliveryTripsByShipmentId(int page, int size, String shipmentId) {
-		Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "lastUpdatedStamp"));
+	public Page<DeliveryTrip> getDeliveryTripsByShipmentId(String shipmentId, Pageable pageable) {
 		return deliveryTripRepository.findByShipmentId(shipmentId, pageable);
 	}
 

@@ -8,10 +8,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import openerp.openerpresourceserver.dto.request.ProductCreateRequest;
 import openerp.openerpresourceserver.entity.Product;
-import openerp.openerpresourceserver.entity.projection.ProductInfoProjection;
-import openerp.openerpresourceserver.entity.projection.ProductNameProjection;
-import openerp.openerpresourceserver.model.request.ProductRequest;
+import openerp.openerpresourceserver.projection.ProductInfoProjection;
+import openerp.openerpresourceserver.projection.ProductNameProjection;
 
 public interface ProductService {
 
@@ -21,9 +21,9 @@ public interface ProductService {
 
 	Product getProductById(UUID productId);
 
-	boolean updateProduct(ProductRequest productDto, MultipartFile imageFile);
+	boolean updateProduct(ProductCreateRequest productDto, MultipartFile imageFile);
 
-	boolean createProduct(ProductRequest productDto, MultipartFile imageFile);
+	boolean createProduct(ProductCreateRequest productDto, MultipartFile imageFile);
 	
 	List<ProductNameProjection> searchProductNames(String searchTerm);
 

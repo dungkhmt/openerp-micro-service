@@ -1,7 +1,5 @@
 package openerp.openerpresourceserver.controller;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.dto.request.ReceiptCreateRequest;
 import openerp.openerpresourceserver.entity.Receipt;
-import openerp.openerpresourceserver.entity.projection.ReceiptInfoProjection;
-import openerp.openerpresourceserver.entity.projection.ReceiptItemDetailProjection;
-import openerp.openerpresourceserver.model.request.ReceiptRequest;
+import openerp.openerpresourceserver.projection.ReceiptInfoProjection;
+import openerp.openerpresourceserver.service.ReceiptItemRequestService;
 import openerp.openerpresourceserver.service.ReceiptService;
 
 @RestController
@@ -33,6 +31,7 @@ import openerp.openerpresourceserver.service.ReceiptService;
 public class ReceiptController {
 
 	private ReceiptService receiptService;
+	private ReceiptItemRequestService receiptItemRequestService;
 	
 	@GetMapping
 	public ResponseEntity<Page<ReceiptInfoProjection>> getReceiptsByStatus(
@@ -49,24 +48,9 @@ public class ReceiptController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 		}
 	}
-		
-	@GetMapping("/{receiptId}")
-	public ResponseEntity<List<ReceiptItemDetailProjection>> getReceiptItemDetails(@PathVariable UUID receiptId) {
-		try {
-			List<ReceiptItemDetailProjection> receiptItemDetails = receiptService.getReceiptItemDetails(receiptId);
-
-			if (receiptItemDetails.isEmpty()) {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ArrayList<>());
-			}
-			return ResponseEntity.ok(receiptItemDetails);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ArrayList<>());
-		}
-	}
 
 	@PostMapping
-	public ResponseEntity<String> createReceipt(@RequestBody ReceiptRequest receiptRequest) {
+	public ResponseEntity<String> createReceipt(@RequestBody ReceiptCreateRequest receiptRequest) {
 	    try {
 	        // Validate item requests
 	        if (receiptRequest.getReceiptItemRequests() == null || receiptRequest.getReceiptItemRequests().isEmpty()) {
@@ -82,7 +66,7 @@ public class ReceiptController {
 	        Receipt createdReceipt = receiptService.createReceipt(receiptRequest);
 
 	        // Create receipt item requests
-	        receiptService.createReceiptItems(createdReceipt.getReceiptId(), receiptRequest.getReceiptItemRequests());
+	        receiptItemRequestService.createReceiptItems(createdReceipt.getReceiptId(), receiptRequest.getReceiptItemRequests());
 
 	        return ResponseEntity.ok("Receipt created successfully with ID: " + createdReceipt.getReceiptId());
 	    } catch (IllegalArgumentException e) {

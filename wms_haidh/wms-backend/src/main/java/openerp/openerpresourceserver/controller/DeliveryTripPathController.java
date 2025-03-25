@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
-import openerp.openerpresourceserver.entity.projection.DeliveryTripPathProjection;
+import openerp.openerpresourceserver.projection.DeliveryTripPathProjection;
 import openerp.openerpresourceserver.service.DeliveryTripPathService;
 
 @RestController

@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import openerp.openerpresourceserver.entity.ReceiptBill;
-import openerp.openerpresourceserver.entity.projection.ReceiptBillProjection;
+import openerp.openerpresourceserver.projection.ReceiptBillProjection;
 
 @Repository
 public interface ReceiptBillRepository extends JpaRepository<ReceiptBill, String> {

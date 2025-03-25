@@ -9,12 +9,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
+import openerp.openerpresourceserver.dto.request.AssignedOrderItemCreateRequest;
 import openerp.openerpresourceserver.entity.AssignedOrderItem;
 import openerp.openerpresourceserver.entity.InventoryItem;
 import openerp.openerpresourceserver.entity.SaleOrderItem;
-import openerp.openerpresourceserver.entity.projection.AssignedOrderItemProjection;
-import openerp.openerpresourceserver.entity.projection.DeliveryOrderItemProjection;
-import openerp.openerpresourceserver.model.request.AssignedOrderItemRequest;
+import openerp.openerpresourceserver.projection.AssignedOrderItemProjection;
+import openerp.openerpresourceserver.projection.DeliveryOrderItemProjection;
 import openerp.openerpresourceserver.repository.AssignedOrderItemRepository;
 import openerp.openerpresourceserver.repository.InventoryItemRepository;
 import openerp.openerpresourceserver.repository.SaleOrderItemRepository;
@@ -28,8 +29,6 @@ public class AssignedOrderItemService {
 	private SaleOrderItemRepository saleOrderItemRepository;
 	@Autowired
 	private InventoryItemRepository inventoryItemRepository;
-//	@Autowired
-//	private OrderService orderService;
 
 	public List<AssignedOrderItemProjection> getAssignedOrderItemsBySaleOrderItemId(UUID saleOrderItemId) {
 		return assignedOrderItemRepository.findAssignedOrderItemsBySaleOrderItemId(saleOrderItemId);
@@ -39,7 +38,7 @@ public class AssignedOrderItemService {
         return assignedOrderItemRepository.findAllDeliveryOrderItemsByWarehouse(warehouseId,pageable);
     }
 
-	public AssignedOrderItem assignOrderItem(AssignedOrderItemRequest dto) {
+	public AssignedOrderItem assignOrderItem(AssignedOrderItemCreateRequest dto) {
         // Step 1: Retrieve SaleOrderItem
         SaleOrderItem saleOrderItem = saleOrderItemRepository.findById(dto.getSaleOrderItemId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid SaleOrderItemId"));
@@ -82,15 +81,10 @@ public class AssignedOrderItemService {
 
         return assignedOrderItem;
     }
-
-	public void updateAssignedOrderItemStatus(UUID assignedOrderItemId) {
-		AssignedOrderItem assignedOrderItem = assignedOrderItemRepository.findById(assignedOrderItemId)
-                .orElseThrow(() -> new IllegalArgumentException("AssignedOrderItem not found with id: " + assignedOrderItemId));
-        
-        assignedOrderItem.setStatus("DONE");
-        assignedOrderItem.setLastUpdatedStamp(LocalDateTime.now());
-        assignedOrderItemRepository.save(assignedOrderItem);
-		
+	
+	@Transactional
+	public int updateAssignedOrderItemsStatus(List<UUID> assignedOrderItemIds, String status) {
+	    return assignedOrderItemRepository.updateStatusByIds(assignedOrderItemIds, status, LocalDateTime.now());
 	}
 
 }

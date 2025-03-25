@@ -10,8 +10,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import openerp.openerpresourceserver.entity.SaleOrderItem;
-import openerp.openerpresourceserver.entity.projection.SaleOrderItemDetailProjection;
-import openerp.openerpresourceserver.entity.projection.SaleOrderItemProjection;
+import openerp.openerpresourceserver.projection.SaleOrderItemDetailProjection;
+import openerp.openerpresourceserver.projection.SaleOrderItemProjection;
 
 @Repository
 public interface SaleOrderItemRepository extends JpaRepository<SaleOrderItem, UUID> {

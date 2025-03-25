@@ -5,8 +5,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import openerp.openerpresourceserver.entity.projection.SaleOrderItemDetailProjection;
-import openerp.openerpresourceserver.entity.projection.SaleOrderItemProjection;
+import openerp.openerpresourceserver.projection.SaleOrderItemDetailProjection;
+import openerp.openerpresourceserver.projection.SaleOrderItemProjection;
 import openerp.openerpresourceserver.repository.SaleOrderItemRepository;
 
 @Service

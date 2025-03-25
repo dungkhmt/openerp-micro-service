@@ -1,5 +1,7 @@
 package openerp.openerpresourceserver.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -8,9 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
+import openerp.openerpresourceserver.dto.request.ReceiptItemRequestDTO;
 import openerp.openerpresourceserver.entity.ReceiptItemRequest;
-import openerp.openerpresourceserver.entity.projection.BayProjection;
-import openerp.openerpresourceserver.entity.projection.ReceiptItemRequestProjection;
+import openerp.openerpresourceserver.projection.BayProjection;
+import openerp.openerpresourceserver.projection.ReceiptItemRequestProjection;
 import openerp.openerpresourceserver.repository.ReceiptItemRequestRepository;
 
 @Service
@@ -50,4 +53,21 @@ public class ReceiptItemRequestService {
                 .map(ReceiptItemRequest::getProductId)
                 .orElseThrow(() -> new IllegalArgumentException("Receipt Item Request ID not found: " + receiptItemRequestId));
     }
+    
+	public void createReceiptItems(UUID receiptId, List<ReceiptItemRequestDTO> receiptItemRequests) {
+		LocalDateTime now = LocalDateTime.now();
+		// Tạo mới ReceiptItemRequest cho từng item
+		for (ReceiptItemRequestDTO item : receiptItemRequests) {
+			ReceiptItemRequest receiptItemRequest = new ReceiptItemRequest();
+			receiptItemRequest.setReceiptId(receiptId);
+			receiptItemRequest.setProductId(item.getProductId());
+			receiptItemRequest.setQuantity(item.getQuantity());
+			receiptItemRequest.setWarehouseId(item.getWarehouseId());
+			receiptItemRequest.setCompleted(new BigDecimal(0));
+			receiptItemRequest.setLastUpdated(now);
+			// Lưu ReceiptItemRequest vào DB
+			receiptItemRequestRepository.save(receiptItemRequest);
+		}
+
+	}
 }

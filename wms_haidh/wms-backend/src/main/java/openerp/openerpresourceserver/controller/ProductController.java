@@ -23,10 +23,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.dto.request.ProductCreateRequest;
 import openerp.openerpresourceserver.entity.Product;
-import openerp.openerpresourceserver.entity.projection.ProductInfoProjection;
-import openerp.openerpresourceserver.entity.projection.ProductNameProjection;
-import openerp.openerpresourceserver.model.request.ProductRequest;
+import openerp.openerpresourceserver.projection.ProductInfoProjection;
+import openerp.openerpresourceserver.projection.ProductNameProjection;
 import openerp.openerpresourceserver.service.ProductService;
 
 @RestController
@@ -75,7 +75,7 @@ public class ProductController {
 		try {
 			// Deserialize product data
 			ObjectMapper objectMapper = new ObjectMapper();
-			ProductRequest productDto = objectMapper.readValue(productData, ProductRequest.class);
+			ProductCreateRequest productDto = objectMapper.readValue(productData, ProductCreateRequest.class);
 
 			// Tạo mới sản phẩm
 			boolean isCreated = productService.createProduct(productDto, imageFile);
@@ -98,7 +98,7 @@ public class ProductController {
 		try {
 			// Deserialize product data
 			ObjectMapper objectMapper = new ObjectMapper();
-			ProductRequest productDto = objectMapper.readValue(productData, ProductRequest.class);
+			ProductCreateRequest productDto = objectMapper.readValue(productData, ProductCreateRequest.class);
 
 			// Cập nhật sản phẩm
 			boolean isUpdated = productService.updateProduct(productDto, imageFile);

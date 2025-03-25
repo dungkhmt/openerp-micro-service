@@ -1,8 +1,6 @@
 package openerp.openerpresourceserver.service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -11,29 +9,22 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import openerp.openerpresourceserver.dto.request.ReceiptCreateRequest;
 import openerp.openerpresourceserver.entity.Receipt;
-import openerp.openerpresourceserver.entity.ReceiptItemRequest;
-import openerp.openerpresourceserver.entity.projection.ReceiptInfoProjection;
-import openerp.openerpresourceserver.entity.projection.ReceiptItemDetailProjection;
-import openerp.openerpresourceserver.model.request.ReceiptRequest;
-import openerp.openerpresourceserver.model.request.ReceiptItemRequestCreate;
-import openerp.openerpresourceserver.repository.ReceiptItemRequestRepository;
+import openerp.openerpresourceserver.projection.ReceiptInfoProjection;
 import openerp.openerpresourceserver.repository.ReceiptRepository;
 
 @Service
 public class ReceiptService {
 
 	@Autowired
-	private ReceiptRepository receiptRepository;
-	@Autowired
-	private ReceiptItemRequestRepository receiptItemRequestRepository;
-	
+	private ReceiptRepository receiptRepository;	
 
 	public Page<ReceiptInfoProjection> searchReceipts(String status, Pageable pageable) {
 		return receiptRepository.findReceiptsByStatus(status, pageable);
 	}
 
-	public Receipt createReceipt(ReceiptRequest request) {
+	public Receipt createReceipt(ReceiptCreateRequest request) {
 
 		if (request.getCreatedBy() == null || request.getCreatedBy().isEmpty()) {
 			throw new IllegalArgumentException("CreatedBy cannot be empty");
@@ -61,9 +52,6 @@ public class ReceiptService {
 		return receiptRepository.save(receipt);
 	}
 
-	public List<ReceiptItemDetailProjection> getReceiptItemDetails(UUID receiptId) {
-		return receiptItemRequestRepository.findReceiptItemDetails(receiptId);
-	}
 
 	public boolean approveReceipt(UUID receiptId, String approvedBy) {
 		Optional<Receipt> receiptOptional = receiptRepository.findById(receiptId);
@@ -103,22 +91,7 @@ public class ReceiptService {
 		return false; // Nếu không tìm thấy receipt
 	}
 
-	public void createReceiptItems(UUID receiptId, List<ReceiptItemRequestCreate> receiptItemRequests) {
-		LocalDateTime now = LocalDateTime.now();
-		// Tạo mới ReceiptItemRequest cho từng item
-		for (ReceiptItemRequestCreate item : receiptItemRequests) {
-			ReceiptItemRequest receiptItemRequest = new ReceiptItemRequest();
-			receiptItemRequest.setReceiptId(receiptId);
-			receiptItemRequest.setProductId(item.getProductId());
-			receiptItemRequest.setQuantity(item.getQuantity());
-			receiptItemRequest.setWarehouseId(item.getWarehouseId());
-			receiptItemRequest.setCompleted(new BigDecimal(0));
-			receiptItemRequest.setLastUpdated(now);
-			// Lưu ReceiptItemRequest vào DB
-			receiptItemRequestRepository.save(receiptItemRequest);
-		}
 
-	}
 
 	
 

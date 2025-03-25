@@ -23,7 +23,7 @@ const ReceiptDetail = () => {
   const [receiptDetails, setReceiptDetails] = useState([]);
 
   useEffect(() => {
-    request("get", `/receipts/${receiptId}`, (res) => {
+    request("get", `/receipt-item-requests?receiptId=${receiptId}`, (res) => {
       setReceiptDetails(res.data);
     });
   }, [receiptId]);

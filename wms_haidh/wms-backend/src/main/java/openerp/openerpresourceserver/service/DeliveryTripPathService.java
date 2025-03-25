@@ -15,8 +15,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.entity.DeliveryTripPath;
-import openerp.openerpresourceserver.entity.projection.DeliveryTripPathProjection;
+import openerp.openerpresourceserver.projection.DeliveryTripPathProjection;
 import openerp.openerpresourceserver.repository.DeliveryTripPathRepository;
+import openerp.openerpresourceserver.service.route.RouteService;
 
 @Service
 @AllArgsConstructor

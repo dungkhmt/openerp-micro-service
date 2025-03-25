@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.dto.request.DeliveryTripCreateRequest;
 import openerp.openerpresourceserver.entity.DeliveryTrip;
-import openerp.openerpresourceserver.entity.projection.DeliveryTripGeneralProjection;
-import openerp.openerpresourceserver.entity.projection.DeliveryTripProjection;
-import openerp.openerpresourceserver.entity.projection.TodayDeliveryTripProjection;
-import openerp.openerpresourceserver.model.request.DeliveryTripRequest;
+import openerp.openerpresourceserver.projection.DeliveryTripGeneralProjection;
+import openerp.openerpresourceserver.projection.DeliveryTripProjection;
+import openerp.openerpresourceserver.projection.TodayDeliveryTripProjection;
 import openerp.openerpresourceserver.service.DeliveryTripService;
 
 @RestController
@@ -49,7 +49,8 @@ public class DeliveryTripController {
 	public ResponseEntity<Page<DeliveryTrip>> getDeliveryTrips(@RequestParam int page, @RequestParam int size,
 			@RequestParam String shipmentId) {
 
-		Page<DeliveryTrip> trips = deliveryTripService.getDeliveryTripsByShipmentId(page, size, shipmentId);
+		Pageable pageable = PageRequest.of(page, size, Sort.by("lastUpdatedStamp").descending());
+		Page<DeliveryTrip> trips = deliveryTripService.getDeliveryTripsByShipmentId(shipmentId, pageable);
 		return ResponseEntity.ok(trips);
 	}
 
@@ -57,6 +58,7 @@ public class DeliveryTripController {
 	public ResponseEntity<Page<TodayDeliveryTripProjection>> getTodayDeliveryTrips(
 			@RequestParam String deliveryPersonId, @RequestParam(defaultValue = "CREATED") String status,
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
+
 		Pageable pageable = PageRequest.of(page, size, Sort.by("createdStamp").descending());
 		Page<TodayDeliveryTripProjection> trips = deliveryTripService.getTodayDeliveryTrips(deliveryPersonId, status,
 				pageable);
@@ -70,7 +72,7 @@ public class DeliveryTripController {
 	}
 
 	@PostMapping
-	public ResponseEntity<?> createDeliveryTrip(@RequestBody DeliveryTripRequest payload) {
+	public ResponseEntity<?> createDeliveryTrip(@RequestBody DeliveryTripCreateRequest payload) {
 		try {
 			DeliveryTrip trip = deliveryTripService.createDeliveryTrip(payload);
 			return ResponseEntity.ok(trip);

@@ -9,9 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import openerp.openerpresourceserver.entity.DeliveryTrip;
-import openerp.openerpresourceserver.entity.projection.DeliveryTripGeneralProjection;
-import openerp.openerpresourceserver.entity.projection.DeliveryTripProjection;
-import openerp.openerpresourceserver.entity.projection.TodayDeliveryTripProjection;
+import openerp.openerpresourceserver.projection.DeliveryTripGeneralProjection;
+import openerp.openerpresourceserver.projection.DeliveryTripProjection;
+import openerp.openerpresourceserver.projection.TodayDeliveryTripProjection;
 
 public interface DeliveryTripRepository extends JpaRepository<DeliveryTrip, String> {
 

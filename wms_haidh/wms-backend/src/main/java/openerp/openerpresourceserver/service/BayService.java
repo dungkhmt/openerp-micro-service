@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import openerp.openerpresourceserver.entity.Bay;
-import openerp.openerpresourceserver.entity.projection.BayProjection;
+import openerp.openerpresourceserver.projection.BayProjection;
 import openerp.openerpresourceserver.repository.BayRepository;
 
 @Service

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.entity.ReceiptBill;
-import openerp.openerpresourceserver.entity.projection.ReceiptBillProjection;
+import openerp.openerpresourceserver.projection.ReceiptBillProjection;
 import openerp.openerpresourceserver.repository.ReceiptBillRepository;
 
 @Service

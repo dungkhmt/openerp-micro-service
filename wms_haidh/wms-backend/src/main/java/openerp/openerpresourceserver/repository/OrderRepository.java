@@ -11,8 +11,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import openerp.openerpresourceserver.entity.Order;
-import openerp.openerpresourceserver.entity.projection.CustomerOrderProjection;
-import openerp.openerpresourceserver.entity.projection.OrderProjection;
+import openerp.openerpresourceserver.projection.CustomerOrderProjection;
+import openerp.openerpresourceserver.projection.OrderProjection;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, UUID> {

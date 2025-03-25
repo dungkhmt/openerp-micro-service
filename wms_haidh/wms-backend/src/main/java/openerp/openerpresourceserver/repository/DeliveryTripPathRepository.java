@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import openerp.openerpresourceserver.entity.DeliveryTripPath;
-import openerp.openerpresourceserver.entity.projection.DeliveryTripPathProjection;
+import openerp.openerpresourceserver.projection.DeliveryTripPathProjection;
 
 public interface DeliveryTripPathRepository extends JpaRepository<DeliveryTripPath, Integer> {
 

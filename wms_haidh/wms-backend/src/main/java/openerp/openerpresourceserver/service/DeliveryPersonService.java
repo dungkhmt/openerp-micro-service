@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.dto.request.DeliveryPersonCreateRequest;
 import openerp.openerpresourceserver.entity.DeliveryPerson;
 import openerp.openerpresourceserver.entity.User;
-import openerp.openerpresourceserver.entity.projection.DeliveryPersonProjection;
-import openerp.openerpresourceserver.model.request.DeliveryPersonRequest;
+import openerp.openerpresourceserver.projection.DeliveryPersonProjection;
 import openerp.openerpresourceserver.repository.DeliveryPersonRepository;
 import openerp.openerpresourceserver.repository.UserRepository;
 
@@ -42,7 +42,7 @@ public class DeliveryPersonService {
     }
 	
 	@Transactional
-	public boolean createDeliveryPerson(DeliveryPersonRequest request) {
+	public boolean createDeliveryPerson(DeliveryPersonCreateRequest request) {
 	    // Tìm user dựa trên email
 	    Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
 

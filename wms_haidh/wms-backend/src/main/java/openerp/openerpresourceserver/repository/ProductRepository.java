@@ -12,8 +12,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import openerp.openerpresourceserver.entity.Product;
-import openerp.openerpresourceserver.entity.projection.ProductInfoProjection;
-import openerp.openerpresourceserver.entity.projection.ProductNameProjection;
+import openerp.openerpresourceserver.projection.ProductInfoProjection;
+import openerp.openerpresourceserver.projection.ProductNameProjection;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, UUID> {

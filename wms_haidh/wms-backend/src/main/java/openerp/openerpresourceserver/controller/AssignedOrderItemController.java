@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.dto.request.AssignedOrderItemCreateRequest;
 import openerp.openerpresourceserver.entity.AssignedOrderItem;
-import openerp.openerpresourceserver.entity.projection.AssignedOrderItemProjection;
-import openerp.openerpresourceserver.entity.projection.DeliveryOrderItemProjection;
-import openerp.openerpresourceserver.model.request.AssignedOrderItemRequest;
+import openerp.openerpresourceserver.projection.AssignedOrderItemProjection;
+import openerp.openerpresourceserver.projection.DeliveryOrderItemProjection;
 import openerp.openerpresourceserver.service.AssignedOrderItemService;
 
 @RestController
@@ -48,7 +48,7 @@ public class AssignedOrderItemController {
 	}
 
 	@PostMapping
-	public ResponseEntity<AssignedOrderItem> assignOrderItem(@RequestBody AssignedOrderItemRequest dto) {
+	public ResponseEntity<AssignedOrderItem> assignOrderItem(@RequestBody AssignedOrderItemCreateRequest dto) {
 		try {
 			AssignedOrderItem assignedOrderItem = assignedOrderItemService.assignOrderItem(dto);
 			return ResponseEntity.ok(assignedOrderItem);

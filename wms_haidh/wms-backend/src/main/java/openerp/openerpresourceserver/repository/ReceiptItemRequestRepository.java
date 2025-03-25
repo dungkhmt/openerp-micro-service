@@ -10,16 +10,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import openerp.openerpresourceserver.entity.ReceiptItemRequest;
-import openerp.openerpresourceserver.entity.projection.ReceiptItemDetailProjection;
-import openerp.openerpresourceserver.entity.projection.ReceiptItemRequestProjection;
+import openerp.openerpresourceserver.projection.ReceiptItemRequestProjection;
 
 @Repository
 public interface ReceiptItemRequestRepository extends JpaRepository<ReceiptItemRequest, UUID> {
-
-	@Query("SELECT p.name AS productName, " + "r.quantity AS quantity, " + "w.name AS warehouseName "
-			+ "FROM ReceiptItemRequest r " + "JOIN Product p ON r.productId = p.productId "
-			+ "JOIN Warehouse w ON r.warehouseId = w.warehouseId " + "WHERE r.receiptId = :receiptId")
-	List<ReceiptItemDetailProjection> findReceiptItemDetails(@Param("receiptId") UUID receiptId);
 
 	Optional<ReceiptItemRequest> findByReceiptItemRequestId(UUID receiptItemRequestId);
 

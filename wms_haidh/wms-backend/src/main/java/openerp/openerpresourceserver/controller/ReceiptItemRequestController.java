@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
-import openerp.openerpresourceserver.entity.projection.BayProjection;
-import openerp.openerpresourceserver.entity.projection.ReceiptItemRequestProjection;
+import openerp.openerpresourceserver.projection.BayProjection;
+import openerp.openerpresourceserver.projection.ReceiptItemRequestProjection;
 import openerp.openerpresourceserver.service.ReceiptItemRequestService;
 
 @RestController

@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.entity.Order;
-import openerp.openerpresourceserver.entity.projection.CustomerOrderProjection;
-import openerp.openerpresourceserver.entity.projection.OrderProjection;
+import openerp.openerpresourceserver.projection.CustomerOrderProjection;
+import openerp.openerpresourceserver.projection.OrderProjection;
 import openerp.openerpresourceserver.service.OrderService;
 
 @RestController

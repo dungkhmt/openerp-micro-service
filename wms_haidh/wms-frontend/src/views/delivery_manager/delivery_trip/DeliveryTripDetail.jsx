@@ -40,7 +40,7 @@ const DeliveryTripDetail = () => {
   }, [id]);
 
   const handleSubmit = async () => {
-    request("post", `/delivery-trip/${id}/cancel`, (res) => {
+    request("post", `/delivery-trips/${id}/cancel`, (res) => {
       if (res.status === 200) {
         alert("Trip cancelled successfully !")
         navigate(`/delivery-manager/delivery-trip`); // Redirect after success

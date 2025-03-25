@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
-import openerp.openerpresourceserver.entity.projection.SaleOrderItemDetailProjection;
-import openerp.openerpresourceserver.entity.projection.SaleOrderItemProjection;
+import openerp.openerpresourceserver.projection.SaleOrderItemDetailProjection;
+import openerp.openerpresourceserver.projection.SaleOrderItemProjection;
 import openerp.openerpresourceserver.service.SaleOrderItemService;
 
 @RestController

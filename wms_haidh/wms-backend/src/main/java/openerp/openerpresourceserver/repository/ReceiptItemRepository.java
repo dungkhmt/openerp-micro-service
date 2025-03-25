@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import openerp.openerpresourceserver.entity.ReceiptItem;
-import openerp.openerpresourceserver.entity.projection.ReceiptItemProjection;
+import openerp.openerpresourceserver.projection.ReceiptItemProjection;
 
 @Repository
 public interface ReceiptItemRepository extends JpaRepository<ReceiptItem, UUID> {

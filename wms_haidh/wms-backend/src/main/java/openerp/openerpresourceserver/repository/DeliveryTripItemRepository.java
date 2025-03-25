@@ -1,18 +1,20 @@
 package openerp.openerpresourceserver.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import openerp.openerpresourceserver.entity.DeliveryTripItem;
-import openerp.openerpresourceserver.entity.projection.CustomerDeliveryProjection;
-import openerp.openerpresourceserver.entity.projection.DeliveryItemDetailProjection;
+import openerp.openerpresourceserver.projection.CustomerDeliveryProjection;
+import openerp.openerpresourceserver.projection.DeliveryItemDetailProjection;
 
 @Repository
 public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripItem, String> {
@@ -49,4 +51,12 @@ public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripIt
 			""")
 	Page<DeliveryItemDetailProjection> findDeliveryItemsByTripAndOrder(@Param("deliveryTripId") String deliveryTripId,
 			@Param("orderId") UUID orderId, Pageable pageable);
+	
+	@Modifying
+	@Query("UPDATE DeliveryTripItem d SET d.isDeleted = true, d.lastUpdatedStamp = :timestamp WHERE d.deliveryTripId = :deliveryTripId")
+	int markItemsAsDeleted(@Param("deliveryTripId") String deliveryTripId, @Param("timestamp") LocalDateTime timestamp);
+
+	@Query("SELECT d.assignedOrderItemId FROM DeliveryTripItem d WHERE d.deliveryTripId = :deliveryTripId")
+    List<UUID> findIdsByDeliveryTripId(@Param("deliveryTripId") String deliveryTripId);
+
 }

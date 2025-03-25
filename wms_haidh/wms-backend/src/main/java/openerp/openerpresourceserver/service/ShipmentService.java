@@ -10,8 +10,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import openerp.openerpresourceserver.dto.request.ShipmentCreateRequest;
 import openerp.openerpresourceserver.entity.Shipment;
-import openerp.openerpresourceserver.model.request.ShipmentRequest;
 import openerp.openerpresourceserver.repository.ShipmentRepository;
 
 @Service
@@ -40,7 +40,7 @@ public class ShipmentService {
     }
 
     
-    public Shipment createShipment(ShipmentRequest request) {
+    public Shipment createShipment(ShipmentCreateRequest request) {
         Shipment shipment = new Shipment();
         shipment.setShipmentId(generateShipmentId());
         shipment.setExpectedDeliveryStamp(request.getExpectedDeliveryStamp());

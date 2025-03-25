@@ -1,18 +1,20 @@
 package openerp.openerpresourceserver.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import openerp.openerpresourceserver.entity.AssignedOrderItem;
-import openerp.openerpresourceserver.entity.projection.AssignedOrderItemProjection;
-import openerp.openerpresourceserver.entity.projection.DeliveryOrderItemProjection;
+import openerp.openerpresourceserver.projection.AssignedOrderItemProjection;
+import openerp.openerpresourceserver.projection.DeliveryOrderItemProjection;
 
 @Repository
 public interface AssignedOrderItemRepository extends JpaRepository<AssignedOrderItem, UUID> {
@@ -53,4 +55,10 @@ public interface AssignedOrderItemRepository extends JpaRepository<AssignedOrder
 			    AND aoi.status = 'CREATED'
 			""")
 	Page<DeliveryOrderItemProjection> findAllDeliveryOrderItemsByWarehouse(@Param("warehouseId") UUID warehouseId, Pageable pageable);
+
+	@Modifying
+	@Query("UPDATE AssignedOrderItem a SET a.status = :status, a.lastUpdatedStamp = :lastUpdatedStamp WHERE a.assignedOrderItemId IN :ids")
+	int updateStatusByIds(@Param("ids") List<UUID> ids, @Param("status") String status, @Param("lastUpdatedStamp") LocalDateTime lastUpdatedStamp);
+
+
 }

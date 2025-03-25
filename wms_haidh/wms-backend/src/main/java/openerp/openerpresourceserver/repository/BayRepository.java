@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import openerp.openerpresourceserver.entity.Bay;
-import openerp.openerpresourceserver.entity.projection.BayProjection;
+import openerp.openerpresourceserver.projection.BayProjection;
 
 @Repository
 public interface BayRepository extends JpaRepository<Bay, UUID> {

@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
-import openerp.openerpresourceserver.entity.projection.CustomerDeliveryProjection;
-import openerp.openerpresourceserver.entity.projection.DeliveryItemDetailProjection;
+import openerp.openerpresourceserver.projection.CustomerDeliveryProjection;
+import openerp.openerpresourceserver.projection.DeliveryItemDetailProjection;
 import openerp.openerpresourceserver.service.DeliveryTripItemService;
 
 @RestController

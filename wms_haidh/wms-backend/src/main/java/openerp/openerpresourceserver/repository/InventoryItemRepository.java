@@ -12,9 +12,9 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import openerp.openerpresourceserver.entity.InventoryItem;
-import openerp.openerpresourceserver.entity.projection.BayProjection;
-import openerp.openerpresourceserver.entity.projection.InventoryItemProjection;
-import openerp.openerpresourceserver.entity.projection.LotIdProjection;
+import openerp.openerpresourceserver.projection.BayProjection;
+import openerp.openerpresourceserver.projection.InventoryItemProjection;
+import openerp.openerpresourceserver.projection.LotIdProjection;
 
 @Repository
 public interface InventoryItemRepository extends JpaRepository<InventoryItem, UUID> {

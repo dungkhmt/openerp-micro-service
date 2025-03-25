@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import openerp.openerpresourceserver.entity.Receipt;
-import openerp.openerpresourceserver.entity.projection.ReceiptInfoProjection;
+import openerp.openerpresourceserver.projection.ReceiptInfoProjection;
 
 @Repository
 public interface ReceiptRepository extends JpaRepository<Receipt, UUID> {
