@@ -7,13 +7,10 @@ export const handleRejected = (state, action) => {
   state.fetchLoading = false;
 };
 
-export const fetchStatuses = createAsyncThunk(
-  "fetchStatuses",
-  async () => {
-    const statuses = await StatusService.getStatuses();
-    return statuses;
-  }
-);
+export const fetchStatuses = createAsyncThunk("fetchStatuses", async () => {
+  const statuses = await StatusService.getStatuses();
+  return statuses;
+});
 
 export const createStatus = createAsyncThunk(
   "createStatus",
@@ -40,6 +37,8 @@ export const deleteStatus = createAsyncThunk(
 
 const initialState = {
   statuses: [],
+  taskStatuses: [],
+  meetingStatuses: [],
   fetchLoading: false,
   errors: [],
 };
@@ -61,6 +60,12 @@ export const statusSlice = createSlice({
       })
       .addCase(fetchStatuses.fulfilled, (state, action) => {
         state.statuses = action.payload;
+        state.taskStatuses = action.payload.filter(
+          (status) => status.type === "TASK_STATUS"
+        );
+        state.meetingStatuses = action.payload.filter(
+          (status) => status.type === "MEETING_STATUS"
+        );
         state.fetchLoading = false;
       })
       .addCase(fetchStatuses.rejected, handleRejected)
