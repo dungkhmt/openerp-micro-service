@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.service;
 
-import openerp.openerpresourceserver.dto.OrderResponseDto;
 import openerp.openerpresourceserver.dto.OrderSummaryDTO;
 import openerp.openerpresourceserver.dto.VehicleDto;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
@@ -28,7 +27,7 @@ public interface DriverService {
     /**
      * Mark orders as picked up from origin hub
      */
-    void pickupOrders(String username, List<UUID> orderIds);
+    void pickupOrders(String username, List<UUID> orderIds, UUID tripId);
 
     /**
      * Mark orders as delivered to destination hub

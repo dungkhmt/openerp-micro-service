@@ -3,9 +3,15 @@ package openerp.openerpresourceserver.service.impl;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import openerp.openerpresourceserver.dto.RouteDto;
+import openerp.openerpresourceserver.dto.RouteScheduleDto;
+import openerp.openerpresourceserver.dto.RouteStopDto;
 import openerp.openerpresourceserver.dto.ScheduleVehicleAssignmentDto;
 import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.entity.enumentity.VehicleStatus;
+import openerp.openerpresourceserver.mapper.RouteMapper;
+import openerp.openerpresourceserver.mapper.RouteScheduleMapper;
+import openerp.openerpresourceserver.mapper.RouteStopMapper;
 import openerp.openerpresourceserver.mapper.ScheduleVehicleAssignmentMapper;
 import openerp.openerpresourceserver.repository.*;
 import openerp.openerpresourceserver.service.ScheduleVehicleAssignmentService;
@@ -30,6 +36,8 @@ public class ScheduleVehicleAssignmentServiceImpl implements ScheduleVehicleAssi
     private final DriverRepo driverRepository;
     private final ScheduleVehicleAssignmentMapper mapper = ScheduleVehicleAssignmentMapper.INSTANCE;
     private final VehicleDriverRepository vehicleDriverRepository;
+    private final RouteRepository routeRepository;
+    private final RouteStopRepository routeStopRepository;
 
     @Override
     @Transactional
@@ -138,7 +146,24 @@ public class ScheduleVehicleAssignmentServiceImpl implements ScheduleVehicleAssi
 
         List<ScheduleVehicleAssignment> assignments = assignmentRepository.findAllByVehicleId(vehicleDriver.getVehicleId());
 
-        return assignments.stream().map(mapper::assignmentToDto).collect(Collectors.toList());
+        List<ScheduleVehicleAssignmentDto> assignmentDtos = assignments.stream().map(mapper::assignmentToDto).collect(Collectors.toList());
+
+        for(ScheduleVehicleAssignmentDto assignmentDto : assignmentDtos){
+            RouteSchedule routeSchedule = scheduleRepository.findById(assignmentDto.getRouteScheduleId()).orElseThrow(() -> new NotFoundException("Route schedule not found with ID: " + assignmentDto.getRouteScheduleId()));
+            RouteScheduleDto routeScheduleDto = RouteScheduleMapper.INSTANCE.routeScheduleToDto(routeSchedule);
+
+            Route route = routeRepository.findById(routeSchedule.getRouteId()).orElseThrow(()-> new NotFoundException("Route not found with ID: " + routeSchedule.getRouteId()));
+            RouteDto routeDto = RouteMapper.INSTANCE.routeToRouteDto(route);
+
+            List<RouteStop> routeStops = routeStopRepository.findByRouteIdOrderByStopSequence(route.getRouteId());
+            List<RouteStopDto> routeStopDtos = routeStops.stream().map(RouteStopMapper.INSTANCE::routeStopToRouteStopDto).toList();
+
+            routeDto.setStops(routeStopDtos);
+            assignmentDto.setRouteDto(routeDto);
+            assignmentDto.setRouteScheduleDto(routeScheduleDto);
+        }
+
+        return assignmentDtos;
     }
 
     @Override
@@ -208,10 +233,25 @@ public class ScheduleVehicleAssignmentServiceImpl implements ScheduleVehicleAssi
 
     @Override
     public List<ScheduleVehicleAssignmentDto> getAllActiveAssignments() {
-        return assignmentRepository.findByIsActiveTrueAndUnassignedAtIsNull().stream()
-                .map(mapper::assignmentToDto)
-                .map(this::enrichAssignmentDto)
-                .collect(Collectors.toList());
+        List<ScheduleVehicleAssignment> assignments = assignmentRepository.findByIsActiveTrueAndUnassignedAtIsNull();
+        if(assignments.isEmpty()){
+            throw new NotFoundException("No active assignments found");
+        }
+        return assignments.stream().map(a ->{
+            ScheduleVehicleAssignmentDto assignmentDto = ScheduleVehicleAssignmentMapper.INSTANCE.assignmentToDto(a);
+            Vehicle vehicle = vehicleRepository.findById(a.getVehicleId()).orElse(null);
+            RouteSchedule routeSchedule = scheduleRepository.findById(a.getRouteScheduleId()).orElse(null);
+            if (routeSchedule != null) {
+                Route route = routeRepository.findById(routeSchedule.getRouteId()).orElse(null);
+                if(route != null) {
+                    assignmentDto.setRouteCode(route.getRouteCode());
+                    assignmentDto.setRouteName(route.getRouteName());
+                    assignmentDto.setActive(a.getUnassignedAt()==null);
+                    assignmentDto.setRouteScheduleDto(RouteScheduleMapper.INSTANCE.routeScheduleToDto(routeSchedule));
+                }
+            }
+          return assignmentDto;
+        }).collect(Collectors.toList());
     }
 
     @Override

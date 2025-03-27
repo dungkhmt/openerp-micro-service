@@ -1,6 +1,6 @@
 package openerp.openerpresourceserver.service.impl;
-import java.sql.Array;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -61,7 +61,18 @@ public class OrderServiceImpl implements OrderService {
     private HubRepo hubRepo;
     @Autowired
     private CollectorRepo collectorRepo;
-
+    @Autowired
+    private RouteRepository routeRepository;
+    @Autowired
+    private RouteStopRepository routeStopRepository;
+    @Autowired
+    private VehicleRepository vehicleRepository;
+    @Autowired
+    private VehicleDriverRepository vehicleDriverRepository;
+    @Autowired
+    private RouteScheduleRepository routeScheduleRepository;
+    @Autowired
+    private TripRepository tripRepository;
     // Create order method
     @Override
     @Transactional
@@ -516,5 +527,44 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    /**
+     * Get optimal orders for a specific vehicle's route at a hub
+     *
+     * @return List of optimal orders that match the route, sorted by age
+     */
+    @Override
+    public List<OrderForTripDto> getOrdersForRouteSchedule(UUID routeScheduleId) {
 
+        RouteSchedule routeSchedule = routeScheduleRepository.findById(routeScheduleId).orElseThrow(()-> new NotFoundException("route schedule not found: " + routeScheduleId));
+        Route route = routeRepository.findById(routeSchedule.getRouteId()).orElseThrow(() -> new NotFoundException("Route not found " + routeSchedule.getRouteId()));
+
+        // Get all matching orders
+        List<RouteStop> routeStops = routeStopRepository.findByRouteIdOrderByStopSequence(route.getRouteId());
+        List<Order> matchingOrders = routeStops.subList(1,routeStops.size()).stream().flatMap(r -> orderRepo.findAllByFinalHubIdAndStatus(r.getHubId(),OrderStatus.COLLECTED_HUB).stream()).collect(Collectors.toList());
+
+        // STEP 2: Sort matching orders by age (oldest first)
+        matchingOrders.sort(Comparator.comparing(order ->
+                order.getCreatedAt() != null ? order.getCreatedAt().toInstant() : Instant.now()));
+
+
+        List<OrderForTripDto> orderForTripDtos = matchingOrders.stream().map(o -> {
+            OrderForTripDto orderForTripDto = new OrderForTripDto(o);
+            orderForTripDto.setOrderWeight(getOrderWeight(o.getId()));
+            orderForTripDto.setOrderVolume(getOrderVolume(o.getId()));
+            return orderForTripDto;
+        }).collect(Collectors.toList());
+
+        return orderForTripDtos;
+    }
+
+
+    public Double getOrderWeight(UUID orderId) {
+        List<OrderItem> orderItems = orderItemRepo.findAllByOrderId(orderId);
+        return orderItems.stream().map(OrderItem::getWeight).reduce(0.0, Double::sum);
+    }
+
+    public Double getOrderVolume(UUID orderId) {
+        List<OrderItem> orderItems = orderItemRepo.findAllByOrderId(orderId);
+        return orderItems.stream().map(o -> o.getHeight()/100 * o.getWidth()/100 * o.getLength()/100).reduce(0.0, Double::sum);
+    }
 }

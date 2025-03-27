@@ -146,20 +146,20 @@ const DriverRouteMap = () => {
                 }
 
                 // Set orders from trip
-                if (tripRes.data && tripRes.data.orders) {
-                    setOrders(tripRes.data.orders);
+                if (tripRes.data ) {
+                    setOrders(tripRes.data.stops);
 
                     // Find next order to be delivered (first DELIVERING order)
-                    const nextToDeliver = tripRes.data.orders.find(order => order.status === 'DELIVERING');
+                    console.log("ds",tripRes.data.stops);
+                    const nextToDeliver = tripRes.data.stops[tripRes.data.currentStopIndex];
+                    console.log("ds",nextToDeliver);
                     if (nextToDeliver) {
                         setNextOrder(nextToDeliver);
                     }
 
                     // Create assignments for map component
-                    const orderAssignments = tripRes.data.orders.map(order => ({
-                        id: order.id,
-                        orderId: order.id,
-                        status: order.status
+                    const orderAssignments = tripRes.data.stops.map(stop => ({
+                        id: stop.id,
                     }));
                     setAssignments(orderAssignments);
                 }
@@ -297,8 +297,13 @@ const DriverRouteMap = () => {
         history.push(`/middle-mile/driver/orders/${routeVehicleId}`);
     };
 
-    // Complete trip
     const handleCompleteTrip = () => {
+        // Check if we're at the final stop
+        if (currentStop < stopSequence.length) {
+            errorNoti("You must be at the final stop to complete this trip");
+            return;
+        }
+
         if (window.confirm("Are you sure you want to complete this trip? This will mark all orders as delivered.")) {
             const endpoint = tripId
                 ? `/smdeli/driver/trips/${tripId}/complete`
@@ -428,7 +433,7 @@ const DriverRouteMap = () => {
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                 <Typography variant="h4">
-                    Route Map: {route?.routeName || 'Loading...'}
+                    Route Map: {activeTrip?.routeName || 'Loading...'}
                 </Typography>
 
                 <Box sx={{ display: 'flex', gap: 2 }}>
@@ -445,6 +450,7 @@ const DriverRouteMap = () => {
                             variant="contained"
                             color="success"
                             onClick={handleCompleteTrip}
+                            disabled={!stopSequence.length || currentStop < stopSequence.length}
                         >
                             Complete Trip
                         </Button>
@@ -482,14 +488,14 @@ const DriverRouteMap = () => {
                         </Typography>
                     </Box>
 
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={handleAdvanceToNextStop}
-                        disabled={currentStop >= stopSequence.length}
-                    >
-                        Next Stop
-                    </Button>
+                    {/*<Button*/}
+                    {/*    variant="contained"*/}
+                    {/*    color="secondary"*/}
+                    {/*    onClick={handleAdvanceToNextStop}*/}
+                    {/*    disabled={currentStop >= stopSequence.length}*/}
+                    {/*>*/}
+                    {/*    Next Stop*/}
+                    {/*</Button>*/}
                 </Paper>
             )}
 
@@ -506,28 +512,21 @@ const DriverRouteMap = () => {
                             <Divider sx={{ mb: 2 }} />
 
                             <Grid container spacing={2}>
-                                <Grid item xs={6}>
+                                <Grid item xs={12}>
                                     <Typography variant="subtitle2" color="text.secondary">
                                         Route
                                     </Typography>
                                     <Typography variant="body1" gutterBottom>
-                                        {route?.routeName} ({route?.routeCode})
+                                        {activeTrip?.routeName}
                                     </Typography>
                                 </Grid>
+
                                 <Grid item xs={6}>
                                     <Typography variant="subtitle2" color="text.secondary">
-                                        Vehicle
+                                        Orders
                                     </Typography>
-                                    <Typography variant="body1" gutterBottom>
-                                        {routeVehicle?.vehiclePlateNumber || 'N/A'}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="subtitle2" color="text.secondary">
-                                        Direction
-                                    </Typography>
-                                    <Typography variant="body1" gutterBottom>
-                                        {routeVehicle?.direction || 'N/A'}
+                                    <Typography variant="body1">
+                                        Picked up: {activeTrip?.ordersCount}  Delivered: {activeTrip?.ordersDelivered}
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={6}>
@@ -535,21 +534,13 @@ const DriverRouteMap = () => {
                                         Status
                                     </Typography>
                                     <Chip
-                                        label={activeTrip ? 'IN_PROGRESS' : (routeVehicle?.status || 'PLANNED')}
+                                        label={activeTrip?.status}
                                         color={
-                                            activeTrip ? 'warning' :
-                                                routeVehicle?.status === 'COMPLETED' ? 'success' : 'primary'
+                                            activeTrip?.status === 'IN_PROGRESS' ? 'warning' :
+                                                activeTrip?.status === 'COMPLETED' ? 'success' : 'primary'
                                         }
                                         size="small"
                                     />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <Typography variant="subtitle2" color="text.secondary">
-                                        Orders
-                                    </Typography>
-                                    <Typography variant="body1">
-                                        {orders.length} total ({orders.filter(o => o.status === 'DELIVERING').length} in transit)
-                                    </Typography>
                                 </Grid>
                             </Grid>
                         </CardContent>
@@ -636,7 +627,7 @@ const DriverRouteMap = () => {
                                                     startIcon={isOriginHub ? <LocalShippingIcon /> : <CheckCircleIcon />}
                                                     onClick={() => handleArrivalAtHub(stop.hubId, stopNumber)}
                                                 >
-                                                    {isOriginHub
+                                                    { isOriginHub
                                                         ? "I've arrived - Pickup Orders"
                                                         : "I've arrived - Deliver Orders"}
                                                 </Button>
@@ -679,7 +670,9 @@ const DriverRouteMap = () => {
                                     hub={hub}
                                     currentLocation={currentLocation}
                                     currentStop={currentStop}
+                                    nextPointLabel="Điểm tiếp theo" // Add this line to specify the Vietnamese label
                                 />
+
                             ) : (
                                 <Box
                                     display="flex"

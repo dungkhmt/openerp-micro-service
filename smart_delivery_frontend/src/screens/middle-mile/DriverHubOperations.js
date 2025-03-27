@@ -144,7 +144,7 @@ const DriverHubOperations = () => {
 
                 setPendingOrders(orders);
 
-                if (orders.length === 0) {
+                if (tripDetails.currentStopIndex === tripDetails.stops.length) {
                     setProcessingComplete(true);
                     showNotification("No orders to process at this hub", "info");
                 } else {
@@ -230,6 +230,9 @@ const DriverHubOperations = () => {
             setConfirmDialogOpen(true);
         }
     };
+    const isLastStop = tripDetails &&
+        tripDetails.stops &&
+        tripDetails.currentStopIndex === tripDetails.stops.length - 1;
 
     // Process orders based on operation type
     const processOrders = async () => {
@@ -271,7 +274,10 @@ const DriverHubOperations = () => {
                         401: () => showNotification("Unauthorized action", "error"),
                         400: () => showNotification("Unable to pick up orders", "error")
                     },
-                    selectedOrders
+                    {
+                        orderIds: selectedOrders,
+                        tripId: tripId
+                    }
                 );
             } else if (operationType === 'delivery') {
                 // Call deliver API with signature
@@ -318,6 +324,31 @@ const DriverHubOperations = () => {
         }
     };
 
+    const handleCompleteTrip = async () => {
+        if (!tripId) return;
+
+        try {
+            setOperationLoading(true);
+            await request(
+                'post',
+                `/smdeli/driver/trips/${tripId}/complete`,
+                () => {
+                    showNotification("Trip completed successfully", "success");
+                    // Navigate back to the dashboard
+                    history.push('/middle-mile/driver/dashboard');
+                },
+                {
+                    401: () => showNotification("Unauthorized action", "error"),
+                    400: (err) => showNotification(err.response?.data?.message || "Failed to complete trip", "error")
+                }
+            );
+        } catch (error) {
+            console.error("Error completing trip: ", error);
+            showNotification("Failed to complete trip", "error");
+        } finally {
+            setOperationLoading(false);
+        }
+    };
     // Handle signature capture
     const handleSignatureCapture = () => {
         // Simulate signature capture (in a real app, use a signature pad library)
@@ -472,11 +503,15 @@ const DriverHubOperations = () => {
 
                 {/* Trip Information (if part of a trip) */}
                 {tripDetails && (
+
+// Then let's update the Trip Information card to show the appropriate button
                     <Card sx={{ mb: 4, boxShadow: 3, bgcolor: 'primary.light', color: 'white' }}>
                         <CardContent>
                             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                                 <LocalShippingIcon sx={{ mr: 2, fontSize: 28 }} />
-                                <Typography variant="h6">Active Trip - Stop {tripDetails.currentStopIndex + 1} of {tripDetails.stops?.length}</Typography>
+                                <Typography variant="h6">
+                                    Active Trip - {isLastStop ? 'Final Stop' : `Stop ${tripDetails.currentStopIndex + 1} of ${tripDetails.stops?.length}`}
+                                </Typography>
                             </Box>
                             <Divider sx={{ mb: 2, borderColor: 'rgba(255,255,255,0.3)' }} />
 
@@ -488,27 +523,30 @@ const DriverHubOperations = () => {
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={12} md={6}>
-                                    <Typography variant="body2" sx={{ opacity: 0.8 }}>Next Stop:</Typography>
+                                    <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                                        {isLastStop ? 'Final Destination' : 'Next Stop:'}
+                                    </Typography>
                                     <Typography variant="body1">
-                                        {tripDetails.stops?.[tripDetails.currentStopIndex + 1]?.hubName || 'End of Route'}
+                                        {isLastStop
+                                            ? 'End of Route'
+                                            : tripDetails.stops?.[tripDetails.currentStopIndex + 1]?.hubName || 'End of Route'}
                                     </Typography>
                                 </Grid>
                             </Grid>
 
                             <Button
                                 variant="contained"
-                                color="secondary"
+                                color={isLastStop ? "success" : "secondary"}
                                 sx={{ mt: 2 }}
-                                onClick={handleAdvanceToNextStop}
-                                disabled={!tripDetails.stops?.[tripDetails.currentStopIndex + 1] || !processingComplete}
+                                onClick={isLastStop ? handleCompleteTrip : handleAdvanceToNextStop}
                             >
-                                Advance to Next Stop
+                                {isLastStop ? 'Complete Trip' : 'Advance to Next Stop'}
                             </Button>
                         </CardContent>
                     </Card>
+
                 )}
 
-                {/* All orders processed notification */}
                 {processingComplete && (
                     <Alert
                         severity="success"
@@ -518,9 +556,9 @@ const DriverHubOperations = () => {
                                 <Button
                                     color="inherit"
                                     size="small"
-                                    onClick={handleAdvanceToNextStop}
+                                    onClick={isLastStop ? handleCompleteTrip : handleAdvanceToNextStop}
                                 >
-                                    NEXT STOP
+                                    {isLastStop ? 'COMPLETE TRIP' : 'NEXT STOP'}
                                 </Button>
                             )
                         }
@@ -528,9 +566,11 @@ const DriverHubOperations = () => {
                         <Typography variant="subtitle1">
                             All orders have been processed at this hub
                         </Typography>
-                        {tripId ?
-                            "You can now proceed to the next stop in your route." :
-                            "You can now return to your dashboard."
+                        {tripId
+                            ? isLastStop
+                                ? "You have reached the final stop. You can now complete your trip."
+                                : "You can now proceed to the next stop in your route."
+                            : "You can now return to your dashboard."
                         }
                     </Alert>
                 )}
@@ -588,10 +628,11 @@ const DriverHubOperations = () => {
                                         {pendingOrders.length === 0 && tripId && (
                                             <Button
                                                 variant="contained"
+                                                color={isLastStop ? "success" : "primary"}
                                                 sx={{ mt: 3 }}
-                                                onClick={handleAdvanceToNextStop}
+                                                onClick={isLastStop ? handleCompleteTrip : handleAdvanceToNextStop}
                                             >
-                                                Proceed to Next Stop
+                                                {isLastStop ? 'Complete Trip' : 'Proceed to Next Stop'}
                                             </Button>
                                         )}
                                     </Paper>

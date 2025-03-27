@@ -171,4 +171,9 @@ public class OrderController {
                     new ResponseEntity<>("FAIL", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+        @PreAuthorize("hasAnyRole('ROUTE_MANAGER', 'DRIVER')")
+        @GetMapping("/middle-mile/for-out/{routeScheduleId}")
+        public ResponseEntity<List<OrderForTripDto>> getMiddleMileOrdersForOut(@PathVariable  UUID routeScheduleId) {
+            return ResponseEntity.ok(orderService.getOrdersForRouteSchedule(routeScheduleId));
+        }
 }

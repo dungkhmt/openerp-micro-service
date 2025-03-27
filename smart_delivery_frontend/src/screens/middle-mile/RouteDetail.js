@@ -133,7 +133,7 @@ const RouteDetail = () => {
     };
 
     const getDirectionColor = (direction) => {
-        switch (direction.toUpperCase()) {
+        switch (direction?.toUpperCase()) {
             case 'OUTBOUND':
                 return '#2196f3';
             case 'INBOUND':
@@ -305,22 +305,22 @@ const RouteDetail = () => {
 
                             {vehicles.length > 0 ? (
                                 vehicles.map((vehicle) => (
-                                    <Paper key={vehicle.id} elevation={1} sx={{ p: 2, mb: 2 }}>
+                                    <Paper key={vehicle.vehicleId} elevation={1} sx={{ p: 2, mb: 2 }}>
                                         <Grid container spacing={2}>
                                             <Grid item xs={6}>
                                                 <Typography variant="subtitle2" color="text.secondary">
                                                     Vehicle
                                                 </Typography>
                                                 <Typography variant="body1">
-                                                    {vehicle.vehicle ? vehicle.vehicle.plateNumber : 'N/A'}
+                                                    {vehicle.plateNumber || 'N/A'}
                                                 </Typography>
                                             </Grid>
                                             <Grid item xs={6}>
                                                 <Typography variant="subtitle2" color="text.secondary">
-                                                    Direction
+                                                    Type
                                                 </Typography>
-                                                <Typography variant="body1" sx={{ color: getDirectionColor(vehicle.direction) }}>
-                                                    {vehicle.direction}
+                                                <Typography variant="body1" >
+                                                    {vehicle.vehicleType}
                                                 </Typography>
                                             </Grid>
                                             {vehicle.driver && (
@@ -465,28 +465,6 @@ const RouteDetail = () => {
                         </CardContent>
                     </Card>
 
-                    <Card sx={{ mt: 3 }}>
-                        <CardContent>
-                            <Typography variant="h6" gutterBottom>
-                                Active Trips
-                            </Typography>
-                            <Divider sx={{ mb: 2 }} />
-
-                            {/* This section would display active trips for this route */}
-                            <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 2 }}>
-                                No active trips for this route
-                            </Typography>
-
-                            <Button
-                                variant="contained"
-                                fullWidth
-                                onClick={() => history.push(`/order-assignment?routeId=${routeId}`)}
-                                sx={{ mt: 2 }}
-                            >
-                                Assign Orders to This Route
-                            </Button>
-                        </CardContent>
-                    </Card>
                 </Grid>
             </Grid>
         </Box>

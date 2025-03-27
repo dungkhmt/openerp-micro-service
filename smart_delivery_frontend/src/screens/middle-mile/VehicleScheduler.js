@@ -81,22 +81,31 @@ const VehicleScheduler = () => {
             field: "routeName",
         },
         {
-            title: "Tài xế",
-            field: "driverName",
-        },
-        {
             title: "Ngày phân công",
             field: "assignmentDate",
         },
         {
             title: "Lịch trình",
-            field: "routeScheduleInfo",
-            render: (rowData) => `${rowData.dayOfWeek} (${rowData.startTime} - ${rowData.endTime})`
-        },
+            field: "routeScheduleDto",
+            renderCell: (rowData) => {
+                const schedule = rowData.routeScheduleDto;
+                if (schedule) {
+                    return `${schedule.dayOfWeek} (${schedule.startTime} - ${schedule.endTime})`;
+                }
+                return "N/A";
+            }     },
         {
             title: "Trạng thái",
-            field: "isActive",
-            lookup: { true: 'Đang hoạt động', false: 'Tạm dừng' }
+            field: "active",
+            renderCell: (rowData) => {
+                if (rowData.active === true) {
+                    return "ACTIVE";
+                }
+                else if (rowData.active === false) {
+                    return "INACTIVE";
+                }
+                return "N/A";
+            }
         },
         {
             title: "Thao tác",
@@ -209,15 +218,7 @@ const VehicleScheduler = () => {
                     startIcon={<AddIcon />}
                     onClick={() => setOpenModal(true)}
                 >
-                    Phân công phương tiện mới
-                </Button>
-                <Button
-                    variant="contained"
-                    color="success"
-                    startIcon={<PlayArrowIcon />}
-                    onClick={handleGenerateTrips}
-                >
-                    Tạo chuyến cho hôm nay
+                    Phân công phương tiện
                 </Button>
             </Box>
 
@@ -265,9 +266,6 @@ const VehicleScheduler = () => {
                             </Typography>
                             <Typography variant="body1" sx={{ mb: 2 }}>
                                 <strong>Tuyến đường:</strong> {selectedAssignment.routeName}
-                            </Typography>
-                            <Typography variant="body1" sx={{ mb: 2 }}>
-                                <strong>Tài xế:</strong> {selectedAssignment.driverName || "Chưa phân công"}
                             </Typography>
                             <Typography variant="body1" sx={{ mb: 2 }}>
                                 <strong>Ngày phân công:</strong> {selectedAssignment.assignmentDate}

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,4 +30,9 @@ public interface OrderRepo extends JpaRepository<Order, UUID>, OrderRepositoryCu
     List<Order> findByRouteVehicleId(UUID routeVehicleId);
 
     List<Order> findByRouteVehicleIdAndStatus(UUID routeVehicleId, OrderStatus orderStatus);
+
+
+    List<Order> findAllByFinalHubIdAndStatus(UUID hubId, OrderStatus orderStatus);
+
+    List<Order> findAllByOriginHubIdAndStatus(UUID hubId, OrderStatus orderStatus);
 }

@@ -32,7 +32,16 @@ public class RouteScheduleServiceImpl implements RouteScheduleService {
     public List<RouteScheduleDto> getAllActiveSchedules() {
         return routeScheduleRepository.findAll().stream()
                 .filter(RouteSchedule::isActive)
-                .map(routeScheduleMapper::routeScheduleToDto)
+                .map(routeSchedule -> {
+                    Route route = routeRepository.findById(routeSchedule.getRouteId()).orElse(null);
+                    RouteScheduleDto routeScheduleDto = RouteScheduleMapper.INSTANCE.routeScheduleToDto(routeSchedule);
+                    if(route != null) {
+                        routeScheduleDto.setRouteId(route.getRouteId());
+                        routeScheduleDto.setRouteName(route.getRouteName());
+                        routeScheduleDto.setRouteCode(route.getRouteCode());
+                    }
+                    return routeScheduleDto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -75,7 +84,7 @@ public class RouteScheduleServiceImpl implements RouteScheduleService {
 
                     // Check if a schedule already exists for this time and route vehicle
 
-                    int existingSchedule = routeScheduleRepository.findExistedRouteSchedule(routeId, startTime, endTime);
+                    int existingSchedule = routeScheduleRepository.findExistedRouteSchedule(routeId, startTime, endTime, dayOfWeek);
                     if(existingSchedule > 0) throw new IllegalStateException("A schedule already exists conflict this time and route");
 
                     // create new routeschedule

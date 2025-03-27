@@ -32,6 +32,14 @@ public interface RouteScheduleRepository extends JpaRepository<RouteSchedule, UU
             "WHERE rst.hubId = :hubId AND rs.isActive = true")
     List<RouteSchedule> findActiveSchedulesByHub(@Param("hubId") UUID hubId);
 
-    @Query("SELECT COUNT(rs) FROM RouteSchedule rs WHERE rs.routeId = :routeId AND ((:startTime > rs.startTime AND :startTime < rs.endTime) OR (:endTime > rs.startTime AND :endTime < rs.endTime)) OR (:endTime >= rs.endTime AND :startTime <= rs.startTime) ")
-    int findExistedRouteSchedule(UUID routeId, LocalTime startTime, LocalTime endTime);
+    @Query("SELECT COUNT(rs) FROM RouteSchedule rs WHERE rs.routeId = :routeId AND rs.dayOfWeek = :dayOfWeek AND " +
+            "(((:startTime >= rs.startTime AND :startTime < rs.endTime) OR " +
+            "(:endTime > rs.startTime AND :endTime <= rs.endTime)) OR " +
+            "(:startTime <= rs.startTime AND :endTime >= rs.endTime))")
+    int findExistedRouteSchedule(UUID routeId, LocalTime startTime, LocalTime endTime, DayOfWeek dayOfWeek);
+
+
+    List<RouteSchedule> findAllByIsActiveIsTrue();
+
+    List<RouteSchedule> findAllByIsActiveIsTrueAndRouteId(UUID routeId);
 }

@@ -10,12 +10,12 @@ import { errorNoti, successNoti } from 'utils/notification';
 import StandardTable from 'components/StandardTable';
 
 const DriverOrderManagement = () => {
-    const { routeVehicleId } = useParams();
+    const { routeScheduleId } = useParams();
     const history = useHistory();
 
     const [loading, setLoading] = useState(true);
     const [orders, setOrders] = useState([]);
-    const [routeVehicle, setRouteVehicle] = useState(null);
+    const [routeSchedule, setRouteSchedule] = useState(null);
     const [route, setRoute] = useState(null);
     const [openStatusDialog, setOpenStatusDialog] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
@@ -32,13 +32,13 @@ const DriverOrderManagement = () => {
                 setLoading(true);
 
                 // Get orders for this route vehicle
-                await request('get', `/smdeli/driver/routes/${routeVehicleId}/orders`, (res) => {
+                await request('get', `/smdeli/ordermanager/middle-mile/for-out/${routeScheduleId}`, (res) => {
                     setOrders(res.data || []);
                 });
 
                 // Get route vehicle details
-                await request('get', `/smdeli/middle-mile/vehicle-assignments/${routeVehicleId}`, (res) => {
-                    setRouteVehicle(res.data);
+                await request('get', `/smdeli/route-scheduler/schedule/${routeScheduleId}`, (res) => {
+                    setRouteSchedule(res.data);
 
                     // Get route details
                     if (res.data?.routeId) {
@@ -57,7 +57,7 @@ const DriverOrderManagement = () => {
         };
 
         fetchData();
-    }, [routeVehicleId]);
+    }, [routeScheduleId]);
 
     const handleBack = () => {
         history.push('/driver/dashboard');
@@ -256,7 +256,7 @@ const DriverOrderManagement = () => {
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                 <Typography variant="h4">
-                    Orders for Route: {route?.routeName || 'Loading...'}
+                    Orders for {route?.routeCode || 'Loading...'} route
                 </Typography>
 
                 <Box sx={{ display: 'flex', gap: 2 }}>
@@ -281,66 +281,6 @@ const DriverOrderManagement = () => {
                     </Button>
                 </Box>
             </Box>
-
-            <Card sx={{ mb: 3 }}>
-                <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                        <LocalShippingIcon fontSize="large" color="primary" sx={{ mr: 2 }} />
-                        <Typography variant="h6">
-                            Route Information
-                        </Typography>
-                    </Box>
-                    <Divider sx={{ mb: 2 }} />
-
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} md={4}>
-                            <Typography variant="subtitle2" color="text.secondary">
-                                Route
-                            </Typography>
-                            <Typography variant="body1" gutterBottom>
-                                {route?.routeName} ({route?.routeCode})
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={12} md={4}>
-                            <Typography variant="subtitle2" color="text.secondary">
-                                Vehicle
-                            </Typography>
-                            <Typography variant="body1" gutterBottom>
-                                {routeVehicle?.vehiclePlateNumber || 'N/A'}
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={12} md={4}>
-                            <Typography variant="subtitle2" color="text.secondary">
-                                Direction
-                            </Typography>
-                            <Typography variant="body1" gutterBottom>
-                                {routeVehicle?.direction || 'N/A'}
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={12} md={4}>
-                            <Typography variant="subtitle2" color="text.secondary">
-                                Status
-                            </Typography>
-                            <Chip
-                                label={routeVehicle?.status || 'UNKNOWN'}
-                                color={
-                                    routeVehicle?.status === 'IN_PROGRESS' ? 'warning' :
-                                        routeVehicle?.status === 'COMPLETED' ? 'success' : 'primary'
-                                }
-                                size="small"
-                            />
-                        </Grid>
-                        <Grid item xs={12} md={4}>
-                            <Typography variant="subtitle2" color="text.secondary">
-                                Total Orders
-                            </Typography>
-                            <Typography variant="body1" gutterBottom>
-                                {orders.length}
-                            </Typography>
-                        </Grid>
-                    </Grid>
-                </CardContent>
-            </Card>
 
             <StandardTable
                 title="Orders"

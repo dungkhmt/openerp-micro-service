@@ -70,7 +70,7 @@ const DriverSchedule = () => {
         setLoading(true);
         try {
             // Get all trips for the driver
-            await request('get', '/smdeli/driver/trips', (res) => {
+            await request('get', '/smdeli/driver/trips/today', (res) => {
                 // If the backend returns a structured object with trip categories
                 if (res.data && typeof res.data === 'object' && (res.data.activeTrips || res.data.scheduledTrips)) {
                     setTrips(res.data);
@@ -230,7 +230,7 @@ const DriverSchedule = () => {
 
             <Grid container spacing={3}>
                 {/* Today's Trips Section */}
-                <Grid item xs={12} md={selectedTrip ? 4 : 12}>
+                <Grid item xs={12} md={selectedTrip ? 6 : 12}>
                     <Card>
                         <CardHeader
                             title={
@@ -330,7 +330,7 @@ const DriverSchedule = () => {
                                                         primary={
                                                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                                                 <Typography variant="subtitle1">
-                                                                    {trip.routeName || `Trip #${trip.id.substring(0, 8)}`}
+                                                                    {trip.routeName} - Code: {trip.routeCode}
                                                                 </Typography>
                                                                 <Chip
                                                                     label={trip.status}
@@ -444,7 +444,7 @@ const DriverSchedule = () => {
 
                 {/* Trip Details Section */}
                 {selectedTrip && (
-                    <Grid item xs={12} md={8}>
+                    <Grid item xs={12} md={6}>
                         <Card>
                             <CardHeader
                                 title={
@@ -457,7 +457,7 @@ const DriverSchedule = () => {
                                                 <ArrowBackIcon />
                                             </IconButton>
                                             <Typography variant="h6">
-                                                Trip Details
+                                                Trip Stops
                                             </Typography>
                                         </Box>
 
@@ -474,26 +474,16 @@ const DriverSchedule = () => {
                                                         Start Trip
                                                     </Button>
                                                 )}
-                                                {tripDetails.status === 'IN_PROGRESS' && (
-                                                    <>
-                                                        <Button
-                                                            variant="outlined"
-                                                            color="primary"
-                                                            startIcon={<ArrowForwardIcon />}
-                                                            onClick={() => handleAdvanceTrip(tripDetails.id)}
-                                                            sx={{ mr: 1 }}
-                                                        >
-                                                            Next Stop
-                                                        </Button>
+                                                {tripDetails.status !== 'PLANNED' && (
                                                         <Button
                                                             variant="contained"
                                                             color="success"
                                                             startIcon={<CheckIcon />}
-                                                            onClick={() => setCompleteTripDialogOpen(true)}
+                                                            onClick={() =>history.push(`/middle-mile/driver/route/${tripDetails.routeScheduleId}?tripId=${tripDetails.id}`)
+                                                            }
                                                         >
-                                                            Complete
+                                                            Details
                                                         </Button>
-                                                    </>
                                                 )}
                                             </Box>
                                         )}
@@ -511,60 +501,9 @@ const DriverSchedule = () => {
                             ) : (
                                 <CardContent>
                                     <Grid container spacing={3}>
-                                        {/* Trip Summary */}
-                                        <Grid item xs={12}>
-                                            <Paper sx={{ p: 2, bgcolor: 'background.default' }}>
-                                                <Typography variant="subtitle1" gutterBottom>
-                                                    {tripDetails.routeName || `Trip #${tripDetails.id.substring(0, 8)}`}
-                                                </Typography>
-                                                <Grid container spacing={2}>
-                                                    <Grid item xs={4}>
-                                                        <Typography variant="body2" color="text.secondary">Status</Typography>
-                                                        <Chip
-                                                            label={tripDetails.status}
-                                                            color={
-                                                                tripDetails.status === 'PLANNED' ? 'info' :
-                                                                    tripDetails.status === 'IN_PROGRESS' ? 'warning' : 'success'
-                                                            }
-                                                            size="small"
-                                                        />
-                                                    </Grid>
-                                                    <Grid item xs={4}>
-                                                        <Typography variant="body2" color="text.secondary">Current Stop</Typography>
-                                                        <Typography variant="body1">
-                                                            {tripDetails.currentStopIndex !== undefined
-                                                                ? `${tripDetails.currentStopIndex + 1} of ${tripDetails.totalStops}`
-                                                                : 'N/A'}
-                                                        </Typography>
-                                                    </Grid>
-                                                    <Grid item xs={4}>
-                                                        <Typography variant="body2" color="text.secondary">Orders</Typography>
-                                                        <Typography variant="body1">
-                                                            {tripDetails.ordersDelivered}/{tripDetails.ordersCount}
-                                                        </Typography>
-                                                    </Grid>
-                                                    {tripDetails.startTime && (
-                                                        <Grid item xs={6}>
-                                                            <Typography variant="body2" color="text.secondary">Started</Typography>
-                                                            <Typography variant="body1">
-                                                                {new Date(tripDetails.startTime).toLocaleString()}
-                                                            </Typography>
-                                                        </Grid>
-                                                    )}
-                                                    {tripDetails.endTime && (
-                                                        <Grid item xs={6}>
-                                                            <Typography variant="body2" color="text.secondary">Completed</Typography>
-                                                            <Typography variant="body1">
-                                                                {new Date(tripDetails.endTime).toLocaleString()}
-                                                            </Typography>
-                                                        </Grid>
-                                                    )}
-                                                </Grid>
-                                            </Paper>
-                                        </Grid>
 
                                         {/* Stops */}
-                                        <Grid item xs={12} md={6}>
+                                        <Grid item xs={12} md={12}>
                                             <Typography variant="h6" gutterBottom>
                                                 <DirectionsIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
                                                 Stops
@@ -581,43 +520,14 @@ const DriverSchedule = () => {
                                                     >
                                                         <ListItem
                                                             secondaryAction={
-                                                                stop.status === 'CURRENT' && tripDetails.status === 'IN_PROGRESS' ? (
-                                                                    <Box>
-                                                                        <Button
-                                                                            variant="contained"
-                                                                            size="small"
-                                                                            onClick={() => handleHubOperation(
-                                                                                tripDetails.id,
-                                                                                stop.hubId,
-                                                                                'pickup'
-                                                                            )}
-                                                                            sx={{ mr: 1 }}
-                                                                        >
-                                                                            Pickup
-                                                                        </Button>
-                                                                        <Button
-                                                                            variant="contained"
-                                                                            size="small"
-                                                                            color="secondary"
-                                                                            onClick={() => handleHubOperation(
-                                                                                tripDetails.id,
-                                                                                stop.hubId,
-                                                                                'delivery'
-                                                                            )}
-                                                                        >
-                                                                            Deliver
-                                                                        </Button>
-                                                                    </Box>
-                                                                ) : (
-                                                                    <Chip
-                                                                        label={stop.status}
-                                                                        color={
-                                                                            stop.status === 'CURRENT' ? 'warning' :
-                                                                                stop.status === 'COMPLETED' ? 'success' : 'default'
-                                                                        }
-                                                                        size="small"
-                                                                    />
-                                                                )
+                                                                <Chip
+                                                                    label={stop.status}
+                                                                    color={
+                                                                        stop.status === 'CURRENT' ? 'warning' :
+                                                                            stop.status === 'COMPLETED' ? 'success' : 'default'
+                                                                    }
+                                                                    size="small"
+                                                                />
                                                             }
                                                         >
                                                             <ListItemText
@@ -649,49 +559,49 @@ const DriverSchedule = () => {
                                         </Grid>
 
                                         {/* Orders */}
-                                        <Grid item xs={12} md={6}>
-                                            <Typography variant="h6" gutterBottom>
-                                                <InventoryIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                                                Orders
-                                            </Typography>
-                                            <Box sx={{ maxHeight: '60vh', overflow: 'auto' }}>
-                                                {tripDetails.orders && tripDetails.orders.length > 0 ? (
-                                                    <List sx={{ bgcolor: 'background.paper', borderRadius: 1 }}>
-                                                        {tripDetails.orders.map((order) => (
-                                                            <Paper key={order.id} sx={{ mb: 1 }}>
-                                                                <ListItem>
-                                                                    <ListItemText
-                                                                        primary={
-                                                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                                                <Typography variant="subtitle2">
-                                                                                    #{order.id.substring(0, 8)}...
-                                                                                </Typography>
-                                                                                <Chip label={order.status} size="small" />
-                                                                            </Box>
-                                                                        }
-                                                                        secondary={
-                                                                            <>
-                                                                                <Typography variant="body2" color="text.secondary">
-                                                                                    From: {order.senderName}
-                                                                                </Typography>
-                                                                                <Typography variant="body2" color="text.secondary">
-                                                                                    To: {order.recipientName}
-                                                                                </Typography>
-                                                                                <Typography variant="body2" color="text.secondary">
-                                                                                    Created: {new Date(order.createdAt).toLocaleDateString()}
-                                                                                </Typography>
-                                                                            </>
-                                                                        }
-                                                                    />
-                                                                </ListItem>
-                                                            </Paper>
-                                                        ))}
-                                                    </List>
-                                                ) : (
-                                                    <Alert severity="info">No orders associated with this trip</Alert>
-                                                )}
-                                            </Box>
-                                        </Grid>
+                                        {/*<Grid item xs={12} md={6}>*/}
+                                        {/*    <Typography variant="h6" gutterBottom>*/}
+                                        {/*        <InventoryIcon sx={{ mr: 1, verticalAlign: 'middle' }} />*/}
+                                        {/*        Orders*/}
+                                        {/*    </Typography>*/}
+                                        {/*    <Box sx={{ maxHeight: '60vh', overflow: 'auto' }}>*/}
+                                        {/*        {tripDetails.orders && tripDetails.orders.length > 0 ? (*/}
+                                        {/*            <List sx={{ bgcolor: 'background.paper', borderRadius: 1 }}>*/}
+                                        {/*                {tripDetails.orders.map((order) => (*/}
+                                        {/*                    <Paper key={order.id} sx={{ mb: 1 }}>*/}
+                                        {/*                        <ListItem>*/}
+                                        {/*                            <ListItemText*/}
+                                        {/*                                primary={*/}
+                                        {/*                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>*/}
+                                        {/*                                        <Typography variant="subtitle2">*/}
+                                        {/*                                            #{order.id.substring(0, 8)}...*/}
+                                        {/*                                        </Typography>*/}
+                                        {/*                                        <Chip label={order.status} size="small" />*/}
+                                        {/*                                    </Box>*/}
+                                        {/*                                }*/}
+                                        {/*                                secondary={*/}
+                                        {/*                                    <>*/}
+                                        {/*                                        <Typography variant="body2" color="text.secondary">*/}
+                                        {/*                                            From: {order.senderName}*/}
+                                        {/*                                        </Typography>*/}
+                                        {/*                                        <Typography variant="body2" color="text.secondary">*/}
+                                        {/*                                            To: {order.recipientName}*/}
+                                        {/*                                        </Typography>*/}
+                                        {/*                                        <Typography variant="body2" color="text.secondary">*/}
+                                        {/*                                            Created: {new Date(order.createdAt).toLocaleDateString()}*/}
+                                        {/*                                        </Typography>*/}
+                                        {/*                                    </>*/}
+                                        {/*                                }*/}
+                                        {/*                            />*/}
+                                        {/*                        </ListItem>*/}
+                                        {/*                    </Paper>*/}
+                                        {/*                ))}*/}
+                                        {/*            </List>*/}
+                                        {/*        ) : (*/}
+                                        {/*            <Alert severity="info">No orders associated with this trip</Alert>*/}
+                                        {/*        )}*/}
+                                        {/*    </Box>*/}
+                                        {/*</Grid>*/}
                                     </Grid>
                                 </CardContent>
                             )}

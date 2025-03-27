@@ -34,7 +34,7 @@ const createHubIcon = () => {
         iconAnchor: [15, 15]
     });
 };
-// Custom marker icon creation remains the same...
+
 const createCustomIcon = (isNextPoint) => {
     return L.divIcon({
         className: 'custom-icon',
@@ -61,6 +61,7 @@ function LocationAndRoutingControl({ points, nextPointIndex, showReturnRoute, hu
     const [position, setPosition] = useState(null);
     const [routingControl, setRoutingControl] = useState(null);
     const [isRoutingActive, setIsRoutingActive] = useState(false);
+    const [isCompleteRouteActive, setIsCompleteRouteActive] = useState(false);
 
     const map = useMap();
 
@@ -68,8 +69,12 @@ function LocationAndRoutingControl({ points, nextPointIndex, showReturnRoute, hu
         setPosition(e.latlng);
         map.flyTo(e.latlng, 15);
 
-        if (points && points.length > 0) {
-            updateRoute(e.latlng);
+        if (points && points.length > 0 && (isRoutingActive || isCompleteRouteActive)) {
+            if (isCompleteRouteActive) {
+                showCompleteRoute(e.latlng);
+            } else {
+                updateRoute(e.latlng);
+            }
         }
     };
 
@@ -80,14 +85,14 @@ function LocationAndRoutingControl({ points, nextPointIndex, showReturnRoute, hu
 
         let waypoints = [];
 
-        if (nextPointIndex==null) {
-            // Khi nextOrder = null, hiển thị đường về hub
+        if (nextPointIndex === null) {
+            // When nextOrder = null, show route back to hub
             waypoints = [
                 L.latLng(currentPosition.lat, currentPosition.lng),
                 L.latLng(hub.latitude, hub.longitude)
             ];
         } else if (points[nextPointIndex]) {
-            // Bình thường thì chỉ đường tới điểm tiếp theo
+            // Otherwise show route to next point
             waypoints = [
                 L.latLng(currentPosition.lat, currentPosition.lng),
                 L.latLng(points[nextPointIndex].lat, points[nextPointIndex].lng)
@@ -113,6 +118,53 @@ function LocationAndRoutingControl({ points, nextPointIndex, showReturnRoute, hu
         setRoutingControl(control);
     };
 
+    const showCompleteRoute = (currentPosition) => {
+        if (routingControl && map) {
+            map.removeControl(routingControl);
+        }
+
+        if (!points || points.length === 0) return;
+
+        // Create waypoints starting with current position
+        let waypoints = [L.latLng(currentPosition.lat, currentPosition.lng)];
+
+        // Sort points by their sequence if available
+        const sortedPoints = [...points].sort((a, b) => {
+            if (a.sequence && b.sequence) {
+                return a.sequence - b.sequence;
+            }
+            return 0;
+        });
+
+        // Add all points to waypoints
+        sortedPoints.forEach(point => {
+            waypoints.push(L.latLng(point.lat, point.lng));
+        });
+
+        // Add hub as the final destination if requested
+        if (hub && showReturnRoute) {
+            waypoints.push(L.latLng(hub.latitude, hub.longitude));
+        }
+
+        const control = L.Routing.control({
+            waypoints: waypoints,
+            routeWhileDragging: false,
+            showAlternatives: false,
+            lineOptions: {
+                styles: [{
+                    color: '#9C27B0', // Purple for complete route
+                    weight: 4,
+                    opacity: 0.8
+                }]
+            },
+            router: L.Routing.osrmv1({
+                serviceUrl: 'https://router.project-osrm.org/route/v1'
+            })
+        });
+
+        control.addTo(map);
+        setRoutingControl(control);
+    };
 
     const handleLocationError = (e) => {
         alert("Không thể tìm thấy vị trí của bạn. Vui lòng bật dịch vụ vị trí.");
@@ -126,15 +178,18 @@ function LocationAndRoutingControl({ points, nextPointIndex, showReturnRoute, hu
     const handleLocateClick = () => {
         map.locate({ setView: false });
     };
+
     const toggleRouting = () => {
+        setIsCompleteRouteActive(false);
+
         if (isRoutingActive) {
-            // Tắt chỉ đường
+            // Turn off routing
             if (routingControl) {
                 map.removeControl(routingControl);
                 setRoutingControl(null);
             }
         } else {
-            // Bật chỉ đường
+            // Turn on routing
             if (position) {
                 updateRoute(position);
             } else {
@@ -144,10 +199,25 @@ function LocationAndRoutingControl({ points, nextPointIndex, showReturnRoute, hu
         setIsRoutingActive(!isRoutingActive);
     };
 
+    const toggleCompleteRoute = () => {
+        setIsRoutingActive(false);
 
-    useMapEvents({
-        locationfound: handleLocationFound
-    });
+        if (isCompleteRouteActive) {
+            // Turn off complete route
+            if (routingControl) {
+                map.removeControl(routingControl);
+                setRoutingControl(null);
+            }
+        } else {
+            // Turn on complete route
+            if (position) {
+                showCompleteRoute(position);
+            } else {
+                map.locate({ setView: false });
+            }
+        }
+        setIsCompleteRouteActive(!isCompleteRouteActive);
+    };
 
     return (
         <>
@@ -174,10 +244,25 @@ function LocationAndRoutingControl({ points, nextPointIndex, showReturnRoute, hu
                         backgroundColor: isRoutingActive ? "#FF9800" : "white",
                         border: "2px solid rgba(0,0,0,0.2)",
                         borderRadius: "4px",
-                        cursor: "pointer"
+                        cursor: "pointer",
+                        marginBottom: "5px"
                     }}
                 >
                     🧭 Chỉ đường
+                </button>
+                <button
+                    className="leaflet-control"
+                    onClick={toggleCompleteRoute}
+                    style={{
+                        padding: "6px 10px",
+                        backgroundColor: isCompleteRouteActive ? "#9C27B0" : "white",
+                        color: isCompleteRouteActive ? "white" : "black",
+                        border: "2px solid rgba(0,0,0,0.2)",
+                        borderRadius: "4px",
+                        cursor: "pointer"
+                    }}
+                >
+                    🚚 Chỉ đường qua tất cả điểm
                 </button>
             </div>
             {position && (
@@ -197,32 +282,27 @@ function LocationAndRoutingControl({ points, nextPointIndex, showReturnRoute, hu
     );
 };
 
-
-export function EnhancedMap({ points, assignments,onNextOrder , nextOrder, hub  }) {
-
+export function EnhancedMap({ points, assignments, onNextOrder, nextOrder, hub }) {
     const [nextPointIndex, setNextPointIndex] = useState(0);
     const [showReturnRoute, setShowReturnRoute] = useState(false);
-    console.log("nexxt order", nextOrder)
-    console.log('nextPointIndex:', nextPointIndex);
 
     useEffect(() => {
         if (nextOrder === null && hub) {
-            // Nếu không có đơn hàng tiếp theo, hiển thị đường về hub
+            // If there's no next order, show route back to hub
             setShowReturnRoute(true);
             setNextPointIndex(null);
         } else if (nextOrder && assignments) {
             setShowReturnRoute(false);
             const index = assignments.findIndex(order => order?.id === nextOrder?.id);
-            console.log("index",index)
             if (index !== -1) {
                 setNextPointIndex(index);
             }
         }
     }, [nextOrder, assignments, hub]);
+
     if (!points || points.length === 0) {
         return <div>Không có điểm đến nào</div>;
     }
-
 
     const formatDateTime = (dateTimeString) => {
         return new Date(dateTimeString).toLocaleString('vi-VN', {
@@ -236,7 +316,7 @@ export function EnhancedMap({ points, assignments,onNextOrder , nextOrder, hub  
 
     return (
         <MapContainer
-            center={nextPointIndex!==null ? [points[nextPointIndex].lat, points[nextPointIndex].lng] : [hub.latitude, hub.longitude]}
+            center={nextPointIndex !== null ? [points[nextPointIndex].lat, points[nextPointIndex].lng] : [hub.latitude, hub.longitude]}
             zoom={12}
             style={{
                 width: "100%",
@@ -269,7 +349,6 @@ export function EnhancedMap({ points, assignments,onNextOrder , nextOrder, hub  
                     key={index}
                     position={[point.lat, point.lng]}
                     icon={createCustomIcon(index === nextPointIndex)}
-
                 >
                     <Popup>
                         <div style={{
@@ -280,26 +359,28 @@ export function EnhancedMap({ points, assignments,onNextOrder , nextOrder, hub  
                                 margin: "0 0 10px 0",
                                 color: index === nextPointIndex ? '#4CAF50' : '#1976D2'
                             }}>
-                                { index === nextPointIndex
-                                        ? '📍 Điểm tiếp theo'
-                                        : `Điểm dừng ${index + 1}`}
+                                {index === nextPointIndex
+                                    ? '📍 Điểm tiếp theo'
+                                    : `Điểm dừng ${index + 1}`}
                             </h3>
-
-                                <div style={{ fontSize: "14px" }}>
-                                    <p style={{ margin: "5px 0" }}><strong>Mã đơn:</strong> {assignments[index]?.orderId}</p>
-                                    <p style={{ margin: "5px 0" }}><strong>Người gửi:</strong> {assignments[index]?.senderName}</p>
-                                    <p style={{ margin: "5px 0" }}><strong>SĐT:</strong> {assignments[index]?.senderPhone}</p>
-                                    <p style={{ margin: "5px 0" }}><strong>Địa chỉ:</strong> {assignments[index]?.senderAddress}</p>
-                                    <p style={{ margin: "5px 0" }}><strong>Thời gian tạo:</strong> {formatDateTime(assignments[index]?.orderCreatedAt)}</p>
-                                    <p style={{ margin: "5px 0" }}><strong>Trạng thái:</strong> {assignments[index]?.status}</p>
-                                </div>
-                            )
+                            <div style={{ fontSize: "14px" }}>
+                                <p style={{ margin: "5px 0" }}><strong>Mã đơn:</strong> {assignments[index]?.orderId}</p>
+                                <p style={{ margin: "5px 0" }}><strong>Người gửi:</strong> {assignments[index]?.senderName}</p>
+                                <p style={{ margin: "5px 0" }}><strong>SĐT:</strong> {assignments[index]?.senderPhone}</p>
+                                <p style={{ margin: "5px 0" }}><strong>Địa chỉ:</strong> {assignments[index]?.senderAddress}</p>
+                                <p style={{ margin: "5px 0" }}><strong>Thời gian tạo:</strong> {formatDateTime(assignments[index]?.orderCreatedAt)}</p>
+                                <p style={{ margin: "5px 0" }}><strong>Trạng thái:</strong> {assignments[index]?.status}</p>
+                            </div>
                         </div>
                     </Popup>
                 </Marker>
             ))}
-            <LocationAndRoutingControl points={points} nextPointIndex={nextPointIndex}    showReturnRoute={showReturnRoute}
-                                       hub={hub} />
+            <LocationAndRoutingControl
+                points={points}
+                nextPointIndex={nextPointIndex}
+                showReturnRoute={showReturnRoute}
+                hub={hub}
+            />
         </MapContainer>
     );
 }

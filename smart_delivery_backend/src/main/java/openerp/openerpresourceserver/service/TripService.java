@@ -4,6 +4,7 @@ import openerp.openerpresourceserver.dto.*;
 import openerp.openerpresourceserver.entity.Trip;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -11,6 +12,8 @@ import java.util.UUID;
 public interface TripService {
 
     List<TripDTO> getAllTripsForDriver(String username);
+
+    List<TripDTO> getAllTripsForDriverToday(String username);
 
     TripDetailsDTO getTripDetailsForDriver(UUID tripId, String username);
 
@@ -22,6 +25,12 @@ public interface TripService {
 
     @Transactional
     TripSummaryDTO completeTrip(UUID tripId, String username, String completionNotes);
+
+    @Transactional
+    List<Trip> createTripThisWeek();
+
+    @Transactional
+    List<Trip> createTripFromTo(LocalDate startDate, LocalDate endDate);
 
     @Transactional
     Trip createTripForToday(UUID routeVehicleId, String username);

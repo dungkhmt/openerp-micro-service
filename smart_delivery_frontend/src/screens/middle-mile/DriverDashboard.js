@@ -23,7 +23,7 @@ const DriverDashboard = () => {
     const authState = useSelector((state) => state.auth);
 
     // New state for weekday selection
-    const [selectedDay, setSelectedDay] = useState(new Date().getDay() || 7); // Default to today or Sunday if today is 0
+    const [selectedDay, setSelectedDay] = useState(new Date().getDay() || 1); // Default to today or Sunday if today is 0
     const [filteredAssignments, setFilteredAssignments] = useState([]);
 
     // Map numeric day of week to string
@@ -102,7 +102,7 @@ const DriverDashboard = () => {
         if (assignments.length > 0) {
             const selectedDayString = dayOfWeekMap[selectedDay];
             const filtered = assignments.filter(
-                assignment => assignment.dayOfWeek === selectedDayString
+                assignment => assignment.routeScheduleDto?.dayOfWeek === selectedDayString
             );
             setFilteredAssignments(filtered);
         }
@@ -363,22 +363,17 @@ const DriverDashboard = () => {
                                                         </Box>
 
                                                         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                                            Assignment ID: {assignment.id.substring(0, 8)}...
+                                                            Route Code: {assignment.routeDto?.routeCode}
                                                         </Typography>
 
                                                         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                                            Route Schedule: {assignment.routeScheduleId.substring(0, 8)}...
+                                                            Route Name: {assignment.routeDto?.routeName}
                                                         </Typography>
 
                                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                                                             <Typography variant="body2" color="text.secondary">
-                                                                Status:
+                                                                Schedule: {assignment.routeScheduleDto?.startTime?.substring(0,5)} - {assignment.routeScheduleDto?.endTime?.substring(0,5)}
                                                             </Typography>
-                                                            <Chip
-                                                                label={assignment.active ? "Active" : "Inactive"}
-                                                                color={assignment.active ? "success" : "default"}
-                                                                size="small"
-                                                            />
                                                         </Box>
 
                                                         {assignment.startTime && assignment.endTime && (
@@ -392,18 +387,14 @@ const DriverDashboard = () => {
                                                             </Box>
                                                         )}
 
-                                                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
-                                                            <Button
-                                                                variant="outlined"
-                                                                size="small"
-                                                                onClick={() => handleViewRoute(assignment.routeScheduleId)}
-                                                            >
-                                                                View Route
-                                                            </Button>
+                                                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'right' }}>
                                                             <Button
                                                                 variant="contained"
                                                                 size="small"
-                                                                color="primary"
+                                                                color="primary"                                                                onClick={() => handleViewRoute(assignment.routeScheduleId)}
+
+                                                                onClick={() => handleViewRoute(assignment.routeScheduleId)}
+
                                                             >
                                                                 View Details
                                                             </Button>

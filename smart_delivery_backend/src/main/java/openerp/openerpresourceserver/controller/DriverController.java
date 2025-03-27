@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -31,6 +32,14 @@ public class DriverController {
     public ResponseEntity<List<TripDTO>> getAllDriverTrips(Principal principal) {
         String username = principal.getName();
         List<TripDTO> tripsDTO = tripService.getAllTripsForDriver(username);
+        return ResponseEntity.ok(tripsDTO);
+    }
+
+    @PreAuthorize("hasRole('DRIVER')")
+    @GetMapping("/trips/today")
+    public ResponseEntity<List<TripDTO>> getAllDriverTripsToday(Principal principal) {
+        String username = principal.getName();
+        List<TripDTO> tripsDTO = tripService.getAllTripsForDriverToday(username);
         return ResponseEntity.ok(tripsDTO);
     }
 
@@ -122,13 +131,11 @@ public class DriverController {
      */
     @PreAuthorize("hasRole('DRIVER')")
     @PutMapping("/pickup-orders")
-    public ResponseEntity<Void> pickupOrders(@RequestBody List<UUID> orderIds, Principal principal) {
+    public ResponseEntity<Void> pickupOrders(@RequestBody PickupOrdersRequest request, Principal principal) {
         String username = principal.getName();
-        driverService.pickupOrders(username, orderIds);
+        driverService.pickupOrders(username, request.getOrderIds(), request.getTripId());
         System.out.println("DriverController.getAssignedVehicle: " + principal);
-
         return ResponseEntity.ok().build();
-
     }
 
     /**

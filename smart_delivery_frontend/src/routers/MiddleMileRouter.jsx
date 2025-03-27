@@ -40,7 +40,7 @@ export default function MiddleMileRouter() {
                 <Route exact path={`${path}/vehicle/manage`} component={VehicleManagement}/>
                 <Route exact path={`${path}/driver-vehicle/manage`} component={DriverVehicleAssignmentManagement}/>
                 <Route exact path={`${path}/driver/dashboard`} component={DriverDashboard}/>
-                <Route exact path={`${path}/driver/orders/:routeVehicleId`} component={DriverOrderManagement}/>
+                <Route exact path={`${path}/driver/orders/:routeScheduleId`} component={DriverOrderManagement}/>
                 <Route exact path={`${path}/driver/route/:routeVehicleId`} component={DriverRouteMap}/>
                 <Route exact path={`${path}/driver/hub/:hubId/:operationType`} component={DriverHubOperations}/>
                 <Route exact path={`${path}/schedule`} component={VehicleScheduler}/>

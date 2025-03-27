@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.sql.Date;
 import java.time.DayOfWeek;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 
 /**
@@ -30,18 +32,15 @@ public class Trip {
      */
     @Column(name = "route_schelude_id", nullable = false)
     private UUID routeScheduleId;
-
+    private UUID vehicleId;
     /**
      * The driver assigned to this trip
      */
     @Column(name = "driver_id", nullable = false)
     private UUID driverId;
-    @Column(name = "day_of_week")
-    @Enumerated(EnumType.STRING)
-    private DayOfWeek dayOfWeek;
-    /**
-     * When the trip started
-     */
+
+    private LocalDate date;
+
     @Column(name = "start_time", nullable = true)
     private Instant startTime;
 

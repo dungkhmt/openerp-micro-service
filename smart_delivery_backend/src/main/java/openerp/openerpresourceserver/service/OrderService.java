@@ -3,6 +3,8 @@ package openerp.openerpresourceserver.service;
 import jakarta.transaction.Transactional;
 import openerp.openerpresourceserver.dto.*;
 import openerp.openerpresourceserver.entity.Order;
+import openerp.openerpresourceserver.entity.RouteSchedule;
+import openerp.openerpresourceserver.entity.Vehicle;
 import org.springframework.http.ResponseEntity;
 
 import java.security.Principal;
@@ -48,4 +50,5 @@ public interface OrderService {
 
     boolean confirmOutHub(UUID[] orderIds,  UUID vehicleId);
 
+    List<OrderForTripDto> getOrdersForRouteSchedule(UUID routeScheduleId);
 }

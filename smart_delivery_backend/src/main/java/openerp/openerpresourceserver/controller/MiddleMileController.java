@@ -94,4 +94,10 @@ public class MiddleMileController {
         routeService.deleteRoute(routeId);
         return ResponseEntity.noContent().build();
     }
+    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'ROUTE_MANAGER')")
+    @GetMapping("/routes/{routeId}/vehicles")
+    public ResponseEntity<List<VehicleDto>> getVehicleForRoute(@PathVariable UUID routeId) {
+
+        return ResponseEntity.ok(routeService.getVehicleForRoute(routeId));
+    }
 }

@@ -7,14 +7,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.dto.RouteDto;
 import openerp.openerpresourceserver.dto.RouteStopDto;
-import openerp.openerpresourceserver.entity.Hub;
-import openerp.openerpresourceserver.entity.Route;
-import openerp.openerpresourceserver.entity.RouteStop;
+import openerp.openerpresourceserver.dto.VehicleDto;
+import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.mapper.RouteMapper;
 import openerp.openerpresourceserver.mapper.RouteStopMapper;
-import openerp.openerpresourceserver.repository.HubRepo;
-import openerp.openerpresourceserver.repository.RouteRepository;
-import openerp.openerpresourceserver.repository.RouteStopRepository;
+import openerp.openerpresourceserver.mapper.VehicleMapper;
+import openerp.openerpresourceserver.repository.*;
 import openerp.openerpresourceserver.service.RouteService;
 import openerp.openerpresourceserver.utils.DistanceCalculator.HaversineDistanceCalculator;
 
@@ -30,6 +28,10 @@ import java.util.UUID;
 public class RouteServiceImpl implements RouteService {
 
     private final RouteRepository routeRepository;
+    private final RouteScheduleRepository routeScheduleRepository;
+    private final VehicleRepository vehicleRepository;
+    private final ScheduleVehicleAssignmentRepository scheduleVehicleAssignmentRepository;
+
     private final RouteStopRepository routeStopRepository;
     private final HubRepo hubRepo;
     private final RouteMapper routeMapper = RouteMapper.INSTANCE;
@@ -239,5 +241,25 @@ public class RouteServiceImpl implements RouteService {
         route.setEstimatedDuration(totalDuration);
 
         routeRepository.save(route);
+    }
+    @Override
+    public List<VehicleDto> getVehicleForRoute(UUID routeId) {
+        Route route = routeRepository.findById(routeId).orElseThrow(() -> new NotFoundException("Route not found"));
+        List<RouteSchedule> routeSchedules = routeScheduleRepository.findAllByIsActiveIsTrueAndRouteId(routeId);
+        List<Vehicle> vehicles = new ArrayList<>();
+        if (!routeSchedules.isEmpty()) {
+
+            for (RouteSchedule routeSchedule : routeSchedules) {
+                List<ScheduleVehicleAssignment> assignments = scheduleVehicleAssignmentRepository.findByRouteScheduleId(routeSchedule.getId());
+                List<Vehicle> vehicles1 = assignments.stream().map(a -> vehicleRepository.findById(a.getVehicleId()).orElse(null)).toList();
+                for(Vehicle vehicle : vehicles1){
+                    if(!vehicles.contains(vehicle)){
+                        vehicles.add(vehicle);
+                    }
+                }
+            }
+
+        }
+        return vehicles.stream().map(VehicleMapper.INSTANCE::vehicleToVehicleDto).toList();
     }
 }

@@ -47,6 +47,8 @@ public class TripOrder {
     @Column(name = "is_pickup")
     private Boolean isPickup;
 
+    private Boolean delivered;
+
     /**
      * Whether this order is delivered in this trip
      */

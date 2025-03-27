@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 public class TripAssignmentServiceImpl implements TripAssignmentService {
 
     private final OrderRepo orderRepo;
+    private final OrderItemRepo orderItemRepo;
     private final TripRepository tripRepository;
     private final TripOrderRepository tripOrderRepository;
     private final VehicleRepository vehicleRepository;
@@ -279,7 +280,9 @@ public class TripAssignmentServiceImpl implements TripAssignmentService {
     private double calculateOrderWeight(Order order) {
         // Use actual weight if available (from order items), otherwise estimate based on price
         // This is a simplification; in a real system, you would use actual weight data
-        return order.getTotalPrice() != null ? order.getTotalPrice() / 10.0 : 5.0; // Default 5kg if no price
+        List<OrderItem> orderItems = orderItemRepo.findAllByOrderId(order.getId());
+
+        return orderItems.size() != 0 ? orderItems.stream().mapToDouble(OrderItem::getWeight).sum(): 0; // Default 5kg if no price
     }
 
     /**

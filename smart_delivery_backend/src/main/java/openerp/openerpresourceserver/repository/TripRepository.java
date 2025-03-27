@@ -26,4 +26,6 @@ public interface TripRepository extends JpaRepository<Trip, UUID> {
     Optional<Trip> findActiveByRouteScheduleId(UUID routeScheduleId);
 
     List<Trip> findByDriverId(UUID id);
+
+    List<Trip> findByDriverIdAndDate(UUID id, LocalDate now);
 }

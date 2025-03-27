@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import openerp.openerpresourceserver.entity.RouteSchedule;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -17,18 +18,14 @@ import java.util.UUID;
 public class ScheduleVehicleAssignmentDto {
 
     private UUID id;
-
     @NotNull(message = "Route schedule ID is required")
     private UUID routeScheduleId;
-
+    private RouteScheduleDto routeScheduleDto;
+    private RouteDto routeDto;
     private String routeName;
-
     private String routeCode;
-
     private String dayOfWeek;
-
     private String startTime;
-
     private String endTime;
 
     @NotNull(message = "Vehicle ID is required")

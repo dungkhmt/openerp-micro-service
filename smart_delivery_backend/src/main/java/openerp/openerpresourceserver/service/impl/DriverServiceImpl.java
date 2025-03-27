@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import openerp.openerpresourceserver.dto.OrderResponseDto;
 import openerp.openerpresourceserver.dto.OrderSummaryDTO;
 import openerp.openerpresourceserver.dto.VehicleDto;
 import openerp.openerpresourceserver.entity.*;
@@ -36,6 +35,8 @@ public class DriverServiceImpl implements DriverService {
     private final RouteRepository routeRepository;
     private final MiddleMileOrderService middleMileOrderService;
     private final VehicleMapper vehicleMapper = VehicleMapper.INSTANCE;
+    private final TripOrderRepository tripOrderRepository;
+    private final TripRepository tripRepository;
 
     @Override
     public VehicleDto getDriverVehicleByUsername(String username) {
@@ -75,7 +76,7 @@ public class DriverServiceImpl implements DriverService {
 
         // Get orders at the hub that are ready for pickup (COLLECTED_HUB status)
         // and are not already assigned to a vehicle
-        List<Order> pendingOrders = orderRepo.findAllByOriginHubIdAndStatusAndVehicleId(hubId, OrderStatus.COLLECTED_HUB, vehicleDriver.getVehicleId());
+        List<Order> pendingOrders = orderRepo.findAllByOriginHubIdAndStatus(hubId, OrderStatus.COLLECTED_HUB);
 
         return pendingOrders.stream()
                 .map(OrderSummaryDTO::new)
@@ -84,7 +85,7 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     @Transactional
-    public void pickupOrders(String username, List<UUID> orderIds) {
+    public void pickupOrders(String username, List<UUID> orderIds, UUID tripId) {
         if (orderIds == null || orderIds.isEmpty()) {
             throw new IllegalArgumentException("No orders provided for pickup");
         }
@@ -105,6 +106,7 @@ public class DriverServiceImpl implements DriverService {
 
         // Update orders status and assign to driver's vehicle
         List<Order> orders = new ArrayList<>();
+        List<TripOrder> tripOrders = new ArrayList<>();
         for (UUID orderId : orderIds) {
             Order order = orderRepo.findById(orderId)
                     .orElseThrow(() -> new NotFoundException("Order not found with ID: " + orderId));
@@ -123,7 +125,14 @@ public class DriverServiceImpl implements DriverService {
             order.setDriverName(driver.getName());
 
             orders.add(order);
-        }
+
+            tripOrders.add(new TripOrder().builder()
+                    .tripId(tripId)
+                    .orderId(orderId)
+                    .sequenceNumber(orders.indexOf(order))
+                    .delivered(false)
+                    .build());
+
 
         // Update vehicle status if needed
         if (vehicle.getStatus() == VehicleStatus.AVAILABLE) {
@@ -132,7 +141,9 @@ public class DriverServiceImpl implements DriverService {
         }
 
         orderRepo.saveAll(orders);
+        tripOrderRepository.saveAll(tripOrders);
     }
+        }
 
     @Override
     @Transactional

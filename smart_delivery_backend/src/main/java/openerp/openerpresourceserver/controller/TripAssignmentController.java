@@ -2,16 +2,21 @@ package openerp.openerpresourceserver.controller;
 
 import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.dto.OrderSummaryDTO;
+import openerp.openerpresourceserver.dto.TripDTO;
 import openerp.openerpresourceserver.dto.TripDetailsDTO;
 import openerp.openerpresourceserver.entity.Order;
 import openerp.openerpresourceserver.entity.Trip;
 import openerp.openerpresourceserver.entity.TripOrder;
 import openerp.openerpresourceserver.service.TripAssignmentService;
+import openerp.openerpresourceserver.service.TripService;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -26,7 +31,26 @@ import java.util.stream.Collectors;
 public class TripAssignmentController {
 
     private final TripAssignmentService tripAssignmentService;
+    private final TripService tripService;
 
+    @PreAuthorize("hasAnyRole('ROUTE_MANAGER')")
+    @PostMapping("/weekly/create")
+    public ResponseEntity<List<Trip>> createTripThisWeek(){
+
+        return ResponseEntity.ok(tripService.createTripThisWeek());
+
+    }
+
+    @PostMapping("/create-from-to")
+    public ResponseEntity<List<Trip>> createTripsFromTo(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        List<Trip> createdTrips = tripService.createTripFromTo(startDate, endDate);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(createdTrips);
+    }
     /**
      * Manually trigger morning trip assignments for a hub
      */

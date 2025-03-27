@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.service;
 import jakarta.transaction.Transactional;
 import openerp.openerpresourceserver.dto.RouteDto;
 import openerp.openerpresourceserver.dto.RouteStopDto;
+import openerp.openerpresourceserver.dto.VehicleDto;
 import openerp.openerpresourceserver.entity.Route;
 import openerp.openerpresourceserver.entity.RouteStop;
 
@@ -31,4 +32,5 @@ public interface RouteService {
 
     void updateRouteMetrics(UUID routeId);
 
+    List<VehicleDto> getVehicleForRoute(UUID routeId);
 }
