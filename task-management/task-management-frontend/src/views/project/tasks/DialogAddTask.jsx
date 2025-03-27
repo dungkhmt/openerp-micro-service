@@ -122,19 +122,14 @@ const DialogAddTask = ({ open, setOpen, defaultEvent }) => {
 
   const handleAssigneeSearch = (search) => {
     setFilteredAssignees(
-      members
-        .filter(
-          ({ member }) =>
-            (member.firstName &&
-              removeDiacritics(member.firstName)
-                .toLowerCase()
-                .includes(removeDiacritics(search).toLowerCase())) ||
-            (member.lastName &&
-              removeDiacritics(member.lastName)
-                .toLowerCase()
-                .includes(removeDiacritics(search).toLowerCase()))
-        )
-        .filter(({ member }) => member.firstName || member.lastName)
+      members.filter(({ member }) => {
+        if (!member.firstName && !member.lastName) return false;
+
+        const fullName = `${member.firstName || ""} ${
+          member.lastName || ""
+        }`.toLowerCase();
+        return fullName.includes(search.toLowerCase());
+      })
     );
   };
 
@@ -261,7 +256,7 @@ const DialogAddTask = ({ open, setOpen, defaultEvent }) => {
                 disabled
                 inputProps={{ placeholder: "Trạng thái" }}
               >
-                {status.statuses.map((status) => (
+                {status.taskStatuses.map((status) => (
                   <MenuItem key={status.statusId} value={status.statusId}>
                     <TaskStatus status={status} />
                   </MenuItem>
