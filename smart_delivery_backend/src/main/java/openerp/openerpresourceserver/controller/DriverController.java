@@ -115,14 +115,14 @@ public class DriverController {
      * Get pending collection orders for the driver's vehicle at a specific hub
      */
     @PreAuthorize("hasRole('DRIVER')")
-    @GetMapping("/hub/{hubId}/pending-pickups")
-    public ResponseEntity<List<OrderSummaryDTO>> getPendingPickupOrders(
+    @GetMapping("/trip/{tripId}/pending-pickups")
+    public ResponseEntity<List<OrderItemForTripDto>> getPendingPickupOrders(
             Principal principal,
-            @PathVariable UUID hubId) {
+            @PathVariable UUID tripId) {
         String username = principal.getName();
         System.out.println("DriverController.getAssignedVehicle: " + principal);
 
-        List<OrderSummaryDTO> orders = driverService.getPendingPickupOrdersForDriver(username, hubId);
+        List<OrderItemForTripDto> orders = driverService.getPendingPickupOrderItemsForDriver(username, tripId);
         return ResponseEntity.ok(orders);
     }
 
@@ -133,7 +133,7 @@ public class DriverController {
     @PutMapping("/pickup-orders")
     public ResponseEntity<Void> pickupOrders(@RequestBody PickupOrdersRequest request, Principal principal) {
         String username = principal.getName();
-        driverService.pickupOrders(username, request.getOrderIds(), request.getTripId());
+        driverService.pickupOrders(username, request.getOrderItemIds(), request.getTripId());
         System.out.println("DriverController.getAssignedVehicle: " + principal);
         return ResponseEntity.ok().build();
     }
@@ -143,9 +143,9 @@ public class DriverController {
      */
     @PreAuthorize("hasRole('DRIVER')")
     @PutMapping("/deliver-orders")
-    public ResponseEntity<Void> deliverOrders(@RequestBody List<UUID> orderIds, Principal principal) {
+    public ResponseEntity<Void> deliverOrderItems(@RequestBody List<UUID> orderItemIds, Principal principal) {
         String username = principal.getName();
-        driverService.deliverOrders(username, orderIds);
+        driverService.deliverOrderItems(username, orderItemIds);
         return ResponseEntity.ok().build();
     }
 
@@ -168,10 +168,10 @@ public class DriverController {
      * Get all orders currently assigned to the driver's vehicle
      */
     @PreAuthorize("hasRole('DRIVER')")
-    @GetMapping("/current-orders")
-    public ResponseEntity<List<OrderSummaryDTO>> getCurrentOrders(Principal principal) {
+    @GetMapping("/current-orders/{tripId}")
+    public ResponseEntity<List<OrderItemForTripDto>> getCurrentOrders(Principal principal,@PathVariable UUID tripId) {
         String username = principal.getName();
-        List<OrderSummaryDTO> orders = driverService.getCurrentOrdersForDriver(username);
+        List<OrderItemForTripDto> orders = driverService.getCurrentOrderItemsForDriver(username, tripId);
         return ResponseEntity.ok(orders);
     }
 

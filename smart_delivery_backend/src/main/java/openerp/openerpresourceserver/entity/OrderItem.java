@@ -5,8 +5,13 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import openerp.openerpresourceserver.entity.enumentity.OrderItemStatus;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedBy;
 
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Data
@@ -29,6 +34,8 @@ public class OrderItem {
     private Double length;
     private Double width;
     private Double height;
+    @Enumerated(EnumType.STRING)
+    private OrderItemStatus status;
 
     public OrderItem(String name, Integer quantity, Double weight, Double price, Double length, Double width, Double height) {
         this.name = name;
@@ -39,4 +46,15 @@ public class OrderItem {
         this.width = width;
         this.height = height;
     }
+    @CreatedBy
+    private String createdBy;
+    private String approvedBy;
+    private String cancelledBy;
+
+    @CreationTimestamp
+    private Timestamp createdAt;
+
+    @UpdateTimestamp
+    private Timestamp updatedAt;
+
 }

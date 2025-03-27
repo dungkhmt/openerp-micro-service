@@ -294,7 +294,7 @@ const DriverRouteMap = () => {
     };
 
     const handleViewOrders = () => {
-        history.push(`/middle-mile/driver/orders/${routeVehicleId}`);
+        history.push(`/middle-mile/driver/orders/${tripId}`);
     };
 
     const handleCompleteTrip = () => {

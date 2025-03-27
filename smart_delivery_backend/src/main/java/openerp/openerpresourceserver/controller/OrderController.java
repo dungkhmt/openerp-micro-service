@@ -172,8 +172,8 @@ public class OrderController {
         }
 
         @PreAuthorize("hasAnyRole('ROUTE_MANAGER', 'DRIVER')")
-        @GetMapping("/middle-mile/for-out/{routeScheduleId}")
-        public ResponseEntity<List<OrderForTripDto>> getMiddleMileOrdersForOut(@PathVariable  UUID routeScheduleId) {
-            return ResponseEntity.ok(orderService.getOrdersForRouteSchedule(routeScheduleId));
+        @GetMapping("/middle-mile/for-out/{tripId}")
+        public ResponseEntity<List<OrderItemForTripDto>> getMiddleMileOrdersForOut(@PathVariable  UUID tripId) {
+            return ResponseEntity.ok(orderService.getOrderItemsForTrip(tripId));
         }
 }

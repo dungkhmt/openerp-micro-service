@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.service;
 
 import openerp.openerpresourceserver.dto.*;
+import openerp.openerpresourceserver.entity.RouteStop;
 import openerp.openerpresourceserver.entity.Trip;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +35,8 @@ public interface TripService {
 
     @Transactional
     Trip createTripForToday(UUID routeVehicleId, String username);
+
+    RouteStop getCurrentRouteStop(UUID tripId);
 
     Map<String, Object> getTripDetails(UUID tripId, String username);
 

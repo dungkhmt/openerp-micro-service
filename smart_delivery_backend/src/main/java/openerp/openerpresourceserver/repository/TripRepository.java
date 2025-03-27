@@ -28,4 +28,7 @@ public interface TripRepository extends JpaRepository<Trip, UUID> {
     List<Trip> findByDriverId(UUID id);
 
     List<Trip> findByDriverIdAndDate(UUID id, LocalDate now);
+
+    @Query("select distinct t from Trip t join RouteSchedule rs on t.routeScheduleId = rs.id join RouteStop rst on rs.routeId = rst.routeId where rst.hubId = :hubId and t.status = :status and t.date = :date")
+    List<Trip> findAllTripsByHubIdAndStatusAndDate(@Param("hubId") UUID hubId, @Param("status") String tripStatus, @Param("date") LocalDate date);
 }

@@ -2,11 +2,11 @@ package openerp.openerpresourceserver.service.impl;
 
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.dto.*;
 import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
 import openerp.openerpresourceserver.entity.enumentity.VehicleStatus;
-import openerp.openerpresourceserver.mapper.OrderMapper;
 import openerp.openerpresourceserver.repository.*;
 import openerp.openerpresourceserver.service.TripService;
 import org.springframework.stereotype.Service;
@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TripServiceImpl implements TripService {
 
     private final TripRepository tripRepository;
@@ -34,7 +35,7 @@ public class TripServiceImpl implements TripService {
     private final TripOrderRepository tripOrderRepository;
     private final RouteScheduleRepository routeScheduleRepository;
     private final ScheduleVehicleAssignmentRepository scheduleVehicleAssignmentRepository;
-
+    private final OrderItemRepo orderItemRepo;
     /**
      * Get all trips for a driver categorized as active, scheduled, or completed
      */
@@ -111,7 +112,7 @@ public class TripServiceImpl implements TripService {
                     .orElseThrow(() -> new NotFoundException("Hub not found"));
 
             String status;
-            if (i < trip.getCurrentStopIndex()) {
+            if (i < trip.getCurrentStopIndex() || i == trip.getCurrentStopIndex() && "COMPLETED".equals(trip.getStatus())) {
                 status = "COMPLETED";
             } else if (i == trip.getCurrentStopIndex()) {
                 status = "CURRENT";
@@ -352,6 +353,7 @@ public class TripServiceImpl implements TripService {
                 vehicleRepository.save(vehicle);
             }
         }
+        RouteStop lastStop = getCurrentRouteStop(trip.getId());
 
         // Complete the trip
         Instant endTime = Instant.now();
@@ -449,9 +451,9 @@ public class TripServiceImpl implements TripService {
         }
         List<Trip> trips = new ArrayList<>();
         LocalDate today = LocalDate.now();
-        if (startDate.isBefore(today)) {
-            throw new IllegalStateException("Start date must be after today");
-        }
+//        if (startDate.isBefore(today)) {
+//            throw new IllegalStateException("Start date must be after today");
+//        }
         int startDateDayOfWeek = startDate.getDayOfWeek().getValue();
         for (RouteSchedule routeSchedule : routeSchedules) {
             List<ScheduleVehicleAssignment> scheduleVehicleAssignments = scheduleVehicleAssignmentRepository.findAllByRouteScheduleIdAndUnassignedAtIsNull(routeSchedule.getId());
@@ -468,7 +470,8 @@ public class TripServiceImpl implements TripService {
                 for (ScheduleVehicleAssignment scheduleVehicleAssignment : scheduleVehicleAssignments) {
                     VehicleDriver vehicleDriver = vehicleDriverRepository.findByVehicleIdAndUnassignedAtIsNull(scheduleVehicleAssignment.getVehicleId());
                     if (vehicleDriver == null) {
-                        throw new NotFoundException("Not assignment found with username: " + scheduleVehicleAssignment.getVehicleId());
+                        log.warn("Not assignment found with username: " + scheduleVehicleAssignment.getVehicleId());
+                        continue;
                     }
 
                     // Create new trip
@@ -525,6 +528,22 @@ public class TripServiceImpl implements TripService {
         return tripRepository.save(trip);
     }
 
+    @Override
+    public RouteStop getCurrentRouteStop(UUID tripId){
+        // Get the trip
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new NotFoundException("Trip not found with ID: " + tripId));
+
+        RouteSchedule routeSchedule = routeScheduleRepository.findById(trip.getRouteScheduleId()).orElseThrow(() -> new NotFoundException("Route not found"));
+
+        // Get route stops to check if we're at the last stop
+        List<RouteStop> stops = routeStopRepository.findByRouteIdOrderByStopSequence(routeSchedule.getRouteId());
+
+
+
+        // Process orders at current stop - update statuses as needed
+        return stops.get(trip.getCurrentStopIndex());
+    }
     // Helper methods
 
     /**
@@ -538,20 +557,23 @@ public class TripServiceImpl implements TripService {
         List<RouteStop> routeStops = routeStopRepository.findByRouteIdOrderByStopSequence(route.getRouteId());
 
         List<TripOrder> tripOrders = tripOrderRepository.findByTripId(trip.getId());
-        List<Optional<Order>> orders = tripOrders.stream().map(tripOrder -> orderRepo.findById(tripOrder.getOrderId())).toList();
+        List<Order> orders = tripOrders.stream().map(tripOrder -> orderRepo.findById(tripOrder.getOrderId()).orElse(null)).toList();
+
         if(orders.size() != tripOrders.size()) {
             throw new IllegalStateException("Trip order IDs do not match order IDs in the order table");
         }
         // Count delivered orders
         int ordersDelivered = (int) orders.stream()
-                .filter(order -> order.get().getStatus() == OrderStatus.DELIVERED ||
-                        order.get().getStatus() == OrderStatus.COMPLETED)
+                .filter(order -> order.getStatus() == OrderStatus.DELIVERED ||
+                        order.getStatus() == OrderStatus.COMPLETED)
                 .count();
+
+        int packagesCount = orders.stream().mapToInt(order -> orderItemRepo.countAllByOrderId(order.getId())).sum();
 
         return TripDTO.builder()
                 .id(trip.getId())
                 .routeScheduleId(routeScheduleId)
-                .routeName(route != null ? route.getRouteName() : "Unknown Route")
+                .routeName(route.getRouteName())
                 .routeCode(route.getRouteCode())
                 .status(trip.getStatus())
                 .startTime(trip.getStartTime())
@@ -560,6 +582,7 @@ public class TripServiceImpl implements TripService {
                 .currentStopIndex(trip.getCurrentStopIndex())
                 .totalStops(routeStops.size())
                 .ordersCount(tripOrders.size())
+                .packagesCount(packagesCount)
                 .ordersDelivered(ordersDelivered)
                 .build();
     }

@@ -7,16 +7,16 @@ import java.util.UUID;
 
 @Data
 public class PickupOrdersRequest {
-    private List<UUID> orderIds;
+    private List<UUID> orderItemIds;
     private UUID tripId;
 
     // Getters and setters
-    public List<UUID> getOrderIds() {
-        return orderIds;
+    public List<UUID> getOrderItemIds() {
+        return orderItemIds;
     }
 
     public void setOrderIds(List<UUID> orderIds) {
-        this.orderIds = orderIds;
+        this.orderItemIds = orderIds;
     }
 
     public UUID getTripId() {

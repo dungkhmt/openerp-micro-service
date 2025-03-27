@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.service.impl;
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -10,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.dto.*;
 import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.entity.enumentity.CollectorAssignmentStatus;
+import openerp.openerpresourceserver.entity.enumentity.OrderItemStatus;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
 import openerp.openerpresourceserver.entity.enumentity.Role;
 import openerp.openerpresourceserver.mapper.OrderMapper;
@@ -54,7 +54,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private SenderRepo senderRepo;
-
+    @Autowired
+    private TripOrderRepository tripOrderRepository;
     @Autowired
     private RecipientRepo recipientRepo;
     @Autowired
@@ -73,6 +74,8 @@ public class OrderServiceImpl implements OrderService {
     private RouteScheduleRepository routeScheduleRepository;
     @Autowired
     private TripRepository tripRepository;
+    @Autowired
+    private TripItemRepository tripItemRepository;
     // Create order method
     @Override
     @Transactional
@@ -121,7 +124,6 @@ public class OrderServiceImpl implements OrderService {
 
         assignmentService.assignOrderToHub(orderEntity);
         Order savedOrder = orderRepo.save(orderEntity);
-        assignmentService.assignOrderToRoute(savedOrder.getId());
 
         return savedOrder;
     }
@@ -449,6 +451,10 @@ public class OrderServiceImpl implements OrderService {
             if (order.getStatus() != OrderStatus.COLLECTED_COLLECTOR) {
                 throw new RuntimeException("Đơn hàng chưa được collector collect");
             }
+            List<OrderItem> orderItems = orderItemRepo.findAllByOrderId(orderId);
+            for (OrderItem orderItem : orderItems) {
+                orderItem.setStatus(OrderItemStatus.COLLECTED_HUB);
+            }
             order.setStatus(OrderStatus.COLLECTED_HUB);
             AssignOrderCollector assignOrderCollector = assignOrderCollectorRepository.findByOrderIdAndStatus(orderId, CollectorAssignmentStatus.COLLECTED);
             if(assignOrderCollector!=null) {
@@ -457,11 +463,11 @@ public class OrderServiceImpl implements OrderService {
 
             }
             updatedOrder.add(order);
+            orderItemRepo.saveAll(orderItems);
         }
         orderRepo.saveAll(updatedOrder);
         assignOrderCollectorRepository.saveAll(updatedAssignments);
 
-        assignmentService.assignMultipleOrdersToRoutes(orderIdList);
 
         return true;
     }
@@ -533,28 +539,33 @@ public class OrderServiceImpl implements OrderService {
      * @return List of optimal orders that match the route, sorted by age
      */
     @Override
-    public List<OrderForTripDto> getOrdersForRouteSchedule(UUID routeScheduleId) {
+    public List<OrderItemForTripDto> getOrderItemsForTrip(UUID tripId) {
 
-        RouteSchedule routeSchedule = routeScheduleRepository.findById(routeScheduleId).orElseThrow(()-> new NotFoundException("route schedule not found: " + routeScheduleId));
-        Route route = routeRepository.findById(routeSchedule.getRouteId()).orElseThrow(() -> new NotFoundException("Route not found " + routeSchedule.getRouteId()));
+       List<TripItem> tripItems = tripItemRepository.findByTripId(tripId);
+        if (tripItems.isEmpty()) {
+            log.warn("No order item found for this trip");
+            return Collections.emptyList();
+        }
 
-        // Get all matching orders
-        List<RouteStop> routeStops = routeStopRepository.findByRouteIdOrderByStopSequence(route.getRouteId());
-        List<Order> matchingOrders = routeStops.subList(1,routeStops.size()).stream().flatMap(r -> orderRepo.findAllByFinalHubIdAndStatus(r.getHubId(),OrderStatus.COLLECTED_HUB).stream()).collect(Collectors.toList());
+        List<OrderItem> orderItems = tripItems.stream().map(tripItem -> orderItemRepo.findById(tripItem.getOrderItemId()).orElse(null)).collect(Collectors.toList());
 
-        // STEP 2: Sort matching orders by age (oldest first)
-        matchingOrders.sort(Comparator.comparing(order ->
-                order.getCreatedAt() != null ? order.getCreatedAt().toInstant() : Instant.now()));
-
-
-        List<OrderForTripDto> orderForTripDtos = matchingOrders.stream().map(o -> {
-            OrderForTripDto orderForTripDto = new OrderForTripDto(o);
-            orderForTripDto.setOrderWeight(getOrderWeight(o.getId()));
-            orderForTripDto.setOrderVolume(getOrderVolume(o.getId()));
-            return orderForTripDto;
+        List<OrderItemForTripDto> orderItemForTripDtos = orderItems.stream().map(o -> {
+            OrderItemForTripDto orderItemForTripDto = new OrderItemForTripDto(o);
+            Order order = orderRepo.findById(o.getOrderId()).orElseThrow(() -> new NotFoundException("order not found " + o.getOrderId()));
+            Sender sender = senderRepo.findById(order.getSenderId()).orElseThrow(() -> new NotFoundException("sender not found " + order.getSenderId()));
+            Recipient recipient = recipientRepo.findById(order.getRecipientId()).orElseThrow(() -> new NotFoundException("sender not found " + order.getSenderId()));
+            orderItemForTripDto.setOrderId(order.getId());
+            orderItemForTripDto.setSenderName(order.getSenderName());
+            orderItemForTripDto.setRecipientName(order.getRecipientName());
+            orderItemForTripDto.setSenderPhone(sender.getPhone());
+            orderItemForTripDto.setRecipientPhone(recipient.getPhone());
+            orderItemForTripDto.setSenderAddress(sender.getAddress());
+            orderItemForTripDto.setRecipientAddress(recipient.getAddress());
+            return orderItemForTripDto;
         }).collect(Collectors.toList());
 
-        return orderForTripDtos;
+
+        return orderItemForTripDtos;
     }
 
 
@@ -566,5 +577,20 @@ public class OrderServiceImpl implements OrderService {
     public Double getOrderVolume(UUID orderId) {
         List<OrderItem> orderItems = orderItemRepo.findAllByOrderId(orderId);
         return orderItems.stream().map(o -> o.getHeight()/100 * o.getWidth()/100 * o.getLength()/100).reduce(0.0, Double::sum);
+    }
+
+    public OrderItemForTripDto convertOrderItemToDtoForTrip(OrderItem orderItem){
+        OrderItemForTripDto orderItemForTripDto = new OrderItemForTripDto(orderItem);
+        Order order = orderRepo.findById(orderItem.getOrderId()).orElseThrow(() -> new NotFoundException("order not found " + orderItem.getOrderId()));
+        Sender sender = senderRepo.findById(order.getSenderId()).orElseThrow(() -> new NotFoundException("sender not found " + order.getSenderId()));
+        Recipient recipient = recipientRepo.findById(order.getRecipientId()).orElseThrow(() -> new NotFoundException("sender not found " + order.getSenderId()));
+        orderItemForTripDto.setOrderId(order.getId());
+        orderItemForTripDto.setSenderName(order.getSenderName());
+        orderItemForTripDto.setRecipientName(order.getRecipientName());
+        orderItemForTripDto.setSenderPhone(sender.getPhone());
+        orderItemForTripDto.setRecipientPhone(recipient.getPhone());
+        orderItemForTripDto.setSenderAddress(sender.getAddress());
+        orderItemForTripDto.setRecipientAddress(recipient.getAddress());
+        return orderItemForTripDto;
     }
 }

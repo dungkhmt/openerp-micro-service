@@ -10,19 +10,16 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
-
-/**
- * Entity that represents the connection between an Order and a Trip.
- * This allows for many-to-many relationship tracking between orders and trips.
- */
 @Entity
-@Table(name = "smartdelivery_trip_order")
+@Table(name = "smartdelivery_trip_item")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TripOrder {
+public class TripItem {
 
     @Id
     @GeneratedValue(generator = "UUID")
@@ -32,8 +29,8 @@ public class TripOrder {
     @Column(name = "trip_id", nullable = false)
     private UUID tripId;
 
-    @Column(name = "order_id", nullable = false)
-    private UUID orderId;
+    @Column(name = "order_item_id", nullable = false)
+    private UUID orderItemId;
 
     /**
      * The sequence number for optimized order of pickup/delivery within the trip

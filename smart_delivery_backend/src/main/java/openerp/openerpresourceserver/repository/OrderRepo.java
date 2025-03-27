@@ -35,4 +35,8 @@ public interface OrderRepo extends JpaRepository<Order, UUID>, OrderRepositoryCu
     List<Order> findAllByFinalHubIdAndStatus(UUID hubId, OrderStatus orderStatus);
 
     List<Order> findAllByOriginHubIdAndStatus(UUID hubId, OrderStatus orderStatus);
+
+    @Query("select o from Order o where o.id in :orderIds and o.status = :orderStatus")
+    List<Order> findAllByIdAndStatus(@Param("orderIds") List<UUID> orderIds,
+                                     @Param("orderStatus") OrderStatus orderStatus);
 }

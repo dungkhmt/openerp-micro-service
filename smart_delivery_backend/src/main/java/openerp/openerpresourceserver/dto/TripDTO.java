@@ -27,5 +27,6 @@ public class TripDTO {
     private Integer currentStopIndex;
     private Integer totalStops;
     private Integer ordersCount;
+    private Integer packagesCount;
     private Integer ordersDelivered;
 }

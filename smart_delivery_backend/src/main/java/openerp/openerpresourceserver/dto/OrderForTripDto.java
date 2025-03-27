@@ -40,6 +40,7 @@ public class OrderForTripDto {
         private Double orderWeight;
         private Double finalPrice;
         private Timestamp createdAt;
+        private int packagesCount;
 
 
 }

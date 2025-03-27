@@ -50,5 +50,7 @@ public interface OrderService {
 
     boolean confirmOutHub(UUID[] orderIds,  UUID vehicleId);
 
-    List<OrderForTripDto> getOrdersForRouteSchedule(UUID routeScheduleId);
+
+    List<OrderItemForTripDto> getOrderItemsForTrip(UUID tripId);
+
 }

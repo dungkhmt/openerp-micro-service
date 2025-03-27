@@ -10,12 +10,12 @@ import { errorNoti, successNoti } from 'utils/notification';
 import StandardTable from 'components/StandardTable';
 
 const DriverOrderManagement = () => {
-    const { routeScheduleId } = useParams();
+    const { tripId } = useParams();
     const history = useHistory();
 
     const [loading, setLoading] = useState(true);
     const [orders, setOrders] = useState([]);
-    const [routeSchedule, setRouteSchedule] = useState(null);
+    const [trip, setTrip] = useState(null);
     const [route, setRoute] = useState(null);
     const [openStatusDialog, setOpenStatusDialog] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
@@ -32,20 +32,23 @@ const DriverOrderManagement = () => {
                 setLoading(true);
 
                 // Get orders for this route vehicle
-                await request('get', `/smdeli/ordermanager/middle-mile/for-out/${routeScheduleId}`, (res) => {
+                await request('get', `/smdeli/ordermanager/middle-mile/for-out/${tripId}`, (res) => {
                     setOrders(res.data || []);
                 });
 
                 // Get route vehicle details
-                await request('get', `/smdeli/route-scheduler/schedule/${routeScheduleId}`, (res) => {
-                    setRouteSchedule(res.data);
+                await request('get', `/smdeli/driver/trips/${tripId}`, (res) => {
+                    setTrip(res.data);
+                    if(res.data.routeScheduleId)
+                    request('get', `/smdeli/route-scheduler/schedule/${res.data.routeScheduleId}`, (res) => {
+                        // Get route details
+                        if (res.data?.routeId) {
+                            request('get', `/smdeli/middle-mile/routes/${res.data.routeId}`, (routeRes) => {
+                                setRoute(routeRes.data);
+                            });
+                        }
+                    })
 
-                    // Get route details
-                    if (res.data?.routeId) {
-                        request('get', `/smdeli/middle-mile/routes/${res.data.routeId}`, (routeRes) => {
-                            setRoute(routeRes.data);
-                        });
-                    }
                 });
 
                 setLoading(false);
@@ -57,7 +60,7 @@ const DriverOrderManagement = () => {
         };
 
         fetchData();
-    }, [routeScheduleId]);
+    }, [tripId]);
 
     const handleBack = () => {
         history.push('/driver/dashboard');
@@ -256,7 +259,7 @@ const DriverOrderManagement = () => {
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                 <Typography variant="h4">
-                    Orders for {route?.routeCode || 'Loading...'} route
+                     {orders.length} orders - {orders.reduce((total, item) => total + item.packagesCount, 0)} packages
                 </Typography>
 
                 <Box sx={{ display: 'flex', gap: 2 }}>

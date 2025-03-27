@@ -53,4 +53,8 @@ public interface TripOrderRepository extends JpaRepository<TripOrder, UUID> {
     List<TripOrder> findByTripId(UUID id);
 
     List<TripOrder> findByTripIdAndDeliveredIsTrue(UUID tripId);
+
+    List<TripOrder> findAllByTripId(UUID tripId);
+
+    List<TripOrder> findAllByTripIdAndIsPickupIsFalse(UUID tripId);
 }

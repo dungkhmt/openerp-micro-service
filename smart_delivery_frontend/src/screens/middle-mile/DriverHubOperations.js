@@ -120,11 +120,11 @@ const DriverHubOperations = () => {
         try {
             let endpoint;
             if (operationType === 'pickup') {
-                endpoint = `/smdeli/driver/hub/${hubId}/pending-pickups`;
+                endpoint = `/smdeli/driver/trip/${tripId}/pending-pickups`;
             } else if (operationType === 'delivery') {
                 // Since there's no specific endpoint for pending deliveries in the backend,
                 // we'll use the current orders and filter them client-side
-                endpoint = `/smdeli/driver/current-orders`;
+                endpoint = `/smdeli/driver/current-orders/${tripId}`;
             } else {
                 showNotification("Invalid operation type", "error");
                 return;
@@ -275,7 +275,7 @@ const DriverHubOperations = () => {
                         400: () => showNotification("Unable to pick up orders", "error")
                     },
                     {
-                        orderIds: selectedOrders,
+                        orderItemIds: selectedOrders,
                         tripId: tripId
                     }
                 );
@@ -579,7 +579,7 @@ const DriverHubOperations = () => {
                 <Card sx={{ mb: 3, boxShadow: 2 }}>
                     <CardContent sx={{ pb: 1 }}>
                         <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 2 }}>
-                            <Tab label={`Pending Orders (${filteredOrders.length})`} />
+                            <Tab label={`Pending Packages (${filteredOrders.length})`} />
                             <Tab label={`Selected (${selectedOrders.length})`} disabled={selectedOrders.length === 0} />
                         </Tabs>
 

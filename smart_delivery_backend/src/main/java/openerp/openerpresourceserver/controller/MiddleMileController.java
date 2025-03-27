@@ -27,7 +27,13 @@ public class MiddleMileController {
     private final RouteService routeService;
     private final MiddleMileOrderService orderService;
     private final MiddleMileOrderService middleMileOrderService;
+    private final AssignmentService assignmentService;
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/assign-orders")
+    public void assign(){
+        assignmentService.assignOrderItemsForTripsForAllHubs();
+    }
     // ===== Route Endpoints =====
     @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'ROUTE_MANAGER')")
     @PostMapping("/routes")
