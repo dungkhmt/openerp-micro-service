@@ -107,15 +107,14 @@ const DialogEditTask = ({ open, setOpen }) => {
 
   const handleAssigneeSearch = (search) => {
     setFilteredAssignees(
-      members.filter(
-        ({ member }) =>
-          removeDiacritics(member.firstName)
-            .toLowerCase()
-            .includes(search.toLowerCase()) ||
-          removeDiacritics(member.lastName)
-            .toLowerCase()
-            .includes(search.toLowerCase())
-      )
+      members.filter(({ member }) => {
+        if (!member.firstName && !member.lastName) return false;
+
+        const fullName = `${member.firstName || ""} ${
+          member.lastName || ""
+        }`.toLowerCase();
+        return fullName.includes(search.toLowerCase());
+      })
     );
   };
 
@@ -320,7 +319,7 @@ const DialogEditTask = ({ open, setOpen }) => {
                     labelId="status-select"
                     inputProps={{ placeholder: "Trạng thái" }}
                   >
-                    {status.statuses.map((status) => (
+                    {status.taskStatuses.map((status) => (
                       <MenuItem key={status.statusId} value={status.statusId}>
                         <TaskStatus status={status} />
                       </MenuItem>
