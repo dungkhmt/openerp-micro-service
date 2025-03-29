@@ -4,12 +4,12 @@ import privateClient from "../client/private.client";
 const endPoints = {
   getAll: "/users",
   sync: "/",
-  getUser: "/users/me",
-  updateUser: "/users/me",
+  getMyProfile: "/users/me",
+  updateMyProfile: "/users/me",
   getAssignedTaskCreator: "/users/assigned-task-creator",
   getMeCreatedAssignee: "/users/assigned-task-assignee",
-  getUserSkills: "/user-skills",
-  updateUserSkills: "/user-skills",
+  getMySkills: "/user-skills/me",
+  updateMySkills: "/user-skills/me",
 };
 
 export const UserService = {
@@ -35,9 +35,9 @@ export const UserService = {
     const res = await privateClient.get(endPoints.getMeCreatedAssignee);
     return res.data;
   },
-  async getUserSkills(cb) {
+  async getMySkills(cb) {
     try {
-      const response = await privateClient.get(endPoints.getUserSkills);
+      const response = await privateClient.get(endPoints.getMySkills);
       if (response?.data && isFunction(cb)) cb(null, response.data);
       return response?.data;
     } catch (e) {
@@ -45,9 +45,9 @@ export const UserService = {
       else throw e;
     }
   },
-  async getUser(cb) {
+  async getMyProfile(cb) {
     try {
-      const response = await privateClient.get(endPoints.getUser);
+      const response = await privateClient.get(endPoints.getMyProfile);
       if (response?.data && isFunction(cb)) cb(null, response.data);
       return response?.data;
     } catch (e) {
@@ -55,9 +55,9 @@ export const UserService = {
       else throw e;
     }
   },
-  async updateUser(data, cb) {
+  async updateMyProfile(data, cb) {
     try {
-      const response = await privateClient.put(endPoints.updateUser, data);
+      const response = await privateClient.put(endPoints.updateMyProfile, data);
       if (response?.data && isFunction(cb)) cb(null, response.data);
       return response?.data;
     } catch (e) {
@@ -65,9 +65,9 @@ export const UserService = {
       else throw e;
     }
   },
-  async updateUserSkills(data, cb) {
+  async updateMySkills(data, cb) {
     try {
-      const response = await privateClient.put(endPoints.updateUserSkills, data);
+      const response = await privateClient.put(endPoints.updateMySkills, data);
       if (response?.data && isFunction(cb)) cb(null, response.data);
       return response?.data;
     } catch (e) {

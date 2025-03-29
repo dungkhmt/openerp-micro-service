@@ -17,9 +17,27 @@ const ConfirmationDialog = ({
   onConfirm,
   title,
   content,
-  confirmText = "Delete",
-  cancelText = "Cancel",
+  confirmText = "Xác nhận",
+  cancelText = "Hủy",
+  variant = "error",
 }) => {
+  const colorSchemes = {
+    error: {
+      iconColor: "error.main",
+      backgroundColor: "error.background",
+      buttonColor: "error.dark",
+      buttonHoverColor: "error.dark",
+    },
+    warning: {
+      iconColor: "warning.main",
+      backgroundColor: "warning.background",
+      buttonColor: "warning.dark",
+      buttonHoverColor: "warning.dark",
+    },
+  };
+
+  const scheme = colorSchemes[variant] || colorSchemes.error;
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>{title}</DialogTitle>
@@ -30,16 +48,13 @@ const ConfirmationDialog = ({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              backgroundColor: "rgba(255, 0, 0, 0.1)",
+              color: scheme.iconColor,
+              backgroundColor: scheme.backgroundColor,
               padding: 3,
               borderRadius: "50%",
             }}
           >
-            <Icon
-              icon="ion:warning-outline"
-              fontSize={24}
-              style={{ color: "#FF0000" }}
-            />
+            <Icon icon={"ion:warning-outline"} fontSize={28} />
           </Box>
           <Typography variant="body1">{content}</Typography>
         </Box>
@@ -50,12 +65,12 @@ const ConfirmationDialog = ({
           onClick={onClose}
           variant="outlined"
           sx={{
-            color: "#696969",
-            borderColor: "#D3D3D3",
+            color: "grey.700",
+            borderColor: "grey.300",
             textTransform: "none",
             "&:hover": {
-              borderColor: "#B0B0B0",
-              backgroundColor: "rgba(211, 211, 211, 0.5)",
+              borderColor: "grey.300",
+              backgroundColor: "grey.300",
             },
           }}
         >
@@ -65,11 +80,11 @@ const ConfirmationDialog = ({
           onClick={onConfirm}
           variant="contained"
           sx={{
-            color: "rgba(255, 255, 255, 0.9)",
+            color: "white",
             textTransform: "none",
-            backgroundColor: "#DC143C",
+            backgroundColor: scheme.buttonColor,
             "&:hover": {
-              backgroundColor: "#DC143C",
+              backgroundColor: scheme.buttonHoverColor,
             },
           }}
         >
@@ -88,6 +103,7 @@ ConfirmationDialog.propTypes = {
   content: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
   confirmText: PropTypes.string,
   cancelText: PropTypes.string,
+  variant: PropTypes.oneOf(["error", "warning"]),
 };
 
 export default ConfirmationDialog;

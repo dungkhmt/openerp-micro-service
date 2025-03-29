@@ -12,6 +12,9 @@
   "The status already exists. Please check the status list before adding a new one": 
     "Trạng thái này đã tồn tại. Vui lòng kiểm tra danh sách trạng thái trước khi thêm mới",
   "The category already exists. Please check the category list before adding a new one": 
-    "Danh mục này đã tồn tại. Vui lòng kiểm tra danh sách danh mục trước khi thêm mới"
+    "Danh mục này đã tồn tại. Vui lòng kiểm tra danh sách danh mục trước khi thêm mới",
+  "Registration deadline has passed. You can no longer update sessions": 
+    "Hạn đăng ký đã qua. Bạn không thể cập nhật phiên nữa"
+
 }
   

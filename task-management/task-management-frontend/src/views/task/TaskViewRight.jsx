@@ -40,7 +40,7 @@ const TaskViewRight = () => {
     priority: priorityStore,
     status: statusStore,
   } = useSelector((state) => state);
-  
+
   const category = categoryStore.categories.find(
     (c) => c.categoryId === task.categoryId
   );
@@ -49,12 +49,23 @@ const TaskViewRight = () => {
   );
   const status = statusStore.statuses.find((s) => s.statusId === task.statusId);
 
-  if(fetchLoading) return <CircularProgressLoading />;
+  if (fetchLoading || !project || !task) return <CircularProgressLoading />;
 
   return (
-    <Card sx={{ position: "sticky", top: 0, mr: 2 }}>
+    <Card
+      sx={{
+        position: "sticky",
+        top: 0,
+        mr: 2,
+        maxHeight: "80vh",
+        overflowY: "auto",
+        "&::-webkit-scrollbar": { display: "none" },
+        "-ms-overflow-style": "none",
+        "scrollbar-width": "none",
+      }}
+    >
       <Box sx={{ p: 6 }}>
-        <Typography>Chi tiết</Typography>
+        <Typography fontWeight={600}>Chi tiết</Typography>
 
         {/* project */}
         <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
@@ -78,7 +89,7 @@ const TaskViewRight = () => {
               },
             }}
           >
-            {project.name ?? "Không xác định"}
+            {project?.name ?? "Không xác định"}
           </Typography>
         </Box>
 

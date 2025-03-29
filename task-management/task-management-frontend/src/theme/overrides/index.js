@@ -7,6 +7,7 @@ import MuiCard from "./card";
 import MuiDialog from "./dialog";
 import MuiList from "./list";
 import MuiTab from "./tab";
+import MuiStepper from "./stepper";
 
 const Overrides = () => {
   const dataGrid = MuiDataGrid();
@@ -18,6 +19,7 @@ const Overrides = () => {
   const dialog = MuiDialog();
   const list = MuiList();
   const tab = MuiTab();
+  const stepper = MuiStepper();
 
   return {
     ...dataGrid,
@@ -29,6 +31,7 @@ const Overrides = () => {
     ...dialog,
     ...list,
     ...tab,
+    ...stepper,
   };
 };
 

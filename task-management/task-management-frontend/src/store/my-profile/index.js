@@ -2,36 +2,36 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { UserService } from "../../services/api/user.service";
 
 
-export const fetchUser = createAsyncThunk(
-  "fetchUser",
+export const fetchMyProfile = createAsyncThunk(
+  "fetchMyProfile",
   async () => {
-    const user = await UserService.getUser();
+    const user = await UserService.getMyProfile();
     return user;
   }
 );
 
-export const updateUser = createAsyncThunk(
-  "updateUser",
+export const updateMyProfile = createAsyncThunk(
+  "updateMyProfile",
   async (data, { dispatch }) => {
-    const user = await UserService.updateUser(data);
-    await dispatch(fetchUser());
+    const user = await UserService.updateMyProfile(data);
+    await dispatch(fetchMyProfile());
     return user;
   }
 );
 
-export const fetchUserSkills = createAsyncThunk(
+export const fetchMySkills = createAsyncThunk(
   "fetchUserSkills",
   async () => {
-    const userSkills = await UserService.getUserSkills();
+    const userSkills = await UserService.getMySkills();
     return userSkills;
   }
 );
 
-export const updateUserSkills = createAsyncThunk(
+export const updateMySkills = createAsyncThunk(
   "updateUserSkills",
   async (data, { dispatch }) => {
-    const userSkills = await UserService.updateUserSkills(data);
-    await dispatch(fetchUserSkills());
+    const userSkills = await UserService.updateMySkills(data);
+    await dispatch(fetchMySkills());
     return userSkills;
   }
 );
@@ -54,25 +54,25 @@ export const myProfileSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUserSkills.pending, (state) => {
+      .addCase(fetchMySkills.pending, (state) => {
         state.fetchLoading = true;
       })
-      .addCase(fetchUserSkills.fulfilled, (state, action) => {
+      .addCase(fetchMySkills.fulfilled, (state, action) => {
         state.userSkills = action.payload;
         state.fetchLoading = false;
       })
-      .addCase(fetchUserSkills.rejected, (state, action) => {
+      .addCase(fetchMySkills.rejected, (state, action) => {
         state.errors.push(action.error);
         state.fetchLoading = false;
       })
-      .addCase(fetchUser.pending, (state) => {
+      .addCase(fetchMyProfile.pending, (state) => {
         state.fetchLoading = true;
       })
-      .addCase(fetchUser.fulfilled, (state, action) => {
+      .addCase(fetchMyProfile.fulfilled, (state, action) => {
         state.user = action.payload;
         state.fetchLoading = false;
       })
-      .addCase(fetchUser.rejected, (state, action) => {
+      .addCase(fetchMyProfile.rejected, (state, action) => {
         state.errors.push(action.error);
         state.fetchLoading = false;
       });

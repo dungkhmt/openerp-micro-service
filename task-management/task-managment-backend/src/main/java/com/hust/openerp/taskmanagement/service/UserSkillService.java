@@ -9,8 +9,8 @@ import com.hust.openerp.taskmanagement.dto.UserSkillDTO;
 @Service
 public interface UserSkillService {
 	
-    List<UserSkillDTO> getUserSkills(String userId);
+    List<UserSkillDTO> getMySkills(String userId);
     
-    void updateUserSkills(String userId, List<String> skillList);
+    void updateMySkills(String userId, List<String> skillList);
 
 }

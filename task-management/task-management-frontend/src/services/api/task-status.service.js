@@ -2,9 +2,9 @@ import { isFunction } from "lodash";
 import privateClient from "../client/private.client";
 
 const endPoints = {
-  getStatuses: "/task-statuses",
-  deleteStatus: (statusId) => `/task-statuses/${statusId}`,
-  createStatus: "/task-statuses",
+  getStatuses: "/statuses",
+  deleteStatus: (statusId) => `/statuses/${statusId}`,
+  createStatus: "/statuses",
 };
 
 export const StatusService = {

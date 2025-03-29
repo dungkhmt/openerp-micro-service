@@ -6,7 +6,8 @@ import { fetchCategories } from "../store/category";
 import { fetchPriorities } from "../store/priority";
 import { fetchStatuses } from "../store/status";
 import { fetchSkills } from "../store/skill";
-import { fetchUser } from "../store/my-profile";
+import { fetchMyProfile } from "../store/my-profile";
+import { fetchAllUsers } from "../store/user-management";
 
 function PrivateRoute() {
   const { keycloak } = useKeycloak();
@@ -24,7 +25,8 @@ function PrivateRoute() {
         dispatch(fetchCategories()),
         dispatch(fetchPriorities()),
         dispatch(fetchSkills()),
-        dispatch(fetchUser()),
+        dispatch(fetchMyProfile()),
+        dispatch(fetchAllUsers()),
       ]);
 
     fetchData();

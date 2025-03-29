@@ -4,7 +4,7 @@ import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,12 +17,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "status_item")
-public class TaskStatus {
+public class Status {
     @Id
     @Column(name = "status_id")
     private String statusId;
 
-    @JsonIgnore
     @Column(name = "status_type_id")
     private String type;
 
@@ -35,4 +34,8 @@ public class TaskStatus {
     @CreationTimestamp
     @Column(name = "created_stamp")
     private Date createdStamp;
+    
+    @Column(name = "is_default")
+    @JsonProperty("isDefault")
+    private boolean isDefault;
 }

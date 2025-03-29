@@ -284,7 +284,7 @@ const DialogAddExistingTask = ({ open, setOpen, isUpdate, setIsUpdate }) => {
                               fontWeight: 600,
                               fontSize: "1rem",
                               textTransform: "capitalize",
-                              color: (theme) => theme.palette.text.secondary,
+                              color: (theme) => theme.palette.text.primary,
                               overflow: "hidden",
                               textOverflow: "ellipsis",
                               whiteSpace: "nowrap",

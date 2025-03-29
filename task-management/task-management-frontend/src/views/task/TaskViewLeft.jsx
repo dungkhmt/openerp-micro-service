@@ -124,7 +124,7 @@ const TaskViewLeft = () => {
                     >
                       <TextHighlight component="span">{` ${getDiffDateWithCurrent(
                         task.createdStamp
-                      ).join(" ")}`}</TextHighlight>
+                      ).join(" ")} `}</TextHighlight>
                     </Tooltip>
                     trước.
                     {task.lastUpdatedStamp && (

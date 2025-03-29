@@ -10,9 +10,8 @@ export const handleRejected = (state, action) => {
 
 export const fetchProject = createAsyncThunk(
   "project/fetchProject",
-  async (projectId, { dispatch, rejectWithValue }) => {
+  async (projectId, { rejectWithValue }) => {
     try {
-      dispatch(setLoading(true));
       const project = await ProjectService.getProject(projectId);
       return project;
     } catch (e) {

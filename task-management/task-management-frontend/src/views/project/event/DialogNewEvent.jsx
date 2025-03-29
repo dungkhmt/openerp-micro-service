@@ -21,7 +21,7 @@ import { useParams } from "react-router";
 import { createEvent } from "../../../store/project/events";
 import toast from "react-hot-toast";
 import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
-import { ViewEventMembers } from "./ViewEventMembers";
+import { GroupedAvatars } from "../../../components/common/avatar/GroupedAvatars";
 import ItemSelector from "../../../components/mui/dialog/ItemSelector";
 import { DatePicker } from "@mui/x-date-pickers";
 
@@ -55,6 +55,8 @@ const DialogNewEvent = ({ openDialog, setOpenDialog }) => {
   const onSubmit = async (data) => {
     try {
       setCreateLoading(true);
+      data.name = data.name?.trim();
+      data.description = data.description?.trim();
       await dispatch(
         createEvent({
           ...data,
@@ -77,10 +79,10 @@ const DialogNewEvent = ({ openDialog, setOpenDialog }) => {
 
   const handleSearch = (search) => {
     setFilteredMembers(
-      members.filter(
-        ({ member }) =>
-          member.firstName.toLowerCase().includes(search.toLowerCase()) ||
-          member.lastName.toLowerCase().includes(search.toLowerCase())
+      members.filter(({ member }) =>
+        `${member.firstName} ${member.lastName}`
+          .toLowerCase()
+          .includes(search.toLowerCase())
       )
     );
   };
@@ -175,7 +177,7 @@ const DialogNewEvent = ({ openDialog, setOpenDialog }) => {
                   </Typography>
                 </Box>
               )}
-              renderSelectedItem={(items) => <ViewEventMembers users={items} />}
+              renderSelectedItem={(items) => <GroupedAvatars users={items} />}
               placeholder="Tìm kiếm thành viên"
               label="Thành viên"
               startIcon={<Icon icon="tdesign:member" />}
