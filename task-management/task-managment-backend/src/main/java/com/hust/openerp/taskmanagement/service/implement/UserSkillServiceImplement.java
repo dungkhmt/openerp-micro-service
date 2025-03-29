@@ -22,14 +22,14 @@ public class UserSkillServiceImplement implements UserSkillService {
 	private final UserSkillRepository userSkillRepository;
 
 	@Override
-	public List<UserSkillDTO> getUserSkills(String userId) {
+	public List<UserSkillDTO> getMySkills(String userId) {
       var entities = userSkillRepository.findByUserId(userId);
       return entities.stream().map(entity -> modelMapper.map(entity, UserSkillDTO.class)).toList();
 	}
 
 	@Override
 	@Transactional
-	public void updateUserSkills(String userId, List<String> skillList) {
+	public void updateMySkills(String userId, List<String> skillList) {
 		userSkillRepository.deleteByUserId(userId);
 		
 		for (String skillId : skillList) {

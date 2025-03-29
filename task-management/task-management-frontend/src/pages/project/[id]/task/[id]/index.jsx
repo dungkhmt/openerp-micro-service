@@ -2,7 +2,6 @@ import { Grid, Card, Box, Skeleton, Divider, IconButton } from "@mui/material";
 import { Icon } from "@iconify/react";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import PerfectScrollbar from "react-perfect-scrollbar";
 import { Helmet } from "react-helmet";
 import { useTaskContext } from "../../../../../hooks/useTaskContext";
 import { TaskViewLeft } from "../../../../../views/task/TaskViewLeft";
@@ -76,7 +75,9 @@ const Task = () => {
 
   useEffect(() => {
     updateMaxHeight();
-  }, [window?.innerHeight, ref]);
+    window.addEventListener("resize", updateMaxHeight);
+    return () => window.removeEventListener("resize", updateMaxHeight);
+  }, [updateMaxHeight]);
 
   if (error) {
     if (error.response?.status === 404) return <NotFound />;
@@ -112,16 +113,14 @@ const Task = () => {
           mt: 1.5,
         }}
       >
-        <PerfectScrollbar style={{ flex: 1 }}>
-          <Grid container spacing={5}>
-            <Grid item lg={9} xs={12}>
-              {loading ? <LeftLoading /> : <TaskViewLeft />}
-            </Grid>
-            <Grid item lg={3} xs={12}>
-              {loading ? <RightLoading /> : <TaskViewRight />}
-            </Grid>
+        <Grid container spacing={5}>
+          <Grid item lg={9} xs={12}>
+            {loading ? <LeftLoading /> : <TaskViewLeft />}
           </Grid>
-        </PerfectScrollbar>
+          <Grid item lg={3} xs={12}>
+            {loading ? <RightLoading /> : <TaskViewRight />}
+          </Grid>
+        </Grid>
       </Box>
     </>
   );

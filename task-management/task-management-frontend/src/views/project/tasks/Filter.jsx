@@ -40,16 +40,19 @@ const Filter = (props) => {
     sx,
     filters,
     members = [],
+    statusType = "task",
   } = props;
   const { status, priority, category } = useSelector((state) => state);
   const [anchorEl, setAnchorEl] = useState(null);
 
   const getStatusOptions = useCallback(() => {
-    return status.statuses.map((item) => ({
+    const statuses =
+      statusType === "task" ? status.taskStatuses : status.meetingStatuses;
+    return statuses.map((item) => ({
       id: item.statusId,
       label: item.description,
     }));
-  }, [status.statuses]);
+  }, [status.meetingStatuses, status.taskStatuses, statusType]);
 
   const getPriorityOptions = useCallback(() => {
     return priority.priorities.map((item) => ({
@@ -187,6 +190,7 @@ Filter.propTypes = {
   sx: PropTypes.object,
   filters: PropTypes.object,
   members: PropTypes.array,
+  statusType: PropTypes.string,
 };
 
 export { Filter };

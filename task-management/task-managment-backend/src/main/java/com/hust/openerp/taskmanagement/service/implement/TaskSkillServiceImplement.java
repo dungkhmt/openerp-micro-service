@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hust.openerp.taskmanagement.entity.Skill;
 import com.hust.openerp.taskmanagement.entity.TaskSkill;
@@ -15,7 +16,6 @@ import com.hust.openerp.taskmanagement.repository.TaskSkillRepository;
 import com.hust.openerp.taskmanagement.service.ProjectMemberService;
 import com.hust.openerp.taskmanagement.service.TaskSkillService;
 
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 @Service

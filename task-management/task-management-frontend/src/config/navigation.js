@@ -59,6 +59,23 @@ const navigation = [
     ],
   },
   {
+    sectionTitle: "Meetings",
+  },
+  {
+    title: "Quản lý cuộc họp",
+    icon: "mdi:event-multiple-check",
+    children: [
+      {
+        title: "Cuộc họp đã tạo",
+        path: "meetings/created-meetings",
+      },
+      {
+        title: "Cuộc họp tham gia",
+        path: "meetings/joined-meetings",
+      },
+    ],
+  },
+  {
     sectionTitle: "Administration",
   },
   {
@@ -68,24 +85,6 @@ const navigation = [
       {
         title: "Danh sách nhân viên",
         path: "/user-management",
-      },
-    ],
-  },
-  {
-    title: "Quản lý lịch họp",
-    icon: "mdi:event-multiple-check",
-    children: [
-      {
-        title: "Kế hoạch cuộc họp",
-        path: "/",
-      },
-      {
-        title: "Đăng ký phiên họp",
-        path: "/",
-      },
-      {
-        title: "Phiên họp của tôi",
-        path: "/",
       },
     ],
   },

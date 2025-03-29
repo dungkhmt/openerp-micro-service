@@ -1,19 +1,26 @@
 import MuiAvatar from "@mui/material/Avatar";
-import { Box, Tooltip } from "@mui/material";
+import { Box, Tooltip, useMediaQuery, useTheme } from "@mui/material";
 import PropTypes from "prop-types";
-import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
+import { UserAvatar } from "./UserAvatar";
 
-const ViewEventMembers = ({ users, max_displayed_users }) => {
-  const displayedUsers = users.slice(0, max_displayed_users);
+const GroupedAvatars = ({ users, max_displayed_users = 5 }) => {
+  const theme = useTheme();
+  const isSm = useMediaQuery(theme.breakpoints.only("sm"));
+  const isMd = useMediaQuery(theme.breakpoints.only("md"));
+  const isLg = useMediaQuery(theme.breakpoints.up("lg"));
+
+  // Determine max avatars dynamically based on screen size
+  let responsiveLimit = 2;
+  if (isSm) responsiveLimit = 3;
+  else if (isMd) responsiveLimit = 4;
+  else if (isLg) responsiveLimit = 5;
+
+  const maxAvatars = Math.min(max_displayed_users, responsiveLimit);
+  const displayedUsers = users.slice(0, maxAvatars);
   const hiddenUsersCount = users.length - displayedUsers.length;
 
   return (
-    <Box
-      sx={{
-        display: "inline-flex",
-        alignItems: "center",
-      }}
-    >
+    <Box sx={{ display: "inline-flex", alignItems: "center" }}>
       {displayedUsers.map((user, index) => (
         <UserAvatar
           key={index}
@@ -33,7 +40,7 @@ const ViewEventMembers = ({ users, max_displayed_users }) => {
               marginLeft: -1.5,
               border: "1px solid white",
               backgroundColor: "#A9A9A9",
-              color:"white",
+              color: "white",
               width: 30,
               height: 30,
               fontSize: "0.875rem",
@@ -47,9 +54,9 @@ const ViewEventMembers = ({ users, max_displayed_users }) => {
   );
 };
 
-ViewEventMembers.propTypes = {
+GroupedAvatars.propTypes = {
   users: PropTypes.arrayOf(PropTypes.object).isRequired,
   max_displayed_users: PropTypes.number.isRequired,
 };
 
-export { ViewEventMembers };
+export { GroupedAvatars };

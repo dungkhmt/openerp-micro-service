@@ -66,8 +66,9 @@ const ProjectViewRight = () => {
 
   useEffect(() => {
     updateMaxHeight();
-    ref.current?.click();
-  }, [window?.innerHeight, ref]);
+    window.addEventListener("resize", updateMaxHeight);
+    return () => window.removeEventListener("resize", updateMaxHeight);
+  }, [updateMaxHeight]);
 
   return (
     <TabContext value={activeTab}>

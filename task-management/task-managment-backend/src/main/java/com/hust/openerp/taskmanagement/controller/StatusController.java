@@ -11,33 +11,33 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hust.openerp.taskmanagement.config.OpenApiConfig;
-import com.hust.openerp.taskmanagement.entity.TaskStatus;
-import com.hust.openerp.taskmanagement.service.TaskStatusService;
+import com.hust.openerp.taskmanagement.entity.Status;
+import com.hust.openerp.taskmanagement.service.StatusService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/task-statuses")
-@Tag(name = "Task Status", description = "APIs for task status management")
+@RequestMapping("/statuses")
+@Tag(name = "Status", description = "APIs for task status management")
 @SecurityRequirement(name = OpenApiConfig.SECURITY_SCHEME_NAME)
 @RequiredArgsConstructor
-public class TaskStatusController {
-    private final TaskStatusService taskStatusService;
+public class StatusController {
+    private final StatusService statusService;
 
     @GetMapping
-    public List<TaskStatus> getListTaskStatus() {
-        return taskStatusService.getAllTaskStatus();
+    public List<Status> getAllStatus() {
+        return statusService.getAllStatus();
     }
     
     @PostMapping
-    public TaskStatus createTaskStatus(@RequestBody TaskStatus taskStatus) {
-        return taskStatusService.create(taskStatus);
+    public Status createStatus(@RequestBody Status status) {
+        return statusService.create(status);
     }
 
     @DeleteMapping("{id}")
-    public void deleteTaskStatus(@PathVariable("id") String id) {
-    	taskStatusService.delete(id);
+    public void deleteStatus(@PathVariable("id") String id) {
+    	statusService.delete(id);
     }
 }

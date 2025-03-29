@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hust.openerp.taskmanagement.entity.Skill;
 import com.hust.openerp.taskmanagement.exception.ApiException;
@@ -13,7 +14,6 @@ import com.hust.openerp.taskmanagement.repository.TaskSkillRepository;
 import com.hust.openerp.taskmanagement.repository.UserSkillRepository;
 import com.hust.openerp.taskmanagement.service.SkillService;
 
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 @Service

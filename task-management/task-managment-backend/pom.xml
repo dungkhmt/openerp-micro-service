@@ -158,6 +158,13 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-amqp</artifactId>
     </dependency>
+    
+    <!-- Google OR-tools -->
+    <dependency>
+	    <groupId>com.google.ortools</groupId>
+	    <artifactId>ortools-java</artifactId>
+	    <version>9.10.4067</version>
+	</dependency>
 
   </dependencies>
 

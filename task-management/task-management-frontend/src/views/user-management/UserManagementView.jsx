@@ -1,28 +1,22 @@
-import { Icon } from "@iconify/react";
-import {
-  Box,
-  IconButton,
-  TextField,
-  Tooltip,
-  Typography,
-  Tab,
-  Tabs,
-  Grid,
-  Card,
-} from "@mui/material";
+import { Box, Tooltip, Typography, Tab, Tabs, Grid, Card } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { UserAvatar } from "../../components/common/avatar/UserAvatar";
 import { usePreventOverflow } from "../../hooks/usePreventOverflow";
-import { fetchAllUsers } from "../../store/user-management";
+import {
+  fetchAllUsers,
+  setCurrentUser,
+  setTabValue,
+} from "../../store/user-management";
 import { CircularProgressLoading } from "../../components/common/loading/CircularProgressLoading";
 import { TabUserProjects } from "./TabUserProjects";
 import { TabUserTasks } from "./TabUserTasks";
 import PropTypes from "prop-types";
+import SearchField from "../../components/mui/search/SearchField";
 
-const columns = (setSelectedUser) => [
+const columns = [
   {
     flex: 0.4,
     minWidth: 150,
@@ -44,7 +38,6 @@ const columns = (setSelectedUser) => [
           >
             <Tooltip title={fullName}>
               <Typography
-                onClick={() => setSelectedUser(row)}
                 sx={{
                   fontWeight: 650,
                   fontSize: "0.9rem",
@@ -99,35 +92,32 @@ function a11yProps(index) {
 }
 
 const UserManagementView = () => {
-  const { usersCache } = useSelector((state) => state.userManagement);
+  const { usersCache, fetchLoading, currentUser, tabValue } = useSelector(
+    (state) => state.userManagement
+  );
   const [filterUsers, setFilterUsers] = useState(usersCache);
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [selectedUser, setSelectedUser] = useState();
-  const [value, setValue] = useState(0);
   const { ref, updateHeight } = usePreventOverflow();
-
   const dispatch = useDispatch();
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    dispatch(setTabValue(newValue));
   };
 
   const getUsers = useCallback(async () => {
-    if (usersCache?.length > 0) {
-      setLoading(false);
-      return;
-    }
+    if (usersCache?.length > 0) return;
     try {
       await dispatch(fetchAllUsers());
     } catch (e) {
       console.log(e);
       toast.error("Lỗi khi lấy danh sách người dùng");
-    } finally {
-      setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading]);
+  }, [dispatch]);
+
+  useEffect(() => {
+    getUsers();
+  }, [getUsers]);
 
   useEffect(() => {
     setFilterUsers(
@@ -149,26 +139,17 @@ const UserManagementView = () => {
 
   useEffect(() => {
     updateHeight(10);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [window?.innerHeight, ref]);
+  }, [window.innerHeight]);
 
-  useEffect(() => {
-    getUsers();
-  }, [getUsers]);
-
-  if (loading) {
+  if (usersCache?.length === 0 && fetchLoading) {
     return <CircularProgressLoading />;
   }
 
   return (
-    <Grid container spacing={3} sx={{ height: "92vh" }}>
-      <Grid
-        item
-        md={4}
-        xs={4}
-        sx={{ height: "100%", display: "flex", flexDirection: "column" }}
-      >
+    <Grid container spacing={3}>
+      <Grid item md={4} xs={4}>
         <Card
+          ref={ref}
           sx={{
             height: "100%",
             display: "flex",
@@ -202,10 +183,11 @@ const UserManagementView = () => {
                 width: { xs: "100%", sm: "auto" },
               }}
             >
-              <TextField
-                size="small"
+              <SearchField
                 value={search}
-                sx={{
+                onChange={(e) => setSearch(e.target.value)}
+                onClear={() => setSearch("")}
+                inputSx={{
                   flexGrow: 1,
                   maxWidth: { xs: "100%", sm: "250px" },
                   "& .MuiInputBase-root": {
@@ -215,39 +197,29 @@ const UserManagementView = () => {
                     width: "100%",
                   },
                 }}
-                placeholder="Search User"
-                onChange={(e) => setSearch(e.target.value)}
-                InputProps={{
-                  endAdornment: search && (
-                    <IconButton
-                      onClick={() => setSearch("")}
-                      sx={{ padding: 0, marginRight: "-4px" }}
-                    >
-                      <Icon icon="mdi:close" fontSize={20} />
-                    </IconButton>
-                  ),
-                }}
               />
             </Box>
           </Box>
 
           <DataGrid
-            rows={filterUsers.map((user) => ({
-              ...user,
-              id: user.id,
-            }))}
-            columns={columns(setSelectedUser)}
+            rows={filterUsers}
+            columns={columns}
+            getRowId={(row) => row.id} // Ensure row selection uses the correct ID
+            rowSelectionModel={currentUser ? [currentUser.id] : []} // Sync selected row with Redux state
+            onRowSelectionModelChange={(newSelection) => {
+              const selectedUser = filterUsers.find(
+                (user) => user.id === newSelection[0]
+              );
+              if (selectedUser) {
+                dispatch(setCurrentUser(selectedUser));
+              }
+            }}
             columnHeaderHeight={0}
             hideFooter
           />
         </Card>
       </Grid>
-      <Grid
-        item
-        md={8}
-        xs={8}
-        sx={{ height: "100%", display: "flex", flexDirection: "column" }}
-      >
+      <Grid item md={8} xs={8}>
         <Card
           sx={{
             height: "100%",
@@ -256,19 +228,19 @@ const UserManagementView = () => {
             borderRadius: "20px",
           }}
         >
-          {selectedUser ? (
+          {currentUser ? (
             <Box>
               <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                <Tabs value={value} onChange={handleChange}>
+                <Tabs value={tabValue} onChange={handleChange}>
                   <Tab label="Nhiệm vụ" {...a11yProps(0)} />
                   <Tab label="Dự án" {...a11yProps(1)} />
                 </Tabs>
               </Box>
-              <CustomTabPanel value={value} index={0}>
-                <TabUserTasks user={selectedUser} />
+              <CustomTabPanel value={tabValue} index={0}>
+                <TabUserTasks />
               </CustomTabPanel>
-              <CustomTabPanel value={value} index={1}>
-                <TabUserProjects user={selectedUser} />
+              <CustomTabPanel value={tabValue} index={1}>
+                <TabUserProjects />
               </CustomTabPanel>
             </Box>
           ) : (

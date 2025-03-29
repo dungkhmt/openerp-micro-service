@@ -17,6 +17,10 @@ import NotFound from "../views/errors/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import Redirect from "./Redirect";
 import { AttributeManager } from "../pages/task-attributes";
+import CreatedMeetings from "../pages/meetings/created-meetings";
+import CreatedMeeting from "../pages/meetings/created-meetings/[id]";
+import JoinedMeetings from "../pages/meetings/joined-meetings";
+import JoinedMeeting from "../pages/meetings/joined-meetings/[id]";
 
 export const router = createBrowserRouter([
   {
@@ -91,6 +95,27 @@ export const router = createBrowserRouter([
               {
                 path: "created-by-me",
                 element: <TaskCreated />,
+              },
+            ],
+          },
+          {
+            path: "/meetings",
+            children: [
+              {
+                path: "created-meetings",
+                element: <CreatedMeetings />,
+              },
+              {
+                path: "created-meetings/:pid",
+                element: <CreatedMeeting />,
+              },
+              {
+                path: "joined-meetings",
+                element: <JoinedMeetings />,
+              },
+              {
+                path: "joined-meetings/:pid",
+                element: <JoinedMeeting />,
               },
             ],
           },

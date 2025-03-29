@@ -30,7 +30,13 @@ public enum ErrorCode {
     PRIORITY_EXIST("E1010", "The priority already exists. Please check the priority list before adding a new one", HttpStatus.BAD_REQUEST),
     STATUS_EXIST("E1011", "The status already exists. Please check the status list before adding a new one", HttpStatus.BAD_REQUEST),
     CATEGORY_EXIST("E1012", "The category already exists. Please check the category list before adding a new one", HttpStatus.BAD_REQUEST),
-
+    MEETING_PLAN_NOT_EXIST("E1013", "The meeting plan does not exist", HttpStatus.BAD_REQUEST),
+    MEETING_PLAN_USER_NOT_EXIST("E1014", "The meeting plan member does not exist", HttpStatus.BAD_REQUEST),
+    MEETING_SESSION_NOT_EXIST("E1015", "The meeting session does not exist", HttpStatus.BAD_REQUEST),
+    MEETING_SESSION_USER_NOT_EXIST("E1016", "The meeting session member does not exist", HttpStatus.BAD_REQUEST),
+    STATUS_NOT_EXIST("E1017", "The status does not exist", HttpStatus.BAD_REQUEST),
+    INVALID_STATUS_TRANSITION("E1018", "Invalid meeting plan status transition", HttpStatus.BAD_REQUEST),
+	
     // 401
 
     UNAUTHORIZED("E0100", "Unauthorized", HttpStatus.UNAUTHORIZED),
@@ -44,6 +50,10 @@ public enum ErrorCode {
             HttpStatus.FORBIDDEN),
     INSUFFICIENT_PERMISSIONS("E0202", "You do not have sufficient permissions to perform this action", HttpStatus.FORBIDDEN),
     LAST_OWNER_CANNOT_LEAVE("E0203", "You are the last owner, please assign a new owner before leaving the project", HttpStatus.FORBIDDEN),
+    NOT_A_MEMBER_OF_MEETING_PLAN("E0204",
+            "You are not a member of this meeting plan, please contact the administrator to be added to the project",
+            HttpStatus.FORBIDDEN),
+    REGISTRATION_CLOSED("E0205", "Registration deadline has passed. You can no longer update sessions", HttpStatus.FORBIDDEN),
 
     // 404
 
@@ -52,6 +62,7 @@ public enum ErrorCode {
     PROJECT_NOT_FOUND("E0302", "Project not found", HttpStatus.NOT_FOUND),
     TASK_NOT_FOUND("E0303", "Task not found", HttpStatus.NOT_FOUND),
     EVENT_NOT_FOUND("E0304", "Event not found", HttpStatus.NOT_FOUND),
+    MEETING_PLAN_NOT_FOUND("E0305", "Meeting plan not found", HttpStatus.NOT_FOUND),
 
     // 405
 

@@ -8,6 +8,7 @@ import {
   MenuItem,
   IconButton,
   Tooltip,
+  useTheme,
 } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useEffect, useState } from "react";
@@ -15,7 +16,7 @@ import { useSelector } from "react-redux";
 import dayjs from "dayjs";
 import { DialogNewEvent } from "./DialogNewEvent";
 import { DialogEditEvent } from "./DialogEditEvent";
-import { ViewEventMembers } from "./ViewEventMembers";
+import { GroupedAvatars } from "../../../components/common/avatar/GroupedAvatars";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
 import { deleteEvent } from "../../../store/project/events";
@@ -27,6 +28,7 @@ import { removeDiacritics } from "../../../utils/stringUtils.js";
 
 const ProjectViewEvents = () => {
   const { id } = useParams();
+  const theme = useTheme();
   const { events, fetchLoading } = useSelector((state) => state.events);
 
   const [createDialog, setCreateDialog] = useState(false);
@@ -42,7 +44,6 @@ const ProjectViewEvents = () => {
   const [sortOption, setSortOption] = useState("latest");
   const [sortAnchorEl, setSortAnchorEl] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
-
 
   const dispatch = useDispatch();
 
@@ -119,135 +120,152 @@ const ProjectViewEvents = () => {
     const timeoutId = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
     }, 300);
-    return () => clearTimeout(timeoutId); 
+    return () => clearTimeout(timeoutId);
   }, [searchQuery]);
 
   useEffect(() => {
     let sortedEvents = [...events];
-  
+
     if (sortOption === "latest") {
       sortedEvents.sort((a, b) => new Date(b.dueDate) - new Date(a.dueDate));
     } else {
       sortedEvents.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
     }
-  
+
     if (debouncedSearchQuery) {
       sortedEvents = sortedEvents.filter((event) =>
-        removeDiacritics(event.name).toLowerCase().includes(debouncedSearchQuery.toLowerCase())
+        removeDiacritics(event.name)
+          .toLowerCase()
+          .includes(debouncedSearchQuery.toLowerCase())
       );
     }
-  
+
     setFilteredEvents(sortedEvents);
   }, [debouncedSearchQuery, events, sortOption]);
 
   return (
-    <Box sx={{ overflowY: "none" }}>
-      <Grid
-        container
-        spacing={2}
-        alignItems="center"
-        justifyContent="space-between"
+    <>
+      <Box
         sx={{
-          height: 60,
-          borderBottom: "1px solid #e0e0e0",
+          position: "sticky",
+          top: 0,
+          backgroundColor: "background.default",
+          zIndex: 10,
+          p: 0,
         }}
       >
-        <Grid item xs={4}>
-          <TextField
-            placeholder="Tìm kiếm sự kiện..."
-            variant="outlined"
-            fullWidth
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            InputProps={{
-              startAdornment: <Icon fontSize={18} icon="ri:search-line" />,
-              sx: { height: 40, gap: 2 },
-              endAdornment: searchQuery && (
-                <IconButton
-                  onClick={() => setSearchQuery("")}
-                  sx={{ padding: 0, marginRight: "-4px" }} 
-                >
-                  <Icon icon="mdi:close" fontSize={20} />
-                </IconButton>
-              ),
-            }}
-            sx={{ ml: 3 }}
-          />
-        </Grid>
-        <Grid
-          item
-          sx={{ display: "flex", alignItems: "center", gap: 5, mr: 3 }}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            height: 50,
+            borderBottom: `1px solid ${theme.palette.grey[300]}`,
+          }}
         >
+          <Box sx={{ flexBasis: "33%", display: "flex", alignItems: "center" }}>
+            <TextField
+              placeholder="Tìm kiếm sự kiện..."
+              variant="outlined"
+              fullWidth
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              InputProps={{
+                startAdornment: <Icon fontSize={18} icon="ri:search-line" />,
+                sx: { height: 40, gap: 2 },
+                endAdornment: searchQuery && (
+                  <IconButton
+                    onClick={() => setSearchQuery("")}
+                    sx={{ padding: 0, marginRight: "-4px" }}
+                  >
+                    <Icon icon="mdi:close" fontSize={20} />
+                  </IconButton>
+                ),
+              }}
+            />
+          </Box>
+
           <Box
             sx={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              width: { xs: 40, sm: 80 },
-              height: 36,
-              borderRadius: 15,
-              gap: 3,
-              border: "1px solid grey",
-              cursor: "pointer",
-              transition: "background-color 0.3s, border-color 0.3s",
-              "&:hover": { backgroundColor: "#E5E4E2", borderColor: "#696969" },
+              gap: 5,
             }}
-            onClick={handleSortClick}
           >
-            <Icon fontSize={20} icon="fa-solid:sort" sx={{ color: "grey" }} />
-            <Typography sx={{ display: { xs: "none", sm: "block" } }}>
-              Sort
-            </Typography>
-          </Box>
-          <Menu
-            anchorEl={sortAnchorEl}
-            open={Boolean(sortAnchorEl)}
-            onClose={handleSortClose}
-            slotProps={{
-              paper: {
-                style: {
-                  minWidth: "8rem",
-                  marginTop: "8px",
-                  padding: "3px 10px",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.4)",
-                  borderRadius: "8px",
-                  border: "1px solid #e0e0e0",
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: { xs: 40, sm: 80 },
+                height: 36,
+                borderRadius: 15,
+                gap: 3,
+                border: "1px solid grey",
+                cursor: "pointer",
+                transition: "background-color 0.3s, border-color 0.3s",
+                "&:hover": {
+                  backgroundColor: "grey.300",
+                  borderColor: "text.primary",
                 },
-              },
-            }}
-          >
-            <MenuItem onClick={() => handleSortOptionChange("latest")}>
-              Most recent
-            </MenuItem>
-            <MenuItem onClick={() => handleSortOptionChange("oldest")}>
-              Oldest first
-            </MenuItem>
-          </Menu>
-          <Button
-            onClick={handleCreateEvent}
-            color="primary"
-            variant="contained"
-            sx={{ textTransform: "none" }}
-          >
-            <Icon
-              icon="fluent:add-16-filled"
-              fontSize={20}
-              sx={{ display: { xs: "block", sm: "none" } }}
-            />
-            <Box component="span" sx={{ display: { xs: "none", sm: "block" } }}>
-              Thêm Sự Kiện
+              }}
+              onClick={handleSortClick}
+            >
+              <Icon fontSize={20} icon="fa-solid:sort" sx={{ color: "grey" }} />
+              <Typography sx={{ display: { xs: "none", sm: "block" } }}>
+                Sort
+              </Typography>
             </Box>
-          </Button>
-        </Grid>
-      </Grid>
+            <Menu
+              anchorEl={sortAnchorEl}
+              open={Boolean(sortAnchorEl)}
+              onClose={handleSortClose}
+              slotProps={{
+                paper: {
+                  style: {
+                    minWidth: "8rem",
+                    marginTop: "8px",
+                    padding: "3px 10px",
+                    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.4)",
+                    borderRadius: "8px",
+                    border: `1px solid ${theme.palette.grey[300]}`,
+                  },
+                },
+              }}
+            >
+              <MenuItem onClick={() => handleSortOptionChange("latest")}>
+                Most recent
+              </MenuItem>
+              <MenuItem onClick={() => handleSortOptionChange("oldest")}>
+                Oldest first
+              </MenuItem>
+            </Menu>
+            <Button
+              onClick={handleCreateEvent}
+              color="primary"
+              variant="contained"
+              sx={{ textTransform: "none" }}
+            >
+              <Icon
+                icon="fluent:add-16-filled"
+                fontSize={20}
+                sx={{ display: { xs: "block", sm: "none" } }}
+              />
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "block" } }}
+              >
+                Thêm Sự Kiện
+              </Box>
+            </Button>
+          </Box>
+        </Box>
+      </Box>
 
       <Box
         sx={{
           display: "flex",
-          flexDirection: "column",
           alignItems: "center",
-          overflowY: "auto",
-          height: "calc(75vh - 60px)",
         }}
       >
         {fetchLoading ? (
@@ -279,7 +297,7 @@ const ProjectViewEvents = () => {
                         component={Link}
                         to={`/project/${id}/event/${event.id}`}
                         sx={{
-                          color: "#333333",
+                          color: "grey.800",
                           flexGrow: 1,
                           overflow: "hidden",
                           whiteSpace: "nowrap",
@@ -299,11 +317,11 @@ const ProjectViewEvents = () => {
                         alignItems: "center",
                         justifyContent: "center",
                         fontSize: "0.85rem",
-                        backgroundColor: "#f0f0f0",
+                        backgroundColor: "grey.150",
                         borderRadius: "20px",
                         padding: "2px 10px",
                         minWidth: "100px",
-                        color: "#333333",
+                        color: "grey.800",
                       }}
                     >
                       {dayjs(event.dueDate).format("DD MMM, YYYY")}
@@ -327,7 +345,7 @@ const ProjectViewEvents = () => {
                     <Typography
                       variant="body1"
                       gutterBottom
-                      sx={{ fontSize: "0.95rem", color: "#696969" }}
+                      sx={{ fontSize: "0.95rem", color: "text.primary" }}
                     >
                       {event.description ? (
                         event.description.split("\n").map((line, index) => (
@@ -339,7 +357,7 @@ const ProjectViewEvents = () => {
                       ) : (
                         <Box
                           sx={{
-                            backgroundColor: "#f7f7f7",
+                            backgroundColor: "grey.100",
                             borderRadius: "10px",
                             height: "13vh",
                             display: "flex",
@@ -347,7 +365,10 @@ const ProjectViewEvents = () => {
                             justifyContent: "center",
                           }}
                         >
-                          <Typography variant="body2" sx={{ color: "#808080" }}>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: "text.secondary" }}
+                          >
                             Không có mô tả.
                           </Typography>
                         </Box>
@@ -357,7 +378,7 @@ const ProjectViewEvents = () => {
 
                   <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                     {event.eventUsers && event.eventUsers.length > 0 ? (
-                      <ViewEventMembers
+                      <GroupedAvatars
                         users={event.eventUsers}
                         max_displayed_users={5}
                       />
@@ -365,7 +386,7 @@ const ProjectViewEvents = () => {
                       <Typography
                         variant="body2"
                         sx={{
-                          color: "#808080",
+                          color: "text.secondary",
                           height: 30,
                           display: "flex",
                           alignItems: "center",
@@ -389,27 +410,32 @@ const ProjectViewEvents = () => {
                         display: "flex",
                         alignItems: "center",
                         gap: 2,
-                        color: "rgba(0, 0, 0, 0.5)",
+                        color: "text.secondary",
                       }}
                     >
                       <Icon fontSize={16} icon="nrk:media-media-complete" />
-                      <Typography
-                        variant="body1"
-                        sx={{ fontSize: "0.875rem", color: "#808080" }}
-                      >
-                        {event.totalTasks > 0
-                          ? `${event.finishedTasks}/${event.totalTasks} nhiệm vụ`
-                          : "Không có nhiệm vụ"}
-                      </Typography>
+                      {event.totalTasks > 0 ? (
+                        <Typography
+                          sx={{ fontSize: "0.875rem", color: "text.primary" }}
+                        >
+                          {`${event.finishedTasks}/${event.totalTasks} nhiệm vụ`}
+                        </Typography>
+                      ) : (
+                        <Typography
+                          sx={{ fontSize: "0.875rem", color: "text.secondary" }}
+                        >
+                          Không có nhiệm vụ
+                        </Typography>
+                      )}
                     </Box>
                     <IconButton
                       onClick={(e) => handleClick(event, e)}
                       sx={{
-                        color: "#4F4F4F",
+                        color: "text.primary",
                         transition: "background-color 0.5s",
                         "&:hover": {
-                          backgroundColor: "#E0E0E0",
-                          "& svg": { color: "#4F4F4F" },
+                          backgroundColor: "grey.300",
+                          "& svg": { color: "text.primary" },
                         },
                       }}
                     >
@@ -444,18 +470,20 @@ const ProjectViewEvents = () => {
                         sx={{ gap: 3 }}
                       >
                         <Icon fontSize={18} icon="ic:round-open-in-new" />
-                        <Typography variant="body1">Open in new tab</Typography>
+                        <Typography variant="body1">
+                          Mở trong tab mới
+                        </Typography>
                       </MenuItem>
                       <MenuItem onClick={handleEdit} sx={{ gap: 3 }}>
                         <Icon fontSize={18} icon="mingcute:pencil-line" />
-                        <Typography variant="body1">Edit</Typography>
+                        <Typography variant="body1">Chỉnh sửa</Typography>
                       </MenuItem>
                       <MenuItem
                         onClick={() => handleDeleteClick(selectedEvent)}
                         sx={{ gap: 3 }}
                       >
                         <Icon fontSize={18} icon="mingcute:delete-2-line" />
-                        <Typography variant="body1">Delete</Typography>
+                        <Typography variant="body1">Xóa</Typography>
                       </MenuItem>
                     </Menu>
                   </Box>
@@ -464,7 +492,15 @@ const ProjectViewEvents = () => {
             ))}
           </Grid>
         ) : (
-          <>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              textAlign: "center",
+              width: "100%",
+            }}
+          >
             <Typography variant="h6" sx={{ pt: 5, mb: 2 }}>
               Không có sự kiện nào
             </Typography>
@@ -480,7 +516,7 @@ const ProjectViewEvents = () => {
             >
               Thêm Sự Kiện
             </Button>
-          </>
+          </Box>
         )}
 
         <DialogNewEvent
@@ -510,7 +546,7 @@ const ProjectViewEvents = () => {
           />
         )}
       </Box>
-    </Box>
+    </>
   );
 };
 

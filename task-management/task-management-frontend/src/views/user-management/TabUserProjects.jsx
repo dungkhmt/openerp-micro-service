@@ -1,4 +1,4 @@
-import { Box, Tooltip, Typography, IconButton, TextField } from "@mui/material";
+import { Box, Tooltip, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -6,7 +6,8 @@ import { Link } from "react-router-dom";
 import { useDebounce } from "../../hooks/useDebounce";
 import { usePreventOverflow } from "../../hooks/usePreventOverflow";
 import { ProjectService } from "../../services/api/project.service";
-import { Icon } from "@iconify/react";
+import { useSelector } from "react-redux";
+import SearchField from "../../components/mui/search/SearchField";
 
 /**
  * @type {import("@mui/x-data-grid").GridColDef[]}
@@ -64,8 +65,9 @@ const columns = [
 const DEFAULT_SORT_MODE = "desc";
 const DEFAULT_SORT_COLUMN = "createdStamp";
 
-const TabUserProjects = (user) => {
-  const { firstName, lastName, id } = user.user;
+const TabUserProjects = () => {
+  const { currentUser } = useSelector((state) => state.userManagement);
+  const { firstName, lastName, id } = currentUser;
   const fullName =
     firstName || lastName ? `${firstName ?? ""} ${lastName ?? ""}` : " - ";
 
@@ -156,27 +158,16 @@ const TabUserProjects = (user) => {
             gap: 3,
           }}
         >
-          <TextField
-            size="small"
+          <SearchField
             value={searchValue}
-            sx={{
+            onChange={(e) => setSearchValue(e.target.value)}
+            onClear={() => setSearchValue("")}
+            inputSx={{
               "& .MuiInputBase-root": {
                 height: "34px",
                 fontSize: "14px",
-                borderRadius:"20px"
+                borderRadius: "20px",
               },
-            }}
-            placeholder="Search Project"
-            onChange={(e) => setSearchValue(e.target.value)}
-            InputProps={{
-              endAdornment: searchValue && (
-                <IconButton
-                  onClick={() => setSearchValue("")}
-                  sx={{ padding: 0, marginRight: "-4px" }} 
-                >
-                  <Icon icon="mdi:close" fontSize={20} />
-                </IconButton>
-              ),
             }}
           />
         </Box>

@@ -25,15 +25,15 @@ import lombok.RequiredArgsConstructor;
 public class UserSkillController {
     private final UserSkillService userSkillService;
 
-    @GetMapping
-    public List<UserSkillDTO> getUserSkills(Principal principal) {
-        return userSkillService.getUserSkills(principal.getName());
+    @GetMapping("/me")
+    public List<UserSkillDTO> getMySkills(Principal principal) {
+        return userSkillService.getMySkills(principal.getName());
     }
 
-    @PutMapping
-    public void updateUserSkills(Principal principal, 
+    @PutMapping("/me")
+    public void updateMySkills(Principal principal, 
     		@RequestBody List<String> skillList) {
-        userSkillService.updateUserSkills(principal.getName(), skillList);
+        userSkillService.updateMySkills(principal.getName(), skillList);
     }
 
 }

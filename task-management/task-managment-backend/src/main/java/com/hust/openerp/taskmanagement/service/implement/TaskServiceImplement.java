@@ -315,7 +315,7 @@ public class TaskServiceImplement implements TaskService {
 		} else {
 			search = "projectId:" + projectId;
 		}
-
+		
 		GenericSpecificationsBuilder<Task> builder = new GenericSpecificationsBuilder<>();
 		var specs = builder.build(new CriteriaParser().parse(search), TaskSpecification::new);
 		return taskRepository.findAll(specs, pageable).map(this::convertToDto);
