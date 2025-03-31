@@ -77,18 +77,18 @@ public class MiddleMileOrderServiceImpl implements MiddleMileOrderService {
         Order order = orderRepo.findById(orderId)
                 .orElseThrow(() -> new NotFoundException("Order not found with ID: " + orderId));
 
-        // Kiểm tra đơn hàng có được gán cho chuyến nào không
-        if (order.getRouteId() == null || order.getVehicleId() == null) {
-            throw new IllegalStateException("Order is not assigned to a trip: " + orderId);
-        }
-
-        // Hủy gán đơn hàng
-        order.setRouteId(null);
-        order.setVehicleId(null);
-        order.setVehicleType(null);
-        order.setVehicleLicensePlate(null);
-        order.setDriverId(null);
-        order.setDriverName(null);
+//        // Kiểm tra đơn hàng có được gán cho chuyến nào không
+//        if (order.getRouteId() == null || order.getVehicleId() == null) {
+//            throw new IllegalStateException("Order is not assigned to a trip: " + orderId);
+//        }
+//
+//        // Hủy gán đơn hàng
+//        order.setRouteId(null);
+//        order.setVehicleId(null);
+//        order.setVehicleType(null);
+//        order.setVehicleLicensePlate(null);
+//        order.setDriverId(null);
+//        order.setDriverName(null);
 
         // Đặt lại trạng thái nếu đang ở trạng thái SHIPPING
         if (order.getStatus() == OrderStatus.DELIVERING) {

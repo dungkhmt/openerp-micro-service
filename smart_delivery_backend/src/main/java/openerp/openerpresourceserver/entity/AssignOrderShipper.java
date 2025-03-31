@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import openerp.openerpresourceserver.entity.enumentity.ShipperAssignmentStatus;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Table(name = "smartdelivery_assign_order_shipper")
 public class AssignOrderShipper {
     @Id
@@ -38,10 +40,6 @@ public class AssignOrderShipper {
     private ShipperAssignmentStatus status;
 
     private String deliveryNotes;
-
-    private String confirmationType;  // "otp", "signature"
-
-    private String confirmationValue;
 
     private Integer deliveryAttempts;
 

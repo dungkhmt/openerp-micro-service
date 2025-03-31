@@ -52,7 +52,7 @@ public class Trip {
 
     /**
      * Current status of the trip
-     * Possible values: "PLANNED", "IN_PROGRESS", "COMPLETED", "CANCELLED"
+     * Possible values: "PLANNED", "IN_PROGRESS", "CONFIRMED_IN","COMPLETED", "CANCELLED"
      */
     @Column(name = "status", nullable = false)
     private String status;

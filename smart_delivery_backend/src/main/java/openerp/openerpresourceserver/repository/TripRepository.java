@@ -31,4 +31,12 @@ public interface TripRepository extends JpaRepository<Trip, UUID> {
 
     @Query("select distinct t from Trip t join RouteSchedule rs on t.routeScheduleId = rs.id join RouteStop rst on rs.routeId = rst.routeId where rst.hubId = :hubId and t.status = :status and t.date = :date")
     List<Trip> findAllTripsByHubIdAndStatusAndDate(@Param("hubId") UUID hubId, @Param("status") String tripStatus, @Param("date") LocalDate date);
+
+    @Query("select distinct t from Trip t join RouteSchedule rs on t.routeScheduleId = rs.id join RouteStop rst on rs.routeId = rst.routeId where rst.hubId = :hubId and t.date = :date")
+    List<Trip> findAllTripsByHubIdAndDate(@Param("hubId") UUID hubId, @Param("date") LocalDate date);
+
+    @Query("select distinct t from Trip t join RouteSchedule rs on t.routeScheduleId = rs.id join RouteStop rst on rs.routeId = rst.routeId where rst.hubId = :hubId and t.date = :date and rst.stopSequence = 1")
+    List<Trip> findAllTripsByHubIdAndDateStart(@Param("hubId") UUID hubId, @Param("date") LocalDate date);
+    @Query("select distinct t from Trip t join RouteSchedule rs on t.routeScheduleId = rs.id join RouteStop rst on rs.routeId = rst.routeId where rst.hubId = :hubId and t.date = :date and rst.stopSequence != 1")
+    List<Trip> findAllTripsByHubIdAndDateThrough(@Param("hubId") UUID hubId, @Param("date") LocalDate date);
 }

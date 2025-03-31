@@ -1056,7 +1056,7 @@ const DriverHubOperations = () => {
                             Status:
                         </Typography>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
-                            {['COLLECTED_HUB', 'DELIVERING', 'PENDING'].map(status => (
+                            {['CONFIRMED_OUT','COLLECTED_HUB', 'DELIVERING'].map(status => (
                                 <Chip
                                     key={status}
                                     label={status}

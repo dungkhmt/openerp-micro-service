@@ -273,7 +273,7 @@ public class TripServiceImpl implements TripService {
 //        }
 
         // For orders that are being delivered to this stop, update status
-        List<Order> deliveredOrders = orderRepo.findByRouteVehicleId(trip.getRouteScheduleId()).stream()
+        List<Order> deliveredOrders = orderRepo.findByTripId(trip.getId()).stream()
                 .filter(order -> {
                     // If this is a delivery stop for the order
                     return order.getFinalHubId() != null &&
@@ -328,12 +328,12 @@ public class TripServiceImpl implements TripService {
         }
 
         // Verify trip is in progress
-        if (!"IN_PROGRESS".equals(trip.getStatus())) {
-            throw new IllegalStateException("Trip is not in progress");
+        if (! "CONFIRMED_IN".equals(trip.getStatus())) {
+            throw new IllegalStateException("Trip is confirmed in");
         }
 
         // Update any remaining orders
-        List<Order> remainingOrders = orderRepo.findByRouteVehicleId(trip.getRouteScheduleId()).stream()
+        List<Order> remainingOrders = orderRepo.findByTripId(trip.getId()).stream()
                 .filter(order -> order.getStatus() == OrderStatus.DELIVERING)
                 .collect(Collectors.toList());
 
@@ -360,7 +360,7 @@ public class TripServiceImpl implements TripService {
         trip.setStatus("COMPLETED");
         trip.setEndTime(endTime);
         trip.setCompletionNotes(completionNotes);
-        trip.setOrdersDelivered(orderRepo.findByRouteVehicleId(trip.getRouteScheduleId()).size());
+        trip.setOrdersDelivered(orderRepo.findByTripId(trip.getId()).size());
 
         Trip completedTrip = tripRepository.save(trip);
 
@@ -622,5 +622,27 @@ public class TripServiceImpl implements TripService {
         Map<String, Object> result = new HashMap<>();
         result.put("summary", summary);
         return result;
+    }
+
+    @Override
+    public List<TripDTO> getTripsForHubToday(UUID hubId) {
+        // Get all trips for today
+        List<Trip> trips = tripRepository.findAllTripsByHubIdAndDate(hubId, LocalDate.now());
+        return trips.stream().map(this::convertToTripDTO)
+                .collect(Collectors.toList());
+    }
+    @Override
+    public List<TripDTO> getTripsForHubTodayStart(UUID hubId) {
+        // Get all trips for today start
+        List<Trip> trips = tripRepository.findAllTripsByHubIdAndDateStart(hubId, LocalDate.now());
+        return trips.stream().map(this::convertToTripDTO)
+                .collect(Collectors.toList());
+    }
+    @Override
+    public List<TripDTO> getTripsForHubTodayThrough(UUID hubId) {
+        // Get all trips for today start
+        List<Trip> trips = tripRepository.findAllTripsByHubIdAndDateThrough(hubId, LocalDate.now());
+        return trips.stream().map(this::convertToTripDTO)
+                .collect(Collectors.toList());
     }
 }

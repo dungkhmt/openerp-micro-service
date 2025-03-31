@@ -53,4 +53,17 @@ public class VehicleController {
         vehicleService.deleteVehicle(vehicleId);
         return ResponseEntity.ok().build();
     }
+    @PreAuthorize("hasAnyRole('HUB_STAFF', 'HUB_MANAGER', 'ADMIN', 'ROUTE_MANAGER', 'DRIVER_MANAGER')")
+    @GetMapping("/trip/{tripId}")
+    public ResponseEntity<VehicleDto> getVehicleByTripId(@PathVariable UUID tripId) {
+        VehicleDto vehicle = vehicleService.getVehicleByTripId(tripId);
+        return ResponseEntity.ok(vehicle);
+    }
+    @PreAuthorize("hasAnyRole('HUB_STAFF', 'HUB_MANAGER', 'ADMIN', 'ROUTE_MANAGER', 'DRIVER_MANAGER')")
+    @GetMapping("/trip")
+    public ResponseEntity<List<VehicleDto>> getVehicleByTripIds(@RequestBody List<UUID> tripIds) {
+        List<VehicleDto> vehicles = vehicleService.getVehicleByTripIds(tripIds);
+        return ResponseEntity.ok(vehicles);
+    }
+
 }

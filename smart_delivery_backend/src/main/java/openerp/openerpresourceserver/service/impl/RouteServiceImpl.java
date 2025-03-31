@@ -44,8 +44,8 @@ public class RouteServiceImpl implements RouteService {
     public RouteDto createRoute(RouteDto routeDto) {
         System.out.println("routeid" + routeDto.getRouteId());
         if (routeDto.getRouteId() != null) {
-
-            Route updatedRoute = routeRepository.save(routeMapper.routeDtoToRoute(routeDto));
+            Route route = routeMapper.routeDtoToRoute(routeDto);
+            Route updatedRoute = routeRepository.save(route);
             System.out.println("routeid1 " + routeDto.getRouteId());
 
             // Xóa các điểm dừng cũ
@@ -67,7 +67,10 @@ public class RouteServiceImpl implements RouteService {
                 throw new IllegalArgumentException("Route code already exists: " + routeDto.getRouteCode());
             }
 
-            Route savedRoute = routeRepository.save(RouteMapper.INSTANCE.routeDtoToRoute(routeDto));
+            Route route = RouteMapper.INSTANCE.routeDtoToRoute(routeDto);
+            route.setStatus(Route.RouteStatus.ACTIVE);
+
+            Route savedRoute = routeRepository.save(route);
             routeStopRepository.deleteByRouteId(routeDto.getRouteId());
 
             for (RouteStopDto stop : routeDto.getStops()) {

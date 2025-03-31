@@ -8,7 +8,7 @@ import {useSelector} from "react-redux";
 import {errorNoti, successNoti} from "../../utils/notification";
 
 
-const OutOrder = () => {
+const InOrderMiddleMile = () => {
     const hubId = useSelector((state) => state.auth.hubId);
 
     // Trip related states
@@ -36,7 +36,7 @@ const OutOrder = () => {
     const fetchTripsForToday = () => {
         request(
             "get",
-            `smdeli/trip-assignments/hub/${hubId}/today/start`,
+            `smdeli/trip-assignments/hub/${hubId}/today/through`,
             (res) => {
                 setTrips(res.data);
             },
@@ -100,7 +100,7 @@ const OutOrder = () => {
     const fetchOrderItemsForTrip = (tripId) => {
         request(
             "get",
-            `smdeli/ordermanager/middle-mile/for-out/${tripId}`,
+            `smdeli/driver/current-orders/${tripId}`,
             (res) => {
                 setTripOrderItems(res.data);
             },
@@ -232,4 +232,4 @@ const OutOrder = () => {
     );
 }
 
-export default OutOrder;
+export default InOrderMiddleMile;

@@ -43,4 +43,10 @@ public interface TripService {
     List<RouteStopDto> getTripStops(UUID tripId, String username);
 
     Map<String, Object> completeTripWithSummary(UUID tripId, String username, String notes);
+
+    List<TripDTO> getTripsForHubToday(UUID hubId);
+
+    List<TripDTO> getTripsForHubTodayStart(UUID hubId);
+
+    List<TripDTO> getTripsForHubTodayThrough(UUID hubId);
 }

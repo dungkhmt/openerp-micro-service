@@ -305,26 +305,7 @@ public class TripAssignmentServiceImpl implements TripAssignmentService {
 
             tripOrderRepository.save(tripOrder);
 
-            // Update order with trip/vehicle info
-            order.setRouteId(trip.getRouteScheduleId());
-            order.setDriverId(trip.getDriverId());
 
-            // Find driver name
-            Driver driver = driverRepo.findById(trip.getDriverId()).orElse(null);
-            if (driver != null) {
-                order.setDriverName(driver.getName());
-            }
-
-            // Find vehicle info
-            VehicleDriver vehicleDriver = vehicleDriverRepository.findByDriverIdAndUnassignedAtIsNull(trip.getDriverId());
-            if (vehicleDriver != null) {
-                Vehicle vehicle = vehicleRepository.findById(vehicleDriver.getVehicleId()).orElse(null);
-                if (vehicle != null) {
-                    order.setVehicleId(vehicle.getVehicleId());
-                    order.setVehicleType(vehicle.getVehicleType());
-                    order.setVehicleLicensePlate(vehicle.getPlateNumber());
-                }
-            }
 
             orderRepo.save(order);
         }
@@ -350,26 +331,6 @@ public class TripAssignmentServiceImpl implements TripAssignmentService {
 
         tripOrderRepository.save(tripOrder);
 
-        // Update order with trip/vehicle info (same as in assignClusterToTrip)
-        order.setRouteId(trip.getRouteScheduleId());
-        order.setDriverId(trip.getDriverId());
-
-        // Find driver name
-        Driver driver = driverRepo.findById(trip.getDriverId()).orElse(null);
-        if (driver != null) {
-            order.setDriverName(driver.getName());
-        }
-
-        // Find vehicle info
-        VehicleDriver vehicleDriver = vehicleDriverRepository.findByDriverIdAndUnassignedAtIsNull(trip.getDriverId());
-        if (vehicleDriver != null) {
-            Vehicle vehicle = vehicleRepository.findById(vehicleDriver.getVehicleId()).orElse(null);
-            if (vehicle != null) {
-                order.setVehicleId(vehicle.getVehicleId());
-                order.setVehicleType(vehicle.getVehicleType());
-                order.setVehicleLicensePlate(vehicle.getPlateNumber());
-            }
-        }
 
         orderRepo.save(order);
     }
@@ -488,8 +449,6 @@ public class TripAssignmentServiceImpl implements TripAssignmentService {
 
             // Update order status
             order.setStatus(OrderStatus.DELIVERING);
-            order.setRouteId(trip.getRouteScheduleId());
-            order.setDriverId(trip.getDriverId());
             orderRepo.save(order);
         }
 
@@ -521,12 +480,6 @@ public class TripAssignmentServiceImpl implements TripAssignmentService {
             if (otherAssignments.isEmpty()) {
                 // If no other trips, revert to COLLECTED_HUB
                 order.setStatus(OrderStatus.COLLECTED_HUB);
-                order.setRouteId(null);
-                order.setDriverId(null);
-                order.setDriverName(null);
-                order.setVehicleId(null);
-                order.setVehicleType(null);
-                order.setVehicleLicensePlate(null);
                 orderRepo.save(order);
             }
         }

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import openerp.openerpresourceserver.cache.RedisCacheService;
 import openerp.openerpresourceserver.dto.*;
 import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.entity.enumentity.CollectorAssignmentStatus;
@@ -76,6 +77,8 @@ public class OrderServiceImpl implements OrderService {
     private TripRepository tripRepository;
     @Autowired
     private TripItemRepository tripItemRepository;
+    @Autowired
+    private RedisCacheService redisCacheService;
     // Create order method
     @Override
     @Transactional
@@ -131,12 +134,25 @@ public class OrderServiceImpl implements OrderService {
     // Get all orders method
     @Override
     public List<OrderSummaryDTO> getAllOrders() {
-        List<Order> orderList = orderRepo.findAll();
+        List<Order> orderList = getAllOrdersInCacheElseDatabase();
         List<OrderSummaryDTO> orderSummaries = new ArrayList<>();
         for (Order order : orderList) {
             orderSummaries.add(new OrderSummaryDTO(order));
         }
         return orderSummaries;
+    }
+
+    public List<Order> getAllOrdersInCacheElseDatabase() {
+        List<Order> orderList = redisCacheService.getCachedListObject(RedisCacheService.ALL_ORDER_KEY, Order.class);
+
+        if (orderList == null) {
+            orderList = orderRepo.findAll();
+            redisCacheService.setCachedValueWithExpire(RedisCacheService.ALL_ORDER_KEY, orderList, RedisCacheService.DEFAULT_EXPIRE_TIME_IN_MINUTES);
+            return orderList;
+
+        }
+        // Nếu không có trong cache, lấy từ database và lưu vào cache
+        return orderList;
     }
 
     @Override
@@ -276,19 +292,19 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepo.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
 
-        // Store vehicle ID for load update if order is assigned to a vehicle
-        UUID vehicleId = order.getVehicleId();
+//        // Store vehicle ID for load update if order is assigned to a vehicle
+//        UUID vehicleId = order.getVehicleId();
 
         // Delete order items
         orderItemRepo.deleteAllByOrderId(orderId);
 
         // Delete the order
         orderRepo.deleteById(orderId);
-
-        // Update vehicle load if order was assigned to a vehicle
-        if (vehicleId != null && order.getStatus() == OrderStatus.DELIVERING) {
-            assignmentService.decreaseVehicleLoad(vehicleId, orderId);
-        }
+//
+//        // Update vehicle load if order was assigned to a vehicle
+//        if (vehicleId != null && order.getStatus() == OrderStatus.DELIVERING) {
+//            assignmentService.decreaseVehicleLoad(vehicleId, orderId);
+//        }
 
         log.info("Deleted Order with ID: {}", orderId);
     }
@@ -486,9 +502,9 @@ public class OrderServiceImpl implements OrderService {
         for(UUID orderId: orderIds){
             Order order = orderRepo.findById(orderId).orElseThrow(() -> new NotFoundException("order not found " + orderId));
             order.setStatus(OrderStatus.DELIVERING);
-            order.setVehicleId(vehicleId);
-            order.setVehicleType(vehicle.getVehicleType());
-            order.setVehicleLicensePlate(vehicle.getPlateNumber());
+//            order.setVehicleId(vehicleId);
+//            order.setVehicleType(vehicle.getVehicleType());
+//            order.setVehicleLicensePlate(vehicle.getPlateNumber());
             updatedOrder.add(order);
         }
         orderRepo.saveAll(updatedOrder);
@@ -517,17 +533,17 @@ public class OrderServiceImpl implements OrderService {
             return false;
         }
 
-        // Store vehicle ID for load update
-        UUID vehicleId = order.getVehicleId();
+//        // Store vehicle ID for load update
+//        UUID vehicleId = order.getVehicleId();
 
         // Update order status
         order.setStatus(OrderStatus.COMPLETED);
         orderRepo.save(order);
 
-        // Decrease vehicle load
-        if (vehicleId != null) {
-            assignmentService.decreaseVehicleLoad(vehicleId, orderId);
-        }
+//        // Decrease vehicle load
+//        if (vehicleId != null) {
+//            assignmentService.decreaseVehicleLoad(vehicleId, orderId);
+//        }
 
         return true;
     }

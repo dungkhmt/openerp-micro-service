@@ -46,6 +46,7 @@ public class DriverServiceImpl implements DriverService {
     private final SenderRepo senderRepo;
     private final RecipientRepo recipientRepo;
     private final RouteScheduleRepository routeScheduleRepository;
+
     @Override
     public VehicleDto getDriverVehicleByUsername(String username) {
         // Find driver by username
@@ -68,7 +69,6 @@ public class DriverServiceImpl implements DriverService {
     }
 
 
-
     @Override
     public List<OrderItemForTripDto> getPendingPickupOrderItemsForDriver(String username, UUID tripId) {
         // Find driver and vehicle
@@ -85,7 +85,7 @@ public class DriverServiceImpl implements DriverService {
         List<UUID> tripItemIds = tripItems.stream().map(TripItem::getOrderItemId).collect(Collectors.toList());
         List<OrderItem> orderItems = orderItemRepo.findAllById(tripItemIds);
 
-        return orderItems.stream().map(o ->{
+        return orderItems.stream().map(o -> {
             OrderItemForTripDto orderItemForTripDto = new OrderItemForTripDto(o);
             Order order = orderRepo.findById(o.getOrderId()).orElseThrow(() -> new NotFoundException("order not found " + o.getOrderId()));
             Sender sender = senderRepo.findById(order.getSenderId()).orElseThrow(() -> new NotFoundException("sender not found " + order.getSenderId()));
@@ -131,34 +131,29 @@ public class DriverServiceImpl implements DriverService {
                     .orElseThrow(() -> new NotFoundException("Order item not found with ID: " + orderItemId));
 
             // Verify order is in correct state
-            if (orderItem.getStatus() != OrderItemStatus.COLLECTED_HUB) {
-                throw new IllegalStateException("Order is not in COLLECTED_HUB state: " + orderItemId);
+            if (orderItem.getStatus() != OrderItemStatus.CONFIRMED_OUT) {
+                throw new IllegalStateException("Order is not in CONFIRMED_OUT state: " + orderItemId);
             }
 
             // Update order
             orderItem.setStatus(OrderItemStatus.DELIVERING);
 
             orderItems.add(orderItem);
-
-            tripItems.add(new TripItem().builder()
-                    .tripId(tripId)
-                    .orderItemId(orderItemId)
-                    .sequenceNumber(orderItems.indexOf(orderItem))
-                    .delivered(false)
-                    .isPickup(false)
-                    .build());
+            TripItem tripItem = tripItemRepository.findTopByOrderItemIdOrderByCreatedAtDesc(orderItemId);
+            tripItem.setStatus("DELIVERING");
+            tripItems.add(tripItem);
 
 
-        // Update vehicle status if needed
-        if (vehicle.getStatus() == VehicleStatus.AVAILABLE) {
-            vehicle.setStatus(VehicleStatus.TRANSITING);
-            vehicleRepo.save(vehicle);
+            // Update vehicle status if needed
+            if (vehicle.getStatus() == VehicleStatus.AVAILABLE) {
+                vehicle.setStatus(VehicleStatus.TRANSITING);
+                vehicleRepo.save(vehicle);
+            }
+
+            orderItemRepo.saveAll(orderItems);
+            tripItemRepository.saveAll(tripItems);
         }
-
-        orderItemRepo.saveAll(orderItems);
-        tripItemRepository.saveAll(tripItems);
     }
-        }
 
     @Override
     @Transactional
@@ -181,10 +176,10 @@ public class DriverServiceImpl implements DriverService {
             OrderItem orderItem = orderItemRepo.findById(orderItemId)
                     .orElseThrow(() -> new NotFoundException("Order not found with ID: " + orderItemId));
 
-            TripItem tripItem = tripItemRepository.findByOrderItemId(orderItemId);
+            TripItem tripItem = tripItemRepository.findTopByOrderItemIdOrderByCreatedAtDesc(orderItemId);
             Trip trip = tripRepository.findById(tripItem.getTripId()).orElseThrow(() -> new NotFoundException("Trip not found"));
             RouteSchedule routeSchedule = routeScheduleRepository.findById(trip.getRouteScheduleId()).orElseThrow(() -> new NotFoundException("Route schedule not found"));
-            if(!trip.getDriverId().equals(driver.getId())) {
+            if (!trip.getDriverId().equals(driver.getId())) {
                 throw new IllegalStateException("Order is not assigned to this driver: " + orderItemId);
             }
             // Verify order is assigned to this driver
@@ -198,7 +193,7 @@ public class DriverServiceImpl implements DriverService {
             // Update order
             orderItem.setStatus(OrderItemStatus.DELIVERED);
             orderItems.add(orderItem);
-            tripItem.setStatus("COMPLETED");
+            tripItem.setStatus("DELIVERED");
             tripItems.add(tripItem);
         }
 
@@ -219,10 +214,10 @@ public class DriverServiceImpl implements DriverService {
         Order order = orderRepo.findById(orderId)
                 .orElseThrow(() -> new NotFoundException("Order not found with ID: " + orderId));
 
-        // Verify order is assigned to this driver
-        if (order.getDriverId() == null || !order.getDriverId().equals(driver.getId())) {
-            throw new IllegalStateException("Order is not assigned to this driver: " + orderId);
-        }
+//        // Verify order is assigned to this driver
+//        if (order.getDriverId() == null || !order.getDriverId().equals(driver.getId())) {
+//            throw new IllegalStateException("Order is not assigned to this driver: " + orderId);
+//        }
 
         // Verify status transition is valid
         if (!OrderStatus.isValidTransition(order.getStatus(), status)) {
@@ -244,8 +239,9 @@ public class DriverServiceImpl implements DriverService {
         List<TripItem> tripItems = tripItemRepository.findAllByTripId(tripId);
         List<UUID> orderItemIds = tripItems.stream().map(TripItem::getOrderItemId).collect(Collectors.toList());
         List<OrderItem> driverOrderItems = orderItemRepo.findAllByIdAndStatus(orderItemIds, OrderItemStatus.DELIVERING);
+
         RouteStop stop = tripService.getCurrentRouteStop(tripId);
-        if(stop == null){
+        if (stop == null) {
             throw new IllegalStateException("No current stop found for trip: " + tripId);
         }
         System.out.println("hub id: " + stop.getHubId());
@@ -258,7 +254,7 @@ public class DriverServiceImpl implements DriverService {
                 .collect(Collectors.toList());
     }
 
-    private OrderItemForTripDto convertOrderItemToDtoForTrip(OrderItem orderItem){
+    private OrderItemForTripDto convertOrderItemToDtoForTrip(OrderItem orderItem) {
         OrderItemForTripDto orderItemForTripDto = new OrderItemForTripDto(orderItem);
         Order order = orderRepo.findById(orderItem.getOrderId()).orElseThrow(() -> new NotFoundException("order not found " + orderItem.getOrderId()));
         Sender sender = senderRepo.findById(order.getSenderId()).orElseThrow(() -> new NotFoundException("sender not found " + order.getSenderId()));

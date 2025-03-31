@@ -58,7 +58,9 @@ const DriverRouteMap = () => {
     const [confirmArrivalDialog, setConfirmArrivalDialog] = useState(false);
     const [selectedHub, setSelectedHub] = useState(null);
     const [operationType, setOperationType] = useState(null);
-
+    const [confirmCompleteTripDialogOpen, setConfirmCompleteTripDialogOpen] = useState(false);
+    const [processingComplete, setProcessingComplete] = useState(false);
+    const [canCompleteTrip, setCanCompleteTrip] = useState(false);
     // Map points and assignments
     const [mapPoints, setMapPoints] = useState([]);
     const [assignments, setAssignments] = useState([]);
@@ -129,7 +131,9 @@ const DriverRouteMap = () => {
                 if (tripRes.data && tripRes.data.currentStopIndex !== undefined) {
                     setCurrentStop(tripRes.data.currentStopIndex + 1); // Convert to 1-based for display
                 }
-
+                if(tripRes.data.status === 'CONFIRMED_IN') {
+                    setCanCompleteTrip(true)
+                }
                 // Extract stop sequence
                 if (tripRes.data && tripRes.data.stops) {
                     setStopSequence(tripRes.data.stops);
@@ -351,7 +355,15 @@ const DriverRouteMap = () => {
             { routeVehicleId: scheduleIdToUse }
         );
     };
+    // Prompt for completing trip or opening confirmation dialog
+    const promptCompleteTrip = () => {
+        if (!canCompleteTrip) {
+            errorNoti("Trip status must be CONFIRMED_IN to complete the trip", "error");
+            return;
+        }
 
+        setConfirmCompleteTripDialogOpen(true);
+    };
     // Advance to next stop
     const handleAdvanceToNextStop = () => {
         if (!tripId) {
@@ -450,7 +462,7 @@ const DriverRouteMap = () => {
                             variant="contained"
                             color="success"
                             onClick={handleCompleteTrip}
-                            disabled={!stopSequence.length || currentStop < stopSequence.length}
+                            disabled={ !canCompleteTrip}
                         >
                             Complete Trip
                         </Button>

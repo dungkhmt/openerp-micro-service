@@ -73,9 +73,7 @@ public class DeliveryConfirmationServiceImpl implements DeliveryConfirmationServ
         // Get active assignment
         AssignOrderShipper assignment = getActiveAssignment(orderId);
 
-        // Store proof
-        assignment.setConfirmationType(proofType);
-        assignment.setConfirmationValue(proofValue);
+
 
         assignOrderShipperRepository.save(assignment);
     }
@@ -114,8 +112,7 @@ public class DeliveryConfirmationServiceImpl implements DeliveryConfirmationServ
 
         // Update assignment
         assignment.setStatus(ShipperAssignmentStatus.DELIVERED);
-        assignment.setConfirmationType(confirmationType);
-        assignment.setConfirmationValue(confirmationValue);
+
         assignOrderShipperRepository.save(assignment);
 
         // Update order status

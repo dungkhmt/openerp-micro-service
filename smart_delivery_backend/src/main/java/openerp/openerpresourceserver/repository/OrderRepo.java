@@ -25,12 +25,8 @@ public interface OrderRepo extends JpaRepository<Order, UUID>, OrderRepositoryCu
 
     List<Order> findByOriginHubIdOrderByCreatedAtDesc(UUID hubId);
 
-    List<Order> findAllByOriginHubIdAndStatusAndVehicleId(UUID hubId, OrderStatus orderStatus, UUID vehicleId);
-
-    List<Order> findByRouteVehicleId(UUID routeVehicleId);
-
-    List<Order> findByRouteVehicleIdAndStatus(UUID routeVehicleId, OrderStatus orderStatus);
-
+    @Query("SELECT o FROM Order o join TripOrder to ON o.id = to.orderId where to.tripId = :tripId")
+    List<Order> findByTripId(@Param("tripId") UUID tripId);
 
     List<Order> findAllByFinalHubIdAndStatus(UUID hubId, OrderStatus orderStatus);
 

@@ -96,8 +96,6 @@ public class ShipperAssignmentServiceImpl implements ShipperAssignmentService {
 
             // Update order status
             order.setStatus(OrderStatus.ASSIGNED_SHIPPER);
-            order.setShipperId(shipper.getId());
-            order.setShipperName(shipper.getName());
             orderRepo.save(order);
 
             // Create response DTO

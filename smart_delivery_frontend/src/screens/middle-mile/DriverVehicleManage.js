@@ -388,7 +388,7 @@ const DriverVehicleManage = () => {
     return (
         <Box sx={{ p: 3 }}>
             <Typography variant="h4" gutterBottom>
-                Transport Management
+                Route Management
             </Typography>
 
             {/*<Grid container spacing={3} sx={{ mb: 3 }}>*/}

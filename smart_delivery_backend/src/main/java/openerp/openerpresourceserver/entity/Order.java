@@ -39,16 +39,6 @@ public class Order {
     private String senderName;
     private UUID recipientId;
     private String recipientName;
-    private UUID collectorId;
-    private String collectorName;
-    private UUID shipperId;
-    private String shipperName;
-    private UUID vehicleId;
-    private VehicleType vehicleType;
-    private String vehicleLicensePlate;
-    private UUID driverId;
-    private String driverName;
-    private UUID routeId;
     private String orderType;
     @Enumerated(EnumType.STRING)
     private OrderStatus status; // NEW, PROCESSING, COMPLETED
@@ -63,7 +53,6 @@ public class Order {
     private Double distance;
     private UUID finalHubId;
     private String finalHubName;
-    private UUID routeVehicleId;
     @CreatedBy
     private String createdBy;
     private String approvedBy;

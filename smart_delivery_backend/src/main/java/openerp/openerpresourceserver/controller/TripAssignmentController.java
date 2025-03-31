@@ -41,6 +41,27 @@ public class TripAssignmentController {
 
     }
 
+    @PreAuthorize("hasAnyRole('HUB_MANAGER','HUB_STAFF')")
+    @GetMapping("/hub/{hubId}/today")
+    public ResponseEntity<List<TripDTO>> getTripsForHubToday(@PathVariable UUID hubId) {
+        List<TripDTO> trips = tripService.getTripsForHubToday(hubId);
+        return ResponseEntity.ok(trips);
+    }
+
+    @PreAuthorize("hasAnyRole('HUB_MANAGER','HUB_STAFF')")
+    @GetMapping("/hub/{hubId}/today/start")
+    public ResponseEntity<List<TripDTO>> getTripsForHubTodayStart(@PathVariable UUID hubId) {
+        List<TripDTO> trips = tripService.getTripsForHubTodayStart(hubId);
+        return ResponseEntity.ok(trips);
+    }
+    @PreAuthorize("hasAnyRole('HUB_MANAGER','HUB_STAFF')")
+    @GetMapping("/hub/{hubId}/today/through")
+    public ResponseEntity<List<TripDTO>> getTripsForHubTodayThrough(@PathVariable UUID hubId) {
+        List<TripDTO> trips = tripService.getTripsForHubTodayThrough(hubId);
+        return ResponseEntity.ok(trips);
+    }
+
+
     @PostMapping("/create-from-to")
     public ResponseEntity<List<Trip>> createTripsFromTo(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,

@@ -73,6 +73,10 @@ public class TripItem {
     @Column(name = "updated_at", nullable = false)
     private Timestamp updatedAt;
 
+    private String confirmedOutBy;
+
+    private String confirmedInBy;
+
     @PrePersist
     protected void onCreate() {
         if (status == null) {

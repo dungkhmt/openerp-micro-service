@@ -78,7 +78,7 @@ const DriverSchedule = () => {
                     // If the backend returns a flat list of trips, categorize them here
                     const allTrips = res.data || [];
                     const categorizedTrips = {
-                        activeTrips: allTrips.filter(trip => trip.status === 'IN_PROGRESS'),
+                        activeTrips: allTrips.filter(trip => trip.status === 'IN_PROGRESS' || trip.status === 'CONFIRMED_IN'),
                         scheduledTrips: allTrips.filter(trip => trip.status === 'PLANNED'),
                         completedTrips: allTrips.filter(trip => trip.status === 'COMPLETED')
                     };

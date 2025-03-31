@@ -19,6 +19,6 @@ public interface AssignmentService {
     @Transactional
     void assignOrderItemsToTrip(UUID hubId);
 
-      @Scheduled(cron = "0 0 6 * * ?")  // Runs every day at 6:00 AM
+    @Scheduled(cron = "0 0 6 * * ?")  // Runs every day at 6:00 AM
     void assignOrderItemsForTripsForAllHubs();
 }

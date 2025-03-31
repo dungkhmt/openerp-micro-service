@@ -121,7 +121,6 @@ const InOrder = () =>{
                     {
                         iconOnClickHandle: confirmHandle,
                         tooltip: "Duyệt vào",
-
                     }
                 ]}
                 options={{
