@@ -45,6 +45,43 @@ const navigation = [
       },
     ],
   },
+  {
+    title: "Quản lý nhân sự",
+    icon: "mdi:account-group-outline",
+    children: [
+      {
+        title: "Phòng ban",
+        path: "/hr/department",
+        icon: "mdi:office-building-outline",
+      },
+      {
+        title: "Danh sách nhân sự",
+        path: "/hr/staff",
+        icon: "mdi:account-multiple-outline"
+      },
+      {
+        title: "Vị trí công việc",
+        path: "/hr/job-position",
+        icon: "mdi:briefcase-outline"
+      },
+      {
+        title: "Đánh giá nhân sự",
+        icon: "mdi:star-check-outline",
+        children: [
+          {
+            title: "Tiêu chí",
+            path: "/hr/checkpoint/configure",
+            icon: "mdi:clipboard-text-outline"
+          },
+          {
+            title: "Đánh giá",
+            path: "/hr/checkpoint/period",
+            icon: "mdi:calendar-check-outline"
+          },
+        ]
+      },
+    ],
+  },
 ];
 
 export default navigation;

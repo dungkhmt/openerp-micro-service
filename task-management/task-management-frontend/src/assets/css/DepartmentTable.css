@@ -27,7 +27,7 @@
   
   .export-buttons {
     display: flex;
-    gap: 15px; /* Space between buttons */
+    gap: 15px;
   }
   
   .search-bar {
@@ -36,7 +36,7 @@
   }
   
   .search-bar input {
-    width: 250px; /* Adjust input width */
+    width: 250px;
     font-size: 14px;
   }
   

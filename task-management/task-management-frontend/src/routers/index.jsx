@@ -13,6 +13,11 @@ import TaskCreated from "../pages/tasks/create-by-me";
 import NotFound from "../views/errors/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import Redirect from "./Redirect";
+import StaffScreen from "../views/hr/StaffScreen.jsx";
+import DepartmentScreen from "../views/hr/DepartmentScreen.jsx";
+import JobPositionScreen from "../views/hr/JobPositionScreen.jsx";
+import CheckpointConfigureScreen from "../views/hr/CheckpointConfigureScreen.jsx";
+import CheckpointPeriodScreen from "../views/hr/CheckpointPeriodScreen.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -79,6 +84,40 @@ export const router = createBrowserRouter([
               {
                 path: "created-by-me",
                 element: <TaskCreated />,
+              },
+            ],
+          },
+          {
+            path: "/hr",
+            children: [
+              {
+                path: "staff",
+                element: <StaffScreen />,
+              },
+              {
+                path: "department",
+                element: <DepartmentScreen />,
+              },
+              {
+                path: "job-position",
+                element: <JobPositionScreen />,
+              },
+              {
+                path: "job-position",
+                element: <JobPositionScreen />,
+              },
+              {
+                path: "checkpoint",
+                children: [
+                  {
+                    path: "configure",
+                    element: <CheckpointConfigureScreen />,
+                  },
+                  {
+                    path: "period",
+                    element: <CheckpointPeriodScreen />,
+                  },
+                ]
               },
             ],
           },
