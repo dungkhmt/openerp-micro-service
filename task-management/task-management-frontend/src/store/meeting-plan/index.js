@@ -14,7 +14,7 @@ export const fetchMeetingPlan = createAsyncThunk(
     try {
       return await MeetingPlanService.getMeetingPlan(meetingPlanId);
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error.response || error.message);
     }
   }
 );
@@ -25,7 +25,7 @@ export const fetchMeetingPlanMembers = createAsyncThunk(
     try {
       return await MeetingPlanService.getMeetingPlanUsers(meetingPlanId);
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error.response || error.message);
     }
   }
 );
@@ -42,7 +42,7 @@ export const updateMeetingPlan = createAsyncThunk(
       dispatch(clearCache());
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error.response || error.message);
     }
   }
 );
@@ -59,7 +59,7 @@ export const updateStatus = createAsyncThunk(
       dispatch(clearCache());
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error.response || error.message);
     }
   }
 );
@@ -75,7 +75,7 @@ export const addMemberToMeetingPlan = createAsyncThunk(
       dispatch(fetchMeetingPlanMembers(meetingPlanId));
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error.response || error.message);
     }
   }
 );
@@ -92,7 +92,7 @@ export const removeMemberFromMeetingPlan = createAsyncThunk(
       dispatch(fetchAllSessionRegistrations(meetingPlanId));
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error.response || error.message);
     }
   }
 );
@@ -104,7 +104,7 @@ export const fetchMyAssignment = createAsyncThunk(
       const res = await MeetingPlanService.getMyAssignment(meetingPlanId);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error.response || error.message);
     }
   }
 );
@@ -116,7 +116,7 @@ export const fetchMemberAssignments = createAsyncThunk(
       const res = await MeetingPlanService.getMemberAssignments(meetingPlanId);
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error.response || error.message);
     }
   }
 );
@@ -132,7 +132,7 @@ export const updateMemberAssignments = createAsyncThunk(
       dispatch(fetchMemberAssignments(meetingPlanId));
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error.response || error.message);
     }
   }
 );

@@ -1,8 +1,6 @@
 import { Helmet } from "react-helmet";
 import JoinedMeetingsListPage from "../../../views/meetings/joined/JoinedMeetingsListPage";
 import { CircularProgressLoading } from "../../../components/common/loading/CircularProgressLoading";
-import NotFound from "../../../views/errors/NotFound";
-import Unknown from "../../../views/errors/Unknown";
 import { useSelector } from "react-redux";
 import { useAPIExceptionHandler } from "../../../hooks/useAPIExceptionHandler";
 import {
@@ -126,12 +124,10 @@ const JoinedMeetings = () => {
     } else {
       setIsInitialized(true);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchDebounce]);
 
-  const { errorType } = useAPIExceptionHandler(fetchLoading, errors, clearErrors);
-  if (errorType === "notFound") return <NotFound />;
-  if (errorType === "unknown") return <Unknown />;
+  useAPIExceptionHandler(fetchLoading, errors, clearErrors);
   if (fetchLoading) return <CircularProgressLoading />;
 
   return (

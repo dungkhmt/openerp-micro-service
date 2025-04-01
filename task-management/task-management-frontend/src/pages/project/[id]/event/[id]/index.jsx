@@ -24,7 +24,7 @@ import { EventService } from "../../../../../services/api/event.service";
 import { TaskService } from "../../../../../services/api/task.service";
 import { CircularProgressLoading } from "../../../../../components/common/loading/CircularProgressLoading";
 import { DialogAddTask } from "../../../../../views/project/tasks/DialogAddTask";
-import { DialogAddExistingTask } from "../../../../../views/project/event/DialogAddExistingTask";
+import { DialogAddExistingTask } from "../../../../../views/project/events/DialogAddExistingTask";
 import { TaskPriority } from "../../../../../components/task/priority";
 import { TaskCategory } from "../../../../../components/task/category";
 import { TaskStatus } from "../../../../../components/task/status";
@@ -35,10 +35,11 @@ import {
 } from "../../../../../utils/color.util";
 import { deleteEvent } from "../../../../../store/project/events";
 import { useDispatch } from "react-redux";
-import { DialogEditEvent } from "../../../../../views/project/event/DialogEditEvent";
+import { DialogEditEvent } from "../../../../../views/project/events/DialogEditEvent";
 import ConfirmationDialog from "../../../../../components/mui/dialog/ConfirmationDialog";
 import { usePreventOverflow } from "../../../../../hooks/usePreventOverflow";
 import DescriptionText from "../../../../../components/common/text/DescriptionText";
+import NotFound from "../../../../../views/errors/NotFound";
 
 const Event = () => {
   const {
@@ -320,7 +321,7 @@ const Event = () => {
   }, [updateMaxHeight]);
 
   if (error) {
-    if (error.response?.status === 404) return <h1>Không tìm thấy sự kiện</h1>;
+    if (error.response?.status === 404) return <NotFound />;
     else {
       toast.error("Có lỗi xảy ra khi tải dữ liệu");
       return null;

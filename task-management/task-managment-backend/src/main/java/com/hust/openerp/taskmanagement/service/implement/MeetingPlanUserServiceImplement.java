@@ -41,7 +41,7 @@ public class MeetingPlanUserServiceImplement implements MeetingPlanUserService {
 
 	@Override
 	public List<User> getAllMeetingPlanUsers(String userId, UUID planId) {
-		permissionService.checkMeetingPlanMember(userId, planId);
+		permissionService.checkMeetingPlanCreatorOrMember(userId, planId);
 		return meetingPlanUserRepository.findUsersByPlanId(planId);
 	}
 
@@ -70,7 +70,7 @@ public class MeetingPlanUserServiceImplement implements MeetingPlanUserService {
 
 		MeetingPlanUserId compositeKey = new MeetingPlanUserId(planId, memberId);
 		if (!meetingPlanUserRepository.existsById(compositeKey)) {
-			throw new ApiException(ErrorCode.MEETING_PLAN_USER_NOT_EXIST);
+			throw new ApiException(ErrorCode.MEETING_PLAN_USER_NOT_FOUND);
 		}
 		meetingPlanUserRepository.deleteById(compositeKey);
 	}
@@ -98,7 +98,7 @@ public class MeetingPlanUserServiceImplement implements MeetingPlanUserService {
 		for (MeetingPlanUserDTO assignment : assignments.getAssignments()) {
 			MeetingPlanUserId compositeKey = new MeetingPlanUserId(planId, assignment.getUserId());
 			MeetingPlanUser member = meetingPlanUserRepository.findById(compositeKey)
-					.orElseThrow(() -> new ApiException(ErrorCode.MEETING_PLAN_USER_NOT_EXIST));
+					.orElseThrow(() -> new ApiException(ErrorCode.MEETING_PLAN_USER_NOT_FOUND));
 			member.setSessionId(assignment.getSessionId());
 			meetingPlanUserRepository.save(member);
 		}

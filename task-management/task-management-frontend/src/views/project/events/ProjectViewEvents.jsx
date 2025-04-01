@@ -24,7 +24,7 @@ import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 import { CircularProgressLoading } from "../../../components/common/loading/CircularProgressLoading";
 import ConfirmationDialog from "../../../components/mui/dialog/ConfirmationDialog";
-import { removeDiacritics } from "../../../utils/stringUtils.js";
+import { removeDiacritics } from "../../../utils/stringUtils.js.js";
 
 const ProjectViewEvents = () => {
   const { id } = useParams();
@@ -142,6 +142,8 @@ const ProjectViewEvents = () => {
 
     setFilteredEvents(sortedEvents);
   }, [debouncedSearchQuery, events, sortOption]);
+
+  if (fetchLoading ) return <CircularProgressLoading />;
 
   return (
     <>
@@ -268,9 +270,7 @@ const ProjectViewEvents = () => {
           alignItems: "center",
         }}
       >
-        {fetchLoading ? (
-          <CircularProgressLoading />
-        ) : filteredEvents.length ? (
+        {filteredEvents?.length > 0 ? (
           <Grid container spacing={2} sx={{ mt: 0 }}>
             {filteredEvents.map((event) => (
               <Grid item xs={12} sm={6} md={4} key={event.id}>
@@ -295,7 +295,7 @@ const ProjectViewEvents = () => {
                       <Typography
                         variant="h6"
                         component={Link}
-                        to={`/project/${id}/event/${event.id}`}
+                        to={`/project/${id}/events/${event.id}`}
                         sx={{
                           color: "grey.800",
                           flexGrow: 1,

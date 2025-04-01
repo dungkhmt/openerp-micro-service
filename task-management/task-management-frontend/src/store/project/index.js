@@ -14,8 +14,8 @@ export const fetchProject = createAsyncThunk(
     try {
       const project = await ProjectService.getProject(projectId);
       return project;
-    } catch (e) {
-      return rejectWithValue(e.response?.data);
+    } catch (error) {
+      return rejectWithValue(error.response || error.message);
     }
   }
 );
@@ -35,8 +35,8 @@ export const fetchMembers = createAsyncThunk(
     try {
       const members = await ProjectService.getMembers(projectId);
       return members;
-    } catch (e) {
-      return rejectWithValue(e.response?.data);
+    } catch (error) {
+      return rejectWithValue(error.response || error.message);
     }
   }
 );
@@ -63,8 +63,8 @@ export const deleteMember = createAsyncThunk(
       await dispatch(fetchEvents(projectId));
       dispatch(clearCache());
       return members;
-    } catch (e) {
-      return rejectWithValue(e.response?.data);
+    } catch (error) {
+      return rejectWithValue(error.response || error.message);
     }
   }
 );
@@ -76,8 +76,8 @@ export const updateMemberRole = createAsyncThunk(
       const members = await ProjectService.updateMemberRole(data);
       await dispatch(fetchMembers(data.projectId));
       return members;
-    } catch (e) {
-      return rejectWithValue(e.response?.data);
+    } catch (error) {
+      return rejectWithValue(error.response || error.message);
     }
   }
 );
@@ -88,8 +88,8 @@ export const fetchMyRole = createAsyncThunk(
     try {
       const role = await ProjectService.getMyRole(projectId);
       return role;
-    } catch (e) {
-      return rejectWithValue(e.response?.data);
+    } catch (error) {
+      return rejectWithValue(error.response || error.message);
     }
   }
 );

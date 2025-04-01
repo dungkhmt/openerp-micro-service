@@ -10,4 +10,5 @@ import com.hust.openerp.taskmanagement.entity.MeetingPlan;
 public interface PermissionService {
 	public MeetingPlan checkMeetingPlanMember(String userId, UUID planId);
 	public MeetingPlan checkMeetingPlanCreator(String userId, UUID planId);
+	public MeetingPlan checkMeetingPlanCreatorOrMember(String userId, UUID planId);
 }

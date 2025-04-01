@@ -12,7 +12,7 @@ export const fetchJoinedMeetingPlans = createAsyncThunk(
     try {
       return await MeetingPlanService.getJoinedMeetingPlans(filters);
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error.response || error.message);
     }
   }
 );

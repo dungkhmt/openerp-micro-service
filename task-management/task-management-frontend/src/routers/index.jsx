@@ -21,6 +21,7 @@ import CreatedMeetings from "../pages/meetings/created-meetings";
 import CreatedMeeting from "../pages/meetings/created-meetings/[id]";
 import JoinedMeetings from "../pages/meetings/joined-meetings";
 import JoinedMeeting from "../pages/meetings/joined-meetings/[id]";
+import Unknown from "../views/errors/Unknown";
 
 export const router = createBrowserRouter([
   {
@@ -74,7 +75,7 @@ export const router = createBrowserRouter([
                     ],
                   },
                   {
-                    path: ":id/event/:eid",
+                    path: ":id/events/:eid",
                     element: <Event />,
                   },
                 ],
@@ -126,6 +127,10 @@ export const router = createBrowserRouter([
           {
             path: "/attribute-management",
             element: <AttributeManager />,
+          },
+          {
+            path: "/unknown-error",
+            element: <Unknown />,
           },
           {
             path: "*",

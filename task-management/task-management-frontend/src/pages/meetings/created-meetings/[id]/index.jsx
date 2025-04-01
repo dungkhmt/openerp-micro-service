@@ -8,20 +8,18 @@ import {
   fetchMeetingPlanMembers,
   fetchMemberAssignments,
   setIsCreator,
-  clearErrors as clearMeetingPlanErrors,
+  clearErrors as clearPlanErrors,
 } from "../../../../store/meeting-plan";
 import {
   fetchAllSessionRegistrations,
   fetchMeetingSessions,
-  clearErrors as clearMeetingSessionErrors,
+  clearErrors as clearSessionErrors,
 } from "../../../../store/meeting-plan/meeting-sessions";
 import { CircularProgressLoading } from "../../../../components/common/loading/CircularProgressLoading";
 import CreatedMeetingPage from "../../../../views/meetings/created/CreatedMeetingPage";
 import { IconButton } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useAPIExceptionHandler } from "../../../../hooks/useAPIExceptionHandler";
-import NotFound from "../../../../views/errors/NotFound";
-import Unknown from "../../../../views/errors/Unknown";
 
 const CreatedMeeting = () => {
   const navigate = useNavigate();
@@ -41,17 +39,6 @@ const CreatedMeeting = () => {
   if (pid && !scrollPositions.current[pid]) {
     scrollPositions.current[pid] = { 0: 0, 1: 0 };
   }
-
-  const { errorType: planErrorType } = useAPIExceptionHandler(
-    planLoading,
-    planErrors,
-    clearMeetingPlanErrors
-  );
-  const { errorType: sessionErrorType } = useAPIExceptionHandler(
-    sessionLoading,
-    sessionErrors,
-    clearMeetingSessionErrors
-  );
 
   useEffect(() => {
     if (!pid) return;
@@ -75,10 +62,9 @@ const CreatedMeeting = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, pid]);
 
-  if (planErrorType === "notFound" || sessionErrorType === "notFound")
-    return <NotFound />;
-  if (planErrorType === "unknown" || sessionErrorType === "unknown")
-    return <Unknown />;
+  useAPIExceptionHandler(planLoading, planErrors, clearPlanErrors);
+  useAPIExceptionHandler(sessionLoading, sessionErrors, clearSessionErrors);
+
   if (planLoading || sessionLoading || !currentPlan)
     return <CircularProgressLoading />;
 

@@ -87,7 +87,7 @@ public class MeetingPlanServiceImplement implements MeetingPlanService {
 			pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
 					Sort.by(MeetingPlan_.CREATED_STAMP).ascending());
 		}
-
+		
 		if (search != null && !search.equals("")) {
 			search = "( " + search + " ) AND createdBy:" + userId;
 		} else {
@@ -135,7 +135,7 @@ public class MeetingPlanServiceImplement implements MeetingPlanService {
 
 	@Override
 	public MeetingPlan getMeetingPlanById(String userId, UUID id) {
-		MeetingPlan mp = permissionService.checkMeetingPlanMember(userId, id);
+		MeetingPlan mp = permissionService.checkMeetingPlanCreatorOrMember(userId, id);
 		return mp;
 	}
 
@@ -158,16 +158,17 @@ public class MeetingPlanServiceImplement implements MeetingPlanService {
 		modelMapper.map(updateForm, mp);
 		meetingPlanRepository.save(mp);
 
-		try {
 		List<User> members = meetingPlanUserService.getAllMeetingPlanUsers(userId, planId);
 		for (User member : members) {
-			notificationService.createInAppNotification(userId, member.getId(),
-					"Cuộc họp \"" + mp.getName() + "\" vừa được cập nhật.", "/meetings/joined-meetings/" + planId);
+			try {
+				notificationService.createInAppNotification(userId, member.getId(),
+						"Cuộc họp \"" + mp.getName() + "\" vừa được cập nhật.", "/meetings/joined-meetings/" + planId);
+			} catch (Exception e) {
+				e.printStackTrace();
+				// TODO: handle exception
+			}
 		}
-		} catch (Exception e) {
-			e.printStackTrace();
-			// TODO: handle exception
-		}
+
 	}
 
 	@Override
@@ -184,7 +185,7 @@ public class MeetingPlanServiceImplement implements MeetingPlanService {
 
 		String currentStatusId = plan.getStatus().getStatusId();
 		if (!statusRepository.findByStatusId(statusId).isPresent()) {
-			throw new ApiException(ErrorCode.STATUS_NOT_EXIST);
+			throw new ApiException(ErrorCode.STATUS_NOT_FOUND);
 		}
 
 		Map<String, Set<String>> transitions = Map.of("PLAN_DRAFT", Set.of("PLAN_REG_OPEN", "PLAN_CANCELED"),
@@ -198,39 +199,38 @@ public class MeetingPlanServiceImplement implements MeetingPlanService {
 
 		meetingPlanRepository.updateStatus(planId, statusId);
 
-		try {
-			String subject = "";
-			String mailForm = "";
-			Map<String, Object> model = new HashMap<>();
-			String link = clientEndpoint + "/meetings/joined-meetings/" + planId;
+		// Send in-app notifications and email notifications
+		String subject = "";
+		String mailForm = "";
+		Map<String, Object> model = new HashMap<>();
+		String link = clientEndpoint + "/meetings/joined-meetings/" + planId;
+		User creator = plan.getCreator();
+		String creatorName = creator.getFirstName() == null ? ""
+				: creator.getFirstName() + " " + creator.getLastName() == null ? "" : creator.getLastName();
+		model.put("meetingCreator", creatorName.isBlank() ? plan.getCreatedBy() : creatorName);
+		model.put("meetingName", plan.getName());
+		model.put("location", plan.getLocation());
+		model.put("meetingDescription", plan.getDescription());
+		model.put("meetingLink", link);
 
-			User creator = plan.getCreator();
-			String creatorName = creator.getFirstName() == null ? ""
-					: creator.getFirstName() + " " + creator.getLastName() == null ? "" : creator.getLastName();
-			model.put("meetingCreator", creatorName.isBlank() ? plan.getCreatedBy() : creatorName);
-			model.put("meetingName", plan.getName());
-			model.put("location", plan.getLocation());
-			model.put("meetingDescription", plan.getDescription());
-			model.put("meetingLink", link);
-
+		List<User> members = meetingPlanUserService.getAllMeetingPlanUsers(userId, planId);
+		for (User member : members) {
 			if (statusId.equals("PLAN_REG_OPEN")) {
 				subject = "Bạn được thêm vào cuộc họp \"" + plan.getName() + "\".";
-
 				mailForm = "new-meeting";
 				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy, HH:mm");
 				String formattedDate = formatter.format(plan.getRegistrationDeadline());
 				model.put("registrationDeadline", formattedDate);
 			} else if (statusId.equals("PLAN_ASSIGNED")) {
-				MeetingPlanUserDTO mpu = meetingPlanUserService.getMyAssignment(userId, planId);
+				MeetingPlanUserDTO mpu = meetingPlanUserService.getMyAssignment(member.getId(), planId);
 				if (mpu != null && mpu.getMeetingSession() != null) {
 					MeetingSessionDTO sessionDto = mpu.getMeetingSession();
 					SimpleDateFormat startTimeFormatter = new SimpleDateFormat("dd/MM/yyyy, 'từ' HH:mm");
-					SimpleDateFormat endTimeFormatter = new SimpleDateFormat("'đến' HH:mm");
+					SimpleDateFormat endTimeFormatter = new SimpleDateFormat("HH:mm");
 					String formattedDate = startTimeFormatter.format(sessionDto.getStartTime()) + " - "
 							+ endTimeFormatter.format(sessionDto.getEndTime());
 					subject = "Bạn đã được phân công vào phiên họp vào ngày " + formattedDate + " trong cuộc họp \""
 							+ plan.getName() + "\".";
-
 					mailForm = "meeting-session-assign";
 					model.put("assignedSession", formattedDate);
 				}
@@ -238,28 +238,26 @@ public class MeetingPlanServiceImplement implements MeetingPlanService {
 				subject = "Cuộc họp \"" + plan.getName() + "\" đã bị hủy.";
 				mailForm = "cancel-meeting";
 			} else {
-				return;
+				break;
 			}
 
-			List<User> members = meetingPlanUserService.getAllMeetingPlanUsers(userId, planId);
-
-			for (User member : members) {
-System.out.println("\n\n\n Notify " + member.getId() + " \n\n\n");
+			try {
 				notificationService.createInAppNotification(userId, member.getId(), subject, link);
-System.out.println("\n\n\n Notify " + userId + " \n\n\n");
-//				String emailMember = member.getEmail();
-//				if (emailMember != null) {
-//					String memberName = member.getFirstName() == null ? ""
-//							: member.getFirstName() + " " + member.getLastName() == null ? "" : member.getLastName();
-//					model.put("userName", memberName.isBlank() ? member.getId() : memberName);
-//					notificationService.createMailNotification(creator.getEmail(), emailMember, subject, mailForm,
-//							model);
-//				}
+
+				String emailMember = member.getEmail();
+				if (emailMember != null) {
+					String memberName = member.getFirstName() == null ? ""
+							: member.getFirstName() + " " + member.getLastName() == null ? "" : member.getLastName();
+					model.put("userName", memberName.isBlank() ? member.getId() : memberName);
+					notificationService.createMailNotification(creator.getEmail(), emailMember, subject, mailForm,
+							model);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				// TODO: handle exception
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			// TODO: handle exception
 		}
+
 	}
 
 	@Override

@@ -272,7 +272,7 @@ public class TaskServiceImplement implements TaskService {
 	}
 	
 	public void addExistingTasksToEvent(String userId, UUID eventId, List<UUID> taskIds) {
-		var event = eventRepository.findById(eventId).orElseThrow(() -> new ApiException(ErrorCode.EVENT_NOT_EXIST));
+		var event = eventRepository.findById(eventId).orElseThrow(() -> new ApiException(ErrorCode.EVENT_NOT_FOUND));
 		if (!projectMemberService.checkAddedMemberInProject(userId, event.getProjectId())) {
 			throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_PROJECT);
 		}
