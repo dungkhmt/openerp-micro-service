@@ -11,8 +11,8 @@ export const fetchMeetingSessions = createAsyncThunk(
   async (meetingPlanId, { rejectWithValue }) => {
     try {
       return await MeetingSessionService.getMeetingSessions(meetingPlanId);
-    } catch (err) {
-      return rejectWithValue(err.response?.data || err.message);
+    } catch (error) {
+      return rejectWithValue(error.response || error.message);
     }
   }
 );
@@ -27,8 +27,8 @@ export const createMeetingSessions = createAsyncThunk(
       );
       dispatch(fetchMeetingSessions(meetingPlanId));
       return res;
-    } catch (err) {
-      return rejectWithValue(err.response?.data || err.message);
+    } catch (error) {
+      return rejectWithValue(error.response || error.message);
     }
   }
 );
@@ -47,8 +47,8 @@ export const deleteMeetingSession = createAsyncThunk(
       dispatch(fetchMeetingSessions(meetingPlanId));
       dispatch(fetchAllSessionRegistrations(meetingPlanId));
       return res;
-    } catch (err) {
-      return rejectWithValue(err.response?.data || err.message);
+    } catch (error) {
+      return rejectWithValue(error.response || error.message);
     }
   }
 );
@@ -58,8 +58,8 @@ export const fetchMyMeetingSessions = createAsyncThunk(
   async (meetingPlanId, { rejectWithValue }) => {
     try {
       return await MeetingSessionService.getSessionsByMe(meetingPlanId);
-    } catch (err) {
-      return rejectWithValue(err.response?.data || err.message);
+    } catch (error) {
+      return rejectWithValue(error.response || error.message);
     }
   }
 );
@@ -74,8 +74,8 @@ export const updateMyMeetingSessions = createAsyncThunk(
       );
       dispatch(fetchMyMeetingSessions(meetingPlanId));
       return res;
-    } catch (err) {
-      return rejectWithValue(err.response?.data || err.message);
+    } catch (error) {
+      return rejectWithValue(error.response || error.message);
     }
   }
 );
@@ -87,8 +87,8 @@ export const fetchAllSessionRegistrations = createAsyncThunk(
       return await MeetingSessionService.getAllSessionRegistrations(
         meetingPlanId
       );
-    } catch (err) {
-      return rejectWithValue(err.response?.data || err.message);
+    } catch (error) {
+      return rejectWithValue(error.response || error.message);
     }
   }
 );

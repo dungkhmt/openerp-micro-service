@@ -36,7 +36,6 @@ import { clearCache } from "../../../store/project/tasks";
 import { SkillChip } from "../../../components/task/skill";
 import ItemSelector from "../../../components/mui/dialog/ItemSelector";
 import { fetchEvents } from "../../../store/project/events";
-import { CircularProgressLoading } from "../../../components/common/loading/CircularProgressLoading";
 import { removeDiacritics } from "../../../utils/stringUtils.js";
 
 const Transition = forwardRef(function Transition(props, ref) {
@@ -47,21 +46,9 @@ const DialogAddTask = ({ open, setOpen, defaultEvent }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const {
-    members,
-    project,
-    fetchLoading: projectFetchLoading,
-  } = useSelector((state) => state.project);
-  const { events, fetchLoading: eventFetchLoading } = useSelector(
-    (state) => state.events
-  );
-  const {
-    category,
-    priority,
-    status,
-    skill,
-    fetchLoading: skillFetchLoading,
-  } = useSelector((state) => state);
+  const { members, project } = useSelector((state) => state.project);
+  const { events } = useSelector((state) => state.events);
+  const { category, priority, status, skill } = useSelector((state) => state);
   const [files, setFiles] = useState([]);
   const [createLoading, setCreateLoading] = useState(false);
   const { register, handleSubmit, errors, setValue, control } = useForm();
@@ -76,9 +63,6 @@ const DialogAddTask = ({ open, setOpen, defaultEvent }) => {
 
   const [selectedAssignees, setSelectedAssignees] = useState([]);
   const [filteredAssignees, setFilteredAssignees] = useState(members);
-
-  if (projectFetchLoading || eventFetchLoading || skillFetchLoading)
-    return <CircularProgressLoading />;
 
   const handleSkillSearch = (search) => {
     setFilteredSkills(

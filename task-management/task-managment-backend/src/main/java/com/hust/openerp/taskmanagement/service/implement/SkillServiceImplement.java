@@ -57,7 +57,7 @@ public class SkillServiceImplement implements SkillService {
 	@Override
 	public void update(String id, Skill updatedSkill) {
 		Skill skill = skillRepository.findById(id).orElseThrow(
-				() -> new ApiException(ErrorCode.SKILL_NOT_EXIST));
+				() -> new ApiException(ErrorCode.SKILL_NOT_FOUND));
         
 		skill.setDescription(updatedSkill.getDescription());
 		skillRepository.save(skill);

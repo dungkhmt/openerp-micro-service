@@ -22,11 +22,22 @@ public class PermissionServiceImplement implements PermissionService {
 	private final MeetingPlanUserRepository meetingPlanUserRepository;
 
 	@Override
+	public MeetingPlan checkMeetingPlanCreatorOrMember(String userId, UUID planId) {
+		MeetingPlan mp = meetingPlanRepository.findById(planId)
+				.orElseThrow(() -> new ApiException(ErrorCode.MEETING_PLAN_NOT_FOUND));
+		boolean isMember = meetingPlanUserRepository.existsByUserIdAndPlanId(userId, planId);
+		boolean isCreator = mp.getCreatedBy().equals(userId);
+		if (!isMember && !isCreator) {
+			throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_MEETING_PLAN);
+		}
+		return mp;
+	}
+	
+	@Override
 	public MeetingPlan checkMeetingPlanMember(String userId, UUID planId) {
 		MeetingPlan mp = meetingPlanRepository.findById(planId)
-				.orElseThrow(() -> new ApiException(ErrorCode.MEETING_PLAN_NOT_EXIST));
-		if (!meetingPlanUserRepository.existsByUserIdAndPlanId(userId, planId) 
-				&& !mp.getCreatedBy().equals(userId)) {
+				.orElseThrow(() -> new ApiException(ErrorCode.MEETING_PLAN_NOT_FOUND));
+		if (!meetingPlanUserRepository.existsByUserIdAndPlanId(userId, planId)) {
 			throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_MEETING_PLAN);
 		}
 		return mp;
@@ -35,11 +46,10 @@ public class PermissionServiceImplement implements PermissionService {
 	@Override
 	public MeetingPlan checkMeetingPlanCreator(String userId, UUID planId) {
 		MeetingPlan mp = meetingPlanRepository.findById(planId)
-				.orElseThrow(() -> new ApiException(ErrorCode.MEETING_PLAN_NOT_EXIST));
+				.orElseThrow(() -> new ApiException(ErrorCode.MEETING_PLAN_NOT_FOUND));
 		if (!mp.getCreatedBy().equals(userId)) {
 			throw new ApiException(ErrorCode.INSUFFICIENT_PERMISSIONS);
 		}
 		return mp;
 	}
-
 }

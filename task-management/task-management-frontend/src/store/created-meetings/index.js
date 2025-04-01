@@ -12,7 +12,7 @@ export const fetchCreatedMeetingPlans = createAsyncThunk(
     try {
       return await MeetingPlanService.getCreatedMeetingPlans(filters);
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error.response || error.message);
     }
   }
 );
@@ -25,7 +25,7 @@ export const createMeetingPlan = createAsyncThunk(
       dispatch(clearCache());
       return res;
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error.response || error.message);
     }
   }
 );

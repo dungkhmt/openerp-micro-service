@@ -32,7 +32,7 @@ public class MeetingPlanSpecification extends BaseSpecification<MeetingPlan> {
 			return this.parseStringField(root, builder);
 		case MeetingPlan_.STATUS_ID:
 		case MeetingPlan_.CREATED_BY:
-			return this.parseIdField(root, builder);
+			return this.parseStringField(root, builder);
 		case MeetingPlan_.ID:
 			return this.parseUUIDField(root, builder);
 		case MeetingPlan_.CREATED_STAMP:

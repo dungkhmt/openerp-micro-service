@@ -32,7 +32,7 @@ public class MeetingSessionServiceImplement implements MeetingSessionService {
 
 	@Override
 	public List<MeetingSessionDTO> getSessionsByPlanId(UUID planId, String userId) {
-		permissionService.checkMeetingPlanMember(userId, planId);
+		permissionService.checkMeetingPlanCreatorOrMember(userId, planId);
 		return meetingSessionRepository.findByPlanIdOrderByStartTimeAsc(planId).stream()
 				.map(session -> modelMapper.map(session, MeetingSessionDTO.class)).toList();
 	}

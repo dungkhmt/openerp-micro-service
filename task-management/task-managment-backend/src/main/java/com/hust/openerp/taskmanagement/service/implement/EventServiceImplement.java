@@ -115,7 +115,7 @@ public class EventServiceImplement implements EventService {
 	@Override
 	public void update(String userId, UUID eventId, UpdateEventForm updateEventForm) {
 		var event = eventRepository.findById(eventId).orElseThrow(
-				() -> new ApiException(ErrorCode.EVENT_NOT_EXIST));
+				() -> new ApiException(ErrorCode.EVENT_NOT_FOUND));
 		
 		if (!projectMemberService.checkAddedMemberInProject(userId, event.getProjectId())) {
 			throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_PROJECT);

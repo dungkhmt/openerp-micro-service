@@ -42,7 +42,6 @@ const MeetingPlanService = {
   },
   getJoinedMeetingPlans: async (filters, cb) => {
     try {
-      console.log(filters);
       const response = await privateClient.get(
         endPoints.getJoinedMeetingPlans,
         {

@@ -1,7 +1,5 @@
-import { Box, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { useCallback, useEffect } from "react";
-import { Helmet } from "react-helmet";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet, useParams } from "react-router-dom";
 import {
@@ -10,23 +8,29 @@ import {
   fetchProject,
   resetProject,
   setLoading,
-  clearErrors,
+  clearErrors as clearProjectErrors,
 } from "../../../store/project";
 import { resetCalendarData } from "../../../store/project/calendar";
 import { resetGanttData } from "../../../store/project/gantt-chart";
 import { fetchStatisticData } from "../../../store/project/statistic";
 import { resetTasksData } from "../../../store/project/tasks";
-import NotFound from "../../../views/errors/NotFound";
-import { fetchEvents, resetEvents } from "../../../store/project/events";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
 import { CircularProgressLoading } from "../../../components/common/loading/CircularProgressLoading";
+import { useAPIExceptionHandler } from "../../../hooks/useAPIExceptionHandler";
+import {
+  clearErrors as clearEventsErrors,
+  fetchEvents,
+  resetEvents,
+} from "../../../store/project/events";
 
 const ProjectWrapper = () => {
   const { id } = useParams();
-  const { t } = useTranslation();
   const dispatch = useDispatch();
-  const { fetchLoading, errors } = useSelector((state) => state.project);
+  const { fetchLoading: projectLoading, errors: projectErrors } = useSelector(
+    (state) => state.project
+  );
+  const { fetchLoading: eventsLoading, errors: eventsErrors } = useSelector(
+    (state) => state.events
+  );
   const { period } = useSelector((state) => state.statistic);
 
   const fetchProjectData = useCallback(async () => {
@@ -60,43 +64,10 @@ const ProjectWrapper = () => {
     fetchProjectData();
   }, [fetchProjectData]);
 
-  if (fetchLoading) return <CircularProgressLoading />;
+  useAPIExceptionHandler(projectLoading, projectErrors, clearProjectErrors);
+  useAPIExceptionHandler(eventsLoading, eventsErrors, clearEventsErrors);
 
-  if (!fetchLoading && errors?.length > 0) {
-    const firstError = errors[0];
-
-    if (firstError?.code?.includes("E03")) return <NotFound />;
-
-    if (firstError?.code?.includes("E02")) {
-      toast.error(t(firstError.message));
-      dispatch(clearErrors());
-      return <Outlet />;
-    }
-
-    return (
-      <>
-        <Helmet>
-          <title>Opps Occur Error | Task management</title>
-        </Helmet>
-        <Box
-          sx={{
-            mt: 6,
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "column",
-          }}
-        >
-          <Typography variant="h4" color="error.dark">
-            Có lỗi xảy ra
-          </Typography>
-          <Typography variant="body1" color="error.light">
-            Có lẽ đã xảy ra lỗi khi tải dữ liệu, chúng tôi đang cố gắng để khắc
-            phục. Vui lòng thử lại sau.
-          </Typography>
-        </Box>
-      </>
-    );
-  }
+  if (projectLoading) return <CircularProgressLoading />;
 
   return <Outlet />;
 };

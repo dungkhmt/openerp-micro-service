@@ -4,12 +4,12 @@ import { useNavigate, useParams } from "react-router";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import {
-  clearErrors as clearMeetingSessionErrors,
+  clearErrors as clearSessionErrors,
   fetchMeetingSessions,
   fetchMyMeetingSessions,
 } from "../../../../store/meeting-plan/meeting-sessions";
 import {
-  clearErrors as clearMeetingPlanErrors,
+  clearErrors as clearPlanErrors,
   fetchMeetingPlan,
   fetchMeetingPlanMembers,
   fetchMyAssignment,
@@ -20,8 +20,6 @@ import JoinedMeetingPage from "../../../../views/meetings/joined/JoinedMeetingPa
 import { IconButton } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useAPIExceptionHandler } from "../../../../hooks/useAPIExceptionHandler";
-import NotFound from "../../../../views/errors/NotFound";
-import Unknown from "../../../../views/errors/Unknown";
 
 const JoinedMeeting = () => {
   const navigate = useNavigate();
@@ -34,17 +32,6 @@ const JoinedMeeting = () => {
   } = useSelector((state) => state.meetingPlan);
   const { errors: sessionErrors, fetchLoading: sessionLoading } = useSelector(
     (state) => state.meetingSessions
-  );
-
-  const { errorType: planErrorType } = useAPIExceptionHandler(
-    planLoading,
-    planErrors,
-    clearMeetingPlanErrors
-  );
-  const { errorType: sessionErrorType } = useAPIExceptionHandler(
-    sessionLoading,
-    sessionErrors,
-    clearMeetingSessionErrors
   );
 
   useEffect(() => {
@@ -71,10 +58,9 @@ const JoinedMeeting = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, pid]);
 
-  if (planErrorType === "notFound" || sessionErrorType === "notFound")
-    return <NotFound />;
-  if (planErrorType === "unknown" || sessionErrorType === "unknown")
-    return <Unknown />;
+  useAPIExceptionHandler(planLoading, planErrors, clearPlanErrors);
+  useAPIExceptionHandler(sessionLoading, sessionErrors, clearSessionErrors);
+
   if (planLoading || sessionLoading || !currentPlan)
     return <CircularProgressLoading />;
 

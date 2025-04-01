@@ -126,7 +126,6 @@ const UserManagementView = () => {
           `${user.firstName ?? ""} ${user.lastName ?? ""}`?.toLowerCase() ?? "";
         const id = user.id.toLowerCase();
         const email = user.email?.toLowerCase() ?? "";
-        // Filter out all users don't have name and email
         if (!user.firstName && !user.lastName && !user.email) return false;
         return (
           fullName.includes(search.toLowerCase()) ||
@@ -139,6 +138,7 @@ const UserManagementView = () => {
 
   useEffect(() => {
     updateHeight(10);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [window.innerHeight]);
 
   if (usersCache?.length === 0 && fetchLoading) {
@@ -204,8 +204,8 @@ const UserManagementView = () => {
           <DataGrid
             rows={filterUsers}
             columns={columns}
-            getRowId={(row) => row.id} // Ensure row selection uses the correct ID
-            rowSelectionModel={currentUser ? [currentUser.id] : []} // Sync selected row with Redux state
+            getRowId={(row) => row.id}
+            rowSelectionModel={currentUser ? [currentUser.id] : []}
             onRowSelectionModelChange={(newSelection) => {
               const selectedUser = filterUsers.find(
                 (user) => user.id === newSelection[0]

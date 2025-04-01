@@ -1,6 +1,8 @@
 import { Box, Container, Typography } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
+import { usePreventOverflow } from "../../hooks/usePreventOverflow";
+import { useEffect } from "react";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -23,6 +25,13 @@ const useStyles = makeStyles((theme) => ({
 
 const NotFound = () => {
   const classes = useStyles();
+  const { ref, updateMaxHeight } = usePreventOverflow();
+
+  useEffect(() => {
+    updateMaxHeight();
+    window.addEventListener("resize", updateMaxHeight);
+    return () => window.removeEventListener("resize", updateMaxHeight);
+  }, [updateMaxHeight]);
 
   return (
     <>
@@ -30,13 +39,13 @@ const NotFound = () => {
         <title>Not Found | Task management</title>
       </Helmet>
       <Box
-        display="flex"
-        flexDirection="column"
-        // height="100%"
-        justifyContent="center"
-        className={classes.wrapper}
+        ref={ref}
         sx={{
           borderRadius: 2,
+          overflowY: "auto",
+          display: "flex",
+          alignItems: "center",
+          flexDirection: "column",
         }}
       >
         <Container maxWidth="md">

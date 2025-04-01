@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Box, TextField, IconButton } from "@mui/material";
-import { Icon } from "@iconify/react"; // Import Icon from @iconify/react
+import { Icon } from "@iconify/react";
 import PropTypes from "prop-types";
+import { useDebounce } from "../../../hooks/useDebounce";
 
 const ExpandableSearch = ({
   initialExpanded = false,
@@ -13,11 +14,17 @@ const ExpandableSearch = ({
   iconSize = 20,
   inputSx = {},
   containerSx = {},
+  debounceDelay = 500,
 }) => {
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, debounceDelay);
   const inputRef = useRef(null);
   const containerRef = useRef(null);
+
+  useEffect(() => {
+    onSearchChange(debouncedSearchTerm);
+  }, [debouncedSearchTerm, onSearchChange]);
 
   useEffect(() => {
     if (isExpanded && inputRef.current) {
@@ -44,7 +51,6 @@ const ExpandableSearch = ({
 
   const clearSearch = () => {
     setSearchTerm("");
-    onSearchChange("");
     onClear();
     if (inputRef.current) {
       inputRef.current.focus();
@@ -57,7 +63,6 @@ const ExpandableSearch = ({
     if (newSearchTerm && !isExpanded) {
       setIsExpanded(true);
     }
-    onSearchChange(newSearchTerm);
   };
 
   const handleKeyPress = (event) => {
@@ -132,7 +137,6 @@ const ExpandableSearch = ({
   );
 };
 
-// PropTypes for validation and documentation
 ExpandableSearch.propTypes = {
   initialExpanded: PropTypes.bool,
   placeholder: PropTypes.string,
@@ -140,9 +144,10 @@ ExpandableSearch.propTypes = {
   onSearchChange: PropTypes.func,
   onSearchSubmit: PropTypes.func,
   onClear: PropTypes.func,
-  iconSize: PropTypes.number, // Changed to number since we’re using pixels
+  iconSize: PropTypes.number,
   inputSx: PropTypes.object,
   containerSx: PropTypes.object,
+  debounceDelay: PropTypes.number,
 };
 
 export default ExpandableSearch;
