@@ -1,3 +1,9 @@
+# Ignore IDE folders
+.idea/
+*.iml
+.vscode/
+
+# Ignore anything not required for the build
 Dockerfile
 docs
 .dockerignore

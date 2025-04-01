@@ -4,64 +4,65 @@ import { request } from "api";
 import { Button } from "@mui/material";
 
 export const useGeneralTableColumns = (setClasses) => {
-    const handleRemoveTimeSlot = (generalClassId, roomReservationId) => {
-      request(
-        "delete",
-        `/general-classes/${generalClassId}/room-reservations/${roomReservationId}`,
-        (res) => {
-          toast.success("Xóa ca thành công!");
-          setClasses((prevClasses) => {
-            return prevClasses.filter(
-              (prevClass) => prevClass.roomReservationId !== roomReservationId
-            );
-          });
-        },
-        (err) => {
-          if (err.response.status === 410) {
-            toast.error(err.response.data);
-          } else {
-            toast.error("Xóa ca thất bại!");
-          }
+  const handleRemoveTimeSlot = (generalClassId, roomReservationId) => {
+    request(
+      "delete",
+      `/general-classes/${generalClassId}/room-reservations/${roomReservationId}`,
+      (res) => {
+        toast.success("Xóa ca thành công!");
+        setClasses((prevClasses) => {
+          return prevClasses.filter(
+            (prevClass) => prevClass.roomReservationId !== roomReservationId
+          );
+        });
+      },
+      (err) => {
+        if (err.response.status === 410) {
+          toast.error(err.response.data);
+        } else {
+          toast.error("Xóa ca thất bại!");
         }
-      );
-    };
+      }
+    );
+  };
 
-    const handleAddTimeSlot = (generalClassId, roomReservationId) => {
-      request(
-        "post",
-        `/general-classes/${generalClassId}/room-reservations/`,
-        (res) => {
-          console.log(res.data);
-          const newClasses = res.data.timeSlots.map((timeSlot, index) => {
-            const newClass = {
-              ...res.data,
-              ...timeSlot,
-              id: `${res.data.id}-${index + 1}`,
-              roomReservationId: timeSlot?.id,
-            };
-            delete newClass.timeSlots;
-            console.log(newClass.roomReservationId);
-            return newClass;
-          });
+  const handleAddTimeSlot = (generalClassId, roomReservationId) => {
+    console.log(generalClassId);
+    request(
+      "post",
+      `/general-classes/${generalClassId}/room-reservations/`,
+      (res) => {
+        console.log(res.data);
+        const newClasses = res.data.timeSlots.map((timeSlot, index) => {
+          const newClass = {
+            ...res.data,
+            ...timeSlot,
+            id: `${res.data.id}-${index + 1}`,
+            roomReservationId: timeSlot?.id,
+          };
+          delete newClass.timeSlots;
+          console.log(newClass.roomReservationId);
+          return newClass;
+        });
 
-          setClasses((prevClasses) => {
-            return [
-              ...prevClasses.filter(
-                (prevClass) => prevClass.id.split("-")[0] !== generalClassId
-              ),
-              ...newClasses,
-            ];
-          });
-        },
-        (err) => {
-          if (err.response.status === 410) {
-            toast.error(err.response.data);
-          } else {
-            toast.error("Thêm ca học thất bại!");
-          }
+        setClasses((prevClasses) => {
+          return [
+            ...prevClasses.filter(
+              (prevClass) => prevClass.id.split("-")[0] !== generalClassId
+            ),
+            ...newClasses,
+          ];
+        });
+      },
+      (err) => {
+        if (err.response.status === 410) {
+          toast.error(err.response.data);
+        } else {
+          toast.error("Thêm ca học thất bại!");
         }
-      );
-    };
+      }
+    );
+  };
   return [
     {
       headerName: "Mã lớp",

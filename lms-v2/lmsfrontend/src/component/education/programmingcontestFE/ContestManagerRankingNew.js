@@ -11,6 +11,7 @@ import HustContainerCard from "../../common/HustContainerCard";
 import StandardTable from "../../table/StandardTable";
 
 import { makeStyles } from "@material-ui/core/styles";
+import ContestManagerRankingPercentageNew from "./ContestManagerRankingPercentageNew";
 
 const useStyles = makeStyles({
   actions: {
@@ -257,6 +258,7 @@ export default function ContestManagerRankingNew(props) {
           ]}
         />
       </Box>
+  
     </HustContainerCard>
   );
 }

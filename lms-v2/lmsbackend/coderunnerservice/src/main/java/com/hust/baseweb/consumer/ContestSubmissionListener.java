@@ -1,13 +1,17 @@
 package com.hust.baseweb.consumer;
 
 import com.hust.baseweb.config.rabbitmq.RabbitProgrammingContestConfig;
-import com.hust.baseweb.service.ProblemTestCaseService;
+import com.hust.baseweb.config.rabbitmq.RabbitProgrammingContestProperties;
+import com.hust.baseweb.service.Judge0ProblemTestCaseServiceImpl;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import com.hust.baseweb.config.rabbitmq.RabbitProgrammingContestProperties;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
@@ -18,27 +22,22 @@ import static com.hust.baseweb.config.rabbitmq.ProblemContestRoutingKey.JUDGE_PR
 
 @Slf4j
 @Component
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor(onConstructor_ = {@Autowired})
 public class ContestSubmissionListener extends BaseRabbitListener {
 
-    private final ProblemTestCaseService problemTestCaseService;
+    Judge0ProblemTestCaseServiceImpl problemTestCaseService;
 
-    private final RabbitProgrammingContestProperties rabbitConfig;
-
-    public ContestSubmissionListener(
-            ProblemTestCaseService problemTestCaseService,
-            RabbitProgrammingContestProperties rabbitConfig
-    ) {
-        this.problemTestCaseService = problemTestCaseService;
-        this.rabbitConfig = rabbitConfig;
-    }
+    RabbitProgrammingContestProperties rabbitConfig;
 
     @Override
-    @RabbitListener(queues = RabbitProgrammingContestConfig.JUDGE_PROBLEM_QUEUE)
+    @RabbitListener(queues = RabbitProgrammingContestConfig.JUDGE_PROBLEM_QUEUE,
+            containerFactory = "judgeProblemListenerContainerFactory")
     public void onMessage(
             Message message, String messageBody, Channel channel,
             @Header(required = false, name = "x-delivery-count") Integer deliveryCount
     ) throws Exception {
-        if (deliveryCount == null || deliveryCount < rabbitConfig.getRetryLimit()) {
+        if (deliveryCount == null || deliveryCount < rabbitConfig.getJudgeProblem().getRetryLimit()) {
             retryMessage(message, messageBody, channel);
         } else {
             sendMessageToDeadLetterQueue(message, channel);

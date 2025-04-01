@@ -1,5 +1,5 @@
 import MuiAvatar from "@mui/material/Avatar";
-import { useTheme } from "@mui/material/styles";
+import { lighten } from "@mui/material/styles";
 import { forwardRef, memo } from "react";
 import { useBgColor } from "../../../hooks/useBgColor";
 import { getRandomColorSkin } from "../../../utils/color.util";
@@ -13,7 +13,6 @@ const Avatar = forwardRef((props, ref) => {
     color = getRandomColorSkin();
   }
 
-  const theme = useTheme();
   const bgColors = useBgColor();
 
   const getAvatarStyles = (skin, skinColor) => {
@@ -23,8 +22,11 @@ const Avatar = forwardRef((props, ref) => {
       avatarStyles = { ...bgColors[`${skinColor}Light`] };
     } else if (skin === "light-static") {
       avatarStyles = {
-        color: bgColors[`${skinColor}Light`].color,
-        backgroundColor: lighten(theme.palette[skinColor].main, 0.88),
+        ...bgColors[`${skinColor}Filled`],
+        backgroundColor: lighten(
+          bgColors[`${skinColor}Filled`].backgroundColor,
+          0.25
+        ),
       };
     } else {
       avatarStyles = { ...bgColors[`${skinColor}Filled`] };

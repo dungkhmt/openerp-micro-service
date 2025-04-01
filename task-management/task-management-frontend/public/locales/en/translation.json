@@ -1,1 +1,22 @@
-{}
+{
+  "Access denied": "Truy cập bị từ chối",
+  "You are not a member of this project, please contact the administrator to be added to the project": "Bạn không phải là thành viên của dự án này. Vui lòng liên hệ với quản trị viên để được thêm vào dự án",
+  "You are the last owner, please assign a new owner before leaving the project": "Bạn là chủ sở hữu cuối cùng. Vui lòng chỉ định chủ sở hữu mới trước khi rời dự án",
+  "You do not have sufficient permissions to perform this action": "Bạn không có quyền thực hiện hành động này",
+  "The project code already exists": "Má dự án đã tồn tại",
+  "The skill already exists. Please check the skill list before adding a new one": "Kỹ năng này đã tồn tại. Vui lòng kiểm tra danh sách kỹ năng trước khi thêm mới",
+  "The priority already exists. Please check the priority list before adding a new one": "Độ ưu tiên này đã tồn tại. Vui lòng kiểm tra danh sách độ ưu tiên trước khi thêm mới",
+  "The status already exists. Please check the status list before adding a new one": "Trạng thái này đã tồn tại. Vui lòng kiểm tra danh sách trạng thái trước khi thêm mới",
+  "The category already exists. Please check the category list before adding a new one": "Danh mục này đã tồn tại. Vui lòng kiểm tra danh sách danh mục trước khi thêm mới",
+  "Registration deadline has passed. You can no longer update sessions": "Hạn đăng ký đã qua. Bạn không thể cập nhật phiên nữa",
+  "You are not a member of this meeting, please contact the administrator to be added to the meeting": "Bạn không phải là thành viên của cuộc họp này. Vui lòng liên hệ với quản trị viên để được thêm vào cuộc họp.",
+  "Project not found": "Không tìm thấy dự án",
+  "Task not found": "Không tìm thấy công việc",
+  "Event not found": "Không tìm thấy sự kiện",
+  "Meeting plan not found": "Không tìm thấy cuộc họp",
+  "The meeting plan member not found": "Không tìm thấy thành viên cuộc họp",
+  "The status not found": "Không tìm thấy trạng thái",
+  "The role not found": "Không tìm thấy vai trò",
+  "The skill not found": "Không tìm thấy kỹ năng",
+  "Invalid meeting plan status transition": "Chuyển đổi trạng thái kế hoạch họp không hợp lệ."
+}

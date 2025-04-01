@@ -25,7 +25,7 @@ const GeneralScheduleTable = ({
   };
 
   return (
-    <Box style={{ height: 550, width: "100%" }}>
+    <Box style={{ height: 550 }}>
       <ClassDetailDialog open={open} setOpen={setOpen} row={row} />
       <DataGrid
         onRowSelectionModelChange={(rows) => setSelectedRows(rows)}

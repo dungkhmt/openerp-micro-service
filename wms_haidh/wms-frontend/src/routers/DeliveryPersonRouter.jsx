@@ -1,28 +1,15 @@
-// import { Route, Switch, useRouteMatch } from "react-router";
-// import TodayDeliveryTrip from "../screens/deliveryperson/todayDeliveryTrip";
-// import DeliveryPersonTripDetail from "../screens/deliveryperson/deliveryPersonTripDetail";
+import { Routes, Route } from "react-router-dom";
+import DeliveryTrip from "../views/delivery_staff/DeliveryTrip";
+import DeliveryTripDetail from "../views/delivery_staff/DeliveryTripDetail";
+import DeliveryTripItem from "../views/delivery_staff/DeliveryTripItem";
+const PurchasePersonRouter = () => {
+  return (
+    <Routes>
+      <Route path="delivery-trip" element={<DeliveryTrip />} />
+      <Route path="delivery-trip/:id" element={<DeliveryTripDetail />} />
+      <Route path="delivery-trip/:id1/:id2" element={<DeliveryTripItem />} />
+    </Routes>
+  );
+};
 
-// export default function DeliveryPersonRouter () {
-//   let { path } = useRouteMatch();
-//   return (
-//     <div>
-//       <Switch>
-//         <Route
-//           component={TodayDeliveryTrip}
-//           exact
-//           path={`${path}/trip`}
-//         ></Route>
-//         <Route
-//           component={DeliveryPersonTripDetail}
-//           exact
-//           path={`${path}/trip/:id`}
-//         ></Route>
-//       </Switch>
-//     </div>
-//   );
-// }
-const DeliveryPersonRouter = () => {
-    return <div>Delivery Person Router</div>;
-  };
-  
-  export default DeliveryPersonRouter;
+export default PurchasePersonRouter;

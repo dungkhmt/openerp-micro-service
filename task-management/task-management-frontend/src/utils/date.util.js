@@ -30,3 +30,31 @@ export const getDiffDateWithCurrent = (from) => {
 
   return [Math.floor(diff / 31536000), "năm"];
 };
+
+export const getTimeUntilDeadline = (toDate) => {
+  let diff = dayjs(toDate).diff(dayjs(), "seconds");
+
+  if (diff <= 0) return "Đã hết hạn";
+
+  const units = [
+    { label: "năm", value: 31536000 },
+    { label: "tháng", value: 2592000 },
+    { label: "tuần", value: 604800 },
+    { label: "ngày", value: 86400 },
+    { label: "giờ", value: 3600 },
+    { label: "phút", value: 60 },
+    { label: "giây", value: 1 },
+  ];
+
+  let result = [];
+  for (const unit of units) {
+    const count = Math.floor(diff / unit.value);
+    if (count > 0) {
+      result.push(`${count} ${unit.label}`);
+      diff -= count * unit.value;
+    }
+    if (result.length === 2) break; // Limit to 2 units (e.g., "1 ngày và 2 giờ")
+  }
+
+  return `Còn ${result.join(" và ")}`;
+};

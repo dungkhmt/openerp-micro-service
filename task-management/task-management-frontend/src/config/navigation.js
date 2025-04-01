@@ -15,6 +15,19 @@ const navigation = [
     ],
   },
   {
+    sectionTitle: "My Profile",
+  },
+  {
+    title: "My Profile",
+    icon: "mdi:account-outline",
+    children: [
+      {
+        title: "My Profile",
+        path: "/my-profile",
+      },
+    ],
+  },
+  {
     sectionTitle: "Projects & Tasks",
   },
   {
@@ -79,6 +92,47 @@ const navigation = [
             icon: "mdi:calendar-check-outline"
           },
         ]
+      },
+    ]
+  },
+  {
+    sectionTitle: "Meetings",
+  },
+  {
+    title: "Quản lý cuộc họp",
+    icon: "mdi:event-multiple-check",
+    children: [
+      {
+        title: "Cuộc họp đã tạo",
+        path: "meetings/created-meetings",
+      },
+      {
+        title: "Cuộc họp tham gia",
+        path: "meetings/joined-meetings",
+      },
+    ],
+  },
+  {
+    sectionTitle: "Administration",
+  },
+  {
+    title: "Quản lý nhân viên",
+    icon: "mdi:users-group-outline",
+    children: [
+      {
+        title: "Danh sách nhân viên",
+        path: "/user-management",
+      },
+    ],
+  },
+  {
+    title: "Quản lý thuộc tính",
+    icon: "mdi:category-outline",
+    children: [
+      {
+        title: "Danh sách thuộc tính",
+        path: "/attribute-management"
+
       },
     ],
   },

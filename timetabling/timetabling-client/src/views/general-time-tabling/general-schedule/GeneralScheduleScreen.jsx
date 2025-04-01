@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import GeneralScheduleTable from "./components/GeneralScheduleTable";
 import { Button } from "@mui/material";
 import GeneralGroupAutoComplete from "../common-components/GeneralGroupAutoComplete";
 import GeneralSemesterAutoComplete from "../common-components/GeneralSemesterAutoComplete";
@@ -17,12 +16,11 @@ const GeneralScheduleScreen = () => {
   const [isTimeScheduleLoading, setTimeScheduleLoading] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [refresh, setRefresh] = useState(false); // Thêm cờ refresh
-  const { loading, classes, setClasses, setLoading } = useClasses(
+  const { loading, classes, setClasses } = useClasses(
     selectedGroup,
     selectedSemester,
     refresh
   );
-  const [saveRequests, setSaveRequests] = useState([]);
   const [isAutoSaveLoading, setAutoSaveLoading] = useState(false);
   const [isOpenClassroomDialog, setOpenClassroomDialog] = useState(false);
   const [isOpenTimeslotDialog, setOpenTimeslotDialog] = useState(false);
@@ -187,35 +185,8 @@ const GeneralScheduleScreen = () => {
     ).then();
   };
 
-  // const handleSaveTimeTabling = () => {
-  //   setSaveLoading(true);
-  //   request(
-  //     "post",
-  //     `/general-classes/update-class-schedule-v2?semester=${selectedSemester?.semester}`,
-  //     (res) => {
-  //       setSaveLoading(false);
-  //       toast.success("Lưu TKB thành công!");
-  //       console.log(res.data);
-  //       setSaveRequests([]);
-  //       handleRefreshClasses();
-  //     },
-  //     (error) => {
-  //       if (error.response.status === 410) {
-  //         toast.warn(error.response.data);
-  //       } else if (error.response.status === 420) {
-  //         toast.error(error.response.data);
-  //       } else {
-  //         toast.error("Có lỗi khi lưu TKB!");
-  //       }
-  //       setSaveLoading(false);
-  //       console.log(error);
-  //     },
-  //     { saveRequests: saveRequests }
-  //   );
-  // };
-
   return (
-    <div className="flex flex-col gap-4 w-full h-[700px]">
+    <div className="flex flex-col gap-4 h-[700px]">
       <AutoScheduleDialog
         title={"Tự động xếp lịch học"}
         open={isOpenTimeslotDialog}
@@ -315,27 +286,14 @@ const GeneralScheduleScreen = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-row gap-4 w-full overflow-y-hidden">
-        <GeneralScheduleTable
-          saveRequests={saveRequests}
-          setSaveRequests={setSaveRequests}
-          isLoading={isResetLoading}
-          isDataLoading={loading}
+      <div className="flex flex-row gap-4 w-full overflow-y-hidden h-[550px] border-[1px] border-[#ccc] rounded-[8px]">
+        <TimeTable
+          selectedSemester={selectedSemester}
           classes={classes}
-          setClasses={setClasses}
-          setSelectedRows={setSelectedRows}
-          setLoading={setLoading}
-          semester={selectedSemester}
+          selectedGroup={selectedGroup}
+          onSaveSuccess={handleRefreshClasses}
+          loading={loading}
         />
-
-        <div className="flex-1 w-full h-[550px] ">
-          <TimeTable
-            selectedSemester={selectedSemester}
-            classes={classes}
-            selectedGroup={selectedGroup}
-            onSaveSuccess={handleRefreshClasses}
-          />
-        </div>
       </div>
     </div>
   );

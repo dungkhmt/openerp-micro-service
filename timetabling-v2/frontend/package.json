@@ -1,0 +1,86 @@
+{
+  "name": "openerp-oauth2-client",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.0",
+    "@heroicons/react": "^2.1.3",
+    "@hookstate/core": "^3.0.8",
+    "@mui/icons-material": "^5.15.12",
+    "@mui/material": "^5.15.12",
+    "@mui/styles": "^5.12.0",
+    "@mui/system": "^5.8.1",
+    "@mui/x-charts": "^7.4.0",
+    "@mui/x-data-grid": "^6.19.6",
+    "@mui/x-date-pickers": "^7.2.0",
+    "@react-keycloak/web": "^3.4.0",
+    "@react-pdf/renderer": "^3.4.4",
+    "@tanstack/react-query": "^5.62.7",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "axios": "^1.7.9",
+    "class-variance-authority": "^0.7.1",
+    "d3": "^7.9.0",
+    "dayjs": "^1.11.10",
+    "echarts": "^5.5.0",
+    "echarts-for-react": "^3.0.2",
+    "erp-hust": "^0.0.21",
+    "event-source-polyfill": "^1.0.24",
+    "file-saver": "^2.0.5",
+    "framer-motion": "^2.9.5",
+    "js-cookie": "^3.0.5",
+    "keycloak-js": "^21.0.2",
+    "overlayscrollbars": "^1.13.1",
+    "overlayscrollbars-react": "^0.2.3",
+    "randomcolor": "^0.6.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-google-charts": "^4.0.1",
+    "react-hook-form": "^7.54.2",
+    "react-icons": "^4.8.0",
+    "react-infinite-scroll-component": "^4.1.0",
+    "react-query": "^3.39.3",
+    "react-router-dom": "^5.3.0",
+    "react-scripts": "5.0.1",
+    "react-toastify": "^6.2.0",
+    "react-widgets": "^5.8.4",
+    "read-excel-file": "^5.7.1",
+    "simplebar-react": "^2.3.6",
+    "uuid": "^9.0.1",
+    "uuidv4": "^6.2.13",
+    "web-vitals": "^2.1.4",
+    "write-excel-file": "^1.4.30"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "babel-plugin-import": "^1.13.3",
+    "compression-webpack-plugin": "^6.1.1",
+    "prop-types": "^15.7.2",
+    "tailwindcss": "^3.4.1",
+    "webpack-cli": "^5.1.4"
+  }
+}

@@ -180,6 +180,134 @@ function ExamClassDetail() {
       body
     );
   }
+  const randomNumberInRange = (min, max) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  };
+  function genPass(L){
+    let r = randomNumberInRange(10000,1000000);
+    let s = r.toString();    
+    while(len(s) < L) s = '0' + s;
+    return s;
+  }
+
+  function updateFullnameOfAUserId(userId, fullname){
+    // PUT
+    // {{keycloak_url}}/admin/realms/{{realm}}/users/{{userId}}
+
+    // {
+    // “id”: “56f6c53f-5150-4b42-9757-4c3dd4e7d947”,
+    // “enabled”: false,
+    // “firstName”: “Clark”,
+    // “lastName”: “Kent”
+    // }
+    let data = {
+      id: userId,
+      enabled: true,
+      firstName: fullname,
+      lastName: ""
+    };
+    const headerConfig = {
+      headers: {
+        "content-Type": "application/json",
+      },
+    };
+
+    //  API: /auth/admin/realms/{realm}/users/{id}/reset-password
+    request(
+      "PUT",
+      //`${config.url.KEYCLOAK_BASE_URL}/auth/admin/realms/${KC_REALM}/users/${userId}/reset-password`,
+      `${config.url.KEYCLOAK_BASE_URL}/admin/realms/${KC_REALM}/users/${userId}`,
+      (res) => {
+        //data.status = "SUCCESS";
+        //data.message = "";
+        //data.password = password;
+        //data.doneAt = defaultDatetimeFormat(new Date());
+        //setResult(result => [...result, data]);
+      },
+      {
+        409: (err) => {
+          //data.status = "FAIL";
+          //data.message = err?.response.data.errorMessage || "";
+          //data.password = password;
+          //data.doneAt = defaultDatetimeFormat(new Date());
+          //setResult(result => [...result, data]);
+
+          if (!continueOnError) {
+            clearInterval(intervalIdRef.current);
+            //setLoading(false);
+          }
+        },
+      },
+      data,
+      headerConfig
+    );
+
+  }
+
+  function updateFullnameOfAUserName(userName, fullname){
+    const headerConfig = {
+      headers: {
+        "content-Type": "application/json",
+      },
+    };
+
+    // get user_id (based on userName)
+    let userId = "";
+    request(
+      "GET",
+      //`${config.url.KEYCLOAK_BASE_URL}/auth/admin/realms/${KC_REALM}/users/${userId}/reset-password`,
+      `${config.url.KEYCLOAK_BASE_URL}/admin/realms/${KC_REALM}/ui-ext/brute-force-user?briefRepresentation=true&first=0&max=11&q=&search=${userName}`,
+      (res) => {
+        console.log("res = ", res);
+        console.log("GOT userId = ", res.data[0].id);
+        //return res.data[0].id;
+        updateFullnameOfAUserId(res.data[0].id, fullname);
+      },
+      {
+        409: (err) => {
+          //data.status = "FAIL";
+          if (!continueOnError) {
+            clearInterval(intervalIdRef.current);
+            //setLoading(false);
+          }
+        },
+      },
+      headerConfig
+    );
+
+  }
+
+  function synRandomUserInfo(){
+    //alert('syn, REST API below');
+    // PUT
+    // {{keycloak_url}}/admin/realms/{{realm}}/users/{{userId}}
+
+    // {
+    // “id”: “56f6c53f-5150-4b42-9757-4c3dd4e7d947”,
+    // “enabled”: false,
+    // “firstName”: “Clark”,
+    // “lastName”: “Kent”
+    // }
+
+    let idx = 0;
+    intervalIdRef.current = setInterval(() => {
+      if (idx < mapUserLogins.length) {
+        //if (idx < 3) {
+        var userName = mapUserLogins[idx].randomUserLoginId;
+        //let userId = getUserId(userName);
+        //console.log('found id = ',userId,' of username ',userName);
+        //resetPasswordOfUser(mapUserLogins[idx].randomUserLoginId,mapUserLogins[idx].password);
+        
+        updateFullnameOfAUserName(
+          mapUserLogins[idx].randomUserLoginId,
+          mapUserLogins[idx].fullname
+        );
+        console.log('synchronize fullname -> done ', idx, '/',mapUserLogins.length,' : ', mapUserLogins[idx].randomUserLoginId,':',mapUserLogins[idx].password);
+        idx++;
+      }
+    }, 500);
+
+  }
   function resetPassword() {
     //for(i = 0; i < mapUserLogins.length; i++){
     // resetPasswordOfUser(mapUserLogins[i].randomUserLoginId,mapUserLogins[i].password);
@@ -193,11 +321,12 @@ function ExamClassDetail() {
         //let userId = getUserId(userName);
         //console.log('found id = ',userId,' of username ',userName);
         //resetPasswordOfUser(mapUserLogins[idx].randomUserLoginId,mapUserLogins[idx].password);
+        
         resetPasswordOfUserName(
           mapUserLogins[idx].randomUserLoginId,
           mapUserLogins[idx].password
         );
-        //console.log('reset password ', idx, ' : ', mapUserLogins[idx].randomUserLoginId,':',mapUserLogins[idx].password);
+        console.log('reset password done ', idx, '/', mapUserLogins.length,': ', mapUserLogins[idx].randomUserLoginId,':',mapUserLogins[idx].password);
         idx++;
       }
     }, 500);
@@ -369,6 +498,10 @@ function ExamClassDetail() {
           <Button variant="contained" color="primary" onClick={resetPassword}>
             RESET PASSWORD KEY CLOAK
           </Button>
+          <Button variant="contained" color="primary" onClick={synRandomUserInfo}>
+            Synchronize random user info
+          </Button>
+          
 
           <Button variant="contained" color="primary" onClick={clearAccount}>
             CLEAR

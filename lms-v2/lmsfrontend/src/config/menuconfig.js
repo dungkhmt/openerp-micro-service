@@ -31,6 +31,7 @@ import {eduLearningManagement} from "./menuconfig/classmanagement/student";
 import {eduTeachingManagement} from "./menuconfig/classmanagement/teacher";
 import {DataAdministration} from "./menuconfig/dataadmin";
 import {ThesisDefensePlanManagement} from "./menuconfig/Thesis_defense_plan_managenment";
+import { ExamMenu } from "./menuconfig/exam";
 import {whiteboard} from "./menuconfig/whiteboard";
 import {ProgrammingContestMenuStudent, ProgrammingContestMenuTeacher,} from "./menuconfig/ProgramingContest";
 import {general} from "./menuconfig/general";
@@ -48,6 +49,8 @@ MENU_LIST.push(DataAdministration);
 MENU_LIST.push(ThesisDefensePlanManagement);
 MENU_LIST.push(whiteboard);
 MENU_LIST.push(teachingassignment);
+MENU_LIST.push(ExamMenu);
+
 MENU_LIST.push(user);
 
 export const menuIconMap = new Map();

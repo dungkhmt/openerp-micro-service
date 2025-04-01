@@ -1,117 +1,88 @@
-import { makeStyles } from "@material-ui/core/styles";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import { LoadingButton } from "@mui/lab";
-import {
-  Box,
-  Button,
-  Checkbox,
-  Chip,
-  FormControl,
-  FormControlLabel,
-  Grid,
-  InputAdornment,
-  InputLabel,
-  ListItemText, ListSubheader,
-  MenuItem,
-  OutlinedInput,
-  Select,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { request } from "api";
+import {makeStyles} from "@material-ui/core/styles";
+import {LoadingButton} from "@mui/lab";
+import {Box, Checkbox, FormControlLabel, Grid, InputAdornment, Stack, TextField, Typography,} from "@mui/material";
+import {request} from "api";
 import withScreenSecurity from "component/withScreenSecurity";
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import { useTranslation } from "react-i18next";
-import { useParams } from "react-router";
+import {useTranslation} from "react-i18next";
+import {useParams} from "react-router";
 import FileUploadZone from "utils/FileUpload/FileUploadZone";
-import { randomImageName } from "utils/FileUpload/covert";
-import { PROBLEM_STATUS } from "utils/constants";
-import { errorNoti, successNoti, warningNoti } from "utils/notification";
+import {randomImageName} from "utils/FileUpload/covert";
+import {errorNoti, successNoti} from "utils/notification";
 import HustCodeEditor from "../../common/HustCodeEditor";
-import HustContainerCard from "../../common/HustContainerCard";
 import HustDropzoneArea from "../../common/HustDropzoneArea";
 import RichTextEditor from "../../common/editor/RichTextEditor";
-import { CompileStatus } from "./CompileStatus";
-import {
-  COMPUTER_LANGUAGES,
-  CUSTOM_EVALUATION,
-  NORMAL_EVALUATION,
-} from "./Constant";
+import {CompileStatus} from "./CompileStatus";
+import {COMPUTER_LANGUAGES, CUSTOM_EVALUATION, NORMAL_EVALUATION,} from "./Constant";
 import ListTestCase from "./ListTestCase";
 import ModelAddNewTag from "./ModelAddNewTag";
-import { getAllTags } from "./service/TagService";
+import {getAllTags} from "./service/TagService";
+import ProgrammingContestLayout from "./ProgrammingContestLayout";
+import {useHistory} from "react-router-dom";
+import StyledSelect from "../../select/StyledSelect";
+import {getLevels, getPublicOptions, getStatuses} from "./CreateProblem";
+import FilterByTag from "../../table/FilterByTag";
+import TertiaryButton from "../../button/TertiaryButton";
+import AddIcon from "@mui/icons-material/Add";
 
 const useStyles = makeStyles((theme) => ({
   description: {
     marginTop: theme.spacing(3),
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(3),
   },
 }));
 
 function EditProblem() {
-  const { t } = useTranslation([
+  const history = useHistory();
+  const {problemId} = useParams();
+  const classes = useStyles();
+  const {t} = useTranslation([
     "education/programmingcontest/problem",
     "common",
     "validation",
   ]);
-
-  const classes = useStyles();
-
-  const { problemId } = useParams();
+  const levels = getLevels(t);
+  const publicOptions = getPublicOptions(t)
+  const statuses = getStatuses(t)
 
   const [problemName, setProblemName] = useState("");
   const [description, setDescription] = useState("");
   const [solution, setSolution] = useState("");
-  // const [timeLimit, setTimeLimit] = useState(1);
-  const [timeLimitCPP, setTimeLimitCPP] = useState(1);
-  const [timeLimitJAVA, setTimeLimitJAVA] = useState(1);
-  const [timeLimitPYTHON, setTimeLimitPYTHON] = useState(1);
-  const [memoryLimit, setMemoryLimit] = useState(1);
+  // const [timeLimit, setTimeLimit] = useState('');
+  const [timeLimitCPP, setTimeLimitCPP] = useState('');
+  const [timeLimitJAVA, setTimeLimitJAVA] = useState('');
+  const [timeLimitPYTHON, setTimeLimitPYTHON] = useState('');
+  const [memoryLimit, setMemoryLimit] = useState('');
   const [levelId, setLevelId] = useState("");
   const [codeSolution, setCodeSolution] = useState("");
   const [isPreloadCode, setIsPreloadCode] = useState(false);
   const [preloadCode, setPreloadCode] = useState("");
-  const [solutionCheckerLanguage, setSolutionCheckerLanguage] = useState(
-    COMPUTER_LANGUAGES.CPP17
-  );
+  const [solutionCheckerLanguage, setSolutionCheckerLanguage] = useState(COMPUTER_LANGUAGES.CPP17);
   const [solutionChecker, setSolutionChecker] = useState("");
   const [isCustomEvaluated, setIsCustomEvaluated] = useState(false);
-  const [languageSolution, setLanguageSolution] = useState(
-    COMPUTER_LANGUAGES.CPP17
-  );
+  const [languageSolution, setLanguageSolution] = useState(COMPUTER_LANGUAGES.CPP17);
   const [showCompile, setShowCompile] = useState(false);
   const [statusSuccessful, setStatusSuccessful] = useState(false);
-  const [isPublic, setIsPublic] = useState(false);
+  const [isPublic, setIsPublic] = useState('');
   const [compileMessage, setCompileMessage] = useState("");
   const [tags, setTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [attachmentFiles, setAttachmentFiles] = useState([]);
   const [fetchedImageArray, setFetchedImageArray] = useState([]);
   const [removedFilesId, setRemovedFileIds] = useState([]);
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState('');
   const [isOwner, setIsOwner] = useState(false);
   const [sampleTestCase, setSampleTestCase] = useState(null);
-
-  const defaultLevel = ["easy", "medium", "hard"];
 
   const [loading, setLoading] = useState(false);
 
   const [openModalAddNewTag, setOpenModalAddNewTag] = useState(false);
 
   const handleGetTagsSuccess = (res) => setTags(res.data);
-  useEffect(() => {
-    getAllTags(handleGetTagsSuccess);
-  }, []);
 
-  const handleSelectTags = (event) => {
-    const selectingTags = event.target.value;
-
-    const filteredTags = [
-      ...new Map(selectingTags.map((tag) => [tag.tagId, tag])).values(),
-    ];
-
-    setSelectedTags(filteredTags);
+  const handleSelectTags = (tags) => {
+    setSelectedTags(tags);
   };
 
   const handleAttachmentFiles = (files) => {
@@ -125,44 +96,7 @@ function EditProblem() {
     setRemovedFileIds([...removedFilesId, fileId]);
   };
 
-  useEffect(() => {
-    request("get", "teacher/problems/" + problemId, (res) => {
-      res = res.data;
-      if (res.attachment && res.attachment.length !== 0) {
-        const newFileURLArray = res.attachment.map((url) => ({
-          id: randomImageName(),
-          content: url,
-        }));
-        newFileURLArray.forEach((file, idx) => {
-          file.fileName = res.attachmentNames[idx];
-        });
-        setFetchedImageArray(newFileURLArray);
-      }
-
-      setProblemName(res.problemName);
-      setLevelId(res.levelId);
-      // setTimeLimit(res.timeLimit);
-      setTimeLimitCPP(res.timeLimitCPP);
-      setTimeLimitJAVA(res.timeLimitJAVA);
-      setTimeLimitPYTHON(res.timeLimitPYTHON);
-      setMemoryLimit(res.memoryLimit);
-      setIsPublic(res.publicProblem);
-      setLanguageSolution(res.correctSolutionLanguage);
-      setCodeSolution(res.correctSolutionSourceCode);
-      setIsPreloadCode(res.isPreloadCode);
-      setPreloadCode(res.preloadCode);
-      setSolutionCheckerLanguage(res.solutionCheckerLanguage);
-      setSolutionChecker(res.solutionCheckerSourceCode || "");
-      setIsCustomEvaluated(res.scoreEvaluationType === CUSTOM_EVALUATION);
-      setDescription(res.problemDescription);
-      setSelectedTags(res.tags);
-      setStatus(res.status);
-      setSampleTestCase(res.sampleTestCase);
-      setIsOwner(res.roles?.includes("OWNER"));
-    });
-  }, [problemId]);
-
-  function checkCompile() {
+  const checkCompile = () => {
     let body = {
       source: codeSolution,
       computerLanguage: languageSolution,
@@ -174,39 +108,39 @@ function EditProblem() {
       "post",
       "/check-compile",
       (res) => {
-        if (res.data.status === "Successful") {
-          setShowCompile(true);
-          setStatusSuccessful(true);
-        } else {
-          setShowCompile(true);
-          setStatusSuccessful(false);
-        }
-        setCompileMessage(res.data.message);
+        setLoading(false)
+
+        setShowCompile(true);
+        setStatusSuccessful(res.data.status !== "Compilation Error");
+        setCompileMessage(res.data)
       },
-      {},
+      {
+        onError: (e) => {
+          setLoading(false)
+          errorNoti(t("common:error"), true);
+        }
+      },
       body
-    ).then(() => setLoading(false));
+    );
   }
 
   const validateSubmit = () => {
     if (problemName === "") {
       errorNoti(
-        t("missingField", { ns: "validation", fieldName: t("problemName") }),
+        t("validation:missingField", {fieldName: t("problemName")}),
         3000
       );
       return false;
     }
-    if (
-      timeLimitCPP <= 0 ||
-      timeLimitJAVA <= 0 ||
-      timeLimitPYTHON <= 0 ||
-      timeLimitCPP > 300 ||
-      timeLimitJAVA > 300 ||
-      timeLimitPYTHON > 300
+    if (timeLimitCPP < 1
+      || timeLimitJAVA < 1
+      || timeLimitPYTHON < 1
+      || timeLimitCPP > 300
+      || timeLimitJAVA > 300
+      || timeLimitPYTHON > 300
     ) {
       errorNoti(
-        t("numberBetween", {
-          ns: "validation",
+        t("validation:numberBetween", {
           fieldName: t("timeLimit"),
           min: 1,
           max: 300,
@@ -215,10 +149,9 @@ function EditProblem() {
       );
       return false;
     }
-    if (memoryLimit <= 0 || memoryLimit > 1024) {
+    if (memoryLimit < 3 || memoryLimit > 1024) {
       errorNoti(
-        t("numberBetween", {
-          ns: "validation",
+        t("validation:numberBetween", {
           fieldName: t("memoryLimit"),
           min: 1,
           max: 1024,
@@ -228,7 +161,7 @@ function EditProblem() {
       return false;
     }
     if (!statusSuccessful) {
-      warningNoti(t("validateSubmit.warningCheckSolutionCompile"), 5000);
+      errorNoti(t("validateSubmit.warningCheckSolutionCompile"), 5000);
       return false;
     }
     return true;
@@ -237,6 +170,7 @@ function EditProblem() {
   function handleSubmit() {
     if (!validateSubmit()) return;
 
+    setLoading(true);
     const tagIds = selectedTags.map((tag) => tag.tagId);
 
     let fileId = [];
@@ -252,7 +186,7 @@ function EditProblem() {
       });
     }
 
-    let body = {
+    const body = {
       problemName: problemName,
       problemDescription: description,
       // timeLimit: timeLimit,
@@ -267,28 +201,26 @@ function EditProblem() {
       isPreloadCode: isPreloadCode,
       preloadCode: preloadCode,
       solutionChecker: solutionChecker,
-      isPublic: isPublic,
+      solutionCheckerLanguage: solutionCheckerLanguage,
+      isPublic: isPublic === 'Y',
       fileId: fileId,
       removedFilesId: removedFilesId,
-      scoreEvaluationType: isCustomEvaluated
-        ? CUSTOM_EVALUATION
-        : NORMAL_EVALUATION,
+      scoreEvaluationType: isCustomEvaluated ? CUSTOM_EVALUATION : NORMAL_EVALUATION,
       tagIds: tagIds,
       status: status,
       sampleTestCase: sampleTestCase,
     };
 
-    let formData = new FormData();
-    formData.append("ModelUpdateContestProblem", JSON.stringify(body));
+    const formData = new FormData();
+    formData.append("dto", new Blob([JSON.stringify(body)], {type: 'application/json'}));
+
     for (const file of attachmentFiles) {
       formData.append("files", file);
     }
 
-    setLoading(true);
-
     const config = {
       headers: {
-        "content-Type": "multipart/form-data",
+        "content-type": "multipart/form-data",
       },
     };
 
@@ -297,11 +229,12 @@ function EditProblem() {
       "/problems/" + problemId,
       (res) => {
         setLoading(false);
-        successNoti("Problem saved successfully", 10000);
+        successNoti(t("common:editSuccess", {name: t("problem")}), 3000);
+        history.push("/programming-contest/manager-view-problem-detail/" + problemId);
       },
       {
         onError: (e) => {
-          errorNoti(t("error", { ns: "common" }), 3000);
+          errorNoti(t("common:error"), 3000);
           setLoading(false);
         },
       },
@@ -310,16 +243,77 @@ function EditProblem() {
     );
   }
 
+  const handleBackToList = () => {
+    history.push(`/programming-contest/list-problems`);
+  }
+
+  const handleExit = () => {
+    history.push(`/programming-contest/manager-view-problem-detail/` + problemId);
+  }
+
+  useEffect(() => {
+    request(
+      "get",
+      "teacher/problems/" + problemId,
+      (res) => {
+        res = res.data;
+        if (res.attachment && res.attachment.length !== 0) {
+          const newFileURLArray = res.attachment.map((url) => ({
+            id: randomImageName(),
+            content: url,
+          }));
+          newFileURLArray.forEach((file, idx) => {
+            file.fileName = res.attachmentNames[idx];
+          });
+          setFetchedImageArray(newFileURLArray);
+        }
+
+        setProblemName(res.problemName);
+        setLevelId(res.levelId);
+        // setTimeLimit(res.timeLimit);
+        setTimeLimitCPP(res.timeLimitCPP);
+        setTimeLimitJAVA(res.timeLimitJAVA);
+        setTimeLimitPYTHON(res.timeLimitPYTHON);
+        setMemoryLimit(res.memoryLimit);
+        setIsPublic(res.publicProblem ? 'Y' : 'N');
+        setLanguageSolution(res.correctSolutionLanguage);
+        setCodeSolution(res.correctSolutionSourceCode);
+        setIsPreloadCode(res.isPreloadCode);
+        setPreloadCode(res.preloadCode);
+        setSolutionCheckerLanguage(res.solutionCheckerSourceLanguage);
+        setSolutionChecker(res.solutionCheckerSourceCode || "");
+        setIsCustomEvaluated(res.scoreEvaluationType === CUSTOM_EVALUATION);
+        setDescription(res.problemDescription);
+        setSelectedTags(res.tags);
+        setStatus(res.status);
+        setSampleTestCase(res.sampleTestCase);
+        setIsOwner(res.roles?.includes("OWNER"));
+      },
+      {
+        onError: (e) => {
+          errorNoti(t("common:error"))
+        }
+      });
+  }, [problemId]);
+
+  useEffect(() => {
+    getAllTags(handleGetTagsSuccess);
+  }, [])
+
   return (
-    <HustContainerCard title={t("editProblem")}>
-      <Grid container spacing={2}>
-        <Grid item xs={10}>
+    <ProgrammingContestLayout title={t("common:edit", {name: t("problem")})} onBack={handleBackToList}>
+      <Typography variant="h6">
+        {t("generalInfo")}
+      </Typography>
+
+      <Grid container spacing={2} mt={0}>
+        <Grid item xs={3}>
           <TextField
             fullWidth
+            size='small'
             required
             id="problemName"
             label={t("problemName")}
-            placeholder="Problem Name"
             value={problemName}
             onChange={(event) => {
               setProblemName(event.target.value);
@@ -327,131 +321,110 @@ function EditProblem() {
           />
         </Grid>
 
-        <Grid item xs={2}>
-          <TextField
+        <Grid item xs={3}>
+          <StyledSelect
             fullWidth
             required
-            id="status"
+            key={t("level")}
+            label={t("level")}
+            options={levels}
+            value={levelId}
+            sx={{minWidth: 'unset', mr: 'unset'}}
+            onChange={(event) => {
+              setLevelId(event.target.value);
+            }}
+          />
+        </Grid>
+
+        <Grid item xs={3}>
+          <StyledSelect
+            fullWidth
+            required
+            key={t("status")}
             label={t("status")}
-            select
+            options={statuses}
             value={status}
+            sx={{minWidth: 'unset', mr: 'unset'}}
             onChange={(event) => {
               setStatus(event.target.value);
             }}
             disabled={!isOwner}
-          >
-            {Object.values(PROBLEM_STATUS).map((item) => (
-              <MenuItem key={item} value={item}>
-                {item}
-              </MenuItem>
-            ))}
-          </TextField>
+          />
         </Grid>
 
-        <Grid item xs={2}>
-          <TextField
+        <Grid item xs={3}>
+          <StyledSelect
             fullWidth
             required
-            select
-            id="levelId"
-            label={t("level")}
-            value={levelId}
-            onChange={(event) => {
-              setLevelId(event.target.value);
-            }}
-          >
-            {defaultLevel.map((item) => (
-              <MenuItem key={item} value={item}>
-                {item}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-
-        <Grid item xs={2}>
-          <TextField
-            fullWidth
-            required
-            select
-            id="isPublicProblem"
-            label={t("public", { ns: "common" })}
+            key={t("common:public")}
+            label={t("common:public")}
+            options={publicOptions}
+            sx={{minWidth: 'unset', mr: 'unset'}}
+            value={isPublic}
             onChange={(event) => {
               setIsPublic(event.target.value);
             }}
-            value={isPublic}
-          >
-            <MenuItem key={"true"} value={true}>
-              {t("yes", { ns: "common" })}
-            </MenuItem>
-            <MenuItem key={"false"} value={false}>
-              {t("no", { ns: "common" })}
-            </MenuItem>
-          </TextField>
+          />
         </Grid>
 
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <TextField
             fullWidth
+            size='small'
             required
             id="timeLimitCPP"
-            label={t("timeLimit")}
+            label={t("timeLimit") + ' C/CPP'}
             type="number"
             value={timeLimitCPP}
             onChange={(event) => {
               setTimeLimitCPP(event.target.value);
             }}
             InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">C/CPP: </InputAdornment>
-              ),
               endAdornment: <InputAdornment position="end">s</InputAdornment>,
             }}
           />
         </Grid>
 
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <TextField
             fullWidth
+            size='small'
             required
             id="timeLimitJAVA"
-            label={t("timeLimit")}
+            label={t("timeLimit") + ' Java'}
             type="number"
             value={timeLimitJAVA}
             onChange={(event) => {
               setTimeLimitJAVA(event.target.value);
             }}
             InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">JAVA: </InputAdornment>
-              ),
               endAdornment: <InputAdornment position="end">s</InputAdornment>,
             }}
           />
         </Grid>
 
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <TextField
             fullWidth
+            size='small'
             required
             id="timeLimitPYTHON"
-            label={t("timeLimit")}
+            label={t("timeLimit") + ' Python'}
             type="number"
             value={timeLimitPYTHON}
             onChange={(event) => {
               setTimeLimitPYTHON(event.target.value);
             }}
             InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">PYTHON: </InputAdornment>
-              ),
               endAdornment: <InputAdornment position="end">s</InputAdornment>,
             }}
           />
         </Grid>
 
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <TextField
             fullWidth
+            size='small'
             required
             id="memoryLimit"
             label={t("memoryLimit")}
@@ -466,66 +439,23 @@ function EditProblem() {
           />
         </Grid>
 
-        <Grid item xs={12}>
-          <FormControl sx={{ width: "100%" }}>
-            <InputLabel id="select-tag-label">Tags</InputLabel>
-            <Select
-              labelId="select-tag-label"
-              id="select-tag"
-              multiple
-              value={selectedTags}
-              onChange={handleSelectTags}
-              input={<OutlinedInput label="Tags" />}
-              renderValue={(selectedTags) => (
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.8 }}>
-                  {selectedTags?.map((selectedTag) => (
-                    <Chip
-                      size="small"
-                      label={selectedTag.name}
-                      sx={{
-                        marginRight: "6px",
-                        marginBottom: "6px",
-                        border: "1px solid lightgray",
-                        fontStyle: "italic",
-                      }}
-                    />
-                  ))}
-                </Box>
-              )}
-            >
-              <ListSubheader>
-                <Button
-                  sx={{marginLeft: "20px"}}
-                  startIcon={<AddCircleIcon/>}
-                  onClick={() => setOpenModalAddNewTag(true)}
-                >
-                  {t("common:addNew")}
-                </Button>
-              </ListSubheader>
-
-              {tags.map((tag) => (
-                <MenuItem key={tag.tagId} value={tag}>
-                  <Checkbox
-                    checked={selectedTags.some(
-                      (selectedTag) => selectedTag.tagId === tag.tagId
-                    )}
-                  />
-                  <ListItemText
-                    primary={tag.name}
-                    secondary={tag?.description}
-                  />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+        <Grid item xs={9}>
+          <FilterByTag limitTags={3} tags={tags} onSelect={handleSelectTags} value={selectedTags}/>
+        </Grid>
+        <Grid item xs={3}>
+          <TertiaryButton
+            startIcon={<AddIcon/>}
+            onClick={() => setOpenModalAddNewTag(true)}
+          >
+            {t("common:add", {name: t('tag')})}
+          </TertiaryButton>
         </Grid>
       </Grid>
 
       <Box className={classes.description}>
         <Typography
-          variant="h5"
-          component="div"
-          sx={{ marginTop: "12px", marginBottom: "8px" }}
+          variant="h6"
+          sx={{marginTop: "8px", marginBottom: "8px"}}
         >
           {t("problemDescription")}
         </Typography>
@@ -537,8 +467,8 @@ function EditProblem() {
         <RichTextEditor content={sampleTestCase} onContentChange={text => setSampleTestCase(text)}/>
               */}
         <HustCodeEditor
-          title="Sample TestCase"
-          language={COMPUTER_LANGUAGES.C}
+          title={t("sampleTestCase")}
+          placeholder={null}
           sourceCode={sampleTestCase}
           onChangeSourceCode={(code) => {
             setSampleTestCase(code);
@@ -570,9 +500,9 @@ function EditProblem() {
               </Box>
               */}
 
-      <Box sx={{ marginTop: "32px" }} />
+      <Box sx={{marginTop: "32px"}}/>
       <HustCodeEditor
-        title={t("correctSourceCode")}
+        title={t("solutionSourceCode") + " *"}
         language={languageSolution}
         onChangeLanguage={(event) => {
           setLanguageSolution(event.target.value);
@@ -584,10 +514,10 @@ function EditProblem() {
       />
 
       <LoadingButton
-        variant="contained"
+        variant="outlined"
         loading={loading}
         onClick={checkCompile}
-        sx={{ marginTop: "12px", marginBottom: "6px" }}
+        sx={{margin: "12px 0", textTransform: 'none'}}
       >
         {t("checkSolutionCompile")}
       </LoadingButton>
@@ -595,10 +525,10 @@ function EditProblem() {
       <CompileStatus
         showCompile={showCompile}
         statusSuccessful={statusSuccessful}
-        message={compileMessage}
+        detail={compileMessage}
       />
 
-      <Box sx={{ marginTop: "12px" }}>
+      <Box sx={{marginTop: "12px"}}>
         <FormControlLabel
           label={t("isPreloadCode")}
           control={
@@ -621,7 +551,7 @@ function EditProblem() {
         )}
       </Box>
 
-      <Box sx={{ marginTop: "12px" }}>
+      <Box sx={{marginTop: "12px"}}>
         <FormControlLabel
           label={t("isCustomEvaluated")}
           control={
@@ -651,27 +581,31 @@ function EditProblem() {
         )}
       </Box>
 
-      <ListTestCase />
+      <ListTestCase/>
 
-      <Box width="100%" sx={{ marginTop: "16px" }}>
+      <Stack direction="row" spacing={2} mt={2}>
+        <TertiaryButton variant="outlined" onClick={handleExit}>
+          {t("common:exit")}
+        </TertiaryButton>
         <LoadingButton
           variant="contained"
-          color="success"
           loading={loading}
           onClick={handleSubmit}
+          sx={{textTransform: 'capitalize'}}
         >
-          {t("save", { ns: "common" })}
+          {t("save", {ns: "common"})}
         </LoadingButton>
-      </Box>
+      </Stack>
 
       <ModelAddNewTag
         isOpen={openModalAddNewTag}
         handleSuccess={() => {
+          successNoti(t("common:addSuccess", {name: t('tag')}), 3000)
           getAllTags(handleGetTagsSuccess);
         }}
         handleClose={() => setOpenModalAddNewTag(false)}
       />
-    </HustContainerCard>
+    </ProgrammingContestLayout>
   );
 }
 

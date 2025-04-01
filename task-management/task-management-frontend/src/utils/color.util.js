@@ -10,25 +10,46 @@ export const getCategoryColor = (category) => {
       return "error";
     case "OTHER":
       return "info";
-    default:
+    case "IMPROVEMENT":
       return "primary";
+    default:
+      return "secondary";
   }
 };
 
 export const getStatusColor = (status) => {
   switch (status) {
+    // Task statuses
     case "ASSIGNMENT_ACTIVE":
-      return "warning";
+      return "success";
     case "ASSIGNMENT_INACTIVE":
       return "secondary";
     case "TASK_INPROGRESS":
       return "primary";
     case "TASK_OPEN":
-      return "success";
+      return "warning";
     case "TASK_RESOLVED":
-      return "info";
+      return "success";
     case "TASK_CLOSED":
       return "error";
+
+    // Meeting plan statuses
+    case "PLAN_DRAFT":
+      return "secondary";
+    case "PLAN_REG_OPEN":
+      return "warning";
+    case "PLAN_REG_CLOSED":
+      return "info";
+    case "PLAN_ASSIGNED":
+      return "success";
+    case "PLAN_IN_PROGRESS":
+      return "primary";
+    case "PLAN_COMPLETED":
+      return "success";
+    case "PLAN_CANCELED":
+      return "error";
+
+    // Fallback for unknown statuses
     default:
       return "info";
   }
@@ -42,10 +63,10 @@ export const getPriorityColor = (priority) => {
       return "info";
     case "HIGH":
       return "warning";
-    case "BUG":
+    case "URGENT":
       return "error";
     default:
-      return "info";
+      return "primary";
   }
 };
 
@@ -115,4 +136,15 @@ export const getProgressColor = (progress) => {
   if (progress < 70) return "warning";
   if (progress < 90) return "success";
   return "info";
+};
+
+export const getDeadlineColor = (deadline) => {
+  if (!deadline) return "gray";
+
+  const now = dayjs();
+  const deadlineTime = dayjs(deadline);
+
+  if (now.isAfter(deadlineTime)) return "error.main";
+  if (deadlineTime.diff(now, "hour") < 24) return "warning.main";
+  return "success.main";
 };

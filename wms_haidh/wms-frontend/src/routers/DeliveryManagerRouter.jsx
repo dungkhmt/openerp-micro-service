@@ -1,52 +1,24 @@
-// import { Route, Switch, useRouteMatch } from "react-router";
-// import DeliveryPersonManagement from "../screens/deliveryperson/deliveryPersonManagement";
-// import ShipmentListing from "../screens/shipment/shipmentListing";
-// import ShipmentDetail from "../screens/shipment/shipmentDetail";
-// import DeliveryTripListing from "../screens/shipment/deliveryTripListing";
-// import DeliveryTripDetail from "../screens/shipment/deliveryTripDetail";
-// import DeliveryTripItemsListing from "../screens/shipment/deliveryTripItemsListing";
-
-// export default function DeliveryManagerRouter () {
-//   let { path } = useRouteMatch();
-//   return (
-//     <div>
-//       <Switch>
-//         <Route
-//           component={DeliveryPersonManagement}
-//           exact
-//           path={`${path}/delivery-person`}
-//         ></Route>
-//         <Route
-//           component={ShipmentListing}
-//           exact
-//           path={`${path}/shipments`}
-//         ></Route>
-//         <Route
-//           component={ShipmentDetail}
-//           exact
-//           path={`${path}/shipments/:id`}
-//         ></Route>
-//         <Route
-//           component={DeliveryTripListing}
-//           exact
-//           path={`${path}/delivery-trips`}
-//         ></Route>
-//         <Route
-//           component={DeliveryTripDetail}
-//           exact
-//           path={`${path}/delivery-trips/:id`}
-//         ></Route>
-//         <Route
-//           component={DeliveryTripItemsListing}
-//           exact
-//           path={`${path}/items`}
-//         ></Route>
-//       </Switch>
-//     </div>
-//   );
-// }
-const DeliveryManagerRouter = () => {
-  return <div>Delivery Manager Router</div>;
-};
+import { Routes, Route } from "react-router-dom";
+import DeliveryTripDetail from "../views/delivery_manager/delivery_trip/DeliveryTripDetail";
+import DeliveryTrip from "../views/delivery_manager/delivery_trip/DeliveryTrip";
+import AddTrip from "../views/delivery_manager/delivery_trip/AddTrip";
+import DeliveryTripItem from "../views/delivery_manager/delivery_trip/DeliveryTripItem";
+import DeliveryPerson from "../views/delivery_manager/delivery_person/DeliveryPerson";
+import Shipment from "../views/delivery_manager/shipment/Shipment";
+import ShipmentDetail from "../views/delivery_manager/shipment/ShipmentDetail";
+function DeliveryManagerRouter() {
+  return (
+    <Routes>   
+      <Route path="delivery-person" element={<DeliveryPerson />} />
+      <Route path="delivery-person/:id" element={<DeliveryPerson />} />
+      <Route path="shipments" element={<Shipment />} />
+      <Route path="shipments/:id" element={<ShipmentDetail />} />
+      <Route path="delivery-trip" element={<DeliveryTrip />} />
+      <Route path="delivery-trip/add-trip" element={<AddTrip />} /> 
+      <Route path="delivery-trip/:id" element={<DeliveryTripDetail/>} />
+      <Route path="delivery-trip/:id1/:id2" element={<DeliveryTripItem/>} />   
+    </Routes>
+  );
+}
 
 export default DeliveryManagerRouter;

@@ -1,19 +1,23 @@
 package com.hust.baseweb.applications.programmingcontest.entity;
 
 import lombok.*;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Builder
 @Table(name = "contest_problem_new")
+@EntityListeners(AuditingEntityListener.class)
 public class ProblemEntity implements Serializable {
     private static final long serialVersionUID = 3487495895819800L;
     public static final String PROBLEM_STATUS_OPEN = "OPEN";
@@ -29,23 +33,20 @@ public class ProblemEntity implements Serializable {
     @Column(name = "problem_description")
     private String problemDescription;
 
-    @Column(name = "created_by_user_login_id")
-    private String userId;
-
-    @Column(name = "time_limit")
-    private int timeLimit;
+//    @Column(name = "time_limit")
+//    private float timeLimit;
 
     @Column(name = "time_limit_cpp")
-    private int timeLimitCPP;
+    private float timeLimitCPP;
 
     @Column(name = "time_limit_java")
-    private int timeLimitJAVA;
+    private float timeLimitJAVA;
 
     @Column(name = "time_limit_python")
-    private int timeLimitPYTHON;
+    private float timeLimitPYTHON;
 
     @Column(name = "memory_limit")
-    private int memoryLimit;
+    private float memoryLimit;
 
     @Column(name = "level_id")
     private String levelId;
@@ -70,9 +71,6 @@ public class ProblemEntity implements Serializable {
 
     @Column(name = "level_order")
     private int levelOrder;
-
-    @Column(name = "created_stamp")
-    private Date createdAt;
 
     @Column(name = "is_public")
     private boolean isPublicProblem;
@@ -114,4 +112,14 @@ public class ProblemEntity implements Serializable {
     @Column(name = "sample_testcase")
     private String sampleTestcase;
 
+    @CreatedDate
+    @Column(name = "created_stamp")
+    private Date createdAt;
+
+    @LastModifiedDate
+    private Date lastUpdatedStamp;
+
+    @CreatedBy
+    @Column(name = "created_by_user_login_id")
+    private String createdBy;
 }

@@ -2,9 +2,12 @@ import { createBrowserRouter } from "react-router-dom";
 import Layout from "../layout/Layout";
 import Home from "../pages";
 import DashBoard from "../pages/dashboard";
+import MyProfile from "../pages/my-profile";
+import UserManagement from "../pages/user-management";
 import { ProjectWrapper } from "../pages/project/[id]/ProjectWrapper";
 import Project from "../pages/project/[id]/[tab]";
 import Task from "../pages/project/[id]/task/[id]";
+import Event from "../pages/project/[id]/event/[id]";
 import { TaskContextProvider } from "../pages/project/[id]/task/[id]/TaskContextProvider";
 import Projects from "../pages/projects";
 import NewProject from "../pages/projects/new";
@@ -18,6 +21,13 @@ import DepartmentScreen from "../views/hr/DepartmentScreen.jsx";
 import JobPositionScreen from "../views/hr/JobPositionScreen.jsx";
 import CheckpointConfigureScreen from "../views/hr/CheckpointConfigureScreen.jsx";
 import CheckpointPeriodScreen from "../views/hr/CheckpointPeriodScreen.jsx";
+import { AttributeManager } from "../pages/task-attributes";
+import CreatedMeetings from "../pages/meetings/created-meetings";
+import CreatedMeeting from "../pages/meetings/created-meetings/[id]";
+import JoinedMeetings from "../pages/meetings/joined-meetings";
+import JoinedMeeting from "../pages/meetings/joined-meetings/[id]";
+import Unknown from "../views/errors/Unknown";
+
 
 export const router = createBrowserRouter([
   {
@@ -33,6 +43,10 @@ export const router = createBrowserRouter([
           {
             path: "/dashboard",
             element: <DashBoard />,
+          },
+          {
+            path: "/my-profile",
+            element: <MyProfile />,
           },
           {
             path: "/projects",
@@ -65,6 +79,10 @@ export const router = createBrowserRouter([
                         element: <Task />,
                       },
                     ],
+                  },
+                  {
+                    path: ":id/events/:eid",
+                    element: <Event />,
                   },
                 ],
               },
@@ -103,23 +121,52 @@ export const router = createBrowserRouter([
                 element: <JobPositionScreen />,
               },
               {
-                path: "job-position",
-                element: <JobPositionScreen />,
-              },
-              {
                 path: "checkpoint",
                 children: [
                   {
                     path: "configure",
-                    element: <CheckpointConfigureScreen />,
+                    element: <CheckpointConfigureScreen/>,
                   },
                   {
                     path: "period",
-                    element: <CheckpointPeriodScreen />,
+                    element: <CheckpointPeriodScreen/>,
                   },
                 ]
               },
             ],
+          },
+          {
+            path: "/meetings",
+            children: [
+              {
+                path: "created-meetings",
+                element: <CreatedMeetings />,
+              },
+              {
+                path: "created-meetings/:pid",
+                element: <CreatedMeeting />,
+              },
+              {
+                path: "joined-meetings",
+                element: <JoinedMeetings />,
+              },
+              {
+                path: "joined-meetings/:pid",
+                element: <JoinedMeeting />,
+              },
+            ],
+          },
+          {
+            path: "/user-management",
+            element: <UserManagement />,
+          },
+          {
+            path: "/attribute-management",
+            element: <AttributeManager />,
+          },
+          {
+            path: "/unknown-error",
+            element: <Unknown />,
           },
           {
             path: "*",

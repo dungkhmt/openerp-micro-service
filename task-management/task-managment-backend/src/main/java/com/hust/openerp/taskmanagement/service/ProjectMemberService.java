@@ -14,4 +14,10 @@ public interface ProjectMemberService {
     ProjectMember addMemberToProject(ProjectMember projectMemberForm, String adderId);
 
     boolean checkAddedMemberInProject(String memberId, UUID projectId);
+    
+    String getMemberRole(String memberId, UUID projectId);
+    
+    void deleteMemberFromProject(String userId, UUID projectId, String memberId, String roleId);
+    
+    ProjectMember updateMemberRole(String updaterId, ProjectMember projectMemberForm);
 }

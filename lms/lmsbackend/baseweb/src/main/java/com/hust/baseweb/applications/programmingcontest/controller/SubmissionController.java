@@ -9,6 +9,8 @@ import com.hust.baseweb.applications.programmingcontest.entity.ContestProblem;
 import com.hust.baseweb.applications.programmingcontest.entity.ContestSubmissionEntity;
 import com.hust.baseweb.applications.programmingcontest.entity.UserRegistrationContestEntity;
 import com.hust.baseweb.applications.programmingcontest.model.*;
+import com.hust.baseweb.applications.programmingcontest.model.externalapi.ModelResponseGetContestSubmissionOfPeriod;
+import com.hust.baseweb.applications.programmingcontest.model.externalapi.ModelResponseGetContestSubmissionPage;
 import com.hust.baseweb.applications.programmingcontest.repo.*;
 import com.hust.baseweb.applications.programmingcontest.service.ContestService;
 import com.hust.baseweb.applications.programmingcontest.service.ContestSubmissionCommentService;
@@ -747,6 +749,21 @@ public class SubmissionController {
         Collections.reverse(comments);
 
         return ResponseEntity.ok(comments);
+    }
+    @PostMapping("/get-contest-submissions-date-between")
+    public ResponseEntity<?> getContestSubmissionDateBetween(Principal principal, @RequestBody
+                                                  ModelResponseGetContestSubmissionOfPeriod model
+                                                  ){
+        List<ContestSubmissionEntity> res = contestSubmissionRepo.findAllByCreatedAtBetween(model.getFromDateTime(), model.getToDateTime());
+        return ResponseEntity.ok().body(res);
+    }
+
+    @PostMapping("/get-contest-submissions-page-date-between")
+    public ResponseEntity<?> getContestSubmissionPageDateBetween(Principal principal, @RequestBody
+                                                      ModelResponseGetContestSubmissionPage m
+                                                      ){
+        List<ContestSubmissionEntity> res = contestSubmissionRepo.findPageByCreatedAtBetween(m.getFromDate(),m.getToDate(),m.getOffset(),m.getLimit());
+        return ResponseEntity.ok().body(res);
     }
 
 //    @Secured("ROLE_TEACHER")

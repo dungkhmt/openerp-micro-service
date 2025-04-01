@@ -13,7 +13,8 @@ import ApproverRouter from "./ApproverRouter";
 import DeliveryManagerRouter from "./DeliveryManagerRouter";
 import DeliveryPersonRouter from "./DeliveryPersonRouter";
 import PurchaseManagerRouter from "./PurchaseManagerRouter";
-
+import PurchaseStaffRouter from "./PurchaseStaffRouter";
+import Dashboard from "../components/Dashboard/Dashboard";
 const styles = {
   loadingProgress: {
     position: "fixed",
@@ -48,13 +49,14 @@ function MainAppRouter() {
     <Layout>
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Routes>
-          <Route path="/" element={<>Welcome back !</>} />
+          <Route path="/" element={<Dashboard/>} />
           <Route path="/admin/*" element={renderPrivateRoute(AdminRouter)} />
           <Route path="/sale-manager/*" element={renderPrivateRoute(SaleManagerRouter)} />
           <Route path="/customer/*" element={renderPrivateRoute(CustomerRouter)} />
           <Route path="/approver/*" element={renderPrivateRoute(ApproverRouter)} />
           <Route path="/delivery-manager/*" element={renderPrivateRoute(DeliveryManagerRouter)} />
-          <Route path="/delivery-person/*" element={renderPrivateRoute(DeliveryPersonRouter)} />
+          <Route path="/delivery-staff/*" element={renderPrivateRoute(DeliveryPersonRouter)} />
+          <Route path="/purchase-staff/*" element={renderPrivateRoute(PurchaseStaffRouter)} />
           <Route path="/purchase-manager/*" element={renderPrivateRoute(PurchaseManagerRouter)} />
           <Route path="*" element={<NotFound />} />
         </Routes>

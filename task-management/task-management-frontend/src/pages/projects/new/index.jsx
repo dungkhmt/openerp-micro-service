@@ -13,6 +13,7 @@ import { useNavigate } from "react-router";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import { ProjectService } from "../../../services/api/project.service";
+import { useTranslation } from "react-i18next";
 
 const defaultValues = {
   name: "",
@@ -21,6 +22,7 @@ const defaultValues = {
 
 const NewProject = () => {
   const navigate = useNavigate();
+  const {t} = useTranslation();
 
   const { handleSubmit, errors, control } = useForm({
     defaultValues,
@@ -33,8 +35,8 @@ const NewProject = () => {
       toast.success("Thêm mới dự án thành công!");
       navigate("/projects");
     } catch (error) {
-      // TODO: handle error
-      toast.error("Thêm mới dự án thất bại!");
+      console.error(error);
+      toast.error(t(error.response?.data?.message) || "Thêm mới dự án thất bại!");
     }
   };
 
