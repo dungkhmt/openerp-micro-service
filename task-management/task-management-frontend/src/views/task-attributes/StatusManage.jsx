@@ -7,7 +7,7 @@ import { createStatus, deleteStatus } from "../../store/status";
 const StatusManage = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const { statuses, fetchLoading } = useSelector((state) => state.status);
+  const { taskStatuses, fetchLoading } = useSelector((state) => state.status);
 
   const handleCreateStatus = async (data) => {
     // Generate statusId based on statusCode field
@@ -18,6 +18,7 @@ const StatusManage = () => {
       .substring(0, 60);
     const dataForm = {
       statusId,
+      type: "TASK_STATUS",
       ...data,
       statusCode: data.statusCode.trim().toUpperCase(),
     };
@@ -40,22 +41,14 @@ const StatusManage = () => {
     }
   };
 
-  const defaultStatusCodes = [
-    "ACTIVE",
-    "INACTIVE",
-    "CLOSED",
-    "INPROGRESS",
-    "OPEN",
-    "RESOLVED",
-  ];
   const canDelete = (row) => {
-    return !defaultStatusCodes.includes(row.statusCode);
+    return !row.isDefault;
   };
 
   return (
     <ManageTable
       title="Danh sách trạng thái"
-      items={statuses}
+      items={taskStatuses}
       columns={[
         { key: "statusCode", label: "Mã trạng thái" },
         { key: "description", label: "Mô tả" },

@@ -26,9 +26,9 @@ import { Helmet } from "react-helmet";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchUserSkills,
-  updateUser,
-  updateUserSkills,
+  fetchMySkills,
+  updateMyProfile,
+  updateMySkills,
 } from "../../store/my-profile";
 import toast from "react-hot-toast";
 import { Controller, useForm } from "react-hook-form";
@@ -40,11 +40,18 @@ import { config } from "../../config/config";
 import { Icon } from "@iconify/react";
 import CustomAvatar from "../../components/mui/avatar/CustomAvatar";
 import { getRandomColorSkin } from "../../utils/color.util";
+import { usePreventOverflow } from "../../hooks/usePreventOverflow";
 
 const MyProfile = () => {
   const dispatch = useDispatch();
-  const { skill, fetchLoading: skillFetchLoading } = useSelector((state) => state);
-  const { user, userSkills, fetchLoading: userFetchLoading } = useSelector((state) => state.myProfile);
+  const { skill, fetchLoading: skillFetchLoading } = useSelector(
+    (state) => state
+  );
+  const {
+    user,
+    userSkills,
+    fetchLoading: userFetchLoading,
+  } = useSelector((state) => state.myProfile);
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [firstName, setFirstName] = useState(null);
   const [lastName, setLastName] = useState(null);
@@ -52,7 +59,7 @@ const MyProfile = () => {
   const { handleSubmit, control } = useForm();
   const [updateLoading, setUpdateLoading] = useState(false);
   const inputRef = useRef(null);
-
+  const { ref, updateMaxHeight } = usePreventOverflow();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(user?.avatarUrl);
 
@@ -74,20 +81,23 @@ const MyProfile = () => {
 
   const getUserSkills = useCallback(async () => {
     try {
-      await dispatch(fetchUserSkills());
+      await dispatch(fetchMySkills()).unwrap();
     } catch (error) {
       console.error(error);
-      toast.error("Lỗi khi lấy dữ liệu");
+      toast.error(error?.message || "Lỗi khi lấy dữ liệu");
     }
   }, [dispatch]);
 
   const setUserSkills = useCallback(() => {
     if (userSkills.length > 0 && skill.skills.length > 0) {
       const selectedSkills = userSkills
-      .map((userSkill) => 
-        skill.skills.find((skill) => skill.skillId === userSkill.skill.skillId) || null
-      )
-      .filter(Boolean);
+        .map(
+          (userSkill) =>
+            skill.skills.find(
+              (skill) => skill.skillId === userSkill.skill.skillId
+            ) || null
+        )
+        .filter(Boolean);
       setSelectedSkills(selectedSkills);
     }
   }, [userSkills, skill.skills]);
@@ -100,11 +110,11 @@ const MyProfile = () => {
     try {
       setUpdateLoading(true);
       const skillList = selectedSkills.map((skill) => skill.skillId);
-      await dispatch(updateUserSkills(skillList));
+      await dispatch(updateMySkills(skillList)).unwrap();
       toast.success("Cập nhật thông tin thành công");
     } catch (e) {
       console.error(e);
-      toast.error("Cập nhật thất bại. Vui lòng thử lại sau.");
+      toast.error(error?.message || "Cập nhật thất bại. Vui lòng thử lại sau.");
     } finally {
       setUpdateLoading(false);
     }
@@ -124,11 +134,11 @@ const MyProfile = () => {
       }
     }
     try {
-      await dispatch(updateUser({ avatarUrl: avatarUrl }));
+      await dispatch(updateMyProfile({ avatarUrl: avatarUrl })).unwrap();
       toast.success("Ảnh đại diện đã được cập nhật");
     } catch (error) {
       console.error(error);
-      toast.error("Tải lên ảnh thất bại");
+      toast.error(error?.message || "Tải lên ảnh thất bại");
     } finally {
       setIsDialogOpen(false);
     }
@@ -147,7 +157,19 @@ const MyProfile = () => {
     }
   }, [setUserSkills, user]);
 
-  if (skillFetchLoading || userFetchLoading || updateLoading) {
+  useEffect(() => {
+    updateMaxHeight();
+    window.addEventListener("resize", updateMaxHeight);
+    return () => window.removeEventListener("resize", updateMaxHeight);
+  }, [updateMaxHeight]);
+
+  if (
+    skillFetchLoading ||
+    userFetchLoading ||
+    updateLoading ||
+    !user ||
+    !skill
+  ) {
     return <CircularProgressLoading />;
   }
 
@@ -156,7 +178,7 @@ const MyProfile = () => {
       <Helmet>
         <title>Thông tin tài khoản | Task management</title>
       </Helmet>
-      <Box sx={{ pr: 3, overflow: "auto", maxHeight: "92%" }}>
+      <Box ref={ref} sx={{ pr: 3, overflow: "auto" }}>
         <Grid container spacing={3}>
           <Grid item lg={5} md={6} xs={12}>
             <Card sx={{ borderRadius: "20px" }}>

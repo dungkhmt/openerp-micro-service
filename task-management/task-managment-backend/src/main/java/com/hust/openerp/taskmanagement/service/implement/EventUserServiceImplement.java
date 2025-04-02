@@ -62,7 +62,7 @@ public class EventUserServiceImplement implements EventUserService {
 	@Override
 	public void addUserToEvent(String adderId, String memberId, UUID eventId) {
 		var event = eventRepository.findById(eventId).orElseThrow(
-				() -> new ApiException(ErrorCode.EVENT_NOT_EXIST));
+				() -> new ApiException(ErrorCode.EVENT_NOT_FOUND));
 
 		if (!projectMemberService.checkAddedMemberInProject(adderId, event.getProjectId())) {
 			throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_PROJECT);
@@ -85,7 +85,7 @@ public class EventUserServiceImplement implements EventUserService {
 			String subject = "Bạn được thêm vào sự kiện: " + event.getName();
 
 			notiService.createInAppNotification(adderId, member.getId(), subject,
-					"/project/" + event.getProjectId() + "/event/" + event.getId());
+					"/project/" + event.getProjectId() + "/events/" + event.getId());
 
 			if (member.getEmail() == null || member.getEmail().isEmpty()) {
 				return;

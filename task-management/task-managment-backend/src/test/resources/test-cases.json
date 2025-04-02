@@ -1,0 +1,94 @@
+[
+  {
+      "name": "basic_5_users_3_slots",
+      "userChoices": {
+          "user1": ["slot1", "slot2", "slot3"],
+          "user2": ["slot1", "slot2"],
+          "user3": ["slot2"],
+          "user4": ["slot2", "slot3"],
+          "user5": ["slot3"]
+      }
+  },
+  {
+      "name": "all_choose_one_4_users_1_slots",
+      "userChoices": {
+          "user1": ["slot1"],
+          "user2": ["slot1"],
+          "user3": ["slot1"],
+          "user4": ["slot1"]
+      }
+  },
+  {
+      "name": "dense_3_users_3_slots",
+      "userChoices": {
+          "user1": ["slot1", "slot2", "slot3"],
+          "user2": ["slot1", "slot2", "slot3"],
+          "user3": ["slot1", "slot2", "slot3"]
+      }
+  },
+  {
+      "name": "dense_10_users_5_slots",
+      "userChoices": {
+          "user1": ["slot1", "slot2", "slot3", "slot4", "slot5"],
+          "user2": ["slot1", "slot2", "slot3", "slot4", "slot5"],
+          "user3": ["slot1", "slot2", "slot3", "slot4", "slot5"],
+          "user4": ["slot1", "slot2", "slot3", "slot4", "slot5"],
+          "user5": ["slot1", "slot2", "slot3", "slot4", "slot5"],
+          "user6": ["slot1", "slot2", "slot3", "slot4", "slot5"],
+          "user7": ["slot1", "slot2", "slot3", "slot4", "slot5"],
+          "user8": ["slot1", "slot2", "slot3", "slot4", "slot5"],
+          "user9": ["slot1", "slot2", "slot3", "slot4", "slot5"],
+          "user10": ["slot1", "slot2", "slot3", "slot4", "slot5"]
+      }
+  },
+  {
+      "name": "large_sparse_20_users_10_slots",
+      "userChoices": {
+          "user1": ["slot1", "slot2", "slot3"],
+          "user2": ["slot2", "slot3", "slot4"],
+          "user3": ["slot3", "slot4", "slot5"],
+          "user4": ["slot4", "slot5", "slot6"],
+          "user5": ["slot5", "slot6", "slot7"],
+          "user6": ["slot6", "slot7", "slot8"],
+          "user7": ["slot7", "slot8", "slot9"],
+          "user8": ["slot8", "slot9", "slot10"],
+          "user9": ["slot9", "slot10", "slot1"],
+          "user10": ["slot10", "slot1", "slot2"],
+          "user11": ["slot1", "slot3", "slot5"],
+          "user12": ["slot2", "slot4", "slot6"],
+          "user13": ["slot3", "slot5", "slot7"],
+          "user14": ["slot4", "slot6", "slot8"],
+          "user15": ["slot5", "slot7", "slot9"],
+          "user16": ["slot6", "slot8", "slot10"],
+          "user17": ["slot7", "slot9", "slot1"],
+          "user18": ["slot8", "slot10", "slot2"],
+          "user19": ["slot9", "slot1", "slot3"],
+          "user20": ["slot10", "slot2", "slot4"]
+      }
+  },
+  {
+      "name": "large_dense_20_users_10_slots",
+      "userChoices": {
+          "user1": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"],
+          "user2": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"],
+          "user3": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"],
+          "user4": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"],
+          "user5": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"],
+          "user6": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"],
+          "user7": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"],
+          "user8": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"],
+          "user9": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"],
+          "user10": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"],
+          "user11": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"],
+          "user12": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"],
+          "user13": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"],
+          "user14": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"],
+          "user15": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"],
+          "user16": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"],
+          "user17": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"],
+          "user18": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"],
+          "user19": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"],
+          "user20": ["slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10"]
+      }
+  }
+]

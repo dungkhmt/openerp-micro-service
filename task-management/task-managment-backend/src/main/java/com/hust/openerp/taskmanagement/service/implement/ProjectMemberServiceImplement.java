@@ -128,7 +128,7 @@ public class ProjectMemberServiceImplement implements ProjectMemberService {
 		}
 		
     	ProjectMember pm = projectMemberRepository.findByProjectIdAndUserId(projectId, memberId);
-    	if(pm == null) throw new ApiException(ErrorCode.PROJECT_MEMBER_NOT_EXIST);
+    	if(pm == null) throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_PROJECT);
     	
     	return pm.getRoleId();
 	}
@@ -169,7 +169,7 @@ public class ProjectMemberServiceImplement implements ProjectMemberService {
 		if (projectMemberRepository.existsById(projectMemberId)) {
 			projectMemberRepository.deleteById(projectMemberId);
 		} else {
-			throw new ApiException(ErrorCode.PROJECT_MEMBER_NOT_EXIST);
+			throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_PROJECT);
 		}
 		
 		// Unassign member from all tasks in this project
@@ -235,7 +235,7 @@ public class ProjectMemberServiceImplement implements ProjectMemberService {
         }
         
         ProjectMember projectMember = projectMemberRepository.findByProjectIdAndUserId(projectId, memberId);
-        if(projectMember == null) throw new ApiException(ErrorCode.PROJECT_MEMBER_NOT_EXIST);
+        if(projectMember == null) throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_PROJECT);
         
         projectMemberRepository.delete(projectMember);
         
@@ -255,7 +255,7 @@ public class ProjectMemberServiceImplement implements ProjectMemberService {
 
         
         ProjectRole newRole = projectRoleRepository.findById(roleId).orElseThrow(
-        		() -> new ApiException(ErrorCode.ROLE_NOT_EXIST));
+        		() -> new ApiException(ErrorCode.ROLE_NOT_FOUND));
         User member = userService.findById(memberId);
         if (member == null) {
             throw new ApiException(ErrorCode.USER_NOT_EXIST);

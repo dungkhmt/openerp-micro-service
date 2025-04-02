@@ -2,6 +2,10 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { TaskService } from "../../services/api/task.service";
 import { UserService } from "../../services/api/user.service";
 
+export const handleRejected = (state, action) => {
+  state.errors.push(action.payload || action.error);
+  state.fetchLoading = false;
+};
 
 export const fetchAllUsers = createAsyncThunk(
   "userManagement/fetchAllUsers",
@@ -21,6 +25,7 @@ export const fetchAssignedTasksForUser = createAsyncThunk(
 
 const initialState = {
   usersCache: [],
+  currentUser: null,
   tasksCache: {},
   totalCount: 0,
   search: "",
@@ -29,6 +34,7 @@ const initialState = {
     size: 10,
   },
   sort: { sort: "desc", field: "createdStamp" },
+  tabValue: 0,
   fetchLoading: false,
   errors: [],
 };
@@ -37,6 +43,12 @@ export const userManagementSlice = createSlice({
   name: "userManagement",
   initialState,
   reducers: {
+    setCurrentUser: (state, action) => {
+      state.currentUser = action.payload;
+    },
+    setTabValue: (state, action) => {
+      state.tabValue = action.payload;
+    },
     setSearch: (state, action) => {
       state.search = action.payload;
     },
@@ -63,12 +75,14 @@ export const userManagementSlice = createSlice({
       state.totalCount = initialState.totalCount;
       state.pagination = initialState.pagination;
       state.sort = initialState.sort;
-      state.fetchLoading = initialState.fetchLoading;
-      state.errors = initialState.errors;
     },
     resetUsersData: (state) => {
       state.usersCache = initialState.usersCache;
-    }
+    },
+    resetuserManagement: (state) => {
+      // eslint-disable-next-line no-unused-vars
+      state = initialState;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -79,10 +93,7 @@ export const userManagementSlice = createSlice({
         state.usersCache = action.payload;
         state.fetchLoading = false;
       })
-      .addCase(fetchAllUsers.rejected, (state, action) => {
-        state.errors.push(action.error);
-        state.fetchLoading = false;
-      })
+      .addCase(fetchAllUsers.rejected, handleRejected)
       .addCase(fetchAssignedTasksForUser.pending, (state) => {
         state.fetchLoading = true;
       })
@@ -91,15 +102,13 @@ export const userManagementSlice = createSlice({
         state.totalCount = action.payload.totalElements;
         state.fetchLoading = false;
       })
-      .addCase(fetchAssignedTasksForUser.rejected, (state, action) => {
-        state.errors.push(action.error);
-        state.fetchLoading = false;
-        throw action.error;
-      });
+      .addCase(fetchAssignedTasksForUser.rejected, handleRejected);
   },
 });
 
 export const {
+  setCurrentUser,
+  setTabValue,
   setPagination,
   setSort,
   resetTasksData,

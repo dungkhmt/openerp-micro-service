@@ -24,7 +24,7 @@ import { EventService } from "../../../../../services/api/event.service";
 import { TaskService } from "../../../../../services/api/task.service";
 import { CircularProgressLoading } from "../../../../../components/common/loading/CircularProgressLoading";
 import { DialogAddTask } from "../../../../../views/project/tasks/DialogAddTask";
-import { DialogAddExistingTask } from "../../../../../views/project/event/DialogAddExistingTask";
+import { DialogAddExistingTask } from "../../../../../views/project/events/DialogAddExistingTask";
 import { TaskPriority } from "../../../../../components/task/priority";
 import { TaskCategory } from "../../../../../components/task/category";
 import { TaskStatus } from "../../../../../components/task/status";
@@ -35,9 +35,11 @@ import {
 } from "../../../../../utils/color.util";
 import { deleteEvent } from "../../../../../store/project/events";
 import { useDispatch } from "react-redux";
-import { DialogEditEvent } from "../../../../../views/project/event/DialogEditEvent";
+import { DialogEditEvent } from "../../../../../views/project/events/DialogEditEvent";
 import ConfirmationDialog from "../../../../../components/mui/dialog/ConfirmationDialog";
-
+import { usePreventOverflow } from "../../../../../hooks/usePreventOverflow";
+import DescriptionText from "../../../../../components/common/text/DescriptionText";
+import NotFound from "../../../../../views/errors/NotFound";
 
 const Event = () => {
   const {
@@ -199,13 +201,10 @@ const Event = () => {
 
   const [event, setEvent] = useState(null);
   const [eventLoading, setEventLoading] = useState(true);
-
   const [eventTasks, setEventTasks] = useState([]);
   const [eventTasksLoading, setEventTasksLoading] = useState(true);
-
   const [eventUsers, setEventUsers] = useState([]);
   const [eventUsersLoading, setEventUsersLoading] = useState(true);
-
   const [error, setError] = useState(null);
   const [isUpdate, setIsUpdate] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -213,10 +212,11 @@ const Event = () => {
   const [addExistingTaskDialog, setAddExistingTaskDialog] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-
   const { project, fetchLoading: projectLoading } = useSelector(
     (state) => state.project
   );
+
+  const { ref, updateMaxHeight } = usePreventOverflow();
 
   const handleClick = (e) => {
     setAnchorEl(e.currentTarget);
@@ -238,7 +238,7 @@ const Event = () => {
 
   const handleDeleteClick = () => {
     setIsConfirmDialogOpen(true);
-  }
+  };
 
   const handleCancelDelete = () => {
     setIsConfirmDialogOpen(false);
@@ -314,8 +314,14 @@ const Event = () => {
     getEventTasks();
   }, [getEvent, getEventTasks, getEventUsers]);
 
+  useEffect(() => {
+    updateMaxHeight();
+    window.addEventListener("resize", updateMaxHeight);
+    return () => window.removeEventListener("resize", updateMaxHeight);
+  }, [updateMaxHeight]);
+
   if (error) {
-    if (error.response?.status === 404) return <h1>Không tìm thấy sự kiện</h1>;
+    if (error.response?.status === 404) return <NotFound />;
     else {
       toast.error("Có lỗi xảy ra khi tải dữ liệu");
       return null;
@@ -346,7 +352,14 @@ const Event = () => {
         <Icon fontSize={24} icon="mdi:arrow-left" />
       </IconButton>
 
-      <Box sx={{ pr: 2, pl: 1, overflow: "auto", maxHeight: "80vh" }}>
+      <Box
+        ref={ref}
+        sx={{
+          pr: 2,
+          pl: 1,
+          overflowY: "auto",
+        }}
+      >
         <Box
           sx={{
             display: "flex",
@@ -407,27 +420,7 @@ const Event = () => {
               <Typography variant="h6" gutterBottom>
                 Mô tả
               </Typography>
-              <Typography
-                variant="body1"
-                sx={{
-                  overflowX: "hidden",
-                  wordBreak: "break-word",
-                  whiteSpace: "pre-wrap",
-                }}
-              >
-                {event.description ? (
-                  event.description.split("\n").map((line, index) => (
-                    <Box key={index} component="span">
-                      {line}
-                      <br />
-                    </Box>
-                  ))
-                ) : (
-                  <Typography variant="body1" color="textSecondary">
-                    Không có mô tả.
-                  </Typography>
-                )}
-              </Typography>
+              <DescriptionText text={event.description} />
             </Card>
             <Card sx={{ p: 5, borderRadius: 3 }}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
@@ -496,11 +489,11 @@ const Event = () => {
                   />
                 ) : (
                   <Typography
-                    variant="body1"
+                    variant="body2"
                     color="textSecondary"
-                    sx={{ mt: 2 }}
+                    sx={{ mt: 2, fontStyle: "italic" }}
                   >
-                    Không có nhiệm vụ nào.
+                    Không có nhiệm vụ.
                   </Typography>
                 )}
               </Box>
@@ -589,7 +582,7 @@ const Event = () => {
                     );
                   })
                 ) : (
-                  <Typography variant="body2" color="textSecondary">
+                  <Typography variant="body2" color="textSecondary" sx={{fontStyle: "italic"}}>
                     Không có thành viên.
                   </Typography>
                 )}
@@ -624,8 +617,8 @@ const Event = () => {
           content={
             <>
               Bạn có chắc chắn muốn xoá{" "}
-              <span style={{ fontWeight: "bold" }}>{event.name}</span>?
-              Hành động này không thể hoàn tác.
+              <span style={{ fontWeight: "bold" }}>{event.name}</span>? Hành
+              động này không thể hoàn tác.
             </>
           }
         />

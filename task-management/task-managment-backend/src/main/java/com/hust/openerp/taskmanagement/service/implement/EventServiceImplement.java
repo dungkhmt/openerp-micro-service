@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hust.openerp.taskmanagement.dto.EventDTO;
 import com.hust.openerp.taskmanagement.dto.EventOverviewDTO;
@@ -30,7 +31,7 @@ import com.hust.openerp.taskmanagement.service.EventUserService;
 import com.hust.openerp.taskmanagement.service.ProjectMemberService;
 import com.hust.openerp.taskmanagement.service.TaskService;
 
-import jakarta.transaction.Transactional;
+
 import lombok.AllArgsConstructor;
 
 @Service
@@ -114,7 +115,7 @@ public class EventServiceImplement implements EventService {
 	@Override
 	public void update(String userId, UUID eventId, UpdateEventForm updateEventForm) {
 		var event = eventRepository.findById(eventId).orElseThrow(
-				() -> new ApiException(ErrorCode.EVENT_NOT_EXIST));
+				() -> new ApiException(ErrorCode.EVENT_NOT_FOUND));
 		
 		if (!projectMemberService.checkAddedMemberInProject(userId, event.getProjectId())) {
 			throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_PROJECT);

@@ -19,6 +19,7 @@ export const getCategoryColor = (category) => {
 
 export const getStatusColor = (status) => {
   switch (status) {
+    // Task statuses
     case "ASSIGNMENT_ACTIVE":
       return "success";
     case "ASSIGNMENT_INACTIVE":
@@ -31,6 +32,24 @@ export const getStatusColor = (status) => {
       return "success";
     case "TASK_CLOSED":
       return "error";
+
+    // Meeting plan statuses
+    case "PLAN_DRAFT":
+      return "secondary";
+    case "PLAN_REG_OPEN":
+      return "warning";
+    case "PLAN_REG_CLOSED":
+      return "info";
+    case "PLAN_ASSIGNED":
+      return "success";
+    case "PLAN_IN_PROGRESS":
+      return "primary";
+    case "PLAN_COMPLETED":
+      return "success";
+    case "PLAN_CANCELED":
+      return "error";
+
+    // Fallback for unknown statuses
     default:
       return "info";
   }
@@ -117,4 +136,15 @@ export const getProgressColor = (progress) => {
   if (progress < 70) return "warning";
   if (progress < 90) return "success";
   return "info";
+};
+
+export const getDeadlineColor = (deadline) => {
+  if (!deadline) return "gray";
+
+  const now = dayjs();
+  const deadlineTime = dayjs(deadline);
+
+  if (now.isAfter(deadlineTime)) return "error.main";
+  if (deadlineTime.diff(now, "hour") < 24) return "warning.main";
+  return "success.main";
 };

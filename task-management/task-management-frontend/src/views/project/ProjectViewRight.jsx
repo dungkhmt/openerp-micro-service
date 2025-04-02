@@ -13,7 +13,7 @@ import { ProjectViewOverview } from "./overview/ProjectViewOverview";
 import { ProjectViewSetting } from "./setting/ProjectViewSetting";
 import { DialogAddTask } from "./tasks/DialogAddTask";
 import { ProjectViewTasks } from "./tasks/ProjectViewTasks";
-import { ProjectViewEvents } from "./event/ProjectViewEvents";
+import { ProjectViewEvents } from "./events/ProjectViewEvents";
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   minHeight: "34px",
@@ -66,8 +66,9 @@ const ProjectViewRight = () => {
 
   useEffect(() => {
     updateMaxHeight();
-    ref.current?.click();
-  }, [window?.innerHeight, ref]);
+    window.addEventListener("resize", updateMaxHeight);
+    return () => window.removeEventListener("resize", updateMaxHeight);
+  }, [updateMaxHeight]);
 
   return (
     <TabContext value={activeTab}>
@@ -124,7 +125,7 @@ const ProjectViewRight = () => {
             }
           />
           <Tab
-            value="event"
+            value="events"
             label={
               <Box
                 sx={{
@@ -230,7 +231,7 @@ const ProjectViewRight = () => {
         <TabPanel sx={{ p: 0, pr: 2 }} value="tasks">
           <ProjectViewTasks />
         </TabPanel>
-        <TabPanel sx={{ p: 0, pr: 2 }} value="event">
+        <TabPanel sx={{ p: 0, pr: 2 }} value="events">
           <ProjectViewEvents />
         </TabPanel>
         <TabPanel sx={{ p: 0, pr: 2 }} value="timeline">

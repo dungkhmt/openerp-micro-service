@@ -12,8 +12,12 @@ import search from "./search";
 import statistic from "./project/statistic";
 import skill from "./skill";
 import myProfile from "./my-profile";
-import userManagement from "./user-management"
+import userManagement from "./user-management";
 import events from "./project/events";
+import meetingPlan from "./meeting-plan";
+import meetingSessions from "./meeting-plan/meeting-sessions";
+import createdMeetings from "./created-meetings";
+import joinedMeetings from "./joined-meetings";
 
 export const store = configureStore({
   reducer: {
@@ -32,6 +36,10 @@ export const store = configureStore({
     skill,
     userManagement,
     events,
+    meetingPlan,
+    meetingSessions,
+    createdMeetings,
+    joinedMeetings,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -36,7 +36,6 @@ import { clearCache } from "../../../store/project/tasks";
 import { SkillChip } from "../../../components/task/skill";
 import ItemSelector from "../../../components/mui/dialog/ItemSelector";
 import { fetchEvents } from "../../../store/project/events";
-import { CircularProgressLoading } from "../../../components/common/loading/CircularProgressLoading";
 import { removeDiacritics } from "../../../utils/stringUtils.js";
 
 const Transition = forwardRef(function Transition(props, ref) {
@@ -47,21 +46,9 @@ const DialogAddTask = ({ open, setOpen, defaultEvent }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const {
-    members,
-    project,
-    fetchLoading: projectFetchLoading,
-  } = useSelector((state) => state.project);
-  const { events, fetchLoading: eventFetchLoading } = useSelector(
-    (state) => state.events
-  );
-  const {
-    category,
-    priority,
-    status,
-    skill,
-    fetchLoading: skillFetchLoading,
-  } = useSelector((state) => state);
+  const { members, project } = useSelector((state) => state.project);
+  const { events } = useSelector((state) => state.events);
+  const { category, priority, status, skill } = useSelector((state) => state);
   const [files, setFiles] = useState([]);
   const [createLoading, setCreateLoading] = useState(false);
   const { register, handleSubmit, errors, setValue, control } = useForm();
@@ -76,9 +63,6 @@ const DialogAddTask = ({ open, setOpen, defaultEvent }) => {
 
   const [selectedAssignees, setSelectedAssignees] = useState([]);
   const [filteredAssignees, setFilteredAssignees] = useState(members);
-
-  if (projectFetchLoading || eventFetchLoading || skillFetchLoading)
-    return <CircularProgressLoading />;
 
   const handleSkillSearch = (search) => {
     setFilteredSkills(
@@ -122,19 +106,14 @@ const DialogAddTask = ({ open, setOpen, defaultEvent }) => {
 
   const handleAssigneeSearch = (search) => {
     setFilteredAssignees(
-      members
-        .filter(
-          ({ member }) =>
-            (member.firstName &&
-              removeDiacritics(member.firstName)
-                .toLowerCase()
-                .includes(removeDiacritics(search).toLowerCase())) ||
-            (member.lastName &&
-              removeDiacritics(member.lastName)
-                .toLowerCase()
-                .includes(removeDiacritics(search).toLowerCase()))
-        )
-        .filter(({ member }) => member.firstName || member.lastName)
+      members.filter(({ member }) => {
+        if (!member.firstName && !member.lastName) return false;
+
+        const fullName = `${member.firstName || ""} ${
+          member.lastName || ""
+        }`.toLowerCase();
+        return fullName.includes(search.toLowerCase());
+      })
     );
   };
 
@@ -261,7 +240,7 @@ const DialogAddTask = ({ open, setOpen, defaultEvent }) => {
                 disabled
                 inputProps={{ placeholder: "Trạng thái" }}
               >
-                {status.statuses.map((status) => (
+                {status.taskStatuses.map((status) => (
                   <MenuItem key={status.statusId} value={status.statusId}>
                     <TaskStatus status={status} />
                   </MenuItem>

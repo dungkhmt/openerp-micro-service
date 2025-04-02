@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hust.openerp.taskmanagement.entity.TaskPriority;
 import com.hust.openerp.taskmanagement.exception.ApiException;
@@ -12,7 +13,6 @@ import com.hust.openerp.taskmanagement.repository.TaskPriorityRepository;
 import com.hust.openerp.taskmanagement.repository.TaskRepository;
 import com.hust.openerp.taskmanagement.service.TaskPriorityService;
 
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 @Service

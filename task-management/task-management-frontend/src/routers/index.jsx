@@ -17,6 +17,11 @@ import NotFound from "../views/errors/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import Redirect from "./Redirect";
 import { AttributeManager } from "../pages/task-attributes";
+import CreatedMeetings from "../pages/meetings/created-meetings";
+import CreatedMeeting from "../pages/meetings/created-meetings/[id]";
+import JoinedMeetings from "../pages/meetings/joined-meetings";
+import JoinedMeeting from "../pages/meetings/joined-meetings/[id]";
+import Unknown from "../views/errors/Unknown";
 
 export const router = createBrowserRouter([
   {
@@ -70,7 +75,7 @@ export const router = createBrowserRouter([
                     ],
                   },
                   {
-                    path: ":id/event/:eid",
+                    path: ":id/events/:eid",
                     element: <Event />,
                   },
                 ],
@@ -95,12 +100,37 @@ export const router = createBrowserRouter([
             ],
           },
           {
+            path: "/meetings",
+            children: [
+              {
+                path: "created-meetings",
+                element: <CreatedMeetings />,
+              },
+              {
+                path: "created-meetings/:pid",
+                element: <CreatedMeeting />,
+              },
+              {
+                path: "joined-meetings",
+                element: <JoinedMeetings />,
+              },
+              {
+                path: "joined-meetings/:pid",
+                element: <JoinedMeeting />,
+              },
+            ],
+          },
+          {
             path: "/user-management",
             element: <UserManagement />,
           },
           {
             path: "/attribute-management",
             element: <AttributeManager />,
+          },
+          {
+            path: "/unknown-error",
+            element: <Unknown />,
           },
           {
             path: "*",

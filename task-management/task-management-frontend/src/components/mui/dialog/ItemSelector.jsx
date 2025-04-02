@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import {
   Box,
   Button,
-  Checkbox,
   List,
   ListItemButton,
   Popover,
@@ -27,25 +26,19 @@ const ItemSelector = ({
   idPopover,
   maxHeight = 200,
   maxWidth = 400,
+  showCheckbox = true,
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [search, setSearch] = useState("");
   const [position, setPosition] = useState({
-    anchorOrigin: {
-      vertical: "bottom",
-      horizontal: "left",
-    },
-    transformOrigin: {
-      vertical: "top",
-      horizontal: "left",
-    },
+    anchorOrigin: { vertical: "bottom", horizontal: "left" },
+    transformOrigin: { vertical: "top", horizontal: "left" },
   });
 
   const containerRef = useRef(null);
 
   const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
-
     const container = containerRef.current.getBoundingClientRect();
     const availableSpaceBelow = window.innerHeight - container.bottom;
     const availableSpaceAbove = container.top;
@@ -55,25 +48,13 @@ const ItemSelector = ({
       availableSpaceAbove > availableSpaceBelow
     ) {
       setPosition({
-        anchorOrigin: {
-          vertical: "top",
-          horizontal: "left",
-        },
-        transformOrigin: {
-          vertical: "bottom",
-          horizontal: "left",
-        },
+        anchorOrigin: { vertical: "top", horizontal: "left" },
+        transformOrigin: { vertical: "bottom", horizontal: "left" },
       });
     } else {
       setPosition({
-        anchorOrigin: {
-          vertical: "bottom",
-          horizontal: "left",
-        },
-        transformOrigin: {
-          vertical: "top",
-          horizontal: "left",
-        },
+        anchorOrigin: { vertical: "bottom", horizontal: "left" },
+        transformOrigin: { vertical: "top", horizontal: "left" },
       });
     }
   };
@@ -92,11 +73,7 @@ const ItemSelector = ({
   return (
     <Box ref={containerRef}>
       <Box
-        sx={{
-          display: "flex",
-          justifyContent: "flex-start",
-          height: "50px",
-        }}
+        sx={{ display: "flex", justifyContent: "flex-start", height: "50px" }}
       >
         <Button
           variant="outlined"
@@ -113,10 +90,10 @@ const ItemSelector = ({
             textTransform: "none",
             color: (theme) => theme.palette.text.secondary,
             borderRadius: 1,
-            borderColor: "#B2BEB5",
+            borderColor: "grey.400",
             "&:hover": {
-              borderColor: "#E5E4E2",
-              backgroundColor: "#E5E4E2",
+              borderColor: "grey.200",
+              backgroundColor: "grey.200",
               color: (theme) => theme.palette.text.primary,
               "& .hover-typography": {
                 color: (theme) => theme.palette.text.primary,
@@ -153,12 +130,12 @@ const ItemSelector = ({
       >
         <Box sx={{ p: 2, height: 40, mb: 3 }}>
           <TextField
+            autoFocus
+            autoComplete="off"
             fullWidth
             placeholder={placeholder}
             value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-            }}
+            onChange={(e) => setSearch(e.target.value)}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -177,12 +154,19 @@ const ItemSelector = ({
             }}
           />
         </Box>
+
+        {selectedItems.length > 0 && (
+          <Typography
+            variant="subtitle2"
+            color="text.secondary"
+            sx={{ pl: 5, pb: 1, fontSize: "0.9rem" }}
+          >
+            Đã chọn <strong>{selectedItems.length}</strong> mục
+          </Typography>
+        )}
+
         <List
-          sx={{
-            maxHeight: maxHeight,
-            overflowY: "auto",
-            maxWidth: maxWidth,
-          }}
+          sx={{ maxHeight: maxHeight, overflowY: "auto", maxWidth: maxWidth }}
         >
           {items.length === 0 ? (
             <Box sx={{ p: 2 }}>
@@ -195,18 +179,36 @@ const ItemSelector = ({
               </Typography>
             </Box>
           ) : (
-            items.map((item) => (
-              <ListItemButton
-                key={item.id}
-                onClick={() => onSelectChange(item)}
-                sx={{
-                  height: 50,
-                }}
-              >
-                <Checkbox checked={selectedItems?.includes(item) || false} />
-                {renderItem(item)}
-              </ListItemButton>
-            ))
+            items.map((item) => {
+              const isSelected = selectedItems?.includes(item);
+              return (
+                <ListItemButton
+                  key={item.id}
+                  onClick={() => onSelectChange(item)}
+                  sx={{
+                    height: 50,
+                    bgcolor: isSelected ? "primary.background" : "transparent",
+                    gap: 2,
+                  }}
+                >
+                  {showCheckbox && (
+                    <IconButton
+                      sx={{ color: isSelected ? "primary.main" : "grey.500" }}
+                    >
+                      <Icon
+                        icon={
+                          isSelected
+                            ? "ci:checkbox-check"
+                            : "fluent:checkbox-unchecked-16-filled"
+                        }
+                        fontSize={24}
+                      />
+                    </IconButton>
+                  )}
+                  {renderItem(item)}
+                </ListItemButton>
+              );
+            })
           )}
         </List>
       </Popover>
@@ -227,6 +229,7 @@ ItemSelector.propTypes = {
   idPopover: PropTypes.string,
   maxHeight: PropTypes.number,
   maxWidth: PropTypes.number,
+  showCheckbox: PropTypes.bool,
 };
 
 export default ItemSelector;

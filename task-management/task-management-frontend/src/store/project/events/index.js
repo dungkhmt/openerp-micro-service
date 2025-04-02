@@ -9,38 +9,54 @@ export const handleRejected = (state, action) => {
 
 export const fetchEvents = createAsyncThunk(
   "project/fetchEvents",
-  async (projectId) => {
-    const events = await EventService.getEvents(projectId);
-    return events;
+  async (projectId, { rejectWithValue }) => {
+    try {
+      const events = await EventService.getEvents(projectId);
+      return events;
+    } catch (error) {
+      return rejectWithValue(error.response || error.message);
+    }
   }
 );
 
 export const createEvent = createAsyncThunk(
   "project/createEvent",
-  async (data, { dispatch }) => {
-    const res = await EventService.createEvent(data);
-    await dispatch(fetchEvents(data.projectId));
-    return res;
+  async (data, { dispatch, rejectWithValue }) => {
+    try {
+      const res = await EventService.createEvent(data);
+      await dispatch(fetchEvents(data.projectId));
+      return res;
+    } catch (error) {
+      return rejectWithValue(error.response || error.message);
+    }
   }
 );
 
 export const updateEvent = createAsyncThunk(
   "project/updateEvent",
-  async ({ eventId, data, projectId }, { dispatch }) => {
-    const res = await EventService.updateEvent(eventId, data);
-    await dispatch(fetchEvents(projectId));
-    dispatch(clearCache());
-    return res;
+  async ({ eventId, data, projectId }, { dispatch, rejectWithValue }) => {
+    try {
+      const res = await EventService.updateEvent(eventId, data);
+      await dispatch(fetchEvents(projectId));
+      dispatch(clearCache());
+      return res;
+    } catch (error) {
+      return rejectWithValue(error.response || error.message);
+    }
   }
 );
 
 export const deleteEvent = createAsyncThunk(
   "project/deleteEvent",
-  async ({ projectId, eventId }, { dispatch }) => {
-    const res = await EventService.deleteEvent(eventId);
-    await dispatch(fetchEvents(projectId));
-    dispatch(clearCache());
-    return res;
+  async ({ projectId, eventId }, { dispatch, rejectWithValue }) => {
+    try {
+      const res = await EventService.deleteEvent(eventId);
+      await dispatch(fetchEvents(projectId));
+      dispatch(clearCache());
+      return res;
+    } catch (error) {
+      return rejectWithValue(error.response || error.message);
+    }
   }
 );
 
@@ -56,6 +72,9 @@ export const eventsSlice = createSlice({
   reducers: {
     setLoading: (state, action) => {
       state.fetchLoading = action.payload;
+    },
+    clearErrors: (state) => {
+      state.errors = [];
     },
     resetEvents: (state) => {
       state.events = initialState.events;
@@ -76,6 +95,6 @@ export const eventsSlice = createSlice({
   },
 });
 
-export const { setLoading, resetEvents } = eventsSlice.actions;
+export const { clearErrors, setLoading, resetEvents } = eventsSlice.actions;
 
 export default eventsSlice.reducer;

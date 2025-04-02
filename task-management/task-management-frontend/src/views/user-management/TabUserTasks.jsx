@@ -1,5 +1,4 @@
-import { Icon } from "@iconify/react";
-import { Box, IconButton, TextField, Tooltip, Typography } from "@mui/material";
+import { Box, Tooltip, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -18,11 +17,9 @@ import {
 import { TaskStatus } from "../../components/task/status";
 import { useDebounce } from "../../hooks/useDebounce";
 import { usePreventOverflow } from "../../hooks/usePreventOverflow";
+import SearchField from "../../components/mui/search/SearchField";
 
-const TabUserTasks = (user) => {
-  const { firstName, lastName, id } = user.user;
-  const fullName =
-    firstName || lastName ? `${firstName ?? ""} ${lastName ?? ""}` : " - ";
+const TabUserTasks = () => {
   const {
     tasksCache,
     totalCount,
@@ -30,7 +27,12 @@ const TabUserTasks = (user) => {
     pagination,
     sort,
     fetchLoading,
+    currentUser,
   } = useSelector((state) => state.userManagement);
+  const { firstName, lastName, id } = currentUser;
+  const fullName =
+    firstName || lastName ? `${firstName ?? ""} ${lastName ?? ""}` : " - ";
+
   const { statuses } = useSelector((state) => state.status);
   const dispatch = useDispatch();
 
@@ -222,6 +224,7 @@ const TabUserTasks = (user) => {
         }}
       >
         <Typography variant="h6">{fullName}</Typography>
+
         <Box
           sx={{
             display: "flex",
@@ -230,27 +233,16 @@ const TabUserTasks = (user) => {
             gap: 3,
           }}
         >
-          <TextField
-            size="small"
+          <SearchField
             value={search}
-            sx={{
+            onChange={(e) => setSearch(e.target.value)}
+            onClear={() => setSearch("")}
+            inputSx={{
               "& .MuiInputBase-root": {
                 height: "34px",
                 fontSize: "14px",
-                borderRadius:"20px"
+                borderRadius: "20px",
               },
-            }}
-            placeholder="Search Task"
-            onChange={(e) => setSearch(e.target.value)}
-            InputProps={{
-              endAdornment: search && (
-                <IconButton
-                  onClick={() => setSearch("")}
-                  sx={{ padding: 0, marginRight: "-4px" }} 
-                >
-                  <Icon icon="mdi:close" fontSize={20} />
-                </IconButton>
-              ),
             }}
           />
         </Box>
