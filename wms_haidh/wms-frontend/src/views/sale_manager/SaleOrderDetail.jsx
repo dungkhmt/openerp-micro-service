@@ -85,6 +85,7 @@ const SaleOrderDetail = () => {
             <Typography><b>Description:</b> {generalInfo && generalInfo.description}</Typography>
             <Typography><b>Payment Type:</b> {generalInfo && generalInfo.paymentType}</Typography>
             <Typography><b>Order Type:</b> {generalInfo && generalInfo.orderType}</Typography>
+            <Typography><b>Status:</b> {generalInfo && generalInfo.status}</Typography>
           </Paper>
         </Grid>
 
@@ -128,15 +129,17 @@ const SaleOrderDetail = () => {
         </Paper>
       </Box>
 
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
-        <Button variant="contained" color="error" onClick={handleCancel} sx={{ mr: 2 }}>
-          Cancel
-        </Button>
-        <Button variant="contained" color="primary" onClick={handleApprove}>
-          Approve
-        </Button>
-      </Box>
-    </Box>
+      {generalInfo && generalInfo.status === 'CREATED' && (
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+          <Button variant="contained" color="error" onClick={handleCancel} sx={{ mr: 2 }}>
+            Cancel
+          </Button>
+          <Button variant="contained" color="primary" onClick={handleApprove}>
+            Approve
+          </Button>
+        </Box>)}
+    </Box >
+
   );
 };
 

@@ -36,7 +36,7 @@ const ShipmentDetail = () => {
                 setLoading(false);
             }).catch(() => setLoading(false));
         }
-    }, [id,page,rowsPerPage]);
+    }, [id, page, rowsPerPage]);
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -104,7 +104,13 @@ const ShipmentDetail = () => {
                                             </TableCell>
                                         </TableRow>
                                     ))
-                                    : deliveryTrips.map((trip) => (
+                                    : deliveryTrips.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={5} align="center">
+                                                No delivery trips found.
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : deliveryTrips.map((trip) => (
                                         <TableRow key={trip.deliveryTripId}>
                                             <TableCell sx={{ textAlign: 'center' }} width={150}>{trip.deliveryTripId}</TableCell>
                                             <TableCell sx={{ textAlign: 'center' }} width={150}>{trip.distance}</TableCell>

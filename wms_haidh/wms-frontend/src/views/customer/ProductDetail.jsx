@@ -1,0 +1,152 @@
+import React, { useState } from "react";
+import { Card, IconButton, TextField, Button, Typography, Grid } from "@mui/material";
+import RemoveIcon from "@mui/icons-material/Remove";
+import AddIcon from "@mui/icons-material/Add";
+import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
+import { toast, Toaster } from "react-hot-toast";
+import { formatPrice } from "../../utils/utils";
+import BreadcrumbsCustom from "../../components/BreadcrumbsCustom";
+
+const mockProduct = {
+    id: 1,
+    title: "Super Cool Refrigerator",
+    code: "ABC123",
+    image: "/demo.jpg",
+    price: 20000,
+    quantity: 50,
+    category: "Appliances",
+    description: "A state-of-the-art refrigerator with amazing features.",
+    specs: {
+        height: "200 cm",
+        weight: "75 kg",
+        area: "2 m²"
+    },
+    uom: "Unit"
+};
+
+const QuantityControl = ({ quantity, onIncrease, onDecrease, onChange, onBlur }) => (
+    <div className="flex items-center space-x-2">
+        <IconButton
+            disableRipple
+            onClick={onDecrease}
+            size="small"
+            sx={{
+                backgroundColor: "rgb(241, 245, 249)",
+                borderRadius: "4px",
+                "&:hover": { backgroundColor: "rgb(226, 232, 240)" },
+            }}
+        >
+            <RemoveIcon />
+        </IconButton>
+        <TextField
+            value={quantity}
+            onChange={onChange}
+            onBlur={onBlur}
+            inputProps={{ style: { textAlign: "center", width: "50px", padding: "5px" } }}
+            variant="outlined"
+            size="small"
+        />
+        <IconButton
+            disableRipple
+            onClick={onIncrease}
+            size="small"
+            sx={{
+                backgroundColor: "rgb(241, 245, 249)",
+                borderRadius: "4px",
+                "&:hover": { backgroundColor: "rgb(226, 232, 240)" },
+            }}
+        >
+            <AddIcon />
+        </IconButton>
+    </div>
+);
+
+const ProductDetail = () => {
+    const [quantity, setQuantity] = useState(1);
+
+    const handleIncrease = () => {
+        if (quantity < 999) setQuantity(prev => prev + 1);
+    };
+
+    const handleDecrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
+
+    const handleAddToCart = () => {
+        if (quantity > mockProduct.quantity) {
+            toast.error("Order quantity exceeds available quantity!");
+            return;
+        }
+        const cartItems = JSON.parse(sessionStorage.getItem("cart")) || [];
+        const existingItemIndex = cartItems.findIndex(cartItem => cartItem.id === mockProduct.id);
+        if (existingItemIndex !== -1) {
+            cartItems[existingItemIndex].quantity += quantity;
+        } else {
+            cartItems.push({ ...mockProduct, quantity });
+        }
+        sessionStorage.setItem("cart", JSON.stringify(cartItems));
+        toast.success("Product added to cart");
+    };
+
+    const breadcrumbPaths = [
+        { label: "Home", link: "/" },
+        { label: "Products", link: "/customer/products" },
+        { label: `${mockProduct.title}`, link: `/customer/products/${mockProduct.id}` }
+    ];
+
+    return (
+        <div style={{ padding: "16px" }}>
+            <Toaster />
+            <BreadcrumbsCustom paths={breadcrumbPaths} />
+            <Card sx={{ p: 4, maxWidth: '900px', margin: 'auto' }}>
+                <Grid container spacing={4}>
+                    <Grid item xs={12} md={5}>
+                        <img src={mockProduct.image} alt={mockProduct.title} style={{ width: '100%', borderRadius: '8px' }} />
+                        <div style={{ marginTop: '16px' }}>
+                            <Typography variant="body1" sx={{ fontWeight: 'bold', marginBottom: '10px' }}>Specifications:</Typography>
+                            <Grid container spacing={2}>
+                                <Grid item xs={6}><Typography variant="body2">Height: {mockProduct.specs.height}</Typography></Grid>
+                                <Grid item xs={6}><Typography variant="body2">Weight: {mockProduct.specs.weight}</Typography></Grid>
+                                <Grid item xs={6}><Typography variant="body2">Area: {mockProduct.specs.area}</Typography></Grid>
+                                <Grid item xs={6}><Typography variant="body2">Unit: {mockProduct.uom}</Typography></Grid>
+                            </Grid>
+                        </div>
+                    </Grid>
+                    <Grid item xs={12} md={7}>
+                        <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{mockProduct.title}</Typography>
+                        <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>Code: {mockProduct.code}</Typography>
+                        <Typography variant="h6" sx={{ mt: 2, color: "black" }}>{formatPrice(mockProduct.price)}</Typography>
+                        <Typography variant="body1" sx={{ mt: 2 }}>{mockProduct.description}</Typography>
+                        <div style={{ marginTop: '16px' }}>
+                            <QuantityControl
+                                quantity={quantity}
+                                onIncrease={handleIncrease}
+                                onDecrease={handleDecrease}
+                                onChange={(e) => setQuantity(Math.min(999, Math.max(1, Number(e.target.value.replace(/\D/g, '')) || 1)))}
+                                onBlur={() => setQuantity(quantity || 1)}
+                            />
+                        </div>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<AddShoppingCartIcon />}
+                            onClick={handleAddToCart}
+                            sx={{
+                                mt: 3,
+                                width: '40%',
+                                backgroundColor: 'black',
+                                color: 'white',
+                                '&:hover': {
+                                    backgroundColor: 'black',
+                                    opacity: 0.75,
+                                }
+                            }}
+                        >
+                            Add to cart
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Card>
+        </div>
+    );
+};
+
+export default ProductDetail;

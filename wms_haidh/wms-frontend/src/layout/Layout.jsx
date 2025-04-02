@@ -12,7 +12,7 @@ import { useLocation } from "react-router-dom";
 import AccountButton from "./account/AccountButton";
 // import NotificationButton from "./notification/NotificationButton";
 import SideBar, { drawerWidth } from "./sidebar/SideBar";
-
+import { useSidebar } from "./SidebarContext";
 /**
  * https://mui.com/material-ui/react-app-bar/#fixed-placement
  */
@@ -82,6 +82,7 @@ const styles = {
 };
 
 function Layout({ children }) {
+  const { open, setOpen } = useSidebar();
   const { pathname } = useLocation();
   const isMeeting = pathname ? pathname.startsWith("/chat/voice/main") : undefined;
 
@@ -89,7 +90,7 @@ function Layout({ children }) {
   const { keycloak } = useKeycloak();
 
   //
-  const [open, setOpen] = React.useState(true);
+  // const [open, setOpen] = React.useState(true);
   const [image] = useState(bgImage);
   const [color] = useState("blue");
 

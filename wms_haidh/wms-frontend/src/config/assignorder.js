@@ -9,8 +9,7 @@ const columns = [
   
   const statusOptions = [
     { name: "APPROVED", uid: "APPROVED" },
-    { name: "DELIVERING_A_PART", uid: "DELIVERING_A_PART" },
-    { name: "DISTRIBUTED", uid: "DISTRIBUTED" },
+    { name: "DELIVERING", uid: "DELIVERING" },
     { name: "COMPLETED", uid: "COMPLETED" },
   ];
   export { columns, statusOptions };

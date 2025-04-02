@@ -7,7 +7,7 @@ export const deliverymanager = {
       id: "MENU_WMSv2_DELIVERY_MANAGER.DELIVERY_PERSON",
       path: "/delivery-manager/delivery-person",
       isPublic: true,
-      text: "Manage Delivery Staff",
+      text: "Delivery Staff",
       child: [],
     },
     {

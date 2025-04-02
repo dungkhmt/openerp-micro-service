@@ -25,8 +25,7 @@ const statusColorMap = {
   CREATED: "default",
   CANCELLED: "destructive",
   APPROVED: "secondary",
-  DELIVERING_A_PART: "warning",
-  DISTRIBUTED: "warning",
+  DELIVERING: "warning",
   COMPLETED: "success",
 };
 

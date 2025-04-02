@@ -1,13 +1,13 @@
 export const customer = {
   id: "MENU_WMSv2_CUSTOMER",
   icon: "CustomerIcon",
-  text: "E-commerce",
+  text: "Order Management",
   child: [
     {
       id: "MENU_WMSv2_CUSTOMER.PRODUCTS",
       path: "/customer/products",
       isPublic: true,
-      text: "Online Shopping",
+      text: "Products",
       child: [],
     },
     {
@@ -19,7 +19,7 @@ export const customer = {
     },
     {
       id: "MENU_WMSv2_CUSTOMER.HISTORY",
-      path: "/customer/order_history",
+      path: "/customer/order-history",
       isPublic: true,
       text: "My Orders",
       child: [],

@@ -23,8 +23,7 @@ import { request } from "../../../api";
 import { formatDate, formatPrice } from '../../../utils/utils';
 const statusColorMap = {
   APPROVED: "secondary",
-  DELIVERING_A_PART: "warning",
-  DISTRIBUTED: "warning",
+  DELIVERING: "warning",
   COMPLETED: "success",
 };
 

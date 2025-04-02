@@ -107,7 +107,7 @@ export function AccountMenu(props) {
     const logoutOptions = {
       redirectUri: window.location.origin + "/",
     };
-
+    sessionStorage.clear();
     keycloak.logout(logoutOptions);
   };
 

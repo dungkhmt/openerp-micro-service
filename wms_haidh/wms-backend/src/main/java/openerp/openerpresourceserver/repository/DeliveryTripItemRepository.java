@@ -28,8 +28,7 @@ public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripIt
 			    FROM DeliveryTripItem dti
 			    JOIN Order o ON dti.orderId = o.orderId
 			    JOIN CustomerAddress ca ON o.customerAddressId = ca.customerAddressId
-			    WHERE dti.isDeleted = false
-			      AND dti.deliveryTripId = :deliveryTripId
+			    WHERE dti.deliveryTripId = :deliveryTripId
 			    ORDER BY dti.sequence
 			""")
 	List<CustomerDeliveryProjection> findCustomersByDeliveryTripId(@Param("deliveryTripId") String deliveryTripId);

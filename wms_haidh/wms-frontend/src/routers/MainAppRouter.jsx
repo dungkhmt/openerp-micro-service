@@ -15,6 +15,7 @@ import DeliveryPersonRouter from "./DeliveryPersonRouter";
 import PurchaseManagerRouter from "./PurchaseManagerRouter";
 import PurchaseStaffRouter from "./PurchaseStaffRouter";
 import Dashboard from "../components/Dashboard/Dashboard";
+import { SidebarProvider } from "../layout/SidebarContext";
 const styles = {
   loadingProgress: {
     position: "fixed",
@@ -46,6 +47,7 @@ function MainAppRouter() {
   };
 
   return (
+    <SidebarProvider>
     <Layout>
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Routes>
@@ -62,6 +64,7 @@ function MainAppRouter() {
         </Routes>
       </Suspense>
     </Layout>
+    </SidebarProvider>
   );
 }
 
