@@ -17,14 +17,17 @@ import {
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import BreadcrumbsCustom from "../../components/BreadcrumbsCustom";
 import { formatDate, formatPrice } from '../../utils/utils';
+import { request } from '../../api';
+
 const OrderHistory = () => {
     const navigate = useNavigate();
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(3);
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
     const [totalItems, setTotalItems] = useState(0);
 
+    const userLoginId = 'diep.vtb';
     const breadcrumbPaths = [
         { label: "Home", link: "/" },
         { label: "Order history", link: "/order-history" }
@@ -33,17 +36,11 @@ const OrderHistory = () => {
 
     useEffect(() => {
         setLoading(true);
-        // Mock data for testing
-        setTimeout(() => {
-            const mockOrders = [
-                { date: '2024-04-01', customerName: 'John Doe', totalAmount: 150.00, status: 'Completed' },
-                { date: '2024-04-02', customerName: 'Jane Smith', totalAmount: 200.50, status: 'Pending' },
-                { date: '2024-04-03', customerName: 'Alice Brown', totalAmount: 99.99, status: 'Shipped' },
-            ];
-            setOrders(mockOrders);
-            setTotalItems(mockOrders.length);
+        request("get", `/orders/by-user?userLoginId=${userLoginId}&page=${page}&size=${rowsPerPage}`, (res) => {
+            setOrders(res.data.content);
+            setTotalItems(res.data.totalElements);
             setLoading(false);
-        }, 100);
+        }).then();
     }, [page, rowsPerPage]);
 
     const handleChangePage = (event, newPage) => {
@@ -61,7 +58,7 @@ const OrderHistory = () => {
             <Box>
                 <Paper elevation={3} sx={{ p: 3, mt: 3 }}>
                     <Typography variant="h6" gutterBottom>
-                        Order List
+                        My Orders
                     </Typography>
                     <Typography variant="subtitle1" gutterBottom className="text-green-500">
                         Total orders: {totalItems}
@@ -95,14 +92,14 @@ const OrderHistory = () => {
                                     ) : (
                                         orders.map((order, index) => (
                                             <TableRow key={index}>
-                                                <TableCell align="center">{order.date}</TableCell>
+                                                <TableCell align="center">{formatDate(order.orderDate)}</TableCell>
                                                 <TableCell align="center">{order.customerName}</TableCell>
-                                                <TableCell align="center">{formatPrice(order.totalAmount)}</TableCell>
+                                                <TableCell align="center">{formatPrice(order.totalOrderCost)}</TableCell>
                                                 <TableCell align="center">{order.status}</TableCell>
                                                 <TableCell align="center">
                                                     <IconButton
                                                         color="primary"
-                                                        onClick={() => navigate(`${index}`)}
+                                                        onClick={() => navigate(order.orderId)}
                                                     >
                                                         <VisibilityIcon />
                                                     </IconButton>

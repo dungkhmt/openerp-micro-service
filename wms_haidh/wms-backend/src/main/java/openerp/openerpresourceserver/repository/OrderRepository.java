@@ -31,6 +31,20 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 	Page<OrderProjection> findOrdersByStatus(@Param("status") String status, Pageable pageable);
 
 	@Query("""
+	        SELECT o.orderId AS orderId,
+	               o.orderDate AS orderDate,
+	               o.totalOrderCost AS totalOrderCost,
+	               o.customerName AS customerName,
+	               o.status AS status,
+	               o.approvedBy AS approvedBy,
+	               o.cancelledBy AS cancelledBy
+	        FROM Order o
+	        WHERE o.userLoginId = :userLoginId
+	        ORDER BY o.lastUpdatedStamp DESC
+	        """)
+	Page<OrderProjection> findOrdersByUserLoginId(@Param("userLoginId") String userLoginId, Pageable pageable);
+
+	@Query("""
 			    SELECT
 			        o.customerName AS customerName,
 			        o.customerPhoneNumber AS customerPhoneNumber,

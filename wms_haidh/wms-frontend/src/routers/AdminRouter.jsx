@@ -12,6 +12,7 @@ import OrderDetail from "../views/admin/order/OrderDetail";
 function AdminRouter() {
   return (
     <Routes>
+      <Route path="warehouse" element={<InventoryList />} />
       <Route path="inventory" element={<InventoryList />} />
       <Route path="product" element={<ProductList />} />
       <Route path="product/add-product" element={<AddProduct />} />

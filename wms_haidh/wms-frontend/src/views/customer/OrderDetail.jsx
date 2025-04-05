@@ -16,27 +16,7 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import { formatDate, formatPrice } from '../../utils/utils';
 import BreadcrumbsCustom from '../../components/BreadcrumbsCustom';
-const mockGeneralInfo = {
-    orderDate: '2024-03-25',
-    deliveryFee: 5.0,
-    totalProductCost: 45.0,
-    totalOrderCost: 50.0,
-    description: 'Test order',
-    paymentType: 'Credit Card',
-    orderType: 'Online',
-    status: 'CREATED',
-    customerName: 'John Doe',
-    customerPhoneNumber: '123-456-7890',
-};
-
-const mockCustomerInfo = {
-    addressName: '123 Main Street, City, Country'
-};
-
-const mockDetails = [
-    { productName: 'Product A', quantity: 2, priceUnit: 20.0 },
-    { productName: 'Product B', quantity: 1, priceUnit: 25.0 }
-];
+import { request } from '../../api';
 
 const OrderDetail = () => {
     const navigate = useNavigate();
@@ -44,6 +24,7 @@ const OrderDetail = () => {
     const [generalInfo, setGeneralInfo] = useState(null);
     const [customerInfo, setCustomerInfo] = useState(null);
     const [details, setDetails] = useState([]);
+    const userLoginId = "diep.vtb";
 
     const breadcrumbPaths = [
         { label: "Home", link: "/" },
@@ -53,14 +34,29 @@ const OrderDetail = () => {
     ];
 
     useEffect(() => {
-        setGeneralInfo(mockGeneralInfo);
-        setCustomerInfo(mockCustomerInfo);
-        setDetails(mockDetails);
-    }, []);
+        request('get', `/orders/${orderId}`, (res) => {
+            setGeneralInfo(res.data);
+        });
+
+        request('get', `/orders/${orderId}/customer-address`, (res) => {
+            setCustomerInfo(res.data);
+        });
+
+        request('get', `/order-items?orderId=${orderId}`, (res) => {
+            setDetails(res.data);
+        });
+    }, [orderId]);
 
     const handleCancel = () => {
-        alert('Order cancelled successfully!');
-        navigate('/customer/order-history');
+        request('post', `/orders/${orderId}/cancel?cancelledBy=${userLoginId}`, (res) => {
+            if (res.status === 200) {
+                alert('Order cancelled successfully!');
+                navigate('/customer/order-history');
+            } else {
+                alert('Failed to cancel order.');
+            }
+        });
+
     };
 
     return (

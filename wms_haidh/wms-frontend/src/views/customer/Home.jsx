@@ -9,54 +9,53 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useSidebar } from "../../layout/SidebarContext";
 import ProductPreview from "./ProductPreview";
 import BreadcrumbsCustom from "../../components/BreadcrumbsCustom";
-// Mock data
-const mockProducts = [
-    { id: 1, title: "Tủ lạnh siêu hiện đại siêu xịn", category: "book", price: 20000, quantity: 50, image: "/demo.jpg" },
-    { id: 2, title: "CD B", category: "cd", price: 15000, quantity: 30, image: "/demo.jpg" },
-    { id: 3, title: "DVD C", category: "dvd", price: 30000, quantity: 20, image: "/demo.jpg" },
-    { id: 4, title: "LP D", category: "lp", price: 40000, quantity: 10, image: "/demo.jpg" },
-    { id: 5, title: "Book A1", category: "book", price: 20000, quantity: 50, image: "/demo.jpg" },
-    { id: 6, title: "CD B1", category: "cd", price: 15000, quantity: 30, image: "/demo.jpg" },
-    { id: 7, title: "DVD C1", category: "dvd", price: 30000, quantity: 20, image: "/demo.jpg" },
-    { id: 8, title: "LP D1", category: "lp", price: 40000, quantity: 10, image: "/demo.jpg" }
-];
-
-
+import { request } from '../../api';
 
 export default function Home() {
-    const [products, setProducts] = useState(mockProducts);
-    const [sorting, setSorting] = useState("");
+    const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [search, setSearch] = useState("");
-    const [categoryId, setCategoryId] = useState("All");
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+    const [categoryId, setCategoryId] = useState("all");
+    const categoryParam = categoryId === 'all' ? '' : categoryId;
+    const [sorting, setSorting] = useState("asc");
     const { open } = useSidebar();
-    const [currentPage, setCurrentPage] = useState(1);
+    const [page, setPage] = useState(1);
     const itemsPerPage = open ? 3 : 4;
+    const [totalPages, setTotalPages] = useState(1);
+
 
     useEffect(() => {
-        setCurrentPage(1);
-    }, [open]);
+        const timer = setTimeout(() => {
+            setDebouncedSearchTerm(search);  // Chỉ cập nhật sau khi người dùng ngừng gõ
+        }, 500); // 1000ms = 1 giây
+
+        // Hủy bỏ timeout nếu người dùng tiếp tục gõ
+        return () => clearTimeout(timer);
+    }, [search]);
+
+    useEffect(() => {
+        request("get", "/categories", (res) => {
+            setCategories(res.data);
+        }).then();
+    }, [])
+
+    useEffect(() => {
+        setPage(1);
+    }, [open, debouncedSearchTerm, categoryId, sorting]);
+
+    useEffect(() => {
+        request("get", `/products/public?page=${page - 1}&size=${itemsPerPage}&searchTerm=${debouncedSearchTerm}&categoryId=${categoryParam}&sortDir=${sorting}`, (res) => {
+            setProducts(res.data.content);
+            setTotalPages(res.data.totalPages);
+        }).then();
+    }, [page, itemsPerPage, debouncedSearchTerm, categoryParam, sorting]);
 
     const breadcrumbPaths = [
         { label: "Home", link: "/" },
         { label: "Products", link: "/products" }
 
     ];
-
-    const filteredItems = products
-        .filter(item =>
-            (categoryId === "All" || item.category === categoryId) &&
-            (!search || item.title.toLowerCase().includes(search.toLowerCase()))
-        )
-        .sort((a, b) => {
-            if (sorting === "asc") return a.price - b.price;
-            if (sorting === "desc") return b.price - a.price;
-            return a.id - b.id;
-        });
-
-
-    const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const displayedItems = filteredItems.slice(startIndex, startIndex + itemsPerPage);
 
     return (
         <div style={{ padding: "16px" }}>
@@ -95,13 +94,15 @@ export default function Home() {
                         label="Category"
                         sx={{ height: "48px" }}
                     >
-                        <MenuItem value="All">All categories</MenuItem>
-                        <MenuItem value="book">Book</MenuItem>
-                        <MenuItem value="cd">CD</MenuItem>
-                        <MenuItem value="dvd">DVD</MenuItem>
-                        <MenuItem value="lp">LP</MenuItem>
+                        <MenuItem value="all">All categories</MenuItem>
+                        {categories.map((category) => (
+                            <MenuItem key={category.categoryId} value={category.categoryId}>
+                                {category.name}
+                            </MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
+
 
                 <Button
                     variant={sorting === "asc" ? "contained" : "outlined"}
@@ -150,15 +151,15 @@ export default function Home() {
                 gap: "16px",
                 marginTop: "16px"
             }}>
-                {displayedItems.map(item => (
-                    <ProductPreview key={item.id} item={item} />
+                {products && products.map(item => (
+                    <ProductPreview key={item.productId} item={item} />
                 ))}
             </div>
             <div className="flex justify-center space-x-4 mt-4">
                 <Button
                     variant="contained"
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage((prev) => prev - 1)}
+                    disabled={page === 1}
+                    onClick={() => setPage((prev) => prev - 1)}
                     sx={{
                         backgroundColor: 'black',
                         color: 'white',
@@ -172,12 +173,12 @@ export default function Home() {
                     <ChevronLeftIcon />
                 </Button>
 
-                <span className="self-center text-sm">Page {currentPage} of {totalPages}</span>
+                <span className="self-center text-sm">Page {page} of {totalPages}</span>
 
                 <Button
                     variant="contained"
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage((prev) => prev + 1)}
+                    disabled={page === totalPages}
+                    onClick={() => setPage((prev) => prev + 1)}
                     sx={{
                         backgroundColor: 'black',
                         color: 'white',

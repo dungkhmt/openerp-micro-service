@@ -12,11 +12,13 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.dto.request.SaleOrderCreateRequest;
 import openerp.openerpresourceserver.entity.Order;
 import openerp.openerpresourceserver.projection.CustomerOrderProjection;
 import openerp.openerpresourceserver.projection.OrderProjection;
@@ -29,7 +31,7 @@ import openerp.openerpresourceserver.service.OrderService;
 public class SaleOrderController {
 
 	private OrderService orderService;
-	
+
 	@GetMapping
 	public ResponseEntity<Page<OrderProjection>> getOrders(@RequestParam(defaultValue = "CREATED") String status,
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
@@ -38,18 +40,33 @@ public class SaleOrderController {
 		return ResponseEntity.ok(orders);
 	}
 
+	@GetMapping("/by-user")
+	public ResponseEntity<Page<OrderProjection>> getOrdersByUserLoginId(@RequestParam String userLoginId,
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<OrderProjection> orders = orderService.getOrdersByUserLoginId(userLoginId, pageable);
+		return ResponseEntity.ok(orders);
+	}
+
 	@GetMapping("/{orderId}")
 	public ResponseEntity<Order> getOrderById(@PathVariable UUID orderId) {
 		Order order = orderService.getOrderById(orderId);
 		return ResponseEntity.ok(order);
 	}
-	
+
 	@GetMapping("/{orderId}/customer-address")
 	public ResponseEntity<CustomerOrderProjection> getCustomerOrderById(@PathVariable UUID orderId) {
 		Optional<CustomerOrderProjection> order = orderService.getCustomerOrderById(orderId);
 		return order.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
 	}
 	
+	@PostMapping
+	public ResponseEntity<String> createOrder(@RequestBody SaleOrderCreateRequest request) {
+	    Order order = orderService.placeOrder(request); 
+	    return ResponseEntity.ok("Order created with ID: " + order.getOrderId());
+	}
+
+
 	@PostMapping("/{orderId}/approve")
 	public ResponseEntity<Order> approveOrder(@PathVariable UUID orderId, @RequestParam String approvedBy) {
 		Order approvedOrder = orderService.approveOrder(orderId, approvedBy);

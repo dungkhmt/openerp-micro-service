@@ -41,8 +41,6 @@ const ProductForm = () => {
 
   useEffect(() => {
     if (id) {
-      const formData = new FormData();
-
       request("get", `/products/${id}`, (res) => {
         const product = res.data;
         setName(product.name);
@@ -54,9 +52,7 @@ const ProductForm = () => {
         setDescription(product.description);
         setUom(product.uom);
         setImage(product.imageUrl);
-
-
-      }, {}, formData); // Gửi FormData trong body của yêu cầu
+      }, {}); 
     }
   }, [id]);
 

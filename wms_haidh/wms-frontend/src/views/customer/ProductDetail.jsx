@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, IconButton, TextField, Button, Typography, Grid } from "@mui/material";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
@@ -6,23 +6,8 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { toast, Toaster } from "react-hot-toast";
 import { formatPrice } from "../../utils/utils";
 import BreadcrumbsCustom from "../../components/BreadcrumbsCustom";
-
-const mockProduct = {
-    id: 1,
-    title: "Super Cool Refrigerator",
-    code: "ABC123",
-    image: "/demo.jpg",
-    price: 20000,
-    quantity: 50,
-    category: "Appliances",
-    description: "A state-of-the-art refrigerator with amazing features.",
-    specs: {
-        height: "200 cm",
-        weight: "75 kg",
-        area: "2 m²"
-    },
-    uom: "Unit"
-};
+import { request } from "../../api";
+import { useParams } from "react-router-dom";
 
 const QuantityControl = ({ quantity, onIncrease, onDecrease, onChange, onBlur }) => (
     <div className="flex items-center space-x-2">
@@ -62,7 +47,18 @@ const QuantityControl = ({ quantity, onIncrease, onDecrease, onChange, onBlur })
 );
 
 const ProductDetail = () => {
+
+    const { id } = useParams();
+    const [product, setProduct] = useState({});
     const [quantity, setQuantity] = useState(1);
+
+    useEffect(() => {
+        if (id) {
+            request("get", `/products/public/${id}`, (res) => {
+                setProduct(res.data);
+            }, {});
+        }
+    }, [id]);
 
     const handleIncrease = () => {
         if (quantity < 999) setQuantity(prev => prev + 1);
@@ -71,16 +67,16 @@ const ProductDetail = () => {
     const handleDecrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
 
     const handleAddToCart = () => {
-        if (quantity > mockProduct.quantity) {
+        if (quantity > product.quantity) {
             toast.error("Order quantity exceeds available quantity!");
             return;
         }
         const cartItems = JSON.parse(sessionStorage.getItem("cart")) || [];
-        const existingItemIndex = cartItems.findIndex(cartItem => cartItem.id === mockProduct.id);
+        const existingItemIndex = cartItems.findIndex(cartItem => cartItem.productId === product.productId);
         if (existingItemIndex !== -1) {
             cartItems[existingItemIndex].quantity += quantity;
         } else {
-            cartItems.push({ ...mockProduct, quantity });
+            cartItems.push({ ...product, quantity });
         }
         sessionStorage.setItem("cart", JSON.stringify(cartItems));
         toast.success("Product added to cart");
@@ -89,7 +85,7 @@ const ProductDetail = () => {
     const breadcrumbPaths = [
         { label: "Home", link: "/" },
         { label: "Products", link: "/customer/products" },
-        { label: `${mockProduct.title}`, link: `/customer/products/${mockProduct.id}` }
+        { label: `${product.name}`, link: `/customer/products/${product.productId}` }
     ];
 
     return (
@@ -99,22 +95,22 @@ const ProductDetail = () => {
             <Card sx={{ p: 4, maxWidth: '900px', margin: 'auto' }}>
                 <Grid container spacing={4}>
                     <Grid item xs={12} md={5}>
-                        <img src={mockProduct.image} alt={mockProduct.title} style={{ width: '100%', borderRadius: '8px' }} />
+                        <img src={product.imageUrl} alt={product.name} style={{ width: '100%', borderRadius: '8px' }} />
                         <div style={{ marginTop: '16px' }}>
                             <Typography variant="body1" sx={{ fontWeight: 'bold', marginBottom: '10px' }}>Specifications:</Typography>
                             <Grid container spacing={2}>
-                                <Grid item xs={6}><Typography variant="body2">Height: {mockProduct.specs.height}</Typography></Grid>
-                                <Grid item xs={6}><Typography variant="body2">Weight: {mockProduct.specs.weight}</Typography></Grid>
-                                <Grid item xs={6}><Typography variant="body2">Area: {mockProduct.specs.area}</Typography></Grid>
-                                <Grid item xs={6}><Typography variant="body2">Unit: {mockProduct.uom}</Typography></Grid>
+                                <Grid item xs={6}><Typography variant="body2">Height: {product.height}</Typography></Grid>
+                                <Grid item xs={6}><Typography variant="body2">Weight: {product.weight}</Typography></Grid>
+                                <Grid item xs={6}><Typography variant="body2">Area: {product.area}</Typography></Grid>
+                                <Grid item xs={6}><Typography variant="body2">Unit: {product.uom}</Typography></Grid>
                             </Grid>
                         </div>
                     </Grid>
                     <Grid item xs={12} md={7}>
-                        <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{mockProduct.title}</Typography>
-                        <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>Code: {mockProduct.code}</Typography>
-                        <Typography variant="h6" sx={{ mt: 2, color: "black" }}>{formatPrice(mockProduct.price)}</Typography>
-                        <Typography variant="body1" sx={{ mt: 2 }}>{mockProduct.description}</Typography>
+                        <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{product.name}</Typography>
+                        <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>Code: {product.code}</Typography>
+                        <Typography variant="h6" sx={{ mt: 2, color: "black" }}>{product.price && formatPrice(product.price)}</Typography>
+                        <Typography variant="body1" sx={{ mt: 2 }}>{product.description}</Typography>
                         <div style={{ marginTop: '16px' }}>
                             <QuantityControl
                                 quantity={quantity}
@@ -131,7 +127,7 @@ const ProductDetail = () => {
                             onClick={handleAddToCart}
                             sx={{
                                 mt: 3,
-                                width: '40%',
+                                width: '33%',
                                 backgroundColor: 'black',
                                 color: 'white',
                                 '&:hover': {

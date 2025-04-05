@@ -10,8 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import openerp.openerpresourceserver.dto.request.ProductCreateRequest;
 import openerp.openerpresourceserver.entity.Product;
+import openerp.openerpresourceserver.projection.ProductDetailProjection;
 import openerp.openerpresourceserver.projection.ProductInfoProjection;
 import openerp.openerpresourceserver.projection.ProductNameProjection;
+import openerp.openerpresourceserver.projection.ProductProjection;
 
 public interface ProductService {
 
@@ -26,6 +28,10 @@ public interface ProductService {
 	boolean createProduct(ProductCreateRequest productDto, MultipartFile imageFile);
 	
 	List<ProductNameProjection> searchProductNames(String searchTerm);
+	
+	public ProductDetailProjection getProductDetail(UUID productId);
+
+	Page<ProductProjection> getProducts(Pageable pageable, String searchTerm, UUID categoryId);
 
 }
 

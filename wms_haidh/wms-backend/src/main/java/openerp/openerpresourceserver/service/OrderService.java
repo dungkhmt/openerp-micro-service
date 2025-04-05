@@ -8,22 +8,28 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.dto.request.SaleOrderCreateRequest;
 import openerp.openerpresourceserver.entity.Order;
 import openerp.openerpresourceserver.projection.CustomerOrderProjection;
 import openerp.openerpresourceserver.projection.OrderProjection;
 import openerp.openerpresourceserver.repository.OrderRepository;
 
 @Service
+@AllArgsConstructor
 public class OrderService {
+	
     private final OrderRepository orderRepository;
-
-    public OrderService(OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
-    }
+    private final SaleOrderItemService saleOrderItemService;
 
     public Page<OrderProjection> getOrders(String status, Pageable pageable) {
         
         return orderRepository.findOrdersByStatus(status, pageable);
+    }
+    
+    public Page<OrderProjection> getOrdersByUserLoginId(String userLoginId, Pageable pageable) {
+        return orderRepository.findOrdersByUserLoginId(userLoginId, pageable);
     }
     
     public Order getOrderById(UUID orderId) {
@@ -68,5 +74,34 @@ public class OrderService {
         order.setLastUpdatedStamp(LocalDateTime.now());
         return orderRepository.save(order);
     }
+    
+    public Order createOrder(SaleOrderCreateRequest request) {
+    	LocalDateTime now = LocalDateTime.now();
+        Order order = Order.builder()
+                .userLoginId(request.getUserLoginId())
+                .deliveryFee(request.getDeliveryFee())
+                .totalProductCost(request.getTotalProductCost())
+                .totalOrderCost(request.getTotalOrderCost())
+                .customerAddressId(request.getCustomerAddressId())
+                .customerName(request.getCustomerName())
+                .customerPhoneNumber(request.getCustomerPhoneNumber())
+                .description(request.getDescription())
+                .paymentType(request.getPaymentType())
+                .orderType(request.getOrderType())
+                .status("CREATED")
+                .orderDate(now)
+                .createdStamp(now)
+                .lastUpdatedStamp(now)
+                .build();
+        return orderRepository.save(order);
+    }
+    
+    @Transactional
+    public Order placeOrder(SaleOrderCreateRequest request) {
+        Order order = createOrder(request);
+        saleOrderItemService.createItems(request.getItems(), order.getOrderId());
+        return order;
+    }
+
 }
 

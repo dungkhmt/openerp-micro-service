@@ -5,6 +5,7 @@ import { toast, Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import BreadcrumbsCustom from "../../components/BreadcrumbsCustom";
 import { formatPrice } from "../../utils/utils";
+import { request } from "../../api";
 
 const Checkout = () => {
     const navigate = useNavigate();
@@ -14,8 +15,8 @@ const Checkout = () => {
     const [description, setDescription] = useState("");
     const [savedAddresses, setSavedAddresses] = useState([]);
     const [cartItems, setCartItems] = useState([]);
-    const [coordinates, setCoordinates] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
+    const userLoginId = 'diep.vtb';
 
     const breadcrumbPaths = [
         { label: "Home", link: "/" },
@@ -23,8 +24,17 @@ const Checkout = () => {
         { label: "Checkout", link: "/customer/cart/checkout" },
     ];
 
+    const totalCost = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const deliveryFee = 20000;
+    const totalOrderCost = totalCost + deliveryFee;
+
     useEffect(() => {
-        setSavedAddresses(["123 Main St, City A", "456 Elm St, City B"]);
+        request("get", `/customer-addresses?userLoginId=${userLoginId}`, (res) => {
+            setSavedAddresses(res.data);
+        }).then();
+    }, [])
+
+    useEffect(() => {
         setCartItems(JSON.parse(sessionStorage.getItem("cart")) || []);
     }, []);
 
@@ -44,19 +54,47 @@ const Checkout = () => {
         sessionStorage.setItem("description", description);
         navigate("new-address");
     };
-    
+
     const handleSubmit = () => {
         if (!name || !phone || !address) {
             toast.error("Please fill in all required fields.");
             return;
         }
-        sessionStorage.removeItem("cart");
-        setOpenDialog(true);
-    };
 
-    const totalCost = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const deliveryFee = 20000;
-    const totalOrderCost = totalCost + deliveryFee;
+        if (address === "new") {
+            toast.error("Please select a saved address or add a new one.");
+            return;
+        }   
+
+        const items = cartItems.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            priceUnit: item.price
+        }));
+
+        const payload = {
+            userLoginId: userLoginId,
+            deliveryFee,
+            totalProductCost: totalCost,
+            totalOrderCost,
+            customerAddressId: address,
+            customerName: name,
+            customerPhoneNumber: phone,
+            description,
+            paymentType: "COD",
+            orderType: "ONLINE",
+            items
+        };
+
+        request("post", "/orders", (res) => {
+            if (res.status === 200) {
+                sessionStorage.removeItem("cart");
+                setOpenDialog(true);
+            } else {
+                toast.error("Error occurred!");
+            }
+        }, {}, payload);
+    };
 
     return (
         <div className="flex justify-center p-6">
@@ -71,8 +109,8 @@ const Checkout = () => {
                         <TextField label="Phone Number" className="w-1/2" value={phone} onChange={(e) => setPhone(e.target.value)} />
                     </div>
                     <TextField select label="Address" fullWidth value={address} onChange={(e) => setAddress(e.target.value)}>
-                        {savedAddresses.map((addr, index) => (
-                            <MenuItem key={index} value={addr}>{addr}</MenuItem>
+                        {savedAddresses.map((addr) => (
+                            <MenuItem key={addr.customerAddressId} value={addr.customerAddressId}>{addr.addressName}</MenuItem>
                         ))}
                         <MenuItem value="new" onClick={handleSelectNewAddress}>Add new address</MenuItem>
                     </TextField>
@@ -93,10 +131,10 @@ const Checkout = () => {
                             </TableHead>
                             <TableBody>
                                 {cartItems.map((item) => (
-                                    <TableRow key={item.id}>
+                                    <TableRow key={item.productId}>
                                         <TableCell>
-                                            <img src={item.image} alt={item.title} className="w-24 h-24 object-contain" />
-                                            {item.title}
+                                            <img src={item.imageUrl} alt={item.name} className="w-24 h-24 object-contain" />
+                                            {item.name}
                                         </TableCell>
                                         <TableCell align="center">{item.quantity}</TableCell>
                                         <TableCell align="center">{formatPrice(item.price)}</TableCell>

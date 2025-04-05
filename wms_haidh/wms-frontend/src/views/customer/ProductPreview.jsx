@@ -26,7 +26,7 @@ const ProductPreview = ({ item }) => {
             return;
         }
         const cartItems = JSON.parse(sessionStorage.getItem("cart")) || [];
-        const existingItemIndex = cartItems.findIndex(cartItem => cartItem.id === item.id);
+        const existingItemIndex = cartItems.findIndex(cartItem => cartItem.productId === item.productId);
         if (existingItemIndex !== -1) {
             cartItems[existingItemIndex].quantity += quantity;
         } else {
@@ -69,7 +69,7 @@ const ProductPreview = ({ item }) => {
                 }}
             >
                 <img
-                    src={item.image}
+                    src={item.imageUrl}
                     alt="poster"
                     className="w-full h-full object-contain"
                     style={{
@@ -83,7 +83,7 @@ const ProductPreview = ({ item }) => {
                     className="font-semibold whitespace-nowrap overflow-hidden text-ellipsis mx-auto"
                     style={{ maxWidth: "200px" }} 
                 >
-                    {item.title}
+                    {item.name}
                 </p>
                 <p className="text-md text-green-500">Available: {item.quantity}</p>
             </div>
@@ -157,7 +157,7 @@ const ProductPreview = ({ item }) => {
             >
                 Add to cart
             </Button>
-            <Link to={`/customer/products/${item.id}`} className="block">
+            <Link to={`/customer/products/${item.productId}`} className="block">
                 <Button
                     variant="outlined"
                     fullWidth

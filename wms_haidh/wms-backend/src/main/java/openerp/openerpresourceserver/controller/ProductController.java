@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -25,8 +26,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.dto.request.ProductCreateRequest;
 import openerp.openerpresourceserver.entity.Product;
+import openerp.openerpresourceserver.projection.ProductDetailProjection;
 import openerp.openerpresourceserver.projection.ProductInfoProjection;
 import openerp.openerpresourceserver.projection.ProductNameProjection;
+import openerp.openerpresourceserver.projection.ProductProjection;
 import openerp.openerpresourceserver.service.ProductService;
 
 @RestController
@@ -34,9 +37,9 @@ import openerp.openerpresourceserver.service.ProductService;
 @Validated
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class ProductController {
-	
+
 	private ProductService productService;
-		
+
 	@GetMapping
 	public ResponseEntity<Page<ProductInfoProjection>> getProductInfoWithPaging(
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size,
@@ -47,28 +50,63 @@ public class ProductController {
 
 		return ResponseEntity.ok(products);
 	}
-	
-	@GetMapping("/{id}")
-	public ResponseEntity<?> getProductDetail(@PathVariable("id") UUID productId) {
-	    try {
-	        Product product = productService.getProductById(productId);
 
-	        if (product != null) {
-	            return ResponseEntity.ok(product);
-	        } else {
-	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
-	        }
-	    } catch (IllegalArgumentException e) {
-	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid UUID format");
+	@GetMapping("/public")
+	public ResponseEntity<?> getProducts(@RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "3") int size,
+	        @RequestParam(required = false) String searchTerm,
+	        @RequestParam(required = false) UUID categoryId,
+	        @RequestParam(defaultValue = "asc") String sortDir) {
+	    try {
+	        Sort sort = Sort.by("price");
+	        sort = sortDir.equalsIgnoreCase("desc") ? sort.descending() : sort.ascending();
+	        Pageable pageable = PageRequest.of(page, size, sort);
+	        Page<ProductProjection> products = productService.getProducts(pageable, searchTerm, categoryId);
+	        return ResponseEntity.ok(products);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body("Đã xảy ra lỗi khi xử lý yêu cầu.");
 	    }
 	}
-	
+
+
+	@GetMapping("/{id}")
+	public ResponseEntity<?> getProductDetail(@PathVariable("id") UUID productId) {
+		try {
+			Product product = productService.getProductById(productId);
+
+			if (product != null) {
+				return ResponseEntity.ok(product);
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+			}
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid UUID format");
+		}
+	}
+
+	@GetMapping("/public/{id}")
+	public ResponseEntity<?> getPublicProductDetail(@PathVariable("id") UUID productId) {
+		try {
+			ProductDetailProjection product = productService.getProductDetail(productId);
+
+			if (product != null) {
+				return ResponseEntity.ok(product);
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+			}
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid UUID format");
+		}
+	}
+
 	@GetMapping("/names")
 	public ResponseEntity<List<ProductNameProjection>> searchProducts(@RequestParam("search") String searchTerm) {
 		List<ProductNameProjection> products = productService.searchProductNames(searchTerm);
 		return ResponseEntity.ok(products);
 	}
-	
+
 	@PostMapping
 	public ResponseEntity<String> createProduct(@RequestParam("productData") String productData,
 			@RequestParam(value = "image", required = false) MultipartFile imageFile) {
@@ -91,7 +129,6 @@ public class ProductController {
 		}
 	}
 
-	
 	@PostMapping("/update")
 	public ResponseEntity<String> updateProduct(@RequestParam("productData") String productData,
 			@RequestParam(value = "image", required = false) MultipartFile imageFile) {
@@ -129,5 +166,5 @@ public class ProductController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid UUID format");
 		}
 	}
-	
+
 }

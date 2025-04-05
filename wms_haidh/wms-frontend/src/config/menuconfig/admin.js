@@ -4,6 +4,13 @@ export const admin = {
   text: "Inventory Management",
   child: [
     {
+      id: "MENU_WMSv2_ADMIN.WAREHOUSE",
+      path: "/admin/warehouse",
+      isPublic: true,
+      text: "Warehouse",
+      child: [],
+    },
+    {
       id: "MENU_WMSv2_ADMIN.INVENTORY",
       path: "/admin/inventory",
       isPublic: true,

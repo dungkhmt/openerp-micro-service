@@ -69,14 +69,14 @@ const Cart = () => {
 
     const handleQuantityChange = (id, value) => {
         const updatedCart = cartItems.map((item) =>
-            item.id === id ? { ...item, quantity: Math.max(1, Math.min(999, value)) } : item
+            item.productId === id ? { ...item, quantity: Math.max(1, Math.min(999, value)) } : item
         );
         setCartItems(updatedCart);
         sessionStorage.setItem("cart", JSON.stringify(updatedCart));
     };
 
     const handleRemoveItem = (id) => {
-        const updatedCart = cartItems.filter((item) => item.id !== id);
+        const updatedCart = cartItems.filter((item) => item.productId !== id);
         setCartItems(updatedCart);
         sessionStorage.setItem("cart", JSON.stringify(updatedCart));
         toast.success("Product removed from cart");
@@ -97,31 +97,31 @@ const Cart = () => {
                         ) : (
                             cartItems.map((item) => (
                                 <Card
-                                    key={item.id}
+                                    key={item.productId}
                                     className="p-6 mb-4 flex justify-between items-center"
                                     sx={{ height: "120px", width: "100%" }}
                                 >
                                     <div className="flex items-center space-x-4">
-                                        <img src={item.image} alt={item.title} className="w-24 h-24 object-contain" />
+                                        <img src={item.imageUrl} alt={item.name} className="w-24 h-24 object-contain" />
                                         <div className="w-[200px]"> 
                                             <p
                                                 className="font-semibold whitespace-nowrap overflow-hidden text-ellipsis"
                                                 style={{ maxWidth: "100%" }} 
                                             >
-                                                {item.title}
+                                                {item.name}
                                             </p>
-                                            <p className="text-sm text-gray-500">{formatPrice(item.price)}</p>
+                                            <p className="text-sm text-gray-500">{item.price && formatPrice(item.price)}</p>
                                         </div>
                                     </div>
 
                                     <QuantityControl
                                         quantity={item.quantity}
-                                        onIncrease={() => handleQuantityChange(item.id, item.quantity + 1)}
-                                        onDecrease={() => handleQuantityChange(item.id, item.quantity - 1)}
-                                        onChange={(e) => handleQuantityChange(item.id, parseInt(e.target.value) || 1)}
-                                        onBlur={() => handleQuantityChange(item.id, item.quantity || 1)}
+                                        onIncrease={() => handleQuantityChange(item.productId, item.quantity + 1)}
+                                        onDecrease={() => handleQuantityChange(item.productId, item.quantity - 1)}
+                                        onChange={(e) => handleQuantityChange(item.productId, parseInt(e.target.value) || 1)}
+                                        onBlur={() => handleQuantityChange(item.productId, item.quantity || 1)}
                                     />
-                                    <IconButton onClick={() => handleRemoveItem(item.id)}>
+                                    <IconButton onClick={() => handleRemoveItem(item.productId)}>
                                         <DeleteIcon />
                                     </IconButton>
                                 </Card>
