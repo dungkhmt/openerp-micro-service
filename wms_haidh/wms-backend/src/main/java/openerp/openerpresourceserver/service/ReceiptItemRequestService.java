@@ -32,7 +32,7 @@ public class ReceiptItemRequestService {
 	
 	public List<BayProjection> getBaysByReceiptItemRequestId(UUID receiptItemRequestId) {
 		UUID warehouseId = getWarehouseIdByReceiptItemRequestId(receiptItemRequestId);
-		return bayService.getBaysByWarehouseId(warehouseId);
+		return bayService.getBaysProjectionByWarehouseId(warehouseId);
 	}
     
     public List<ReceiptItemRequestProjection> getAllReceiptItemRequests(UUID receiptId) {

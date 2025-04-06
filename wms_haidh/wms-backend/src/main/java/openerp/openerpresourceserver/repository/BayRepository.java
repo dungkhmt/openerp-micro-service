@@ -18,4 +18,6 @@ public interface BayRepository extends JpaRepository<Bay, UUID> {
     List<BayProjection> findByWarehouseIdWithProjection(@Param("warehouseId") UUID warehouseId);
 
     Optional<Bay> findByBayId(UUID bayId);
+
+	List<Bay> findByWarehouseId(UUID warehouseId);
 }

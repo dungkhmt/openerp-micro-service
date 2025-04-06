@@ -9,10 +9,14 @@ import InventoryList from "../views/admin/inventory/InventoryList";
 import OrderList from "../views/admin/order/OrderList";
 import OrderItem from "../views/admin/order/OrderItem";
 import OrderDetail from "../views/admin/order/OrderDetail";
+import WarehouseList from "../views/admin/warehouse/WarehouseList";
+import WarehouseLayout from "../views/admin/warehouse/WarehouseLayout";
+
 function AdminRouter() {
   return (
     <Routes>
-      <Route path="warehouse" element={<InventoryList />} />
+      <Route path="warehouse" element={<WarehouseList />} />
+      <Route path="warehouse/:id" element={<WarehouseLayout />} />
       <Route path="inventory" element={<InventoryList />} />
       <Route path="product" element={<ProductList />} />
       <Route path="product/add-product" element={<AddProduct />} />

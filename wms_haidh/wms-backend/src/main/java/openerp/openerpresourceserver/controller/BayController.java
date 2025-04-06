@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.entity.Bay;
 import openerp.openerpresourceserver.projection.BayProjection;
 import openerp.openerpresourceserver.service.BayService;
 
@@ -25,7 +26,13 @@ public class BayController {
 
 	@GetMapping
 	public ResponseEntity<List<BayProjection>> getAllBays(@RequestParam("warehouseId") UUID warehouseId) {
-		List<BayProjection> warehouses = bayService.getBaysByWarehouseId(warehouseId);
+		List<BayProjection> warehouses = bayService.getBaysProjectionByWarehouseId(warehouseId);
 		return ResponseEntity.ok(warehouses);
 	}
+	
+	@GetMapping("/full")
+    public ResponseEntity<List<Bay>> getBaysByWarehouseId(@RequestParam UUID warehouseId) {
+        List<Bay> bays = bayService.getBaysByWarehouseId(warehouseId);
+        return ResponseEntity.ok(bays);
+    }
 }
