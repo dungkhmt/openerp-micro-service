@@ -53,6 +53,8 @@ public class Order {
     private Double distance;
     private UUID finalHubId;
     private String finalHubName;
+    @Version
+    private Integer version;
     @CreatedBy
     private String createdBy;
     private String approvedBy;
@@ -63,5 +65,7 @@ public class Order {
 
     @UpdateTimestamp
     private Timestamp updatedAt;
+    private String changedBy;
+
 
 }

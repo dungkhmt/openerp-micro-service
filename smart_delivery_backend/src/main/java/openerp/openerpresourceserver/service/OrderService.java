@@ -25,11 +25,11 @@ public interface OrderService {
 
     // Edit order method
     @Transactional
-    Order editOrder(UUID orderId, OrderRequestDto orderREQ);
+    Order editOrder(Principal principal,UUID orderId, OrderRequestDto orderREQ);
 
     // Delete order method
     @Transactional
-    void deleteOrder(UUID orderId);
+    void deleteOrder(Principal principal, UUID orderId);
 
     List<OrderSummaryDTO> getAllOrdersByHubIdToday(UUID hubId);
 
@@ -46,9 +46,9 @@ public interface OrderService {
 
     List<OrderSummaryDTO> getCollectedHubList(UUID hubId);
 
-    boolean confirmCollectedHub(UUID[] orderId);
+    boolean confirmCollectedHub(Principal principal, UUID[] orderId);
 
-    boolean confirmOutHub(UUID[] orderIds,  UUID vehicleId);
+    boolean confirmOutHub(Principal principal, UUID[] orderIds,  UUID vehicleId);
 
 
     List<OrderItemForTripDto> getOrderItemsForTrip(UUID tripId);

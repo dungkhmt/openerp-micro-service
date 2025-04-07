@@ -19,8 +19,8 @@ public enum OrderStatus {
     ASSIGNED_SHIPPER("Đã phân công cho shipper", Set.of(Role.ADMIN, Role.HUB_MANAGER)),
     SHIPPED("Đã giao hàng", Set.of(Role.ADMIN, Role.SHIPPER)),
     COMPLETED("Đã hoàn thành", Set.of(Role.ADMIN)),
-    CANCELLED("Đã hủy", Set.of(Role.ADMIN, Role.CUSTOMER));
-
+    CANCELLED("Đã hủy", Set.of(Role.ADMIN, Role.CUSTOMER)),
+    DELETED("Đã hủy", Set.of(Role.ADMIN, Role.CUSTOMER, Role.HUB_MANAGER));
     private final String description;
     private final Set<Role> rolesAllowedToUpdate;
 

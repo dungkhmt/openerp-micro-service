@@ -1,14 +1,22 @@
 package openerp.openerpresourceserver.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
 @Table(name = "smartdelivery_trip_history")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TripHistory {
     @Id
     @GenericGenerator(name = "uuid1", strategy = "org.hibernate.id.UUIDGenerator")
@@ -18,21 +26,20 @@ public class TripHistory {
     @Column(nullable = false)
     private UUID tripId;
 
-    private String previousStatus;
-    private String newStatus;
-
-    private Integer previousStopIndex;
-    private Integer newStopIndex;
-
-    private UUID driverId;
-    private String driverName;
-
-    @Column(length = 500)
-    private String notes;
-
     @Column(nullable = false)
     private String changedBy;
 
     @CreationTimestamp
-    private Timestamp createdAt;
+    private Instant createdAt;
+
+    // Previous state
+    private String status;
+    private Integer currentStopIndex;
+    private Integer ordersPickedUp;
+
+    // Information for reference
+    private UUID driverId;
+    private Integer version;
+    @Column(length = 500)
+    private String notes;
 }

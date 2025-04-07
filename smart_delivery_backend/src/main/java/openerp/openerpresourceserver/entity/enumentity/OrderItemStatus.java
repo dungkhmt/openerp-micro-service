@@ -15,5 +15,6 @@ public enum OrderItemStatus {
     ASSIGNED_SHIPPER,
     SHIPPED,
     COMPLETED,
-    CANCELLED;
+    CANCELLED,
+    DELETED;
 }

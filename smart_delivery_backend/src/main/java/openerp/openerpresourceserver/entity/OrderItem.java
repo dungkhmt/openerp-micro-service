@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import openerp.openerpresourceserver.entity.enumentity.OrderItemStatus;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "smartdelivery_order_item")
 public class OrderItem {
     @Id
@@ -36,7 +38,8 @@ public class OrderItem {
     private Double height;
     @Enumerated(EnumType.STRING)
     private OrderItemStatus status;
-
+    @Version
+    private Integer version;
     public OrderItem(String name, Integer quantity, Double weight, Double price, Double length, Double width, Double height) {
         this.name = name;
         this.quantity = quantity;
@@ -48,13 +51,11 @@ public class OrderItem {
     }
     @CreatedBy
     private String createdBy;
-    private String approvedBy;
-    private String cancelledBy;
 
     @CreationTimestamp
     private Timestamp createdAt;
 
     @UpdateTimestamp
     private Timestamp updatedAt;
-
+    private String updatedBy;
 }

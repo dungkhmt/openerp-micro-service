@@ -5,11 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import openerp.openerpresourceserver.entity.enumentity.CollectorAssignmentStatus;
-import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedBy;
 
 import java.sql.Timestamp;
 import java.util.UUID;
@@ -20,18 +18,18 @@ import java.util.UUID;
 @NoArgsConstructor
 public class AssignOrderCollector {
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    private UUID id;  // Thay Long bằng UUID
+    @GenericGenerator(name = "uuid1", strategy = "org.hibernate.id.UUIDGenerator")
+    @GeneratedValue(generator = "uuid1")
+    private UUID id;
     private UUID orderId;
     private UUID collectorId;
     private String collectorName;
+    @Version
     private Long version;
     private int sequenceNumber;
     @Enumerated(EnumType.STRING)
-    private CollectorAssignmentStatus status; // FAILED, DONE
+    private CollectorAssignmentStatus status;
 
-    @CreatedBy
     private String createdBy;
     private String approvedBy;
     private String cancelledBy;

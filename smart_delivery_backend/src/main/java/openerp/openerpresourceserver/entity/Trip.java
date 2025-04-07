@@ -112,6 +112,8 @@ public class Trip {
         createdAt = Instant.now();
         updatedAt = Instant.now();
     }
+    @Version
+    private Integer version;
 
     @PreUpdate
     protected void onUpdate() {

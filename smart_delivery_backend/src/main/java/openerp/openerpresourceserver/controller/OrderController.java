@@ -70,15 +70,15 @@ public class OrderController {
 
     // Edit an existing order
     @PutMapping("/order/update/{id}")
-    public ResponseEntity<Order> updateOrder(@PathVariable UUID id, @Valid @RequestBody OrderRequestDto orderRequest) {
-        Order updatedOrder = orderService.editOrder(id, orderRequest);
+    public ResponseEntity<Order> updateOrder(Principal principal, @PathVariable UUID id, @Valid @RequestBody OrderRequestDto orderRequest) {
+        Order updatedOrder = orderService.editOrder(principal, id, orderRequest);
         return ResponseEntity.ok(updatedOrder);
     }
 
     // Delete an order
     @DeleteMapping("/order/delete/{id}")
-    public ResponseEntity<Void> deleteOrder(@PathVariable UUID id) {
-        orderService.deleteOrder(id);
+    public ResponseEntity<Void> deleteOrder(Principal principal, @PathVariable UUID id) {
+        orderService.deleteOrder(principal,id);
         return ResponseEntity.noContent().build();  // Return 204 No Content on successful deletion
     }
 
@@ -158,16 +158,16 @@ public class OrderController {
 
     @PreAuthorize("hasAnyRole('HUB_STAFF', 'HUB_MANAGER')")
     @PutMapping("/collected-hub/complete/{orderIds}")
-    public ResponseEntity<String> confirmCollectedHub(@PathVariable UUID[] orderIds) {
-        return orderService.confirmCollectedHub(orderIds) ? ResponseEntity.ok("OK") :
+    public ResponseEntity<String> confirmCollectedHub(Principal principal, @PathVariable UUID[] orderIds) {
+        return orderService.confirmCollectedHub(principal, orderIds) ? ResponseEntity.ok("OK") :
                 new ResponseEntity<>("FAIL", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 
         @PreAuthorize("hasAnyRole('HUB_STAFF', 'HUB_MANAGER')")
         @PutMapping("/out-hub/complete/{orderIds}/{vehicleId}")
-        public ResponseEntity<String> confirmOutHub(@PathVariable UUID[] orderIds, @PathVariable UUID vehicleId) {
-            return orderService.confirmOutHub(orderIds, vehicleId) ? ResponseEntity.ok("OK") :
+        public ResponseEntity<String> confirmOutHub(Principal principal, @PathVariable UUID[] orderIds, @PathVariable UUID vehicleId) {
+            return orderService.confirmOutHub(principal,orderIds, vehicleId) ? ResponseEntity.ok("OK") :
                     new ResponseEntity<>("FAIL", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

@@ -1,4 +1,5 @@
 package openerp.openerpresourceserver.service.impl;
+
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -79,12 +80,13 @@ public class OrderServiceImpl implements OrderService {
     private TripItemRepository tripItemRepository;
     @Autowired
     private RedisCacheService redisCacheService;
+
     // Create order method
     @Override
     @Transactional
     public Order createOrder(Principal principal, OrderRequestDto orderREQ) {
         Order orderEntity = new Order();
-        Sender sender = senderRepo.findByNameAndPhone(orderREQ.getSenderName(),orderREQ.getSenderPhone());
+        Sender sender = senderRepo.findByNameAndPhone(orderREQ.getSenderName(), orderREQ.getSenderPhone());
         Recipient recipient = recipientRepo.findByNameAndPhone(orderREQ.getRecipientName(), orderREQ.getRecipientPhone());
 
 
@@ -111,13 +113,23 @@ public class OrderServiceImpl implements OrderService {
         orderEntity.setRecipientId(recipient.getRecipientId());
         orderEntity.setOrderType(orderREQ.getOrderType());
         orderEntity.setOrderType(orderREQ.getOrderType());
+        orderEntity.setCreatedBy(principal.getName());
         List<OrderItem> orderItems = new ArrayList<>();
         List<OrderItem> items = orderREQ.getItems();
 
         for (OrderItem item : items) {
-//            OrderItem orderItem = new OrderItem(item.getName(), item.getQuantity(), item.getWeight(), item.getPrice(), item.getLength(), item.getWidth(), item.getHeight());
-            item.setOrderId(orderEntity.getId());
-            orderItems.add(item);
+            OrderItem orderItem = OrderItem.builder()
+                    .name(item.getName())
+                    .quantity(item.getQuantity())
+                    .weight(item.getWeight())
+                    .price(item.getPrice())
+                    .length(item.getLength())
+                    .width(item.getWidth())
+                    .height(item.getHeight())
+                    .createdBy(principal.getName())
+                    .orderId(orderEntity.getId())
+                    .build();
+            orderItems.add(orderItem);
         }
 
         orderItemRepo.saveAll(orderItems);
@@ -184,7 +196,7 @@ public class OrderServiceImpl implements OrderService {
     // Edit order method
     @Override
     @Transactional
-    public Order editOrder(UUID orderId, OrderRequestDto orderREQ) {
+    public Order editOrder(Principal principal, UUID orderId, OrderRequestDto orderREQ) {
         try {
             // Lấy người dùng hiện tại
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -249,20 +261,22 @@ public class OrderServiceImpl implements OrderService {
             existingOrder.setFinalPrice(orderREQ.getFinalPrice());
             existingOrder.setOrderType(orderREQ.getOrderType());
             existingOrder.setStatus(orderREQ.getStatus() != null ? orderREQ.getStatus() : OrderStatus.PENDING);
-
+            existingOrder.setChangedBy(principal.getName());
             // Xử lý danh sách các mục đơn hàng
             List<OrderItem> orderItems = new ArrayList<>();
             if (orderREQ.getItems() != null) {
                 orderItems = orderREQ.getItems().stream()
-                        .map(item -> new OrderItem(
-                                item.getName(),
-                                item.getQuantity(),
-                                item.getWeight(),
-                                item.getPrice(),
-                                item.getLength(),
-                                item.getWidth(),
-                                item.getHeight()
-                        ))
+                        .map(item -> OrderItem.builder()
+                                .name(item.getName())
+                                .quantity(item.getQuantity())
+                                .weight(item.getWeight())
+                                .price(item.getPrice())
+                                .length(item.getLength())
+                                .width(item.getWidth())
+                                .height(item.getHeight())
+                                .updatedBy(principal.getName())
+                                .build()
+                        )
                         .peek(item -> item.setOrderId(existingOrder.getId()))
                         .collect(Collectors.toList());
             }
@@ -288,14 +302,23 @@ public class OrderServiceImpl implements OrderService {
     // Delete order method
     @Override
     @Transactional
-    public void deleteOrder(UUID orderId) {
+    public void deleteOrder(Principal principal, UUID orderId) {
         Order order = orderRepo.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
 
 //        // Store vehicle ID for load update if order is assigned to a vehicle
 //        UUID vehicleId = order.getVehicleId();
-
+//        OrderHistory orderHistory = OrderHistory.builder()
+//                .orderId(order.getId())
+//                        .
+        order.setStatus(OrderStatus.DELETED);
         // Delete order items
+        List<OrderItem> orderItems = orderItemRepo.findAllByOrderId(orderId);
+        for (OrderItem orderItem : orderItems) {
+            orderItem.setStatus(OrderItemStatus.DELETED);
+            orderItemRepo.save(orderItem);
+        }
+
         orderItemRepo.deleteAllByOrderId(orderId);
 
         // Delete the order
@@ -390,10 +413,9 @@ public class OrderServiceImpl implements OrderService {
 //        }
 //
 //        return assignedOrders;
-        return gaAutoAssign.autoAssignOrderToCollector(hub,orderList,collectorList);
+
+        return gaAutoAssign.autoAssignOrderToCollector(hub, orderList, collectorList);
     }
-
-
 
 
     // Phương thức để lấy các bản ghi trong ngày hôm nay theo hubId
@@ -408,7 +430,6 @@ public class OrderServiceImpl implements OrderService {
                 startOfDay,
                 endOfDay
         );
-
 
 
         // Chuyển đối tượng AssignOrderCollector thành TodayAssignmentDto
@@ -453,7 +474,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public boolean confirmCollectedHub(UUID[] orderIds) {
+    public boolean confirmCollectedHub(Principal principal, UUID[] orderIds) {
         List<UUID> orderIdList = Arrays.asList(orderIds);
         if (orderIdList.isEmpty()) {
             log.info("Order id list to update complete is empty");
@@ -463,7 +484,7 @@ public class OrderServiceImpl implements OrderService {
         List<AssignOrderCollector> updatedAssignments = new ArrayList<>();
 
         for (UUID orderId : orderIdList) {
-            Order order = orderRepo.findById(orderId).orElseThrow(()-> new NotFoundException("order not found: " + orderId));
+            Order order = orderRepo.findById(orderId).orElseThrow(() -> new NotFoundException("order not found: " + orderId));
             if (order.getStatus() != OrderStatus.COLLECTED_COLLECTOR) {
                 throw new RuntimeException("Đơn hàng chưa được collector collect");
             }
@@ -473,11 +494,12 @@ public class OrderServiceImpl implements OrderService {
             }
             order.setStatus(OrderStatus.COLLECTED_HUB);
             AssignOrderCollector assignOrderCollector = assignOrderCollectorRepository.findByOrderIdAndStatus(orderId, CollectorAssignmentStatus.COLLECTED);
-            if(assignOrderCollector!=null) {
+            if (assignOrderCollector != null) {
                 assignOrderCollector.setStatus(CollectorAssignmentStatus.COMPLETED);
                 updatedAssignments.add(assignOrderCollector);
 
             }
+            order.setChangedBy(principal.getName());
             updatedOrder.add(order);
             orderItemRepo.saveAll(orderItems);
         }
@@ -490,7 +512,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public boolean confirmOutHub(UUID[] orderIds, UUID vehicleId){
+    public boolean confirmOutHub(Principal principal,UUID[] orderIds, UUID vehicleId) {
         List<UUID> orderIdList = Arrays.asList(orderIds);
         if (orderIdList.isEmpty()) {
             log.info("Order id list to update complete is empty");
@@ -499,12 +521,14 @@ public class OrderServiceImpl implements OrderService {
         Vehicle vehicle = vehicleRepo.findById(vehicleId)
                 .orElseThrow(() -> new NotFoundException("Vehicle not found " + vehicleId));
         List<Order> updatedOrder = new ArrayList<>();
-        for(UUID orderId: orderIds){
+        for (UUID orderId : orderIds) {
             Order order = orderRepo.findById(orderId).orElseThrow(() -> new NotFoundException("order not found " + orderId));
             order.setStatus(OrderStatus.DELIVERING);
 //            order.setVehicleId(vehicleId);
 //            order.setVehicleType(vehicle.getVehicleType());
 //            order.setVehicleLicensePlate(vehicle.getPlateNumber());
+            order.setChangedBy(principal.getName());
+
             updatedOrder.add(order);
         }
         orderRepo.saveAll(updatedOrder);
@@ -512,11 +536,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderSummaryDTO> getCollectedCollectorList(UUID hubId){
+    public List<OrderSummaryDTO> getCollectedCollectorList(UUID hubId) {
         return orderRepo.getCollectedColelctorList(hubId);
     }
+
     @Override
-    public List<OrderSummaryDTO> getCollectedHubList(UUID hubId){
+    public List<OrderSummaryDTO> getCollectedHubList(UUID hubId) {
         return orderRepo.getCollectedHubList(hubId);
     }
 
@@ -557,7 +582,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderItemForTripDto> getOrderItemsForTrip(UUID tripId) {
 
-       List<TripItem> tripItems = tripItemRepository.findByTripId(tripId);
+        List<TripItem> tripItems = tripItemRepository.findByTripId(tripId);
         if (tripItems.isEmpty()) {
             log.warn("No order item found for this trip");
             return Collections.emptyList();
@@ -592,10 +617,10 @@ public class OrderServiceImpl implements OrderService {
 
     public Double getOrderVolume(UUID orderId) {
         List<OrderItem> orderItems = orderItemRepo.findAllByOrderId(orderId);
-        return orderItems.stream().map(o -> o.getHeight()/100 * o.getWidth()/100 * o.getLength()/100).reduce(0.0, Double::sum);
+        return orderItems.stream().map(o -> o.getHeight() / 100 * o.getWidth() / 100 * o.getLength() / 100).reduce(0.0, Double::sum);
     }
 
-    public OrderItemForTripDto convertOrderItemToDtoForTrip(OrderItem orderItem){
+    public OrderItemForTripDto convertOrderItemToDtoForTrip(OrderItem orderItem) {
         OrderItemForTripDto orderItemForTripDto = new OrderItemForTripDto(orderItem);
         Order order = orderRepo.findById(orderItem.getOrderId()).orElseThrow(() -> new NotFoundException("order not found " + orderItem.getOrderId()));
         Sender sender = senderRepo.findById(order.getSenderId()).orElseThrow(() -> new NotFoundException("sender not found " + order.getSenderId()));
