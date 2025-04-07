@@ -5,7 +5,7 @@ import AddStaffModal from "./modals/AddStaffModal";
 import EditIcon from "@mui/icons-material/Edit";
 import { Divider, Tab, Tabs } from "@mui/material";
 import Timeline from "@/components/item/TimelineItem";
-import SalaryTab from "@/components//tab/SalaryTab";
+import SalaryTab from "@/components/tab/SalaryTab";
 
 const EmployeeDetails = () => {
   const { staffCode } = useParams(); 

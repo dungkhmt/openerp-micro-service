@@ -27,6 +27,8 @@ public class MonthAttendanceResponse {
     @Builder
     public static class DayAttendance{
         private List<LocalDateTime> pointTimes;
+        private LocalDateTime startTime;
+        private LocalDateTime endTime;
         private float totalTimeByHours;
         private AttendanceType attendanceType;
     }
@@ -40,7 +42,9 @@ public class MonthAttendanceResponse {
                 var attendanceDayOfModel = model.getAttendances().get(date);
                 var dayAttendance = DayAttendance.builder()
                         .pointTimes(attendanceDayOfModel.getPointTimes())
-                        .attendanceType(attendanceDayOfModel.getAttendanceType())
+                        .startTime(attendanceDayOfModel.getStartTime())
+                        .endTime(attendanceDayOfModel.getEndTime())
+                        .attendanceType(attendanceDayOfModel.getAttendanceType(attendanceDayOfModel.totalTimeByHours()))
                         .totalTimeByHours(attendanceDayOfModel.totalTimeByHours())
                         .build();
                 dayAttendanceMap.put(date, dayAttendance);

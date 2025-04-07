@@ -27,6 +27,10 @@ import CreatedMeeting from "../pages/meetings/created-meetings/[id]";
 import JoinedMeetings from "../pages/meetings/joined-meetings";
 import JoinedMeeting from "../pages/meetings/joined-meetings/[id]";
 import Unknown from "../views/errors/Unknown";
+import EmployeeDetails from "../views/hr/EmployeeDetailsScreen.jsx";
+import CheckpointEvaluation from "../views/hr/CheckpointEvaluationScreen.jsx";
+import CheckinoutScreen from "../views/hr/CheckinoutScreen.jsx";
+import AttendancePage from "../views/hr/AttendancePage.jsx";
 
 
 export const router = createBrowserRouter([
@@ -109,8 +113,20 @@ export const router = createBrowserRouter([
             path: "/hr",
             children: [
               {
+                path: "checkin-out",
+                element: <CheckinoutScreen />
+              },
+              {
+                path: "attendance-list",
+                element: <AttendancePage />
+              },
+              {
                 path: "staff",
                 element: <StaffScreen />,
+              },
+              {
+                path: "staff/:staffCode",
+                element: <EmployeeDetails />,
               },
               {
                 path: "department",
@@ -130,6 +146,10 @@ export const router = createBrowserRouter([
                   {
                     path: "period",
                     element: <CheckpointPeriodScreen/>,
+                  },
+                  {
+                    path: "evaluation",
+                    element: <CheckpointEvaluation />,
                   },
                 ]
               },

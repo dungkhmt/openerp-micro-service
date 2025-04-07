@@ -26,6 +26,17 @@ public class AttendanceModel {
     public static class DayAttendance{
         private List<LocalDateTime> pointTimes = new ArrayList<>();
 
+        public LocalDateTime getStartTime(){
+            return pointTimes.get(0);
+        }
+
+        public LocalDateTime getEndTime(){
+            if(pointTimes.size() > 1){
+                return pointTimes.get(pointTimes.size()-1);
+            }
+            return null;
+        }
+
         /**
          * Calculates the total time between the first and last points in hours.
          *
@@ -38,8 +49,8 @@ public class AttendanceModel {
             }
 
             // Get the first and last points
-            LocalDateTime startTime = pointTimes.get(0);
-            LocalDateTime endTime = pointTimes.get(pointTimes.size() - 1);
+            LocalDateTime startTime = getStartTime();
+            LocalDateTime endTime = getEndTime();
 
             // Calculate the duration in hours
             long durationInSeconds = Duration.between(startTime, endTime).getSeconds();

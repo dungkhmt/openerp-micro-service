@@ -2,6 +2,7 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,13 +18,13 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GetCheckinoutRequest {
-    private String userId;
+    @NotNull
     private LocalDate date;
     private CheckinoutType type;
 
-    public GetCheckinout toUseCase(){
+    public GetCheckinout toUseCase(String userId){
         return GetCheckinout.builder()
-                .userId(this.getUserId())
+                .userId(userId)
                 .date(this.getDate())
                 .type(this.getType())
                 .build();

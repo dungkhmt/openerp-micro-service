@@ -1,9 +1,6 @@
 package com.hust.openerp.taskmanagement.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -27,7 +24,8 @@ public class User {
     private String firstName;
 
     private String lastName;
-    
+
+    @Transient
     private String avatarUrl;
 
     private boolean enabled;

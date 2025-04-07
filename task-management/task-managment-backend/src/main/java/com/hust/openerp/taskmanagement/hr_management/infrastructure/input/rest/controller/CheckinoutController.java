@@ -32,9 +32,10 @@ public class CheckinoutController extends BeanAwareUseCasePublisher {
 
     @PostMapping("get-checkinout")
     public ResponseEntity<?> getCheckinout(
-            @Valid @RequestBody GetCheckinoutRequest request
+            @Valid @RequestBody GetCheckinoutRequest request,
+            Principal principal
     ){
-        var models = publishCollection(CheckinoutModel.class, request.toUseCase());
+        var models = publishCollection(CheckinoutModel.class, request.toUseCase(principal.getName()));
         return ResponseEntity.ok().body(
                 new Resource(models.stream().map(GetCheckinoutResponse::fromModel).toList())
         );

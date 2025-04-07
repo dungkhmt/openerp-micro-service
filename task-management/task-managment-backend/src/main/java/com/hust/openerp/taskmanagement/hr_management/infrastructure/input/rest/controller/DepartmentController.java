@@ -10,10 +10,7 @@ import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.d
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.department.request.UpdateDepartmentRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.department.response.DepartmentResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/department/")
@@ -56,6 +53,17 @@ public class DepartmentController extends BeanAwareUseCasePublisher {
         var responsePage = modelPage.convert(DepartmentResponse::fromModel);
         return ResponseEntity.ok().body(
                 new Resource(responsePage)
+        );
+    }
+
+    @GetMapping("")
+    public ResponseEntity<?> getDepartments(
+        @Valid @ModelAttribute GetDepartmentRequest request
+    ){
+        var modelPage = publishPageWrapper(DepartmentModel.class, request.toUseCase());
+        var responsePage = modelPage.convert(DepartmentResponse::fromModel);
+        return ResponseEntity.ok().body(
+            new Resource(responsePage)
         );
     }
 }

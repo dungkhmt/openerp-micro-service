@@ -23,7 +23,7 @@ public class CheckinoutSpecification implements Specification<CheckinoutEntity> 
             predicates.add(cb.equal(root.get("userId"), filter.getUserId()));
         }
         if (filter.getType() != null){
-            predicates.add(cb.equal(root.get("checkinout"), filter.getType()));
+            predicates.add(cb.equal(root.get("checkinout"), String.valueOf(filter.getType().ordinal())));
         }
         if(filter.getDate() != null){
             predicates.add(cb.equal(

@@ -30,6 +30,7 @@ public class CheckinoutAdapter implements ICheckinoutPort {
         var type = existCheckin(checkinout.getPointTime().toLocalDate())
                 ? CheckinoutType.CHECKOUT : CheckinoutType.CHECKIN;
         var entity = new CheckinoutEntity();
+        entity.setUserId(checkinout.getUserId());
         entity.setTimePoint(checkinout.getPointTime());
         entity.setCheckinout(type);
         checkinoutRepo.save(entity);
@@ -38,7 +39,7 @@ public class CheckinoutAdapter implements ICheckinoutPort {
     @Override
     public List<CheckinoutModel> getCheckinout(ICheckinoutFilter filter) {
         var spec = new CheckinoutSpecification(filter);
-        Sort sort = Sort.by(Sort.Direction.DESC, "timePoint");
+        Sort sort = Sort.by(Sort.Direction.ASC, "timePoint");
         var checkinoutList = checkinoutRepo.findAll(spec, sort);
         return checkinoutList.stream()
                 .map(CheckinoutAdapter::toModel)

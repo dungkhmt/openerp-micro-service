@@ -21,17 +21,18 @@ import deleteIcon from "@/assets/icons/delete.svg";
 import editIcon from "@/assets/icons/edit.svg";
 import { request } from "@/api";
 import { useNavigate  } from "react-router-dom";
+import Pagination from "@/components/item/Pagination";
 
 
 const EmployeeManagement = () => {
-  const history = useNavigate ();
+  const navigate = useNavigate ();
   const [data, setData] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [jobPositions, setJobPositions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [tempPageInput, setTempPageInput] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState(null);
@@ -151,7 +152,7 @@ const EmployeeManagement = () => {
         Cell: ({ row }) => (
           <div
             className="employee-name-cell"
-            onClick={() => history.push(`/employee/${row.original.staff_code}`)}
+            onClick={() => navigate(`/hr/staff/${row.original.staff_code}`)}
             style={{
               display: "flex",
               alignItems: "center",
@@ -503,7 +504,7 @@ const EmployeeManagement = () => {
                 position: "relative",
                 cursor: "pointer",
               }}
-              onClick={() => history.push(`/employee/${employee.staff_code}`)}
+              onClick={() => navigate.push(`/employee/${employee.staff_code}`)}
             >
               <img 
                 src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
@@ -601,56 +602,16 @@ const EmployeeManagement = () => {
       
       )}
 
-      <div className="pagination">
-        <div className="page-controls">
-          <input
-            type="number"
-            value={tempPageInput}
-            onChange={(e) => setTempPageInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                const enteredPage = parseInt(tempPageInput, 10) - 1;
-                if (enteredPage >= 0 && enteredPage < pageCount) {
-                  fetchEmployees(enteredPage, itemsPerPage, searchTerm);
-                }
-              }
-            }}
-            className="page-input"
-          />
-          <span>of {pageCount} pages</span>
-          <button
-            onClick={() => fetchEmployees(currentPage - 1, itemsPerPage, searchTerm)}
-            disabled={currentPage === 0}
-            className="page-button"
-          >
-            {"<"}
-          </button>
-          <button
-            onClick={() => fetchEmployees(currentPage + 1, itemsPerPage, searchTerm)}
-            disabled={currentPage === pageCount - 1}
-            className="page-button"
-          >
-            {">"}
-          </button>
-        </div>
-        <div className="items-per-page">
-          <Select
-            value={itemsPerPage}
-            onChange={(e) => {
-              setItemsPerPage(e.target.value);
-              fetchEmployees(0, e.target.value, searchTerm);
-            }}
-            displayEmpty
-            className="items-per-page-select"
-          >
-            <MenuItem value={5}>5</MenuItem>
-            <MenuItem value={10}>10</MenuItem>
-            <MenuItem value={15}>15</MenuItem>
-            <MenuItem value={20}>20</MenuItem>
-          </Select>
-          <span>items per page</span>
-        </div>
-      </div>
+      <Pagination
+        currentPage={currentPage}
+        pageCount={pageCount}
+        itemsPerPage={itemsPerPage}
+        onPageChange={(page) => fetchEmployees(page, itemsPerPage, searchTerm)}
+        onItemsPerPageChange={(size) => {
+          setItemsPerPage(size);
+          fetchEmployees(0, size, searchTerm);
+        }}
+      />
     </div>
   );
 };

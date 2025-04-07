@@ -34,13 +34,10 @@ const CheckpointPeriodScreen = () => {
   const [deletePeriod, setDeletePeriod] = useState(null);
   const [dropdownVisible, setDropdownVisible] = useState(null);
   const dropdownRefs = useRef([]);
-  const history = useNavigate();
+  const navigate = useNavigate();
   
   const handleRowClick = (period) => {
-    history.push({
-      pathname: `/checkpoint-evaluation`,
-      state: { period }, 
-    });
+    navigate(`/hr/checkpoint/evaluation`, { state: { period } });
   };
 
   useEffect(() => {

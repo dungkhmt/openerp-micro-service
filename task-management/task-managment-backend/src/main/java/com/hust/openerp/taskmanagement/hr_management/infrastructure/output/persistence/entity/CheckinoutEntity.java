@@ -26,7 +26,7 @@ public class CheckinoutEntity extends AuditEntity{
     @Column(name = "time_point")
     private LocalDateTime timePoint;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "checkinout", length = 1)
     private CheckinoutType checkinout;
 

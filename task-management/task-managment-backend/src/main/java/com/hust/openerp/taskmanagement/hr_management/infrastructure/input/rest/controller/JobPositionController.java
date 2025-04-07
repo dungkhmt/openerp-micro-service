@@ -10,10 +10,7 @@ import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.d
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.job_position.request.UpdateJobPositionRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.job_position.response.JobPositionResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/job/")
@@ -56,6 +53,17 @@ public class JobPositionController extends BeanAwareUseCasePublisher {
         var responsePage = modelPage.convert(JobPositionResponse::fromModel);
         return ResponseEntity.ok().body(
                 new Resource(responsePage)
+        );
+    }
+
+    @GetMapping("")
+    public ResponseEntity<?> getJobPositions(
+        @Valid @ModelAttribute GetJobPositionRequest request
+    ){
+        var modelPage = publishPageWrapper(JobPositionModel.class, request.toUseCase());
+        var responsePage = modelPage.convert(JobPositionResponse::fromModel);
+        return ResponseEntity.ok().body(
+            new Resource(responsePage)
         );
     }
 }

@@ -31,8 +31,8 @@ export const UserService = {
     const res = await privateClient.get(endPoints.getAssignedTaskCreator);
     return res.data;
   },
-  async getAllMeCreatedAssignee() {
-    const res = await privateClient.get(endPoints.getMeCreatedAssignee);
+  async getAllMeCreatedAssignee() { const res = await privateClient.get(endPoints.getMeCreatedAssignee);
+
     return res.data;
   },
   async getMySkills(cb) {

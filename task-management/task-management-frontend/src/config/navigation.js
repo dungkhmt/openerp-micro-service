@@ -59,6 +59,14 @@ const navigation = [
     ],
   },
   {
+    sectionTitle: "HR Management",
+  },
+  {
+    title: "Chấm công",
+    path: "/hr/checkin-out",
+    icon: "mdi:calendar-clock",
+  },
+  {
     title: "Quản lý nhân sự",
     icon: "mdi:account-group-outline",
     children: [
@@ -68,14 +76,19 @@ const navigation = [
         icon: "mdi:office-building-outline",
       },
       {
+        title: "Vị trí công việc",
+        path: "/hr/job-position",
+        icon: "mdi:briefcase-outline"
+      },
+      {
         title: "Danh sách nhân sự",
         path: "/hr/staff",
         icon: "mdi:account-multiple-outline"
       },
       {
-        title: "Vị trí công việc",
-        path: "/hr/job-position",
-        icon: "mdi:briefcase-outline"
+        title: "Bảng công tháng",
+        path: "/hr/attendance-list",
+        icon: "mdi:calendar-check-outline"
       },
       {
         title: "Đánh giá nhân sự",

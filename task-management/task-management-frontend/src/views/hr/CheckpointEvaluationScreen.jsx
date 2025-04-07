@@ -16,12 +16,12 @@ import jsPDF from "jspdf";
 import GradeModal from "./modals/GradeModal";
 import "jspdf-autotable";
 import { request } from "@/api";
-import "../assets/css/CheckpointEvaluation.css";
+import "@/assets/css/CheckpointEvaluation.css";
 import { useNavigate, useLocation } from "react-router-dom";
 import GradeIcon from "@mui/icons-material/BorderColor";
 
 const CheckpointEvaluation = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const [staffData, setStaffData] = useState([]);
   const [periods, setPeriods] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -201,7 +201,7 @@ const CheckpointEvaluation = () => {
         Cell: ({ row }) => (
           <div
             className="employee-name-cell"
-            onClick={() => history.push(`/employee/${row.original.staff_code}`)}
+            onClick={() => navigate(`/hr/staff/${row.original.staff_code}`)}
             style={{
               display: "flex",
               alignItems: "center",
