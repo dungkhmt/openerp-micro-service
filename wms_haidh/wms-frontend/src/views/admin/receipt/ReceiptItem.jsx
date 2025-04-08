@@ -26,6 +26,7 @@ import { CircularProgress } from "@nextui-org/react";
 import { useNavigate, useParams } from 'react-router-dom';
 import { request } from "../../../api";
 import { formatDate, formatPrice } from '../../../utils/utils';
+import { toast, Toaster } from "react-hot-toast";
 
 const ReceiptItem = () => {
   const navigate = useNavigate();
@@ -66,6 +67,37 @@ const ReceiptItem = () => {
   };
 
   const handleSubmit = () => {
+    // Kiểm tra số lượng
+    if (!quantity || quantity > generalInfo.quantity || quantity <= 0) {
+      toast.error("Invalid quantity!");
+      return;
+    }
+
+    // Kiểm tra các trường bắt buộc
+    if (!bayCode) {
+      toast.error("Bay code is required!");
+      return;
+    }
+    if (!lotId) {
+      toast.error("Lot ID is required!");
+      return;
+    }
+    if (!importPrice || importPrice <= 0) {
+      toast.error("Invalid import price!");
+      return;
+    }
+
+    // Kiểm tra bill option
+    if (billOption === 'new' && !billName) {
+      toast.error("Bill name is required for new bill!");
+      return;
+    }
+    if (billOption === 'existing' && !existingBill) {
+      toast.error("Please select an existing bill!");
+      return;
+    }
+
+    // Tạo bill mới nếu cần
     if (billOption === 'new') {
       const bilInfo = {
         receiptBillId: billName,
@@ -75,10 +107,12 @@ const ReceiptItem = () => {
       };
       request("post", `/receipt-bills`, (res) => {
         if (res.status !== 200) {
-          alert("Error occcured while creating bill!");
+          alert("Error occurred while creating bill!");
         }
       }, {}, bilInfo);
-    };
+    }
+
+    // Tạo payload và gửi
     const payload = {
       quantity,
       bayId: bayCode,
@@ -88,7 +122,7 @@ const ReceiptItem = () => {
       receiptItemRequestId: id2,
       receiptBillId: billOption === 'new' ? billName : existingBill
     };
-    // console.log(payload);
+
     request("post", `/receipt-items`, (res) => {
       if (res.status === 200) {
         request("get", `/receipt-item-requests/${id2}/general-info`, (res) => {
@@ -100,21 +134,23 @@ const ReceiptItem = () => {
         request("get", `/receipt-bills/ids?requestId=${id2}`, (res) => {
           setExistingBills(res.data);
         });
-        alert("Add new receipt item successfully !")
+        alert("Add new receipt item successfully!");
       } else {
-        alert("Error occcured while creating receipt item!");
+        alert("Error occurred while creating receipt item!");
       }
     }, {}, payload);
   };
 
+
   return (
     <Box sx={{ p: 3 }}>
+      <Toaster />
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
         <IconButton color="primary" onClick={() => navigate(`/admin/receipts/${id1}`)} sx={{ color: 'black' }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>
-          Receipt Management
+          Putaway
         </Typography>
       </Box>
 
@@ -178,7 +214,7 @@ const ReceiptItem = () => {
                 marginBottom: 2, // Khoảng cách bên dưới
               }}
             >
-              Receipt request
+              Request
             </Typography>
             <Typography>
               <b>Product:</b>
@@ -213,6 +249,7 @@ const ReceiptItem = () => {
                   fullWidth
                   label="Quantity"
                   type="number"
+                  inputProps={{ min: 1, max: generalInfo.quantity }}
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
                 />

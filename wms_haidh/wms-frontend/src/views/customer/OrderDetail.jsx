@@ -24,7 +24,7 @@ const OrderDetail = () => {
     const [generalInfo, setGeneralInfo] = useState(null);
     const [customerInfo, setCustomerInfo] = useState(null);
     const [details, setDetails] = useState([]);
-    const userLoginId = "diep.vtb";
+    const userLoginId = "hoanglotar2000";
 
     const breadcrumbPaths = [
         { label: "Home", link: "/" },

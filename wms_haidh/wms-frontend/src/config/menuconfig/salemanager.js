@@ -14,7 +14,7 @@ export const salemanager = {
       id: "MENU_WMSv2_SALE_MANAGER.ORDERS",
       path: "/sale-manager/sale-order",
       isPublic: true,
-      text: "Process Sale Order",
+      text: "Sale Orders",
       child: [],
     },
   ],

@@ -25,7 +25,7 @@ const INITIAL_VISIBLE_COLUMNS = ["productName", "lotId", "bayCode", "quantityOnH
 export default function InventoryList() {
 
   const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [pages, setPages] = useState(1);
   const [items, setItems] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
@@ -204,6 +204,7 @@ export default function InventoryList() {
       td: [
         // changing the rows border radius
         // first
+        "py-3",
         "group-data-[first=true]:first:before:rounded-none",
         "group-data-[first=true]:last:before:rounded-none",
         // middle

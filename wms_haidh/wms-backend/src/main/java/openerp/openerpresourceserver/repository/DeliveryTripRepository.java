@@ -24,8 +24,9 @@ public interface DeliveryTripRepository extends JpaRepository<DeliveryTrip, Stri
 
 	@Query("SELECT d.deliveryTripId AS deliveryTripId, " + "d.distance AS distance, "
 			+ "d.totalLocations AS totalLocations, " + "d.status AS status, " + "d.description AS description "
-			+ "FROM DeliveryTrip d " + "WHERE d.deliveryPersonId = :deliveryPersonId " + "AND d.isDeleted = false "
-			+ "AND DATE(d.createdStamp) = CURRENT_DATE " + "AND d.status = :status")
+			+ "FROM DeliveryTrip d " + "JOIN Shipment s ON d.shipmentId = s.shipmentId "
+			+ "WHERE d.deliveryPersonId = :deliveryPersonId " + "AND d.isDeleted = false "
+			+ "AND DATE(s.expectedDeliveryStamp) = CURRENT_DATE " + "AND d.status = :status")
 	Page<TodayDeliveryTripProjection> findTodayTripsByDeliveryPerson(@Param("deliveryPersonId") String deliveryPersonId,
 			@Param("status") String status, Pageable pageable);
 

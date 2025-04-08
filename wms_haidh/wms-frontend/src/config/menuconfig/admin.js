@@ -7,7 +7,15 @@ export const admin = {
       id: "MENU_WMSv2_ADMIN.WAREHOUSE",
       path: "/admin/warehouse",
       isPublic: true,
-      text: "Warehouse",
+      text: "Warehouses",
+      child: [],
+    },
+    {
+      id: "MENU_WMSv2_ADMIN.PRODUCT",
+      path: "/admin/product",
+      isPublic: true,
+      icon: "StarBorder",
+      text: "Products",
       child: [],
     },
     {
@@ -18,19 +26,11 @@ export const admin = {
       child: [],
     },
     {
-      id: "MENU_WMSv2_ADMIN.PRODUCT",
-      path: "/admin/product",
-      isPublic: true,
-      icon: "StarBorder",
-      text: "Product",
-      child: [],
-    },
-    {
       id: "MENU_WMSv2_ADMIN.PROCESS_RECEIPT",
       path: "/admin/receipts",
       isPublic: true,
       icon: "StarBorder",
-      text: "Receipt",
+      text: "Purchase Orders",
       child: [],
     },
     {
@@ -38,7 +38,7 @@ export const admin = {
       path: "/admin/orders",
       isPublic: true,
       icon: "StarBorder",
-      text: "Assign Order",
+      text: "Sale Orders",
       child: [],
     }
   ],

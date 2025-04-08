@@ -11,13 +11,16 @@ import org.springframework.web.multipart.MultipartFile;
 import openerp.openerpresourceserver.dto.request.ProductCreateRequest;
 import openerp.openerpresourceserver.entity.Product;
 import openerp.openerpresourceserver.projection.ProductDetailProjection;
-import openerp.openerpresourceserver.projection.ProductInfoProjection;
+import openerp.openerpresourceserver.projection.ProductGeneralProjection;
+import openerp.openerpresourceserver.projection.ProductInventoryProjection;
 import openerp.openerpresourceserver.projection.ProductNameProjection;
 import openerp.openerpresourceserver.projection.ProductProjection;
 
 public interface ProductService {
 
-    Page<ProductInfoProjection> getAllProductGeneral(String searchTerm,Pageable pageable);
+    Page<ProductInventoryProjection> getAllProductInventory(String searchTerm,Pageable pageable);
+    
+    Page<ProductGeneralProjection> getAllProductGeneral(String searchTerm,Pageable pageable);
 	
 	boolean deleteProductById(UUID id);
 

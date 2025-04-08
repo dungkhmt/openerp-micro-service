@@ -22,7 +22,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { CircularProgress } from "@nextui-org/react";
 import { useNavigate, useParams } from 'react-router-dom';
 import { request } from "../../../api";
-import { formatDate, formatPrice } from '../../../utils/utils';
+import { formatPrice } from '../../../utils/utils';
+import { toast, Toaster } from "react-hot-toast";
 
 const OrderItem = () => {
   const navigate = useNavigate();
@@ -78,6 +79,31 @@ const OrderItem = () => {
   }, [lotId]);
 
   const handleSubmit = () => {
+    // Kiểm tra các trường bắt buộc
+    if (!warehouseId) {
+      toast.error("Warehouse is required!");
+      return;
+    }
+
+    if (!bayId) {
+      toast.error("Bay code is required!");
+      return;
+    }
+    if (!lotId) {
+      toast.error("Lot ID is required!");
+      return;
+    }
+
+    if (!quantity || quantity > generalInfo.quantity || quantity <= 0) {
+      toast.error("Invalid quantity!");
+      return;
+    }
+
+    if (quantity > quantityOnHand) {
+      toast.error("Quantity exceeds available quantity !");
+      return;
+    }
+
     const payload = {
       warehouseId,
       bayId,
@@ -86,7 +112,7 @@ const OrderItem = () => {
       saleOrderItemId: id2,
       assignedBy: "admin"
     };
-    // console.log(payload);
+    console.log(payload);
     request("post", `/assigned-order-items`, (res) => {
       if (res.status === 200) {
         request("get", `/order-items/${id2}`, (res) => {
@@ -104,12 +130,13 @@ const OrderItem = () => {
 
   return (
     <Box sx={{ p: 3 }}>
+      <Toaster />
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
         <IconButton color="primary" onClick={() => navigate(`/admin/orders/${id1}`)} sx={{ color: 'black' }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>
-          Assign order
+        Pick Assignment
         </Typography>
       </Box>
 

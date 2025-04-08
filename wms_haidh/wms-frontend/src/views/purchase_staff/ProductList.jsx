@@ -6,81 +6,54 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Input,
   Button,
   DropdownTrigger,
   Dropdown,
   DropdownMenu,
   DropdownItem,
   Pagination,
-  Select, MenuItem
 } from "@nextui-org/react";
-import { PlusIcon } from "../../components/icon/PlusIcon";
-import { Badge } from "../../components/button/badge";
 import { VerticalDotsIcon } from "../../components/icon/VerticalDotsIcon";
-import { columns, statusOptions } from "../../config/receipt";
+import { SearchIcon } from "../../components/icon/SearchIcon";
+import { columns } from "../../config/productpurchase";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../api";
 import { formatDate } from '../../utils/utils';
-const statusColorMap = {
-  CREATED: "default",
-  CANCELLED: "destructive",
-  APPROVED: "secondary",
-  IN_PROGRESS: "warning",
-  COMPLETED: "success",
-};
 
-
-const INITIAL_VISIBLE_COLUMNS = ["receiptName", "createdReason", "description", "expectedReceiptDate", "status", "createdBy", "actions"];
-const buttonText = "Create Receipt";
-export default function ReceiptList() {
+export default function ProductList() {
 
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [filterValue, setFilterValue] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [pages, setPages] = useState(1);
   const [items, setItems] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
-  const [statusFilter, setStatusFilter] = useState("CREATED");
 
   useEffect(() => {
-    request("get", `/receipts?status=${statusFilter}&page=${page - 1}&size=${rowsPerPage}`, (res) => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(filterValue);  // Chỉ cập nhật sau khi người dùng ngừng gõ
+    }, 500); // 1000ms = 1 giây
+
+    // Hủy bỏ timeout nếu người dùng tiếp tục gõ
+    return () => clearTimeout(timer);
+  }, [filterValue]);
+
+  // useEffect để gửi request sau khi giá trị tìm kiếm đã debounce
+  useEffect(() => {
+    request("get", `/products/inventory?page=${page - 1}&size=${rowsPerPage}&search=${debouncedSearchTerm}`, (res) => {
       setItems(res.data.content);
       setTotalItems(res.data.totalElements);
       setPages(res.data.totalPages);
     }).then();
-  }, [page, rowsPerPage, statusFilter]);
-
-  const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
-
-  const headerColumns = useMemo(() => {
-    if (visibleColumns === "all") return columns;
-
-    return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
-  }, [visibleColumns]);
+  }, [page, rowsPerPage, debouncedSearchTerm]);
 
   const renderCell = useCallback((item, columnKey) => {
     const cellValue = item[columnKey];
 
     switch (columnKey) {
-      case "status":
-        return (
-          <Badge variant={statusColorMap[item.status]}>{cellValue.replace(/_/g, ' ')}</Badge>
-        );
-      case "actions":
-        return (
-          <div className="relative flex justify-end items-center gap-2">
-            <Dropdown className="bg-background border-1 border-default-200">
-              <DropdownTrigger>
-                <Button isIconOnly radius="full" size="sm" variant="light">
-                  <VerticalDotsIcon className="text-default-400" />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu>
-                <DropdownItem onPress={() => handleUpdate(item.receiptId)}>View receipt</DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </div>
-        );
       default:
         return cellValue;
     }
@@ -100,52 +73,20 @@ export default function ReceiptList() {
     }
   }, []);
 
-  const navigate = useNavigate();
-
-  const handleAddReceipt = () => {
-    navigate('/purchase-staff/receipts/add-receipt');
-  };
-
-  const handleUpdate = (id) => {
-    navigate(`/purchase-staff/receipts/${id}`);
-  };
-
   const topContent = useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
-        <div className="flex justify-between items-center gap-3">
-          {/* Status Select */}
-          <div className="flex-shrink-0 w-40">
-            <Select
-              labelId="status-label"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              defaultSelectedKeys={["CREATED"]}
-              className="w-full"
-            >
-              {statusOptions.map((cat) => (
-                <MenuItem key={cat.uid} value={cat.uid}>
-                  {cat.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </div>
-
-          {/* Add Button */}
-          <div className="flex-shrink-0">
-            <Button
-              className="bg-foreground text-background"
-              endContent={<PlusIcon />}
-              size="md"
-              onPress={handleAddReceipt}
-            >
-              {buttonText}
-            </Button>
-          </div>
+        <div className="flex justify-between gap-3 items-end">
+          <Input
+            isClearable
+            className="w-full sm:max-w-[44%]"
+            placeholder="Search by name..."
+            startContent={<SearchIcon />}
+            value={filterValue}
+            onClear={() => setDebouncedSearchTerm("")}
+            onValueChange={onSearchChange}
+          />
         </div>
-
-
-
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">Total {totalItems} items</span>
           <label className="flex items-center text-default-400 text-small">
@@ -163,6 +104,7 @@ export default function ReceiptList() {
       </div>
     );
   }, [
+    filterValue,
     onSearchChange,
     onRowsPerPageChange,
     totalItems
@@ -194,6 +136,7 @@ export default function ReceiptList() {
       td: [
         // changing the rows border radius
         // first
+        "py-3",
         "group-data-[first=true]:first:before:rounded-none",
         "group-data-[first=true]:last:before:rounded-none",
         // middle
@@ -222,11 +165,11 @@ export default function ReceiptList() {
       topContent={topContent}
       topContentPlacement="outside"
     >
-      <TableHeader columns={headerColumns}>
+      <TableHeader columns={columns}>
         {(column) => (
           <TableColumn
             key={column.uid}
-            align={"center"}
+            align={column.uid === "totalQuantityOnHand" ? "center" : "start"}
             allowsSorting={column.sortable}
           >
             {column.name}
@@ -235,11 +178,11 @@ export default function ReceiptList() {
       </TableHeader>
       <TableBody emptyContent={"Loading ..."} items={items}>
         {(item) => (
-          <TableRow key={item.receiptId}>
+          <TableRow key={item.id}>
             {(columnKey) => (
               <TableCell>
-                {columnKey === "expectedReceiptDate"
-                  ? formatDate(item.expectedReceiptDate)
+                {columnKey === "dateUpdated"
+                  ? formatDate(item.dateUpdated)
                   : renderCell(item, columnKey)}
               </TableCell>
             )}

@@ -81,11 +81,14 @@ const ProductPreview = ({ item }) => {
             <div className="space-y-2 w-full text-center">
                 <p
                     className="font-semibold whitespace-nowrap overflow-hidden text-ellipsis mx-auto"
-                    style={{ maxWidth: "200px" }} 
+                    style={{ maxWidth: "200px" }}
                 >
                     {item.name}
                 </p>
-                <p className="text-md text-green-500">Available: {item.quantity}</p>
+                <p className={`text-md ${item.quantity === 0 ? 'text-red-500' : 'text-green-500'}`}>
+                    Available: {item.quantity}
+                </p>
+
             </div>
 
             <p className="shrink-0 font-medium">{formatPrice(item.price)}</p>

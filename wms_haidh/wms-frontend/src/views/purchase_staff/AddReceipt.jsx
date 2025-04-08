@@ -110,7 +110,7 @@ const AddReceipt = () => {
     const requestUrl = "/receipts";
     request("post", requestUrl, (res) => {
       if (res.status === 200) {
-        navigate(`/purchase-manager/receipts`);
+        navigate(`/purchase-staff/receipts`);
       } else {
         alert("Error occcured !");
       }

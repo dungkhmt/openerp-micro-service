@@ -27,7 +27,8 @@ import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.dto.request.ProductCreateRequest;
 import openerp.openerpresourceserver.entity.Product;
 import openerp.openerpresourceserver.projection.ProductDetailProjection;
-import openerp.openerpresourceserver.projection.ProductInfoProjection;
+import openerp.openerpresourceserver.projection.ProductGeneralProjection;
+import openerp.openerpresourceserver.projection.ProductInventoryProjection;
 import openerp.openerpresourceserver.projection.ProductNameProjection;
 import openerp.openerpresourceserver.projection.ProductProjection;
 import openerp.openerpresourceserver.service.ProductService;
@@ -41,16 +42,27 @@ public class ProductController {
 	private ProductService productService;
 
 	@GetMapping
-	public ResponseEntity<Page<ProductInfoProjection>> getProductInfoWithPaging(
+	public ResponseEntity<Page<ProductGeneralProjection>> getProductGeneralWithPaging(
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size,
 			@RequestParam(value = "search", required = false) String search) {
 
 		Pageable pageable = PageRequest.of(page, size);
-		Page<ProductInfoProjection> products = productService.getAllProductGeneral(search, pageable);
+		Page<ProductGeneralProjection> products = productService.getAllProductGeneral(search, pageable);
 
 		return ResponseEntity.ok(products);
 	}
+	
+	@GetMapping("/inventory")
+	public ResponseEntity<Page<ProductInventoryProjection>> getProductInventoryWithPaging(
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size,
+			@RequestParam(value = "search", required = false) String search) {
 
+		Pageable pageable = PageRequest.of(page, size);
+		Page<ProductInventoryProjection> products = productService.getAllProductInventory(search, pageable);
+
+		return ResponseEntity.ok(products);
+	}
+	
 	@GetMapping("/public")
 	public ResponseEntity<?> getProducts(@RequestParam(defaultValue = "0") int page,
 	        @RequestParam(defaultValue = "3") int size,

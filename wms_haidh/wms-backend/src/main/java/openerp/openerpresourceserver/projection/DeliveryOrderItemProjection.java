@@ -7,7 +7,6 @@ import java.util.UUID;
 public interface DeliveryOrderItemProjection {
 	UUID getAssignedOrderItemId();
 	UUID getOrderId();
-    LocalDateTime getOrderDate();
     String getProductName();
     BigDecimal getWeight();
     Integer getOriginalQuantity();

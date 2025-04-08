@@ -16,7 +16,7 @@ const Checkout = () => {
     const [savedAddresses, setSavedAddresses] = useState([]);
     const [cartItems, setCartItems] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
-    const userLoginId = 'diep.vtb';
+    const userLoginId = 'hoanglotar2000';
 
     const breadcrumbPaths = [
         { label: "Home", link: "/" },
@@ -226,7 +226,7 @@ const Checkout = () => {
                             fontSize: "1rem",
                             "&:hover": { backgroundColor: "black", opacity: 0.75 }
                         }}
-                        onClick={() => navigate("/")}
+                        onClick={() => navigate("/customer/order-history")}
                     >
                         Go to Homepage
                     </Button>

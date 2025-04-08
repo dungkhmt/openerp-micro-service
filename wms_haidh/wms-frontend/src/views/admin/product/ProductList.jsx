@@ -17,13 +17,12 @@ import {
 import { PlusIcon } from "../../../components/icon/PlusIcon";
 import { VerticalDotsIcon } from "../../../components/icon/VerticalDotsIcon";
 import { SearchIcon } from "../../../components/icon/SearchIcon";
-import { columns, statusOptions } from "../../../config/product";
+import { columns } from "../../../config/product";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../../api";
 import { formatDate } from '../../../utils/utils';
 
-const INITIAL_VISIBLE_COLUMNS = ["name", "code", "totalQuantityOnHand", "dateUpdated", "actions"];
 const buttonText = "Add Product";
 export default function ProductList() {
 
@@ -52,27 +51,6 @@ export default function ProductList() {
       setPages(res.data.totalPages);
     }).then();
   }, [page, rowsPerPage, debouncedSearchTerm]);
-
-  const [selectedKeys, setSelectedKeys] = useState(new Set([]));
-  const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
-  const [statusFilter, setStatusFilter] = useState("all");
-
-  const headerColumns = useMemo(() => {
-    if (visibleColumns === "all") return columns;
-
-    return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
-  }, [visibleColumns]);
-
-  const filteredItems = useMemo(() => {
-    let filteredItems = [...items];
-    if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
-      filteredItems = filteredItems.filter((item) =>
-        Array.from(statusFilter).includes(item.status),
-      );
-    }
-
-    return filteredItems;
-  }, [items, statusFilter]);
 
   const renderCell = useCallback((item, columnKey) => {
     const cellValue = item[columnKey];
@@ -243,23 +221,21 @@ export default function ProductList() {
         },
       }}
       classNames={classNames}
-      selectedKeys={selectedKeys}
       topContent={topContent}
       topContentPlacement="outside"
-      onSelectionChange={setSelectedKeys}
     >
-      <TableHeader columns={headerColumns}>
+      <TableHeader columns={columns}>
         {(column) => (
           <TableColumn
             key={column.uid}
-            align={column.uid === "actions" || column.uid === "totalQuantityOnHand" ? "center" : "start"}
+            align={column.uid === "actions" ? "center" : "start"}
             allowsSorting={column.sortable}
           >
             {column.name}
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody emptyContent={"Loading ..."} items={filteredItems}>
+      <TableBody emptyContent={"Loading ..."} items={items}>
         {(item) => (
           <TableRow key={item.id}>
             {(columnKey) => (

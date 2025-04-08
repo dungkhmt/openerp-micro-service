@@ -36,7 +36,7 @@ const ReceiptDetail = () => {
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>
-          Receipt Item Requests
+          Purchase order items
         </Typography>
       </Box>
 

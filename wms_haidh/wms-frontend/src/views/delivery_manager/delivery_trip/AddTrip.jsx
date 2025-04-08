@@ -339,7 +339,7 @@ const AddTrip = () => {
         </Paper>
         <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
           <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-            Assigned Order Items
+            Assigned Items
           </Typography>
           <div className='mb-4'>
             <Typography variant="h7" gutterBottom className="text-green-500">
@@ -351,7 +351,6 @@ const AddTrip = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>Select</TableCell>
-                  <TableCell>Order Date</TableCell>
                   <TableCell>Product</TableCell>
                   <TableCell>Weight</TableCell>
                   <TableCell>Quantity</TableCell>
@@ -368,9 +367,6 @@ const AddTrip = () => {
                           checked={false}
                           inputProps={{ "aria-label": "Select product" }}
                         />
-                      </TableCell>
-                      <TableCell width={150}>
-                        <Skeleton variant="text" />
                       </TableCell>
                       <TableCell width={200}>
                         <Skeleton variant="text" />
@@ -398,7 +394,6 @@ const AddTrip = () => {
                           inputProps={{ "aria-label": "Select product" }}
                         />
                       </TableCell>
-                      <TableCell width={150}>{formatDate(detail.orderDate)}</TableCell>
                       <TableCell width={200}>{detail.productName}</TableCell>
                       <TableCell width={100}>{detail.weight}</TableCell>
                       <TableCell width={100}>{detail.originalQuantity}</TableCell>

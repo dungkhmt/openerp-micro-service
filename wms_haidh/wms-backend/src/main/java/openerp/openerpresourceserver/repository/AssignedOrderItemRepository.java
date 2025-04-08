@@ -40,15 +40,13 @@ public interface AssignedOrderItemRepository extends JpaRepository<AssignedOrder
 	@Query("""
 			    SELECT
 			        aoi.assignedOrderItemId AS assignedOrderItemId,
-			        o.orderId AS orderId,
-			        o.orderDate AS orderDate,
+			        aoi.orderId AS orderId,
 			        p.name AS productName,
 			        p.weight AS weight,
 			        aoi.originalQuantity AS originalQuantity,
 			        b.code AS bayCode,
 			        aoi.lotId AS lotId
 			    FROM AssignedOrderItem aoi
-			    JOIN Order o ON aoi.orderId = o.orderId
 			    JOIN Product p ON aoi.productId = p.productId
 			    JOIN Bay b ON aoi.bayId = b.bayId
 			    WHERE aoi.warehouseId = :warehouseId

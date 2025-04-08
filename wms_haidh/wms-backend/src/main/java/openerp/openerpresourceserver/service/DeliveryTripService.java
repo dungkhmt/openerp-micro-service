@@ -25,7 +25,7 @@ import openerp.openerpresourceserver.repository.DeliveryTripRepository;
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class DeliveryTripService {
 
-	private static final String TRIP_PREFIX = "TRP_";
+	private static final String TRIP_PREFIX = "TRP";
 	private DeliveryTripRepository deliveryTripRepository;
 	private final DeliveryTripItemService deliveryTripItemService;
 	private DeliveryTripPathService deliveryTripPathService;

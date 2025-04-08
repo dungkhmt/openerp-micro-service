@@ -13,7 +13,8 @@ import org.springframework.stereotype.Repository;
 
 import openerp.openerpresourceserver.entity.Product;
 import openerp.openerpresourceserver.projection.ProductDetailProjection;
-import openerp.openerpresourceserver.projection.ProductInfoProjection;
+import openerp.openerpresourceserver.projection.ProductGeneralProjection;
+import openerp.openerpresourceserver.projection.ProductInventoryProjection;
 import openerp.openerpresourceserver.projection.ProductNameProjection;
 import openerp.openerpresourceserver.projection.ProductProjection;
 
@@ -27,8 +28,13 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 			+ "ORDER BY p.dateUpdated DESC", countQuery = "SELECT COUNT(DISTINCT p.productId) " + "FROM Product p "
 					+ "LEFT JOIN ProductWarehouse pw ON p.productId = pw.productId "
 					+ "WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
-	Page<ProductInfoProjection> findProductInfoWithTotalQuantity(@Param("searchTerm") String searchTerm,
-			Pageable pageable);
+	Page<ProductInventoryProjection> findProductInventory(@Param("searchTerm") String searchTerm, Pageable pageable);
+
+	@Query(value = "SELECT p.productId as id, p.code as code, p.name as name, p.dateUpdated as dateUpdated "
+			+ "FROM Product p " + "WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+			+ "ORDER BY p.dateUpdated DESC", countQuery = "SELECT COUNT(DISTINCT p.productId) " + "FROM Product p "
+					+ "WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+	Page<ProductGeneralProjection> findProductGeneral(String searchTerm, Pageable pageable);
 
 	@Query("SELECT p.productId AS productId, p.name AS name FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
 	List<ProductNameProjection> findProductNamesByName(@Param("searchTerm") String searchTerm);
@@ -36,45 +42,41 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 	Optional<Product> findByCode(String code);
 
 	@Query("""
-	    SELECT
-	        p.productId AS productId,
-	        p.name AS name,
-	        CONCAT(:baseUrl, '/api/images/', p.imageId) AS imageUrl,
-	        COALESCE(pr.price, 0) AS price,
-	        COALESCE(SUM(w.quantityOnHand), 0) AS quantity
-	    FROM Product p
-	    LEFT JOIN ProductPrice pr ON p.productId = pr.productId 
-	        AND pr.startDate <= CURRENT_TIMESTAMP 
-	        AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_TIMESTAMP)
-	    LEFT JOIN ProductWarehouse w ON p.productId = w.productId
-	    WHERE (:searchTerm IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')))
-	      AND p.categoryId = :categoryId
-	    GROUP BY p.productId, p.name, p.imageId, pr.price
-	    """)
-	Page<ProductProjection> findAllProductsByCategory(Pageable pageable,
-	    @Param("baseUrl") String baseUrl,
-	    @Param("searchTerm") String searchTerm,
-	    @Param("categoryId") UUID categoryId);
+			SELECT
+			    p.productId AS productId,
+			    p.name AS name,
+			    CONCAT(:baseUrl, '/api/images/', p.imageId) AS imageUrl,
+			    COALESCE(pr.price, 0) AS price,
+			    COALESCE(SUM(w.quantityOnHand), 0) AS quantity
+			FROM Product p
+			LEFT JOIN ProductPrice pr ON p.productId = pr.productId
+			    AND pr.startDate <= CURRENT_TIMESTAMP
+			    AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_TIMESTAMP)
+			LEFT JOIN ProductWarehouse w ON p.productId = w.productId
+			WHERE (:searchTerm IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')))
+			  AND p.categoryId = :categoryId
+			GROUP BY p.productId, p.name, p.imageId, pr.price
+			""")
+	Page<ProductProjection> findAllProductsByCategory(Pageable pageable, @Param("baseUrl") String baseUrl,
+			@Param("searchTerm") String searchTerm, @Param("categoryId") UUID categoryId);
 
 	@Query("""
-	    SELECT
-	        p.productId AS productId,
-	        p.name AS name,
-	        CONCAT(:baseUrl, '/api/images/', p.imageId) AS imageUrl,
-	        COALESCE(pr.price, 0) AS price,
-	        COALESCE(SUM(w.quantityOnHand), 0) AS quantity
-	    FROM Product p
-	    LEFT JOIN ProductPrice pr ON p.productId = pr.productId 
-	        AND pr.startDate <= CURRENT_TIMESTAMP 
-	        AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_TIMESTAMP)
-	    LEFT JOIN ProductWarehouse w ON p.productId = w.productId
-	    WHERE (:searchTerm IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')))
-	    GROUP BY p.productId, p.name, p.imageId, pr.price
-	    """)
-	Page<ProductProjection> findAllProductsWithoutCategory(Pageable pageable,
-	    @Param("baseUrl") String baseUrl,
-	    @Param("searchTerm") String searchTerm);
-
+			SELECT
+			    p.productId AS productId,
+			    p.name AS name,
+			    CONCAT(:baseUrl, '/api/images/', p.imageId) AS imageUrl,
+			    COALESCE(pr.price, 0) AS price,
+			    COALESCE(SUM(w.quantityOnHand), 0) AS quantity
+			FROM Product p
+			LEFT JOIN ProductPrice pr ON p.productId = pr.productId
+			    AND pr.startDate <= CURRENT_TIMESTAMP
+			    AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_TIMESTAMP)
+			LEFT JOIN ProductWarehouse w ON p.productId = w.productId
+			WHERE (:searchTerm IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')))
+			GROUP BY p.productId, p.name, p.imageId, pr.price
+			""")
+	Page<ProductProjection> findAllProductsWithoutCategory(Pageable pageable, @Param("baseUrl") String baseUrl,
+			@Param("searchTerm") String searchTerm);
 
 	@Query("SELECT p.productId AS productId, p.code AS code, p.name AS name, p.description AS description, "
 			+ "p.height AS height, p.weight AS weight, p.area AS area, p.uom AS uom, "

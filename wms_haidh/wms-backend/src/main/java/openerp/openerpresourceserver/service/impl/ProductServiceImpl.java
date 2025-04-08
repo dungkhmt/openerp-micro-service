@@ -16,7 +16,8 @@ import lombok.NoArgsConstructor;
 import openerp.openerpresourceserver.dto.request.ProductCreateRequest;
 import openerp.openerpresourceserver.entity.Product;
 import openerp.openerpresourceserver.projection.ProductDetailProjection;
-import openerp.openerpresourceserver.projection.ProductInfoProjection;
+import openerp.openerpresourceserver.projection.ProductGeneralProjection;
+import openerp.openerpresourceserver.projection.ProductInventoryProjection;
 import openerp.openerpresourceserver.projection.ProductNameProjection;
 import openerp.openerpresourceserver.projection.ProductProjection;
 import openerp.openerpresourceserver.repository.ProductRepository;
@@ -32,8 +33,13 @@ public class ProductServiceImpl implements ProductService {
 	private ImageService imageService;
 
 	@Override
-	public Page<ProductInfoProjection> getAllProductGeneral(String searchTerm, Pageable pageable) {
-		return productRepository.findProductInfoWithTotalQuantity(searchTerm, pageable);
+	public Page<ProductGeneralProjection> getAllProductGeneral(String searchTerm, Pageable pageable) {
+		return productRepository.findProductGeneral(searchTerm, pageable);
+	}
+	
+	@Override
+	public Page<ProductInventoryProjection> getAllProductInventory(String searchTerm, Pageable pageable) {
+		return productRepository.findProductInventory(searchTerm, pageable);
 	}
 
 	@Override
@@ -151,5 +157,7 @@ public class ProductServiceImpl implements ProductService {
 		String baseUrl = "http://localhost:8082";
         return productRepository.findProductDetailById(productId, baseUrl);
     }
+
+	
 
 }
