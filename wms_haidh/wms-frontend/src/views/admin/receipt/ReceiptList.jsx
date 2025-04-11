@@ -22,12 +22,12 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../../api";
 import { formatDate } from '../../../utils/utils';
 const statusColorMap = {
-  APPROVED: "secondary",    
-  IN_PROGRESS: "warning",   
-  COMPLETED: "success",    
+  APPROVED: "secondary",
+  IN_PROGRESS: "warning",
+  COMPLETED: "success",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["receiptName", "createdReason", "description", "expectedReceiptDate", "status", "approvedBy", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["receiptName", "warehouseName", "expectedReceiptDate", "status", "approvedBy", "actions"];
 export default function ReceiptList() {
 
   const [page, setPage] = useState(1);

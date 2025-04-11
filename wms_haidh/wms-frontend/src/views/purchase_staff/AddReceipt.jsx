@@ -11,34 +11,36 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-import { useNavigate, useParams } from 'react-router-dom';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useNavigate } from 'react-router-dom';
 import { request } from "../../api";
-import {debounce}  from '../../utils/utils';
-
+import { debounce } from '../../utils/utils';
 
 const AddReceipt = () => {
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
-  const [warehouse, setWarehouse] = useState([]);
+  const [warehouseList, setWarehouseList] = useState([]);
+  const [warehouseId, setWarehouseId] = useState('');
   const [reason, setReason] = useState('');
   const [expectedReceiptDate, setExpectedReceiptDate] = useState('');
-  const [createdBy] = useState('admin');
-  const [requestDetails, setRequestDetails] = useState([
-    { productId: '', quantity: '', warehouseId: '' },
-  ]);
+  const [createdBy] = useState('hoanglotar2000');
+  const [requestDetails, setRequestDetails] = useState([{ productId: '', quantity: '' }]);
   const [productSuggestions, setProductSuggestions] = useState([]);
-  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(null); // Lưu dòng hiển thị suggestion
-  const [productNames, setProductNames] = useState({}); // Lưu tạm `productName`
+  const [productNames, setProductNames] = useState({});
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(null);
 
   useEffect(() => {
     request("get", "/warehouses", (res) => {
-      setWarehouse(res.data);
+      setWarehouseList(res.data);
     }).then();
   }, []);
 
@@ -51,28 +53,28 @@ const AddReceipt = () => {
       } else {
         setProductSuggestions([]);
       }
-    }, 500), // Debounce delay là 500ms
+    }, 500),
     []
   );
 
   const handleProductSearch = (index, value) => {
     setProductNames((prev) => ({ ...prev, [index]: value }));
-    setActiveSuggestionIndex(index); // Chỉ kích hoạt dòng hiện tại
-    fetchProductSuggestions(value); // Sử dụng debounce để tìm kiếm
+    setActiveSuggestionIndex(index);
+    fetchProductSuggestions(value);
   };
 
   const handleProductSelect = (index, product) => {
     const updatedDetails = [...requestDetails];
-    updatedDetails[index].productId = product.productId; // Chỉ lưu `productId`
+    updatedDetails[index].productId = product.productId;
     setRequestDetails(updatedDetails);
 
-    setProductNames((prev) => ({ ...prev, [index]: product.name })); // Hiển thị `productName`
-    setProductSuggestions([]); // Xóa danh sách gợi ý sau khi chọn
-    setActiveSuggestionIndex(null); // Reset dòng hiển thị suggestion
+    setProductNames((prev) => ({ ...prev, [index]: product.name }));
+    setProductSuggestions([]);
+    setActiveSuggestionIndex(null);
   };
 
   const handleAddRequestDetail = () => {
-    setRequestDetails([...requestDetails, { productId: '', quantity: '', warehouseId: '' }]);
+    setRequestDetails([...requestDetails, { productId: '', quantity: '' }]);
   };
 
   const handleDeleteRequestDetail = (index) => {
@@ -84,7 +86,7 @@ const AddReceipt = () => {
       return newNames;
     });
     if (activeSuggestionIndex === index) {
-      setActiveSuggestionIndex(null); // Tắt suggestion nếu xóa dòng hiện tại
+      setActiveSuggestionIndex(null);
     }
   };
 
@@ -94,105 +96,130 @@ const AddReceipt = () => {
     setRequestDetails(updatedDetails);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+
+    const updatedRequestDetails = requestDetails.map(item => ({
+      ...item,
+      warehouseId: warehouseId, 
+    }));
+
     const receiptData = {
       receiptName: name,
       description,
       receiptDate: date,
-      warehouseId: null,
+      warehouseId,
       createdReason: reason,
       expectedReceiptDate,
       createdBy,
-      receiptItemRequests: requestDetails,
+      receiptItemRequests: updatedRequestDetails, 
     };
-    // console.log(receiptData);
-    const requestUrl = "/receipts";
-    request("post", requestUrl, (res) => {
-      if (res.status === 200) {
-        navigate(`/purchase-staff/receipts`);
-      } else {
-        alert("Error occcured !");
-      }
-    }, {}, receiptData);
+
+    request(
+      "post",
+      "/receipts",
+      (res) => {
+        if (res.status === 200) {
+          navigate(`/purchase-staff/receipts`);
+        } else {
+          alert("Error occurred!");
+        }
+      },
+      {},
+      receiptData
+    );
   };
+
 
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
+      {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <IconButton color="primary" onClick={() => navigate('/purchase-staff/receipts')} sx={{ color: 'black' }}>
+        <IconButton onClick={() => navigate('/purchase-staff/receipts')} sx={{ color: 'black' }}>
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
+        <Typography variant="h6" sx={{ ml: 1 }}>
           Add New Receipt
         </Typography>
         <Button
           variant="contained"
-          color="primary"
           sx={{
             marginLeft: 'auto',
             backgroundColor: 'black',
             color: 'white',
-            '&:hover': {
-              backgroundColor: 'black',
-              opacity: 0.75,
-            }
+            '&:hover': { backgroundColor: 'black', opacity: 0.75 }
           }}
           onClick={handleSubmit}
         >
           Save Receipt
         </Button>
       </Box>
+
       <Grid container spacing={2}>
-        {/* General Information */}
         <Grid item xs={12}>
           <Paper elevation={3} sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              General Information
-            </Typography>
+            <Typography variant="h6" gutterBottom>General Information</Typography>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   label="Receipt Name"
-                  placeholder="Enter receipt name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel id="warehouse-label">Warehouse</InputLabel>
+                  <Select
+                    labelId="warehouse-label"
+                    value={warehouseId}
+                    onChange={(e) => setWarehouseId(e.target.value)}
+                    label="Warehouse"
+                  >
+                    {warehouseList.map((warehouse) => (
+                      <MenuItem key={warehouse.warehouseId} value={warehouse.warehouseId}>
+                        {warehouse.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={12}>
                 <TextField
                   fullWidth
                   label="Description"
-                  placeholder="Enter description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
               </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Reason"
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                />
+              </Grid>
+
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Date"
                   type="date"
+                  label="Receipt Date"
                   InputLabelProps={{ shrink: true }}
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                 />
               </Grid>
+
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Reason"
-                  placeholder="Enter created reason"
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Expected Receipt Date"
                   type="date"
+                  label="Expected Receipt Date"
                   InputLabelProps={{ shrink: true }}
                   value={expectedReceiptDate}
                   onChange={(e) => setExpectedReceiptDate(e.target.value)}
@@ -203,77 +230,78 @@ const AddReceipt = () => {
         </Grid>
 
         <Grid item xs={12}>
-          <Paper elevation={3} sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6" gutterBottom sx={{ flexGrow: 1 }}>
-                Receipt Detail
-              </Typography>
-              <IconButton color="primary" onClick={handleAddRequestDetail}>
-                <AddIcon />
-              </IconButton>
-            </Box>
-            {requestDetails.map((item, index) => (
-              <Grid container spacing={2} key={index} className='mb-4'>
-                <Grid item xs={12} sm={5}>
-                  <TextField
-                    fullWidth
-                    label="Product"
-                    placeholder="Search product"
-                    value={productNames[index] || ''}
-                    onChange={(e) => handleProductSearch(index, e.target.value)}
-                  />
-                  {activeSuggestionIndex === index && productSuggestions.length > 0 && (
-                    <Box>
-                      {productSuggestions.map((product) => (
-                        <MenuItem
-                          key={product.productId}
-                          onClick={() => handleProductSelect(index, product)}
-                        >
-                          {product.name}
-                        </MenuItem>
-                      ))}
-                    </Box>
-                  )}
-                </Grid>
-                <Grid item xs={12} sm={3}>
-                  <TextField
-                    fullWidth
-                    label="Quantity"
-                    placeholder="Enter quantity"
-                    type="number"
-                    value={item.quantity}
-                    onChange={(e) => handleRequestDetailChange(index, 'quantity', e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={3}>
-                  <FormControl fullWidth>
-                    <InputLabel id={`warehouse-label-${index}`}>Warehouse</InputLabel>
-                    <Select
-                      labelId={`warehouse-label-${index}`}
-                      value={item.warehouseId}
-                      onChange={(e) => handleRequestDetailChange(index, 'warehouseId', e.target.value)}
-                      label="Warehouse"
-                    >
-                      {warehouse.map((wh) => (
-                        <MenuItem key={wh.warehouseId} value={wh.warehouseId}>
-                          {wh.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={1}>
-                  <IconButton color="secondary" onClick={() => handleDeleteRequestDetail(index)}>
-                    <RemoveIcon />
-                  </IconButton>
-                </Grid>
-              </Grid>
-            ))}
+          <Paper elevation={3} sx={{ p: 3, mt: 2 }}>
+            <Typography variant="h6" gutterBottom>Products</Typography>
+            <List>
+              {requestDetails.map((detail, index) => (
+                <ListItem key={index} disablePadding sx={{ mb: 2 }}>
+                  <Grid container spacing={2} alignItems="center">
+                    <Grid item xs={8}>
+                      <TextField
+                        fullWidth
+                        label="Product Name"
+                        value={productNames[index] || ''}
+                        onChange={(e) => handleProductSearch(index, e.target.value)}
+                      />
+                      {activeSuggestionIndex === index && productSuggestions.length > 0 && (
+                        <List sx={{ position: 'absolute', bgcolor: 'white', zIndex: 1 }}>
+                          {productSuggestions.map((suggestion, i) => (
+                            <ListItemButton key={i} onClick={() => handleProductSelect(index, suggestion)}>
+                              <ListItemText primary={suggestion.name} />
+                            </ListItemButton>
+                          ))}
+                        </List>
+                      )}
+                    </Grid>
+                    <Grid item xs={3}>
+                      <TextField
+                        fullWidth
+                        label="Quantity"
+                        type="number"
+                        value={detail.quantity}
+                        onChange={(e) => handleRequestDetailChange(index, 'quantity', e.target.value)}
+                      />
+                    </Grid>
+                    <Grid item xs={1}>
+                      <IconButton onClick={() => handleDeleteRequestDetail(index)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </Grid>
+                  </Grid>
+                </ListItem>
+              ))}
+            </List>
+            <Button
+              onClick={handleAddRequestDetail}
+              variant="outlined"
+              sx={{
+                mt: 1,
+                color: 'black',
+                borderColor: 'black',
+                border: '1px solid',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                '&:hover': {
+                  backgroundColor: 'black',
+                  color: 'white',
+                  borderColor: 'black',
+                  '& .add-icon': {
+                    color: 'white',
+                  }
+                }
+              }}
+            >
+              <AddIcon className="add-icon" sx={{ color: 'black' }} />
+              Add Product
+            </Button>
+
           </Paper>
         </Grid>
       </Grid>
     </Box>
   );
+
 };
 
 export default AddReceipt;

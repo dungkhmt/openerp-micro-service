@@ -1,7 +1,7 @@
 const columns = [
   { name: "ORDER DATE", uid: "orderDate" },
-  { name: "TOTAL ORDER COST", uid: "totalOrderCost" },
   { name: "CUSTOMER NAME", uid: "customerName" },
+  { name: "TOTAL ORDER COST", uid: "totalOrderCost" },
   { name: "STATUS", uid: "status" },
   { name: "APPROVED BY", uid: "approvedBy" },
   { name: "ACTIONS", uid: "actions" }

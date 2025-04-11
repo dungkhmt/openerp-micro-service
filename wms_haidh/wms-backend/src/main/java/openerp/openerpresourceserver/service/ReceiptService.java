@@ -12,13 +12,18 @@ import org.springframework.stereotype.Service;
 import openerp.openerpresourceserver.dto.request.ReceiptCreateRequest;
 import openerp.openerpresourceserver.entity.Receipt;
 import openerp.openerpresourceserver.projection.ReceiptInfoProjection;
+import openerp.openerpresourceserver.projection.ReceiptProjection;
 import openerp.openerpresourceserver.repository.ReceiptRepository;
 
 @Service
 public class ReceiptService {
 
 	@Autowired
-	private ReceiptRepository receiptRepository;	
+	private ReceiptRepository receiptRepository;
+
+	public Optional<ReceiptProjection> getReceiptDetailsById(UUID id) {
+        return receiptRepository.findReceiptDetailsById(id);
+    }
 
 	public Page<ReceiptInfoProjection> searchReceipts(String status, Pageable pageable) {
 		return receiptRepository.findReceiptsByStatus(status, pageable);
@@ -45,13 +50,11 @@ public class ReceiptService {
 				.receiptDate(receiptDateTime) // Converted to LocalDateTime
 				.warehouseId(request.getWarehouseId()).createdReason(request.getCreatedReason())
 				.expectedReceiptDate(expectedReceiptDateTime) // Converted to LocalDateTime
-				.status("CREATED").createdBy(request.getCreatedBy()).createdStamp(now).lastUpdatedStamp(now) 																						
-				.build();
+				.status("CREATED").createdBy(request.getCreatedBy()).createdStamp(now).lastUpdatedStamp(now).build();
 
 		// Save to database
 		return receiptRepository.save(receipt);
 	}
-
 
 	public boolean approveReceipt(UUID receiptId, String approvedBy) {
 		Optional<Receipt> receiptOptional = receiptRepository.findById(receiptId);
@@ -59,8 +62,8 @@ public class ReceiptService {
 		if (receiptOptional.isPresent()) {
 			Receipt receipt = receiptOptional.get();
 			if (!"CREATED".equals(receipt.getStatus())) {
-	            return false;
-	        }
+				return false;
+			}
 			receipt.setStatus("APPROVED");
 			receipt.setLastUpdatedStamp(LocalDateTime.now());
 			// Thêm thông tin người duyệt
@@ -75,11 +78,11 @@ public class ReceiptService {
 	public boolean cancelReceipt(UUID receiptId, String cancelledBy) {
 		Optional<Receipt> receiptOptional = receiptRepository.findById(receiptId);
 
-		if (receiptOptional.isPresent()) {		
+		if (receiptOptional.isPresent()) {
 			Receipt receipt = receiptOptional.get();
 			if (!"CREATED".equals(receipt.getStatus())) {
-	            return false;
-	        }
+				return false;
+			}
 			receipt.setStatus("CANCELLED");
 			receipt.setLastUpdatedStamp(LocalDateTime.now());
 			// Thêm thông tin người từ chối
@@ -90,11 +93,5 @@ public class ReceiptService {
 
 		return false; // Nếu không tìm thấy receipt
 	}
-
-
-
-	
-
-	
 
 }

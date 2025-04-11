@@ -31,7 +31,7 @@ const statusColorMap = {
 };
 
 
-const INITIAL_VISIBLE_COLUMNS = ["receiptName", "createdReason", "description", "expectedReceiptDate", "status", "createdBy", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["receiptName", "warehouseName", "expectedReceiptDate", "status", "createdBy", "approvedBy", "cancelledBy", "actions"];
 const buttonText = "Create Receipt";
 export default function ReceiptList() {
 
@@ -50,7 +50,22 @@ export default function ReceiptList() {
     }).then();
   }, [page, rowsPerPage, statusFilter]);
 
-  const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
+  const visibleColumns = useMemo(() => {
+    const updatedColumns = new Set(INITIAL_VISIBLE_COLUMNS);
+
+    if (statusFilter === "CREATED") {
+      updatedColumns.delete("approvedBy");
+      updatedColumns.delete("cancelledBy");
+    } else if (statusFilter === "CANCELLED") {
+      updatedColumns.delete("createdBy");
+      updatedColumns.delete("approvedBy");
+    } else {
+      updatedColumns.delete("createdBy");
+      updatedColumns.delete("cancelledBy");
+    }
+
+    return updatedColumns;
+  }, [statusFilter]);
 
   const headerColumns = useMemo(() => {
     if (visibleColumns === "all") return columns;

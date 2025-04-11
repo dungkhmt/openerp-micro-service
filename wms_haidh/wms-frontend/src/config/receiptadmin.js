@@ -1,7 +1,6 @@
 const columns = [
     { name: "RECEIPT NAME", uid: "receiptName" },
-    { name: "CREATED REASON", uid: "createdReason" },
-    { name: "DESCRIPTION", uid: "description" },
+    { name: "WAREHOUSE", uid: "warehouseName" },
     { name: "EXPECTED RECEIPT DATE", uid: "expectedReceiptDate" },
     { name: "STATUS", uid: "status" },
     { name: "APPROVED BY", uid: "approvedBy" },

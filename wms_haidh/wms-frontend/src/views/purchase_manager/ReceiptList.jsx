@@ -29,7 +29,7 @@ const statusColorMap = {
   COMPLETED: "success",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["receiptName", "createdReason", "description", "expectedReceiptDate", "status", "approvedBy", "cancelledBy", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["receiptName", "warehouseName", "expectedReceiptDate", "status", "createdBy", "approvedBy", "cancelledBy", "actions"];
 export default function ReceiptList() {
 
   const [page, setPage] = useState(1);
@@ -54,8 +54,10 @@ export default function ReceiptList() {
       updatedColumns.delete("approvedBy");
       updatedColumns.delete("cancelledBy");
     } else if (statusFilter === "CANCELLED") {
+      updatedColumns.delete("createdBy");
       updatedColumns.delete("approvedBy");
     } else {
+      updatedColumns.delete("createdBy");
       updatedColumns.delete("cancelledBy");
     }
 

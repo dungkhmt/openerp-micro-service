@@ -1,16 +1,16 @@
 package openerp.openerpresourceserver.projection;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
-public interface ReceiptInfoProjection {
-    UUID getReceiptId();
+public interface ReceiptProjection {
     String getReceiptName();
-    String getWarehouseName();
+    String getDescription();
+    LocalDateTime getReceiptDate();
+    String getWarehouseName();  
+    String getCreatedReason();
     LocalDateTime getExpectedReceiptDate();
     String getStatus();
     String getCreatedBy();
-    String getApprovedBy();
-    String getCancelledBy();
+    LocalDateTime getCreatedStamp();
 }
 

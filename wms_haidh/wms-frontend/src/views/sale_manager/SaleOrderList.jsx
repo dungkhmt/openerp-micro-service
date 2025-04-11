@@ -29,7 +29,7 @@ const statusColorMap = {
   COMPLETED: "success",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["orderDate", "totalOrderCost", "customerName", "status", "approvedBy", "cancelledBy", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["orderDate", "customerName", "totalOrderCost", "status", "approvedBy", "cancelledBy", "actions"];
 export default function SaleOrderList() {
 
   const [page, setPage] = useState(1);

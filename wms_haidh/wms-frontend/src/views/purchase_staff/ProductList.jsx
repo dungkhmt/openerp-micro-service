@@ -7,17 +7,10 @@ import {
   TableRow,
   TableCell,
   Input,
-  Button,
-  DropdownTrigger,
-  Dropdown,
-  DropdownMenu,
-  DropdownItem,
   Pagination,
 } from "@nextui-org/react";
-import { VerticalDotsIcon } from "../../components/icon/VerticalDotsIcon";
 import { SearchIcon } from "../../components/icon/SearchIcon";
 import { columns } from "../../config/productpurchase";
-import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../api";
 import { formatDate } from '../../utils/utils';

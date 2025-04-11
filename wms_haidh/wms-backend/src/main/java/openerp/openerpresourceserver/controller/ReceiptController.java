@@ -21,6 +21,7 @@ import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.dto.request.ReceiptCreateRequest;
 import openerp.openerpresourceserver.entity.Receipt;
 import openerp.openerpresourceserver.projection.ReceiptInfoProjection;
+import openerp.openerpresourceserver.projection.ReceiptProjection;
 import openerp.openerpresourceserver.service.ReceiptItemRequestService;
 import openerp.openerpresourceserver.service.ReceiptService;
 
@@ -32,7 +33,7 @@ public class ReceiptController {
 
 	private ReceiptService receiptService;
 	private ReceiptItemRequestService receiptItemRequestService;
-	
+
 	@GetMapping
 	public ResponseEntity<Page<ReceiptInfoProjection>> getReceiptsByStatus(
 
@@ -49,34 +50,42 @@ public class ReceiptController {
 		}
 	}
 
+	@GetMapping("/{id}")
+	public ResponseEntity<ReceiptProjection> getReceiptDetailsById(@PathVariable UUID id) {
+        return receiptService.getReceiptDetailsById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
 	@PostMapping
 	public ResponseEntity<String> createReceipt(@RequestBody ReceiptCreateRequest receiptRequest) {
-	    try {
-	        // Validate item requests
-	        if (receiptRequest.getReceiptItemRequests() == null || receiptRequest.getReceiptItemRequests().isEmpty()) {
-	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Receipt must contain at least one item.");
-	        }
+		try {
+			// Validate item requests
+			if (receiptRequest.getReceiptItemRequests() == null || receiptRequest.getReceiptItemRequests().isEmpty()) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Receipt must contain at least one item.");
+			}
 
-	        // Optionally validate or process the LocalDateTime values (e.g., null checks or defaults)
-	        if (receiptRequest.getReceiptDate() == null) {
-	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Receipt date cannot be null.");
-	        }
+			// Optionally validate or process the LocalDateTime values (e.g., null checks or
+			// defaults)
+			if (receiptRequest.getReceiptDate() == null) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Receipt date cannot be null.");
+			}
 
-	        // Proceed with creating receipt
-	        Receipt createdReceipt = receiptService.createReceipt(receiptRequest);
+			// Proceed with creating receipt
+			Receipt createdReceipt = receiptService.createReceipt(receiptRequest);
 
-	        // Create receipt item requests
-	        receiptItemRequestService.createReceiptItems(createdReceipt.getReceiptId(), receiptRequest.getReceiptItemRequests());
+			// Create receipt item requests
+			receiptItemRequestService.createReceiptItems(createdReceipt.getReceiptId(),
+					receiptRequest.getReceiptItemRequests());
 
-	        return ResponseEntity.ok("Receipt created successfully with ID: " + createdReceipt.getReceiptId());
-	    } catch (IllegalArgumentException e) {
-	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating receipt");
-	    }
+			return ResponseEntity.ok("Receipt created successfully with ID: " + createdReceipt.getReceiptId());
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating receipt");
+		}
 	}
-	
 
 	@PostMapping("/{receiptId}/approve")
 	public ResponseEntity<String> approveReceipt(@PathVariable UUID receiptId, @RequestParam String approvedBy) {
