@@ -14,5 +14,6 @@ public interface ProductDetailProjection {
     String getUom();
     String getImageUrl(); 
     BigDecimal getPrice(); 
+    int getQuantity();
 }
 

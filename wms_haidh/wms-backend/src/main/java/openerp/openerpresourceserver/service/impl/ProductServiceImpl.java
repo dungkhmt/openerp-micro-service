@@ -19,6 +19,7 @@ import openerp.openerpresourceserver.projection.ProductDetailProjection;
 import openerp.openerpresourceserver.projection.ProductGeneralProjection;
 import openerp.openerpresourceserver.projection.ProductInventoryProjection;
 import openerp.openerpresourceserver.projection.ProductNameProjection;
+import openerp.openerpresourceserver.projection.ProductPriceProjection;
 import openerp.openerpresourceserver.projection.ProductProjection;
 import openerp.openerpresourceserver.repository.ProductRepository;
 import openerp.openerpresourceserver.service.ProductService;
@@ -156,6 +157,11 @@ public class ProductServiceImpl implements ProductService {
 	public ProductDetailProjection getProductDetail(UUID productId) {
 		String baseUrl = "http://localhost:8082";
         return productRepository.findProductDetailById(productId, baseUrl);
+    }
+	
+	@Override
+	public Page<ProductPriceProjection> getProductsWithPrice(Pageable pageable, String search) {
+        return productRepository.findAllWithPrice(pageable, search);
     }
 
 	

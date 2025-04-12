@@ -8,8 +8,6 @@ export function cn(...inputs) {
 }
 
 export const formatDate = (dateString) => {
-  if (!dateString) return "No expiry date";
-
   const date = new Date(dateString);
   const options = {
     year: 'numeric',
@@ -22,6 +20,10 @@ export const formatDate = (dateString) => {
   return date.toLocaleString('en-GB', options);
 };
 
+export const formatDatev2 = (dateString) => {
+  const [year, month, day] = dateString.split("-");
+  return `${day}/${month}/${year}`;
+}
 
 export const formatPrice = (price) => {
   return price.toLocaleString("vi-VN", {

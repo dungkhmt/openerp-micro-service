@@ -14,6 +14,7 @@ import openerp.openerpresourceserver.projection.ProductDetailProjection;
 import openerp.openerpresourceserver.projection.ProductGeneralProjection;
 import openerp.openerpresourceserver.projection.ProductInventoryProjection;
 import openerp.openerpresourceserver.projection.ProductNameProjection;
+import openerp.openerpresourceserver.projection.ProductPriceProjection;
 import openerp.openerpresourceserver.projection.ProductProjection;
 
 public interface ProductService {
@@ -35,6 +36,8 @@ public interface ProductService {
 	public ProductDetailProjection getProductDetail(UUID productId);
 
 	Page<ProductProjection> getProducts(Pageable pageable, String searchTerm, UUID categoryId);
+
+	Page<ProductPriceProjection> getProductsWithPrice(Pageable pageable, String search);
 
 }
 

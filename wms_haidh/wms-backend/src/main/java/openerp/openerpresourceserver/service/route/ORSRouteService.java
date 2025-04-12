@@ -2,7 +2,6 @@ package openerp.openerpresourceserver.service.route;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpEntity;
@@ -26,7 +25,6 @@ public class ORSRouteService implements RouteService {
 
     private final RestTemplate restTemplate;
     
-    @Autowired
     public ORSRouteService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }

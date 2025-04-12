@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, IconButton, TextField, Button, Typography, Grid } from "@mui/material";
+import { Card, IconButton, TextField, Button, Typography, Grid, useTheme } from "@mui/material";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
@@ -49,6 +49,7 @@ const QuantityControl = ({ quantity, onIncrease, onDecrease, onChange, onBlur })
 const ProductDetail = () => {
 
     const { id } = useParams();
+    const theme = useTheme();
     const [product, setProduct] = useState({});
     const [quantity, setQuantity] = useState(1);
 
@@ -109,6 +110,19 @@ const ProductDetail = () => {
                     <Grid item xs={12} md={7}>
                         <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{product.name}</Typography>
                         <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>Code: {product.code}</Typography>
+                        <Typography
+                            variant="body2"
+                            color={product.quantity === 0 ? 'error' : theme.palette.success.main}
+                            sx={{
+                                mt: 1,
+                                fontSize: '1rem', 
+                                fontWeight: 600, 
+                            }}
+                        >
+                            {product.quantity === 0 ? 'Sold out' : `Available: ${product.quantity}`}
+                        </Typography>
+
+
                         <Typography variant="h6" sx={{ mt: 2, color: "black" }}>{product.price && formatPrice(product.price)}</Typography>
                         <Typography variant="body1" sx={{ mt: 2 }}>{product.description}</Typography>
                         <div style={{ marginTop: '16px' }}>
@@ -125,6 +139,7 @@ const ProductDetail = () => {
                             color="primary"
                             startIcon={<AddShoppingCartIcon />}
                             onClick={handleAddToCart}
+                            disabled={product.quantity === 0}
                             sx={{
                                 mt: 3,
                                 width: '33%',

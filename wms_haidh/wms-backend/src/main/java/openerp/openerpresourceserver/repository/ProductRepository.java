@@ -16,6 +16,7 @@ import openerp.openerpresourceserver.projection.ProductDetailProjection;
 import openerp.openerpresourceserver.projection.ProductGeneralProjection;
 import openerp.openerpresourceserver.projection.ProductInventoryProjection;
 import openerp.openerpresourceserver.projection.ProductNameProjection;
+import openerp.openerpresourceserver.projection.ProductPriceProjection;
 import openerp.openerpresourceserver.projection.ProductProjection;
 
 @Repository
@@ -46,13 +47,13 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 			    p.productId AS productId,
 			    p.name AS name,
 			    CONCAT(:baseUrl, '/api/images/', p.imageId) AS imageUrl,
-			    COALESCE(pr.price, 0) AS price,
-			    COALESCE(SUM(w.quantityOnHand), 0) AS quantity
+			    pr.price AS price,
+			    SUM(w.quantityOnHand) AS quantity
 			FROM Product p
-			LEFT JOIN ProductPrice pr ON p.productId = pr.productId
-			    AND pr.startDate <= CURRENT_TIMESTAMP
-			    AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_TIMESTAMP)
-			LEFT JOIN ProductWarehouse w ON p.productId = w.productId
+			JOIN ProductPrice pr ON p.productId = pr.productId
+			    AND pr.startDate <= CURRENT_DATE
+			    AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_DATE)
+			JOIN ProductWarehouse w ON p.productId = w.productId
 			WHERE (:searchTerm IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')))
 			  AND p.categoryId = :categoryId
 			GROUP BY p.productId, p.name, p.imageId, pr.price
@@ -65,13 +66,13 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 			    p.productId AS productId,
 			    p.name AS name,
 			    CONCAT(:baseUrl, '/api/images/', p.imageId) AS imageUrl,
-			    COALESCE(pr.price, 0) AS price,
-			    COALESCE(SUM(w.quantityOnHand), 0) AS quantity
+			    pr.price AS price,
+			    SUM(w.quantityOnHand) AS quantity
 			FROM Product p
-			LEFT JOIN ProductPrice pr ON p.productId = pr.productId
-			    AND pr.startDate <= CURRENT_TIMESTAMP
-			    AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_TIMESTAMP)
-			LEFT JOIN ProductWarehouse w ON p.productId = w.productId
+			JOIN ProductPrice pr ON p.productId = pr.productId
+			    AND pr.startDate <= CURRENT_DATE
+			    AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_DATE)
+			JOIN ProductWarehouse w ON p.productId = w.productId
 			WHERE (:searchTerm IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')))
 			GROUP BY p.productId, p.name, p.imageId, pr.price
 			""")
@@ -82,8 +83,21 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 			+ "p.height AS height, p.weight AS weight, p.area AS area, p.uom AS uom, "
 			+ "CONCAT(:baseUrl, '/api/images/', p.imageId) AS imageUrl, "
 			+ "(SELECT pr.price FROM ProductPrice pr WHERE pr.productId = p.productId "
-			+ "AND pr.startDate <= CURRENT_TIMESTAMP AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_TIMESTAMP)) AS price "
-			+ "FROM Product p WHERE p.productId = :productId")
+			+ "AND pr.startDate <= CURRENT_DATE AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_DATE)) AS price, "
+			+ "SUM(w.quantityOnHand) AS quantity " + "FROM Product p "
+			+ "JOIN ProductWarehouse w ON p.productId = w.productId " + "WHERE p.productId = :productId "
+			+ "GROUP BY p.productId, p.code, p.name, p.description, p.height, p.weight, p.area, p.uom, p.imageId")
 	ProductDetailProjection findProductDetailById(@Param("productId") UUID productId, @Param("baseUrl") String baseUrl);
+
+	@Query("""
+			    SELECT p.productId AS productId, p.name AS name,
+			           COALESCE(pp.price, 0) AS price
+			    FROM Product p
+			    LEFT JOIN ProductPrice pp ON p.productId = pp.productId
+			    AND pp.startDate <= CURRENT_DATE
+			      AND (pp.endDate IS NULL OR pp.endDate >= CURRENT_DATE)
+			    WHERE (:search IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')))
+			""")
+	Page<ProductPriceProjection> findAllWithPrice(Pageable pageable, @Param("search") String search);
 
 }

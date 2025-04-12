@@ -86,8 +86,9 @@ const ProductPreview = ({ item }) => {
                     {item.name}
                 </p>
                 <p className={`text-md ${item.quantity === 0 ? 'text-red-500' : 'text-green-500'}`}>
-                    Available: {item.quantity}
+                    {item.quantity === 0 ? 'Sold out' : ' Available : ' + item.quantity}
                 </p>
+
 
             </div>
 
@@ -147,6 +148,7 @@ const ProductPreview = ({ item }) => {
                 color="primary"
                 startIcon={<AddShoppingCartIcon />}
                 onClick={handleAddToCart}
+                disabled={item.quantity === 0}
                 sx={{
                     marginLeft: 'auto',
                     backgroundColor: 'black',
@@ -160,6 +162,7 @@ const ProductPreview = ({ item }) => {
             >
                 Add to cart
             </Button>
+
             <Link to={`/customer/products/${item.productId}`} className="block">
                 <Button
                     variant="outlined"

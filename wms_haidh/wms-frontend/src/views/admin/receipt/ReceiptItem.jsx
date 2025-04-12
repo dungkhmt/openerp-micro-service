@@ -379,7 +379,7 @@ const ReceiptItem = () => {
                     <TableCell>{detail.lotId}</TableCell>
                     <TableCell>{detail.bayCode}</TableCell>
                     <TableCell>{formatPrice(detail.importPrice)}</TableCell>
-                    <TableCell>{formatDate(detail.expiredDate)}</TableCell>
+                    <TableCell>{detail.expiredDate ? formatDate(detail.expiredDate) : "No expiry date"}</TableCell>
                     <TableCell>{detail.receiptBillId}</TableCell>
                   </TableRow>
                 ))}

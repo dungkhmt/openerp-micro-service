@@ -30,6 +30,7 @@ import openerp.openerpresourceserver.projection.ProductDetailProjection;
 import openerp.openerpresourceserver.projection.ProductGeneralProjection;
 import openerp.openerpresourceserver.projection.ProductInventoryProjection;
 import openerp.openerpresourceserver.projection.ProductNameProjection;
+import openerp.openerpresourceserver.projection.ProductPriceProjection;
 import openerp.openerpresourceserver.projection.ProductProjection;
 import openerp.openerpresourceserver.service.ProductService;
 
@@ -44,44 +45,40 @@ public class ProductController {
 	@GetMapping
 	public ResponseEntity<Page<ProductGeneralProjection>> getProductGeneralWithPaging(
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size,
-			@RequestParam(value = "search", required = false) String search) {
+			@RequestParam(required = false) String search) {
 
 		Pageable pageable = PageRequest.of(page, size);
 		Page<ProductGeneralProjection> products = productService.getAllProductGeneral(search, pageable);
 
 		return ResponseEntity.ok(products);
 	}
-	
+
 	@GetMapping("/inventory")
 	public ResponseEntity<Page<ProductInventoryProjection>> getProductInventoryWithPaging(
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size,
-			@RequestParam(value = "search", required = false) String search) {
+			@RequestParam(required = false) String search) {
 
 		Pageable pageable = PageRequest.of(page, size);
 		Page<ProductInventoryProjection> products = productService.getAllProductInventory(search, pageable);
 
 		return ResponseEntity.ok(products);
 	}
-	
+
 	@GetMapping("/public")
 	public ResponseEntity<?> getProducts(@RequestParam(defaultValue = "0") int page,
-	        @RequestParam(defaultValue = "3") int size,
-	        @RequestParam(required = false) String searchTerm,
-	        @RequestParam(required = false) UUID categoryId,
-	        @RequestParam(defaultValue = "asc") String sortDir) {
-	    try {
-	        Sort sort = Sort.by("price");
-	        sort = sortDir.equalsIgnoreCase("desc") ? sort.descending() : sort.ascending();
-	        Pageable pageable = PageRequest.of(page, size, sort);
-	        Page<ProductProjection> products = productService.getProducts(pageable, searchTerm, categoryId);
-	        return ResponseEntity.ok(products);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                .body("Đã xảy ra lỗi khi xử lý yêu cầu.");
-	    }
+			@RequestParam(defaultValue = "3") int size, @RequestParam(required = false) String searchTerm,
+			@RequestParam(required = false) UUID categoryId, @RequestParam(defaultValue = "asc") String sortDir) {
+		try {
+			Sort sort = Sort.by("price");
+			sort = sortDir.equalsIgnoreCase("desc") ? sort.descending() : sort.ascending();
+			Pageable pageable = PageRequest.of(page, size, sort);
+			Page<ProductProjection> products = productService.getProducts(pageable, searchTerm, categoryId);
+			return ResponseEntity.ok(products);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi khi xử lý yêu cầu.");
+		}
 	}
-
 
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getProductDetail(@PathVariable("id") UUID productId) {
@@ -119,8 +116,17 @@ public class ProductController {
 		return ResponseEntity.ok(products);
 	}
 
+	@GetMapping("/price")
+	public ResponseEntity<Page<ProductPriceProjection>> getProductsWithPrice(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size, @RequestParam(required = false) String search) {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<ProductPriceProjection> productList = productService.getProductsWithPrice(pageable, search);
+
+		return ResponseEntity.ok(productList);
+	}
+
 	@PostMapping
-	public ResponseEntity<String> createProduct(@RequestParam("productData") String productData,
+	public ResponseEntity<String> createProduct(@RequestParam String productData,
 			@RequestParam(value = "image", required = false) MultipartFile imageFile) {
 		try {
 			// Deserialize product data
@@ -142,7 +148,7 @@ public class ProductController {
 	}
 
 	@PostMapping("/update")
-	public ResponseEntity<String> updateProduct(@RequestParam("productData") String productData,
+	public ResponseEntity<String> updateProduct(@RequestParam String productData,
 			@RequestParam(value = "image", required = false) MultipartFile imageFile) {
 		try {
 			// Deserialize product data
