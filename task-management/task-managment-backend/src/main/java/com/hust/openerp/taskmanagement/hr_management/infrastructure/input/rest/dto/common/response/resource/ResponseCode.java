@@ -44,6 +44,10 @@ public enum ResponseCode {
     CHECKPOINT_CONFIGURE_NOT_EXISTED(1026L, "checkpoint configure not existed"),
     CHECKPOINT_PERIOD_NOT_EXISTED(1027L, "checkpoint period not existed"),
     CHECKPOINT_PERIOD_UPDATE_ERROR(1028L, "checkpoint period update error"),
+    HOLIDAY_NOT_EXISTED(1029L, "holiday not existed"),
+    HOLIDAY_UPDATE_ERROR(1030L, "holiday update error"),
+    HOLIDAY_CREATE_ERROR(1031L, "holiday create error"),
+    HOLIDAY_DELETE_ERROR(1032L, "holiday delete error"),
     ;
     private final long code;
     private final String message;

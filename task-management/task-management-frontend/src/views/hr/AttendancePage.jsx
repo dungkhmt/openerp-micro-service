@@ -11,6 +11,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { request } from "@/api";
 import SearchSelect from "@/components/item/SearchSelect";
 import { useNavigate } from "react-router-dom";
+import Pagination from "@/components/item/Pagination";
 
 const AttendancePage = () => {
   const navigate = useNavigate();
@@ -20,17 +21,24 @@ const AttendancePage = () => {
   const [selectedPos, setSelectedPos] = useState(null);
   const [searchName, setSearchName] = useState("");
   const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [currentPage, setCurrentPage] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [pageCount, setPageCount] = useState(0);
+
 
   const todayStr = new Date().toISOString().split("T")[0];
 
-  const fetchEmployees = async () => {
+  const fetchEmployees = async (page = 0, size = itemsPerPage) => {
     return new Promise((resolve) => {
       request(
         "post",
         "/staff/get-all-staff-info",
         (res) => {
           const list = res.data.data || [];
+          const meta = res.data.meta || {};
           setEmployees(list);
+          setPageCount(meta.page_info?.total_page || 1);
+          setCurrentPage(meta.page_info?.page || 0);
           resolve(list);
         },
         {},
@@ -39,11 +47,13 @@ const AttendancePage = () => {
           department_code: selectedDept?.department_code || null,
           job_position_code: selectedPos?.code || null,
           status: "ACTIVE",
-          pageable_request: { page: 0, page_size: 100 },
+          pageable_request: { page, page_size: size },
         }
       );
     });
   };
+
+
 
   const fetchAttendances = async (employeeList) => {
     const userIds = employeeList.map((e) => e.user_login_id);
@@ -61,10 +71,12 @@ const AttendancePage = () => {
     );
   };
 
-  const handleSearch = async () => {
-    const list = await fetchEmployees();
+  const handleSearch = async (page = 0, size = itemsPerPage) => {
+    const list = await fetchEmployees(page, size);
     await fetchAttendances(list);
   };
+
+
 
   useEffect(() => {
     handleSearch();
@@ -289,6 +301,16 @@ const AttendancePage = () => {
           </table>
         </Box>
       </Box>
+      <Pagination
+        currentPage={currentPage}
+        pageCount={pageCount}
+        itemsPerPage={itemsPerPage}
+        onPageChange={(page) => handleSearch(page, itemsPerPage)}
+        onItemsPerPageChange={(size) => {
+          setItemsPerPage(size);
+          handleSearch(0, size);
+        }}
+      />
 
     </Box>
   );
