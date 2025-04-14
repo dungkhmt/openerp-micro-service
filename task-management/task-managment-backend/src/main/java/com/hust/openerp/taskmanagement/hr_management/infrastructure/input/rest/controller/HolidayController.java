@@ -30,7 +30,7 @@ public class HolidayController extends BeanAwareUseCasePublisher {
         return ResponseEntity.ok(HolidayResponse.fromModel(holidayModel));
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<?> getHolidays(
         @RequestParam YearMonth month
     ) {
@@ -42,7 +42,7 @@ public class HolidayController extends BeanAwareUseCasePublisher {
         return ResponseEntity.ok(HolidayListResponse.fromModel(model));
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<?> createHoliday(
             @Valid @RequestBody CreateHolidayRequest request
     ){
@@ -52,7 +52,7 @@ public class HolidayController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PutMapping("/")
+    @PutMapping("")
     public ResponseEntity<?> updateHoliday(
             @Valid @RequestBody UpdateHolidayRequest request
     ){

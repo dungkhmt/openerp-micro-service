@@ -11,15 +11,14 @@ import {
   InputLabel,
   FormControl,
   Typography,
-  IconButton,
   Stack,
-  Box,
 } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { request } from "@/api";
 import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+dayjs.extend(isSameOrBefore);
 
 const AddHolidayModal = ({ open, onClose, onSubmit }) => {
   const [form, setForm] = useState({
@@ -28,34 +27,36 @@ const AddHolidayModal = ({ open, onClose, onSubmit }) => {
     dates: [],
   });
 
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAddDate = (newDate) => {
-    const formatted = dayjs(newDate).format("YYYY-MM-DD");
-    if (!form.dates.includes(formatted)) {
-      setForm((prev) => ({
-        ...prev,
-        dates: [...prev.dates, formatted],
-      }));
-    }
-  };
+  const generateDateRange = (start, end) => {
+    const startDate = dayjs(start);
+    const endDate = dayjs(end);
+    const result = [];
 
-  const handleRemoveDate = (date) => {
-    setForm((prev) => ({
-      ...prev,
-      dates: prev.dates.filter((d) => d !== date),
-    }));
+    let current = startDate;
+    while (current.isSameOrBefore(endDate, "day")) {
+      result.push(current.format("YYYY-MM-DD"));
+      current = current.add(1, "day");
+    }
+
+    return result;
   };
 
   const handleSubmit = () => {
+    if (!fromDate || !toDate) return;
+
+    const dateArray = generateDateRange(fromDate, toDate);
+
     request(
       "post",
-      "/holiday/create",
+      "/holidays",
       () => {
         onSubmit();
       },
@@ -65,7 +66,7 @@ const AddHolidayModal = ({ open, onClose, onSubmit }) => {
       {
         name: form.name,
         type: form.type,
-        dates: form.dates,
+        dates: dateArray,
       }
     );
   };
@@ -97,46 +98,31 @@ const AddHolidayModal = ({ open, onClose, onSubmit }) => {
           </FormControl>
 
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-              label="Chọn ngày nghỉ"
-              value={selectedDate}
-              onChange={(date) => {
-                setSelectedDate(date);
-                handleAddDate(date);
-              }}
-              format="DD/MM/YYYY"
-            />
+            <Stack direction="row" spacing={2}>
+              <DatePicker
+                label="Từ ngày"
+                value={fromDate}
+                onChange={(date) => setFromDate(date)}
+                format="DD/MM/YYYY"
+                slotProps={{ textField: { fullWidth: true } }}
+                sx={{ flex: 1 }}
+              />
+              <DatePicker
+                label="Đến ngày"
+                value={toDate}
+                onChange={(date) => setToDate(date)}
+                format="DD/MM/YYYY"
+                minDate={fromDate}
+                slotProps={{ textField: { fullWidth: true } }}
+                sx={{ flex: 1 }}
+              />
+            </Stack>
           </LocalizationProvider>
 
-          {form.dates.length > 0 && (
-            <Box>
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                Ngày đã chọn:
-              </Typography>
-              <Stack spacing={1}>
-                {form.dates.map((date) => (
-                  <Box
-                    key={date}
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    px={2}
-                    py={1}
-                    border="1px solid #e0e0e0"
-                    borderRadius={1}
-                  >
-                    <Typography>{dayjs(date).format("DD/MM/YYYY")}</Typography>
-                    <IconButton
-                      color="error"
-                      onClick={() => handleRemoveDate(date)}
-                      size="small"
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
-                ))}
-              </Stack>
-            </Box>
+          {fromDate && toDate && (
+            <Typography variant="body2" color="text.secondary">
+              Tổng cộng: {generateDateRange(fromDate, toDate).length} ngày
+            </Typography>
           )}
         </Stack>
       </DialogContent>
@@ -146,7 +132,7 @@ const AddHolidayModal = ({ open, onClose, onSubmit }) => {
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={!form.name || form.dates.length === 0}
+          disabled={!form.name || !fromDate || !toDate}
         >
           Lưu
         </Button>

@@ -9,15 +9,18 @@ import java.util.List;
 import java.util.UUID;
 
 public interface HolidayRepo extends IBaseRepository<HolidayEntity, UUID>  {
-    @Query("SELECT h FROM HolidayEntity h " +
-        "WHERE (" +
-        "   ( :startDate <= h.dates AND :endDate >= h.dates ) " +
-        "   OR " +
-        "   (h.type = 'EVERY_YEAR' AND " +
-        "      (MONTH(:startDate) <= MONTH(h.dates) AND MONTH(:endDate) >= MONTH(h.dates)) AND " +
-        "      (DAY(:startDate) <= DAY(h.dates) AND DAY(:endDate) >= DAY(h.dates))" +
-        ") )")
-    List<HolidayEntity> findHolidaysBetweenDates(@Param("startDate") LocalDate startDate,
-                                                 @Param("endDate") LocalDate endDate);
+    @Query(value = """
+    SELECT *
+    FROM hr_holiday h
+    WHERE EXISTS (
+        SELECT 1
+        FROM unnest(h.dates) AS d
+        WHERE d BETWEEN CAST(:startDate AS date) AND CAST(:endDate AS date)
+    )
+    """, nativeQuery = true)
+    List<HolidayEntity> findHolidaysWithDatesInRange(
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate
+    );
 }
 

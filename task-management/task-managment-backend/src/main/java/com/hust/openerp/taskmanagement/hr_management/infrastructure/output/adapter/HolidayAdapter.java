@@ -61,7 +61,7 @@ public class HolidayAdapter implements IHolidayPort {
 
     @Override
     public List<HolidayModel> getHolidays(LocalDate startDate, LocalDate endDate) {
-        var holidays = holidayRepo.findHolidaysBetweenDates(startDate, endDate);
+        var holidays = holidayRepo.findHolidaysWithDatesInRange(startDate, endDate);
         return toModels(holidays);
     }
 
