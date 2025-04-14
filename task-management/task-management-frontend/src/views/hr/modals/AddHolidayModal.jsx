@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -18,17 +18,30 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { request } from "@/api";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import toast from "react-hot-toast";
 dayjs.extend(isSameOrBefore);
 
-const AddHolidayModal = ({ open, onClose, onSubmit }) => {
+const AddHolidayModal = ({ open, onClose, onSubmit, initialData = null }) => {
   const [form, setForm] = useState({
     name: "",
     type: "IN_YEAR",
     dates: [],
   });
-
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
+
+  useEffect(() => {
+    if (initialData) {
+      const dates = initialData.dates || [];
+      setForm({
+        name: initialData.name || "",
+        type: initialData.type || "IN_YEAR",
+        dates,
+      });
+      setFromDate(dayjs(dates[0]));
+      setToDate(dayjs(dates[dates.length - 1]));
+    }
+  }, [initialData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -54,14 +67,18 @@ const AddHolidayModal = ({ open, onClose, onSubmit }) => {
 
     const dateArray = generateDateRange(fromDate, toDate);
 
+    const method = initialData ? "put" : "post";
+    const url = initialData ? `/holidays/${initialData.id}` : "/holidays";
+
     request(
-      "post",
-      "/holidays",
+      method,
+      url,
       () => {
         onSubmit();
+        toast.success( initialData? "Cập nhật thành công" : "Thêm thành công");
       },
       {
-        onError: (err) => console.error("Create failed", err),
+        onError: (err) => console.error("Create/Update failed", err),
       },
       {
         name: form.name,
@@ -73,7 +90,7 @@ const AddHolidayModal = ({ open, onClose, onSubmit }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Thêm ngày nghỉ lễ</DialogTitle>
+      <DialogTitle>{initialData ? "Cập nhật ngày nghỉ" : "Thêm ngày nghỉ lễ"}</DialogTitle>
       <DialogContent>
         <Stack spacing={3} mt={2}>
           <TextField

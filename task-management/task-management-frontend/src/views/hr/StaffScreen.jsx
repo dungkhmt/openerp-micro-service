@@ -22,6 +22,7 @@ import editIcon from "@/assets/icons/edit.svg";
 import { request } from "@/api";
 import { useNavigate  } from "react-router-dom";
 import Pagination from "@/components/item/Pagination";
+import toast from "react-hot-toast";
 
 
 const EmployeeManagement = () => {
@@ -317,6 +318,7 @@ const EmployeeManagement = () => {
           fetchEmployees(currentPage, itemsPerPage, searchTerm);
           setDeleteModalOpen(false);
           setDeleteEmployee(null);
+          toast.success("Xoá thành công");
         },
         {
           onError: (err) => {

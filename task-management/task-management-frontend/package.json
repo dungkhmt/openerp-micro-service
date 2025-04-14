@@ -53,6 +53,7 @@
     "jspdf": "^3.0.1",
     "keycloak-js": "21.0.2",
     "lodash": "^4.17.21",
+    "lunar-calendar": "^0.1.4",
     "material-table": "^2.0.5",
     "nprogress": "^0.2.0",
     "overlayscrollbars": "^2.3.2",

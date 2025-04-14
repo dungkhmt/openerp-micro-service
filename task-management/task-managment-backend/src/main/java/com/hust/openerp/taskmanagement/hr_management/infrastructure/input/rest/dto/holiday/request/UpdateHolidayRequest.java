@@ -17,14 +17,12 @@ import java.util.UUID;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UpdateHolidayRequest {
     @NotNull
-    private UUID id;
-    @NotNull
     private String name;
     @NotNull
     private HolidayType type;
     private List<LocalDate> dates;
 
-    public UpdateHoliday toUseCase(){
+    public UpdateHoliday toUseCase(UUID id){
         return UpdateHoliday.builder()
             .id(id)
             .name(name)

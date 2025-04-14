@@ -18,6 +18,7 @@ import "@/assets/css/CheckpointConfigureTable.css";
 import deleteIcon from "@/assets/icons/delete.svg";
 import editIcon from "@/assets/icons/edit.svg";
 import { request } from "@/api";
+import toast from "react-hot-toast";
 
 const CheckpointConfigureScreen = () => {
   const [data, setData] = useState([]);
@@ -225,6 +226,7 @@ const CheckpointConfigureScreen = () => {
           fetchCheckpoints(currentPage, itemsPerPage, searchTerm);
           setDeleteModalOpen(false);
           setDeleteCheckpoint(null);
+          toast.success("Xoá thành công")
         },
         {
           onError: (err) => {

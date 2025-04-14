@@ -17,6 +17,7 @@ import "jspdf-autotable";
 import "@/assets/css/JobPositionTable.css";
 import deleteIcon from "@/assets/icons/delete.svg";
 import editIcon from "@/assets/icons/edit.svg";
+import toast from "react-hot-toast";
 
 const JobPositionTable = () => {
   const [data, setData] = useState([]);
@@ -233,6 +234,7 @@ const JobPositionTable = () => {
         fetchData(currentPage, itemsPerPage, searchTerm);
         setDeleteModalOpen(false);
         setDeleteJob(null);
+        toast.success("Xoá thành công");
       },
       {
         onError: (err) => {

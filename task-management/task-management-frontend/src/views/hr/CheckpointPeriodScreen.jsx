@@ -19,6 +19,7 @@ import "@/assets/css/CheckpointPeriodTable.css";
 import deleteIcon from "@/assets/icons/delete.svg";
 import editIcon from "@/assets/icons/edit.svg";
 import { request } from "@/api";
+import toast from "react-hot-toast";
 
 const CheckpointPeriodScreen = () => {
   const [data, setData] = useState([]);
@@ -235,6 +236,7 @@ const CheckpointPeriodScreen = () => {
           fetchPeriods(currentPage, itemsPerPage, searchTerm);
           setDeleteModalOpen(false);
           setDeletePeriod(null);
+          toast.success("Xoá thành công")
         },
         {
           onError: (err) => {

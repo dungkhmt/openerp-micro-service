@@ -52,11 +52,12 @@ public class HolidayController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PutMapping("")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateHoliday(
-            @Valid @RequestBody UpdateHolidayRequest request
+        @PathVariable UUID id,
+        @Valid @RequestBody UpdateHolidayRequest request
     ){
-        publish(request.toUseCase());
+        publish(request.toUseCase(id));
         return ResponseEntity.ok().body(
                 new Resource()
         );

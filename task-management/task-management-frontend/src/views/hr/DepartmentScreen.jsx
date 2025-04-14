@@ -17,6 +17,7 @@ import "jspdf-autotable";
 import "@/assets/css/DepartmentTable.css";
 import deleteIcon from "@/assets/icons/delete.svg";
 import editIcon from "@/assets/icons/edit.svg";
+import toast from "react-hot-toast";
 
 const DepartmentTable = () => {
   const [data, setData] = useState([]);
@@ -233,6 +234,7 @@ const DepartmentTable = () => {
         fetchData(currentPage, itemsPerPage, searchTerm); // Refresh table
         setDeleteModalOpen(false);
         setDeleteDepartment(null);
+        toast.success("Xoá thành công")
       },
       {
         onError: (err) => {
