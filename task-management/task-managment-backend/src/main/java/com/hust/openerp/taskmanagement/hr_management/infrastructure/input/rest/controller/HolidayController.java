@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.UUID;
 
 @RestController
@@ -31,9 +32,10 @@ public class HolidayController extends BeanAwareUseCasePublisher {
 
     @GetMapping("/")
     public ResponseEntity<?> getHolidays(
-        @RequestParam LocalDate startDate,
-        @RequestParam LocalDate endDate) {
-
+        @RequestParam YearMonth month
+    ) {
+        var startDate = month.atDay(1);
+        var endDate = month.atEndOfMonth();
         var useCase = new GetHolidayList(startDate, endDate);
         var model = publish(HolidayListModel.class, useCase);
 

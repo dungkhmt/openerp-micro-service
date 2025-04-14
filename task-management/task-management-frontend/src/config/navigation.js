@@ -64,7 +64,7 @@ const navigation = [
   {
     title: "Chấm công",
     path: "/hr/checkin-out",
-    icon: "mdi:calendar-clock",
+    icon: "mdi:clock-check-outline",
   },
   {
     title: "Quản lý nhân sự",
@@ -86,11 +86,6 @@ const navigation = [
         icon: "mdi:account-multiple-outline"
       },
       {
-        title: "Bảng công tháng",
-        path: "/hr/attendance-list",
-        icon: "mdi:calendar-check-outline"
-      },
-      {
         title: "Đánh giá nhân sự",
         icon: "mdi:star-check-outline",
         children: [
@@ -105,6 +100,64 @@ const navigation = [
             icon: "mdi:calendar-check-outline"
           },
         ]
+      },
+    ]
+  },
+  {
+    title: "Quản lý công",
+    icon: "mdi:calendar-clock-outline",
+    children: [
+      {
+        title: "Bảng công tháng",
+        path: "/hr/attendance-list",
+        icon: "mdi:calendar-check-outline"
+      },
+      {
+        title: "Thông báo nghỉ phép",
+        path: "/hr/announce-absence",
+        icon: "mdi:calendar-alert-outline",
+      },
+      {
+        title: "Danh sách nghỉ phép",
+        path: "/hr/absence-list",
+        icon: "mdi:calendar-today-outline",
+      },
+    ]
+  },
+  {
+    title: "Quản lý phúc lợi",
+    icon: "mdi:account-heart-outline",
+    children: [
+      {
+        title: "Lịch nghỉ lễ",
+        path: "/hr/holiday-schedule",
+        icon: "mdi:calendar-heart-outline",
+      },
+      {
+        title: "Chế độ nghỉ phép",
+        path: "/hr/leave-policy",
+        icon: "mdi:calendar-edit",
+      },
+    ]
+  },
+  {
+    title: "Quản lý lương",
+    icon: "mdi:cash",
+    children: [
+      {
+        title: "Bảng lương",
+        path: "/hr/salary/list",
+        icon: "mdi:file-chart-outline",
+      },
+      {
+        title: "Tính lương",
+        path: "/hr/salary/calculate",
+        icon: "mdi:calculator",
+      },
+      {
+        title: "Lịch sử tính lương",
+        path: "/hr/salary/history",
+        icon: "mdi:history",
       },
     ]
   },

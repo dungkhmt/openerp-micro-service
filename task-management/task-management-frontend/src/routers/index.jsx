@@ -31,6 +31,7 @@ import EmployeeDetails from "../views/hr/EmployeeDetailsScreen.jsx";
 import CheckpointEvaluation from "../views/hr/CheckpointEvaluationScreen.jsx";
 import CheckinoutScreen from "../views/hr/CheckinoutScreen.jsx";
 import AttendancePage from "../views/hr/AttendancePage.jsx";
+import HolidayScreen from "../views/hr/HolidayScreen.jsx";
 
 
 export const router = createBrowserRouter([
@@ -152,6 +153,10 @@ export const router = createBrowserRouter([
                     element: <CheckpointEvaluation />,
                   },
                 ]
+              },
+              {
+                path: "holiday-schedule",
+                element: <HolidayScreen />,
               },
             ],
           },

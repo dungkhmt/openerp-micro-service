@@ -157,7 +157,7 @@ const AttendancePage = () => {
         <Grid item xs={12} md={3}>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
-              views={["year", "month"]}
+              views={["month", "year"]}
               label="Chọn tháng"
               value={selectedMonth}
               onChange={(val) => setSelectedMonth(val)}
