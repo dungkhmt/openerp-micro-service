@@ -24,9 +24,27 @@ const AttendancePage = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [pageCount, setPageCount] = useState(0);
+  const [holidays, setHolidays] = useState({});
 
 
   const todayStr = new Date().toISOString().split("T")[0];
+
+  const fetchHolidays = async () => {
+    const yearMonthStr = `${selectedMonth.getFullYear()}-${String(selectedMonth.getMonth() + 1).padStart(2, "0")}`;
+    request(
+      "get",
+      `/holidays?month=${yearMonthStr}`,
+      (res) => {
+        setHolidays(res.data.holidays || {});
+      },
+      {
+        onError: (err) => {
+          console.error("Failed to load holidays", err);
+        },
+      }
+    );
+  };
+
 
   const fetchEmployees = async (page = 0, size = itemsPerPage) => {
     return new Promise((resolve) => {
@@ -74,6 +92,7 @@ const AttendancePage = () => {
   const handleSearch = async (page = 0, size = itemsPerPage) => {
     const list = await fetchEmployees(page, size);
     await fetchAttendances(list);
+    await fetchHolidays();
   };
 
 
@@ -87,7 +106,7 @@ const AttendancePage = () => {
       case "PRESENT": return "#e0f7fa";
       case "ABSENT": return "#ffebee";
       case "MISSING": return "#ffebee";
-      case "INCOMPLETE": return "#e8f5e9";
+      case "INCOMPLETE": return "#ffebee";
       default: return "#f5f5f5";
     }
   };
@@ -251,30 +270,52 @@ const AttendancePage = () => {
                   const record = attendances[emp.user_login_id]?.[d.dateStr];
                   const {isWeekend, isFuture} = d;
 
+                  const isHoliday = holidays[d.dateStr];
                   let display = "-";
                   let color = "#bbb";
-                  let bg = record ? getAttendanceColor(record.attendanceType) : isWeekend ? "#f9f9f9" : "#fff";
+                  let bg = isHoliday
+                    ? (d.isWeekend ? "#f9f9f9" : "#e8f5e9") // xanh nhạt nếu là weekday holiday, cuối tuần thì giữ nguyên
+                    : record
+                      ? getAttendanceColor(record.attendanceType)
+                      : isWeekend
+                        ? "#f9f9f9"
+                        : "#fff";
 
-                  if (!isFuture && !isWeekend && !record) {
+                  if (isHoliday) {
+                    display = (
+                      <span style={{ fontWeight: 500, color: "#1b5e20", fontSize: 12 }}>
+      Nghỉ lễ
+    </span>
+                    );
+                  } else if (!isFuture && !isWeekend && !record) {
                     display = "❌";
                     color = "#000";
                     bg = getAttendanceColor("ABSENT");
                   } else if (record?.startTime && record?.endTime) {
                     display = (
                       <>
-                        <div style={{color: "#005e05", fontWeight: 500}}>{formatTime(record.startTime)}</div>
-                        <div style={{color: "#005e05", fontWeight: 500}}>{formatTime(record.endTime)}</div>
+                        <div style={{ color: "#005e05", fontWeight: 500 }}>
+                          {formatTime(record.startTime)}
+                        </div>
+                        <div style={{ color: "#005e05", fontWeight: 500 }}>
+                          {formatTime(record.endTime)}
+                        </div>
                       </>
                     );
                   } else if (record?.startTime) {
                     display = (
-                      <div style={{color: "#c62828", fontWeight: 500}}>{formatTime(record.startTime)}</div>
+                      <div style={{ color: "#c62828", fontWeight: 500 }}>
+                        {formatTime(record.startTime)}
+                      </div>
                     );
                   } else if (record?.endTime) {
                     display = (
-                      <div style={{color: "#c62828", fontWeight: 500}}>{formatTime(record.endTime)}</div>
+                      <div style={{ color: "#c62828", fontWeight: 500 }}>
+                        {formatTime(record.endTime)}
+                      </div>
                     );
                   }
+
 
                   return (
                     <td
