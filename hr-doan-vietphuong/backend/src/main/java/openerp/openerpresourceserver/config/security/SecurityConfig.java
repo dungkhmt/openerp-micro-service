@@ -1,70 +1,45 @@
 package openerp.openerpresourceserver.config.security;
 
+import openerp.openerpresourceserver.enums.RoleEnum;
+import openerp.openerpresourceserver.repo.EmployeeRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.savedrequest.NullRequestCache;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter(
-    ) {
-        final var jwtConverter = new Jwt2AuthenticationConverter();
+    private final EmployeeRepository employeeRepository;
 
-        jwtConverter.setJwtGrantedAuthoritiesConverter(new Jwt2AuthoritiesConverter());
-        jwtConverter.setPrincipalClaimName("preferred_username");
-
-        return jwtConverter;
+    public SecurityConfig(EmployeeRepository userRepository) {
+        this.employeeRepository = userRepository;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // Enable OAuth2 with custom authorities mapping
-        http.oauth2ResourceServer().jwt().jwtAuthenticationConverter(jwtAuthenticationConverter());
-
-//        // Enable anonymous
-//        http.anonymous();
-
-        // State-less session (state in access-token only)
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-        // Disable CSRF because of state-less session-management
-        http.csrf().disable();
-
-//        // Return 401 (unauthorized) instead of 302 (redirect to login) when authorization is missing or invalid
-//        http.exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
-//            response.addHeader(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"Restricted Content\"");
-//            response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
-//        });
-//
-//        // If SSL enabled, disable http (https only)
-//        if (serverProperties.getSsl() != null && serverProperties.getSsl().isEnabled()) {
-//            http.requiresChannel().anyRequest().requiresSecure();
-//        }
-
-        // Route security
         http
-                .authorizeHttpRequests()
-                .anyRequest().authenticated()
-                .and()
-                .requestCache()
-                .requestCache(new NullRequestCache()) // Not cache request because of having frontend
-                .and()
-                .httpBasic()
-                .disable()
-                .headers()
-                .frameOptions()
-                .disable();
-
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/public/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole(RoleEnum.ADMIN.name())
+                        .requestMatchers("/manager/**").hasRole(RoleEnum.MANAGER.name())
+                        .anyRequest().authenticated()
+                )
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        )
+                );
         return http.build();
     }
+
+    @Bean
+    public Jwt2AuthenticationConverter jwtAuthenticationConverter() {
+        Jwt2AuthenticationConverter converter = new Jwt2AuthenticationConverter(employeeRepository);
+        converter.setJwtGrantedAuthoritiesConverter(new Jwt2AuthoritiesConverter());
+        converter.setPrincipalClaimName("preferred_username");
+        return converter;
+    }
 }
-
-
