@@ -1,9 +1,10 @@
-package openerp.openerpresourceserver.service;
+package openerp.openerpresourceserver.service.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import openerp.openerpresourceserver.entity.User;
-import openerp.openerpresourceserver.repo.UserRepo;
+import openerp.openerpresourceserver.repo.UserRepository;
+import openerp.openerpresourceserver.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,17 +18,17 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserRepo userRepo;
+    private UserRepository userRepository;
 
     @Override
     public List<User> getAllUsers() {
-        List<User> users = userRepo.findAll();
+        List<User> users = userRepository.findAll();
         return users;
     }
 
     @Override
     public User getUserById(String id) {
-        Optional<User> user = userRepo.findById(id);
+        Optional<User> user = userRepository.findById(id);
 
         if (user.isEmpty()) {
             throw new NoSuchElementException("Not exist user with id " + id);
@@ -37,10 +38,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void synchronizeUser(String userId, String email, String firstName, String lastName) {
-        User user = userRepo.findById(userId).orElse(null);
+        User user = userRepository.findById(userId).orElse(null);
 
         if (user == null) {
-            userRepo.save(User.builder()
+            userRepository.save(User.builder()
                     .id(userId)
                     .email(email)
                     .firstName(firstName)
@@ -55,7 +56,7 @@ public class UserServiceImpl implements UserService {
             user.setFirstName(firstName);
             user.setLastName(lastName);
 
-            userRepo.save(user);
+            userRepository.save(user);
         }
     }
 
