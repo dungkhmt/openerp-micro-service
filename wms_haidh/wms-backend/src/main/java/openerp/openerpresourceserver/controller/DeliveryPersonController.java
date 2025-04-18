@@ -31,7 +31,7 @@ public class DeliveryPersonController {
 	@GetMapping("/paged")
 	public ResponseEntity<Page<DeliveryPerson>> getAllDeliveryPersons(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size,
-			@RequestParam(value = "search", required = false) String search) {
+			@RequestParam(required = false) String search) {
 
 		Page<DeliveryPerson> deliveryPersons = deliveryPersonService.getAllDeliveryPersons(page, size, search);
 		return ResponseEntity.ok(deliveryPersons);

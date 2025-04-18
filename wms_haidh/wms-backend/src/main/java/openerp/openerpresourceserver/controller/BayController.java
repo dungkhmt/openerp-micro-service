@@ -25,7 +25,7 @@ public class BayController {
 	private BayService bayService;
 
 	@GetMapping
-	public ResponseEntity<List<BayProjection>> getAllBays(@RequestParam("warehouseId") UUID warehouseId) {
+	public ResponseEntity<List<BayProjection>> getAllBays(@RequestParam UUID warehouseId) {
 		List<BayProjection> warehouses = bayService.getBaysProjectionByWarehouseId(warehouseId);
 		return ResponseEntity.ok(warehouses);
 	}

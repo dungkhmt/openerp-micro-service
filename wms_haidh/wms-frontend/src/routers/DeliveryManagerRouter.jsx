@@ -6,6 +6,8 @@ import DeliveryTripItem from "../views/delivery_manager/delivery_trip/DeliveryTr
 import DeliveryPerson from "../views/delivery_manager/delivery_person/DeliveryPerson";
 import Shipment from "../views/delivery_manager/shipment/Shipment";
 import ShipmentDetail from "../views/delivery_manager/shipment/ShipmentDetail";
+import Distance from "../views/delivery_manager/distance/Distance";
+
 function DeliveryManagerRouter() {
   return (
     <Routes>   
@@ -17,6 +19,7 @@ function DeliveryManagerRouter() {
       <Route path="delivery-trip/add-trip" element={<AddTrip />} /> 
       <Route path="delivery-trip/:id" element={<DeliveryTripDetail/>} />
       <Route path="delivery-trip/:id1/:id2" element={<DeliveryTripItem/>} />   
+      <Route path="distances" element={<Distance/>} />   
     </Routes>
   );
 }

@@ -43,16 +43,14 @@ public class DeliveryPersonService {
 	
 	@Transactional
 	public boolean createDeliveryPerson(DeliveryPersonCreateRequest request) {
-	    // Tìm user dựa trên email
 	    Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
 
 	    if (optionalUser.isEmpty()) {
-	        return false; // Trả về false nếu không tìm thấy user
+	        return false; 
 	    }
 
 	    User user = optionalUser.get();
 
-	    // Tạo đối tượng DeliveryPerson
 	    DeliveryPerson deliveryPerson = DeliveryPerson.builder()
 	            .userLoginId(user.getId())
 	            .fullName(request.getFullName())
@@ -60,7 +58,7 @@ public class DeliveryPersonService {
 	            .build();
 
 	    deliveryPersonRepository.save(deliveryPerson);
-	    return true; // Trả về true nếu tạo thành công
+	    return true; 
 	}
 
 	public boolean updateDeliveryPerson(DeliveryPerson updatedPerson) {
