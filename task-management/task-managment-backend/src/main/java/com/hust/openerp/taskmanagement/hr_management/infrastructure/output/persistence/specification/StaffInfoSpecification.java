@@ -8,7 +8,6 @@ import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persi
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.StaffJobPositionEntity;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -25,6 +24,11 @@ public class StaffInfoSpecification implements Specification<StaffEntity> {
         if (filter.getStaffCode() != null) {
             Predicate codePredicate = cb.like(cb.lower(root.get("staffCode")),
                     "%" + filter.getStaffCode().toLowerCase() + "%");
+            orPredicates.add(codePredicate);
+        }
+
+        if(filter.getUserLoginId() != null){
+            Predicate codePredicate = cb.equal(root.get("user").get("id"), filter.getUserLoginId());
             orPredicates.add(codePredicate);
         }
 
@@ -55,12 +59,12 @@ public class StaffInfoSpecification implements Specification<StaffEntity> {
         }
 
         // Join and filter by Department
-        if (filter.getDepartmentCode() != null) {
+        if (filter.getDepartmentCode() != null || filter.getDepartmentCodes() != null) {
             predicates.add(getDepartmentPredicate(root, query, cb));
         }
 
         // Join and filter by Job Position
-        if (filter.getJobPositionCode() != null) {
+        if (filter.getJobPositionCode() != null || filter.getJobPositionCodes() != null) {
             predicates.add(getJobPositionPredicate(root, query, cb));
         }
 
@@ -77,8 +81,19 @@ public class StaffInfoSpecification implements Specification<StaffEntity> {
 
         // Join StaffDepartmentEntity
         Root<StaffDepartmentEntity> departmentJoin = query.from(StaffDepartmentEntity.class);
+
+        Predicate codePredicate;
+        if (filter.getJobPositionCodes() != null) {
+            codePredicate = departmentJoin.get("id").get("departmentCode").in(filter.getDepartmentCodes());
+        } else if (filter.getJobPositionCode() != null) {
+            codePredicate = cb.equal(departmentJoin.get("id").get("departmentCode"), filter.getDepartmentCode());
+        } else {
+            codePredicate = cb.conjunction();
+        }
+
+
         return cb.and(
-                cb.equal(departmentJoin.get("id").get("departmentCode"), filter.getDepartmentCode()),
+                codePredicate,
                 cb.equal(departmentJoin.get("id").get("fromDate"), latestDepartmentSubquery),
                 cb.equal(departmentJoin.get("id").get("userId"), root.get("user").get("id"))
         );
@@ -92,10 +107,21 @@ public class StaffInfoSpecification implements Specification<StaffEntity> {
         latestJobPositionSubquery.select(cb.greatest(jobPositionSubRoot.get("id").get("fromDate").as(LocalDateTime.class)))
                 .where(cb.equal(jobPositionSubRoot.get("id").get("userId"), root.get("user").get("id")));
 
+
         // Join StaffJobPositionEntity
         Root<StaffJobPositionEntity> jobPositionJoin = query.from(StaffJobPositionEntity.class);
+
+        Predicate codePredicate;
+        if (filter.getJobPositionCodes() != null) {
+            codePredicate = jobPositionJoin.get("id").get("positionCode").in(filter.getJobPositionCodes());
+        } else if (filter.getJobPositionCode() != null) {
+            codePredicate = cb.equal(jobPositionJoin.get("id").get("positionCode"), filter.getJobPositionCode());
+        } else {
+            codePredicate = cb.conjunction();
+        }
+
         return cb.and(
-                cb.equal(jobPositionJoin.get("id").get("positionCode"), filter.getJobPositionCode()),
+                codePredicate,
                 cb.equal(jobPositionJoin.get("id").get("fromDate"), latestJobPositionSubquery),
                 cb.equal(jobPositionJoin.get("id").get("userId"), root.get("user").get("id"))
         );

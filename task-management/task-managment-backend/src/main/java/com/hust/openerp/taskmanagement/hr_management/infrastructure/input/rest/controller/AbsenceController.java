@@ -1,0 +1,93 @@
+package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
+
+
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.absence.usecase_data.CancelAbsence;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.absence.usecase_data.GetAbsenceList;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.absence.request.AnnounceAbsenceRequest;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.absence.request.UpdateAbsenceRequest;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/absences")
+public class AbsenceController extends BeanAwareUseCasePublisher {
+
+    @PostMapping
+    public ResponseEntity<?> announceAbsence(
+        Principal principal,
+        @Valid @RequestBody AnnounceAbsenceRequest request
+    ){
+        publish(request.toModel(principal.getName()));
+        return ResponseEntity.ok().body(
+            new Resource()
+        );
+    }
+
+    @PutMapping
+    public ResponseEntity<?> updateAbsence(
+        Principal principal,
+        @Valid @RequestBody UpdateAbsenceRequest request
+    ){
+        publish(request.toModel(principal.getName()));
+        return ResponseEntity.ok().body(
+            new Resource()
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> cancelAbsence(
+        Principal principal,
+        @Valid @PathVariable UUID id
+    ){
+        var useCase = CancelAbsence.builder()
+            .id(id)
+            .userId(principal.getName())
+            .build();
+        publish(useCase);
+        return ResponseEntity.ok().body(
+            new Resource()
+        );
+    }
+
+    @GetMapping("")
+    public ResponseEntity<?> getAbsenceList(
+        @Valid @RequestParam List<String> userIds,
+        @Valid @RequestParam LocalDate startDate,
+        @Valid @RequestParam LocalDate endDate
+    ){
+        var useCase = GetAbsenceList.builder()
+            .userIds(userIds)
+            .startDate(startDate)
+            .endDate(endDate)
+            .build();
+        publish(useCase);
+        return ResponseEntity.ok().body(
+            new Resource()
+        );
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getAbsenceListOfStaff(
+        Principal principal,
+        @Valid @RequestParam LocalDate startDate,
+        @Valid @RequestParam LocalDate endDate
+        ){
+        var useCase = GetAbsenceList.builder()
+            .userIds(List.of(principal.getName()))
+            .startDate(startDate)
+            .endDate(endDate)
+            .build();
+        publish(useCase);
+        return ResponseEntity.ok().body(
+            new Resource()
+        );
+    }
+}

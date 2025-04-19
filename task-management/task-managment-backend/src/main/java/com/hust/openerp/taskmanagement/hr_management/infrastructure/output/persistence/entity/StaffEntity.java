@@ -10,7 +10,7 @@ import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
 @Setter
 @Entity
 @Table(name = "hr_staff")
-public class StaffEntity extends AuditEntity{
+public class StaffEntity extends AuditEntity {
     @Id
     @Column(name = "staff_code", nullable = false, length = 100)
     private String staffCode;
@@ -21,6 +21,9 @@ public class StaffEntity extends AuditEntity{
 
     @Column(name = "fullname", length = 200)
     private String fullname;
+
+    @Column(name = "leave_hours")
+    private Float leaveHours;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 100)

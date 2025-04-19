@@ -47,6 +47,7 @@ public class JobPositionAdapter implements IJobPositionPort {
         jobPositionEntity.setPositionName(jobPosition.getName());
         jobPositionEntity.setDescription(jobPosition.getDescription());
         jobPositionEntity.setStatus(jobPosition.getStatus());
+        jobPositionEntity.setType(jobPosition.getType());
         jobPositionRepo.save(jobPositionEntity);
     }
 
@@ -70,10 +71,21 @@ public class JobPositionAdapter implements IJobPositionPort {
         if(jobPosition.getDescription() != null){
             jobPositionEntity.setDescription(jobPosition.getDescription());
         }
+
+        if(jobPosition.getType() != null){
+            jobPositionEntity.setType(jobPosition.getType());
+        }
+
         if(jobPosition.getStatus() != null){
             jobPositionEntity.setStatus(jobPosition.getStatus());
         }
         jobPositionRepo.save(jobPositionEntity);
+    }
+
+    @Override
+    public List<JobPositionModel> getJobPosition(IJobPositionFilter filter) {
+        var spec = new JobPositionSpecification(filter);
+        return toModels(jobPositionRepo.findAll(spec));
     }
 
     @Override
@@ -90,10 +102,11 @@ public class JobPositionAdapter implements IJobPositionPort {
 
     private JobPositionModel toModel(JobPositionEntity jobPosition) {
         return JobPositionModel.builder()
-                .code(jobPosition.getPositionCode())
-                .name(jobPosition.getPositionName())
-                .description(jobPosition.getDescription())
-                .build();
+            .code(jobPosition.getPositionCode())
+            .name(jobPosition.getPositionName())
+            .description(jobPosition.getDescription())
+            .type(jobPosition.getType())
+            .build();
     }
 
     private List<JobPositionModel> toModels(Collection<JobPositionEntity> departments) {

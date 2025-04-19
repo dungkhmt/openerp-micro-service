@@ -12,5 +12,8 @@ public interface IJobPositionPort extends ICodeGeneratorPort {
     List<JobPositionModel> findByCodeIn(List<String> code);
     void createJobPosition(JobPositionModel jobPosition);
     void updateJobPosition(JobPositionModel jobPosition);
+
+    List<JobPositionModel> getJobPosition(IJobPositionFilter filter);
+
     PageWrapper<JobPositionModel> getJobPosition(IJobPositionFilter filter, IPageableRequest request);
 }

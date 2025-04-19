@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.job_position.usecase_data;
 
+import com.hust.openerp.taskmanagement.hr_management.constant.JobPositionType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -17,5 +18,6 @@ public class GetJobPosition implements IJobPositionFilter, UseCase {
     private String code;
     private String name;
     private JobPositionStatus status;
+    private JobPositionType type;
     private IPageableRequest pageableRequest;
 }

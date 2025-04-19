@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.job_position.usecase_data;
 
+import com.hust.openerp.taskmanagement.hr_management.constant.JobPositionType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -16,14 +17,16 @@ public class UpdateJobPosition implements UseCase {
     private String code;
     private String name;
     private String description;
+    private JobPositionType type;
     private JobPositionStatus status;
 
     public JobPositionModel toModel() {
         return JobPositionModel.builder()
-                .code(code)
-                .name(name)
-                .description(description)
-                .status(status)
-                .build();
+            .code(code)
+            .name(name)
+            .description(description)
+            .type(type)
+            .status(status)
+            .build();
     }
 }

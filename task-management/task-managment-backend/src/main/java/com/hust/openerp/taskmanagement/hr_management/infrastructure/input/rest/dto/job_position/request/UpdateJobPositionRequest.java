@@ -2,6 +2,7 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.hust.openerp.taskmanagement.hr_management.constant.JobPositionType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,12 +16,14 @@ public class UpdateJobPositionRequest {
     private String code;
     private String name;
     private String description;
+    private JobPositionType type;
 
     public UpdateJobPosition toUseCase(){
         return UpdateJobPosition.builder()
-                .code(code)
-                .name(name)
-                .description(description)
-                .build();
+            .code(code)
+            .name(name)
+            .type(type)
+            .description(description)
+            .build();
     }
 }

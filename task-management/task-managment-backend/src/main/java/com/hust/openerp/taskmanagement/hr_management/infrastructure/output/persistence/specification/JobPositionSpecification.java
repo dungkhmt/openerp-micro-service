@@ -39,6 +39,11 @@ public class JobPositionSpecification implements Specification<JobPositionEntity
             predicates.add(statusPredicate);
         }
 
+        if(filter.getType() != null){
+            Predicate typePredicate = cb.equal(root.get("type"), filter.getType());
+            predicates.add(typePredicate);
+        }
+
         return cb.and(predicates.toArray(new Predicate[0]));
     }
 }

@@ -17,4 +17,5 @@ public class StaffModel {
     private StaffStatus status;
     private String email;
     private LocalDate dateOfJoin;
+    private Float leaveHours;
 }

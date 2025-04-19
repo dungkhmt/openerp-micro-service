@@ -48,6 +48,16 @@ public enum ResponseCode {
     HOLIDAY_UPDATE_ERROR(1030L, "holiday update error"),
     HOLIDAY_CREATE_ERROR(1031L, "holiday create error"),
     HOLIDAY_DELETE_ERROR(1032L, "holiday delete error"),
+    GET_COMPANY_CONFIG_ERROR(1033L, "get company config error"),
+    FORMAT_CONFIG_ERROR(1034L, "format config error"),
+    CONFIG_NOT_EXISTED(1035L, "config not existed"),
+    UPDATE_ABSENCE_ERROR(1036L, "update absence error"),
+    CREATE_ABSENCE_ERROR(1037L, "create absence error"),
+    VALIDATE_ABSENCE_ERROR(1038L, "validate absence error"),
+    CANCEL_ABSENCE_ERROR(1039L, "cancel absence error"),
+    ABSENCE_NOT_EXISTED(1040L, "absence not existed"),
+    UNAUTHORIZED(1041L, "unauthorized"),
+    UNAUTHENTICATED(1042L, "unauthenticated"),
     ;
     private final long code;
     private final String message;

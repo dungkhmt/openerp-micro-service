@@ -1,0 +1,39 @@
+package com.hust.openerp.taskmanagement.hr_management.application.port.out.absence.usecase_data;
+
+import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceStatus;
+import com.hust.openerp.taskmanagement.hr_management.constant.HolidayType;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.AbsenceModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.HolidayModel;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.UUID;
+
+@Data
+@Builder
+@Getter
+@Setter
+public class UpdateAbsence implements UseCase {
+    private UUID id;
+    private LocalDate date;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private String reason;
+    private String userId;
+
+    public AbsenceModel toModel(){
+        return AbsenceModel.builder()
+            .date(date)
+            .startTime(startTime)
+            .endTime(endTime)
+            .reason(reason)
+            .userId(userId)
+            .build();
+    }
+}

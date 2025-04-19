@@ -1,6 +1,7 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.adapter;
 
 import com.hust.openerp.taskmanagement.entity.User;
+import com.hust.openerp.taskmanagement.hr_management.constant.LeaveHoursUpdateType;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository.UserRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -94,6 +95,25 @@ public class StaffAdapter implements IStaffPort {
     }
 
     @Override
+    public void updateLeaveHours(IStaffFilter filter, Float value, LeaveHoursUpdateType updateType) {
+        try {
+            var spec = new StaffInfoSpecification(filter);
+            var staffs = staffRepo.findAll(spec);
+            for(var staff : staffs){
+                switch (updateType){
+                    case RESET_TO -> staff.setLeaveHours(value);
+                    case SUBTRACT -> staff.setLeaveHours(Math.max(staff.getLeaveHours() - value, 0));
+                    case ADDITIONAL -> staff.setLeaveHours(staff.getLeaveHours() + value);
+                }
+            }
+        }
+        catch(Exception e){
+            throw new ApplicationException(ResponseCode.STAFF_EXISTED, "update leave hours failure");
+        }
+
+    }
+
+    @Override
     public StaffModel findByStaffCode(String staffCode) {
         return toModel(findEntityByStaffCode(staffCode));
     }
@@ -123,13 +143,14 @@ public class StaffAdapter implements IStaffPort {
 
     private StaffModel toModel(StaffEntity staffEntity){
         return StaffModel.builder()
-                .staffCode(staffEntity.getStaffCode())
-                .fullname(staffEntity.getFullname())
-                .userLoginId(staffEntity.getUser().getId())
-                .email(staffEntity.getUser().getEmail())
-                .status(staffEntity.getStatus())
-                .dateOfJoin(staffEntity.getCreatedStamp())
-                .build();
+            .staffCode(staffEntity.getStaffCode())
+            .fullname(staffEntity.getFullname())
+            .userLoginId(staffEntity.getUser().getId())
+            .email(staffEntity.getUser().getEmail())
+            .status(staffEntity.getStatus())
+            .leaveHours(staffEntity.getLeaveHours())
+            .dateOfJoin(staffEntity.getCreatedStamp().toLocalDate())
+            .build();
     }
 
     private List<StaffModel> toModels(List<StaffEntity> staffEntities){

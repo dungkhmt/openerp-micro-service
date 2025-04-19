@@ -16,8 +16,8 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class StaffAdapterAdapter implements IStaffSalaryPort {
-    private static final Logger log = LoggerFactory.getLogger(StaffAdapterAdapter.class);
+public class StaffSalaryAdapter implements IStaffSalaryPort {
+    private static final Logger log = LoggerFactory.getLogger(StaffSalaryAdapter.class);
     private final StaffSalaryRepo staffSalaryRepo;
 
     @Override

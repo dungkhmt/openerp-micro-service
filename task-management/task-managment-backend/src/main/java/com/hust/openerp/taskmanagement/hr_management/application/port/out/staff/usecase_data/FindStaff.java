@@ -7,6 +7,8 @@ import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.IPageableRequest;
 
+import java.util.List;
+
 @Data
 @SuperBuilder
 @Getter
@@ -21,4 +23,7 @@ public class FindStaff implements IStaffFilter, UseCase {
     private IPageableRequest pageableRequest;
     private String departmentCode;
     private String jobPositionCode;
+    private List<String> departmentCodes;
+    private List<String> jobPositionCodes;
+    private String userLoginId;
 }
