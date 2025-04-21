@@ -25,8 +25,13 @@ public class AbsenceAdapter implements IAbsencePort {
     @Override
     public AbsenceModel createAbsence(AbsenceModel absenceModel) {
         var absenceEntity = new AbsenceEntity();
+        absenceEntity.setType(absenceModel.getType());
+        absenceEntity.setStartTime(absenceModel.getStartTime());
+        absenceEntity.setEndTime(absenceModel.getEndTime());
         absenceEntity.setDate(absenceModel.getDate());
         absenceEntity.setReason(absenceModel.getReason());
+        absenceEntity.setUserId(absenceModel.getUserId());
+        absenceEntity.setStatus(AbsenceStatus.ACTIVE);
         return toModel(absenceRepo.save(absenceEntity));
     }
 
@@ -47,6 +52,9 @@ public class AbsenceAdapter implements IAbsencePort {
         }
         if(absenceModel.getStatus() != null){
             absenceEntity.setStatus(absenceModel.getStatus());
+        }
+        if(absenceModel.getType() != null){
+            absenceEntity.setType(absenceModel.getType());
         }
         return toModel(absenceRepo.save(absenceEntity));
     }

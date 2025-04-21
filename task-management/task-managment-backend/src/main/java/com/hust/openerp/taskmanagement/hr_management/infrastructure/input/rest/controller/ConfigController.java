@@ -41,7 +41,7 @@ public class ConfigController extends BeanAwareUseCasePublisher {
     public ResponseEntity<?> updateConfigs(
         @Valid @RequestBody UpdateConfigsRequest request
     ){
-        publish(request.toModel());
+        publish(request.toUseCase());
         return ResponseEntity.ok().body(
             new Resource()
         );

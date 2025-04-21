@@ -2,11 +2,14 @@ package com.hust.openerp.taskmanagement.hr_management.constant;
 
 public enum ConfigType {
     INT,
-    TIME;
+    TIME,
+    FLOAT
+    ;
 
     public Object parseValue(String value) {
         return switch (this) {
             case INT -> Integer.parseInt(value);
+            case FLOAT -> Float.parseFloat(value);
             case TIME -> java.time.LocalTime.parse(value);
         };
     }

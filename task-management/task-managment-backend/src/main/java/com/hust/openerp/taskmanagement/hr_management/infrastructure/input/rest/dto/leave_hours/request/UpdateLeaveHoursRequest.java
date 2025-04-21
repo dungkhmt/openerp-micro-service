@@ -18,7 +18,7 @@ public class UpdateLeaveHoursRequest {
     private Float leaveHours;
     private LeaveHoursUpdateType updateType;
 
-    public UpdateLeaveHours toModel(){
+    public UpdateLeaveHours toUseCase(){
         return UpdateLeaveHours.builder()
             .leaveHours(leaveHours)
             .updateType(updateType)

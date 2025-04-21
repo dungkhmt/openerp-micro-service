@@ -1,5 +1,7 @@
 package com.hust.openerp.taskmanagement.exception.handler;
 
+import com.hust.openerp.taskmanagement.hr_management.domain.exception.ApplicationException;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -227,5 +229,11 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         logger.error("Internal server error", e);
         ApiErrorResponse response = ApiErrorResponse.of(ErrorCode.UNKNOWN_SERVER_ERROR);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(ApplicationException.class)
+    public ResponseEntity<Resource> handleApplicationException(ApplicationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(new Resource(ex.getCode(), ex.getMessage(), ex.getError()));
     }
 }

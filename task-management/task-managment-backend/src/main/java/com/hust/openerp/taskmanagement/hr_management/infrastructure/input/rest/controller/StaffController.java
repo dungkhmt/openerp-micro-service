@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.GetStaffInfo;
 import jakarta.validation.Valid;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffDetailModel;
@@ -11,10 +12,24 @@ import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.d
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @RestController
-@RequestMapping("/staff/")
+@RequestMapping("/staff")
 public class  StaffController extends BeanAwareUseCasePublisher {
-    @PostMapping("add-staff")
+
+    @GetMapping("")
+    public ResponseEntity<?> getStaff(
+        Principal principal
+    ){
+        var useCase = GetStaffInfo.builder().userLoginId(principal.getName()).build();
+        var staff = publish(StaffDetailModel.class, useCase);
+        return ResponseEntity.ok().body(
+            new Resource(StaffDetailResponse.fromModel(staff))
+        );
+    }
+
+    @PostMapping("/add-staff")
     public ResponseEntity<?> addStaff(
             @Valid @RequestBody AddStaffRequest request
     ){
@@ -24,7 +39,7 @@ public class  StaffController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("delete-staff")
+    @PostMapping("/delete-staff")
     public ResponseEntity<?> deleteStaff(
             @Valid @RequestBody DeleteStaffRequest request
     ){
@@ -34,7 +49,7 @@ public class  StaffController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("edit-staff")
+    @PostMapping("/edit-staff")
     public ResponseEntity<?> editStaff(
             @Valid @RequestBody EditStaffRequest request
     ){
@@ -44,7 +59,7 @@ public class  StaffController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("search-staff")
+    @PostMapping("/search-staff")
     public ResponseEntity<?> searchStaff(
             @Valid @RequestBody SearchStaffRequest request
     ){
@@ -55,7 +70,7 @@ public class  StaffController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("get-all-staff-info")
+    @PostMapping("/get-all-staff-info")
     public ResponseEntity<?> getAllStaffInfo(
             @Valid @RequestBody GetAllStaffInfoRequest request
     ){
@@ -66,7 +81,7 @@ public class  StaffController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("get-staff-info")
+    @PostMapping("/get-staff-info")
     public ResponseEntity<?> getStaffInfo(
             @Valid @RequestBody GetStaffInfoRequest request
     ){

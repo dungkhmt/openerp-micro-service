@@ -1,4 +1,4 @@
-package com.hust.openerp.taskmanagement.hr_management.infrastructure.exception.handler;
+/*package com.hust.openerp.taskmanagement.hr_management.infrastructure.exception.handler;
 
 import com.hust.openerp.taskmanagement.hr_management.domain.exception.ApplicationException;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
@@ -33,4 +33,4 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new Resource(ResponseCode.PARAMETER_VALUE_IS_INVALID, errors));
     }
-}
+}*/

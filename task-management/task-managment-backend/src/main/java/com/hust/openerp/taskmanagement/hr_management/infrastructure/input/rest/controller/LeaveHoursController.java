@@ -15,7 +15,7 @@ public class LeaveHoursController extends BeanAwareUseCasePublisher {
     public ResponseEntity<?> updateLeaveHours(
         @Valid @RequestBody UpdateLeaveHoursRequest request
     ){
-        publish(request.toModel());
+        publish(request.toUseCase());
         return ResponseEntity.ok().body(
             new Resource()
         );

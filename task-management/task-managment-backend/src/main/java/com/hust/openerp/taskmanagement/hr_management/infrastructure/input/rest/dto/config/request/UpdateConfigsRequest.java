@@ -16,9 +16,10 @@ import java.util.Map;
 public class UpdateConfigsRequest {
     private Map<ConfigKey, String> configMap;
 
-    public UpdateConfigs toModel(){
+    public UpdateConfigs toUseCase(){
         return UpdateConfigs.builder()
             .configValueMap(configMap)
             .build();
     }
 }
+

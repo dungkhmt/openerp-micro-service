@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class ConfigAdapter implements IConfigPort {
-    private ConfigRepo configRepo;
+    private final ConfigRepo configRepo;
 
     @Override
     public Map<ConfigKey, ConfigModel> getConfigsInGroup(ConfigGroup configGroup){

@@ -4,6 +4,7 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.absence.usecase_data.CancelAbsence;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.absence.usecase_data.GetAbsenceList;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.AbsenceModel;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.absence.request.AnnounceAbsenceRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.absence.request.UpdateAbsenceRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
@@ -25,7 +26,7 @@ public class AbsenceController extends BeanAwareUseCasePublisher {
         Principal principal,
         @Valid @RequestBody AnnounceAbsenceRequest request
     ){
-        publish(request.toModel(principal.getName()));
+        publish(request.toUseCase(principal.getName()));
         return ResponseEntity.ok().body(
             new Resource()
         );
@@ -36,7 +37,7 @@ public class AbsenceController extends BeanAwareUseCasePublisher {
         Principal principal,
         @Valid @RequestBody UpdateAbsenceRequest request
     ){
-        publish(request.toModel(principal.getName()));
+        publish(request.toUseCase(principal.getName()));
         return ResponseEntity.ok().body(
             new Resource()
         );
@@ -68,9 +69,9 @@ public class AbsenceController extends BeanAwareUseCasePublisher {
             .startDate(startDate)
             .endDate(endDate)
             .build();
-        publish(useCase);
+        var absenceList = publishCollection(AbsenceModel.class, useCase);
         return ResponseEntity.ok().body(
-            new Resource()
+            new Resource(absenceList)
         );
     }
 
@@ -85,9 +86,9 @@ public class AbsenceController extends BeanAwareUseCasePublisher {
             .startDate(startDate)
             .endDate(endDate)
             .build();
-        publish(useCase);
+        var absenceList = publishCollection(AbsenceModel.class, useCase);
         return ResponseEntity.ok().body(
-            new Resource()
+            new Resource(absenceList)
         );
     }
 }

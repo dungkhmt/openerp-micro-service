@@ -114,12 +114,17 @@ const navigation = [
       },
       {
         title: "Thông báo nghỉ phép",
-        path: "/hr/announce-absence",
+        path: "/hr/absence/announce",
         icon: "mdi:calendar-alert-outline",
       },
       {
+        title: "Nghỉ phép cá nhân",
+        path: "/hr/absence/me",
+        icon: "mdi:calendar-account-outline",
+      },
+      {
         title: "Danh sách nghỉ phép",
-        path: "/hr/absence-list",
+        path: "/hr/absence/list",
         icon: "mdi:calendar-today-outline",
       },
     ]
@@ -134,7 +139,7 @@ const navigation = [
         icon: "mdi:calendar-heart-outline",
       },
       {
-        title: "Chế độ nghỉ phép",
+        title: "Quản lý nghỉ phép",
         path: "/hr/leave-policy",
         icon: "mdi:calendar-edit",
       },
@@ -142,7 +147,7 @@ const navigation = [
   },
   {
     title: "Quản lý lương",
-    icon: "mdi:cash",
+    icon: "mdi:account-cash-outline",
     children: [
       {
         title: "Bảng lương",
@@ -158,6 +163,22 @@ const navigation = [
         title: "Lịch sử tính lương",
         path: "/hr/salary/history",
         icon: "mdi:history",
+      },
+    ]
+  },
+  {
+    title: "Cấu hình",
+    icon: "mdi:cog-outline",
+    children: [
+      {
+        title: "Cấu hình doanh nghiệp",
+        path: "/hr/config/company",
+        icon: "mdi:domain",
+      },
+      {
+        title: "Cơ chế tính lương",
+        path: "/hr/config/salary",
+        icon: "mdi:cash-multiple",
       },
     ]
   },

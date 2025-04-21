@@ -1,6 +1,7 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity;
 
 import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceStatus;
+import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -38,6 +39,11 @@ public class AbsenceEntity extends AuditEntity {
     @NotNull
     @Column(name = "reason", nullable = false, length = Integer.MAX_VALUE)
     private String reason;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false, length = 60)
+    private AbsenceType type;
 
     @NotNull
     @Enumerated(EnumType.STRING)

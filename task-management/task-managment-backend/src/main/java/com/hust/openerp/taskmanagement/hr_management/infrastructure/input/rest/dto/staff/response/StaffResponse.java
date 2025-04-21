@@ -22,15 +22,17 @@ public class StaffResponse {
     private StaffStatus status;
     private String email;
     private LocalDate dateOfJoin;
+    private Float leaveHours;
 
     public static StaffResponse fromModel(StaffModel model) {
         return StaffResponse.builder()
-                .staffCode(model.getStaffCode())
-                .userLoginId(model.getUserLoginId())
-                .fullname(model.getFullname())
-                .status(model.getStatus())
-                .email(model.getEmail())
-                .dateOfJoin(model.getDateOfJoin())
-                .build();
+            .staffCode(model.getStaffCode())
+            .userLoginId(model.getUserLoginId())
+            .fullname(model.getFullname())
+            .status(model.getStatus())
+            .email(model.getEmail())
+            .dateOfJoin(model.getDateOfJoin())
+            .leaveHours(model.getLeaveHours())
+            .build();
     }
 }

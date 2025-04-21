@@ -32,6 +32,7 @@ import CheckpointEvaluation from "../views/hr/CheckpointEvaluationScreen.jsx";
 import CheckinoutScreen from "../views/hr/CheckinoutScreen.jsx";
 import AttendancePage from "../views/hr/AttendancePage.jsx";
 import HolidayScreen from "../views/hr/HolidayScreen.jsx";
+import AnnounceAbsenceForm from "../views/hr/AnnounceAbsenceForm.jsx";
 
 
 export const router = createBrowserRouter([
@@ -151,6 +152,23 @@ export const router = createBrowserRouter([
                   {
                     path: "evaluation",
                     element: <CheckpointEvaluation />,
+                  },
+                ]
+              },
+              {
+                path: "absence",
+                children: [
+                  {
+                    path: "announce",
+                    element: <AnnounceAbsenceForm/>,
+                  },
+                  {
+                    path: "me",
+                    element: <AnnounceAbsenceForm/>,
+                  },
+                  {
+                    path: "list",
+                    element: <AnnounceAbsenceForm />,
                   },
                 ]
               },
