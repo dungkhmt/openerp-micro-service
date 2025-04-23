@@ -39,12 +39,14 @@ public interface DeliveryTripRepository extends JpaRepository<DeliveryTrip, Stri
 			        dt.description AS description,
 			        s.expectedDeliveryStamp AS expectedDeliveryStamp,
 			        w.name AS warehouseName,
-			        dp.fullName AS deliveryPersonName
+			        dp.fullName AS deliveryPersonName,
+			        CONCAT(v.licensePlate, ' - ', v.description) AS vehicleName
 			    FROM DeliveryTrip dt
 			    JOIN Shipment s ON dt.shipmentId = s.shipmentId
 			    JOIN Warehouse w ON dt.warehouseId = w.warehouseId
 			    JOIN DeliveryPerson dp ON dt.deliveryPersonId = dp.userLoginId
-			    WHERE dt.isDeleted = false AND dt.deliveryTripId = :deliveryTripId
+			    JOIN Vehicle v ON dt.vehicleId = v.vehicleId
+			    WHERE dt.deliveryTripId = :deliveryTripId
 			""")
 	Optional<DeliveryTripGeneralProjection> findDeliveryTripById(@Param("deliveryTripId") String deliveryTripId);
 

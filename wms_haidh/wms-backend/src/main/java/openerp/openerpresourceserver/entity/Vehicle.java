@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.entity;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 import jakarta.persistence.Entity;
@@ -12,25 +11,24 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "wms_warehouse")
-public class Warehouse {
+@ToString
+@Table(name = "wms_vehicle")
+public class Vehicle {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID warehouseId;
-
-    private String name;
-    private String code;
-    private BigDecimal width;
-    private BigDecimal length;
-    private String address;
-    private Double longitude;
-    private Double latitude;
-
+    private UUID vehicleId;
+    
+    private String licensePlate;
+    private String description;
+    private Double maxWeight;
+    private String status;
 }
 

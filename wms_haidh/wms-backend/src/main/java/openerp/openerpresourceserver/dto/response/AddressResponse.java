@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.dto.request;
+package openerp.openerpresourceserver.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CoordinatesDTO {
- private double lat;
- private double lng;
+public class AddressResponse {
+	
+ private String formattedAddress;
+ 
 }
 

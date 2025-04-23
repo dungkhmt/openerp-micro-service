@@ -48,5 +48,17 @@ public class AddressDistanceController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
 		}
 	}
+	
+	@PostMapping("/update-all")
+    public ResponseEntity<String> updateDistances() {
+        try {
+            addressDistanceService.updateDistances(); 
+            return ResponseEntity.ok("Distances updated successfully."); 
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("An error occurred while updating distances.");
+        }
+    }
 
 }

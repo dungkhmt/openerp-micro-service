@@ -1,7 +1,7 @@
 const columns = [
-    { name: "FROM LOCATION ADDRESS", uid: "fromLocationName" },
-    { name: "TO LOCATION ADDRESS", uid: "toLocationName" },
-    { name: "DISTANCE", uid: "distance" },
+    { name: "FROM LOCATION", uid: "fromLocationName" },
+    { name: "TO LOCATION", uid: "toLocationName" },
+    { name: "DISTANCE (M)", uid: "distance" },
     { name: "ACTIONS", uid: "actions" },
 ];
 

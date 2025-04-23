@@ -19,5 +19,7 @@ public interface DeliveryTripGeneralProjection {
     String getWarehouseName();
 
     String getDeliveryPersonName(); 
+    
+    String getVehicleName();
 }
 

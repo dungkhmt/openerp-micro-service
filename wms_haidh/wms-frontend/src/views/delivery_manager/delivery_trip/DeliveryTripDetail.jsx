@@ -57,7 +57,7 @@ const DeliveryTripDetail = () => {
       setLoadingMap(true);
       request('get', `/delivery-trip-paths?deliveryTripId=${id}`, (res) => {
         if (res.status === 200) {
-          setRoute(res.data);
+          setRoute(res.data.path);
         } else {
           alert('Error fetching route data!');
         }
@@ -108,10 +108,11 @@ const DeliveryTripDetail = () => {
                 <Typography><strong>Warehouse:</strong> {generalInfo.warehouseName}</Typography>
                 <Typography><strong>Delivery Person:</strong> {generalInfo.deliveryPersonName}</Typography>
                 <Typography><strong>Total Weight:</strong> {generalInfo.totalWeight} kg</Typography>
-                <Typography><strong>Total Locations:</strong> {generalInfo.totalLocations}</Typography>
+                <Typography><strong>Vehicle:</strong> {generalInfo.vehicleName}</Typography>
               </Grid>
               <Grid item xs={6}>
                 <Typography><strong>Expected Delivery:</strong> {formatDate(generalInfo.expectedDeliveryStamp)}</Typography>
+                <Typography><strong>Total Locations:</strong> {generalInfo.totalLocations}</Typography>
                 <Typography><strong>Status:</strong> {generalInfo.status}</Typography>
                 <Typography><strong>Description:</strong> {generalInfo.description}</Typography>
               </Grid>

@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.dto.request;
 
 import java.util.List;
 import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +15,7 @@ import openerp.openerpresourceserver.entity.DeliveryTripItem;
 @Builder
 public class DeliveryTripCreateRequest {
     private UUID warehouseId;
+    private UUID vehicleId;
     private String deliveryPersonId;
     private String description;
     private String shipmentId;
@@ -21,7 +23,7 @@ public class DeliveryTripCreateRequest {
     private Integer totalLocations;
     private Double distance;
     private List<DeliveryTripItem> items;
-    private List<List<Double>> coordinates;
+    private List<CoordinateDTO> coordinates;
     private String assignedBy;
 }
 

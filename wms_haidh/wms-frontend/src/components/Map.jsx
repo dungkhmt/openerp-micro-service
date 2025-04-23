@@ -29,7 +29,7 @@ const Map = ({ route, enableSelection = false, onSelectLocation }) => {
       if (routeLayerRef.current) {
         routeLayerRef.current.remove();
       }
-      routeLayerRef.current = L.polyline(route.map(({ lng, lat }) => [lat, lng]), {
+      routeLayerRef.current = L.polyline(route, {
         color: "blue",
       });
       routeLayerRef.current.addTo(map);

@@ -38,6 +38,8 @@ const AddTrip = () => {
   const [deliveryPersonId, setDeliveryPersonId] = useState('');
   const [shipmentOptions, setShipmentOptions] = useState([]);
   const [shipmentId, setShipmentId] = useState('');
+  const [vehicleOptions, setVehicleOptions] = useState([]);
+  const [vehicleId, setVehicleId] = useState('');
   const [assignedItems, setAssignedItems] = useState([]);
   const [deliverySequence, setDeliverySequence] = useState([]);
   const [customerInfo, setCustomerInfo] = useState({});
@@ -51,6 +53,7 @@ const AddTrip = () => {
   const [route, setRoute] = useState([]);
   const [loadingMap, setLoadingMap] = useState(true);
   const [distance, setDistance] = useState(0);
+  const [maxWeight, setMaxWeight] = useState(0);
   const prevWarehouseId = useRef(warehouseId);
 
   const selectedWarehouse = useMemo(() =>
@@ -59,7 +62,7 @@ const AddTrip = () => {
   );
 
   const warehouseCoordinates = useMemo(() =>
-    selectedWarehouse ? [selectedWarehouse.longitude, selectedWarehouse.latitude] : null,
+    selectedWarehouse ? { lat: selectedWarehouse.latitude, lng: selectedWarehouse.longitude } : null,
     [selectedWarehouse]
   );
 
@@ -67,12 +70,15 @@ const AddTrip = () => {
     deliverySequence
       .map(({ orderId }) => customerInfo[orderId])
       .filter(info => info)
-      .map(({ longitude, latitude }) => [longitude, latitude]),
+      .map(({ longitude, latitude }) => ({ lat: latitude, lng: longitude })),
     [deliverySequence, customerInfo]
   );
 
+
   const coordinates = useMemo(() =>
-    warehouseCoordinates ? [warehouseCoordinates, ...customerCoordinates] : [],
+    warehouseCoordinates
+      ? [warehouseCoordinates, ...customerCoordinates, warehouseCoordinates]
+      : [],
     [warehouseCoordinates, customerCoordinates]
   );
 
@@ -80,7 +86,7 @@ const AddTrip = () => {
   const prevCoords = useRef([]);
 
   useEffect(() => {
-    if (coordinates.length < 2 || warehouseId !== prevWarehouseId.current) {
+    if (coordinates.length < 3 || warehouseId !== prevWarehouseId.current) {
       setLoadingMap(true);
       setDistance(0);  // Reset distance khi không có đủ điểm
       return;
@@ -107,6 +113,11 @@ const AddTrip = () => {
   useEffect(() => {
     request("get", "/shipments", (res) => {
       setShipmentOptions(res.data);
+    }).then();
+  }, []);
+  useEffect(() => {
+    request("get", "/vehicles", (res) => {
+      setVehicleOptions(res.data);
     }).then();
   }, []);
 
@@ -158,17 +169,18 @@ const AddTrip = () => {
 
     const payload = {
       warehouseId,
+      vehicleId,
       deliveryPersonId,
       description,
       shipmentId,
       totalWeight,
-      totalLocations : deliverySequence.length,
+      totalLocations: deliverySequence.length,
       distance,
       items: submittedData,
       coordinates,
-      assignedBy: "admin"
+      assignedBy: "hoanglotar2000"
     };
-    // console.log(payload);
+    console.log(payload);
 
     const requestUrl = "/delivery-trips";
 
@@ -188,6 +200,14 @@ const AddTrip = () => {
     setPage(0);
   };
 
+  const handleVehicleChange = (e) => {
+    const selectedId = e.target.value;
+    setVehicleId(selectedId);
+  
+    const selectedVehicle = vehicleOptions.find(v => v.vehicleId === selectedId);
+    setMaxWeight(selectedVehicle.maxWeight);
+
+  };
 
   const fetchCustomerInfo = async (orderId) => {
     if (customerInfo[orderId]) return;
@@ -292,6 +312,22 @@ const AddTrip = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
+                <InputLabel>Shipment</InputLabel>
+                <Select
+                  value={shipmentId}
+                  onChange={(e) => setShipmentId(e.target.value)}
+                  label="Shipment"
+                >
+                  {shipmentOptions.map((item) => (
+                    <MenuItem key={item.shipmentId} value={item.shipmentId}>
+                      {formatDate(item.expectedDeliveryStamp)}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>            
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth>
                 <InputLabel>Delivery Person</InputLabel>
                 <Select
                   value={deliveryPersonId}
@@ -301,6 +337,22 @@ const AddTrip = () => {
                   {deliveryPersonOptions.map((item) => (
                     <MenuItem key={item.userLoginId} value={item.userLoginId}>
                       {item.fullName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth>
+                <InputLabel>Vehicle</InputLabel>
+                <Select
+                  value={vehicleId}
+                  onChange={handleVehicleChange}
+                  label="Vehicle"
+                >
+                  {vehicleOptions.map((item) => (
+                    <MenuItem key={item.vehicleId} value={item.vehicleId}>
+                      {item.name}
                     </MenuItem>
                   ))}
                 </Select>
@@ -319,22 +371,7 @@ const AddTrip = () => {
                 />
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Shipment</InputLabel>
-                <Select
-                  value={shipmentId}
-                  onChange={(e) => setShipmentId(e.target.value)}
-                  label="Shipment"
-                >
-                  {shipmentOptions.map((item) => (
-                    <MenuItem key={item.shipmentId} value={item.shipmentId}>
-                      {formatDate(item.expectedDeliveryStamp)}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+
           </Grid>
         </Paper>
         <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
@@ -343,7 +380,7 @@ const AddTrip = () => {
           </Typography>
           <div className='mb-4'>
             <Typography variant="h7" gutterBottom className="text-green-500">
-              Total weight : {totalWeight} kg
+              Total weight : {totalWeight} / {maxWeight} kg
             </Typography>
           </div>
           <TableContainer>
@@ -445,7 +482,7 @@ const AddTrip = () => {
                               <TableCell>{index + 1}</TableCell>
                               <TableCell sx={{ textAlign: 'center' }}>{customerInfo[item.orderId]?.customerName || 'Loading...'}</TableCell>
                               <TableCell sx={{ textAlign: 'center' }}>{customerInfo[item.orderId]?.customerPhoneNumber || 'Loading...'}</TableCell>
-                              <TableCell>{customerInfo[item.orderId]?.addressName || 'Loading...'}</TableCell>                      
+                              <TableCell>{customerInfo[item.orderId]?.addressName || 'Loading...'}</TableCell>
                             </TableRow>
                           )}
                         </Draggable>
@@ -469,13 +506,13 @@ const AddTrip = () => {
                   textAlign: 'center'
                 }}
               >
-                Optimized Delivery Route
+                Delivery Route
               </Typography>
               <Typography variant="h6" gutterBottom className="text-green-500" sx={{
                 textAlign: 'center',
                 marginBottom: 2,    // Spacing below title
               }}>
-                Distance : {(distance/1000).toFixed(2)} km
+                Distance : {(distance / 1000).toFixed(2)} km
               </Typography>
 
               <Box sx={{ height: '100%', borderRadius: 1, overflow: 'hidden' }}>

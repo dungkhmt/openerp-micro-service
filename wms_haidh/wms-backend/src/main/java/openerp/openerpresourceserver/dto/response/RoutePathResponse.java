@@ -1,17 +1,20 @@
 package openerp.openerpresourceserver.dto.response;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class AddressResponseDTO {
-	
- private String formattedAddress;
- 
+public class RoutePathResponse {
+
+    private double distance; 
+    
+    private List<List<Double>> path;
 }
 

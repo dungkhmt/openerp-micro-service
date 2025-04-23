@@ -9,8 +9,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import openerp.openerpresourceserver.dto.request.CoordinatesDTO;
-import openerp.openerpresourceserver.dto.response.AddressResponseDTO;
+import openerp.openerpresourceserver.dto.request.CoordinateDTO;
+import openerp.openerpresourceserver.dto.response.AddressResponse;
 
 @Service
 @Profile("opencage")
@@ -30,7 +30,7 @@ public class OpencageService implements GeocodingService {
     }
 
     @Override
-    public AddressResponseDTO getAddressFromCoordinates(CoordinatesDTO coordinates) {
+    public AddressResponse getAddressFromCoordinates(CoordinateDTO coordinates) {
         String uri = UriComponentsBuilder.fromHttpUrl(apiUrl)
                 .queryParam("key", apiKey)
                 .queryParam("q", coordinates.getLat() + "," + coordinates.getLng())
@@ -44,13 +44,13 @@ public class OpencageService implements GeocodingService {
             JsonNode results = root.path("results");
             if (results.isArray() && results.size() > 0) {
                 String formatted = results.get(0).path("formatted").asText();
-                return new AddressResponseDTO(formatted);
+                return new AddressResponse(formatted);
             } else {
-                return new AddressResponseDTO("No address found for given coordinates.");
+                return new AddressResponse("No address found for given coordinates.");
             }
         } catch (Exception e) {
             // Log lỗi nếu cần
-            return new AddressResponseDTO("Failed to parse response from geocoding API.");
+            return new AddressResponse("Failed to parse response from geocoding API.");
         }
     }
 }

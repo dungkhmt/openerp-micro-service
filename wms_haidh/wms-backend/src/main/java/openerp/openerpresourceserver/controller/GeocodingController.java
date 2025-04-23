@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
-import openerp.openerpresourceserver.dto.request.CoordinatesDTO;
-import openerp.openerpresourceserver.dto.response.AddressResponseDTO;
+import openerp.openerpresourceserver.dto.request.CoordinateDTO;
+import openerp.openerpresourceserver.dto.response.AddressResponse;
 import openerp.openerpresourceserver.service.geocoding.GeocodingService;
 
 @RestController
@@ -18,7 +18,7 @@ public class GeocodingController {
     private final GeocodingService geocodingService;
 
     @PostMapping("/address")
-    public AddressResponseDTO getAddressFromCoordinates(@RequestBody CoordinatesDTO coordinates) {
+    public AddressResponse getAddressFromCoordinates(@RequestBody CoordinateDTO coordinates) {
         return geocodingService.getAddressFromCoordinates(coordinates);
     }
 }

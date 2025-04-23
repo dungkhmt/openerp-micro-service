@@ -84,6 +84,7 @@ export default function Distance() {
             if (res.status === 200) {
                 request("get", `/address-distances?page=${page - 1}&size=${rowsPerPage}&fromLocation=${debouncedFrom}`, (res) => {
                     setItems(res.data.content);
+                    setPage(1);
                     setTotalItems(res.data.totalElements);
                     setPages(res.data.totalPages);
                 });
@@ -92,6 +93,27 @@ export default function Distance() {
             }
         }, {}, payload);
         handleCloseModal();
+    };
+
+    const handleAutoUpdate = () => {
+        request("post", "/address-distances/update-all", (res) => {
+            if (res.status === 200) {
+                alert("Distances updated successfully!");
+                // Reload data
+                request(
+                    "get",
+                    `/address-distances?page=${page - 1}&size=${rowsPerPage}&fromType=${fromType}&toType=${toType}&fromLocation=${debouncedFrom}&toLocation=${debouncedTo}`,
+                    (res) => {
+                        setItems(res.data.content);
+                        setPage(1);
+                        setTotalItems(res.data.totalElements);
+                        setPages(res.data.totalPages);
+                    }
+                );
+            } else {
+                alert("Failed to update distances!");
+            }
+        });
     };
 
     const onRowsPerPageChange = useCallback((e) => {
@@ -156,7 +178,7 @@ export default function Distance() {
                 <Input
                     isClearable
                     className="w-full sm:max-w-[30%]"
-                    placeholder="From address..."
+                    placeholder="From location..."
                     startContent={<SearchIcon />}
                     value={fromFilterValue}
                     onClear={() => setFromFilterValue("")}
@@ -168,7 +190,7 @@ export default function Distance() {
                 <Input
                     isClearable
                     className="w-full sm:max-w-[30%]"
-                    placeholder="To address..."
+                    placeholder="To location..."
                     startContent={<SearchIcon />}
                     value={toFilterValue}
                     onClear={() => setToFilterValue("")}
@@ -180,18 +202,30 @@ export default function Distance() {
             </div>
             <div className="flex justify-between items-center">
                 <span className="text-default-400 text-small">Total {totalItems} items</span>
-                <label className="flex items-center text-default-400 text-small">
-                    Rows per page:
-                    <select
-                        className="bg-transparent outline-none text-default-400 text-small"
-                        onChange={onRowsPerPageChange}
+                <div className="flex items-center gap-3">
+                    <Button
+                        size="sm"
+                        className="bg-success text-white"
+                        onPress={handleAutoUpdate}
                     >
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="15">15</option>
-                    </select>
-                </label>
+                        Auto Update Distances
+                    </Button>
+
+                    <label className="flex items-center text-default-400 text-small">
+                        Rows per page:
+                        <select
+                            className="bg-transparent outline-none text-default-400 text-small ml-1"
+                            onChange={onRowsPerPageChange}
+                        >
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                        </select>
+                    </label>
+                </div>
             </div>
+
+
         </div>
     ), [fromFilterValue, toFilterValue, onRowsPerPageChange, totalItems]);
 

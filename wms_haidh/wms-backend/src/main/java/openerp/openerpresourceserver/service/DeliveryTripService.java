@@ -27,9 +27,10 @@ public class DeliveryTripService {
 
 	private static final String TRIP_PREFIX = "TRP";
 	private DeliveryTripRepository deliveryTripRepository;
-	private final DeliveryTripItemService deliveryTripItemService;
+	private DeliveryTripItemService deliveryTripItemService;
 	private DeliveryTripPathService deliveryTripPathService;
 	private AssignedOrderItemService assignedOrderItemService;
+	private VehicleService vehicleService;
 
 	public Page<DeliveryTripProjection> getFilteredDeliveryTrips(String status, Pageable pageable) {
 		return deliveryTripRepository.findFilteredDeliveryTrips(status, pageable);
@@ -55,13 +56,15 @@ public class DeliveryTripService {
 
 		String tripId = generateTripId();
 		DeliveryTrip trip = DeliveryTrip.builder().deliveryTripId(tripId).warehouseId(payload.getWarehouseId())
-				.deliveryPersonId(payload.getDeliveryPersonId()).description(payload.getDescription())
-				.shipmentId(payload.getShipmentId()).totalWeight(payload.getTotalWeight())
-				.totalLocations(payload.getTotalLocations()).distance(payload.getDistance())
-				.createdBy(payload.getAssignedBy()).createdStamp(LocalDateTime.now())
+				.vehicleId(payload.getVehicleId()).deliveryPersonId(payload.getDeliveryPersonId())
+				.description(payload.getDescription()).shipmentId(payload.getShipmentId())
+				.totalWeight(payload.getTotalWeight()).totalLocations(payload.getTotalLocations())
+				.distance(payload.getDistance()).createdBy(payload.getAssignedBy()).createdStamp(LocalDateTime.now())
 				.lastUpdatedStamp(LocalDateTime.now()).isDeleted(false).status("CREATED").build();
 
 		deliveryTripRepository.save(trip);
+		
+		vehicleService.updateVehicleStatus(payload.getVehicleId(), "BUSY");
 
 		List<DeliveryTripItem> items = payload.getItems().stream()
 				.map(item -> DeliveryTripItem.builder().deliveryTripItemId(deliveryTripItemService.generateTripItemId())
@@ -76,7 +79,7 @@ public class DeliveryTripService {
 		List<UUID> assignedOrderItemIds = items.stream().map(DeliveryTripItem::getAssignedOrderItemId).toList();
 		assignedOrderItemService.updateAssignedOrderItemsStatus(assignedOrderItemIds, "DONE");
 
-		deliveryTripPathService.saveRoutePath(tripId, payload.getCoordinates());
+		deliveryTripPathService.saveWaypoints(tripId, payload.getCoordinates());
 
 		return trip;
 	}
@@ -95,6 +98,8 @@ public class DeliveryTripService {
 
 				assignedOrderItemService.updateAssignedOrderItemsStatus(assignedOrderItemIds, "CREATED");
 
+				vehicleService.updateVehicleStatus(trip.getVehicleId(), "AVAILABLE");
+				
 				trip.setStatus("CANCELLED");
 				deliveryTripRepository.save(trip);
 

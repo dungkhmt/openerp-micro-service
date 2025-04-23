@@ -102,7 +102,6 @@ export default function DeliveryTrip() {
     navigate('/delivery-manager/delivery-trip/add-trip');
   };
 
-
   const topContent = useMemo(() => {
     return (
       <div className="flex flex-col gap-4">

@@ -1,14 +1,18 @@
 package openerp.openerpresourceserver.repository;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import jakarta.transaction.Transactional;
+import openerp.openerpresourceserver.dto.request.AddressDistanceDTO;
 import openerp.openerpresourceserver.entity.AddressDistance;
 import openerp.openerpresourceserver.projection.AddressDistanceProjection;
 
@@ -62,5 +66,43 @@ public interface AddressDistanceRepository extends JpaRepository<AddressDistance
 			""")
 	Page<AddressDistanceProjection> findCustomerToCustomer(@Param("fromLocation") String fromLocation,
 			@Param("toLocation") String toLocation, Pageable pageable);
+
+	@Modifying
+	@Transactional
+	@Query("UPDATE AddressDistance ad SET ad.distance = :distance, ad.lastUpdatedStamp = CURRENT_TIMESTAMP WHERE ad.addressDistanceId = :id")
+	int updateDistanceById(@Param("id") UUID id, @Param("distance") double distance);
+
+	@Query("""
+			SELECT new openerp.openerpresourceserver.dto.request.AddressDistanceDTO(ad.addressDistanceId,
+			       new openerp.openerpresourceserver.dto.request.CoordinateDTO(w.longitude, w.latitude),
+			       new openerp.openerpresourceserver.dto.request.CoordinateDTO(c.longitude, c.latitude))
+			       FROM AddressDistance ad
+			       JOIN Warehouse w ON ad.fromLocationId = w.warehouseId AND ad.fromLocationType = 'WAREHOUSE'
+			       JOIN CustomerAddress c ON ad.toLocationId = c.customerAddressId AND ad.toLocationType = 'CUSTOMER'
+			       WHERE ad.distance = 0
+			        """)
+	List<AddressDistanceDTO> findWarehouseToCustomerWithDistanceZero();
+
+	@Query("""
+			    SELECT new openerp.openerpresourceserver.dto.request.AddressDistanceDTO(ad.addressDistanceId,
+			           new openerp.openerpresourceserver.dto.request.CoordinateDTO(c.longitude, c.latitude),
+			           new openerp.openerpresourceserver.dto.request.CoordinateDTO(w.longitude, w.latitude))
+			           FROM AddressDistance ad
+			           JOIN CustomerAddress c ON ad.fromLocationId = c.customerAddressId AND ad.fromLocationType = 'CUSTOMER'
+			           JOIN Warehouse w ON ad.toLocationId = w.warehouseId AND ad.toLocationType = 'WAREHOUSE'
+			           WHERE ad.distance = 0
+			""")
+	List<AddressDistanceDTO> findCustomerToWarehouseWithDistanceZero();
+
+	@Query("""
+			    SELECT new openerp.openerpresourceserver.dto.request.AddressDistanceDTO(ad.addressDistanceId,
+			           new openerp.openerpresourceserver.dto.request.CoordinateDTO(c1.longitude, c1.latitude),
+			           new openerp.openerpresourceserver.dto.request.CoordinateDTO(c2.longitude, c2.latitude))
+			           FROM AddressDistance ad
+			           JOIN CustomerAddress c1 ON ad.fromLocationId = c1.customerAddressId AND ad.fromLocationType = 'CUSTOMER'
+			           JOIN CustomerAddress c2 ON ad.toLocationId = c2.customerAddressId AND ad.toLocationType = 'CUSTOMER'
+			           WHERE ad.distance = 0
+			""")
+	List<AddressDistanceDTO> findCustomerToCustomerWithDistanceZero();
 
 }
