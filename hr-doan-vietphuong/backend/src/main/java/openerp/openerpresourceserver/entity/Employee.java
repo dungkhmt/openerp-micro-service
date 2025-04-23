@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Data
@@ -77,4 +79,8 @@ public class Employee {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "attendance_range_id", referencedColumnName = "id")
     private AttendanceRange attendanceRange;
+
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Collection<Absence> absences;
 }
