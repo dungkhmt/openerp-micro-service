@@ -11,10 +11,13 @@ import openerp.openerpresourceserver.dto.response.employee.EmployeeResponse;
 import openerp.openerpresourceserver.exception.BadRequestException;
 import openerp.openerpresourceserver.exception.NotFoundException;
 import openerp.openerpresourceserver.service.EmployeeService;
+import openerp.openerpresourceserver.service.impl.FaceRecognitionService;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -23,6 +26,7 @@ import java.util.List;
 @Validated
 public class AdminEmployeeController {
     private final EmployeeService employeeService;
+    private final FaceRecognitionService faceRecognitionService;
 
     @GetMapping
     public Result getEmployeeByProperties(EmployeeQueryRequest dto, PagingRequest pagingRequest) {
@@ -40,6 +44,13 @@ public class AdminEmployeeController {
         return Result.ok(employeeService.addEmployee(dto));
     }
 
+    @PostMapping("/{id}/add-faces")
+    public Result detectFaces(@RequestParam("files") MultipartFile[] files,
+                              @PathVariable Long id) throws IOException {
+        List<String> faces = faceRecognitionService.addFaces(List.of(files), id);
+        return Result.ok(faces);
+    }
+    
     @PutMapping
     public Result updateEmployee(@RequestBody @Valid EmployeeRequest dto) throws BadRequestException, NotFoundException {
         return Result.ok(employeeService.updateEmployee(dto));

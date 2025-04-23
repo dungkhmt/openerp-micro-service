@@ -10,17 +10,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class SecurityUtil {
 
     public String getUserEmail() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication instanceof CustomJwtAuthenticationToken customAuth) {
-            return customAuth.getEmail();
-        }
-        throw new IllegalStateException("Invalid authentication type");
+        return getCustomToken().getEmail();
     }
 
     public String getEmployeeId() {
+        return getCustomToken().getEmployeeId();
+    }
+
+    private CustomJwtAuthenticationToken getCustomToken() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication instanceof CustomJwtAuthenticationToken customAuth) {
-            return customAuth.getEmployeeId();
+            return customAuth;
         }
         throw new IllegalStateException("Invalid authentication type");
     }
