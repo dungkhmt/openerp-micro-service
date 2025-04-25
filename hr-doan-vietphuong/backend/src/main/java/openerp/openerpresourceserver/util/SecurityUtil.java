@@ -13,7 +13,7 @@ public class SecurityUtil {
         return getCustomToken().getEmail();
     }
 
-    public String getEmployeeId() {
+    public Integer getEmployeeId() {
         return getCustomToken().getEmployeeId();
     }
 

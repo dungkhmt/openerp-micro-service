@@ -4,6 +4,7 @@ import openerp.openerpresourceserver.entity.AttendanceRange;
 import openerp.openerpresourceserver.enums.StatusEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,4 +20,9 @@ public interface AttendanceRangeRepository extends JpaRepository<AttendanceRange
 
     Optional<AttendanceRange> findByCode(String code);
 
+    @Query(value = """
+            SELECT ar FROM AttendanceRange ar
+            JOIN Employee e ON e.attendanceRange.id = ar.id AND e.email = :userEmail
+            """)
+    AttendanceRange findByEmployeeEmail(String userEmail);
 }

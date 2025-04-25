@@ -28,7 +28,7 @@ public class Employee {
     private Long id;
 
     @Column(name = "employee_id", unique = true)
-    private String employeeId;
+    private Integer employeeId;
 
     @Column(name = "email")
     private String email;

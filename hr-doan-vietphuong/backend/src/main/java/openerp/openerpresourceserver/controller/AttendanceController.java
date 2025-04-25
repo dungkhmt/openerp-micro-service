@@ -1,13 +1,15 @@
 package openerp.openerpresourceserver.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import openerp.openerpresourceserver.dto.request.attendance.AttendanceRequest;
 import openerp.openerpresourceserver.dto.response.Result;
 import openerp.openerpresourceserver.entity.Attendance;
 import openerp.openerpresourceserver.service.AttendanceService;
 import openerp.openerpresourceserver.service.impl.FaceRecognitionService;
-import org.bytedeco.opencv.opencv_core.IplImage;
 import org.bytedeco.opencv.opencv_core.Mat;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,12 +21,18 @@ import static org.bytedeco.opencv.global.opencv_imgcodecs.imread;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/attendance")
+@Validated
+@RequestMapping("/attendances")
 public class AttendanceController {
 
     private final AttendanceService attendanceService;
 
     private final FaceRecognitionService faceRecognitionService;
+
+    @GetMapping
+    public Result getAttendanceReport(@Valid AttendanceRequest request) {
+        return Result.ok(attendanceService.getAttendanceReport(request.getStart(), request.getEnd()));
+    }
 
     @PostMapping("/test")
     public Result testing(@RequestParam("files") MultipartFile[] files) {
@@ -34,8 +42,6 @@ public class AttendanceController {
                 File tempFile = File.createTempFile("uploaded-", file.getOriginalFilename());
                 file.transferTo(tempFile);
                 Mat image = imread(tempFile.getAbsolutePath());
-
-                faceRecognitionService.init();
                 result.add(faceRecognitionService.recognizes(image));
                 tempFile.delete();
             }
@@ -51,7 +57,6 @@ public class AttendanceController {
                 File tempFile = File.createTempFile("uploaded-", file.getOriginalFilename());
                 file.transferTo(tempFile);
                 Mat image = imread(tempFile.getAbsolutePath());
-                faceRecognitionService.init();
                 int employeeId = faceRecognitionService.recognize(image);
                 tempFile.delete();
             return Result.ok(employeeId);
@@ -67,7 +72,6 @@ public class AttendanceController {
             File tempFile = File.createTempFile("uploaded-", file.getOriginalFilename());
             file.transferTo(tempFile);
             Mat image = imread(tempFile.getAbsolutePath());
-            faceRecognitionService.init();
             Attendance attendance = attendanceService.recordAttendance(image, request);
             tempFile.delete();
             return Result.ok(attendance);

@@ -18,11 +18,11 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
 
     boolean existsByIdNotAndEmail(Long id, String email);
 
-    boolean existsByIdNotAndEmployeeId(Long id, String userId);
+    boolean existsByIdNotAndEmployeeId(Long id, Integer employeeId);
 
     boolean existsByEmail(String email);
 
-    boolean existsByEmployeeId(String userId);
+    boolean existsByEmployeeId(Integer employeeId);
 
 
     Optional<Employee> findByEmailAndStatus(String email, Integer status);
@@ -42,7 +42,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
             (
                 :#{#dto.keyword == null ? 'true' : 'false'} = 'true'
                 OR LOWER(e.email) LIKE %:#{#dto.keyword == null ? '' : #dto.keyword.toLowerCase()}%
-                OR LOWER(e.employeeId) LIKE %:#{#dto.keyword == null ? '' : #dto.keyword.toLowerCase()}%
                 OR LOWER(e.fullName) LIKE %:#{#dto.keyword == null ? '' : #dto.keyword.toLowerCase()}%
             )
             AND (:#{#dto.status} IS NULL OR e.status = :#{#dto.status})
@@ -75,4 +74,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
     boolean existsByIdNotAndUserId(Long id, String userLoginId);
 
     Optional<Employee> findByUserIdAndStatus(String email, int status);
+
+    Employee findByEmployeeIdAndStatus(Integer emloyeeId, int status);
 }

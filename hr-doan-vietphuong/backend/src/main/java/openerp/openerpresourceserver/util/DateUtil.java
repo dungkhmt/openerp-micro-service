@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 @UtilityClass
 public class DateUtil {
-    public final int GRACE_PERIOD_IN_MINUTES = 0;
     public final int BREAK_TIME_IN_MINUTES = 90;
     public final LocalTime START_LUNCH = LocalTime.of(12, 0);
     public final LocalTime END_LUNCH = LocalTime.of(13, 30);

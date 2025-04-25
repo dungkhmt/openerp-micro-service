@@ -11,8 +11,8 @@ import lombok.Setter;
 public class EmployeeRequest {
     private Long id;
 
-    @NotBlank(message = "Employee ID must not be null")
-    private String employeeId;
+    @NotNull(message = "Employee ID must not be null")
+    private Integer employeeId;
 
     @NotBlank(message = "User login ID must not be null")
     private String userLoginId;

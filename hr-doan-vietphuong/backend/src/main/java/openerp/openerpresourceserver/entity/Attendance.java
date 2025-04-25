@@ -29,6 +29,6 @@ public class Attendance {
     private String ip;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_id", referencedColumnName = "employee_id", insertable = false, updatable = false)
+    @JoinColumn(name = "employee_id", referencedColumnName = "employee_id")
     private Employee employee;
 }

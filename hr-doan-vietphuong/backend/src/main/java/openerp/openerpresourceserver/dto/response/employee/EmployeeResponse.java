@@ -13,7 +13,7 @@ import java.util.List;
 public class EmployeeResponse {
     private Long id;
     private String userLoginId;
-    private String employeeId;
+    private Integer employeeId;
     private String fullName;
     private String email;
     private String phone;
@@ -27,7 +27,7 @@ public class EmployeeResponse {
     private List<JobHistory> jobHistoryList;
 
     public EmployeeResponse(final Long id,
-                            final String employeeId,
+                            final Integer employeeId,
                             final String fullName,
                             final String email,
                             final String phone,

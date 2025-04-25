@@ -1,10 +1,12 @@
 package openerp.openerpresourceserver.service.impl;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.entity.Employee;
 import openerp.openerpresourceserver.exception.BadRequestException;
 import openerp.openerpresourceserver.exception.NotFoundException;
 import openerp.openerpresourceserver.repo.EmployeeRepository;
+import openerp.openerpresourceserver.util.SecurityUtil;
 import org.bytedeco.javacpp.DoublePointer;
 import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.opencv.opencv_core.*;
@@ -36,6 +38,7 @@ public class FaceRecognitionService {
     private final String trainingDir = "./faces";
     private static final String HAAR_CASCADE_FILE = "src/main/resources/haarcascade_frontalface_default.xml";
 
+    @PostConstruct
     public void init() {
         File root = new File(trainingDir);
         FilenameFilter imgFilter = (dir, name) -> {
@@ -62,6 +65,7 @@ public class FaceRecognitionService {
         }
         this.faceRecognizer = LBPHFaceRecognizer.create();
         this.faceRecognizer.train(images, labels);
+        System.out.println("Model trained");
     }
 
     public int recognize(Mat faceData) {
@@ -85,10 +89,8 @@ public class FaceRecognitionService {
         int predictedLabel = label.get(0);
 
         System.out.println(confidence.get(0));
-        if (confidence.get(0) > 60) {
+        if (confidence.get(0) > 70 || predictedLabel != SecurityUtil.getEmployeeId()) {
             return -1;
-        } else {
-
         }
         return predictedLabel;
     }
@@ -106,7 +108,7 @@ public class FaceRecognitionService {
         CascadeClassifier faceDetector = new CascadeClassifier(HAAR_CASCADE_FILE);
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Employee not found"));
-        String label = employee.getEmployeeId();
+        Integer label = employee.getEmployeeId();
         File faceDir = new File(trainingDir);
         faceDir.mkdirs();
 
