@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import openerp.openerpresourceserver.dto.request.Item;
 import openerp.openerpresourceserver.entity.AssignedOrderItem;
 import openerp.openerpresourceserver.projection.AssignedOrderItemProjection;
 import openerp.openerpresourceserver.projection.DeliveryOrderItemProjection;
@@ -52,11 +53,37 @@ public interface AssignedOrderItemRepository extends JpaRepository<AssignedOrder
 			    WHERE aoi.warehouseId = :warehouseId
 			    AND aoi.status = 'CREATED'
 			""")
-	Page<DeliveryOrderItemProjection> findAllDeliveryOrderItemsByWarehouse(@Param("warehouseId") UUID warehouseId, Pageable pageable);
+	Page<DeliveryOrderItemProjection> findAllDeliveryOrderItemsByWarehouse(@Param("warehouseId") UUID warehouseId,
+			Pageable pageable);
 
 	@Modifying
 	@Query("UPDATE AssignedOrderItem a SET a.status = :status, a.lastUpdatedStamp = :lastUpdatedStamp WHERE a.assignedOrderItemId IN :ids")
-	int updateStatusByIds(@Param("ids") List<UUID> ids, @Param("status") String status, @Param("lastUpdatedStamp") LocalDateTime lastUpdatedStamp);
+	int updateStatusByIds(@Param("ids") List<UUID> ids, @Param("status") String status,
+			@Param("lastUpdatedStamp") LocalDateTime lastUpdatedStamp);
 
+	@Query("""
+			SELECT new openerp.openerpresourceserver.dto.request.Item(a.assignedOrderItemId, a.warehouseId, o.customerAddressId, a.quantity * p.weight)
+			FROM AssignedOrderItem a
+			JOIN Order o ON a.orderId = o.orderId
+			JOIN Product p ON a.productId = p.productId
+			WHERE a.status = 'CREATED'
+			""")
+	List<Item> getAllItems();
+
+	@Query("""
+			    SELECT
+			        a.assignedOrderItemId AS assignedOrderItemId,
+			        a.orderId AS orderId,
+			        p.name AS productName,
+			        p.weight AS weight,
+			        a.originalQuantity AS originalQuantity,
+			        b.code AS bayCode,
+			        a.lotId AS lotId
+			    FROM AssignedOrderItem a
+			    JOIN Product p ON a.productId = p.productId
+			    JOIN Bay b ON a.bayId = b.bayId
+			    WHERE a.assignedOrderItemId IN :assignedOrderItemIds
+			""")
+	List<DeliveryOrderItemProjection> findDeliveryOrderItemsByIds(List<UUID> assignedOrderItemIds);
 
 }

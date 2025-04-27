@@ -1,5 +1,7 @@
 package openerp.openerpresourceserver.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -81,6 +83,17 @@ public class DeliveryTripController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating trip");
 		}
 
+	}
+	
+	@PostMapping("/batch")
+	public ResponseEntity<?> createMultipleDeliveryTrips(@RequestBody List<DeliveryTripCreateRequest> payloadList) {
+	    try {
+	        List<DeliveryTrip> trips = deliveryTripService.createDeliveryTrip(payloadList);
+	        return ResponseEntity.ok(trips);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating trips");
+	    }
 	}
 
 	@PostMapping("/{deliveryTripId}/cancel")

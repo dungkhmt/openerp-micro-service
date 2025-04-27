@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -32,7 +31,7 @@ public class InventoryItem {
     private UUID warehouseId;
     private UUID bayId;
     private int quantityOnHandTotal;
-    private BigDecimal importPrice;
+    private double importPrice;
     private String currencyUomId; 
     private LocalDateTime datetimeReceived;
     private LocalDateTime expireDate;

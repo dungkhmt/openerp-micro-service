@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +31,7 @@ public class InventoryService {
     @Autowired
     private BayService bayService;
 
-    public void updateInventory(UUID productId, int quantity, UUID bayId, String lotId, BigDecimal importPrice, LocalDateTime expiredDate) {
+    public void updateInventory(UUID productId, int quantity, UUID bayId, String lotId, double importPrice, LocalDateTime expiredDate) {
         // Tìm InventoryItem dựa trên productId, lotId, bayId
         Optional<InventoryItem> existingItem = inventoryItemRepository.findByProductIdAndLotIdAndBayId(productId, lotId, bayId);
 

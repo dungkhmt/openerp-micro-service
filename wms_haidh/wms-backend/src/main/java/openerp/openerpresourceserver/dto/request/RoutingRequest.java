@@ -1,6 +1,6 @@
 package openerp.openerpresourceserver.dto.request;
 
-import java.util.UUID;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SaleOrderItemDTO {
-    private UUID productId;
-    private int quantity;
-    private double priceUnit;
+public class RoutingRequest {
+    private List<VehicleDTO> vehicles;
 }
-

@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -38,7 +37,7 @@ public class SaleOrderItemService {
                     item.setProductId(dto.getProductId());
                     item.setQuantity(dto.getQuantity());
                     item.setPriceUnit(dto.getPriceUnit());
-                    item.setCompleted(BigDecimal.ZERO);
+                    item.setCompleted(0);
                     item.setLastUpdated(LocalDateTime.now());
                     return item;
                 }).collect(Collectors.toList());

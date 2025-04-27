@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import jakarta.transaction.Transactional;
 import openerp.openerpresourceserver.dto.request.AddressDistanceDTO;
 import openerp.openerpresourceserver.entity.AddressDistance;
+import openerp.openerpresourceserver.entity.AddressType;
 import openerp.openerpresourceserver.projection.AddressDistanceProjection;
 
 @Repository
@@ -104,5 +105,7 @@ public interface AddressDistanceRepository extends JpaRepository<AddressDistance
 			           WHERE ad.distance = 0
 			""")
 	List<AddressDistanceDTO> findCustomerToCustomerWithDistanceZero();
+	
+	List<AddressDistance> findByFromLocationTypeAndToLocationType(AddressType fromType, AddressType toType);
 
 }

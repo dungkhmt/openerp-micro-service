@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -25,7 +24,7 @@ public class ProductPrice {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID productPriceId;
     private UUID productId;
-    private BigDecimal price;
+    private double price;
     private String description;
     private LocalDate startDate;
     private LocalDate endDate;

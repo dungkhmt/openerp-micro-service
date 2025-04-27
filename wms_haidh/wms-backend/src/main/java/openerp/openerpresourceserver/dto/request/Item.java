@@ -1,19 +1,17 @@
 package openerp.openerpresourceserver.dto.request;
 
-import java.util.UUID;
-
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class SaleOrderItemDTO {
-    private UUID productId;
-    private int quantity;
-    private double priceUnit;
+public class Item {
+    private UUID itemId;
+    private UUID warehouseId;
+    private UUID customerAddressId;
+    private double weight;
 }
-

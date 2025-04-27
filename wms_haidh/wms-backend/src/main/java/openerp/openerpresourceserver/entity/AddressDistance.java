@@ -39,7 +39,7 @@ public class AddressDistance {
     @Enumerated(EnumType.STRING)
     private AddressType toLocationType;
 
-    private Double distance;
+    private double distance;
 
     private LocalDateTime lastUpdatedStamp;
 

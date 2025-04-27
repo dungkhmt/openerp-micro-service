@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.dto.request;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -16,10 +15,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class ReceiptItemCreateRequest {
-    private Integer quantity;
+    private int quantity;
     private UUID bayId;
     private String lotId;
-    private BigDecimal importPrice;
+    private double importPrice;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate expiredDate;
     private UUID receiptItemRequestId;

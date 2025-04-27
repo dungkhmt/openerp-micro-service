@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -112,5 +113,15 @@ public class DeliveryTripService {
 	public Page<DeliveryTrip> getDeliveryTripsByShipmentId(String shipmentId, Pageable pageable) {
 		return deliveryTripRepository.findByShipmentId(shipmentId, pageable);
 	}
+
+	public List<DeliveryTrip> createDeliveryTrip(List<DeliveryTripCreateRequest> payloadList) {
+	    List<DeliveryTrip> trips = new ArrayList<>();
+	    for (DeliveryTripCreateRequest payload : payloadList) {
+	        DeliveryTrip trip = createDeliveryTrip(payload);
+	        trips.add(trip);
+	    }
+	    return trips;
+	}
+
 
 }

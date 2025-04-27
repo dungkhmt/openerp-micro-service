@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.dto.request;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -17,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ProductPriceCreateRequest {
     private UUID productId;
-    private BigDecimal price;
+    private double price;
     private String description;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;

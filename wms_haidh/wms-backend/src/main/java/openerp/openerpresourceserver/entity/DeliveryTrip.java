@@ -28,11 +28,11 @@ public class DeliveryTrip {
 
     private String deliveryPersonId;
 
-    private Double distance;
+    private double distance;
 
-    private Double totalWeight;
+    private double totalWeight;
 
-    private Integer totalLocations;
+    private int totalLocations;
 
     private LocalDateTime lastUpdatedStamp;
 

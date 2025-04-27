@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -35,6 +34,6 @@ public class ReceiptBill {
 
     private LocalDateTime lastUpdateStamp;
 
-    private BigDecimal totalPrice;
+    private double totalPrice;
 }
 

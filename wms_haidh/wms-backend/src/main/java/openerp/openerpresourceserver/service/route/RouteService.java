@@ -26,7 +26,7 @@ public interface RouteService {
      * 
      * @param coordinateList A list of {@link CoordinateDTO} representing geographic coordinates 
      *                       for which distances will be calculated.
-     * @return A two-dimensional array of doubles representing the distance matrix,
+     * @return A two-dimensional array representing the distance matrix,
      *         where element [i][j] is the distance (in meters) from coordinate i to coordinate j.
      */
 	double[][] getDistances(List<CoordinateDTO> coordinateList);

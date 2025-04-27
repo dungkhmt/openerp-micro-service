@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -30,9 +29,9 @@ public class Product {
     private String code;
     private String name;
     private String description;
-    private BigDecimal height;
-    private BigDecimal weight;
-    private BigDecimal area;
+    private double height;
+    private double weight;
+    private double area;
     private String uom;
     private UUID categoryId;
     private String imageId; 

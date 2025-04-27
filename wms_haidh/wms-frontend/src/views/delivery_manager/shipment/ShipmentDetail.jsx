@@ -17,6 +17,7 @@ import {
     TableRow
 } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Button } from '@nextui-org/react';
 
 const ShipmentDetail = () => {
     const navigate = useNavigate();
@@ -58,7 +59,18 @@ const ShipmentDetail = () => {
                     Shipment Detail
                 </Typography>
             </Box>
-            <Box sx={{ mt: 4 }}>
+
+            <Box>
+                <Button
+                    size="sm"
+                    className="bg-success text-white"
+                    onPress={() => navigate('auto-routing')}
+                >
+                    Use routing recommendation
+                </Button>
+            </Box>
+
+            <Box sx={{ mt: 1 }}>
                 <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
                     <Typography variant="h6" gutterBottom>
                         Delivery Trips

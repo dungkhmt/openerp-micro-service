@@ -31,7 +31,7 @@ public class AssignedOrderItem {
 
     private UUID productId;
 
-    private Integer quantity;
+    private int quantity;
 
     private UUID bayId;
 
@@ -49,6 +49,6 @@ public class AssignedOrderItem {
 
     private UUID inventoryItemId;
 
-    private Integer originalQuantity;
+    private int originalQuantity;
 }
 

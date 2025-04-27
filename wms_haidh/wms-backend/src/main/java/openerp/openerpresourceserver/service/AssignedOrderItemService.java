@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import openerp.openerpresourceserver.dto.request.AssignedOrderItemCreateRequest;
+import openerp.openerpresourceserver.dto.request.Item;
 import openerp.openerpresourceserver.entity.AssignedOrderItem;
 import openerp.openerpresourceserver.entity.InventoryItem;
 import openerp.openerpresourceserver.entity.SaleOrderItem;
@@ -86,5 +87,13 @@ public class AssignedOrderItemService {
 	public int updateAssignedOrderItemsStatus(List<UUID> assignedOrderItemIds, String status) {
 	    return assignedOrderItemRepository.updateStatusByIds(assignedOrderItemIds, status, LocalDateTime.now());
 	}
+	
+	public List<Item> getItems() {
+        return assignedOrderItemRepository.getAllItems();
+    }
+	
+	public List<DeliveryOrderItemProjection> getDeliveryOrderItems(List<UUID> assignedOrderItemIds) {
+        return assignedOrderItemRepository.findDeliveryOrderItemsByIds(assignedOrderItemIds);
+    }
 
 }

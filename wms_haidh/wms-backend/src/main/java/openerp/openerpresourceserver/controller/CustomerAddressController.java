@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,12 @@ public class CustomerAddressController {
     @GetMapping
     public List<CustomerAddress> getCustomerAddresses(@RequestParam String userLoginId) {
         return customerAddressService.getCustomerAddressesByUserLoginId(userLoginId);
+    }
+    
+    @PostMapping("/list")
+    public ResponseEntity<List<CustomerAddress>> getCustomerAddressesByIds(@RequestBody List<UUID> ids) {
+        List<CustomerAddress> addresses = customerAddressService.getCustomerAddressesByIds(ids);
+        return ResponseEntity.ok(addresses);
     }
     
     @PostMapping

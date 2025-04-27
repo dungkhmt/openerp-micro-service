@@ -31,16 +31,17 @@ import openerp.openerpresourceserver.service.AssignedOrderItemService;
 public class AssignedOrderItemController {
 
 	private AssignedOrderItemService assignedOrderItemService;
-	
+
 	@GetMapping
 	public List<AssignedOrderItemProjection> getAssignedOrderItemsBySaleOrderItemId(
 			@RequestParam UUID saleOrderItemId) {
 		return assignedOrderItemService.getAssignedOrderItemsBySaleOrderItemId(saleOrderItemId);
 	}
-	
+
 	@GetMapping("/by-warehouse")
-	public ResponseEntity<Page<DeliveryOrderItemProjection>> getAssignedOrderItemsByWarehouseId(@RequestParam UUID warehouseId,
-			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
+	public ResponseEntity<Page<DeliveryOrderItemProjection>> getAssignedOrderItemsByWarehouseId(
+			@RequestParam UUID warehouseId, @RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size) {
 		Pageable pageable = PageRequest.of(page, size);
 		Page<DeliveryOrderItemProjection> orderItems = assignedOrderItemService.getAllDeliveryOrderItems(warehouseId,
 				pageable);
@@ -58,6 +59,12 @@ public class AssignedOrderItemController {
 
 		}
 	}
-	
+
+	@PostMapping("/delivery-items")
+	public ResponseEntity<List<DeliveryOrderItemProjection>> getDeliveryOrderItems(
+			@RequestBody List<UUID> assignedOrderItemIds) {
+		List<DeliveryOrderItemProjection> items = assignedOrderItemService.getDeliveryOrderItems(assignedOrderItemIds);
+		return ResponseEntity.ok(items);
+	}
 
 }

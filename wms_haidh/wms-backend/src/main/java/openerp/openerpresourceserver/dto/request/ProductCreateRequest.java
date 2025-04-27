@@ -16,9 +16,9 @@ public class ProductCreateRequest {
     private String code;
     private String name;
     private String description;
-    private BigDecimal height;
-    private BigDecimal weight;
-    private BigDecimal area;
+    private double height;
+    private double weight;
+    private double area;
     private String uom;
     private UUID categoryId;
 }

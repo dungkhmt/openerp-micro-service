@@ -7,6 +7,8 @@ import DeliveryPerson from "../views/delivery_manager/delivery_person/DeliveryPe
 import Shipment from "../views/delivery_manager/shipment/Shipment";
 import ShipmentDetail from "../views/delivery_manager/shipment/ShipmentDetail";
 import Distance from "../views/delivery_manager/distance/Distance";
+import RoutingRecommendation from "../views/delivery_manager/shipment/RoutingRecommendation";
+import RoutingResult from "../views/delivery_manager/shipment/RoutingResult";
 
 function DeliveryManagerRouter() {
   return (
@@ -15,6 +17,8 @@ function DeliveryManagerRouter() {
       <Route path="delivery-person/:id" element={<DeliveryPerson />} />
       <Route path="shipments" element={<Shipment />} />
       <Route path="shipments/:id" element={<ShipmentDetail />} />
+      <Route path="shipments/:id/auto-routing" element={<RoutingRecommendation />} />
+      <Route path="shipments/:id/auto-routing/result" element={<RoutingResult />} />
       <Route path="delivery-trip" element={<DeliveryTrip />} />
       <Route path="delivery-trip/add-trip" element={<AddTrip />} /> 
       <Route path="delivery-trip/:id" element={<DeliveryTripDetail/>} />

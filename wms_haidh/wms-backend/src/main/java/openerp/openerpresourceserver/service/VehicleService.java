@@ -29,5 +29,9 @@ public class VehicleService {
         vehicle.setStatus(status);  
         vehicleRepository.save(vehicle); 
     }
+    
+    public VehicleProjection getVehicleById(UUID vehicleId) {
+    	 return vehicleRepository.findVehicleProjectionById(vehicleId);
+    }
 }
 

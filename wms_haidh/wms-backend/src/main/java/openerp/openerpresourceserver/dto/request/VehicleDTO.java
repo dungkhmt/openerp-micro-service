@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SaleOrderItemDTO {
-    private UUID productId;
-    private int quantity;
-    private double priceUnit;
+public class VehicleDTO {
+    private UUID vehicleId;
+    private UUID warehouseId;
+    private Double maxWeight;
 }
 

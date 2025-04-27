@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import openerp.openerpresourceserver.dto.request.AddressDistanceDTO;
 import openerp.openerpresourceserver.dto.request.CoordinateDTO;
 import openerp.openerpresourceserver.dto.request.CoordinatePair;
 import openerp.openerpresourceserver.dto.request.UpdateDistanceRequest;
+import openerp.openerpresourceserver.entity.AddressDistance;
 import openerp.openerpresourceserver.entity.AddressType;
 import openerp.openerpresourceserver.projection.AddressDistanceProjection;
 import openerp.openerpresourceserver.repository.AddressDistanceRepository;
@@ -56,8 +59,9 @@ public class AddressDistanceService {
 		list.addAll(addressDistanceRepository.findCustomerToWarehouseWithDistanceZero());
 		list.addAll(addressDistanceRepository.findCustomerToCustomerWithDistanceZero());
 
-		if (list.isEmpty()) return;
-		
+		if (list.isEmpty())
+			return;
+
 		Set<CoordinateDTO> uniqueCoordinates = new HashSet<>();
 		for (AddressDistanceDTO dto : list) {
 			uniqueCoordinates.add(dto.getFrom());
@@ -92,6 +96,13 @@ public class AddressDistanceService {
 		int updatedRows = addressDistanceRepository.updateDistanceById(request.getAddressDistanceId(),
 				request.getDistance());
 		return updatedRows > 0;
+	}
+
+	public Map<Pair<UUID, UUID>, Double> getDistance(AddressType from, AddressType to) {
+		List<AddressDistance> customerDistances = addressDistanceRepository
+				.findByFromLocationTypeAndToLocationType(from, to);
+		return customerDistances.stream().collect(Collectors
+				.toMap(ad -> Pair.of(ad.getFromLocationId(), ad.getToLocationId()), AddressDistance::getDistance));
 	}
 
 }

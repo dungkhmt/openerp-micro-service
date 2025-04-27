@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.entity;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 import jakarta.persistence.Entity;
@@ -22,5 +21,5 @@ public class ProductWarehouse {
     private UUID productWarehouseId;
     private UUID productId;
     private UUID warehouseId;
-    private BigDecimal quantityOnHand;
+    private double quantityOnHand;
 }

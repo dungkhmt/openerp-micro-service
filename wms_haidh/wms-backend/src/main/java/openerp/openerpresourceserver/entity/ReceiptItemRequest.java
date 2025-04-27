@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -32,7 +31,7 @@ public class ReceiptItemRequest {
     private UUID productId;        
     private int quantity;         
     private UUID warehouseId;   
-    private BigDecimal completed;
+    private double completed;
     private LocalDateTime lastUpdated;
 }
 

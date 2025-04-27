@@ -30,7 +30,7 @@ public class CustomerAddress {
 
 	private String addressName;
 
-	private Double longitude;
+	private double longitude;
 
-	private Double latitude;
+	private double latitude;
 }

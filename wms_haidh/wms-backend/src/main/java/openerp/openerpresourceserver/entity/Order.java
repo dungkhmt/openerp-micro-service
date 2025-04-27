@@ -30,11 +30,11 @@ public class Order {
 
 	private LocalDateTime orderDate;
 
-	private Double deliveryFee;
+	private double deliveryFee;
 
-	private Double totalProductCost;
+	private double totalProductCost;
 
-	private Double totalOrderCost;
+	private double totalOrderCost;
 
 	private UUID customerAddressId;
 

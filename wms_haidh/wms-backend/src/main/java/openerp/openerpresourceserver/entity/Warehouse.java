@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.entity;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 import jakarta.persistence.Entity;
@@ -26,8 +25,8 @@ public class Warehouse {
 
     private String name;
     private String code;
-    private BigDecimal width;
-    private BigDecimal length;
+    private double width;
+    private double length;
     private String address;
     private Double longitude;
     private Double latitude;
