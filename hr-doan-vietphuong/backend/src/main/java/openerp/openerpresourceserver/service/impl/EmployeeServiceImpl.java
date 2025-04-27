@@ -5,6 +5,7 @@ import openerp.openerpresourceserver.dto.request.PagingRequest;
 import openerp.openerpresourceserver.dto.request.employee.EmployeeQueryRequest;
 import openerp.openerpresourceserver.dto.request.employee.EmployeeRequest;
 import openerp.openerpresourceserver.dto.response.employee.EmployeeResponse;
+import openerp.openerpresourceserver.dto.response.employee.SimpleEmployeeResponse;
 import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.enums.StatusEnum;
 import openerp.openerpresourceserver.exception.BadRequestException;
@@ -191,5 +192,20 @@ public class EmployeeServiceImpl implements EmployeeService {
             }
         }
         return result;
+    }
+
+    @Override
+    public List<SimpleEmployeeResponse> getAllEmployees() {
+        List<Employee> employees = employeeRepository.findAllByStatus(StatusEnum.ACTIVE.ordinal());
+        return employees.stream()
+                .map(this::mapToSimpleEmployeeResponse)
+                .toList();
+    }
+
+    private SimpleEmployeeResponse mapToSimpleEmployeeResponse(Employee employee) {
+        return SimpleEmployeeResponse.builder()
+                .email(employee.getEmail())
+                .fullName(employee.getFullName())
+                .build();
     }
 }

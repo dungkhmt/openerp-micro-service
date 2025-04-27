@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Xin nghỉ phép</title>
+    <style>
+        .wrapper {
+            font-family: Arial, sans-serif;
+        }
+        .title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .content {
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+        .reason {
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="content">
+        <p><strong>Dear <span th:text="${leadName}">[Lead Name]</span>,</strong></p>
+        <p>Đây là email thông báo tự động về đơn <b>Bổ sung chấm công</b> của <span th:text="${fullName}">[Họ Tên]</span>
+        <p>Loại bổ sung: <span th:text="${absenceType}">[Loại Nghỉ]</span></p>
+        <p>Ngày: <span th:text="${date}">[Ngày]</span></p>
+        <p>Check in: <span th:text="${checkIn}">[Giờ check-in]</span></p>
+        <p>Check out: <span th:text="${checkOut}">[Giờ check out]</span></p>
+        <p>Lý do:</p>
+        <p class="reason" th:text="${note}">[Lý do]</p>
+        <p><strong> Bạn <a th:href="'mailto:' + ${leadEmail}" target="_blank" th:text="${leadEmail}"></a> vui lòng xem và xét duyệt (nếu có) thông tin trên cho <a th:href="'mailto:' + ${userEmail}" target="_blank" th:text="${userEmail}"></a> tại <a th:href="${approvalLink}" target="_blank" th:text="${approvalLink}">[Approval Link]</a></strong></p>
+        <p>HR sẽ ghi nhận thông tin theo phê duyệt của bạn để cập nhật thông tin tính công cho nhân sự.</p>
+        <p>Trân trọng./.</p>
+    </div>
+</div>
+</body>
+</html>

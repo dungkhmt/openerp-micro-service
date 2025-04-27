@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.List;
 
 public interface OrganizationRepository extends JpaRepository<Organization, Long>, JpaSpecificationExecutor<Organization> {
-    List<Organization> findAllAndByStatus(int status);
+    List<Organization> findAllByStatus(int status);
 
     boolean existsByName(String name);
 

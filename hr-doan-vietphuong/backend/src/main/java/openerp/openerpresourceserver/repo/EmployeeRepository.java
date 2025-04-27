@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSpecificationExecutor<Employee> {
@@ -76,4 +77,14 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
     Optional<Employee> findByUserIdAndStatus(String email, int status);
 
     Employee findByEmployeeIdAndStatus(Integer emloyeeId, int status);
+
+    @Query("""
+        SELECT e FROM Employee e
+        WHERE e.organization.id IN (:organizationIdList)
+        AND e.status = 1
+        ORDER BY e.email ASC
+    """)
+    List<Employee> findByOrganizations(@Param("organizationIdList") List<Long> organizationIdList);
+
+    List<Employee> findAllByStatus(int status);
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.dto.request.PagingRequest;
 import openerp.openerpresourceserver.dto.request.organization.OrganizationQueryRequest;
 import openerp.openerpresourceserver.dto.request.organization.OrganizationRequest;
+import openerp.openerpresourceserver.dto.response.organization.SimpleOrganizationResponse;
 import openerp.openerpresourceserver.entity.Employee;
 import openerp.openerpresourceserver.entity.Organization;
 import openerp.openerpresourceserver.enums.StatusEnum;
@@ -142,6 +143,13 @@ public class OrganizationServiceImpl implements OrganizationService {
         return organizationRepository.save(organization);
     }
 
+    @Override
+    public List<SimpleOrganizationResponse> getAllOrganizations() {
+        return organizationRepository.findAllByStatus(StatusEnum.ACTIVE.ordinal()).stream()
+                .map(this::mapToSimpleOrganizationResponse)
+                .toList();
+    }
+
     private boolean hasCircularReference(Organization child, Organization parent) {
         if (parent == null) {
             return false;
@@ -183,5 +191,12 @@ public class OrganizationServiceImpl implements OrganizationService {
             return true;
         }
         return name != null && name.toLowerCase().contains(keyword.toLowerCase());
+    }
+
+    private SimpleOrganizationResponse mapToSimpleOrganizationResponse(Organization organization) {
+        return SimpleOrganizationResponse.builder()
+                .id(organization.getId())
+                .name(organization.getName())
+                .build();
     }
 }

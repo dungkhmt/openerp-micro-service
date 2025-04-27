@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.service;
 import openerp.openerpresourceserver.dto.request.PagingRequest;
 import openerp.openerpresourceserver.dto.request.organization.OrganizationQueryRequest;
 import openerp.openerpresourceserver.dto.request.organization.OrganizationRequest;
+import openerp.openerpresourceserver.dto.response.organization.SimpleOrganizationResponse;
 import openerp.openerpresourceserver.entity.Organization;
 import openerp.openerpresourceserver.exception.BadRequestException;
 import org.springframework.data.domain.Page;
@@ -11,6 +12,7 @@ import java.util.List;
 
 public interface OrganizationService {
     List<Organization> getOrganizationsByProperties(OrganizationQueryRequest dto);
+
     Page<Organization> getOrganizationsByProperties(OrganizationQueryRequest dto, PagingRequest pagingRequest);
 
     Organization getOrganizationById(Long id);
@@ -20,4 +22,6 @@ public interface OrganizationService {
     Organization updateOrganization(OrganizationRequest dto) throws BadRequestException;
 
     Organization deleteOrganizations(Long id);
+
+    List<SimpleOrganizationResponse> getAllOrganizations();
 }

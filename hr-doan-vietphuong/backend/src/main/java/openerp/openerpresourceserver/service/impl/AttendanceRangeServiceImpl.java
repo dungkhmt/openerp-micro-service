@@ -22,10 +22,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import static openerp.openerpresourceserver.util.DateUtil.*;
 
 import java.time.LocalTime;
-
-import static openerp.openerpresourceserver.util.DateUtil.START_LUNCH;
 
 @Service
 @RequiredArgsConstructor

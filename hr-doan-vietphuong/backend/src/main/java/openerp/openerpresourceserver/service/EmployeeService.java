@@ -5,6 +5,7 @@ import openerp.openerpresourceserver.dto.request.PagingRequest;
 import openerp.openerpresourceserver.dto.request.employee.EmployeeQueryRequest;
 import openerp.openerpresourceserver.dto.request.employee.EmployeeRequest;
 import openerp.openerpresourceserver.dto.response.employee.EmployeeResponse;
+import openerp.openerpresourceserver.dto.response.employee.SimpleEmployeeResponse;
 import openerp.openerpresourceserver.entity.Employee;
 import openerp.openerpresourceserver.exception.BadRequestException;
 import openerp.openerpresourceserver.exception.NotFoundException;
@@ -28,4 +29,5 @@ public interface EmployeeService {
 
     List<Employee> deleteEmployee(List<Long> idList) throws NotFoundException;
 
+    List<SimpleEmployeeResponse> getAllEmployees();
 }
