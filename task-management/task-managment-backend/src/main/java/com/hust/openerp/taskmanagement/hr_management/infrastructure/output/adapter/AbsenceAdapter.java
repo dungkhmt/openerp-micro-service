@@ -97,6 +97,7 @@ public class AbsenceAdapter implements IAbsencePort {
             .endTime(absenceEntity.getEndTime())
             .startTime(absenceEntity.getStartTime())
             .status(absenceEntity.getStatus())
+            .userId(absenceEntity.getUserId())
             .build();
     }
 

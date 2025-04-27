@@ -33,6 +33,7 @@ import CheckinoutScreen from "../views/hr/CheckinoutScreen.jsx";
 import AttendancePage from "../views/hr/AttendancePage.jsx";
 import HolidayScreen from "../views/hr/HolidayScreen.jsx";
 import AnnounceAbsenceForm from "../views/hr/AnnounceAbsenceForm.jsx";
+import AbsenceHistoryPage from "../views/hr/AbsenceHistoryPage.jsx";
 
 
 export const router = createBrowserRouter([
@@ -164,7 +165,7 @@ export const router = createBrowserRouter([
                   },
                   {
                     path: "me",
-                    element: <AnnounceAbsenceForm/>,
+                    element: <AbsenceHistoryPage/>,
                   },
                   {
                     path: "list",

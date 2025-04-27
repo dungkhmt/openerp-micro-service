@@ -101,6 +101,8 @@ const AnnounceAbsenceForm = () => {
     }
 
     let totalHoursUsed = 0;
+    let successfulDates = [];
+
     for (let d of selectedDates) {
       const hours = calculateWorkHours(d.startTime, d.endTime);
       if (d.type === "PAID_LEAVE" && totalHoursUsed + hours > leaveHours) {
@@ -114,6 +116,7 @@ const AnnounceAbsenceForm = () => {
         () => {
           toast.success(`Gửi thành công ${d.date}`);
           totalHoursUsed += hours;
+          successfulDates.push(d.date);
         },
         {
           onError: () => toast.error(`Lỗi gửi ngày ${d.date}`),
@@ -127,7 +130,18 @@ const AnnounceAbsenceForm = () => {
         }
       );
     }
+
+    // Xoá những ngày thành công khỏi selectedDates
+    if (successfulDates.length > 0) {
+      setSelectedDates(prev => prev.filter(d => !successfulDates.includes(d.date)));
+    }
+
+    // Nếu tất cả thành công → reset lý do
+    if (successfulDates.length === selectedDates.length) {
+      setReason("");
+    }
   };
+
 
 
   return (
