@@ -1,13 +1,11 @@
 package openerp.openerpresourceserver.dto.request.role;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 public class RoleRequest {
     private Long id;
     @NotBlank(message = "Privilege Id list must not be null")

@@ -1,10 +1,8 @@
 package openerp.openerpresourceserver.dto.request.absenceType;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class AbsenceTypeQueryRequest {
     private String keyword;
     private Integer type;

@@ -2,11 +2,9 @@ package openerp.openerpresourceserver.dto.request.absenceType;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class AbsenceTypeRequest {
     private Long id;
     @NotNull(message = "Type must not be null")

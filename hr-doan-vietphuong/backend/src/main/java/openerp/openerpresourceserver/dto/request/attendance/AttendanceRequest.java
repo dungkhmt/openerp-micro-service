@@ -2,7 +2,6 @@ package openerp.openerpresourceserver.dto.request.attendance;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.Getter;
 
 import java.time.LocalDate;
 

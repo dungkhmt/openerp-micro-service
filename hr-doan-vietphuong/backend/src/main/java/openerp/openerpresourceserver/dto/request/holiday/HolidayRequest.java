@@ -2,13 +2,10 @@ package openerp.openerpresourceserver.dto.request.holiday;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Getter
-@Setter
+@Data
 public class HolidayRequest {
     private Long id;
     @NotNull(message = "Date must not be null")
