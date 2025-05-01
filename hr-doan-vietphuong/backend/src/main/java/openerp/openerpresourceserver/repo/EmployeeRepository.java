@@ -87,4 +87,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
     List<Employee> findByOrganizations(@Param("organizationIdList") List<Long> organizationIdList);
 
     List<Employee> findAllByStatus(int status);
+
+    Optional<Employee> findByEmailAndPositionIsLead(String email, boolean isLead);
 }
