@@ -1,11 +1,9 @@
 package openerp.openerpresourceserver.controller;
 
-import jakarta.mail.MessagingException;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.dto.request.PagingRequest;
 import openerp.openerpresourceserver.dto.request.absence.AbsenceQueryRequest;
-import openerp.openerpresourceserver.dto.request.absence.AbsenceRequest;
+import openerp.openerpresourceserver.dto.request.absence.ManagerAbsenceRequest;
 import openerp.openerpresourceserver.dto.response.Result;
 import openerp.openerpresourceserver.dto.response.ResultMeta;
 import openerp.openerpresourceserver.dto.response.absence.AbsenceResponse;
@@ -17,24 +15,24 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/absences")
+@RequestMapping("/manager/absences")
 @Validated
-public class AbsenceController {
+public class ManagerAbsenceController {
     private final AbsenceService absenceService;
 
     @GetMapping
-    public Result getUserAbsences(AbsenceQueryRequest dto, PagingRequest pagingRequest) {
-        Page<AbsenceResponse> page = absenceService.getAbsencesByUserLogin(dto, pagingRequest);
+    public Result getAbsencesByProperties(AbsenceQueryRequest dto, PagingRequest pagingRequest) {
+        Page<AbsenceResponse> page = absenceService.getAbsencesByProperties(dto, pagingRequest);
         return Result.ok(page.getContent(), ResultMeta.of(page));
     }
 
-    @GetMapping("/types")
-    public Result getAbsenceTypes() {
-        return Result.ok(absenceService.getAbsencesTypes());
+    @PutMapping("/approve")
+    public Result approveAbsences(@RequestBody ManagerAbsenceRequest dto) throws BadRequestException {
+        return Result.ok(absenceService.approveAbsences(dto));
     }
 
-    @PostMapping
-    public Result addAbsence(@RequestBody @Valid AbsenceRequest dto) throws MessagingException, BadRequestException {
-        return Result.ok(absenceService.addAbsence(dto));
+    @PutMapping("/reject")
+    public Result rejectAbsences(@RequestBody ManagerAbsenceRequest dto) {
+        return Result.ok(absenceService.rejectAbsences(dto));
     }
 }

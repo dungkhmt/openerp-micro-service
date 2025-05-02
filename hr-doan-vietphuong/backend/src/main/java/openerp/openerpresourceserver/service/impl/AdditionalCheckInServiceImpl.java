@@ -222,7 +222,6 @@ public class AdditionalCheckInServiceImpl implements AdditionalCheckInService {
 
             // Save form status
             absence.setStatus(AbsenceStatus.APPROVED.ordinal());
-            absence.setReason(dto.getReason());
             absence.setUpdatedBy(SecurityUtil.getUserEmail());
             result.add(absenceRepository.save(absence));
         }
@@ -238,7 +237,6 @@ public class AdditionalCheckInServiceImpl implements AdditionalCheckInService {
             Absence absence = absenceRepository.findById(id)
                     .orElseThrow(() -> new NotFoundException("Additional check-in not found"));
             absence.setStatus(AbsenceStatus.REJECTED.ordinal());
-            absence.setReason(dto.getReason());
             absence.setUpdatedBy(SecurityUtil.getUserEmail());
             result.add(absenceRepository.save(absence));
         }
@@ -298,7 +296,6 @@ public class AdditionalCheckInServiceImpl implements AdditionalCheckInService {
                 .note(absence.getNote())
                 .type(absence.getType())
                 .subType(absence.getAbsenceType().getDescription())
-                .reason(absence.getReason())
                 .status(absence.getStatus())
                 .emailStatus(absence.getEmailStatus())
                 .build();
@@ -314,7 +311,6 @@ public class AdditionalCheckInServiceImpl implements AdditionalCheckInService {
                 .note(absence.getNote())
                 .type(absence.getType())
                 .subType(absence.getAbsenceType().getDescription())
-                .reason(absence.getReason())
                 .status(absence.getStatus())
                 .emailStatus(absence.getEmailStatus())
                 .build();

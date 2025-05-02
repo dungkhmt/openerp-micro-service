@@ -18,7 +18,6 @@ public class AbsenceResponse {
     private Integer type;
     private String subType;
     private String note;
-    private String reason;
     private Integer status;
     private Integer emailStatus;
 }

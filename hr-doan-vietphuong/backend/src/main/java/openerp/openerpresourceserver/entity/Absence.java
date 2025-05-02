@@ -51,9 +51,6 @@ public class Absence {
     @Column(name = "note")
     private String note;
 
-    @Column(name = "reason")
-    private String reason;
-
     @Column(name = "email_status")
     private Integer emailStatus;
 

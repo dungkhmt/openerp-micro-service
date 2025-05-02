@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.dto.request.PagingRequest;
 import openerp.openerpresourceserver.dto.request.absence.AbsenceQueryRequest;
 import openerp.openerpresourceserver.dto.request.absence.AbsenceRequest;
+import openerp.openerpresourceserver.dto.request.absence.ManagerAbsenceRequest;
 import openerp.openerpresourceserver.dto.response.absence.AbsenceResponse;
 import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.enums.*;
@@ -19,6 +20,8 @@ import openerp.openerpresourceserver.service.AbsenceService;
 import openerp.openerpresourceserver.service.MailService;
 import openerp.openerpresourceserver.service.SyncAttendanceService;
 import openerp.openerpresourceserver.util.Constants;
+import openerp.openerpresourceserver.util.DateUtil;
+import openerp.openerpresourceserver.util.ObjectUtil;
 import openerp.openerpresourceserver.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -27,14 +30,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static openerp.openerpresourceserver.util.Constants.ABSENCE;
+import static openerp.openerpresourceserver.util.Constants.NO_ABSENCE;
 import static openerp.openerpresourceserver.util.DateUtil.*;
 
 @Service
@@ -146,6 +152,105 @@ public class AbsenceServiceImpl implements AbsenceService {
         return convertToAbsenceResponse(absence);
     }
 
+    @Override
+    public Page<AbsenceResponse> getAbsencesByProperties(AbsenceQueryRequest dto, PagingRequest pagingRequest) {
+        String email = SecurityUtil.getUserEmail();
+        Employee lead = employeeRepository.findByEmailAndPositionIsLead(email, true)
+                .orElseThrow(() -> new NotFoundException("Lead not found or you are not lead"));
+        Pageable pageable = PageRequest.of(pagingRequest.getPage(), pagingRequest.getSize(), Sort.by(Sort.Direction.DESC, "updatedAt"));
+        Specification<Absence> specification = Specification
+                .where(AbsenceSpecification.hasStatus(dto.getStatus()))
+                .and(AbsenceSpecification.hasUserEmail(dto.getEmail()))
+                .and(AbsenceSpecification.hasType(AbsenceTypeEnum.ABSENCE.ordinal()))
+                .and(AbsenceSpecification.hasCreatedAtBetween(dto.getFrom(), dto.getTo()))
+                .and(AbsenceSpecification.hasLeadId(lead.getId()))
+                .and(AbsenceSpecification.hasNotUserEmail(lead.getEmail()));
+        Page<Absence> page = absenceRepository.findAll(specification, pageable);
+        return page.map(this::covertToAbsenceResponseForManager);
+    }
+
+    @Override
+    @Transactional
+    public List<AbsenceResponse> approveAbsences(ManagerAbsenceRequest dto) throws BadRequestException {
+        List<Absence> result = new ArrayList<>();
+        for (long id : dto.getIdList()) {
+            Absence absence = absenceRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException("Absence not found"));
+            if (absence.getStatus() != AbsenceStatus.PENDING.ordinal()) continue;
+            AbsenceType absenceType = absence.getAbsenceType();
+            Employee employee = absence.getEmployee();
+            if (Boolean.TRUE.equals(absenceType.getHasValue()) && absenceType.getCode().equals(ABSENCE)) {
+                double decreasedAnnualLeave = employee.getAnnualLeave() - absence.getLength();
+                if (decreasedAnnualLeave < 0) {
+                    throw new BadRequestException("Not enough annual leave for this employee");
+                }
+                employee.setAnnualLeave(decreasedAnnualLeave);
+                employeeRepository.save(employee);
+            }
+            AttendanceRange attendanceRange = employee.getAttendanceRange();
+            LocalTime startTime = attendanceRange.getStartTime();
+            LocalTime endTime = attendanceRange.getEndTime();
+            LocalDate startDate = absence.getStartTime().toLocalDate();
+            LocalDate endDate = absence.getEndTime().toLocalDate();
+            List<Integer> dates = DateUtil.getDatesInDateRange(startDate, endDate);
+
+            for (int i = 0; i < dates.size(); i++) {
+                int date = dates.get(i);
+                if (DateUtil.isWeekend(date)) continue;
+                AttendanceReport attendanceReport;
+                Optional<AttendanceReport> attendanceReportOptional = attendanceReportRepository
+                        .findByEmployeeIdAndDate(employee.getEmployeeId(), date);
+                ObjectUtil.AttendanceRangeTime attendanceRangeTime =
+                        determineAttendanceRangeTime(
+                                i,
+                                dates.size() - 1,
+                                absence.getStartTime(),
+                                absence.getEndTime(),
+                                LocalDateTime.of(DateUtil.convertIntegerToLocalDate(date), startTime),
+                                LocalDateTime.of(DateUtil.convertIntegerToLocalDate(date), endTime)
+                        );
+                LocalDateTime absenceStartTime = attendanceRangeTime.startTime();
+                LocalDateTime absenceEndTime = attendanceRangeTime.endTime();
+                double leaveTime = absenceType.getCode().equals(NO_ABSENCE)
+                        ? 0.0
+                        : syncAttendanceService.computeAttendanceTime(absenceStartTime.toLocalTime(), absenceEndTime.toLocalTime(), attendanceRange);
+                attendanceReport = attendanceReportOptional.orElseGet(() -> AttendanceReport
+                        .builder()
+                        .employeeId(employee.getEmployeeId())
+                        .attendanceRangeId(attendanceRange.getId())
+                        .date(date)
+                        .attendanceTime(0.0)
+                        .build());
+                attendanceReport.setLeaveTime(leaveTime);
+                attendanceReport.setStatus(absence.getAbsenceType().getId().intValue() + 1000);
+                attendanceReportRepository.save(attendanceReport);
+            }
+            // save absence
+            absence.setStatus(AbsenceStatus.APPROVED.ordinal());
+            absence.setUpdatedBy(SecurityUtil.getUserEmail());
+            result.add(absenceRepository.save(absence));
+        }
+        return result.stream()
+                .map(this::covertToAbsenceResponseForManager)
+                .toList();
+    }
+
+    @Override
+    public List<AbsenceResponse> rejectAbsences(ManagerAbsenceRequest dto) {
+        List<Absence> result = new ArrayList<>();
+        for (long id : dto.getIdList()) {
+            Absence absence = absenceRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException("Absence not found"));
+            absence.setStatus(AbsenceStatus.REJECTED.ordinal());
+            absence.setUpdatedBy(SecurityUtil.getUserEmail());
+            result.add(absenceRepository.save(absence));
+        }
+        return result
+                .stream()
+                .map(this::covertToAbsenceResponseForManager)
+                .toList();
+    }
+
     private AbsenceResponse convertToAbsenceResponse(Absence absence) {
         return AbsenceResponse.builder()
                 .email(absence.getEmployee().getEmail())
@@ -157,7 +262,22 @@ public class AbsenceServiceImpl implements AbsenceService {
                 .type(absence.getType())
                 .subType(absence.getAbsenceType().getDescription())
                 .note(absence.getNote())
-                .reason(absence.getReason())
+                .status(absence.getStatus())
+                .emailStatus(absence.getEmailStatus())
+                .build();
+    }
+
+    private AbsenceResponse covertToAbsenceResponseForManager(Absence absence) {
+        return AbsenceResponse.builder()
+                .id(absence.getId())
+                .email(absence.getEmployee().getEmail())
+                .startTime(amOrPm(absence, true))
+                .startDate(absence.getStartTime().toLocalDate())
+                .endTime(amOrPm(absence, false))
+                .endDate(absence.getEndTime().toLocalDate())
+                .type(absence.getType())
+                .subType(absence.getAbsenceType().getDescription())
+                .note(absence.getNote())
                 .status(absence.getStatus())
                 .emailStatus(absence.getEmailStatus())
                 .build();
@@ -250,6 +370,25 @@ public class AbsenceServiceImpl implements AbsenceService {
                 return "Sáng";
             }
         }
+    }
+
+    private ObjectUtil.AttendanceRangeTime determineAttendanceRangeTime(
+            int i,
+            int last,
+            LocalDateTime absenceStartTime,
+            LocalDateTime absenceEndTime,
+            LocalDateTime rangeStartTime,
+            LocalDateTime rangeEndTime) {
+        if (0 == last) {
+            return new ObjectUtil.AttendanceRangeTime(absenceStartTime, absenceEndTime);
+        }
+        if (i != 0 && i != last) {
+            return new ObjectUtil.AttendanceRangeTime(rangeStartTime, rangeEndTime);
+        }
+        if (i == 0) {
+            return new ObjectUtil.AttendanceRangeTime(absenceStartTime, rangeEndTime);
+        }
+        return new ObjectUtil.AttendanceRangeTime(rangeStartTime, absenceEndTime);
     }
 
     private void sendEmail(Absence absence, String leadEmail) {
