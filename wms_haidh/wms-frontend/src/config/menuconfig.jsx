@@ -30,7 +30,7 @@ import { Widgets } from "@mui/icons-material";
 import { CiEdit } from "react-icons/ci";
 import { GiTeacher } from "react-icons/gi";
 import { buildMapPathMenu } from "../utils/MenuUtils";
-import { general } from "./menuconfig/general";
+import { general } from "./menuconfig/director";
 import { admin } from "./menuconfig/admin";
 import { salemanager } from "./menuconfig/salemanager";
 import { customer } from "./menuconfig/customer";

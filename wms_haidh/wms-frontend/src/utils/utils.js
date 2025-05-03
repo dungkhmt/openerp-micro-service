@@ -28,9 +28,10 @@ export const formatDatev2 = (dateString) => {
 export const formatPrice = (price) => {
   return price.toLocaleString("vi-VN", {
     style: "currency",
-    currency: "VND",
+    currency: "VND"
   });
 };
+
 export const debounce = (func, delay) => {
   let timer;
   return (...args) => {

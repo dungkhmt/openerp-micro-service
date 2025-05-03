@@ -5,7 +5,7 @@ import { Suspense, useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { useNotificationState } from "../state/NotificationState";
 import NotFound from "../views/errors/NotFound";
-import { useKeycloak } from "@react-keycloak/web"; 
+import { useKeycloak } from "@react-keycloak/web";
 import AdminRouter from "./AdminRouter";
 import SaleManagerRouter from "./SaleManagerRouter";
 import CustomerRouter from "./CustomerRouter";
@@ -13,7 +13,7 @@ import DeliveryManagerRouter from "./DeliveryManagerRouter";
 import DeliveryPersonRouter from "./DeliveryPersonRouter";
 import PurchaseManagerRouter from "./PurchaseManagerRouter";
 import PurchaseStaffRouter from "./PurchaseStaffRouter";
-import Dashboard from "../components/dashboard/Dashboard";
+import DirectorRouter from "./DirectorRouter";
 import { SidebarProvider } from "../layout/SidebarContext";
 const styles = {
   loadingProgress: {
@@ -31,7 +31,7 @@ const styles = {
 function MainAppRouter() {
   const location = useLocation();
   const notificationState = useNotificationState();
-  const { keycloak } = useKeycloak(); 
+  const { keycloak } = useKeycloak();
 
   useEffect(() => {
     notificationState.open.set(false);
@@ -39,29 +39,30 @@ function MainAppRouter() {
 
   const renderPrivateRoute = (Component) => {
     if (!keycloak.authenticated) {
-      keycloak.login(); 
-      return null; 
+      keycloak.login();
+      return null;
     }
-    return <Component />; 
+    return <Component />;
   };
 
   return (
     <SidebarProvider>
-    <Layout>
-      <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
-        <Routes>
-          <Route path="/" element={<Dashboard/>} />
-          <Route path="/admin/*" element={renderPrivateRoute(AdminRouter)} />
-          <Route path="/sale-manager/*" element={renderPrivateRoute(SaleManagerRouter)} />
-          <Route path="/customer/*" element={renderPrivateRoute(CustomerRouter)} />
-          <Route path="/delivery-manager/*" element={renderPrivateRoute(DeliveryManagerRouter)} />
-          <Route path="/delivery-staff/*" element={renderPrivateRoute(DeliveryPersonRouter)} />
-          <Route path="/purchase-staff/*" element={renderPrivateRoute(PurchaseStaffRouter)} />
-          <Route path="/purchase-manager/*" element={renderPrivateRoute(PurchaseManagerRouter)} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
-    </Layout>
+      <Layout>
+        <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
+          <Routes>
+            <Route path="/" element={<NotFound />} />
+            <Route path="/director/*" element={renderPrivateRoute(DirectorRouter)} />
+            <Route path="/admin/*" element={renderPrivateRoute(AdminRouter)} />
+            <Route path="/sale-manager/*" element={renderPrivateRoute(SaleManagerRouter)} />
+            <Route path="/customer/*" element={renderPrivateRoute(CustomerRouter)} />
+            <Route path="/delivery-manager/*" element={renderPrivateRoute(DeliveryManagerRouter)} />
+            <Route path="/delivery-staff/*" element={renderPrivateRoute(DeliveryPersonRouter)} />
+            <Route path="/purchase-staff/*" element={renderPrivateRoute(PurchaseStaffRouter)} />
+            <Route path="/purchase-manager/*" element={renderPrivateRoute(PurchaseManagerRouter)} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </Layout>
     </SidebarProvider>
   );
 }
