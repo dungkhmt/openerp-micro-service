@@ -16,33 +16,39 @@ import { request } from "@/api";
 
 const WeeklyAbsencePage = () => {
   const [selectedDate, setSelectedDate] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const [fetchSearch, setFetchSearch] = useState(1);
   const [employees, setEmployees] = useState([]);
   const [absenceData, setAbsenceData] = useState([]);
-
   const [selectedDept, setSelectedDept] = useState(null);
   const [selectedPos, setSelectedPos] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [startWork, setStartWork] = useState(null);
+  const [endWork, setEndWork] = useState(null)
 
-  const weekDays = useMemo(() => {
+
+  const calculateWeekDays = useMemo(() => {
     const start = startOfWeek(selectedDate, { weekStartsOn: 1 });
     return Array.from({ length: 5 }).map((_, i) => {
       const date = addDays(start, i);
+      const dayLabels = ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu"];
       return {
         date,
         dateStr: format(date, "yyyy-MM-dd"),
-        label: format(date, "EEEE - dd/MM"),
+        label: `${dayLabels[i]} - ${format(date, "dd/MM")}`,
       };
     });
   }, [selectedDate]);
+
+  const weekDays = useMemo(() => {
+    return calculateWeekDays;
+  }, [fetchSearch]);
 
   const fetchEmployees = async () => {
     return new Promise((resolve) => {
       request(
         "post",
         "/staff/get-all-staff-info",
-        (res) => {
-          resolve(res.data?.data || []);
-        },
+        (res) => resolve(res.data?.data || []),
         {},
         {
           department_code: selectedDept?.department_code || null,
@@ -54,8 +60,8 @@ const WeeklyAbsencePage = () => {
   };
 
   const fetchAbsences = async (userIds) => {
-    const start = format(weekDays[0].date, "yyyy-MM-dd");
-    const end = format(weekDays[weekDays.length - 1].date, "yyyy-MM-dd");
+    const start = format(calculateWeekDays[0].date, "yyyy-MM-dd");
+    const end = format(calculateWeekDays[weekDays.length - 1].date, "yyyy-MM-dd");
 
     if (!userIds.length) return [];
 
@@ -83,26 +89,44 @@ const WeeklyAbsencePage = () => {
     const userIds = employeeList.map((emp) => emp.user_login_id);
     const absences = await fetchAbsences(userIds);
 
-    // Merge absences + staff name
     const mergedAbsences = absences.map(abs => {
       const emp = employeeList.find(e => e.user_login_id === abs.user_id);
+      const startTime = new Date(`1970-01-01T${abs.start_time}`).getTime();
+      const endTime = new Date(`1970-01-01T${abs.end_time}`).getTime();
+      const isFullDay = startTime === startWork && endTime === endWork
       return {
         ...abs,
-        staff_name: emp?.fullname || "(Không rõ nhân viên)"
+        staff_name: emp?.fullname || "(Không rõ nhân viên)",
+        isFullDay,
       };
     });
 
     setAbsenceData(mergedAbsences);
+    setFetchSearch(fetchSearch + 1);
     setLoading(false);
   };
 
   useEffect(() => {
+    request("get", "/configs?configGroup=COMPANY_CONFIGS", (res) => {
+      const map = {};
+      Object.entries(res.data?.data || {}).forEach(([k, v]) => (map[k] = v.config_value));
+      setStartWork(new Date(`1970-01-01T${map.START_WORK_TIME}`).getTime());
+      setEndWork(new Date(`1970-01-01T${map.END_WORK_TIME}`).getTime());
+    });
     handleSearch();
   }, []);
 
+  const absenceByDay = useMemo(() => {
+    const result = {};
+    weekDays.forEach((d) => {
+      result[d.dateStr] = absenceData.filter((a) => a.date === d.dateStr);
+    });
+    return result;
+  }, [absenceData, weekDays]);
+
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom>Bảng nghỉ phép theo tuần</Typography>
+      <Typography variant="h5" gutterBottom>Danh sách nghỉ phép</Typography>
 
       <Grid container spacing={2} mb={3}>
         <Grid item xs={12} md={3}>
@@ -129,7 +153,7 @@ const WeeklyAbsencePage = () => {
         <Grid item xs={12} md={3}>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
-              label="Chọn ngày trong tuần"
+              label="Chọn tuần"
               value={selectedDate}
               onChange={(date) => date && setSelectedDate(date)}
               shouldDisableDate={(date) => !isMonday(date)}
@@ -139,58 +163,65 @@ const WeeklyAbsencePage = () => {
         </Grid>
 
         <Grid item xs={12} md={3}>
-          <Button variant="contained" fullWidth sx={{ height: "100%" }} onClick={handleSearch}>
-            Tìm kiếm
-          </Button>
+          <Box display="flex" justifyContent="flex-end" alignItems="center">
+            <Button
+              variant="contained"
+              onClick={() => handleSearch()}
+              sx={{ height: 55, minWidth: 140 }}
+            >
+              Tìm kiếm
+            </Button>
+          </Box>
         </Grid>
       </Grid>
 
-      <Paper sx={{ overflowX: "auto" }}>
+      <Paper sx={{ overflowY: "auto", maxHeight: "calc(100vh - 300px)" }}>
         <table style={{ borderCollapse: "collapse", width: "100%" }}>
-          <thead>
+          <thead style={{ position: "sticky", top: 0, backgroundColor: "#f3f3f3", zIndex: 1 }}>
           <tr>
-            <th style={{ padding: 12, borderBottom: "2px solid #ddd", backgroundColor: "#fafafa", textAlign: "left" }}>Thứ - Ngày</th>
-            <th style={{ padding: 12, borderBottom: "2px solid #ddd", backgroundColor: "#fafafa", textAlign: "left" }}>Tên nhân viên</th>
-            <th style={{ padding: 12, borderBottom: "2px solid #ddd", backgroundColor: "#fafafa", textAlign: "center" }}>Thời gian</th>
-            <th style={{ padding: 12, borderBottom: "2px solid #ddd", backgroundColor: "#fafafa", textAlign: "center" }}>Lý do</th>
-            <th style={{ padding: 12, borderBottom: "2px solid #ddd", backgroundColor: "#fafafa", textAlign: "center" }}>Loại nghỉ</th>
+            <th style={{ padding: 12, textAlign: "center", backgroundColor: "#fafafa", fontWeight: "bold", borderBottom: "2px solid #ddd" }}>Ngày trong tuần</th>
+            <th style={{ padding: 12, textAlign: "center", backgroundColor: "#fafafa", fontWeight: "bold", borderBottom: "2px solid #ddd" }}>Tên nhân viên</th>
+            <th style={{ padding: 12, textAlign: "center", backgroundColor: "#fafafa", fontWeight: "bold", borderBottom: "2px solid #ddd" }}>Thời gian</th>
+            <th style={{ padding: 12, textAlign: "center", backgroundColor: "#fafafa", fontWeight: "bold", borderBottom: "2px solid #ddd" }}>Lý do nghỉ</th>
+            <th style={{ padding: 12, textAlign: "center", backgroundColor: "#fafafa", fontWeight: "bold", borderBottom: "2px solid #ddd" }}>Loại nghỉ</th>
           </tr>
           </thead>
           <tbody>
-          {weekDays.map((d) => {
-            const absencesInDay = absenceData.filter((a) => a.date === d.dateStr);
+          {absenceData.length === 0 ? (
+            <tr>
+              <td colSpan={5} style={{ padding: 12, textAlign: "center", color: "#888", borderBottom: "2px solid #ddd" }}>
+                Không có dữ liệu
+              </td>
+            </tr>
+          ) : (
+            weekDays.map((d) => {
+              const absences = absenceByDay[d.dateStr];
 
-            if (absencesInDay.length === 0) {
-              return (
-                <tr key={d.dateStr}>
-                  <td style={{ padding: 12, borderBottom: "1px solid #eee" }}>{d.label}</td>
-                  <td colSpan={4} style={{ padding: 12, textAlign: "center", color: "#aaa", borderBottom: "1px solid #eee" }}>
-                    Không có ai nghỉ
+              return absences.map((a, idx) => (
+                <tr key={`${d.dateStr}-${a.user_login_id}-${idx}`}>
+                  {idx === 0 && (
+                    <td rowSpan={absences.length} style={{ padding: 12, textAlign: "center", verticalAlign: "middle", borderBottom: "1px solid #ddd" }}>
+                      {d.label}
+                    </td>
+                  )}
+                  <td style={{ padding: 12, borderBottom: "1px solid #ddd" }}>{a.staff_name}</td>
+                  <td style={{ padding: 12, textAlign: "center", borderBottom: "1px solid #ddd" }}>
+                    {a.isFullDay ? "Cả ngày" : `${a.start_time?.slice(0, 5)} - ${a.end_time?.slice(0, 5)}`}
+                  </td>
+                  <td style={{ padding: 12, whiteSpace: "pre-wrap", maxWidth: "200px", wordWrap: "break-word", borderBottom: "1px solid #ddd" }}>
+                    {a.reason}
+                  </td>
+                  <td style={{ padding: 12, textAlign: "center", borderBottom: "1px solid #ddd" }}>
+                    <Chip
+                      label={a.type === "PAID_LEAVE" ? "Có lương" : "Không lương"}
+                      color={a.type === "PAID_LEAVE" ? "success" : "warning"}
+                      size="small"
+                    />
                   </td>
                 </tr>
-              );
-            }
-
-            return absencesInDay.map((a, index) => (
-              <tr key={`${d.dateStr}-${a.user_login_id}-${index}`}>
-                <td style={{ padding: 12, borderBottom: "1px solid #eee" }}>{d.label}</td>
-                <td style={{ padding: 12, borderBottom: "1px solid #eee", whiteSpace: "nowrap" }}>{a.staff_name}</td>
-                <td style={{ padding: 12, borderBottom: "1px solid #eee", textAlign: "center", whiteSpace: "nowrap" }}>
-                  {a.start_time?.slice(0, 5)} - {a.end_time?.slice(0, 5)}
-                </td>
-                <td style={{ padding: 12, borderBottom: "1px solid #eee", whiteSpace: "normal" }}>
-                  {a.reason}
-                </td>
-                <td style={{ padding: 12, borderBottom: "1px solid #eee", textAlign: "center", whiteSpace: "nowrap" }}>
-                  <Chip
-                    label={a.type === "PAID_LEAVE" ? "Có lương" : "Không lương"}
-                    color={a.type === "PAID_LEAVE" ? "success" : "warning"}
-                    size="small"
-                  />
-                </td>
-              </tr>
-            ));
-          })}
+              ));
+            })
+          )}
           </tbody>
         </table>
       </Paper>

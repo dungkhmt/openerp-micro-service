@@ -186,7 +186,7 @@ const AttendancePage = () => {
             <Button
               variant="contained"
               onClick={() => handleSearch()}
-              sx={{ height: 60, minWidth: 140, marginBottom: 1 }}
+              sx={{ height: 55, minWidth: 140, marginBottom: 1 }}
             >
               Tìm kiếm
             </Button>

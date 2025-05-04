@@ -83,9 +83,9 @@ public class StaffInfoSpecification implements Specification<StaffEntity> {
         Root<StaffDepartmentEntity> departmentJoin = query.from(StaffDepartmentEntity.class);
 
         Predicate codePredicate;
-        if (filter.getJobPositionCodes() != null) {
+        if (filter.getDepartmentCodes() != null) {
             codePredicate = departmentJoin.get("id").get("departmentCode").in(filter.getDepartmentCodes());
-        } else if (filter.getJobPositionCode() != null) {
+        } else if (filter.getDepartmentCode() != null) {
             codePredicate = cb.equal(departmentJoin.get("id").get("departmentCode"), filter.getDepartmentCode());
         } else {
             codePredicate = cb.conjunction();

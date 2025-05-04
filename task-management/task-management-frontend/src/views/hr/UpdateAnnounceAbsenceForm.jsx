@@ -34,7 +34,6 @@ const UpdateAbsenceForm = () => {
       const map = {};
       Object.entries(res.data?.data || {}).forEach(([k, v]) => (map[k] = v.config_value));
       setConfigs(map);
-      console.log(map)
       if (id) {
         request("get", `/absences/${id}`, (res) => {
           const data = res.data?.data;
@@ -111,7 +110,7 @@ const UpdateAbsenceForm = () => {
       }
 
       await request(
-        "put", // Cập nhật thông báo nghỉ phép
+        "put",
         `/absences/${id}`,
         () => {
           toast.success(`Cập nhật thành công ${d.date}`);

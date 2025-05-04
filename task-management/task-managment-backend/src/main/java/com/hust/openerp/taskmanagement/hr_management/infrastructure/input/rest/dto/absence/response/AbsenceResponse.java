@@ -2,10 +2,7 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceStatus;
-import com.hust.openerp.taskmanagement.hr_management.constant.ConfigGroup;
-import com.hust.openerp.taskmanagement.hr_management.constant.ConfigKey;
-import com.hust.openerp.taskmanagement.hr_management.constant.ConfigType;
+import com.hust.openerp.taskmanagement.hr_management.constant.*;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.AbsenceModel;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.ConfigModel;
 import lombok.AllArgsConstructor;
@@ -31,6 +28,7 @@ public class AbsenceResponse {
     private LocalTime endTime;
     private String reason;
     private AbsenceStatus status;
+    private AbsenceType type;
     private String userId;
 
     public static AbsenceResponse fromModel(AbsenceModel model) {
@@ -42,6 +40,7 @@ public class AbsenceResponse {
             .reason(model.getReason())
             .status(model.getStatus())
             .userId(model.getUserId())
+            .type(model.getType())
             .build();
     }
 
