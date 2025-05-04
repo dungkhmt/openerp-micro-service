@@ -2,11 +2,13 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 
 
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.absence.usecase_data.CancelAbsence;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.absence.usecase_data.GetAbsence;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.absence.usecase_data.GetAbsenceList;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.AbsenceModel;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.absence.request.AnnounceAbsenceRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.absence.request.UpdateAbsenceRequest;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.absence.response.AbsenceResponse;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -32,12 +34,13 @@ public class AbsenceController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateAbsence(
         Principal principal,
+        @Valid @PathVariable UUID id,
         @Valid @RequestBody UpdateAbsenceRequest request
     ){
-        publish(request.toUseCase(principal.getName()));
+        publish(request.toUseCase(principal.getName(), id));
         return ResponseEntity.ok().body(
             new Resource()
         );
@@ -58,6 +61,19 @@ public class AbsenceController extends BeanAwareUseCasePublisher {
         );
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getAbsenceList(
+        @Valid @PathVariable UUID id
+    ){
+        var useCase = GetAbsence.builder()
+            .id(id)
+            .build();
+        var absence = publish(AbsenceModel.class, useCase);
+        return ResponseEntity.ok().body(
+            new Resource(AbsenceResponse.fromModel(absence))
+        );
+    }
+
     @GetMapping("")
     public ResponseEntity<?> getAbsenceList(
         @Valid @RequestParam List<String> userIds,
@@ -71,7 +87,7 @@ public class AbsenceController extends BeanAwareUseCasePublisher {
             .build();
         var absenceList = publishCollection(AbsenceModel.class, useCase);
         return ResponseEntity.ok().body(
-            new Resource(absenceList)
+            new Resource(AbsenceResponse.fromModels(absenceList))
         );
     }
 
@@ -88,7 +104,7 @@ public class AbsenceController extends BeanAwareUseCasePublisher {
             .build();
         var absenceList = publishCollection(AbsenceModel.class, useCase);
         return ResponseEntity.ok().body(
-            new Resource(absenceList)
+            new Resource(AbsenceResponse.fromModels(absenceList))
         );
     }
 }

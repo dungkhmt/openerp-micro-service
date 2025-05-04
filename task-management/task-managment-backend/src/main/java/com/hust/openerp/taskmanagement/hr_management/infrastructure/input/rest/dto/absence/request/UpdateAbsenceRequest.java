@@ -14,14 +14,14 @@ import java.util.UUID;
 @Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UpdateAbsenceRequest {
-    private UUID id;
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
     private String reason;
 
-    public UpdateAbsence toUseCase(String userId){
+    public UpdateAbsence toUseCase(String userId, UUID id){
         return UpdateAbsence.builder()
+            .id(id)
             .date(date)
             .startTime(startTime)
             .endTime(endTime)

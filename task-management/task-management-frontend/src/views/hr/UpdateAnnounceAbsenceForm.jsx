@@ -10,75 +10,76 @@ import {
 } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import {
-  DatePicker,
   TimePicker,
   LocalizationProvider,
 } from "@mui/x-date-pickers";
 import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { request } from "@/api";
 import toast from "react-hot-toast";
 import CloseIcon from "@mui/icons-material/Close";
 
-const AnnounceAbsenceForm = () => {
+const UpdateAbsenceForm = () => {
+  const { id } = useParams(); // Lấy ID từ URL
+  const navigate = useNavigate();
+
   const [configs, setConfigs] = useState({});
   const [leaveHours, setLeaveHours] = useState(0);
   const [selectedDates, setSelectedDates] = useState([]);
   const [reason, setReason] = useState("");
 
   useEffect(() => {
+    // Fetch configs and staff info for the leave hours
     request("get", "/configs?configGroup=COMPANY_CONFIGS", (res) => {
       const map = {};
       Object.entries(res.data?.data || {}).forEach(([k, v]) => (map[k] = v.config_value));
       setConfigs(map);
+      console.log(map)
+      if (id) {
+        request("get", `/absences/${id}`, (res) => {
+          const data = res.data?.data;
+          if (data) {
+            const startTime = new Date(`1970-01-01T${data.start_time}`);
+            const endTime = new Date(`1970-01-01T${data.end_time}`);
+            const startWork = new Date(`1970-01-01T${map.START_WORK_TIME}`);
+            const endWork = new Date(`1970-01-01T${map.END_WORK_TIME}`);
+            const dateType = (startTime.getTime() === startWork.getTime() && endTime.getTime() === endWork.getTime())
+              ? "all_day"
+              : "custom";
+
+
+            setSelectedDates([
+              {
+                date: data.date,
+                dateType: dateType,
+                startTime,
+                endTime,
+                type: data.type || "UNPAID_LEAVE",
+              }
+            ]);
+            setReason(data.reason || "");
+          }
+        });
+      }
     });
 
     request("get", "/staff", (res) => {
       const staff = res.data?.data;
       if (staff?.leave_hours) setLeaveHours(staff.leave_hours);
     });
-  }, []);
+
+
+  }, [id]);
 
   const startWork = configs.START_WORK_TIME && new Date(`1970-01-01T${configs.START_WORK_TIME}`);
   const endWork = configs.END_WORK_TIME && new Date(`1970-01-01T${configs.END_WORK_TIME}`);
   const lunchStart = configs.START_LUNCH_TIME && new Date(`1970-01-01T${configs.START_LUNCH_TIME}`);
   const lunchEnd = configs.END_LUNCH_TIME && new Date(`1970-01-01T${configs.END_LUNCH_TIME}`);
 
-  const addSelectedDate = (date) => {
-    if (!date) return;
-    const iso = date.toLocaleDateString('en-CA'); // en-CA => YYYY-MM-DD format
-    if (selectedDates.find((d) => d.date === iso)) return;
-
-    setSelectedDates([
-      ...selectedDates,
-      {
-        date: iso,
-        dateType: "all_day",
-        startTime: startWork,
-        endTime: endWork,
-        type: "PAID_LEAVE",
-      },
-    ]);
-  };
-
-
   const updateDateField = (index, field, value) => {
     const updated = [...selectedDates];
     updated[index][field] = value;
-    if (field === "dateType" && value === "all_day") {
-      updated[index].startTime = startWork;
-      updated[index].endTime = endWork;
-    }
     setSelectedDates(updated);
-  };
-
-  const deleteDate = (index) => {
-    const updated = [...selectedDates];
-    updated.splice(index, 1);
-    setSelectedDates(updated);
-  };
-
-  const shouldDisableTime = (time) => {
-    return lunchStart && lunchEnd && time >= lunchStart && time <= lunchEnd;
   };
 
   const calculateWorkHours = (start, end) => {
@@ -110,15 +111,19 @@ const AnnounceAbsenceForm = () => {
       }
 
       await request(
-        "post",
-        "/absences",
+        "put", // Cập nhật thông báo nghỉ phép
+        `/absences/${id}`,
         () => {
-          toast.success(`Gửi thành công ${d.date}`);
+          toast.success(`Cập nhật thành công ${d.date}`);
           totalHoursUsed += hours;
           successfulDates.push(d.date);
         },
         {
-          onError: () => toast.error(`Lỗi gửi ngày ${d.date}`),
+          onError: (err) => {
+            let data = err.response.data.data;
+            toast.error("Error when update: " + data);
+            toast.error(`Lỗi cập nhật ngày ${d.date}`);
+          }
         },
         {
           date: d.date,
@@ -136,38 +141,17 @@ const AnnounceAbsenceForm = () => {
 
     if (successfulDates.length === selectedDates.length) {
       setReason("");
+      navigate("/hr/absence/me"); // Điều hướng về trang danh sách sau khi cập nhật
     }
   };
-
-
 
   return (
     <Box sx={{ px: 3 }}>
       <Typography variant="h5" sx={{ mb: 2, fontWeight: 600 }}>
-        Thông báo nghỉ phép
+        Chỉnh sửa thông báo nghỉ phép
       </Typography>
 
       <Box sx={{ maxWidth: 800, mx: "auto" }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <DatePicker
-              label="Thêm ngày nghỉ"
-              shouldDisableDate={(date) => {
-                const day = date.getDay();
-                return day === 0 || day === 6; // 0: Sunday, 6: Saturday
-              }}
-              onChange={(date) => date && addSelectedDate(date)}
-              renderInput={(params) => (
-                <TextField {...params} variant="standard" fullWidth sx={{ maxWidth: 250 }} />
-              )}
-            />
-
-          </LocalizationProvider>
-          <Typography variant="body2">
-            Số giờ phép còn lại: <strong>{Math.floor(leaveHours)} giờ {Math.round((leaveHours % 1) * 60)} phút</strong>
-          </Typography>
-        </Box>
-
         {selectedDates.map((d, i) => (
           <Box
             key={i}
@@ -180,19 +164,12 @@ const AnnounceAbsenceForm = () => {
               position: "relative",
             }}
           >
-            <IconButton
-              sx={{ position: "absolute", top: 8, right: 8 }}
-              onClick={() => deleteDate(i)}
-            >
-              <CloseIcon />
-            </IconButton>
-
             <Typography variant="subtitle1" fontWeight={600} mb={1}>
               {d.date}
             </Typography>
 
             <Grid container spacing={2} alignItems="center" sx={{ mt: 1 }}>
-              <Grid item xs={12} sm={5}>
+              <Grid item xs={12} sm={6}>
                 <Box display="flex" alignItems="center">
                   <Typography sx={{ mr: 2, minWidth: 80 }}>Thời gian</Typography>
                   <Select
@@ -206,11 +183,7 @@ const AnnounceAbsenceForm = () => {
                   </Select>
                 </Box>
               </Grid>
-              <Grid item xs={12} sm={1}>
-                <Box display="flex" alignItems="center">
 
-                </Box>
-              </Grid>
               <Grid item xs={12} sm={6}>
                 <Box display="flex" alignItems="center">
                   <Typography sx={{ mr: 2, minWidth: 80 }}>Loại nghỉ</Typography>
@@ -236,7 +209,6 @@ const AnnounceAbsenceForm = () => {
                       value={d.startTime}
                       minTime={startWork}
                       maxTime={endWork}
-                      shouldDisableTime={shouldDisableTime}
                       onChange={(val) => updateDateField(i, "startTime", val)}
                       renderInput={(params) => (
                         <TextField {...params} variant="standard" fullWidth />
@@ -252,7 +224,6 @@ const AnnounceAbsenceForm = () => {
                       value={d.endTime}
                       minTime={startWork}
                       maxTime={endWork}
-                      shouldDisableTime={shouldDisableTime}
                       onChange={(val) => updateDateField(i, "endTime", val)}
                       renderInput={(params) => (
                         <TextField {...params} variant="standard" fullWidth />
@@ -262,10 +233,8 @@ const AnnounceAbsenceForm = () => {
                 </Grid>
               </Grid>
             )}
-
           </Box>
         ))}
-
 
         <TextField
           sx={{ mt: 2 }}
@@ -282,14 +251,13 @@ const AnnounceAbsenceForm = () => {
           fullWidth
           onClick={submit}
           sx={{ mt: 3 }}
-          disabled={!reason.trim() || selectedDates.length <= 0}
+          disabled={!reason.trim()}
         >
-          Gửi yêu cầu
+          Cập nhật yêu cầu
         </Button>
-
       </Box>
     </Box>
   );
 };
 
-export default AnnounceAbsenceForm;
+export default UpdateAbsenceForm;

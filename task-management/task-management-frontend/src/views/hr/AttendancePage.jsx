@@ -21,11 +21,11 @@ const AttendancePage = () => {
   const [selectedPos, setSelectedPos] = useState(null);
   const [searchName, setSearchName] = useState("");
   const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [fetchSearch, setFetchSearch] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [pageCount, setPageCount] = useState(0);
   const [holidays, setHolidays] = useState({});
-
 
   const todayStr = new Date().toISOString().split("T")[0];
 
@@ -44,7 +44,6 @@ const AttendancePage = () => {
       }
     );
   };
-
 
   const fetchEmployees = async (page = 0, size = itemsPerPage) => {
     return new Promise((resolve) => {
@@ -71,8 +70,6 @@ const AttendancePage = () => {
     });
   };
 
-
-
   const fetchAttendances = async (employeeList) => {
     const userIds = employeeList.map((e) => e.user_login_id);
     request(
@@ -93,9 +90,8 @@ const AttendancePage = () => {
     const list = await fetchEmployees(page, size);
     await fetchAttendances(list);
     await fetchHolidays();
+    setFetchSearch(fetchSearch + 1)
   };
-
-
 
   useEffect(() => {
     handleSearch();
@@ -118,11 +114,11 @@ const AttendancePage = () => {
     const currentDate = new Date(year, month, 1);
 
     while (currentDate.getMonth() === month) {
-      const dateStr = currentDate.toISOString().split("T")[0];
+      const dateStr = currentDate.toLocaleDateString("en-CA")
       days.push({
         dateStr,
         day: currentDate.getDate(),
-        weekday: currentDate.toLocaleDateString("vi-VN", { weekday: "short" }),
+        weekday: currentDate.toLocaleDateString("en-CA", { weekday: "short" }),
         isWeekend: currentDate.getDay() === 0 || currentDate.getDay() === 6,
         isFuture: dateStr > todayStr,
       });
@@ -132,7 +128,8 @@ const AttendancePage = () => {
     return days;
   };
 
-  const daysInMonth = useMemo(() => getDaysInMonth(selectedMonth), [selectedMonth]);
+  const daysInMonth = useMemo(() => getDaysInMonth(selectedMonth), [fetchSearch]);
+
 
   const formatTime = (timeStr) => {
     return new Date(timeStr).toLocaleTimeString("vi-VN", {
@@ -186,7 +183,11 @@ const AttendancePage = () => {
         </Grid>
         <Grid item xs={12} md={3}>
           <Box display="flex" justifyContent="flex-end" alignItems="center">
-            <Button variant="contained" onClick={handleSearch} sx={{ height: 60, minWidth: 140, marginBottom:1 }}>
+            <Button
+              variant="contained"
+              onClick={() => handleSearch()}
+              sx={{ height: 60, minWidth: 140, marginBottom: 1 }}
+            >
               Tìm kiếm
             </Button>
           </Box>
@@ -195,145 +196,99 @@ const AttendancePage = () => {
 
       <Box sx={{ overflowX: "auto", marginTop: 2 }}>
         <Box sx={{ maxHeight: "calc(100vh - 300px)", overflowY: "auto" }}>
-          <table style={{borderCollapse: "collapse", width: "100%"}}>
+          <table style={{ borderCollapse: "collapse", width: "100%" }}>
             <thead>
             <tr>
-              <th
-                style={{
+              <th style={{
+                position: "sticky",
+                top: 0,
+                left: 0,
+                zIndex: 3,
+                background: "#fff",
+                padding: 8,
+                borderBottom: "2px solid #ccc",
+                textAlign: "left",
+                whiteSpace: "nowrap",
+              }}>Nhân viên</th>
+              {daysInMonth.map((d) => (
+                <th key={d.dateStr} style={{
                   position: "sticky",
                   top: 0,
-                  left: 0,
-                  zIndex: 3,
-                  background: "#fff",
-                  padding: 8,
+                  zIndex: 2,
+                  padding: 6,
+                  textAlign: "center",
+                  backgroundColor: d.isWeekend ? "#f3f3f3" : "#fff",
+                  color: d.isWeekend ? "#888" : "#000",
+                  fontSize: 12,
+                  lineHeight: 1.2,
                   borderBottom: "2px solid #ccc",
-                  textAlign: "left",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                Nhân viên
-              </th>
-              {daysInMonth.map((d) => (
-                <th
-                  key={d.dateStr}
-                  style={{
-                    position: "sticky",
-                    top: 0,
-                    zIndex: 2,
-                    padding: 6,
-                    textAlign: "center",
-                    backgroundColor: d.isWeekend ? "#f3f3f3" : "#fff",
-                    color: d.isWeekend ? "#888" : "#000",
-                    fontSize: 12,
-                    lineHeight: 1.2,
-                    borderBottom: "2px solid #ccc",
-                  }}
-                >
+                }}>
                   <div>{d.day}</div>
                   <div>{d.weekday}</div>
                 </th>
               ))}
             </tr>
             </thead>
-
             <tbody>
             {employees.map((emp) => (
               <tr key={emp.staff_code}>
-                <td
-                  onClick={() => navigate(`/hr/staff/${emp.staff_code}`)}
-                  style={{
-                    position: "sticky",
-                    left: 0,
-                    zIndex: 1,
-                    background: "#fff",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    padding: 8,
-                    borderBottom: "1px solid #eee",
-                    whiteSpace: "nowrap",
-                    height: 60,
-                    verticalAlign: "middle",
-                  }}
-                >
-                  <img
-                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      emp.fullname
-                    )}&background=random`}
-                    alt="Avatar"
-                    style={{width: 30, height: 30, borderRadius: "50%"}}
-                  />
-                  <span style={{color: "#1976d2", fontWeight: 500}}>{emp.fullname}</span>
+                <td onClick={() => navigate(`/hr/staff/${emp.staff_code}`)} style={{
+                  position: "sticky",
+                  left: 0,
+                  zIndex: 1,
+                  background: "#fff",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: 8,
+                  borderBottom: "1px solid #eee",
+                  whiteSpace: "nowrap",
+                  height: 60,
+                }}>
+                  <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(emp.fullname)}&background=random`} alt="Avatar" style={{ width: 30, height: 30, borderRadius: "50%" }} />
+                  <span style={{ color: "#1976d2", fontWeight: 500 }}>{emp.fullname}</span>
                 </td>
                 {daysInMonth.map((d) => {
                   const record = attendances[emp.user_login_id]?.[d.dateStr];
-                  const {isWeekend, isFuture} = d;
-
                   const isHoliday = holidays[d.dateStr];
+                  const isWeekend = d.isWeekend;
+                  const isFuture = d.isFuture;
+
                   let display = "-";
                   let color = "#bbb";
-                  let bg = isHoliday
-                    ? (d.isWeekend ? "#f9f9f9" : "#e8f5e9") // xanh nhạt nếu là weekday holiday, cuối tuần thì giữ nguyên
-                    : record
-                      ? getAttendanceColor(record.attendanceType)
-                      : isWeekend
-                        ? "#f9f9f9"
-                        : "#fff";
+                  let bg = isHoliday ? (isWeekend ? "#f9f9f9" : "#e8f5e9") :
+                    record ? getAttendanceColor(record.attendanceType) :
+                      isWeekend ? "#f9f9f9" : "#fff";
 
                   if (isHoliday) {
-                    display = (
-                      <span style={{ fontWeight: 500, color: "#1b5e20", fontSize: 12 }}>
-      Nghỉ lễ
-    </span>
-                    );
+                    display = <span style={{ fontWeight: 500, color: "#1b5e20", fontSize: 12 }}>Nghỉ lễ</span>;
                   } else if (!isFuture && !isWeekend && !record) {
                     display = "❌";
                     color = "#000";
                     bg = getAttendanceColor("ABSENT");
                   } else if (record?.startTime && record?.endTime) {
-                    display = (
-                      <>
-                        <div style={{ color: "#005e05", fontWeight: 500 }}>
-                          {formatTime(record.startTime)}
-                        </div>
-                        <div style={{ color: "#005e05", fontWeight: 500 }}>
-                          {formatTime(record.endTime)}
-                        </div>
-                      </>
-                    );
+                    display = (<>
+                      <div style={{ color: "#005e05", fontWeight: 500 }}>{formatTime(record.startTime)}</div>
+                      <div style={{ color: "#005e05", fontWeight: 500 }}>{formatTime(record.endTime)}</div>
+                    </>);
                   } else if (record?.startTime) {
-                    display = (
-                      <div style={{ color: "#c62828", fontWeight: 500 }}>
-                        {formatTime(record.startTime)}
-                      </div>
-                    );
+                    display = (<div style={{ color: "#c62828", fontWeight: 500 }}>{formatTime(record.startTime)}</div>);
                   } else if (record?.endTime) {
-                    display = (
-                      <div style={{ color: "#c62828", fontWeight: 500 }}>
-                        {formatTime(record.endTime)}
-                      </div>
-                    );
+                    display = (<div style={{ color: "#c62828", fontWeight: 500 }}>{formatTime(record.endTime)}</div>);
                   }
 
-
                   return (
-                    <td
-                      key={d.dateStr}
-                      style={{
-                        backgroundColor: bg,
-                        textAlign: "center",
-                        padding: 8,
-                        borderBottom: "1px solid #eee",
-                        fontSize: 13,
-                        color: color,
-                        minWidth: 70,
-                        height: 60,
-                        verticalAlign: "middle",
-                      }}
-                    >
-                      {display}
-                    </td>
+                    <td key={d.dateStr} style={{
+                      backgroundColor: bg,
+                      textAlign: "center",
+                      padding: 8,
+                      borderBottom: "1px solid #eee",
+                      fontSize: 13,
+                      color,
+                      minWidth: 70,
+                      height: 60,
+                    }}>{display}</td>
                   );
                 })}
               </tr>
@@ -352,7 +307,6 @@ const AttendancePage = () => {
           handleSearch(0, size);
         }}
       />
-
     </Box>
   );
 };

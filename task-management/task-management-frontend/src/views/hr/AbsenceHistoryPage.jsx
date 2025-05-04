@@ -21,11 +21,13 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteConfirmationModal from "./modals/DeleteConfirmationModal";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const AbsenceHistoryPage = () => {
   const [selectedDate, setSelectedDate] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [absenceList, setAbsenceList] = useState([]);
   const [deleteId, setDeleteId] = useState(null);
+  const navigate = useNavigate();
 
   const fetchAbsences = () => {
     const start = startOfWeek(selectedDate, { weekStartsOn: 1 });
@@ -101,6 +103,7 @@ const AbsenceHistoryPage = () => {
                   mb: 3,
                   borderRadius: 2,
                   boxShadow: 0,
+                  border: item.status === "INACTIVE" ? "2px solid rgba(244, 67, 54, 0.5)" : "none",
                   "&:hover": {
                     boxShadow: 3, // Show shadow on hover
                   },
@@ -110,18 +113,26 @@ const AbsenceHistoryPage = () => {
                   title={`📅 ${item.date}`}
                   subheader={
                     <Typography variant="body2" fontWeight={600} color="text.primary">
-                      🕒 {item.startTime?.slice(0, 5)} - {item.endTime?.slice(0, 5)}
+                      🕒 {item.start_time?.slice(0, 5)} - {item.end_time?.slice(0, 5)}
                     </Typography>
                   }
                   action={
-                    <Box>
-                      <IconButton edge="end" color="primary" onClick={() => {}}>
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton edge="end" color="error" onClick={() => setDeleteId(item.id)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
+                    item.status === "INACTIVE" ? (
+                      <Box>
+                        <Typography variant="body2" color="error" fontWeight="bold">
+                          Đã huỷ
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <Box>
+                        <IconButton edge="end" color="primary" onClick={() => navigate(`/hr/absence/${item.id}`)}>
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton edge="end" color="error" onClick={() => setDeleteId(item.id)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </Box>
+                    )
                   }
                 />
                 <CardContent>
@@ -154,8 +165,8 @@ const AbsenceHistoryPage = () => {
             open={!!deleteId}
             onClose={() => setDeleteId(null)}
             onSubmit={handleDelete}
-            title="Xác nhận xoá thông báo nghỉ phép?"
-            info="Bạn có chắc chắn muốn xoá thông báo nghỉ phép này không?"
+            title="Xác nhận huỷ thông báo nghỉ phép?"
+            info="Bạn có chắc chắn muốn huỷ thông báo nghỉ phép này không?"
           />
         </Box>
       </Box>

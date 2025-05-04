@@ -15,6 +15,8 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -33,6 +35,7 @@ public class AbsenceResponse {
 
     public static AbsenceResponse fromModel(AbsenceModel model) {
         return AbsenceResponse.builder()
+            .id(model.getId())
             .date(model.getDate())
             .startTime(model.getStartTime())
             .endTime(model.getEndTime())
@@ -40,5 +43,9 @@ public class AbsenceResponse {
             .status(model.getStatus())
             .userId(model.getUserId())
             .build();
+    }
+
+    public static List<AbsenceResponse> fromModels(Collection<AbsenceModel> models) {
+        return models.stream().map(AbsenceResponse::fromModel).toList();
     }
 }

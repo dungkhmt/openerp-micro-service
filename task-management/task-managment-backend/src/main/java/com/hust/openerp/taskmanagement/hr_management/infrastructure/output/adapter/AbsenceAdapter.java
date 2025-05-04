@@ -67,6 +67,7 @@ public class AbsenceAdapter implements IAbsencePort {
             throw new ApplicationException(ResponseCode.CANCEL_ABSENCE_ERROR, "Absence must cancel before start time");
         }
         absenceEntity.setStatus(AbsenceStatus.INACTIVE);
+        absenceRepo.save(absenceEntity);
     }
 
     @Override
@@ -98,6 +99,7 @@ public class AbsenceAdapter implements IAbsencePort {
             .startTime(absenceEntity.getStartTime())
             .status(absenceEntity.getStatus())
             .userId(absenceEntity.getUserId())
+            .type(absenceEntity.getType())
             .build();
     }
 

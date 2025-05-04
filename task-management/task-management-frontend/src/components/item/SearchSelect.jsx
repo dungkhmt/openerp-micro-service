@@ -62,6 +62,9 @@ const SearchSelect = ({
         setInputValue(val);
         debouncedFetch(val);
       }}
+      isOptionEqualToValue={(option, val) => {
+        return getOptionLabel(option) === getOptionLabel(val)
+      }}
       disabled={disabled}
       loading={loading}
       filterSelectedOptions

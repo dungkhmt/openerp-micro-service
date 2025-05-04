@@ -31,6 +31,7 @@ public class UpdateAbsence implements UseCase {
 
     public AbsenceModel toModel(){
         return AbsenceModel.builder()
+            .id(id)
             .date(date)
             .startTime(startTime)
             .endTime(endTime)
