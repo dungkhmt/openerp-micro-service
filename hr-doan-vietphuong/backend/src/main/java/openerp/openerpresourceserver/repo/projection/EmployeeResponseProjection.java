@@ -7,7 +7,7 @@ public interface EmployeeResponseProjection {
     String getFullName();
     String getEmail();
     String getPhone();
-    String getProfileUrl();
+    String getImageUrl();
     Double getAnnualLeave();
     Integer getStatus();
     Long getPositionId();

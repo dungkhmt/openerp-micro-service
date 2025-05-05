@@ -35,7 +35,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
             e.fullName,
             e.email,
             e.phone,
-            e.profileUrl,
+            e.imageUrl,
             e.position.id,
             e.status)
             FROM Employee e
@@ -57,7 +57,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
             e.full_name AS fullName,
             e.email,
             e.phone,
-            e.profile_url AS profileUrl,
+            e.image_url AS imageUrl,
             e.annual_leave AS annualLeave,
             e.status,
             e.organization_id AS organizationId,

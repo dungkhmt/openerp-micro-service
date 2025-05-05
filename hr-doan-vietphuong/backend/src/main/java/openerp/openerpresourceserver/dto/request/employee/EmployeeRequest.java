@@ -36,7 +36,7 @@ public class EmployeeRequest {
     @NotNull(message = "Annual leave must not be null")
     private Double annualLeave;
 
-    private String profileUrl;
+    private String imageUrl;
 
     private String title;
 

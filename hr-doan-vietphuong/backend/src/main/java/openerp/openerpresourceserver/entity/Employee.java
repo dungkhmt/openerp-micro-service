@@ -39,8 +39,8 @@ public class Employee {
     @Column(name = "phone")
     private String phone;
 
-    @Column(name = "profile_url")
-    private String profileUrl;
+    @Column(name = "image_url")
+    private String imageUrl;
 
     @Column(name = "annual_leave")
     private Double annualLeave;

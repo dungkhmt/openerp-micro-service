@@ -13,6 +13,8 @@ import java.time.LocalDate;
 public class JobHistory {
     private Long positionId;
     private String positionName;
+    private Long organizationId;
+    private String organizationName;
     private LocalDate startDate;
     private LocalDate endDate;
     private String createdBy;

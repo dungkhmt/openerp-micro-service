@@ -11,7 +11,9 @@ import openerp.openerpresourceserver.exception.BadRequestException;
 import openerp.openerpresourceserver.exception.NotFoundException;
 import openerp.openerpresourceserver.repo.projection.EmployeeResponseProjection;
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface EmployeeService {
@@ -30,4 +32,6 @@ public interface EmployeeService {
     List<Employee> deleteEmployee(List<Long> idList) throws NotFoundException;
 
     List<SimpleEmployeeResponse> getAllEmployees();
+
+    Employee updateAvatar(MultipartFile image) throws IOException;
 }

@@ -13,13 +13,16 @@ import openerp.openerpresourceserver.exception.NotFoundException;
 import openerp.openerpresourceserver.repo.*;
 import openerp.openerpresourceserver.repo.projection.EmployeeResponseProjection;
 import openerp.openerpresourceserver.service.EmployeeService;
+import openerp.openerpresourceserver.service.UploadService;
 import openerp.openerpresourceserver.util.SecurityUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +32,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
+    private final UploadService uploadService;
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
     private final AttendanceRangeRepository attendanceRangeRepository;
@@ -107,6 +111,8 @@ public class EmployeeServiceImpl implements EmployeeService {
                         JobHistory.builder()
                                 .positionId(position.getId())
                                 .positionName(position.getName())
+                                .organizationId(organization.getId())
+                                .organizationName(organization.getName())
                                 .startDate(LocalDate.now())
                                 .endDate(LocalDate.now())
                                 .createdBy(SecurityUtil.getUserEmail())
@@ -149,8 +155,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setFullName(dto.getFullName());
         employee.setPhone(dto.getPhone());
         employee.setAnnualLeave(dto.getAnnualLeave());
-
-        employee.setOrganization(organization);
         employee.setAttendanceRange(attendanceRange);
 
         List<JobHistory> jobHistories = employee.getJobHistories();
@@ -159,17 +163,23 @@ public class EmployeeServiceImpl implements EmployeeService {
             employee.setJobHistories(jobHistories);
         }
 
-        if (employee.getPosition() != position) {
+        if (employee.getPosition() != position || employee.getOrganization() != organization) {
+            if (!jobHistories.isEmpty()) {
+                jobHistories.get(jobHistories.size() - 1).setEndDate(LocalDate.now());
+            }
             JobHistory history = JobHistory.builder()
                     .positionId(position.getId())
                     .positionName(position.getName())
+                    .organizationId(organization.getId())
+                    .organizationName(organization.getName())
                     .startDate(LocalDate.now())
-                    .endDate(LocalDate.now())
+                    .endDate(null)
                     .createdBy(SecurityUtil.getUserEmail())
                     .build();
             jobHistories.add(history);
         }
 
+        employee.setOrganization(organization);
         employee.setPosition(position);
         employee.setStatus(dto.getStatus());
         employee.setUpdatedBy(SecurityUtil.getUserEmail());
@@ -200,6 +210,15 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employees.stream()
                 .map(this::mapToSimpleEmployeeResponse)
                 .toList();
+    }
+
+    @Override
+    public Employee updateAvatar(MultipartFile image) throws IOException {
+        Employee employee = employeeRepository.findByEmail(SecurityUtil.getUserEmail())
+                .orElseThrow(() -> new NotFoundException("Employee not found"));
+        String imageUrl = uploadService.upload(image.getBytes(), image.getOriginalFilename(), "avatars");
+        employee.setImageUrl(imageUrl);
+        return employeeRepository.save(employee);
     }
 
     private SimpleEmployeeResponse mapToSimpleEmployeeResponse(Employee employee) {

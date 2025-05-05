@@ -17,7 +17,7 @@ public class EmployeeResponse {
     private String fullName;
     private String email;
     private String phone;
-    private String profileUrl;
+    private String imageUrl;
     private Double annualLeave;
     private Integer status;
     private Long organizationId;
@@ -31,7 +31,7 @@ public class EmployeeResponse {
                             final String fullName,
                             final String email,
                             final String phone,
-                            final String profileUrl,
+                            final String imageUrl,
                             final Long positionId,
                             final Integer status) {
         this.id = id;
@@ -39,7 +39,7 @@ public class EmployeeResponse {
         this.fullName = fullName;
         this.email = email;
         this.phone = phone;
-        this.profileUrl = profileUrl;
+        this.imageUrl = imageUrl;
         this.positionId = positionId;
         this.status = status;
     }
