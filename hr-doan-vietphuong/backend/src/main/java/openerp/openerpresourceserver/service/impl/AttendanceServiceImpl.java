@@ -4,11 +4,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.dto.request.attendance.SyncAttendanceRequest;
 import openerp.openerpresourceserver.dto.response.attendance.AttendanceReportResponse;
+import openerp.openerpresourceserver.dto.response.attendance.AttendanceSummaryResponse;
 import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.enums.AbsenceTypeEnum;
 import openerp.openerpresourceserver.enums.AttendanceStatusEnum;
 import openerp.openerpresourceserver.enums.HolidayTypeEnum;
 import openerp.openerpresourceserver.enums.StatusEnum;
+import openerp.openerpresourceserver.exception.NotFoundException;
 import openerp.openerpresourceserver.repo.*;
 import openerp.openerpresourceserver.service.AttendanceRangeService;
 import openerp.openerpresourceserver.service.AttendanceService;
@@ -25,6 +27,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static openerp.openerpresourceserver.util.Constants.NO_ABSENCE;
@@ -141,6 +144,27 @@ public class AttendanceServiceImpl implements AttendanceService {
         return attResponses;
     }
 
+    @Override
+    public AttendanceSummaryResponse getAttendanceSummary(LocalDate start, LocalDate end) {
+        Employee employee = employeeRepository.findByEmail(SecurityUtil.getUserEmail())
+                .orElseThrow(() -> new NotFoundException("Employee not found"));
+        List<Integer> requiredWorkDays = DateUtil.getWeekdayInDateRange(start, end);
+        List<Integer> holidayList = holidayService.getAttendanceHoliday(start, end);
+        LocalDate endDateValue = getEndDate(end);
+        List<AttendanceReportResponse> attReports = getAttendanceReport(start, endDateValue);
+        double totalWorkHours = attReports.stream()
+                .filter(Objects::nonNull)
+                .filter(att -> att.attendanceTime() != null)
+                .mapToDouble(AttendanceReportResponse::attendanceTime)
+                .sum();
+        return AttendanceSummaryResponse.builder()
+                .totalWorkHours(totalWorkHours)
+                .totalWorkDays(Math.round((totalWorkHours / 8.0) * 10) / 10.0)
+                .absenceDayLeft(employee.getAnnualLeave())
+                .requiredWorkDays(requiredWorkDays.size())
+                .totalHolidays(holidayList.size())
+                .build();
+    }
     private String getClientIp(HttpServletRequest request) {
         String ipAddress = request.getHeader("X-Forwarded-For");
         if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {

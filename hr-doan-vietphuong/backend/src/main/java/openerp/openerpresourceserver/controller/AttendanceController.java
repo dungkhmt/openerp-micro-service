@@ -34,6 +34,11 @@ public class AttendanceController {
         return Result.ok(attendanceService.getAttendanceReport(request.getStart(), request.getEnd()));
     }
 
+    @GetMapping("/summary")
+    public Result getAttendanceSummary(@Valid AttendanceRequest request) {
+        return Result.ok(attendanceService.getAttendanceSummary(request.getStart(), request.getEnd()));
+    }
+
     @PostMapping("/test")
     public Result testing(@RequestParam("files") MultipartFile[] files) {
         List<Double> result = new ArrayList<>();
