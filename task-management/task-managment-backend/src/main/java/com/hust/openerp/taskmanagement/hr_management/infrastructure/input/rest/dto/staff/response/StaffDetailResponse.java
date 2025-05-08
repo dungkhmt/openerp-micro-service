@@ -24,15 +24,16 @@ public class StaffDetailResponse extends StaffResponse {
 
     public static StaffDetailResponse fromModel(StaffDetailModel model) {
         return StaffDetailResponse.builder()
-                .staffCode(model.getStaffCode())
-                .department(fromModel(model.getDepartment()))
-                .jobPosition(fromModel(model.getJobPosition()))
-                .userLoginId(model.getUserLoginId())
-                .fullname(model.getFullname())
-                .status(model.getStatus())
-                .dateOfJoin(model.getDateOfJoin())
-                .email(model.getEmail())
-                .build();
+            .staffCode(model.getStaffCode())
+            .leaveHours(model.getLeaveHours())
+            .department(fromModel(model.getDepartment()))
+            .jobPosition(fromModel(model.getJobPosition()))
+            .userLoginId(model.getUserLoginId())
+            .fullname(model.getFullname())
+            .status(model.getStatus())
+            .dateOfJoin(model.getDateOfJoin())
+            .email(model.getEmail())
+            .build();
     }
 
     private static Department fromModel(DepartmentModel model){

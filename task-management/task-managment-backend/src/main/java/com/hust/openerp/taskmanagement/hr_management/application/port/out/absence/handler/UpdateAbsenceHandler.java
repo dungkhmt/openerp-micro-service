@@ -39,7 +39,7 @@ public class UpdateAbsenceHandler extends ObservableUseCasePublisher implements 
         var model = useCase.toModel();
         absenceValidator.validate(model);
         var paidLeaveTimeByHours = absence.getType() == AbsenceType.UNPAID_LEAVE ? 0.0f : absence.getDurationTimeAbsence(companyConfig);
-        var updatedPaidLeaveTimeByHours = absence.getType() == AbsenceType.UNPAID_LEAVE ? 0.0f : model.getDurationTimeAbsence(companyConfig);
+        var updatedPaidLeaveTimeByHours = useCase.getType() == AbsenceType.UNPAID_LEAVE ? 0.0f : model.getDurationTimeAbsence(companyConfig);
         var paidLeaveAddTime = updatedPaidLeaveTimeByHours - paidLeaveTimeByHours;
         if(paidLeaveAddTime > 0) {
             absenceValidator.validateLeaveHour(absence.getUserId(), paidLeaveAddTime);

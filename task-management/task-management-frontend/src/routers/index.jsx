@@ -36,6 +36,8 @@ import AnnounceAbsenceForm from "../views/hr/AnnounceAbsenceForm.jsx";
 import AbsenceHistoryPage from "../views/hr/AbsenceHistoryPage.jsx";
 import UpdateAnnounceAbsenceForm from "../views/hr/UpdateAnnounceAbsenceForm.jsx";
 import WeeklyAbsencePage from "../views/hr/WeeklyAbsencePage.jsx";
+import CompanyConfigPage from "../views/hr/CompanyConfigPage.jsx";
+import LeavePolicyPage from "../views/hr/LeaveHoursPage.jsx";
 
 
 export const router = createBrowserRouter([
@@ -183,6 +185,19 @@ export const router = createBrowserRouter([
                 path: "holiday-schedule",
                 element: <HolidayScreen />,
               },
+              {
+                path: "leave-policy",
+                element: <LeavePolicyPage />,
+              },
+              {
+                path: "config",
+                children: [
+                  {
+                    path: "company",
+                    element: <CompanyConfigPage/>,
+                  },
+                ]
+              }
             ],
           },
           {

@@ -22,7 +22,7 @@ public class UpdateAbsenceLeaveHours implements UseCase {
     }
 
     public LeaveHoursUpdateType getUpdateType() {
-        return LeaveHoursUpdateType.ADDITIONAL;
+        return LeaveHoursUpdateType.SUBTRACT;
     }
 
     public static UpdateAbsenceLeaveHours of(

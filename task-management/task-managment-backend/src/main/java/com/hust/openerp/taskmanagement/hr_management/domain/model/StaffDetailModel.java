@@ -16,6 +16,7 @@ public class StaffDetailModel {
     private String fullname;
     private StaffStatus status;
     private String email;
+    private Float leaveHours;
     private LocalDate dateOfJoin;
     private DepartmentModel department;
     private JobPositionModel jobPosition;
@@ -26,14 +27,15 @@ public class StaffDetailModel {
             JobPositionModel jobPositionModel
     ){
         return StaffDetailModel.builder()
-                .staffCode(staffModel.getStaffCode())
-                .userLoginId(staffModel.getUserLoginId())
-                .fullname(staffModel.getFullname())
-                .status(staffModel.getStatus())
-                .dateOfJoin(staffModel.getDateOfJoin())
-                .email(staffModel.getEmail())
-                .department(departmentModel)
-                .jobPosition(jobPositionModel)
-                .build();
+            .staffCode(staffModel.getStaffCode())
+            .userLoginId(staffModel.getUserLoginId())
+            .fullname(staffModel.getFullname())
+            .status(staffModel.getStatus())
+            .dateOfJoin(staffModel.getDateOfJoin())
+            .leaveHours(staffModel.getLeaveHours())
+            .email(staffModel.getEmail())
+            .department(departmentModel)
+            .jobPosition(jobPositionModel)
+            .build();
     }
 }

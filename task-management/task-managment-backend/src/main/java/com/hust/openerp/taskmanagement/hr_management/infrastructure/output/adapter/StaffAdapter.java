@@ -106,6 +106,7 @@ public class StaffAdapter implements IStaffPort {
                     case ADDITIONAL -> staff.setLeaveHours(staff.getLeaveHours() + value);
                 }
             }
+            staffRepo.saveAll(staffs);
         }
         catch(Exception e){
             throw new ApplicationException(ResponseCode.STAFF_EXISTED, "update leave hours failure");

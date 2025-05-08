@@ -13,6 +13,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { startOfWeek, addDays, format, isMonday } from "date-fns";
 import SearchSelect from "@/components/item/SearchSelect";
 import { request } from "@/api";
+import toast from "react-hot-toast";
 
 const WeeklyAbsencePage = () => {
   const [selectedDate, setSelectedDate] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
@@ -93,7 +94,7 @@ const WeeklyAbsencePage = () => {
       const emp = employeeList.find(e => e.user_login_id === abs.user_id);
       const startTime = new Date(`1970-01-01T${abs.start_time}`).getTime();
       const endTime = new Date(`1970-01-01T${abs.end_time}`).getTime();
-      const isFullDay = startTime === startWork && endTime === endWork
+      const isFullDay = (startTime === startWork && endTime === endWork)
       return {
         ...abs,
         staff_name: emp?.fullname || "(Không rõ nhân viên)",
@@ -114,7 +115,7 @@ const WeeklyAbsencePage = () => {
       setEndWork(new Date(`1970-01-01T${map.END_WORK_TIME}`).getTime());
     });
     handleSearch();
-  }, []);
+  }, [startWork]);
 
   const absenceByDay = useMemo(() => {
     const result = {};

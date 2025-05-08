@@ -6,6 +6,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { Divider, Tab, Tabs } from "@mui/material";
 import Timeline from "@/components/item/TimelineItem";
 import SalaryTab from "@/components/tab/SalaryTab";
+import toast from "react-hot-toast";
 
 const EmployeeDetails = () => {
   const { staffCode } = useParams(); 
@@ -48,52 +49,40 @@ const EmployeeDetails = () => {
 
     const fetchJobHistory = async (userLoginId) => {
       if (!userLoginId) return;
-      const payload = { user_login_id: userLoginId };
-      try {
-        request(
-          "post",
-          "/job/get-job-position-history",
-          (res) => {
-            const history = res.data?.data || [];
-            setJobHistory(
-              history.map((job) => ({
-                title: job.job_position?.name || "N/A",
-                fromDate: formatDate(job.from_date),
-                thruDate: formatDate(job.thru_date),
-              }))
-            );
-          },
-          { onError: (err) => console.error(err) },
-          payload
-        );
-      } catch (err) {
-        console.error(err);
-      }
+      request(
+        "post",
+        `/staffs/${userLoginId}/job-position`,
+        (res) => {
+          const history = res.data?.data || [];
+          setJobHistory(
+            history.map((job) => ({
+              title: job.job_position?.name || "N/A",
+              fromDate: formatDate(job.from_date),
+              thruDate: formatDate(job.thru_date),
+            }))
+          );
+        },
+        { onError: (err) => toast.error(err) }
+      );
     };
 
     const fetchDepartmentHistory = async (userLoginId) => {
       if (!userLoginId) return;
-      const payload = { user_login_id: userLoginId };
-      try {
-        request(
-          "post",
-          "/department/get-department-history",
-          (res) => {
-            const history = res.data?.data || [];
-            setDepartmentHistory(
-              history.map((dept) => ({
-                title: dept.department_model?.department_name || "N/A",
-                fromDate: formatDate(dept.from_date),
-                thruDate: formatDate(dept.thru_date),
-              }))
-            );
-          },
-          { onError: (err) => console.error(err) },
-          payload
-        );
-      } catch (err) {
-        console.error(err);
-      }
+      request(
+        "post",
+        `/staffs/${userLoginId}/department`,
+        (res) => {
+          const history = res.data?.data || [];
+          setDepartmentHistory(
+            history.map((dept) => ({
+              title: dept.department_model?.department_name || "N/A",
+              fromDate: formatDate(dept.from_date),
+              thruDate: formatDate(dept.thru_date),
+            }))
+          );
+        },
+        { onError: (err) => toast.error(err) }
+      );
     };
 
     fetchDetails();

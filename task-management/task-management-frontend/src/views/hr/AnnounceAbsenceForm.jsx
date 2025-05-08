@@ -24,6 +24,7 @@ const AnnounceAbsenceForm = () => {
   const [leaveHours, setLeaveHours] = useState(0);
   const [selectedDates, setSelectedDates] = useState([]);
   const [reason, setReason] = useState("");
+  const [fetch, setFetch] = useState(0);
 
   useEffect(() => {
     request("get", "/configs?configGroup=COMPANY_CONFIGS", (res) => {
@@ -37,6 +38,13 @@ const AnnounceAbsenceForm = () => {
       if (staff?.leave_hours) setLeaveHours(staff.leave_hours);
     });
   }, []);
+
+  useEffect(() => {
+    request("get", "/staff", (res) => {
+      const staff = res.data?.data;
+      if (staff?.leave_hours) setLeaveHours(staff.leave_hours);
+    });
+  }, [fetch]);
 
   const startWork = configs.START_WORK_TIME && new Date(`1970-01-01T${configs.START_WORK_TIME}`);
   const endWork = configs.END_WORK_TIME && new Date(`1970-01-01T${configs.END_WORK_TIME}`);
@@ -98,7 +106,6 @@ const AnnounceAbsenceForm = () => {
       toast.error("Vui lòng nhập lý do nghỉ phép");
       return;
     }
-
     let totalHoursUsed = 0;
     let successfulDates = [];
 
@@ -137,6 +144,8 @@ const AnnounceAbsenceForm = () => {
     if (successfulDates.length === selectedDates.length) {
       setReason("");
     }
+
+    setFetch((prev) => prev + 1)
   };
 
 
