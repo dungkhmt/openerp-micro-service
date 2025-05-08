@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.cache.RedisCacheService;
+import openerp.openerpresourceserver.context.DistributeContext;
 import openerp.openerpresourceserver.dto.*;
 import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.entity.enumentity.CollectorAssignmentStatus;
@@ -37,6 +38,8 @@ public class OrderServiceImpl implements OrderService {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
+    @Autowired
+    private DistributeContext distributeContext;
     @Autowired
     private GAAutoAssign gaAutoAssign;
     @Autowired
@@ -123,9 +126,7 @@ public class OrderServiceImpl implements OrderService {
                     .quantity(item.getQuantity())
                     .weight(item.getWeight())
                     .price(item.getPrice())
-                    .length(item.getLength())
-                    .width(item.getWidth())
-                    .height(item.getHeight())
+
                     .createdBy(principal.getName())
                     .orderId(orderEntity.getId())
                     .build();
@@ -173,6 +174,7 @@ public class OrderServiceImpl implements OrderService {
 
         return orderList;
     }
+
 
 
     @Override
@@ -271,9 +273,6 @@ public class OrderServiceImpl implements OrderService {
                                 .quantity(item.getQuantity())
                                 .weight(item.getWeight())
                                 .price(item.getPrice())
-                                .length(item.getLength())
-                                .width(item.getWidth())
-                                .height(item.getHeight())
                                 .updatedBy(principal.getName())
                                 .build()
                         )
@@ -349,7 +348,7 @@ public class OrderServiceImpl implements OrderService {
 
         // Danh sách đơn hàng và collector
         List<Order> orderList = new ArrayList<>();
-        List<Collector> collectorList = new ArrayList<>();
+        List<Employee> collectorList = new ArrayList<>();
         List<OrderResponseDto> assignedOrders = new ArrayList<>();
 
         // Tính khoảng cách cho từng đơn hàng
@@ -413,11 +412,49 @@ public class OrderServiceImpl implements OrderService {
 //        }
 //
 //        return assignedOrders;
+        Map<UUID, List<Order>> orderCollectorMap = distributeContext.assignOrderToEmployees(hub, orderList, collectorList);
+        List<AssignOrderCollector> assignments = new ArrayList<>();
+        for (Map.Entry<UUID, List<Order>> entry : orderCollectorMap.entrySet()) {
+            UUID collectorId = entry.getKey();
+            int sequenceNumber = 1;
+            for (Order order : entry.getValue()) {
+                // Lưu kết quả vào bảng AssignOrderCollector
+                AssignOrderCollector assignment = new AssignOrderCollector();
+                assignment.setOrderId(order.getId());
+                assignment.setSequenceNumber(sequenceNumber++);
+                assignment.setCollectorId(collectorId);
+                assignment.setCollectorName(getCollectorNameById(collectorList, collectorId));
+                // Set các trường khác nếu cần (như createdBy, approvedBy, v.v.)
+                assignment.setCreatedBy("admin"); // Example, bạn có thể thay đổi
+                assignment.setStatus(CollectorAssignmentStatus.ASSIGNED);
+                // Lưu vào database
+                assignments.add(assignment);
+            }
+        }
+         //Lưu tất cả AssignOrderCollector vào cơ sở dữ liệu một lần
+            this.assignOrderCollectorRepository.saveAll(assignments);
+        List<OrderResponseCollectorShipperDto> responses = new ArrayList<>();
 
-        return gaAutoAssign.autoAssignOrderToCollector(hub, orderList, collectorList);
+        for (Map.Entry<UUID, List<Order>> entry : orderCollectorMap.entrySet()) {
+            UUID collectorId = entry.getKey();
+            for (Order order : entry.getValue()) {
+                responses.add(new OrderResponseCollectorShipperDto().builder()
+                        .id(order.getId())
+                        .collectorId(collectorId)
+                        .build());
+            }
+        }
+
+        return responses;
     }
 
-
+    private String getCollectorNameById(List<Employee> employees, UUID collectorId) {
+        return employees.stream()
+                .filter(collector -> collector.getId().equals(collectorId))
+                .map(Employee::getName)
+                .findFirst()
+                .orElse(null); // hoặc trả về giá trị mặc định
+    }
     // Phương thức để lấy các bản ghi trong ngày hôm nay theo hubId
     public List<TodayAssignmentDto> getAssignmentTodayByHubId(UUID hubId) {
         LocalDate today = LocalDate.now();
@@ -616,8 +653,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public Double getOrderVolume(UUID orderId) {
-        List<OrderItem> orderItems = orderItemRepo.findAllByOrderId(orderId);
-        return orderItems.stream().map(o -> o.getHeight() / 100 * o.getWidth() / 100 * o.getLength() / 100).reduce(0.0, Double::sum);
+        Order order = orderRepo.findById(orderId).orElseThrow(() -> new NotFoundException("order not found " + orderId));
+        return order.getWidth() * order.getHeight() * order.getLength() / 1000000;
     }
 
     public OrderItemForTripDto convertOrderItemToDtoForTrip(OrderItem orderItem) {
@@ -633,5 +670,16 @@ public class OrderServiceImpl implements OrderService {
         orderItemForTripDto.setSenderAddress(sender.getAddress());
         orderItemForTripDto.setRecipientAddress(recipient.getAddress());
         return orderItemForTripDto;
+    }
+
+    public List<OrderSummaryDTO> getAllOrdersDeliveredInHub(UUID hubId){
+        List<Order> orderList = orderRepo.findAllByFinalHubIdAndStatus(hubId, OrderStatus.DELIVERED);
+        List<OrderSummaryDTO> orderSummaries = new ArrayList<>();
+        for (Order order : orderList) {
+            // Thêm vào danh sách orderResponses
+            orderSummaries.add(new OrderSummaryDTO(order));
+
+        }
+        return orderSummaries;
     }
 }

@@ -81,7 +81,12 @@ public class TripItemServiceImpl implements TripItemService {
     public boolean confirmInTripItems(List<UUID> tripItemIds, String username) {
         try {
             List<TripItem> tripItems = tripItemRepository.findAllById(tripItemIds);
-            Trip trip = tripRepository.findById(tripItems.get(0).getTripId())
+            if(tripItems.isEmpty()) {
+                log.error("No trip items found for the provided IDs");
+                
+                return true;
+            }
+            Trip trip = tripRepository.findById(tripItems.getFirst().getTripId())
                     .orElseThrow(() -> new NotFoundException("Trip not found with ID: " + tripItems.get(0).getTripId()));
             trip.setStatus("CONFIRMED_IN");
             // Validate that all trip items exist

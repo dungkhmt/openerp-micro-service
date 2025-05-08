@@ -12,6 +12,7 @@ import InOrder from "../screens/inOut/InOrder";
 import OutOrder from "../screens/inOut/OutOrder";
 import TripOrderItemsOut from "../screens/inOut/TripOrderItemsOut";
 import TripOrderItemsIn from "../screens/inOut/TripOrderItemsIn";
+import AssignOrderShipper from "../screens/order/AssignOrderShipper";
 export default function OrderRouters() {
     let { path } = useRouteMatch();
     console.log("Base path:", path); // Add this line for debugging
@@ -37,7 +38,12 @@ export default function OrderRouters() {
                 <Route
                     component={AssignOrder}
                     exact
-                    path={`${path}/assign`}
+                    path={`${path}/assign/collector`}
+                />
+                <Route
+                    component={AssignOrderShipper}
+                    exact
+                    path={`${path}/assign/shipper`}
                 />
                 <Route
                     component={TodayOrder}
@@ -48,6 +54,11 @@ export default function OrderRouters() {
                     component={CollectorOrderDetail}
                     exact
                     path={`${path}/collector/:id`}
+                />
+                <Route
+                    component={CollectorOrderDetail}
+                    exact
+                    path={`${path}/shipper/:id`}
                 />
                 <Route
                     component={InOrder}

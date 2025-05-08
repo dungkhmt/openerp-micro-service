@@ -26,7 +26,6 @@ public class TripHistory {
     @Column(nullable = false)
     private UUID tripId;
 
-    @Column(nullable = false)
     private String changedBy;
 
     @CreationTimestamp

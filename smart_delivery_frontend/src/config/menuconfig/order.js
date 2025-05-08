@@ -11,8 +11,14 @@ export const order = {
         },
         {
             id: "MENU_ORDER_ASSIGN",
-            path: "/order/assign",
-            text: "Phân công",
+            path: "/order/assign/collector",
+            text: "Phân công collector",
+            child: [],
+        },
+        {
+            id: "MENU_ORDER_ASSIGN_SHIPPER",
+            path: "/order/assign/shipper",
+            text: "Phân công shipper",
             child: [],
         },
         {

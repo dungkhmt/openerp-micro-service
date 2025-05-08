@@ -2,7 +2,7 @@ import LoadingScreen from "components/common/loading/loading";
 import {Box, Button, Grid, Modal, Tab, Typography} from "@mui/material";
 import {request} from "api";
 import StandardTable from "components/StandardTable";
-import React, {Fragment, useEffect, useState} from "react";
+import React, {Fragment, useEffect, useState, useCallback} from "react";
 import useStyles from "screens/styles";
 import {errorNoti, processingNoti, successNoti} from "utils/notification";
 import {useHistory} from "react-router";
@@ -20,86 +20,120 @@ const TodayOrder = (props) => {
     const history = useHistory();
     const {path} = useRouteMatch();
     const username = useSelector((state) => state.auth.username);
-    const orderId = props.match?.params?.id;
+    const role = useSelector((state) => state.auth.role);
     const classes = useStyles();
     const [selectPosition, setSelectPosition] = useState(null);
     const [loading, setLoading] = useState(true);
     const [openModal, setOpenModal] = useState(false);
-    const [allWarehouses, setAllWarehouses] = useState([]);
     const [hubId, setHubId] = useState();
     const [hub, setHub] = useState();
-    const {employeeId} = useParams();
     const [nextOrder, setNextOrder] = useState(null);
-    const [collectorId, setCollectorId] = useState(null);
-    const [assigmentData, setAssigmentData] = useState([]);
+    const [employeeId, setEmployeeId] = useState(null);
+    const [assignmentData, setAssignmentData] = useState([]);
     const [tabValue, setTabValue] = useState('1');
+    console.log("role",role)
+    // Determine if user is collector or shipper
+    const isCollector = role === 'COLLECTOR';
+    const isShipper = role === 'SHIPPER';
+
+    // Session storage keys based on role
+    const assignmentsStorageKey = isCollector ? 'collector_assignments' : 'shipper_assignments';
+    const nextOrderStorageKey = isCollector ? 'collector_nextOrder' : 'shipper_nextOrder';
+    const savedNextOrderKey = isCollector ? 'collector_savedNextOrder' : 'shipper_savedNextOrder';
+
+    // Role-specific strings
+    const roleText = isCollector ? 'lấy hàng' : 'giao hàng';
+    const personTypeText = isCollector ? 'người gửi' : 'người nhận';
+    const actionProcessText = isCollector ? 'thu gom' : 'giao';
+    const packageActionText = isCollector ? 'đã thu' : 'đã giao';
+
+    // Role-specific API endpoints
+    const userEndpoint = isCollector
+        ? `/user/get-collector/${username}`
+        : `/user/get-shipper/${username}`;
+
+    const assignmentsEndpoint = useCallback((id) => {
+        return isCollector
+            ? `/smdeli/ordermanager/order/assign/collector/today/${id}`
+            : `/smdeli/ordermanager/order/assign/shipper/today/${id}`;
+    }, [isCollector]);
+
+    // Role-specific navigation paths
+    const detailPath = isCollector ? '/order/collector/' : '/order/shipper/';
+
     useEffect(() => {
         async function fetchId() {
-            var productIds;
             await request(
                 "get",
-                `/user/get-collector/${username}`
-        ,
-            (res) => {
-                console.log(res.data.id);
-                setCollectorId(res.data.id);
-                setHubId(res.data.hubId);
-                console.log("hubId", res.data.hubId);
-            }
-        )
-
-
+                userEndpoint,
+                (res) => {
+                    console.log(res.data.id);
+                    setEmployeeId(res.data.id);
+                    setHubId(res.data.hubId);
+                    console.log("hubId", res.data.hubId);
+                }
+            );
         }
-
         fetchId();
-    }, []);
+    }, [userEndpoint]);
+
     useEffect(() => {
         const fetchHubLocation = async () => {
+            if (!hubId) return;
+
             await request(
                 "get",
                 `${API_PATH.HUB}/${hubId}`,
                 (res) => {
                     setHub(res.data);
-
                 },
                 {
                     401: () => { },
                     503: () => { errorNoti("Có lỗi khi tải dữ liệu của kho") }
                 }
-            );}
-
+            );
+        }
         fetchHubLocation();
     }, [hubId]);
 
     const handleGoToDetails = () => {
-        const nextOrderFromStorage = sessionStorage.getItem("nextOrder");
+        const nextOrderFromStorage = sessionStorage.getItem(nextOrderStorageKey);
         if (nextOrderFromStorage) {
-            const nextOrder = JSON.parse(nextOrderFromStorage); // Parse lại thành object
+            const nextOrder = JSON.parse(nextOrderFromStorage);
             history.push({
-                pathname: `/order/collector/${nextOrder.orderId}`,
+                pathname: `${detailPath}${nextOrder.orderId}`,
                 state: { assignmentId: nextOrder.id }
             });
         } else {
-            errorNoti("Không tìm thấy đơn hàng tiếp theo");
+            errorNoti(`Không tìm thấy đơn hàng ${roleText} tiếp theo`);
         }
     };
+
     const handleNextOrder = (order) => {
         setNextOrder(order);
     };
-    const NextOrderInfo = ({ }) => {
-        const nextOrder = JSON.parse(sessionStorage.getItem('nextOrder'))
+
+    // Role-specific order information component
+    const NextOrderInfo = () => {
+        const nextOrderData = JSON.parse(sessionStorage.getItem(nextOrderStorageKey));
+
+        const nameField = isCollector ? 'senderName' : 'recipientName';
+        const addressField = isCollector ? 'senderAddress' : 'recipientAddress';
+        const phoneField = isCollector ? 'senderPhone' : 'recipientPhone';
 
         return (
             <Box sx={{paddingTop: 1.25, paddingLeft:2, paddingBottom: 1.25, paddingRight: 2, backgroundColor: '#f5f5f5', borderRadius: 2, marginBottom: 0.8}}>
                 {<Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                     <Box>
-                        {nextOrder != null ? <Typography>Tên người gửi: {nextOrder?.senderName}</Typography> : "Không có đơn hàng!"}
-                        {nextOrder != null && <Typography>Địa chỉ: {nextOrder?.senderAddress}</Typography>}
+                        {nextOrderData != null ?
+                            <Typography>Tên {personTypeText}: {nextOrderData?.[nameField]}</Typography> :
+                            "Không có đơn hàng!"}
+                        {nextOrderData != null && <Typography>Địa chỉ: {nextOrderData?.[addressField]}</Typography>}
                     </Box>
-                    {nextOrder != null &&<Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
-                        <Box sx={{ display: 'flex', flexDirection: 'column' }}> {/* Thêm Box này để căn dọc */}
-                            <Typography>Số điện thoại: {nextOrder?.senderPhone}</Typography>
-                            <Typography>Số lượng package: {nextOrder?.numOfItem}</Typography>
+                    {nextOrderData != null && <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                            <Typography>Số điện thoại: {nextOrderData?.[phoneField]}</Typography>
+                            <Typography>Số lượng package: {nextOrderData?.numOfItem}</Typography>
                         </Box>
                         <Button
                             variant="contained"
@@ -115,150 +149,146 @@ const TodayOrder = (props) => {
     };
 
     useEffect(() => {
-        const nextOrderFromStorage = sessionStorage.getItem('nextOrder');
+        const nextOrderFromStorage = sessionStorage.getItem(nextOrderStorageKey);
         if (nextOrderFromStorage) {
-            setNextOrder(JSON.parse(nextOrderFromStorage)); // Parse lại thành object
-            console.log(nextOrderFromStorage)
+            setNextOrder(JSON.parse(nextOrderFromStorage));
         }
-    }, []);
+    }, [nextOrderStorageKey]);
+
     useEffect(() => {
+        if (!employeeId) return;
+
         async function fetchData() {
             await request(
                 "get",
-                `/smdeli/ordermanager/order/assign/today/collector/${collectorId}`,
+                assignmentsEndpoint(employeeId),
                 (res) => {
-                    // Sắp xếp dữ liệu theo sequenceNumber
                     if (res.data) {
                         const sortedData = res.data.sort((a, b) => a.sequenceNumber - b.sequenceNumber);
+                        setAssignmentData(sortedData);
+                        sessionStorage.setItem(assignmentsStorageKey, JSON.stringify(sortedData));
 
-                        setAssigmentData(sortedData);
-                        sessionStorage.setItem('assignments', JSON.stringify(sortedData)); // Lưu dữ liệu dưới dạng chuỗi JSON
-
-                        if (sortedData.length > 0 && !sessionStorage.getItem('savedNextOrder') ) {
-                            sessionStorage.setItem('nextOrder', JSON.stringify(sortedData[0])); // Lưu dữ liệu dưới dạng chuỗi JSON
-                            sessionStorage.setItem('savedNextOrder',"1")
-                            setNextOrder(sortedData[0])
+                        if (sortedData.length > 0 && !sessionStorage.getItem(savedNextOrderKey)) {
+                            sessionStorage.setItem(nextOrderStorageKey, JSON.stringify(sortedData[0]));
+                            sessionStorage.setItem(savedNextOrderKey, "1");
+                            setNextOrder(sortedData[0]);
                         }
                     }
                 }
             );
         }
 
-
-            const assignmentsFromStorage = sessionStorage.getItem("assignments");
-
+        const assignmentsFromStorage = sessionStorage.getItem(assignmentsStorageKey);
+        if (assignmentsFromStorage) {
             const parsedAssignments = JSON.parse(assignmentsFromStorage);
             const sortedAssignments = parsedAssignments?.sort((a, b) => a.sequenceNumber - b.sequenceNumber);
+            setAssignmentData(sortedAssignments);
 
-            setAssigmentData(sortedAssignments);
-            if (sortedAssignments?.length > 0 && !sessionStorage.getItem('nextOrder')) {
-                sessionStorage.setItem('nextOrder', JSON.stringify(sortedAssignments[0])); // Lưu dữ liệu dưới dạng chuỗi JSON
+            if (sortedAssignments?.length > 0 && !sessionStorage.getItem(nextOrderStorageKey)) {
+                sessionStorage.setItem(nextOrderStorageKey, JSON.stringify(sortedAssignments[0]));
             }
-            fetchData();
+        }
+
+        fetchData();
         setLoading(false);
-    }, [collectorId]);
+    }, [employeeId, assignmentsEndpoint, assignmentsStorageKey, nextOrderStorageKey, savedNextOrderKey]);
 
+    // Get role-specific coordinates for routes
+    const routingPoints = assignmentData?.map(order => {
+        if (isCollector) {
+            return {
+                lat: order.senderLatitude,
+                lng: order.senderLongitude
+            };
+        } else {
+            return {
+                lat: order.recipientLatitude,
+                lng: order.recipientLongitude
+            };
+        }
+    }).filter(point => point.lat && point.lng);
 
-    const routingPoints = assigmentData?.map(order => ({
-        lat: order.senderLatitude,
-        lng: order.senderLongitude
-    })).filter(point => point.lat && point.lng);
-
-
-
-
-    console.log("route",routingPoints)
     const handleShowRoute = () => {
         setOpenModal(true);
     };
 
+    // Role-specific table columns
+    const getTableColumns = () => {
+        const commonColumns = [
+            {title: "STT", field: "sequenceNumber"},
+            {title: "Mã đơn hàng", field: "orderId"},
+            {title: "Trạng thái", field: "status"},
+            {
+                title: "Thao tác",
+                field: "actions",
+                centerHeader: true,
+                sorting: false,
+                renderCell: (rowData) => (
+                    <div>
+                        <IconButton
+                            onClick={() => {
+                                history.push({
+                                    pathname: `${detailPath}${rowData.orderId}`,
+                                    state: { assignmentId: rowData.id }
+                                });
+                            }}
+                            color="success"
+                        >
+                            <VisibilityIcon/>
+                        </IconButton>
+                    </div>
+                ),
+            }
+        ];
 
-    console.log("matching option: ", allWarehouses);
+        if (isCollector) {
+            return [
+                ...commonColumns.slice(0, 2),
+                {title: "Tên người gửi", field: "senderName"},
+                {title: "Địa chỉ", field: "senderAddress"},
+                {title: "Số điện thoại", field: "senderPhone"},
+                ...commonColumns.slice(2)
+            ];
+        } else {
+            return [
+                ...commonColumns.slice(0, 2),
+                {title: "Tên người nhận", field: "recipientName"},
+                {title: "Địa chỉ", field: "recipientAddress"},
+                {title: "Số điện thoại", field: "recipientPhone"},
+                ...commonColumns.slice(2)
+            ];
+        }
+    };
+
     return loading ? (
         <LoadingScreen/>
     ) : (
         <Fragment>
-            {/*<Box>*/}
-            {/*    <Grid*/}
-            {/*        container*/}
-            {/*        justifyContent="space-between"*/}
-            {/*        className={classes.headerBox}*/}
-            {/*    >*/}
-            {/*        <Grid>*/}
-            {/*            <Typography variant="h5">Phân công lấy hàng</Typography>*/}
-            {/*        </Grid>*/}
-            {/*    </Grid>*/}
-            {/*</Box>*/}
-
-
             <Box className={classes.bodyBox}>
-
-
-                {/* Xu ly hang hoa */}
-
-
-                {/* Xu ly hang hoa */}
                 <TabContext value={tabValue}>
                     <Box sx={{borderBottom: 0, borderColor: "divider"}}>
                         <TabList
-                            onChange={(event, newValue) =>
-                                setTabValue(newValue)
-                            }
+                            onChange={(event, newValue) => setTabValue(newValue)}
                         >
                             <Tab label="Danh sách đơn hàng" value="1"/>
                             <Tab label="Bản đồ" value="2"/>
                             <Tab label="Tiến trình" value="3"/>
-
+                            {isShipper && <Tab label="Báo cáo phát" value="4"/>}
                         </TabList>
                     </Box>
 
                     <TabPanel value="1">
-
                         <StandardTable
-                            title="Bảng phân công lấy hàng hôm nay"
-                            columns={[
-                                {title: "STT", field: "sequenceNumber"},
-                                {title: "Mã đơn hàng", field: "orderId"},
-                                {title: "Tên người gửi", field: "senderName"},
-                                {title: "Địa chỉ", field: "senderAddress"},
-                                {title: "Số điện thoại", field: "senderPhone"},
-                                {title: "Thời gian tạo", field: "orderCreatedAt"},
-
-                                {title: "Trạng thái", field: "assignmentStatus"},
-                                {
-                                    title: "Thao tác",
-                                    field: "actions", // Field này vẫn cần để tránh lỗi nếu StandardTable sử dụng nó
-                                    centerHeader: true,
-                                    sorting: false,
-                                    renderCell: (rowData) => ( // Sử dụng renderCell thay vì render
-                                        <div>
-                                            <IconButton
-                                                onClick={() => {
-                                                    history.push({
-                                                        pathname: `/order/collector/${rowData.orderId}`,
-                                                        state: { assignmentId: rowData.id }
-                                                    });
-                                                }}
-                                                color="success"
-                                            >
-                                                <VisibilityIcon/>
-                                            </IconButton>
-                                        </div>
-                                    ),
-                                },
-
-                            ]}
-                            data={assigmentData}
+                            title={`Bảng phân công ${roleText} hôm nay`}
+                            columns={getTableColumns()}
+                            data={assignmentData}
                             options={{
                                 selection: false,
                                 pageSize: 10,
                                 search: true,
                                 sorting: true,
                             }}
-                            defaultOrderBy="sequenceNumber" // Thiết lập orderBy mặc định
-
-
-
+                            defaultOrderBy="sequenceNumber"
                         />
                         <Modal
                             open={openModal}
@@ -285,8 +315,10 @@ const TodayOrder = (props) => {
                                     setSelectPosition={setSelectPosition}
                                 />
                                 <div style={{width: "50%", height: "90%"}}>
-                                    <SearchBox selectPosition={selectPosition}
-                                               setSelectPosition={setSelectPosition}/>
+                                    <SearchBox
+                                        selectPosition={selectPosition}
+                                        setSelectPosition={setSelectPosition}
+                                    />
                                 </div>
                                 <Button
                                     variant="contained"
@@ -299,39 +331,33 @@ const TodayOrder = (props) => {
                             </Box>
                         </Modal>
                     </TabPanel>
+
                     <TabPanel value="2">
                         <Box sx={{
-
                             marginTop: '-3%',
                             width: '100%',
-                            height: '100%', // Set explicit height
-                            position: 'relative'  // Important for map rendering
+                            height: '100%',
+                            position: 'relative'
                         }}>
-                            <TabPanel value="2">
-                                <Box sx={{width: '100%', height: '500px', position: 'relative'}}>
-                                    <NextOrderInfo
-                                        nextOrder={nextOrder}
-                                    />
-                                    <EnhancedMap
-                                        points={routingPoints}
-                                        assignments={assigmentData}
-                                        onNextOrder={setNextOrder}
-                                        nextOrder={nextOrder}
-                                        hub={hub}// Truyền nextOrder vào EnhancedMap
-                                    />
-                                </Box>
-                            </TabPanel>
+                            <Box sx={{width: '100%', height: '500px', position: 'relative'}}>
+                                <NextOrderInfo />
+                                <EnhancedMap
+                                    points={routingPoints}
+                                    assignments={assignmentData}
+                                    onNextOrder={setNextOrder}
+                                    nextOrder={nextOrder}
+                                    hub={hub}
+                                    role={role}
+                                />
+                            </Box>
                         </Box>
                     </TabPanel>
 
-
                     <TabPanel value="3">
-                        <NextOrderInfo
-                            nextOrder={nextOrder}
-                        />
+                        <NextOrderInfo />
                         <Box sx={{ padding: 2, backgroundColor: '#f5f5f5', borderRadius: 2 }}>
                             <Typography variant="h6" sx={{ marginBottom: 2 }}>
-                                Tiến trình thu gom hàng
+                                Tiến trình {actionProcessText} hàng
                             </Typography>
                             <Grid container spacing={2}>
                                 {/* Tổng số điểm dừng */}
@@ -341,19 +367,19 @@ const TodayOrder = (props) => {
                                             Tổng số điểm dừng
                                         </Typography>
                                         <Typography variant="h4" sx={{ color: 'primary.main' }}>
-                                            {assigmentData?.length}
+                                            {assignmentData?.length}
                                         </Typography>
                                     </Box>
                                 </Grid>
 
-                                {/* Số điểm dừng đã qua */}
+                                {/* Số điểm dừng đã hoàn thành */}
                                 <Grid item xs={6}>
                                     <Box sx={{ padding: 2, backgroundColor: 'white', borderRadius: 2, textAlign: 'center' }}>
                                         <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                                             Số điểm dừng hoàn thành
                                         </Typography>
                                         <Typography variant="h4" sx={{ color: 'secondary.main' }}>
-                                            {assigmentData?.filter(order => order.assignmentStatus === "COMPLETED").length}
+                                            {assignmentData?.filter(order => order.assignmentStatus === "COMPLETED").length}
                                         </Typography>
                                     </Box>
                                 </Grid>
@@ -365,19 +391,19 @@ const TodayOrder = (props) => {
                                             Tổng số package
                                         </Typography>
                                         <Typography variant="h4" sx={{ color: 'primary.main' }}>
-                                            {assigmentData?.reduce((total, order) => total + order.numOfItem, 0)}
+                                            {assignmentData?.reduce((total, order) => total + order.numOfItem, 0)}
                                         </Typography>
                                     </Box>
                                 </Grid>
 
-                                {/* Tổng số package đã thu */}
+                                {/* Tổng số package đã thu/giao */}
                                 <Grid item xs={6}>
                                     <Box sx={{ padding: 2, backgroundColor: 'white', borderRadius: 2, textAlign: 'center' }}>
                                         <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                            Tổng số package đã thu
+                                            Tổng số package {packageActionText}
                                         </Typography>
                                         <Typography variant="h4" sx={{ color: 'secondary.main' }}>
-                                            {assigmentData?.filter(order => order.assignmentStatus === "COMPLETED")
+                                            {assignmentData?.filter(order => order.assignmentStatus === "COMPLETED")
                                                 .reduce((total, order) => total + order.numOfItem, 0)}
                                         </Typography>
                                     </Box>
@@ -386,6 +412,56 @@ const TodayOrder = (props) => {
                         </Box>
                     </TabPanel>
 
+                    {/* Shipper-specific tab */}
+                    {isShipper && (
+                        <TabPanel value="4">
+                            <Box sx={{ padding: 2, backgroundColor: '#f5f5f5', borderRadius: 2 }}>
+                                <Typography variant="h6" sx={{ marginBottom: 2 }}>
+                                    Báo cáo giao hàng
+                                </Typography>
+                                <Grid container spacing={2}>
+                                    {/* Giao thành công */}
+                                    <Grid item xs={4}>
+                                        <Box sx={{ padding: 2, backgroundColor: 'white', borderRadius: 2, textAlign: 'center' }}>
+                                            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                                Giao thành công
+                                            </Typography>
+                                            <Typography variant="h4" sx={{ color: '#4caf50' }}>
+                                                {assignmentData?.filter(order => order.assignmentStatus === "COMPLETED").length}
+                                            </Typography>
+                                        </Box>
+                                    </Grid>
+
+                                    {/* Giao không thành công */}
+                                    <Grid item xs={4}>
+                                        <Box sx={{ padding: 2, backgroundColor: 'white', borderRadius: 2, textAlign: 'center' }}>
+                                            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                                Giao không thành công
+                                            </Typography>
+                                            <Typography variant="h4" sx={{ color: '#f44336' }}>
+                                                {assignmentData?.filter(order => order.assignmentStatus === "FAILED").length}
+                                            </Typography>
+                                        </Box>
+                                    </Grid>
+
+                                    {/* Chưa giao */}
+                                    <Grid item xs={4}>
+                                        <Box sx={{ padding: 2, backgroundColor: 'white', borderRadius: 2, textAlign: 'center' }}>
+                                            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                                Chưa giao
+                                            </Typography>
+                                            <Typography variant="h4" sx={{ color: '#ff9800' }}>
+                                                {assignmentData?.filter(order =>
+                                                    order.assignmentStatus !== "COMPLETED" &&
+                                                    order.assignmentStatus !== "FAILED"
+                                                ).length}
+                                            </Typography>
+                                        </Box>
+                                    </Grid>
+                                </Grid>
+                            </Box>
+                        </TabPanel>
+                    )}
                 </TabContext>
             </Box>
         </Fragment>

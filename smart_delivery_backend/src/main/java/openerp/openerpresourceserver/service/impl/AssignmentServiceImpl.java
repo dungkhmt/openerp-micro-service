@@ -133,15 +133,8 @@ public class AssignmentServiceImpl implements AssignmentService {
         double totalWeight = 0.0;
         double totalVolume = 0.0;
         int quantity = items.size();
-        for (OrderItem item : items) {
-            totalWeight += item.getWeight();
-
-            // Calculate volume if dimensions are available
-            if (item.getLength() != null && item.getWidth() != null && item.getHeight() != null) {
-                double itemVolume = item.getLength() * item.getWidth() * item.getHeight();
-                totalVolume += itemVolume * quantity;
-            }
-        }
+        totalWeight += order.getWeight();
+        totalVolume += order.getLength() * order.getWidth() * order.getHeight() / 1000000; //m3
         vehicleLoad.setCurrentVolumeLoad(Math.max(0, vehicleLoad.getCurrentVolumeLoad() - totalVolume));
         vehicleLoad.setCurrentWeightLoad(Math.max(0, vehicleLoad.getCurrentWeightLoad() - totalWeight));
         vehicleLoad.setCurrentItemCount(Math.max(0, vehicleLoad.getCurrentItemCount() - quantity));

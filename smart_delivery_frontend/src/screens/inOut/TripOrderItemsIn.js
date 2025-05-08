@@ -58,10 +58,10 @@ const TripOrderItemsIn = () => {
     };
 
     const confirmHandle = (selectedIds) => {
-        if(selectedIds.length === 0) {
-            errorNoti("Please select order items");
-            return;
-        }
+        // if(selectedIds.length === 0) {
+        //     errorNoti("Please select order items");
+        //     return;
+        // }
         const ids = Array.isArray(selectedIds) && selectedIds.length > 1
             ? selectedIds.join(',')
             : selectedIds;

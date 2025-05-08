@@ -106,7 +106,7 @@ public class Trip {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
-
+    private String changedBy;
     @PrePersist
     protected void onCreate() {
         createdAt = Instant.now();

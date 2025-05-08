@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.utils.GAAutoAssign;
 
 import lombok.Getter;
 import openerp.openerpresourceserver.entity.Collector;
+import openerp.openerpresourceserver.entity.Employee;
 import openerp.openerpresourceserver.entity.Order;
 import openerp.openerpresourceserver.entity.Sender;
 import openerp.openerpresourceserver.repository.SenderRepo;
@@ -22,7 +23,7 @@ public class Population {
     private final GraphHopperCalculator graphHopperCalculator;
     private double[][] distanceMatrix; // Mảng 2 chiều lưu trữ khoảng cách
 
-    public Population(Map<UUID, Sender> senderMap, int populationSize, double crossoverRate, double mutationRate, List<Order> orderList, List<Collector> collectorList, GraphHopperCalculator graphHopperCalculator, double[][] distanceMatrix) {
+    public Population(Map<UUID, Sender> senderMap, int populationSize, double crossoverRate, double mutationRate, List<Order> orderList, List<Employee> employees, GraphHopperCalculator graphHopperCalculator, double[][] distanceMatrix) {
         this.populationSize = populationSize;
         this.crossoverRate = crossoverRate;
         this.mutationRate = mutationRate;
@@ -32,7 +33,7 @@ public class Population {
         this.distanceMatrix = distanceMatrix; // Nhận mảng khoảng cách
 
         for (int i = 0; i < populationSize; i++) {
-            Individual individual = new Individual(senderMap, orderList.size(), collectorList.size(), orderList, graphHopperCalculator, distanceMatrix);
+            Individual individual = new Individual(senderMap, orderList.size(), employees.size(), orderList, graphHopperCalculator, distanceMatrix);
             individual.randomInit();
             this.individuals.add(individual);
         }

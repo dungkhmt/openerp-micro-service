@@ -15,10 +15,6 @@ public class OrderItemForTripDto {
         this.status = String.valueOf(orderItem.getStatus());
         this.weight = orderItem.getWeight();
         this.price = orderItem.getPrice();
-        this.length = orderItem.getLength();
-        this.width = orderItem.getWidth();
-        this.height = orderItem.getHeight();
-        this.volume = orderItem.getLength() * orderItem.getWidth() * orderItem.getHeight()/100/100/100;
     }
 
     private UUID id;

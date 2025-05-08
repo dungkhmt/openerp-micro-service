@@ -10,4 +10,8 @@ import java.util.UUID;
 public interface ShipperRepo extends JpaRepository<Shipper, UUID> {
     @Query("SELECT s FROM Shipper s WHERE s.hubId = :hubId")
     List<Shipper> getAllByHubId(UUID hubId);
+
+    List<Shipper> findAllByHubId(UUID hubId);
+
+    Shipper findByUsername(String username);
 }

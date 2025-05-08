@@ -60,11 +60,11 @@ public class GAAutoAssign {
             }
         }
     }
-    public List<OrderResponseCollectorShipperDto> autoAssignOrderToCollector(Hub hub, List<Order> orderList, List<Collector> collectorList) {
+    public Map<UUID, List<Order>> autoAssignOrderToEmployee(Hub hub, List<Order> orderList, List<Employee> employees) {
         initializeSenderMap(orderList);
         initializeDistanceMatrix(orderList); // Khởi tạo mảng khoảng cách
 
-        Population population = new Population(senderMap, POPULATION_SIZE, CROSSOVER_RATE, MUTATION_RATE, orderList, collectorList, graphHopperCalculator, distanceMatrix);
+        Population population = new Population(senderMap, POPULATION_SIZE, CROSSOVER_RATE, MUTATION_RATE, orderList, employees, graphHopperCalculator, distanceMatrix);
         Individual bestIndividual = null;
 
         for (int generation = 0; generation < MAX_GENERATIONS; generation++) {
@@ -85,10 +85,10 @@ public class GAAutoAssign {
 //        System.out.println("sad" + bestIndividual.getChromosome().toString());
 //        System.out.println("seb" + senderMap.size());
 
-        return generateResponse(bestIndividual, orderList, collectorList);
+        return generateResponse(bestIndividual, orderList, employees);
     }
 
-    private List<OrderResponseCollectorShipperDto> generateResponse(Individual bestIndividual, List<Order> orderList, List<Collector> collectorList) {
+    private Map<UUID, List<Order>> generateResponse(Individual bestIndividual, List<Order> orderList, List<Employee> employees) {
             List<OrderResponseCollectorShipperDto> responses = new ArrayList<>();
             ArrayList<Integer> chromosome = bestIndividual.getChromosome(); // Lấy chromosome từ cá thể tốt nhất
 //        System.out.println("Danh sách Schromosome:" + chromosome.toString());
@@ -106,10 +106,10 @@ public class GAAutoAssign {
             Map<UUID, List<Order>> collectorOrderMap = new HashMap<>();
             for (int i = 0; i < chromosome.size(); i++) {
                 int collectorIndex = chromosome.get(i);
-                Collector collector = collectorList.get(collectorIndex);
+                Employee employee = employees.get(collectorIndex);
 
                 collectorOrderMap
-                        .computeIfAbsent(collector.getId(), k -> new ArrayList<>())
+                        .computeIfAbsent(employee.getId(), k -> new ArrayList<>())
                         .add(orderList.get(i));
             }
 //            System.out.println("Danh sách Collector và hashCode:");
@@ -132,7 +132,7 @@ public class GAAutoAssign {
                     assignment.setOrderId(order.getId());
                     assignment.setSequenceNumber(sequenceNumber++);
                     assignment.setCollectorId(collectorId);
-                    assignment.setCollectorName(getCollectorNameById(collectorList, collectorId));
+                    assignment.setCollectorName(getCollectorNameById(employees, collectorId));
                     // Set các trường khác nếu cần (như createdBy, approvedBy, v.v.)
                     assignment.setCreatedBy("admin"); // Example, bạn có thể thay đổi
                     assignment.setStatus(CollectorAssignmentStatus.ASSIGNED);
@@ -141,26 +141,26 @@ public class GAAutoAssign {
                 }
             }
             // Lưu tất cả AssignOrderCollector vào cơ sở dữ liệu một lần
-            this.assignOrderCollectorRepository.saveAll(assignments);
+//            this.assignOrderCollectorRepository.saveAll(assignments);
 
-            // Tạo danh sách OrderResponse
-            for (Map.Entry<UUID, List<Order>> entry : collectorOrderMap.entrySet()) {
-                UUID collectorId = entry.getKey();
-                for (Order order : entry.getValue()) {
-                    responses.add(new OrderResponseCollectorShipperDto().builder()
-                            .id(order.getId())
-                            .collectorId(collectorId)
-                            .build());
-                }
-            }
+//            // Tạo danh sách OrderResponse
+//            for (Map.Entry<UUID, List<Order>> entry : collectorOrderMap.entrySet()) {
+//                UUID collectorId = entry.getKey();
+//                for (Order order : entry.getValue()) {
+//                    responses.add(new OrderResponseCollectorShipperDto().builder()
+//                            .id(order.getId())
+//                            .collectorId(collectorId)
+//                            .build());
+//                }
+//            }
 
-            return responses;
+            return collectorOrderMap;
         }
 
-    private String getCollectorNameById(List<Collector> collectorList, UUID collectorId) {
-        return collectorList.stream()
+    private String getCollectorNameById(List<Employee> employees, UUID collectorId) {
+        return employees.stream()
                 .filter(collector -> collector.getId().equals(collectorId))
-                .map(Collector::getName)
+                .map(Employee::getName)
                 .findFirst()
                 .orElse(null); // hoặc trả về giá trị mặc định
     }

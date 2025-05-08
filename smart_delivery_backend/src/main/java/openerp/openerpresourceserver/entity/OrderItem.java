@@ -33,9 +33,6 @@ public class OrderItem {
     @Column(nullable = false)
     private Double weight;
     private Double price;
-    private Double length;
-    private Double width;
-    private Double height;
     @Enumerated(EnumType.STRING)
     private OrderItemStatus status;
     @Version
@@ -45,9 +42,7 @@ public class OrderItem {
         this.quantity = quantity;
         this.weight = weight;
         this.price = price;
-        this.length = length;
-        this.width = width;
-        this.height = height;
+
     }
     @CreatedBy
     private String createdBy;

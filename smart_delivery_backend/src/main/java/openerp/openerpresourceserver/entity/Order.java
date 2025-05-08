@@ -42,6 +42,10 @@ public class Order {
     private String orderType;
     @Enumerated(EnumType.STRING)
     private OrderStatus status; // NEW, PROCESSING, COMPLETED
+    private Double weight;
+    private Double length;
+    private Double width;
+    private Double height;
     private Double totalPrice;
     private Double shippingPrice;
     private Double finalPrice;

@@ -46,7 +46,7 @@ public class ThirdMileController {
         return ResponseEntity.ok(shipperAssignmentService.assignOrdersToShippers(
                 request.getHubId(),
                 request.getOrders(),
-                request.getCollectors())); // Note: Using the same DTO structure where "collectors" field contains shippers
+                request.getEmployees())); // Note: Using the same DTO structure where "collectors" field contains shippers
     }
 
     /**

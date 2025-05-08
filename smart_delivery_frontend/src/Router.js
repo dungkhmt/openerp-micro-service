@@ -6,6 +6,11 @@ import { routeState } from "./state/RouteState";
 
 // const Register = lazy(() => import("../src/views/UserRegister/Register"));
 
+// Import new components
+import DeliveryTracking from './screens/order/DeliveryTracking';
+import DeliveryAnalytics from './screens/analytics/DeliveryAnalytics';
+import RouteOptimization from './screens/order/RouteOptimization';
+
 function Routes(props) {
   return (
     <Suspense
@@ -31,6 +36,19 @@ function Routes(props) {
 
             return <MainAppRouter {...props} />;
           }}
+        />
+        {/* Add new routes in the router configuration */}
+        <Route
+          path="/delivery/tracking/:orderId"
+          element={<DeliveryTracking />}
+        />
+        <Route
+          path="/delivery/analytics"
+          element={<DeliveryAnalytics />}
+        />
+        <Route
+          path="/delivery/route/:shipperId"
+          element={<RouteOptimization />}
         />
       </Switch>
     </Suspense>

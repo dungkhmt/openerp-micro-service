@@ -1,11 +1,14 @@
 package openerp.openerpresourceserver.controller;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.entity.Collector;
 import openerp.openerpresourceserver.entity.Driver;
+import openerp.openerpresourceserver.entity.Shipper;
 import openerp.openerpresourceserver.entity.User;
 import openerp.openerpresourceserver.repository.CollectorRepo;
 import openerp.openerpresourceserver.repository.DriverRepo;
+import openerp.openerpresourceserver.repository.ShipperRepo;
 import openerp.openerpresourceserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,17 +20,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/user")
+@RequiredArgsConstructor
 public class UserController {
 
-    private UserService userService;
-    private CollectorRepo collectorRepo;
-    private DriverRepo driverRepo;
+    private final UserService userService;
+    private final CollectorRepo collectorRepo;
+    private final DriverRepo driverRepo;
+    private final ShipperRepo shipperRepo;
 
-    @Autowired
-    public UserController(UserService userService, CollectorRepo collectorRepo) {
-        this.userService = userService;
-        this.collectorRepo= collectorRepo;
-    }
     /**
      * If the user is not in the database, add them. If they are in the database, update their
      * information to synchronize with Keycloak
@@ -59,6 +59,11 @@ public class UserController {
     public ResponseEntity<?> getDriverByUsername(@PathVariable String username) {
         Driver driver = driverRepo.findByUsername(username);
         return ResponseEntity.ok().body(driver);
+    }
+    @GetMapping("get-shipper/{username}")
+    public ResponseEntity<?> getShipperByUsername(@PathVariable String username) {
+        Shipper shipper = shipperRepo.findByUsername(username);
+        return ResponseEntity.ok().body(shipper);
     }
 
     @GetMapping("/get-all")

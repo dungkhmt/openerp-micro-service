@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Data
 public class AssignOrderDto {
-        private List<EmployeeDTO> collectors;
+        private List<EmployeeDTO> employees;
         private List<OrderRequestDto> orders;
         private UUID hubId;
 }
