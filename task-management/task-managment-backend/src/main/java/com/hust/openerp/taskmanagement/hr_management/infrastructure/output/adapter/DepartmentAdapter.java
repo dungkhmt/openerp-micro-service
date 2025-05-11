@@ -80,7 +80,7 @@ public class DepartmentAdapter implements IDepartmentPort {
 
     @Override
     public PageWrapper<DepartmentModel> getDepartment(IDepartmentFilter filter, IPageableRequest request) {
-        var pageable = PageableUtils.getPageable(request, "departmentCode");
+        var pageable = PageableUtils.getPageable(request);
         var spec = new DepartmentSpecification(filter);
         var page = departmentRepo.findAll(spec, pageable);
         return PageWrapper.<DepartmentModel>builder()

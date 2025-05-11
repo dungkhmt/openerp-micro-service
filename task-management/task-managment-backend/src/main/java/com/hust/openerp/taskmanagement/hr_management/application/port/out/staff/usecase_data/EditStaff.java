@@ -20,6 +20,13 @@ public class EditStaff implements UseCase {
     private String departmentCode;
     private String jobPositionCode;
 
+    public static EditStaff delete(String staffCode) {
+        return EditStaff.builder()
+            .staffCode(staffCode)
+            .staffStatus(StaffStatus.INACTIVE)
+            .build();
+    }
+
     public StaffModel toModel(){
         return StaffModel.builder()
                 .fullname(fullName)

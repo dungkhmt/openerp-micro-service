@@ -90,7 +90,7 @@ public class JobPositionAdapter implements IJobPositionPort {
 
     @Override
     public PageWrapper<JobPositionModel> getJobPosition(IJobPositionFilter filter, IPageableRequest request) {
-        var pageable = PageableUtils.getPageable(request, "positionCode");
+        var pageable = PageableUtils.getPageable(request);
         var spec = new JobPositionSpecification(filter);
         var page = jobPositionRepo.findAll(spec ,pageable);
         return PageWrapper.<JobPositionModel>builder()

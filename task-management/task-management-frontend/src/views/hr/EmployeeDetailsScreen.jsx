@@ -24,7 +24,7 @@ const EmployeeDetails = () => {
       try {
         request(
           "post",
-          "/staff/get-staff-info",
+          `/staffs/${staffCode}`,
           (res) => {
             const data = res.data?.data;
             setEmployeeDetails(data);
@@ -36,8 +36,7 @@ const EmployeeDetails = () => {
               console.error(err);
               setError(true);
             },
-          },
-          payload
+          }
         );
       } catch (err) {
         console.error(err);

@@ -52,16 +52,14 @@ const EmployeeManagement = () => {
       department_code: selectedDepartment?.department_code || null,
       job_position_code: selectedJobPosition?.code || null,
       status: "ACTIVE",
-      pageable_request: {
-        page: pageIndex,
-        page_size: pageSize,
-      },
+      page: pageIndex,
+      page_size: pageSize,
     };
 
     try {
       request(
-        "post",
-        "/staff/get-all-staff-info",
+        "get",
+        "/staffs/details",
         (res) => {
           const { data: employees, meta } = res.data;
           setData(employees || []);
@@ -84,8 +82,8 @@ const EmployeeManagement = () => {
   const fetchDepartments = async () => {
     try {
       request(
-        "post",
-        "/department/get-department",
+        "get",
+        "/departments/",
         (res) => {
           setDepartments(res.data.data || []);
         },
@@ -100,8 +98,8 @@ const EmployeeManagement = () => {
   const fetchJobPositions = async () => {
     try {
       request(
-        "post",
-        "/job/get-job-position",
+        "get",
+        "/jobs/",
         (res) => {
           setJobPositions(res.data.data || []);
         },
@@ -312,8 +310,8 @@ const EmployeeManagement = () => {
 
     try {
       await request(
-        "post",
-        "/staff/delete-staff",
+        "delete",
+        `/staffs/${deleteEmployee.staff_code}`,
         () => {
           fetchEmployees(currentPage, itemsPerPage, searchTerm);
           setDeleteModalOpen(false);
@@ -324,8 +322,7 @@ const EmployeeManagement = () => {
           onError: (err) => {
             console.error("Error deleting employee:", err);
           },
-        },
-        { staff_code: deleteEmployee.staff_code }
+        }
       );
     } catch (error) {
       console.error("Error deleting employee:", error);

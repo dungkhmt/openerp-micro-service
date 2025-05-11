@@ -1,5 +1,7 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_period.usecase_data.GetCheckpointPeriodDetails;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_period.usecase_data.UpdateCheckpointPeriod;
 import jakarta.validation.Valid;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodDetailsModel;
@@ -9,17 +11,15 @@ import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.d
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_period.response.CheckpointPeriodResponse;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/checkpoint/")
+@RequestMapping("/checkpoints/periods")
 public class CheckpointPeriodController extends BeanAwareUseCasePublisher {
-    @PostMapping("create-period")
+    @PostMapping("")
     public ResponseEntity<?> createCheckpointPeriod(
             Principal principal,
             @Valid @RequestBody CreateCheckpointPeriodRequest request
@@ -31,29 +31,30 @@ public class CheckpointPeriodController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("update-period")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateCheckpointPeriod(
-            @Valid @RequestBody UpdateCheckpointPeriodRequest request
+        @PathVariable UUID id,
+        @Valid @RequestBody UpdateCheckpointPeriodRequest request
     ){
-        publish(request.toUseCase());
+        publish(request.toUseCase(id));
         return ResponseEntity.ok().body(
                 new Resource()
         );
     }
 
-    @PostMapping("delete-period")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCheckpointPeriod(
-            @Valid @RequestBody DeleteCheckpointPeriodRequest request
+        @PathVariable UUID id
     ){
-        publish(request.toUseCase());
+        publish(UpdateCheckpointPeriod.delete(id));
         return ResponseEntity.ok().body(
                 new Resource()
         );
     }
 
-    @PostMapping("get-all-period")
+    @GetMapping("")
     public ResponseEntity<?> getCheckpointPeriod(
-            @Valid @RequestBody GetAllCheckpointPeriodRequest request
+            @Valid @ModelAttribute GetAllCheckpointPeriodRequest request
     ){
         var modelPage = publishPageWrapper(CheckpointPeriodModel.class, request.toUseCase());
         var responsePage = modelPage.convert(CheckpointPeriodResponse::fromModel);
@@ -62,11 +63,11 @@ public class CheckpointPeriodController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("get-period-detail")
+    @GetMapping("/{id}")
     public ResponseEntity<?> getCheckpointPeriodDetail(
-            @Valid @RequestBody GetCheckpointPeriodDetailsRequest request
+            @PathVariable UUID id
     ){
-        var model = publish(CheckpointPeriodDetailsModel.class, request.toUseCase());
+        var model = publish(CheckpointPeriodDetailsModel.class, new GetCheckpointPeriodDetails(id));
         var response = CheckpointPeriodDetailsResponse.fromModel(model);
         return ResponseEntity.ok().body(
                 new Resource(response)

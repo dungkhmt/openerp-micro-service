@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_configure.usecase_data;
 
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.PageableRequest;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -17,4 +18,5 @@ public class GetAllCheckpointConfigure implements ICheckpointConfigureFilter, Us
     private String name;
     private CheckpointConfigureStatus status;
     private IPageableRequest pageableRequest;
+
 }

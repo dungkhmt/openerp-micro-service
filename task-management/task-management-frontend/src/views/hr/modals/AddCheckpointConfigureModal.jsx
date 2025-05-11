@@ -51,17 +51,16 @@ const AddCheckpointConfigureModal = ({ open, onClose, onSubmit, initialValues })
       description: formValues.description,
     };
 
-    if (initialValues) {
-      payload.code = initialValues.code;
-    }
-
     try {
       const endpoint = initialValues
-        ? "/checkpoint/update-configure" 
-        : "/checkpoint/create-configure"; 
+        ? `/checkpoints/configures/${initialValues.code}`
+        : "/checkpoints/configures";
+      const methodURL = initialValues
+        ? "put"
+        : "post";
 
       request(
-        "post",
+        methodURL,
         endpoint,
         (response) => {
           onSubmit(); 

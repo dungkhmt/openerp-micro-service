@@ -56,15 +56,13 @@ const CheckpointEvaluation = () => {
       department_code: selectedDepartment?.department_code || null,
       job_position_code: selectedJobPosition?.code || null,
       status: "ACTIVE",
-      pageable_request: {
-        page: pageIndex,
-        page_size: pageSize,
-      },
+      page: pageIndex,
+      page_size: pageSize,
     };
     try {
       request(
         "post",
-        "/staff/search-staff",
+        "/staffs",
         (res) => {
           const { data, meta } = res.data;
           setStaffData(data || []);
@@ -86,8 +84,8 @@ const CheckpointEvaluation = () => {
     try {
       const payload = { name: null, status: "ACTIVE", pageable_request: null };
       request(
-        "post",
-        "/checkpoint/get-all-period",
+        "get",
+        "/checkpoint/periods",
         (res) => setPeriods(res.data.data || []),
         { onError: (err) => console.error("Error fetching periods:", err) },
         payload
@@ -100,8 +98,8 @@ const CheckpointEvaluation = () => {
   const fetchDepartments = async () => {
     try {
       request(
-        "post",
-        "/department/get-department",
+        "get",
+        "/departments/",
         (res) => setDepartments(res.data.data || []),
         { onError: (err) => console.error("Error fetching departments:", err) },
         {}
@@ -114,8 +112,8 @@ const CheckpointEvaluation = () => {
   const fetchJobPositions = async () => {
     try {
       request(
-        "post",
-        "/job/get-job-position",
+        "get",
+        "/jobs/",
         (res) => setJobPositions(res.data.data || []),
         { onError: (err) => console.error("Error fetching job positions:", err) },
         {}
@@ -133,8 +131,8 @@ const CheckpointEvaluation = () => {
     };
     try {
       request(
-        "post",
-        "/checkpoint/get-all-checkpoint",
+        "get",
+        "/checkpoints",
         (res) => {
           const { data } = res.data;
           const points = {};

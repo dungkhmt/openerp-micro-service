@@ -19,6 +19,13 @@ public class UpdateCheckpointConfigure implements UseCase {
     private String description;
     private CheckpointConfigureStatus status;
 
+    public static UpdateCheckpointConfigure delete(String code) {
+        return UpdateCheckpointConfigure.builder()
+            .code(code)
+            .status(CheckpointConfigureStatus.INACTIVE)
+            .build();
+    }
+
     public CheckpointConfigureModel toModel() {
         return CheckpointConfigureModel.builder()
                 .code(code)

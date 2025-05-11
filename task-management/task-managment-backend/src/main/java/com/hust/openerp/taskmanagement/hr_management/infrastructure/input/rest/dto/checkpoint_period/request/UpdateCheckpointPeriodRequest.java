@@ -15,8 +15,6 @@ import java.util.UUID;
 @Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UpdateCheckpointPeriodRequest {
-    @NotNull
-    private UUID id;
     private String name;
     private String description;
     private String checkpointDate;
@@ -25,7 +23,7 @@ public class UpdateCheckpointPeriodRequest {
     private List<CreateCheckpointPeriodConfigureRequest> configures;
 
 
-    public UpdateCheckpointPeriod toUseCase(){
+    public UpdateCheckpointPeriod toUseCase(UUID id){
         return UpdateCheckpointPeriod.builder()
                 .id(id)
                 .name(name)

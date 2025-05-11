@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.utils;
 
+import com.hust.openerp.taskmanagement.hr_management.constant.SortDirection;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.PageInfo;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.IPageableRequest;
 import org.springframework.data.domain.Page;
@@ -10,18 +11,25 @@ import org.springframework.data.domain.Sort;
 public class PageableUtils {
 
     public static Pageable getPageable(IPageableRequest request) {
-        return getPageable(request, "id");
-    }
-
-    public static Pageable getPageable(IPageableRequest request, String sortBy) {
-        if (request == null) {
+        if (request == null || request.getPage() == null || request.getPageSize() == null) {
             return Pageable.unpaged();
         }
         return PageRequest.of(
-                Math.toIntExact(request.getPage()),
-                Math.toIntExact(request.getPageSize()),
-                Sort.by(sortBy).descending()
+            Math.toIntExact(request.getPage()),
+            Math.toIntExact(request.getPageSize()),
+            Sort.by(from(request.getOrder()), request.getSortBy())
         );
+    }
+
+    public static Sort.Direction from(SortDirection sortDirection) {
+        if (sortDirection == null) {
+            return Sort.Direction.DESC;
+        }
+        return switch (sortDirection) {
+            case ASC -> Sort.Direction.ASC;
+            case DESC -> Sort.Direction.DESC;
+            default -> Sort.Direction.DESC;
+        };
     }
 
     public static <T> PageInfo getPageInfo(Page<T> result) {

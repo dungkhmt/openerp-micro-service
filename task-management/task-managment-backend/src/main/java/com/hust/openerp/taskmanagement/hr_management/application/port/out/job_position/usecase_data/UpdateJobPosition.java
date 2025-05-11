@@ -20,6 +20,13 @@ public class UpdateJobPosition implements UseCase {
     private JobPositionType type;
     private JobPositionStatus status;
 
+    public static UpdateJobPosition delete(String code){
+        return UpdateJobPosition.builder()
+            .code(code)
+            .status(JobPositionStatus.INACTIVE)
+            .build();
+    }
+
     public JobPositionModel toModel() {
         return JobPositionModel.builder()
             .code(code)

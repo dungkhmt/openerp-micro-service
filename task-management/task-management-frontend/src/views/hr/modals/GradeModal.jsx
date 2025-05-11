@@ -28,13 +28,8 @@ const GradeModal = ({ open, onClose, staff, period }) => {
   const fetchPeriodDetails = async () => {
     setLoading(true);
     try {
-      const periodResponse = await request("post", "/checkpoint/get-period-detail", null, null, {
-        id: period.id,
-      });
-      const checkpointResponse = await request("post", "/checkpoint/get-checkpoint", null, null, {
-        period_id: period.id,
-        user_id: staff.user_login_id,
-      });
+      const periodResponse = await request("get", `/checkpoints/periods/${period.id}`);
+      const checkpointResponse = await request("get", `/checkpoints/${period.id}/${staff.user_login_id}`);
 
       const periodConfigs = periodResponse.data.data.configures || [];
       const checkpointConfigs = checkpointResponse.data.data.configure_points || [];
@@ -85,7 +80,7 @@ const GradeModal = ({ open, onClose, staff, period }) => {
           point: parseFloat(config.point),
         })),
       };
-      await request("post", "/checkpoint/checkpoint-staff", 
+      await request("post", "/checkpoints",
         null, 
         null, 
         payload);

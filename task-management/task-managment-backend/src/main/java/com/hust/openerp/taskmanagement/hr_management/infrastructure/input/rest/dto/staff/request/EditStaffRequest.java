@@ -11,7 +11,6 @@ import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
 @Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class EditStaffRequest {
-    private String staffCode;
     private String userLoginId;
 
     private String fullname;
@@ -19,7 +18,7 @@ public class EditStaffRequest {
     private String departmentCode;
     private String jobPositionCode;
 
-    public EditStaff toUseCase(){
+    public EditStaff toUseCase(String staffCode){
         return EditStaff.builder()
                 .fullName(fullname)
                 .userLoginId(userLoginId)

@@ -19,8 +19,8 @@ public class DeleteCheckpointPeriodRequest {
 
     public UpdateCheckpointPeriod toUseCase(){
         return UpdateCheckpointPeriod.builder()
-                .id(id)
-                .status(CheckpointPeriodStatus.INACTIVE)
-                .build();
+            .id(id)
+            .status(CheckpointPeriodStatus.INACTIVE)
+            .build();
     }
 }

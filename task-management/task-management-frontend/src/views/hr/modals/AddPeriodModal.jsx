@@ -51,10 +51,9 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues }) => {
 
   const fetchPeriodDetail = async (id) => {
     try {
-      const payload = { id };
       request(
-        "post",
-        "/checkpoint/get-period-detail",
+        "get",
+        `/checkpoints/periods/${id}`,
         (res) => {
           const { data } = res.data;
       
@@ -82,8 +81,7 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues }) => {
         {
           onError: (err) =>
             console.error("Error fetching period details:", err),
-        },
-        payload
+        }
       );
       
     } catch (error) {
@@ -98,15 +96,13 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues }) => {
         code: null,
         name: null,
         status: "ACTIVE",
-        pageable_request: {
-          page: 0,
-          page_size: 100,
-        },
+        page: 0,
+        page_size: 100,
       };
 
       request(
         "post",
-        "/checkpoint/get-all-configure",
+        "/checkpoint/",
         (res) => {
           setAvailableConfigures(res.data.data || []);
         },
@@ -178,18 +174,15 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues }) => {
       })),
     };
   
-    // Add ID for update if editing
-    if (initialValues?.id) {
-      payload.id = initialValues.id;
-    }
-  
     try {
       const endpoint = initialValues?.id
-        ? "/checkpoint/update-period"
-        : "/checkpoint/create-period";
-  
+        ? `/checkpoints/periods/${initialValues.id}`
+        : "/checkpoints/periods";
+      const methodURL = initialValues
+        ? `put`
+        : "post";
       await request(
-        "post",
+        methodURL,
         endpoint,
         () => {
           onSubmit(); // Callback to refresh parent data

@@ -35,8 +35,8 @@ const SearchSelect = ({
       {
         params: {
           departmentName: search || null,
-          "pageableRequest.page": 0,
-          "pageableRequest.pageSize": size,
+          page: 0,
+          pageSize: size,
           sortBy: "id",
           order: "asc",
         },

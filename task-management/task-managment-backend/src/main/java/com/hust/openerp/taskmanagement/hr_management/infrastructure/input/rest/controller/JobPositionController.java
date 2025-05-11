@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.job_position.usecase_data.UpdateJobPosition;
 import jakarta.validation.Valid;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.JobPositionModel;
@@ -13,9 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/job/")
+@RequestMapping("/jobs")
 public class JobPositionController extends BeanAwareUseCasePublisher {
-    @PostMapping("create-job-position")
+    @PostMapping("/")
     public ResponseEntity<?> createJobPosition(
             @Valid @RequestBody CreateJobPositionRequest request
     ){
@@ -25,27 +26,28 @@ public class JobPositionController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("update-job-position")
+    @PutMapping("/{code}")
     public ResponseEntity<?> updateJobPosition(
-            @Valid @RequestBody UpdateJobPositionRequest request
+        @PathVariable String code,
+        @Valid @RequestBody UpdateJobPositionRequest request
     ){
-        publish(request.toUseCase());
+        publish(request.toUseCase(code));
         return ResponseEntity.ok().body(
                 new Resource()
         );
     }
 
-    @PostMapping("delete-job-position")
+    @DeleteMapping("/{code}")
     public ResponseEntity<?> deleteJobPosition(
-            @Valid @RequestBody DeleteJobPositionRequest request
+        @PathVariable String code
     ){
-        publish(request.toUseCase());
+        publish(UpdateJobPosition.delete(code));
         return ResponseEntity.ok().body(
                 new Resource()
         );
     }
 
-    @PostMapping("get-job-position")
+    @GetMapping("/")
     public ResponseEntity<?> getJobPosition(
             @Valid @RequestBody GetJobPositionRequest request
     ){
@@ -56,7 +58,7 @@ public class JobPositionController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity<?> getJobPositions(
         @Valid @ModelAttribute GetJobPositionRequest request
     ){

@@ -10,12 +10,11 @@ import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkp
 @Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UpdateCheckpointConfigureRequest {
-    private String code;
     private String name;
     private String description;
 
 
-    public UpdateCheckpointConfigure toUseCase(){
+    public UpdateCheckpointConfigure toUseCase(String code){
         return UpdateCheckpointConfigure.builder()
                 .code(code)
                 .name(name)

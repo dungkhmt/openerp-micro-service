@@ -18,6 +18,13 @@ public class UpdateDepartment implements UseCase {
     private String description;
     private DepartmentStatus status;
 
+    public static UpdateDepartment delete(String departmentCode) {
+        return UpdateDepartment.builder()
+            .departmentCode(departmentCode)
+            .status(DepartmentStatus.INACTIVE)
+            .build();
+    }
+
     public DepartmentModel toModel() {
         return DepartmentModel.builder()
                 .departmentCode(departmentCode)

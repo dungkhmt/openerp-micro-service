@@ -13,13 +13,11 @@ import com.hust.openerp.taskmanagement.hr_management.constant.SalaryType;
 @Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UpdateSalaryRequest {
-    @NotNull
-    private String userLoginId;
     @Min(value = 0)
     private Integer salary;
     private SalaryType salaryType;
 
-    public UpdateStaffSalary toUseCase(){
+    public UpdateStaffSalary toUseCase(String userLoginId){
         return UpdateStaffSalary.builder()
                 .userLoginId(userLoginId)
                 .salary(salary)

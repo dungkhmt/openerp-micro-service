@@ -39,16 +39,14 @@ const DepartmentTable = () => {
       department_code: null,
       department_name: searchValue || null,
       status: "ACTIVE",
-      pageable_request: {
-        page: pageIndex,
-        page_size: pageSize,
-      },
+      page: pageIndex,
+      page_size: pageSize,
     };
 
     try {
       request(
-        "post",
-        "/department/get-department",
+        "get",
+        "/departments/",
         (res) => {
           const { data: departments, meta } = res.data;
           const transformedDepartments = departments.map((dept) => ({
@@ -228,10 +226,10 @@ const DepartmentTable = () => {
     if (!deleteDepartment) return;
 
     request(
-      "post",
-      "/department/delete-department",
+      "delete",
+      `/departments/${deleteDepartment.departmentCode}`,
       () => {
-        fetchData(currentPage, itemsPerPage, searchTerm); // Refresh table
+        fetchData(currentPage, itemsPerPage, searchTerm);
         setDeleteModalOpen(false);
         setDeleteDepartment(null);
         toast.success("Xoá thành công")
@@ -240,8 +238,7 @@ const DepartmentTable = () => {
         onError: (err) => {
           console.error("Error deleting department:", err);
         },
-      },
-      { department_code: deleteDepartment.departmentCode }
+      }
     );
   };
 

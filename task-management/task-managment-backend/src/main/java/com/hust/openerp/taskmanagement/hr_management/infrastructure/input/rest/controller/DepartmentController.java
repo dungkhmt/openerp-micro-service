@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.department.usecase_data.UpdateDepartment;
 import jakarta.validation.Valid;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.DepartmentModel;
@@ -13,9 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/department/")
+@RequestMapping("/departments")
 public class DepartmentController extends BeanAwareUseCasePublisher {
-    @PostMapping("create-department")
+    @PostMapping("/")
     public ResponseEntity<?> createDepartment(
             @Valid @RequestBody CreateDepartmentRequest request
     ){
@@ -25,34 +26,24 @@ public class DepartmentController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("update-department")
+    @PutMapping("/{code}")
     public ResponseEntity<?> updateDepartment(
+        @PathVariable String code,
             @Valid @RequestBody UpdateDepartmentRequest request
     ){
-        publish(request.toUseCase());
+        publish(request.toUseCase(code));
         return ResponseEntity.ok().body(
                 new Resource()
         );
     }
 
-    @PostMapping("delete-department")
+    @DeleteMapping("/{code}")
     public ResponseEntity<?> deleteDepartment(
-            @Valid @RequestBody DeleteDepartmentRequest request
+        @PathVariable String code
     ){
-        publish(request.toUseCase());
+        publish(UpdateDepartment.delete(code));
         return ResponseEntity.ok().body(
                 new Resource()
-        );
-    }
-
-    @PostMapping("get-department")
-    public ResponseEntity<?> getDepartment(
-            @Valid @RequestBody GetDepartmentRequest request
-    ){
-        var modelPage = publishPageWrapper(DepartmentModel.class, request.toUseCase());
-        var responsePage = modelPage.convert(DepartmentResponse::fromModel);
-        return ResponseEntity.ok().body(
-                new Resource(responsePage)
         );
     }
 

@@ -1,6 +1,8 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.EditStaff;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.GetStaffInfo;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.salary.request.UpdateSalaryRequest;
 import jakarta.validation.Valid;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffDetailModel;
@@ -15,10 +17,10 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/staff")
+@RequestMapping("/staffs")
 public class  StaffController extends BeanAwareUseCasePublisher {
 
-    @GetMapping("")
+    @GetMapping("/me")
     public ResponseEntity<?> getStaff(
         Principal principal
     ){
@@ -29,7 +31,7 @@ public class  StaffController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("/add-staff")
+    @PutMapping("")
     public ResponseEntity<?> addStaff(
             @Valid @RequestBody AddStaffRequest request
     ){
@@ -39,27 +41,29 @@ public class  StaffController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("/delete-staff")
+    @DeleteMapping("/{staffCode}")
     public ResponseEntity<?> deleteStaff(
+        @PathVariable String staffCode,
             @Valid @RequestBody DeleteStaffRequest request
     ){
-        publish(request.toUseCase());
+        publish(EditStaff.delete(staffCode));
         return ResponseEntity.ok().body(
                 new Resource()
         );
     }
 
-    @PostMapping("/edit-staff")
+    @PostMapping("/{staffCode}")
     public ResponseEntity<?> editStaff(
+        @PathVariable String staffCode,
             @Valid @RequestBody EditStaffRequest request
     ){
-        publish(request.toUseCase());
+        publish(request.toUseCase(staffCode));
         return ResponseEntity.ok().body(
                 new Resource()
         );
     }
 
-    @PostMapping("/search-staff")
+    @GetMapping("")
     public ResponseEntity<?> searchStaff(
             @Valid @RequestBody SearchStaffRequest request
     ){
@@ -70,7 +74,7 @@ public class  StaffController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("/get-all-staff-info")
+    @PostMapping("/details")
     public ResponseEntity<?> getAllStaffInfo(
             @Valid @RequestBody GetAllStaffInfoRequest request
     ){
@@ -81,9 +85,10 @@ public class  StaffController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("/get-staff-info")
+    @PutMapping("/{staffCode}")
     public ResponseEntity<?> getStaffInfo(
-            @Valid @RequestBody GetStaffInfoRequest request
+        @PathVariable String staffCode,
+        @Valid @RequestBody UpdateSalaryRequest request
     ){
         var staff = publish(StaffDetailModel.class, request.toUseCase());
         return ResponseEntity.ok().body(

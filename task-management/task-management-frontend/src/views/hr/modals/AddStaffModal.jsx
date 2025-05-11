@@ -59,8 +59,8 @@ const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
       };
 
       request(
-          "post",
-          "/department/get-department",
+          "get",
+          "/departments/",
           (res) => {
             const data = res.data.data || [];
             setDepartments(data);
@@ -100,8 +100,8 @@ const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
       };
 
       request(
-          "post",
-          "/job/get-job-position",
+          "get",
+          "/jobs/",
           (res) => {
             const data = res.data.data || [];
             setJobPositions(data);
@@ -144,11 +144,13 @@ const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
 
     try {
       const apiEndpoint = initialValues
-          ? "/staff/edit-staff"
-          : "/staff/add-staff";
-
+          ? `/staffs/${initialValues?.staff_code}`
+          : "/staffs";
+      const methodURL = initialValues
+        ? `put`
+        : "post";
       await request(
-          "post",
+        methodURL,
           apiEndpoint,
           () => {
             onSubmit();
@@ -187,7 +189,7 @@ const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
               }
             },
           },
-          { ...payload, staff_code: initialValues?.staff_code }
+          payload
       );
     } catch (error) {
       console.error("API request failed:", error);

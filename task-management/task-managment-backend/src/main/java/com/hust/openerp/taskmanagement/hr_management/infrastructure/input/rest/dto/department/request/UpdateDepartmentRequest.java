@@ -12,13 +12,11 @@ import com.hust.openerp.taskmanagement.hr_management.constant.DepartmentStatus;
 @Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UpdateDepartmentRequest {
-    @NotNull
-    private String departmentCode;
     private String departmentName;
     private String description;
     private DepartmentStatus status;
 
-    public UpdateDepartment toUseCase(){
+    public UpdateDepartment toUseCase(String departmentCode){
         return UpdateDepartment.builder()
                 .departmentCode(departmentCode)
                 .departmentName(departmentName)

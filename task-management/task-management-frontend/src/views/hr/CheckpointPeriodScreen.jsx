@@ -62,16 +62,14 @@ const CheckpointPeriodScreen = () => {
     const payload = {
       name: searchValue || null,
       status: "ACTIVE",
-      pageable_request: {
-        page: pageIndex,
-        page_size: pageSize,
-      },
+      page: pageIndex,
+      page_size: pageSize,
     };
 
     try {
       request(
-        "post",
-        "/checkpoint/get-all-period",
+        "get",
+        "/checkpoint/periods",
         (res) => {
           const { data: periods, meta } = res.data;
           setData(periods || []);
@@ -230,8 +228,8 @@ const CheckpointPeriodScreen = () => {
 
     try {
       await request(
-        "post",
-        "/checkpoint/delete-period",
+        "delete",
+        `/checkpoints/periods/${deletePeriod.id}`,
         () => {
           fetchPeriods(currentPage, itemsPerPage, searchTerm);
           setDeleteModalOpen(false);
@@ -242,8 +240,7 @@ const CheckpointPeriodScreen = () => {
           onError: (err) => {
             console.error("Error deleting period:", err);
           },
-        },
-        { id: deletePeriod.id }
+        }
       );
     } catch (error) {
       console.error("Error deleting period:", error);

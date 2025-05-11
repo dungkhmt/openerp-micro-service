@@ -3,6 +3,7 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.hust.openerp.taskmanagement.hr_management.constant.SortDirection;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.IPageableRequest;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -10,11 +11,8 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class PageableRequest extends BasePageableRequest {
-    @NotNull
-    private String sortBy = "id";
-    @NotNull
-    private SortDirection order = SortDirection.DESC;
+public abstract class BasePageableRequest implements IPageableRequest {
+    private Long page = 0L;
+    private Long pageSize = 10L;
 }

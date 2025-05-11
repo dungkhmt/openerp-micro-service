@@ -12,13 +12,11 @@ import com.hust.openerp.taskmanagement.hr_management.application.port.out.job_po
 @Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UpdateJobPositionRequest {
-    @NotNull
-    private String code;
     private String name;
     private String description;
     private JobPositionType type;
 
-    public UpdateJobPosition toUseCase(){
+    public UpdateJobPosition toUseCase(String code){
         return UpdateJobPosition.builder()
             .code(code)
             .name(name)

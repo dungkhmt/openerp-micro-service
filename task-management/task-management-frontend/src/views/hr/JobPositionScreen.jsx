@@ -39,16 +39,14 @@ const JobPositionTable = () => {
       code: null,
       name: searchValue || null,
       status: "ACTIVE",
-      pageable_request: {
-        page: pageIndex,
-        page_size: pageSize,
-      },
+      page: pageIndex,
+      page_size: pageSize,
     };
 
     try {
       request(
-        "post",
-        "/job/get-job-position",
+        "get",
+        "/jobs/",
         (res) => {
           const { data: jobs, meta } = res.data;
           // Convert snake_case to camelCase
@@ -228,8 +226,8 @@ const JobPositionTable = () => {
     if (!deleteJob) return;
 
     request(
-      "post",
-      "/job/delete-job-position",
+      "delete",
+      `/jobs/${deleteJob.code}`,
       () => {
         fetchData(currentPage, itemsPerPage, searchTerm);
         setDeleteModalOpen(false);
@@ -240,8 +238,7 @@ const JobPositionTable = () => {
         onError: (err) => {
           console.error("Error deleting job position:", err);
         },
-      },
-      { code: deleteJob.code }
+      }
     );
   };
 

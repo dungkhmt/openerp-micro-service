@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_staff.usecase_data.GetCheckpoint;
 import jakarta.validation.Valid;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointModel;
@@ -9,17 +10,15 @@ import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.d
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_staff.response.CheckpointResponse;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/checkpoint/")
+@RequestMapping("/checkpoints")
 public class CheckpointController extends BeanAwareUseCasePublisher {
-    @PostMapping("checkpoint-staff")
+    @PostMapping("")
     public ResponseEntity<?> checkpointStaff(
             Principal principal,
             @Valid @RequestBody CheckpointStaffRequest request
@@ -32,7 +31,7 @@ public class CheckpointController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("get-all-checkpoint")
+    @GetMapping("")
     public ResponseEntity<?> getAllCheckpoint(
             @Valid @RequestBody GetAllCheckpointRequest request
     ) {
@@ -45,11 +44,15 @@ public class CheckpointController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("get-checkpoint")
+    @GetMapping("/{periodId}/{userId}")
     public ResponseEntity<?> getCheckpoint(
-            @Valid @RequestBody GetCheckpointRequest request
+        @PathVariable("periodId") UUID periodId,
+        @PathVariable("userId") String userId
     ) {
-        var checkpoint = publish(CheckpointModel.class, request.toUseCase());
+        var checkpoint = publish(CheckpointModel.class, GetCheckpoint.builder()
+            .periodId(periodId)
+            .userId(userId)
+            .build());
         var response = CheckpointResponse.fromModel(checkpoint);
         return ResponseEntity.ok().body(
                 new Resource(response)

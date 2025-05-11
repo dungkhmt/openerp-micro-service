@@ -1,26 +1,22 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_configure.usecase_data.UpdateCheckpointConfigure;
 import jakarta.validation.Valid;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointConfigureModel;
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_configure.request.CreateCheckpointConfigureRequest;
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_configure.request.DeleteCheckpointConfigureRequest;
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_configure.request.GetAllCheckpointConfigureRequest;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_configure.request.CreateCheckpointConfigureRequest;import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_configure.request.GetAllCheckpointConfigureRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_configure.request.UpdateCheckpointConfigureRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_configure.response.CheckpointConfigureResponse;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/checkpoint/")
+@RequestMapping("/checkpoints/configures")
 public class CheckpointConfigureController extends BeanAwareUseCasePublisher {
-    @PostMapping("create-configure")
+    @PostMapping("")
     public ResponseEntity<?> createCheckpointConfigure(
-            @Valid @RequestBody CreateCheckpointConfigureRequest request
+        @Valid @RequestBody CreateCheckpointConfigureRequest request
     ){
         var model = publish(CheckpointConfigureModel.class ,request.toUseCase());
         var response = CheckpointConfigureResponse.fromModel(model);
@@ -29,29 +25,30 @@ public class CheckpointConfigureController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("update-configure")
+    @PutMapping("/{code}")
     public ResponseEntity<?> updateCheckpointConfigure(
-            @Valid @RequestBody UpdateCheckpointConfigureRequest request
+        @PathVariable String code,
+        @Valid @RequestBody UpdateCheckpointConfigureRequest request
     ){
-        publish(request.toUseCase());
+        publish(request.toUseCase(code));
         return ResponseEntity.ok().body(
                 new Resource()
         );
     }
 
-    @PostMapping("delete-configure")
+    @DeleteMapping("/{code}")
     public ResponseEntity<?> deleteCheckpointConfigure(
-            @Valid @RequestBody DeleteCheckpointConfigureRequest request
+        @PathVariable String code
     ){
-        publish(request.toUseCase());
+        publish(UpdateCheckpointConfigure.delete(code));
         return ResponseEntity.ok().body(
                 new Resource()
         );
     }
 
-    @PostMapping("get-all-configure")
+    @GetMapping("")
     public ResponseEntity<?> getAllCheckpointConfigure(
-            @Valid @RequestBody GetAllCheckpointConfigureRequest request
+            @Valid @ModelAttribute GetAllCheckpointConfigureRequest request
     ){
         var modelPage = publishPageWrapper(CheckpointConfigureModel.class, request.toUseCase());
         var responsePage = modelPage.convert(CheckpointConfigureResponse::fromModel);

@@ -35,7 +35,7 @@ const SalaryTab = ({ userLoginId }) => {
     try {
       request(
         "post",
-        "/salary/get-salary",
+        "/salaries",
         (res) => {
           if (res.data?.data) {
             setSalaryData({
@@ -63,15 +63,14 @@ const SalaryTab = ({ userLoginId }) => {
   const handleSave = async () => {
     setSaving(true);
     const payload = {
-      user_login_id: userLoginId,
       salary_type: salaryData.salary_type,
       salary: salaryData.salary,
     };
 
     try {
       request(
-        "post",
-        "/salary/update-salary",
+        "put",
+        `/salaries/${userLoginId}`,
         () => {
           fetchSalary(); 
           showNotification("success", "Salary saved successfully.");

@@ -56,16 +56,14 @@ const CheckpointConfigureScreen = () => {
     const payload = {
       name: searchValue || null,
       status: "ACTIVE",
-      pageable_request: {
-        page: pageIndex,
-        page_size: pageSize,
-      },
+      page: pageIndex,
+      page_size: pageSize,
     };
 
     try {
       request(
-        "post",
-        "/checkpoint/get-all-configure",
+        "get",
+        "/checkpoints/configures",
         (res) => {
           const { data: checkpoints, meta } = res.data;
           setData(checkpoints || []);
@@ -77,6 +75,7 @@ const CheckpointConfigureScreen = () => {
         {
           onError: (err) => console.error("Error fetching checkpoints:", err),
         },
+        null,
         payload
       );
     } catch (error) {
@@ -220,8 +219,8 @@ const CheckpointConfigureScreen = () => {
 
     try {
       await request(
-        "post",
-        "/checkpoint/delete-configure",
+        "delete",
+        "/checkpoints/configures",
         () => {
           fetchCheckpoints(currentPage, itemsPerPage, searchTerm);
           setDeleteModalOpen(false);

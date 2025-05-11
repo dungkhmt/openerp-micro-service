@@ -33,14 +33,14 @@ const AnnounceAbsenceForm = () => {
       setConfigs(map);
     });
 
-    request("get", "/staff", (res) => {
+    request("get", "/staffs/me", (res) => {
       const staff = res.data?.data;
       if (staff?.leave_hours) setLeaveHours(staff.leave_hours);
     });
   }, []);
 
   useEffect(() => {
-    request("get", "/staff", (res) => {
+    request("get", "/staffs/me", (res) => {
       const staff = res.data?.data;
       if (staff?.leave_hours) setLeaveHours(staff.leave_hours);
     });

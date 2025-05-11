@@ -48,8 +48,8 @@ const AttendancePage = () => {
   const fetchEmployees = async (page = 0, size = itemsPerPage) => {
     return new Promise((resolve) => {
       request(
-        "post",
-        "/staff/get-all-staff-info",
+        "get",
+        "/staffs/details",
         (res) => {
           const list = res.data.data || [];
           const meta = res.data.meta || {};
@@ -64,7 +64,8 @@ const AttendancePage = () => {
           department_code: selectedDept?.department_code || null,
           job_position_code: selectedPos?.code || null,
           status: "ACTIVE",
-          pageable_request: { page, page_size: size },
+          page,
+          page_size: size
         }
       );
     });
@@ -154,7 +155,7 @@ const AttendancePage = () => {
         <Grid item xs={12} md={2}>
           <SearchSelect
             label="Phòng ban"
-            fetchUrl="/department/"
+            fetchUrl="/departments/"
             value={selectedDept}
             onChange={setSelectedDept}
             getOptionLabel={(item) => item.department_name}
@@ -164,7 +165,7 @@ const AttendancePage = () => {
         <Grid item xs={12} md={2}>
           <SearchSelect
             label="Chức vụ"
-            fetchUrl="/job/"
+            fetchUrl="/jobs/"
             value={selectedPos}
             onChange={setSelectedPos}
             getOptionLabel={(item) => item.name}

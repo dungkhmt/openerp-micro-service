@@ -42,19 +42,17 @@ const AddDepartmentModal = ({ open, onClose, onSubmit, initialValues }) => {
       description: formValues.description,
     };
 
-    // If editing, include additional properties
-    if (initialValues) {
-      payload.department_code = initialValues.departmentCode;
-      payload.status = "ACTIVE"; // Example: keeping status ACTIVE during edit
-    }
 
     try {
-      const endpoint = initialValues
-        ? "/department/update-department" // Edit department
-        : "/department/create-department"; // Add department
 
+      const methodURL = initialValues
+        ? `put`
+        : "post";
+      const endpoint = initialValues
+        ? `/departments/${initialValues.departmentCode}`
+        : "/departments/";
       request(
-        "post",
+        methodURL,
         endpoint,
         (response) => {
           onSubmit(); // Refresh parent data

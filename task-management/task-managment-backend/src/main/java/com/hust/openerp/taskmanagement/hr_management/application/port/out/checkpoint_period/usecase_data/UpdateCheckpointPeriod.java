@@ -25,6 +25,13 @@ public class UpdateCheckpointPeriod implements UseCase {
     private CheckpointPeriodStatus status;
     private List<CheckpointPeriodConfigureModel> configures;
 
+    public static UpdateCheckpointPeriod delete(UUID id) {
+        return UpdateCheckpointPeriod.builder()
+            .id(id)
+            .status(CheckpointPeriodStatus.INACTIVE)
+            .build();
+    }
+
     public CheckpointPeriodModel toModel() {
         return CheckpointPeriodModel.builder()
                 .id(id)

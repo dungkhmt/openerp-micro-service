@@ -51,19 +51,16 @@ const AddJobPositionModal = ({ open, onClose, onSubmit, initialValues }) => {
       description: formValues.description,
     };
 
-    // If editing, include additional properties
-    if (initialValues) {
-      payload.code = initialValues.code;
-      payload.status = "ACTIVE"; // Example: keeping status ACTIVE during edit
-    }
-
     try {
       const endpoint = initialValues
-        ? "/job/update-job-position" // Edit job position
-        : "/job/create-job-position"; // Add job position
+        ? `/jobs/${initialValues.code}`
+        : "/jobs/";
 
+      const methodURL = initialValues
+        ? `put`
+        : "post";
       request(
-        "post",
+        methodURL,
         endpoint,
         (response) => {
           onSubmit(); // Refresh parent data

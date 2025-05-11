@@ -2,6 +2,8 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.hust.openerp.taskmanagement.hr_management.constant.SortDirection;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.BasePageableRequest;
 import lombok.Getter;
 import lombok.Setter;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.FindStaff;
@@ -11,14 +13,13 @@ import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.d
 @Getter
 @Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class SearchStaffRequest {
+public class SearchStaffRequest extends BasePageableRequest {
     private String fullname;
     private String staffCode;
     private String staffEmail;
     private StaffStatus status;
     private String departmentCode;
     private String jobPositionCode;
-    private PageableRequest pageableRequest;
 
     public FindStaff toUseCase(){
         return FindStaff.builder()
@@ -28,7 +29,17 @@ public class SearchStaffRequest {
                 .status(status)
                 .departmentCode(departmentCode)
                 .jobPositionCode(jobPositionCode)
-                .pageableRequest(pageableRequest)
+                .pageableRequest(this)
                 .build();
+    }
+
+    @Override
+    public String getSortBy() {
+        return "staffCode";
+    }
+
+    @Override
+    public SortDirection getOrder() {
+        return SortDirection.DESC;
     }
 }

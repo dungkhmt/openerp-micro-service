@@ -47,8 +47,8 @@ const WeeklyAbsencePage = () => {
   const fetchEmployees = async () => {
     return new Promise((resolve) => {
       request(
-        "post",
-        "/staff/get-all-staff-info",
+        "get",
+        "/staffs/details",
         (res) => resolve(res.data?.data || []),
         {},
         {
@@ -133,7 +133,7 @@ const WeeklyAbsencePage = () => {
         <Grid item xs={12} md={3}>
           <SearchSelect
             label="Phòng ban"
-            fetchUrl="/department/"
+            fetchUrl="/departments/"
             value={selectedDept}
             onChange={setSelectedDept}
             getOptionLabel={(item) => item.department_name}
@@ -144,7 +144,7 @@ const WeeklyAbsencePage = () => {
         <Grid item xs={12} md={3}>
           <SearchSelect
             label="Chức vụ"
-            fetchUrl="/job/"
+            fetchUrl="/jobs/"
             value={selectedPos}
             onChange={setSelectedPos}
             getOptionLabel={(item) => item.name}

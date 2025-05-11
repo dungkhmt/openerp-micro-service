@@ -82,7 +82,7 @@ public class CheckpointPeriodAdapter implements ICheckpointPeriodPort {
 
     @Override
     public PageWrapper<CheckpointPeriodModel> getCheckpointPeriod(ICheckpointPeriodFilter filter, IPageableRequest request) {
-        var pageable = PageableUtils.getPageable(request, "checkpointDate");
+        var pageable = PageableUtils.getPageable(request);
         var spec = new CheckpointPeriodSpecification(filter);
         var page = checkpointPeriodRepo.findAll(spec ,pageable);
         return PageWrapper.<CheckpointPeriodModel>builder()

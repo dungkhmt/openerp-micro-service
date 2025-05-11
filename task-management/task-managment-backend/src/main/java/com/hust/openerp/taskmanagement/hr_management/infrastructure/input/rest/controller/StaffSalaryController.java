@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff_salary.usecase_data.GetCurrentStaffSalary;
 import jakarta.validation.Valid;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffDepartmentModel;
@@ -11,31 +12,31 @@ import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.d
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.staff_department.request.GetDepartmentHistoryRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.staff_department.response.StaffDepartmentResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/salary/")
+@RequestMapping("/salaries")
 public class StaffSalaryController extends BeanAwareUseCasePublisher {
 
-    @PostMapping("get-salary")
+    @GetMapping("/{userId}")
     public ResponseEntity<?> getStaffSalary(
-            @Valid @RequestBody GetSalaryRequest request
+        @PathVariable String userId
     ){
-        var model = publish(StaffSalaryModel.class, request.toUseCase());
+        var model = publish(StaffSalaryModel.class, GetCurrentStaffSalary.builder()
+            .userLoginId(userId)
+            .build());
         var response = StaffSalaryResponse.fromModel(model);
         return ResponseEntity.ok().body(
                 new Resource(response)
         );
     }
 
-    @PostMapping("update-salary")
+    @PutMapping("/{userId}")
     public ResponseEntity<?> updateStaffSalary(
+        @PathVariable String userId,
             @Valid @RequestBody UpdateSalaryRequest request
     ){
-        publish(request.toUseCase());
+        publish(request.toUseCase(userId));
         return ResponseEntity.ok().body(
                 new Resource()
         );
