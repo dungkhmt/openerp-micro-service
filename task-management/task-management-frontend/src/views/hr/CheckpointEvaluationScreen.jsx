@@ -61,7 +61,7 @@ const CheckpointEvaluation = () => {
     };
     try {
       request(
-        "post",
+        "get",
         "/staffs",
         (res) => {
           const { data, meta } = res.data;
@@ -71,7 +71,8 @@ const CheckpointEvaluation = () => {
           setTempPageInput(meta.page_info.page + 1);
         },
         { onError: (err) => console.error("Error fetching staff data:", err) },
-        payload
+        null,
+        {params: payload}
       );
     } catch (error) {
       console.error("Error fetching staff data:", error);
@@ -82,12 +83,13 @@ const CheckpointEvaluation = () => {
 
   const fetchPeriods = async () => {
     try {
-      const payload = { name: null, status: "ACTIVE", pageable_request: null };
+      const payload = { name: null, status: "ACTIVE" };
       request(
         "get",
-        "/checkpoint/periods",
+        "/checkpoints/periods",
         (res) => setPeriods(res.data.data || []),
         { onError: (err) => console.error("Error fetching periods:", err) },
+        null,
         payload
       );
     } catch (error) {
@@ -99,7 +101,7 @@ const CheckpointEvaluation = () => {
     try {
       request(
         "get",
-        "/departments/",
+        "/departments",
         (res) => setDepartments(res.data.data || []),
         { onError: (err) => console.error("Error fetching departments:", err) },
         {}
@@ -126,13 +128,12 @@ const CheckpointEvaluation = () => {
   const fetchCheckpointData = async () => {
     if (!selectedPeriod) return;
     const payload = {
-      period_id: selectedPeriod.id,
-      user_ids: staffData.map((staff) => staff.user_login_id),
+      user_ids: staffData.map((staff) => staff.user_login_id)
     };
     try {
       request(
         "get",
-        "/checkpoints",
+        `/checkpoints/${selectedPeriod.id}`,
         (res) => {
           const { data } = res.data;
           const points = {};

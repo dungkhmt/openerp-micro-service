@@ -60,7 +60,7 @@ const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
 
       request(
           "get",
-          "/departments/",
+          "/departments",
           (res) => {
             const data = res.data.data || [];
             setDepartments(data);
@@ -79,6 +79,7 @@ const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
             }
           },
           { onError: (err) => console.error("Error fetching departments:", err) },
+        null,
           payload
       );
     } catch (error) {

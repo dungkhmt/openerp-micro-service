@@ -14,11 +14,9 @@ import java.util.UUID;
 @Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GetAllCheckpointRequest {
-    @NotNull
-    private UUID periodId;
     private List<String> userIds;
 
-    public GetAllCheckpoint toUseCase(){
+    public GetAllCheckpoint toUseCase(UUID periodId){
         return GetAllCheckpoint.builder()
                 .periodId(periodId)
                 .userIds(userIds)

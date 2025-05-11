@@ -51,10 +51,13 @@ const WeeklyAbsencePage = () => {
         "/staffs/details",
         (res) => resolve(res.data?.data || []),
         {},
+        null,
         {
-          department_code: selectedDept?.department_code || null,
-          job_position_code: selectedPos?.code || null,
-          status: "ACTIVE",
+          params: {
+            department_code: selectedDept?.department_code || null,
+            job_position_code: selectedPos?.code || null,
+            status: "ACTIVE",
+          }
         }
       );
     });
@@ -133,7 +136,7 @@ const WeeklyAbsencePage = () => {
         <Grid item xs={12} md={3}>
           <SearchSelect
             label="Phòng ban"
-            fetchUrl="/departments/"
+            fetchUrl="/departments"
             value={selectedDept}
             onChange={setSelectedDept}
             getOptionLabel={(item) => item.department_name}

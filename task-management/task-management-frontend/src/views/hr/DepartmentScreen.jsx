@@ -46,7 +46,7 @@ const DepartmentTable = () => {
     try {
       request(
         "get",
-        "/departments/",
+        "/departments",
         (res) => {
           const { data: departments, meta } = res.data;
           const transformedDepartments = departments.map((dept) => ({
@@ -65,7 +65,10 @@ const DepartmentTable = () => {
         {
           onError: (err) => console.error("Error fetching data:", err),
         },
-        payload
+        null,
+        {
+          params: payload
+        }
       );
     } catch (error) {
       console.error("Error fetching data:", error);

@@ -76,7 +76,10 @@ const CheckpointConfigureScreen = () => {
           onError: (err) => console.error("Error fetching checkpoints:", err),
         },
         null,
-        payload
+        {
+          params : payload
+        }
+
       );
     } catch (error) {
       console.error("Error fetching checkpoints:", error);

@@ -21,7 +21,7 @@ public class CheckpointController extends BeanAwareUseCasePublisher {
     @PostMapping("")
     public ResponseEntity<?> checkpointStaff(
             Principal principal,
-            @Valid @RequestBody CheckpointStaffRequest request
+            @Valid @ModelAttribute CheckpointStaffRequest request
     ){
         request.setCheckedByUserId(principal.getName());
         var model = publish(CheckpointModel.class, request.toUseCase());
@@ -31,11 +31,12 @@ public class CheckpointController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @GetMapping("")
+    @GetMapping("/{periodId}")
     public ResponseEntity<?> getAllCheckpoint(
-            @Valid @RequestBody GetAllCheckpointRequest request
+        @PathVariable UUID periodId,
+            @Valid @ModelAttribute GetAllCheckpointRequest request
     ) {
-        var checkpoints = publishCollection(CheckpointModel.class, request.toUseCase());
+        var checkpoints = publishCollection(CheckpointModel.class, request.toUseCase(periodId));
         var response = checkpoints.stream()
                 .map(CheckpointResponse::fromModel)
                 .toList();

@@ -65,7 +65,8 @@ const JobPositionTable = () => {
         {
           onError: (err) => console.error("Error fetching data:", err),
         },
-        payload
+        null,
+        {params: payload}
       );
     } catch (error) {
       console.error("Error fetching data:", error);

@@ -50,14 +50,14 @@ const AddDepartmentModal = ({ open, onClose, onSubmit, initialValues }) => {
         : "post";
       const endpoint = initialValues
         ? `/departments/${initialValues.departmentCode}`
-        : "/departments/";
+        : "/departments";
       request(
         methodURL,
         endpoint,
         (response) => {
-          onSubmit(); // Refresh parent data
-          onClose(); // Close the modal
-          setFormValues({ name: "", description: "" }); // Reset form
+          onSubmit();
+          onClose();
+          setFormValues({ name: "", description: "" });
         },
         {
           onError: (err) => {

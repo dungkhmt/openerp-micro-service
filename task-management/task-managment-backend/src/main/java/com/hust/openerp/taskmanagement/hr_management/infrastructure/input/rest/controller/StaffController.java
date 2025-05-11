@@ -64,7 +64,7 @@ public class  StaffController extends BeanAwareUseCasePublisher {
 
     @GetMapping("")
     public ResponseEntity<?> searchStaff(
-            @Valid @RequestBody SearchStaffRequest request
+            @Valid @ModelAttribute SearchStaffRequest request
     ){
         var staffPage = publishPageWrapper(StaffModel.class, request.toUseCase());
         var responsePage = staffPage.convert(StaffResponse::fromModel);
@@ -73,9 +73,9 @@ public class  StaffController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("/details")
+    @GetMapping("/details")
     public ResponseEntity<?> getAllStaffInfo(
-            @Valid @RequestBody GetAllStaffInfoRequest request
+            @Valid @ModelAttribute GetAllStaffInfoRequest request
     ){
         var staffPage = publishPageWrapper(StaffDetailModel.class, request.toUseCase());
         var responsePage = staffPage.convert(StaffDetailResponse::fromModel);

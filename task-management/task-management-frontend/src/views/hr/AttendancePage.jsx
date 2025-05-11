@@ -59,14 +59,18 @@ const AttendancePage = () => {
           resolve(list);
         },
         {},
+        null,
         {
-          fullname: searchName || null,
-          department_code: selectedDept?.department_code || null,
-          job_position_code: selectedPos?.code || null,
-          status: "ACTIVE",
-          page,
-          page_size: size
+          params:        {
+            fullname: searchName || null,
+            department_code: selectedDept?.department_code || null,
+            job_position_code: selectedPos?.code || null,
+            status: "ACTIVE",
+            page,
+            page_size: size
+          }
         }
+
       );
     });
   };
@@ -74,15 +78,22 @@ const AttendancePage = () => {
   const fetchAttendances = async (employeeList) => {
     const userIds = employeeList.map((e) => e.user_login_id);
     request(
-      "post",
-      "/month-attendance",
+      "get",
+      "/checkinout",
       (res) => {
         setAttendances(res.data?.data?.user_attendances || {});
       },
-      {},
       {
-        user_ids: userIds,
-        month: `${selectedMonth.getFullYear()}-${String(selectedMonth.getMonth() + 1).padStart(2, "0")}`,
+        onError: (err) => {
+          console.error("Failed to load attendance", err);
+        },
+      },
+      null,
+      {
+        params: {
+          userIds: userIds.join(","),
+          month: `${selectedMonth.getFullYear()}-${String(selectedMonth.getMonth() + 1).padStart(2, "0")}`,
+        }
       }
     );
   };
@@ -155,7 +166,7 @@ const AttendancePage = () => {
         <Grid item xs={12} md={2}>
           <SearchSelect
             label="Phòng ban"
-            fetchUrl="/departments/"
+            fetchUrl="/departments"
             value={selectedDept}
             onChange={setSelectedDept}
             getOptionLabel={(item) => item.department_name}

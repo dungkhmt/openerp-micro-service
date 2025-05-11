@@ -71,7 +71,8 @@ const EmployeeManagement = () => {
         {
           onError: (err) => console.error("Error fetching employees:", err),
         },
-        payload
+        null,
+        {params: payload}
       );
     } catch (error) {
       console.error("Error fetching employees:", error);
@@ -83,7 +84,7 @@ const EmployeeManagement = () => {
     try {
       request(
         "get",
-        "/departments/",
+        "/departments",
         (res) => {
           setDepartments(res.data.data || []);
         },

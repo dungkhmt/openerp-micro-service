@@ -11,18 +11,15 @@ import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.d
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkinout.response.MonthAttendanceResponse;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/checkinout")
 public class CheckinoutController extends BeanAwareUseCasePublisher {
 
-    @PostMapping("checkinout")
+    @PostMapping("")
     public ResponseEntity<?> checkinout(Principal principal){
         publish(Checkinout.from(principal.getName()));
         return ResponseEntity.ok().body(
@@ -30,9 +27,9 @@ public class CheckinoutController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("get-checkinout")
+    @GetMapping("/me")
     public ResponseEntity<?> getCheckinout(
-            @Valid @RequestBody GetCheckinoutRequest request,
+            @Valid @ModelAttribute GetCheckinoutRequest request,
             Principal principal
     ){
         var models = publishCollection(CheckinoutModel.class, request.toUseCase(principal.getName()));
@@ -41,9 +38,9 @@ public class CheckinoutController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("month-attendance")
+    @GetMapping("")
     public ResponseEntity<?> getMonthAttendance(
-            @Valid @RequestBody MonthAttendanceRequest request
+            @Valid @ModelAttribute MonthAttendanceRequest request
     ){
         var models = publishCollection(AttendanceModel.class, request.toUseCase());
         return ResponseEntity.ok().body(

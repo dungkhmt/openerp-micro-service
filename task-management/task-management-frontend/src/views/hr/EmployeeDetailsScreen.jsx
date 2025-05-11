@@ -23,7 +23,7 @@ const EmployeeDetails = () => {
       const payload = { staff_code: staffCode };
       try {
         request(
-          "post",
+          "get",
           `/staffs/${staffCode}`,
           (res) => {
             const data = res.data?.data;
@@ -49,7 +49,7 @@ const EmployeeDetails = () => {
     const fetchJobHistory = async (userLoginId) => {
       if (!userLoginId) return;
       request(
-        "post",
+        "get",
         `/staffs/${userLoginId}/job-position`,
         (res) => {
           const history = res.data?.data || [];
@@ -68,7 +68,7 @@ const EmployeeDetails = () => {
     const fetchDepartmentHistory = async (userLoginId) => {
       if (!userLoginId) return;
       request(
-        "post",
+        "get",
         `/staffs/${userLoginId}/department`,
         (res) => {
           const history = res.data?.data || [];

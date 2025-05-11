@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/departments")
 public class DepartmentController extends BeanAwareUseCasePublisher {
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<?> createDepartment(
             @Valid @RequestBody CreateDepartmentRequest request
     ){

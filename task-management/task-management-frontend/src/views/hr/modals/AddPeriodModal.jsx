@@ -110,7 +110,8 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues }) => {
           onError: (err) =>
             console.error("Error fetching available configures:", err),
         },
-        payload
+        null,
+        {params: payload}
       );
     } catch (error) {
       console.error("Error fetching available configures:", error);

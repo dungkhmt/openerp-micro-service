@@ -35,13 +35,13 @@ const Timesheet = () => {
   }, [checkInTime]);
 
   const fetchData = async () => {
-    const today = currentTime.toISOString().split("T")[0];
+    const today = currentTime.toLocaleDateString("en-CA").split("T")[0];
     const payload = { date: today };
 
     try {
       request(
-        "post",
-        "/get-checkinout",
+        "get",
+        "/checkinout/me",
         (res) => {
           const data = res.data?.data || [];
           setCheckData(data);
@@ -69,7 +69,8 @@ const Timesheet = () => {
             console.error(err);
           },
         },
-        payload
+        null,
+        {params: payload}
       );
     } catch (err) {
       console.error(err);

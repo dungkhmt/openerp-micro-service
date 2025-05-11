@@ -69,7 +69,7 @@ const CheckpointPeriodScreen = () => {
     try {
       request(
         "get",
-        "/checkpoint/periods",
+        "/checkpoints/periods",
         (res) => {
           const { data: periods, meta } = res.data;
           setData(periods || []);
