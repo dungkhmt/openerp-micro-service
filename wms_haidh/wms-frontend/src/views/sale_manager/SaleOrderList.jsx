@@ -24,9 +24,7 @@ import { formatDate, formatPrice } from '../../utils/utils';
 const statusColorMap = {
   CREATED: "default",
   CANCELLED: "destructive",
-  APPROVED: "secondary",
-  DELIVERING: "warning",
-  COMPLETED: "success",
+  APPROVED: "success"
 };
 
 const INITIAL_VISIBLE_COLUMNS = ["orderDate", "customerName", "totalOrderCost", "status", "approvedBy", "cancelledBy", "actions"];

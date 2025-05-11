@@ -23,8 +23,8 @@ import { request } from "../../../api";
 import { formatDate, formatPrice } from '../../../utils/utils';
 const statusColorMap = {
   APPROVED: "secondary",
-  DELIVERING: "warning",
-  COMPLETED: "success",
+  IN_PROGRESS: "warning",
+  ASSIGNED: "success",
 };
 
 const INITIAL_VISIBLE_COLUMNS = ["orderDate", "customerName", "totalOrderCost", "status", "approvedBy", "actions"];

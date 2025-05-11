@@ -42,7 +42,7 @@ public class OrderService {
 		return orderRepository.findCustomerOrderById(orderId);
 	}
 
-	public Order markAsCompleted(UUID orderId) {
+	public Order markOrderAsCompleted(UUID orderId) {
 		Order order = getOrderById(orderId);
 		order.setStatus("COMPLETED");
 		order.setLastUpdatedStamp(LocalDateTime.now());

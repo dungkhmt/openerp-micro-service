@@ -67,9 +67,12 @@ public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripIt
 	@Query("SELECT COUNT(d) FROM DeliveryTripItem d " + "WHERE d.deliveryTripId = :tripId "
 			+ "AND d.status <> 'DELIVERED' " + "AND d.isDeleted = false")
 	long countUndeliveredItems(@Param("tripId") String tripId);
-	
+
+	@Query("SELECT COUNT(d) FROM DeliveryTripItem d " + "WHERE d.orderId = :orderId " + "AND d.status <> 'DELIVERED' "
+			+ "AND d.isDeleted = false")
+	long countUndeliveredItemsByOrderId(@Param("orderId") UUID orderId);
+
 	@Query("SELECT DISTINCT d.orderId FROM DeliveryTripItem d WHERE d.deliveryTripId = :deliveryTripId")
 	List<UUID> findOrderIdsByDeliveryTripId(@Param("deliveryTripId") String deliveryTripId);
-
 
 }

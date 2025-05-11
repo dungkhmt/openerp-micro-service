@@ -50,8 +50,10 @@ public interface AssignedOrderItemRepository extends JpaRepository<AssignedOrder
 			    FROM AssignedOrderItem aoi
 			    JOIN Product p ON aoi.productId = p.productId
 			    JOIN Bay b ON aoi.bayId = b.bayId
+			    JOIN Order o ON aoi.orderId = o.orderId
 			    WHERE aoi.warehouseId = :warehouseId
 			    AND aoi.status = 'CREATED'
+			    AND o.status = 'ASSIGNED'
 			""")
 	Page<DeliveryOrderItemProjection> findAllDeliveryOrderItemsByWarehouse(@Param("warehouseId") UUID warehouseId,
 			Pageable pageable);

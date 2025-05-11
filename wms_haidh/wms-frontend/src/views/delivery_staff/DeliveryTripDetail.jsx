@@ -174,7 +174,7 @@ const DeliveryTripDetail = () => {
                   View Items
                 </Button>
 
-                {generalInfo && generalInfo.status === 'DELIVERING' && item.status === 'CREATED' && (
+                {generalInfo && generalInfo.status === 'STARTED' && item.status === 'CREATED' && (
                   <Stack direction="row" spacing={1}>
                     <Button
                       variant="contained"

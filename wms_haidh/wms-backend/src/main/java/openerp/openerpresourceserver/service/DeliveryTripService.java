@@ -120,7 +120,7 @@ public class DeliveryTripService {
 			
 			if ("CREATED".equals(trip.getStatus())) {
 								
-				trip.setStatus("DELIVERING");
+				trip.setStatus("STARTED");
 				deliveryTripRepository.save(trip);
 				
 				List<UUID> orderIds = deliveryTripItemService.findOrderIdsByDeliveryTripId(deliveryTripId);
@@ -154,7 +154,11 @@ public class DeliveryTripService {
         if (notYetDelivered == 0) {
             deliveryTripRepository.markTripAsDone(deliveryTripId);
         }
-        orderService.markAsCompleted(orderId);
+        
+        long notYetDeliveredInOrder = deliveryTripItemService.countUndeliveredItemsByOrderId(orderId);
+        if (notYetDeliveredInOrder == 0) {
+            orderService.markOrderAsCompleted(orderId);
+        }
         return updatedCount;
     }
 

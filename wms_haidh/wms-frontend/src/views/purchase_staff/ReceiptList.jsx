@@ -25,9 +25,7 @@ import { formatDate } from '../../utils/utils';
 const statusColorMap = {
   CREATED: "default",
   CANCELLED: "destructive",
-  APPROVED: "secondary",
-  IN_PROGRESS: "warning",
-  COMPLETED: "success",
+  APPROVED: "success"
 };
 
 

@@ -65,6 +65,11 @@ public class DeliveryTripItemService {
     public long countUndeliveredItems(String deliveryTripId) {
         return deliveryTripItemRepository.countUndeliveredItems(deliveryTripId);
     }
+    
+    public long countUndeliveredItemsByOrderId(UUID orderId) {
+        return deliveryTripItemRepository.countUndeliveredItemsByOrderId(orderId);
+    }
+
 
 	public List<UUID> findOrderIdsByDeliveryTripId(String deliveryTripId) {
 		return deliveryTripItemRepository.findOrderIdsByDeliveryTripId(deliveryTripId);
