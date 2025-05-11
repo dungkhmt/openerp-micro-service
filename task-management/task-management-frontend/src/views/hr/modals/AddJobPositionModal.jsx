@@ -54,7 +54,7 @@ const AddJobPositionModal = ({ open, onClose, onSubmit, initialValues }) => {
     try {
       const endpoint = initialValues
         ? `/jobs/${initialValues.code}`
-        : "/jobs/";
+        : "/jobs";
 
       const methodURL = initialValues
         ? `put`

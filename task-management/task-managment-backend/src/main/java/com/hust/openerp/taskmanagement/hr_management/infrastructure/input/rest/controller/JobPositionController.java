@@ -6,7 +6,6 @@ import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanA
 import com.hust.openerp.taskmanagement.hr_management.domain.model.JobPositionModel;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.job_position.request.CreateJobPositionRequest;
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.job_position.request.DeleteJobPositionRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.job_position.request.GetJobPositionRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.job_position.request.UpdateJobPositionRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.job_position.response.JobPositionResponse;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/jobs")
 public class JobPositionController extends BeanAwareUseCasePublisher {
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<?> createJobPosition(
             @Valid @RequestBody CreateJobPositionRequest request
     ){
@@ -47,18 +46,7 @@ public class JobPositionController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @GetMapping("/")
-    public ResponseEntity<?> getJobPosition(
-            @Valid @RequestBody GetJobPositionRequest request
-    ){
-        var modelPage = publishPageWrapper(JobPositionModel.class, request.toUseCase());
-        var responsePage = modelPage.convert(JobPositionResponse::fromModel);
-        return ResponseEntity.ok().body(
-                new Resource(responsePage)
-        );
-    }
-
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<?> getJobPositions(
         @Valid @ModelAttribute GetJobPositionRequest request
     ){

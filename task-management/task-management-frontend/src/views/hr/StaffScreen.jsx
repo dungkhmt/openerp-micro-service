@@ -99,7 +99,7 @@ const EmployeeManagement = () => {
     try {
       request(
         "get",
-        "/jobs/",
+        "/jobs",
         (res) => {
           setJobPositions(res.data.data || []);
         },

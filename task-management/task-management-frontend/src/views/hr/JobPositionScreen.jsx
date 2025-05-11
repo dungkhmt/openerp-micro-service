@@ -46,7 +46,7 @@ const JobPositionTable = () => {
     try {
       request(
         "get",
-        "/jobs/",
+        "/jobs",
         (res) => {
           const { data: jobs, meta } = res.data;
           // Convert snake_case to camelCase

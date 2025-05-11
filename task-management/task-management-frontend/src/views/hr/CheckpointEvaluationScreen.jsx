@@ -113,7 +113,7 @@ const CheckpointEvaluation = () => {
     try {
       request(
         "get",
-        "/jobs/",
+        "/jobs",
         (res) => setJobPositions(res.data.data || []),
         { onError: (err) => console.error("Error fetching job positions:", err) },
         {}

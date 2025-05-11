@@ -101,7 +101,7 @@ const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
 
       request(
           "get",
-          "/jobs/",
+          "/jobs",
           (res) => {
             const data = res.data.data || [];
             setJobPositions(data);

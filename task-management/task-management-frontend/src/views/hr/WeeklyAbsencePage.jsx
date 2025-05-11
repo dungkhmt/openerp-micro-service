@@ -144,7 +144,7 @@ const WeeklyAbsencePage = () => {
         <Grid item xs={12} md={3}>
           <SearchSelect
             label="Chức vụ"
-            fetchUrl="/jobs/"
+            fetchUrl="/jobs"
             value={selectedPos}
             onChange={setSelectedPos}
             getOptionLabel={(item) => item.name}
