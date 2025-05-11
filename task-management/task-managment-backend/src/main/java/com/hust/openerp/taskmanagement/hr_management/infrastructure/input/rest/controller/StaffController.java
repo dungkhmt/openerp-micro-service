@@ -2,7 +2,6 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.EditStaff;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.GetStaffInfo;
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.salary.request.UpdateSalaryRequest;
 import jakarta.validation.Valid;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffDetailModel;
@@ -85,12 +84,13 @@ public class  StaffController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PutMapping("/{staffCode}")
+    @GetMapping("/{staffCode}")
     public ResponseEntity<?> getStaffInfo(
-        @PathVariable String staffCode,
-        @Valid @RequestBody UpdateSalaryRequest request
+        @PathVariable String staffCode
     ){
-        var staff = publish(StaffDetailModel.class, request.toUseCase());
+        var staff = publish(StaffDetailModel.class, GetStaffInfo.builder()
+            .staffCode(staffCode)
+            .build());
         return ResponseEntity.ok().body(
                 new Resource(StaffDetailResponse.fromModel(staff))
         );
