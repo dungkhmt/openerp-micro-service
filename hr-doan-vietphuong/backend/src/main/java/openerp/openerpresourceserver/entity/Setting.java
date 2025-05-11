@@ -19,10 +19,14 @@ import java.time.LocalDateTime;
 public class Setting {
     @Id
     private String key;
+
+    @Column(name = "value", columnDefinition = "text")
     private String value;
+
     @Column(name = "updated_at")
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
     @Column(name = "updated_by")
     private String updateBy;
 }

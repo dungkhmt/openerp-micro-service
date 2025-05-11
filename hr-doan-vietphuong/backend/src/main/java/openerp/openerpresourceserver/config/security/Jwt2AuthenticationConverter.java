@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.config.security;
 import openerp.openerpresourceserver.entity.Employee;
 import openerp.openerpresourceserver.enums.StatusEnum;
 import openerp.openerpresourceserver.repo.EmployeeRepository;
+import openerp.openerpresourceserver.service.UserService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,10 +18,12 @@ public class Jwt2AuthenticationConverter implements Converter<Jwt, AbstractAuthe
 
     private Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter;
     private final EmployeeRepository employeeRepository;
+    private final UserService userService;
     private String principalClaimName = "preferred_username";
 
-    public Jwt2AuthenticationConverter(EmployeeRepository employeeRepository) {
+    public Jwt2AuthenticationConverter(UserService userService, EmployeeRepository employeeRepository) {
         this.jwtGrantedAuthoritiesConverter = new Jwt2AuthoritiesConverter();
+        this.userService = userService;
         this.employeeRepository = employeeRepository;
     }
 
@@ -32,6 +35,15 @@ public class Jwt2AuthenticationConverter implements Converter<Jwt, AbstractAuthe
         if (userLoginId == null) {
             throw new IllegalArgumentException("Preferred username claim is missing in JWT");
         }
+
+        // Đăng ký keycloak lần đầu thì lưu vào bảng user_login
+        userService.synchronizeUser(
+                jwt.getClaim("preferred_username"),
+                jwt.getClaim("email"),
+                jwt.getClaim("given_name"),
+                jwt.getClaim("family_name")
+        );
+
         // Tra cứu người dùng từ cơ sở dữ liệu
         Employee employee = employeeRepository.findByUserIdAndStatus(userLoginId, StatusEnum.ACTIVE.ordinal())
                 .orElseThrow(() -> new IllegalArgumentException("User with user login id " + userLoginId + " not found or inactive"));

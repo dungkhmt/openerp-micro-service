@@ -14,7 +14,7 @@ public class AbsenceSpecification {
             if (email == null) {
                 return builder.conjunction();
             }
-            return builder.equal(root.get("user").get("email"), email);
+            return builder.equal(root.get("employee").get("email"), email);
         };
     }
 
@@ -57,7 +57,7 @@ public class AbsenceSpecification {
     }
 
     public static Specification<Absence> hasNotUserEmail(String email) {
-        return (root, query, builder) -> builder.notEqual(root.get("user").get("email"), email);
+        return (root, query, builder) -> builder.notEqual(root.get("employee").get("email"), email);
     }
 
     public static Specification<Absence> hasLeadId(Long leadId) {

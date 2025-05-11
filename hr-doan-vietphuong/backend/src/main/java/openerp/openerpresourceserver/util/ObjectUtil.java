@@ -6,6 +6,10 @@ import java.time.LocalDateTime;
 
 @UtilityClass
 public class ObjectUtil {
+    public record RGBColor(int red,
+                           int green,
+                           int blue) {
+    }
 
     public record AttendanceRangeTime(LocalDateTime startTime, LocalDateTime endTime) {
     }

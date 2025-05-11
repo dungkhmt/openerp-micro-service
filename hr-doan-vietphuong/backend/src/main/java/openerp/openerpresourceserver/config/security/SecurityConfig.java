@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.config.security;
 
 import openerp.openerpresourceserver.enums.RoleEnum;
 import openerp.openerpresourceserver.repo.EmployeeRepository;
+import openerp.openerpresourceserver.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,10 +12,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
     private final EmployeeRepository employeeRepository;
+    private final UserService userService;
 
-    public SecurityConfig(EmployeeRepository userRepository) {
+    public SecurityConfig(UserService userService, EmployeeRepository userRepository) {
+        this.userService = userService;
         this.employeeRepository = userRepository;
     }
 
@@ -37,7 +39,7 @@ public class SecurityConfig {
 
     @Bean
     public Jwt2AuthenticationConverter jwtAuthenticationConverter() {
-        Jwt2AuthenticationConverter converter = new Jwt2AuthenticationConverter(employeeRepository);
+        Jwt2AuthenticationConverter converter = new Jwt2AuthenticationConverter(userService, employeeRepository);
         converter.setJwtGrantedAuthoritiesConverter(new Jwt2AuthoritiesConverter());
         converter.setPrincipalClaimName("preferred_username");
         return converter;

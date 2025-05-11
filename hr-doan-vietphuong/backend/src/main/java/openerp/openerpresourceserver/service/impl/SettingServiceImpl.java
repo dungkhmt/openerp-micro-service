@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +14,12 @@ import openerp.openerpresourceserver.enums.SettingEnum;
 import openerp.openerpresourceserver.exception.InternalServerException;
 import openerp.openerpresourceserver.repo.SettingRepository;
 import openerp.openerpresourceserver.service.SettingService;
+import openerp.openerpresourceserver.util.ObjectUtil;
 import openerp.openerpresourceserver.util.SecurityUtil;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -64,6 +67,21 @@ public class SettingServiceImpl implements SettingService {
                 attendanceDateRangeMapper.getEndDay(),
                 monthValue,
                 yearValue);
+    }
+
+    @Override
+    public Map<String, ObjectUtil.RGBColor> getReportColors() {
+        Setting setting = settingRepository.findById(SettingEnum.REPORT_COLORS.name()).get();
+        String value = setting.getValue();
+        Map<String, ObjectUtil.RGBColor> reportColorMap = null;
+        try {
+            reportColorMap =
+                    objectMapper.readValue(value, new TypeReference<Map<String, ObjectUtil.RGBColor>>() {
+                    });
+        } catch (JsonProcessingException e) {
+            throw new InternalServerException(e.getMessage());
+        }
+        return reportColorMap;
     }
 
     @Getter

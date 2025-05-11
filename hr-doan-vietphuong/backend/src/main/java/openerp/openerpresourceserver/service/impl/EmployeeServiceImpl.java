@@ -114,7 +114,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                                 .organizationId(organization.getId())
                                 .organizationName(organization.getName())
                                 .startDate(LocalDate.now())
-                                .endDate(LocalDate.now())
+                                .endDate(null)
                                 .createdBy(SecurityUtil.getUserEmail())
                                 .build()
                 ))
