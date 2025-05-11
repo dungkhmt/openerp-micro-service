@@ -13,5 +13,4 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ShipmentCreateRequest {
 	private LocalDateTime expectedDeliveryStamp;
-    private String createdBy;
 }

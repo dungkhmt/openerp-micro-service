@@ -1,12 +1,12 @@
 import { Routes, Route } from "react-router-dom";
 import DeliveryTripDetail from "../views/delivery_manager/delivery_trip/DeliveryTripDetail";
-import DeliveryTrip from "../views/delivery_manager/delivery_trip/DeliveryTrip";
+import DeliveryTrip from "../views/delivery_manager/delivery_trip/DeliveryTripList";
 import AddTrip from "../views/delivery_manager/delivery_trip/AddTrip";
 import DeliveryTripItem from "../views/delivery_manager/delivery_trip/DeliveryTripItem";
-import DeliveryPerson from "../views/delivery_manager/delivery_person/DeliveryPerson";
-import Shipment from "../views/delivery_manager/shipment/Shipment";
+import DeliveryPerson from "../views/delivery_manager/delivery_person/DeliveryPersonList";
+import Shipment from "../views/delivery_manager/shipment/ShipmentList";
 import ShipmentDetail from "../views/delivery_manager/shipment/ShipmentDetail";
-import Distance from "../views/delivery_manager/distance/Distance";
+import Distance from "../views/delivery_manager/distance/DistanceList";
 import RoutingRecommendation from "../views/delivery_manager/shipment/RoutingRecommendation";
 import RoutingResult from "../views/delivery_manager/shipment/RoutingResult";
 

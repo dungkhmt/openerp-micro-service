@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class CustomerAddressCreateRequest {
-    private String userLoginId;
     private String addressName;
     private Double longitude;
     private Double latitude;

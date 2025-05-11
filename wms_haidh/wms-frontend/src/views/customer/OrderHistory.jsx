@@ -27,7 +27,6 @@ const OrderHistory = () => {
     const [loading, setLoading] = useState(false);
     const [totalItems, setTotalItems] = useState(0);
 
-    const userLoginId = 'hoanglotar2000';
     const breadcrumbPaths = [
         { label: "Home", link: "/" },
         { label: "Order history", link: "/order-history" }
@@ -36,7 +35,7 @@ const OrderHistory = () => {
 
     useEffect(() => {
         setLoading(true);
-        request("get", `/orders/by-user?userLoginId=${userLoginId}&page=${page}&size=${rowsPerPage}`, (res) => {
+        request("get", `/orders/by-user?page=${page}&size=${rowsPerPage}`, (res) => {
             setOrders(res.data.content);
             setTotalItems(res.data.totalElements);
             setLoading(false);

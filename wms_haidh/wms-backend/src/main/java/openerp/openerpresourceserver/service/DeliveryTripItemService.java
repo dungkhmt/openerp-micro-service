@@ -56,7 +56,19 @@ public class DeliveryTripItemService {
 	public List<UUID> findIdsByDeliveryTripId(String deliveryTripId) {
 		return deliveryTripItemRepository.findIdsByDeliveryTripId(deliveryTripId);
 	}
+	
+	@Transactional
+    public int markItemsAsDelivered(String deliveryTripId, UUID orderId) {
+        return deliveryTripItemRepository.markItemsAsDelivered(deliveryTripId, orderId);
+    }
 
+    public long countUndeliveredItems(String deliveryTripId) {
+        return deliveryTripItemRepository.countUndeliveredItems(deliveryTripId);
+    }
+
+	public List<UUID> findOrderIdsByDeliveryTripId(String deliveryTripId) {
+		return deliveryTripItemRepository.findOrderIdsByDeliveryTripId(deliveryTripId);
+	}
 
 
 }

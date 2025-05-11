@@ -18,5 +18,4 @@ public class AssignedOrderItemCreateRequest {
 	private String lotId;
 	private int quantity;
 	private UUID saleOrderItemId;
-	private String assignedBy;
 }

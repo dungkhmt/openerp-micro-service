@@ -24,7 +24,6 @@ const OrderDetail = () => {
     const [generalInfo, setGeneralInfo] = useState(null);
     const [customerInfo, setCustomerInfo] = useState(null);
     const [details, setDetails] = useState([]);
-    const userLoginId = "hoanglotar2000";
 
     const breadcrumbPaths = [
         { label: "Home", link: "/" },
@@ -48,7 +47,7 @@ const OrderDetail = () => {
     }, [orderId]);
 
     const handleCancel = () => {
-        request('post', `/orders/${orderId}/cancel?cancelledBy=${userLoginId}`, (res) => {
+        request('post', `/orders/${orderId}/cancel`, (res) => {
             if (res.status === 200) {
                 alert('Order cancelled successfully!');
                 navigate('/customer/order-history');

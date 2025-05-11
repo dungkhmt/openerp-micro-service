@@ -151,8 +151,7 @@ const RoutingResult = () => {
                     assignedOrderItemId: itemId,
                     sequence: trip.itemSequences[idx],
                     quantity: deliveryItemInfoMap[itemId]?.originalQuantity,
-                })),
-                assignedBy: "hoanglotar2000"
+                }))
             };
         });
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router-dom';
 import { request } from "../../../api";
@@ -9,16 +9,12 @@ import {
   Button,
   Paper,
   IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow
+  Stack
 } from '@mui/material';
 import Map from '../../../components/Map';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import { formatDate } from '../../../utils/utils';
+import PhoneIcon from '@mui/icons-material/Phone';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 const DeliveryTripDetail = () => {
   const navigate = useNavigate();
@@ -42,8 +38,10 @@ const DeliveryTripDetail = () => {
   const handleSubmit = async () => {
     request("post", `/delivery-trips/${id}/cancel`, (res) => {
       if (res.status === 200) {
-        alert("Trip cancelled successfully !")
+        alert("Trip cancelled successfully !");
         navigate(`/delivery-manager/delivery-trip`); // Redirect after success
+      } else {
+        alert("Error occurred while canceling trip !");
       }
     }, {});
   };
@@ -129,40 +127,45 @@ const DeliveryTripDetail = () => {
               Total locations : {deliverySequence.length}
             </Typography>
           </div>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>#</TableCell>
-                  <TableCell align="center">Customer Name</TableCell>
-                  <TableCell align="center">Phone Number</TableCell>
-                  <TableCell>Customer Address</TableCell>
-                  <TableCell align="center" >Items</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {deliverySequence &&
-                  deliverySequence.map(item => (
-                    <TableRow key={item.orderId}>
-                      <TableCell>{item.sequence}</TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>{item.customerName}</TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>{item.customerPhoneNumber}</TableCell>
-                      <TableCell>{item.customerAddress}</TableCell>
-                      {/* Action Icon */}
-                      <TableCell sx={{ textAlign: 'center' }}>
-                        <IconButton
-                          color="primary"
-                          onClick={() => navigate(`/delivery-manager/delivery-trip/${id}/${item.orderId}`)}
-                        >
-                          <VisibilityIcon />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <Stack spacing={2}>
+            {deliverySequence && deliverySequence.map((item) => (
+              <Paper key={item.orderId} elevation={2} sx={{ p: 2, mb: 2 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                  #{item.sequence} - {item.customerName}
+                </Typography>
 
+                <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 1 }}>
+                  <PhoneIcon fontSize="small" />
+                  <Typography>{item.customerPhoneNumber}</Typography>
+                </Stack>
+
+                <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 1 }}>
+                  <LocationOnIcon fontSize="small" />
+                  <Typography>{item.customerAddress}</Typography>
+                </Stack>
+
+                <Typography sx={{ mt: 1 }}>
+                  <strong>Status:</strong> {item.status}
+                </Typography>
+
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                  {/* Left side: View Items */}
+                  <Button
+                    variant="contained"
+                    sx={{
+                      backgroundColor: 'black',
+                      color: 'white',
+                      '&:hover': { backgroundColor: 'black', opacity: 0.75 }
+                    }}
+                    onClick={() => navigate(`/delivery-staff/delivery-trip/${id}/${item.orderId}`)}
+                  >
+                    View Items
+                  </Button>
+                </Box>
+
+              </Paper>
+            ))}
+          </Stack>
         </Paper>
 
 
@@ -198,7 +201,7 @@ const DeliveryTripDetail = () => {
                     textAlign: 'center'
                   }}
                 >
-                  Optimized Delivery Route
+                  Delivery Route
                 </Typography>
                 <Typography variant="h6" gutterBottom className="text-green-500" sx={{
                   textAlign: 'center',

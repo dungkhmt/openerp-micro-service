@@ -29,11 +29,7 @@ public class ReceiptService {
 		return receiptRepository.findReceiptsByStatus(status, pageable);
 	}
 
-	public Receipt createReceipt(ReceiptCreateRequest request) {
-
-		if (request.getCreatedBy() == null || request.getCreatedBy().isEmpty()) {
-			throw new IllegalArgumentException("CreatedBy cannot be empty");
-		}
+	public Receipt createReceipt(ReceiptCreateRequest request, String userLoginId) {
 
 		// Set timestamps
 		LocalDateTime now = LocalDateTime.now();
@@ -50,7 +46,7 @@ public class ReceiptService {
 				.receiptDate(receiptDateTime) // Converted to LocalDateTime
 				.warehouseId(request.getWarehouseId()).createdReason(request.getCreatedReason())
 				.expectedReceiptDate(expectedReceiptDateTime) // Converted to LocalDateTime
-				.status("CREATED").createdBy(request.getCreatedBy()).createdStamp(now).lastUpdatedStamp(now).build();
+				.status("CREATED").createdBy(userLoginId).createdStamp(now).lastUpdatedStamp(now).build();
 
 		// Save to database
 		return receiptRepository.save(receipt);

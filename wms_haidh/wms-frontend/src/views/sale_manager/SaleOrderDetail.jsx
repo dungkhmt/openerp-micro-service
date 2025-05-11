@@ -40,7 +40,7 @@ const SaleOrderDetail = () => {
   }, [orderId]);
 
   const handleApprove = () => {
-    request('post', `/orders/${orderId}/approve?approvedBy=admin`, (res) => {
+    request('post', `/orders/${orderId}/approve`, (res) => {
       if (res.status === 200) {
         alert('Order approved successfully!');
         navigate('/sale-manager/sale-order');
@@ -51,7 +51,7 @@ const SaleOrderDetail = () => {
   };
 
   const handleCancel = () => {
-    request('post', `/orders/${orderId}/cancel?cancelledBy=admin`, (res) => {
+    request('post', `/orders/${orderId}/cancel`, (res) => {
       if (res.status === 200) {
         alert('Order cancelled successfully!');
         navigate('/sale-manager/sale-order');
@@ -134,7 +134,7 @@ const SaleOrderDetail = () => {
           <Button variant="contained" color="error" onClick={handleCancel} sx={{ mr: 2 }}>
             Cancel
           </Button>
-          <Button variant="contained" color="primary" onClick={handleApprove}>
+          <Button variant="contained" color="success" onClick={handleApprove}>
             Approve
           </Button>
         </Box>)}

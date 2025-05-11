@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,6 +43,7 @@ public class ProductController {
 
 	private ProductService productService;
 
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping
 	public ResponseEntity<Page<ProductGeneralProjection>> getProductGeneralWithPaging(
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size,
@@ -53,6 +55,7 @@ public class ProductController {
 		return ResponseEntity.ok(products);
 	}
 
+	@Secured("ROLE_WMS_PURCHASE_STAFF")
 	@GetMapping("/inventory")
 	public ResponseEntity<Page<ProductInventoryProjection>> getProductInventoryWithPaging(
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size,
@@ -64,6 +67,7 @@ public class ProductController {
 		return ResponseEntity.ok(products);
 	}
 
+	@Secured("ROLE_WMS_ONLINE_CUSTOMER")
 	@GetMapping("/public")
 	public ResponseEntity<?> getProducts(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "3") int size, @RequestParam(required = false) String searchTerm,
@@ -80,6 +84,7 @@ public class ProductController {
 		}
 	}
 
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getProductDetail(@PathVariable("id") UUID productId) {
 		try {
@@ -95,6 +100,7 @@ public class ProductController {
 		}
 	}
 
+	@Secured("ROLE_WMS_ONLINE_CUSTOMER")
 	@GetMapping("/public/{id}")
 	public ResponseEntity<?> getPublicProductDetail(@PathVariable("id") UUID productId) {
 		try {
@@ -110,12 +116,14 @@ public class ProductController {
 		}
 	}
 
+	@Secured("ROLE_WMS_PURCHASE_STAFF")
 	@GetMapping("/names")
 	public ResponseEntity<List<ProductNameProjection>> searchProducts(@RequestParam("search") String searchTerm) {
 		List<ProductNameProjection> products = productService.searchProductNames(searchTerm);
 		return ResponseEntity.ok(products);
 	}
 
+	@Secured("ROLE_WMS_SALE_MANAGER")
 	@GetMapping("/price")
 	public ResponseEntity<Page<ProductPriceProjection>> getProductsWithPrice(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size, @RequestParam(required = false) String search) {
@@ -125,6 +133,7 @@ public class ProductController {
 		return ResponseEntity.ok(productList);
 	}
 
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@PostMapping
 	public ResponseEntity<String> createProduct(@RequestParam String productData,
 			@RequestParam(value = "image", required = false) MultipartFile imageFile) {
@@ -147,6 +156,7 @@ public class ProductController {
 		}
 	}
 
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@PostMapping("/update")
 	public ResponseEntity<String> updateProduct(@RequestParam String productData,
 			@RequestParam(value = "image", required = false) MultipartFile imageFile) {
@@ -169,6 +179,7 @@ public class ProductController {
 		}
 	}
 
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@PostMapping("/delete")
 	public ResponseEntity<String> deleteProduct(@RequestBody Map<String, Object> requestBody) {
 		try {

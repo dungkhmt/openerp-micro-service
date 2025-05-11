@@ -16,7 +16,6 @@ const Checkout = () => {
     const [savedAddresses, setSavedAddresses] = useState([]);
     const [cartItems, setCartItems] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
-    const userLoginId = 'hoanglotar2000';
 
     const breadcrumbPaths = [
         { label: "Home", link: "/" },
@@ -29,7 +28,7 @@ const Checkout = () => {
     const totalOrderCost = totalCost + deliveryFee;
 
     useEffect(() => {
-        request("get", `/customer-addresses?userLoginId=${userLoginId}`, (res) => {
+        request("get", `/customer-addresses`, (res) => {
             setSavedAddresses(res.data);
         }).then();
     }, [])
@@ -73,7 +72,6 @@ const Checkout = () => {
         }));
 
         const payload = {
-            userLoginId: userLoginId,
             deliveryFee,
             totalProductCost: totalCost,
             totalOrderCost,

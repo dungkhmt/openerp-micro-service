@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +29,7 @@ public class DeliveryPersonController {
 
 	private DeliveryPersonService deliveryPersonService;
 	
+	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@GetMapping("/paged")
 	public ResponseEntity<Page<DeliveryPerson>> getAllDeliveryPersons(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size,
@@ -37,11 +39,13 @@ public class DeliveryPersonController {
 		return ResponseEntity.ok(deliveryPersons);
 	}
 	
+	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@GetMapping("/all")
 	public List<DeliveryPersonProjection> getAllDeliveryPersons() {
 		return deliveryPersonService.getAllDeliveryPersons();
 	}
 	
+	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@GetMapping("/{userLoginId}")
     public ResponseEntity<DeliveryPerson> getDeliveryPersonById(@PathVariable String userLoginId) {
         return deliveryPersonService.getDeliveryPersonById(userLoginId)
@@ -49,12 +53,14 @@ public class DeliveryPersonController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 	
+	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@PostMapping
     public ResponseEntity<Boolean> createDeliveryPerson(@RequestBody DeliveryPersonCreateRequest request) {
 		boolean success = deliveryPersonService.createDeliveryPerson(request);
         return ResponseEntity.ok(success);
     }
 	
+	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@PostMapping("/update")
     public ResponseEntity<Boolean> updateDeliveryPerson(@RequestBody DeliveryPerson updatedPerson) {
         boolean success = deliveryPersonService.updateDeliveryPerson(updatedPerson);

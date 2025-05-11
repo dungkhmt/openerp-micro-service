@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ public class DeliveryTripPathController {
 
 	private DeliveryTripPathService deliveryTripPathService;
 	
+	@Secured({"ROLE_WMS_DELIVERY_PERSON","ROLE_WMS_DELIVERY_MANAGER"})
 	@GetMapping
 	public ResponseEntity<?> getDeliveryTripPaths(@RequestParam String deliveryTripId) {
 	    try {

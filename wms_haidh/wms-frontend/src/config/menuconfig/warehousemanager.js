@@ -1,4 +1,4 @@
-export const admin = {
+export const warehousemanager = {
   id: "MENU_WMSv2_ADMIN",
   icon: "AdminIcon",
   text: "Inventory Management",
@@ -6,14 +6,14 @@ export const admin = {
     {
       id: "MENU_WMSv2_ADMIN.WAREHOUSE",
       path: "/admin/warehouse",
-      isPublic: true,
+      isPublic: false,
       text: "Warehouses",
       child: [],
     },
     {
       id: "MENU_WMSv2_ADMIN.PRODUCT",
       path: "/admin/product",
-      isPublic: true,
+      isPublic: false,
       icon: "StarBorder",
       text: "Products",
       child: [],
@@ -21,14 +21,14 @@ export const admin = {
     {
       id: "MENU_WMSv2_ADMIN.INVENTORY",
       path: "/admin/inventory",
-      isPublic: true,
+      isPublic: false,
       text: "Inventory",
       child: [],
     },
     {
       id: "MENU_WMSv2_ADMIN.PROCESS_RECEIPT",
       path: "/admin/receipts",
-      isPublic: true,
+      isPublic: false,
       icon: "StarBorder",
       text: "Purchase Orders",
       child: [],
@@ -36,7 +36,7 @@ export const admin = {
     {
       id: "MENU_WMSv2_ADMIN.ORDER",
       path: "/admin/orders",
-      isPublic: true,
+      isPublic: false,
       icon: "StarBorder",
       text: "Sale Orders",
       child: [],

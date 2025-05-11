@@ -12,43 +12,64 @@ import {
   DropdownMenu,
   DropdownItem,
   Pagination,
-  Select, MenuItem
+  Select, MenuItem, SelectItem
 } from "@nextui-org/react";
 import { VerticalDotsIcon } from "../../../components/icon/VerticalDotsIcon";
-import { Badge } from "../../../components/button/badge";
-import { columns, statusOptions } from "../../../config/assignorder";
+import { columns } from "../../../config/inventory";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../../api";
-import { formatDate, formatPrice } from '../../../utils/utils';
-const statusColorMap = {
-  APPROVED: "secondary",
-  DELIVERING: "warning",
-  COMPLETED: "success",
-};
+import { formatDate } from '../../../utils/utils';
 
-const INITIAL_VISIBLE_COLUMNS = ["orderDate", "customerName", "totalOrderCost", "status", "approvedBy", "actions"];
-export default function SaleOrderList() {
+const INITIAL_VISIBLE_COLUMNS = ["productName", "lotId", "bayCode", "quantityOnHandTotal", "lastUpdatedStamp"];
+export default function InventoryList() {
 
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [pages, setPages] = useState(1);
   const [items, setItems] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
-  const [statusFilter, setStatusFilter] = useState("APPROVED");
+  const [warehouseId, setWarehouseId] = useState("");
+  const [bayId, setBayId] = useState("");
+  const [warehouses, setWarehouses] = useState([]);
+  const [bays, setBays] = useState([]);
 
   useEffect(() => {
-    request("get", `/orders?status=${statusFilter}&page=${page - 1}&size=${rowsPerPage}`, (res) => {
-      setItems(res.data.content);
-      setTotalItems(res.data.totalElements);
-      setPages(res.data.totalPages);
+    request("get", "/warehouses", (res) => {
+      const warehouseList = res.data;
+      setWarehouses(warehouseList);
+      if (warehouseList.length > 0) {
+        setWarehouseId(warehouseList[0].warehouseId);
+      }
     }).then();
-  }, [page, rowsPerPage, statusFilter]);
+  }, []);
 
-  const visibleColumns = useMemo(() => {
-    const updatedColumns = new Set(INITIAL_VISIBLE_COLUMNS);
-    return updatedColumns;
-  }, [statusFilter]);
+
+  useEffect(() => {
+    if (warehouseId) {
+      setBayId("");
+      request("get", `/bays?warehouseId=${warehouseId}`, (res) => {
+        setBays(res.data);
+        if (res.data.length > 0) {
+          setBayId(res.data[0].bayId);
+        }
+      }).then();
+    }
+  }, [warehouseId]);
+
+
+
+  useEffect(() => {
+    if (warehouseId && bayId) {
+      request("get", `/inventory?warehouseId=${warehouseId}&bayId=${bayId}&page=${page - 1}&size=${rowsPerPage}`, (res) => {
+        setItems(res.data.content);
+        setTotalItems(res.data.totalElements);
+        setPages(res.data.totalPages);
+      }).then();
+    }
+  }, [warehouseId, bayId, page, rowsPerPage]);
+
+  const [visibleColumns, setVisibleColumns] = useState(new Set(INITIAL_VISIBLE_COLUMNS));
 
   const headerColumns = useMemo(() => {
     if (visibleColumns === "all") return columns;
@@ -60,10 +81,6 @@ export default function SaleOrderList() {
     const cellValue = item[columnKey];
 
     switch (columnKey) {
-      case "status":
-        return (
-          <Badge variant={statusColorMap[item.status]}>{cellValue.replace(/_/g, ' ')}</Badge>
-        );
       case "actions":
         return (
           <div className="relative flex justify-end items-center gap-2">
@@ -74,7 +91,7 @@ export default function SaleOrderList() {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem onPress={() => handleUpdate(item.orderId)}>Update order</DropdownItem>
+                <DropdownItem onPress={() => handleUpdate(item.receiptId)}>View receipt</DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
@@ -89,36 +106,62 @@ export default function SaleOrderList() {
     setPage(1);
   }, []);
 
+  const onSearchChange = useCallback((value) => {
+    if (value) {
+      setFilterValue(value);
+      setPage(1);
+    } else {
+      setFilterValue("");
+    }
+  }, []);
 
   const navigate = useNavigate();
 
   const handleUpdate = (id) => {
-    navigate(`/admin/orders/${id}`);
+    navigate(`/sale-manager/receipt/${id}`);
   };
 
   const topContent = useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
-        <div className="flex justify-between items-center gap-3">
-          {/* Status Select */}
-          <div className="flex-shrink-0 w-40">
+        <div className="flex justify-start items-center gap-3">
+          {/* Warehouse Select */}
+          <div className="flex-shrink-0 w-52">
             <Select
-              labelId="status-label"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              defaultSelectedKeys={["APPROVED"]}
+              aria-label="Warehouse"
+              selectedKeys={warehouseId ? [warehouseId] : []}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0];
+                setWarehouseId(selected);
+              }}
               className="w-full"
             >
-              {statusOptions.map((cat) => (
-                <MenuItem key={cat.uid} value={cat.uid}>
-                  {cat.name}
-                </MenuItem>
+              {warehouses.map((wh) => (
+                <SelectItem key={wh.warehouseId} value={wh.warehouseId}>
+                  {wh.name}
+                </SelectItem>
+              ))}
+            </Select>
+          </div>
+          {/* Bay Select */}
+          <div className="flex-shrink-0 w-52">
+            <Select
+              aria-label="Bay"
+              selectedKeys={bayId ? [bayId] : []}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0];
+                setBayId(selected);
+              }}
+              className="w-full"
+            >
+              {bays.map((bay) => (
+                <SelectItem key={bay.bayId} value={bay.bayId}>
+                  {bay.code}
+                </SelectItem>
               ))}
             </Select>
           </div>
         </div>
-
-
 
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">Total {totalItems} items</span>
@@ -135,8 +178,12 @@ export default function SaleOrderList() {
           </label>
         </div>
       </div>
+
+
+
     );
   }, [
+    onSearchChange,
     onRowsPerPageChange,
     totalItems
   ]);
@@ -167,6 +214,7 @@ export default function SaleOrderList() {
       td: [
         // changing the rows border radius
         // first
+        "py-3",
         "group-data-[first=true]:first:before:rounded-none",
         "group-data-[first=true]:last:before:rounded-none",
         // middle
@@ -199,7 +247,7 @@ export default function SaleOrderList() {
         {(column) => (
           <TableColumn
             key={column.uid}
-            align={"center"}
+            align={column.uid === "productName" ? "start" : "center"}
             allowsSorting={column.sortable}
           >
             {column.name}
@@ -208,12 +256,12 @@ export default function SaleOrderList() {
       </TableHeader>
       <TableBody emptyContent={"Loading ..."} items={items}>
         {(item) => (
-          <TableRow key={item.orderId}>
+          <TableRow key={item.inventoryItemId}>
             {(columnKey) => (
               <TableCell>
-                {columnKey === "orderDate"
-                  ? formatDate(item.orderDate)
-                  : (columnKey === "totalOrderCost" ? formatPrice(item.totalOrderCost) : renderCell(item, columnKey))}
+                {columnKey === "lastUpdatedStamp"
+                  ? formatDate(item.lastUpdatedStamp)
+                  : renderCell(item, columnKey)}
               </TableCell>
             )}
           </TableRow>

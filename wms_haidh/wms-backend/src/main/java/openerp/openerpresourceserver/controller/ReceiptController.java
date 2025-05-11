@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.controller;
 
+import java.security.Principal;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,6 +36,7 @@ public class ReceiptController {
 	private ReceiptService receiptService;
 	private ReceiptItemRequestService receiptItemRequestService;
 
+	@Secured({"ROLE_WMS_WAREHOUSE_MANAGER","ROLE_WMS_PURCHASE_STAFF","ROLE_WMS_PURCHASE_MANAGER"})
 	@GetMapping
 	public ResponseEntity<Page<ReceiptInfoProjection>> getReceiptsByStatus(
 
@@ -50,6 +53,7 @@ public class ReceiptController {
 		}
 	}
 
+	@Secured({"ROLE_WMS_PURCHASE_STAFF","ROLE_WMS_PURCHASE_MANAGER"})
 	@GetMapping("/{id}")
 	public ResponseEntity<ReceiptProjection> getReceiptDetailsById(@PathVariable UUID id) {
         return receiptService.getReceiptDetailsById(id)
@@ -57,8 +61,9 @@ public class ReceiptController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+	@Secured("ROLE_WMS_PURCHASE_STAFF")
 	@PostMapping
-	public ResponseEntity<String> createReceipt(@RequestBody ReceiptCreateRequest receiptRequest) {
+	public ResponseEntity<String> createReceipt(@RequestBody ReceiptCreateRequest receiptRequest, Principal principal) {
 		try {
 			// Validate item requests
 			if (receiptRequest.getReceiptItemRequests() == null || receiptRequest.getReceiptItemRequests().isEmpty()) {
@@ -72,7 +77,7 @@ public class ReceiptController {
 			}
 
 			// Proceed with creating receipt
-			Receipt createdReceipt = receiptService.createReceipt(receiptRequest);
+			Receipt createdReceipt = receiptService.createReceipt(receiptRequest, principal.getName());
 
 			// Create receipt item requests
 			receiptItemRequestService.createReceiptItems(createdReceipt.getReceiptId(),
@@ -87,6 +92,7 @@ public class ReceiptController {
 		}
 	}
 
+	@Secured("ROLE_WMS_PURCHASE_MANAGER")
 	@PostMapping("/{receiptId}/approve")
 	public ResponseEntity<String> approveReceipt(@PathVariable UUID receiptId, @RequestParam String approvedBy) {
 		try {
@@ -103,6 +109,7 @@ public class ReceiptController {
 		}
 	}
 
+	@Secured("ROLE_WMS_PURCHASE_MANAGER")
 	@PostMapping("/{receiptId}/cancel")
 	public ResponseEntity<String> cancelReceipt(@PathVariable UUID receiptId, @RequestParam String cancelledBy) {
 		try {

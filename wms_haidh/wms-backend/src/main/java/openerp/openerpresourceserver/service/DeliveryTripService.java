@@ -32,6 +32,7 @@ public class DeliveryTripService {
 	private DeliveryTripPathService deliveryTripPathService;
 	private AssignedOrderItemService assignedOrderItemService;
 	private VehicleService vehicleService;
+	private OrderService orderService;
 
 	public Page<DeliveryTripProjection> getFilteredDeliveryTrips(String status, Pageable pageable) {
 		return deliveryTripRepository.findFilteredDeliveryTrips(status, pageable);
@@ -53,14 +54,14 @@ public class DeliveryTripService {
 	}
 
 	@Transactional
-	public DeliveryTrip createDeliveryTrip(DeliveryTripCreateRequest payload) {
+	public DeliveryTrip createDeliveryTrip(DeliveryTripCreateRequest payload, String userLoginId) {
 
 		String tripId = generateTripId();
 		DeliveryTrip trip = DeliveryTrip.builder().deliveryTripId(tripId).warehouseId(payload.getWarehouseId())
 				.vehicleId(payload.getVehicleId()).deliveryPersonId(payload.getDeliveryPersonId())
 				.description(payload.getDescription()).shipmentId(payload.getShipmentId())
 				.totalWeight(payload.getTotalWeight()).totalLocations(payload.getTotalLocations())
-				.distance(payload.getDistance()).createdBy(payload.getAssignedBy()).createdStamp(LocalDateTime.now())
+				.distance(payload.getDistance()).createdBy(userLoginId).createdStamp(LocalDateTime.now())
 				.lastUpdatedStamp(LocalDateTime.now()).isDeleted(false).status("CREATED").build();
 
 		deliveryTripRepository.save(trip);
@@ -109,19 +110,52 @@ public class DeliveryTripService {
 		}
 		return false;
 	}
+	
+	@Transactional
+	public boolean startDeliveryTrip(String deliveryTripId) {
+		Optional<DeliveryTrip> optionalTrip = deliveryTripRepository.findById(deliveryTripId);
+
+		if (optionalTrip.isPresent()) {
+			DeliveryTrip trip = optionalTrip.get();		
+			
+			if ("CREATED".equals(trip.getStatus())) {
+								
+				trip.setStatus("DELIVERING");
+				deliveryTripRepository.save(trip);
+				
+				List<UUID> orderIds = deliveryTripItemService.findOrderIdsByDeliveryTripId(deliveryTripId);
+
+	            orderService.markOrdersAsDelivering(orderIds); 
+
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public Page<DeliveryTrip> getDeliveryTripsByShipmentId(String shipmentId, Pageable pageable) {
 		return deliveryTripRepository.findByShipmentId(shipmentId, pageable);
 	}
 
-	public List<DeliveryTrip> createDeliveryTrip(List<DeliveryTripCreateRequest> payloadList) {
+	public List<DeliveryTrip> createDeliveryTrip(List<DeliveryTripCreateRequest> payloadList, String userLoginId) {
 	    List<DeliveryTrip> trips = new ArrayList<>();
 	    for (DeliveryTripCreateRequest payload : payloadList) {
-	        DeliveryTrip trip = createDeliveryTrip(payload);
+	        DeliveryTrip trip = createDeliveryTrip(payload, userLoginId);
 	        trips.add(trip);
 	    }
 	    return trips;
 	}
-
+	
+	@Transactional
+    public int markAsDelivered(String deliveryTripId, UUID orderId) {
+		
+        int updatedCount = deliveryTripItemService.markItemsAsDelivered(deliveryTripId, orderId);     
+        long notYetDelivered = deliveryTripItemService.countUndeliveredItems(deliveryTripId);
+        if (notYetDelivered == 0) {
+            deliveryTripRepository.markTripAsDone(deliveryTripId);
+        }
+        orderService.markAsCompleted(orderId);
+        return updatedCount;
+    }
 
 }

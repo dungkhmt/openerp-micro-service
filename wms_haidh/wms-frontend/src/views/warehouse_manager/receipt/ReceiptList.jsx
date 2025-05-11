@@ -111,6 +111,7 @@ export default function ReceiptList() {
           {/* Status Select */}
           <div className="flex-shrink-0 w-40">
             <Select
+              aria-label="Status"
               labelId="status-label"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}

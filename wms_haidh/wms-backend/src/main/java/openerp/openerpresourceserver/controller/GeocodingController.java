@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.controller;
 
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ public class GeocodingController {
 
     private final GeocodingService geocodingService;
 
+    @Secured("ROLE_WMS_ONLINE_CUSTOMER")
     @PostMapping("/address")
     public AddressResponse getAddressFromCoordinates(@RequestBody CoordinateDTO coordinates) {
         return geocodingService.getAddressFromCoordinates(coordinates);

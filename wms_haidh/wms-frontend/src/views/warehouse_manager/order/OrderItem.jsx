@@ -109,10 +109,9 @@ const OrderItem = () => {
       bayId,
       lotId,
       quantity,
-      saleOrderItemId: id2,
-      assignedBy: "admin"
+      saleOrderItemId: id2
     };
-    console.log(payload);
+    // console.log(payload);
     request("post", `/assigned-order-items`, (res) => {
       if (res.status === 200) {
         request("get", `/order-items/${id2}`, (res) => {

@@ -13,5 +13,7 @@ public interface CustomerDeliveryProjection {
     String getCustomerAddress();
 
     int getSequence();
+    
+    String getStatus();
 }
 

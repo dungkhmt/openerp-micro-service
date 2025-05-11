@@ -23,7 +23,6 @@ public class ReceiptCreateRequest {
     private String createdReason;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate expectedReceiptDate;
-    private String createdBy;
     private List<ReceiptItemRequestDTO> receiptItemRequests;  
     
 }

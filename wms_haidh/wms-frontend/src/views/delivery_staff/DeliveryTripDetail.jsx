@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router-dom';
 import { request } from "../../api";
@@ -9,16 +9,12 @@ import {
   Button,
   Paper,
   IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow
+  Stack
 } from '@mui/material';
 import Map from '../../components/Map';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import { formatDate } from '../../utils/utils';
+import PhoneIcon from '@mui/icons-material/Phone';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 const DeliveryTripDetail = () => {
   const navigate = useNavigate();
@@ -39,8 +35,35 @@ const DeliveryTripDetail = () => {
     });
   }, [id]);
 
+  const handleSubmit = async () => {
+    request("post", `/delivery-trips/${id}/start`, (res) => {
+      if (res.status === 200) {
+        request('get', `/delivery-trips/${id}/general-info`, (res) => {
+          setGeneralInfo(res.data);
+        });
+        alert("Your delivery trip has started. Good luck!");
+      } else {
+        alert("Error occurred while starting trip!");
+      }
+    }, {});
+  };
+
   const handleToggleMap = () => {
     setIsMapOpen((prev) => !prev);
+  };
+
+  const handleMarkDelivered = (orderId) => {
+    request('post', `/delivery-trips/${id}/mark-delivered?orderId=${orderId}`, (res) => {
+      if (res.status === 200) {
+        request('get', `/delivery-trips/${id}/general-info`, (res) => {
+          setGeneralInfo(res.data);
+        });
+
+        request("get", `/delivery-trip-items/customers?deliveryTripId=${id}`, (res) => {
+          setDeliverySequence(res.data);
+        });
+      }
+    });
   };
 
   useEffect(() => {
@@ -48,19 +71,18 @@ const DeliveryTripDetail = () => {
       setLoadingMap(true);
       request('get', `/delivery-trip-paths?deliveryTripId=${id}`, (res) => {
         if (res.status === 200) {
-          setRoute(res.data);
+          setRoute(res.data.path);
         } else {
           alert('Error fetching route data!');
         }
         setLoadingMap(false);
       });
     }
-  }, [isMapOpen, id, route]);
-
-
+  }, [isMapOpen, id]);
 
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
+      {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         <IconButton color="primary" onClick={() => navigate('/delivery-staff/delivery-trip')} sx={{ color: 'black' }}>
           <ArrowBackIcon />
@@ -68,81 +90,12 @@ const DeliveryTripDetail = () => {
         <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
           Delivery Trip Detail
         </Typography>
-      </Box>
-      <Box sx={{ mt: 4 }}>
-        <Paper elevation={3} sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-            General information
-          </Typography>
-          {generalInfo && (
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <Typography><strong>Warehouse:</strong> {generalInfo.warehouseName}</Typography>
-                <Typography><strong>Delivery Person:</strong> {generalInfo.deliveryPersonName}</Typography>
-                <Typography><strong>Total Weight:</strong> {generalInfo.totalWeight} kg</Typography>
-                <Typography><strong>Total Locations:</strong> {generalInfo.totalLocations}</Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography><strong>Expected Delivery:</strong> {formatDate(generalInfo.expectedDeliveryStamp)}</Typography>
-                <Typography><strong>Status:</strong> {generalInfo.status}</Typography>
-                <Typography><strong>Description:</strong> {generalInfo.description}</Typography>
-              </Grid>
-            </Grid>
-          )}
-
-        </Paper>
-        <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
-          <Typography variant="h6" gutterBottom>
-            Delivery Sequence
-          </Typography>
-          <div className='mb-4'>
-            <Typography variant="h7" gutterBottom className="text-green-500">
-              Total locations : {deliverySequence.length}
-            </Typography>
-          </div>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>#</TableCell>
-                  <TableCell align="center">Customer Name</TableCell>
-                  <TableCell align="center">Phone Number</TableCell>
-                  <TableCell>Customer Address</TableCell>
-                  <TableCell align="center" >Items</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {deliverySequence &&
-                  deliverySequence.map(item => (
-                    <TableRow key={item.orderId}>
-                      <TableCell>{item.sequence}</TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>{item.customerName}</TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>{item.customerPhoneNumber}</TableCell>
-                      <TableCell>{item.customerAddress}</TableCell>
-                      {/* Action Icon */}
-                      <TableCell sx={{ textAlign: 'center' }}>
-                        <IconButton
-                          color="primary"
-                          onClick={() => navigate(`/delivery-staff/delivery-trip/${id}/${item.orderId}`)}
-                        >
-                          <VisibilityIcon />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-
-        </Paper>
-
-
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <Button
+        {
+          generalInfo && generalInfo.status === 'CREATED' &&
+          (<Button
             variant="contained"
             color="primary"
             sx={{
-              mt: 4,
               marginLeft: 'auto',
               backgroundColor: 'black',
               color: 'white',
@@ -151,49 +104,131 @@ const DeliveryTripDetail = () => {
                 opacity: 0.75,
               }
             }}
-            onClick={handleToggleMap}
+            onClick={handleSubmit}
           >
-            {isMapOpen ? "Close Map" : "Open Map"}
-          </Button>
-        </Box>
-
-        {isMapOpen &&
-          <Grid container sx={{ mt: 4 }}>
-            {/* Map Container */}
-            <Grid item xs={12}>
-              <Paper elevation={3} sx={{ p: 3, height: 540 }}>
-                <Typography
-                  variant="h6"
-                  gutterBottom
-                  sx={{
-                    textAlign: 'center'
-                  }}
-                >
-                  Optimized Delivery Route
-                </Typography>
-                <Typography variant="h6" gutterBottom className="text-green-500" sx={{
-                  textAlign: 'center',
-                  marginBottom: 2,    // Spacing below title
-                }}>
-                  Distance : {(generalInfo.distance / 1000).toFixed(2)} km
-                </Typography>
-
-                <Box sx={{ height: '100%', borderRadius: 1, overflow: 'hidden' }}>
-                  {/* Pass the route data to the Map component */}
-                  {loadingMap ? (
-                    <Typography variant="h6" sx={{ textAlign: 'center' }}>
-                      Loading route...
-                    </Typography>
-                  ) : (
-                    <Map route={route} />
-                  )}
-                </Box>
-              </Paper>
-            </Grid>
-
-          </Grid>
+            Start
+          </Button>)
         }
       </Box>
+
+      {/* General Info */}
+      <Paper elevation={3} sx={{ p: 3 }}>
+        <Typography variant="h6" gutterBottom>General information</Typography>
+        {generalInfo && (
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <Typography><strong>Warehouse:</strong> {generalInfo.warehouseName}</Typography>
+              <Typography><strong>Delivery Person:</strong> {generalInfo.deliveryPersonName}</Typography>
+              <Typography><strong>Total Weight:</strong> {generalInfo.totalWeight} kg</Typography>
+              <Typography><strong>Vehicle:</strong> {generalInfo.vehicleName}</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography><strong>Expected Delivery:</strong> {formatDate(generalInfo.expectedDeliveryStamp)}</Typography>
+              <Typography><strong>Total Locations:</strong> {generalInfo.totalLocations}</Typography>
+              <Typography><strong>Status:</strong> {generalInfo.status}</Typography>
+              <Typography><strong>Description:</strong> {generalInfo.description}</Typography>
+            </Grid>
+          </Grid>
+        )}
+      </Paper>
+
+      {/* Delivery Cards */}
+      <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
+        <Typography variant="h6" gutterBottom>Delivery Sequence</Typography>
+        <Typography className="text-green-500" sx={{ mb: 2 }}>
+          Total locations: {deliverySequence.length}
+        </Typography>
+
+        <Stack spacing={2}>
+          {deliverySequence && deliverySequence.map((item) => (
+            <Paper key={item.orderId} elevation={2} sx={{ p: 2, mb: 2 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                #{item.sequence} - {item.customerName}
+              </Typography>
+
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 1 }}>
+                <PhoneIcon fontSize="small" />
+                <Typography>{item.customerPhoneNumber}</Typography>
+              </Stack>
+
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 1 }}>
+                <LocationOnIcon fontSize="small" />
+                <Typography>{item.customerAddress}</Typography>
+              </Stack>
+
+              <Typography sx={{ mt: 1 }}>
+                <strong>Status:</strong> {item.status}
+              </Typography>
+
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                {/* Left side: View Items */}
+                <Button
+                  variant="contained"
+                  sx={{
+                    backgroundColor: 'black',
+                    color: 'white',
+                    '&:hover': { backgroundColor: 'black', opacity: 0.75 }
+                  }}
+                  onClick={() => navigate(`/delivery-staff/delivery-trip/${id}/${item.orderId}`)}
+                >
+                  View Items
+                </Button>
+
+                {generalInfo && generalInfo.status === 'DELIVERING' && item.status === 'CREATED' && (
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      variant="contained"
+                      color="success"
+                      onClick={() => handleMarkDelivered(item.orderId)}
+                    >
+                      Delivered
+                    </Button>
+                  </Stack>
+                )}
+              </Box>
+            </Paper>
+          ))}
+        </Stack>
+      </Paper>
+
+      {/* Toggle Map */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <Button
+          variant="contained"
+          sx={{
+            mt: 4,
+            backgroundColor: 'black',
+            color: 'white',
+            '&:hover': { backgroundColor: 'black', opacity: 0.75 }
+          }}
+          onClick={handleToggleMap}
+        >
+          {isMapOpen ? 'Close Map' : 'Open Map'}
+        </Button>
+      </Box>
+
+      {/* Map Section */}
+      {isMapOpen && (
+        <Grid container sx={{ mt: 4 }}>
+          <Grid item xs={12}>
+            <Paper elevation={3} sx={{ p: 3, height: 540 }}>
+              <Typography variant="h6" gutterBottom align="center">
+                Delivery Route
+              </Typography>
+              <Typography variant="h6" gutterBottom align="center" className="text-green-500">
+                Distance : {(generalInfo?.distance / 1000).toFixed(2)} km
+              </Typography>
+              <Box sx={{ height: '100%', borderRadius: 1, overflow: 'hidden' }}>
+                {loadingMap ? (
+                  <Typography variant="h6" align="center">Loading route...</Typography>
+                ) : (
+                  <Map route={route} />
+                )}
+              </Box>
+            </Paper>
+          </Grid>
+        </Grid>
+      )}
     </Box>
   );
 };

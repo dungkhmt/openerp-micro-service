@@ -35,7 +35,7 @@ const ReceiptDetail = () => {
   const handleApprove = () => {
     request(
       "post",
-      `/receipts/${receiptId}/approve?approvedBy=hoanglotar2000`,
+      `/receipts/${receiptId}/approve`,
       (res) => {
         if (res.status === 200) {
           navigate(`/purchase-manager/process-receipts`);
@@ -49,7 +49,7 @@ const ReceiptDetail = () => {
   const handleCancel = () => {
     request(
       "post",
-      `/receipts/${receiptId}/cancel?cancelledBy=hoanglotar2000`,
+      `/receipts/${receiptId}/cancel`,
       (res) => {
         if (res.status === 200) {
           navigate(`/purchase-manager/process-receipts`);
@@ -127,7 +127,7 @@ const ReceiptDetail = () => {
           <Button variant="contained" color="error" onClick={handleCancel} sx={{ mr: 2 }}>
             Cancel
           </Button>
-          <Button variant="contained" color="primary" onClick={handleApprove}>
+          <Button variant="contained" color="success" onClick={handleApprove}>
             Approve
           </Button>
         </Box>)}

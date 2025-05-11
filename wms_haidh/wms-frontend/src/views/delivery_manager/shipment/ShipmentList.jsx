@@ -108,8 +108,7 @@ export default function Shipment() {
     const formattedDateTime = `${selectedDateTime}:00`;
 
     const payload = {
-      expectedDeliveryStamp: formattedDateTime,
-      createdBy: "admin",
+      expectedDeliveryStamp: formattedDateTime
     };
 
     const requestUrl = "/shipments";

@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,12 +29,14 @@ public class ReceiptItemController {
 
 	private ReceiptItemService receiptItemService;
 	
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping
 	public ResponseEntity<List<ReceiptItemProjection>> getItemsByReceiptItemRequestId(@RequestParam UUID requestId) {
 	    List<ReceiptItemProjection> items = receiptItemService.getItemsByRequestId(requestId);
 	    return ResponseEntity.ok(items);
 	}
 
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@PostMapping
 	public ResponseEntity<?> createReceiptItem(@RequestBody ReceiptItemCreateRequest request) {
 		try {

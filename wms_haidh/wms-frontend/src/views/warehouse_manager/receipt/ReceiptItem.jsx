@@ -102,7 +102,6 @@ const ReceiptItem = () => {
       const bilInfo = {
         receiptBillId: billName,
         description: "Create new bill",
-        createdBy: "admin",
         receiptItemRequestId: id2
       };
       request("post", `/receipt-bills`, (res) => {

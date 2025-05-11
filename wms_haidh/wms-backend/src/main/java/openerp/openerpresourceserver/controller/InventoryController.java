@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +32,7 @@ public class InventoryController {
 
 	private InventoryService inventoryService;
 	
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping
 	public ResponseEntity<Page<InventoryItemProjection>> getInventoryItems(
 			@RequestParam(required = false) UUID warehouseId, @RequestParam(required = false) UUID bayId,
@@ -53,11 +55,13 @@ public class InventoryController {
 		}
 	}
 	
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping("/available-warehouses")
 	public List<Warehouse> getDistinctWarehousesWithStock(@RequestParam UUID saleOrderItemId) {
 		return inventoryService.getDistinctWarehousesWithStockBySaleOrderItemId(saleOrderItemId);
 	}
 
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping("/available-bays")
 	public ResponseEntity<List<BayProjection>> getBaysWithProductsInSaleOrder(@RequestParam UUID saleOrderItemId,
 			@RequestParam UUID warehouseId) {
@@ -65,6 +69,7 @@ public class InventoryController {
 		return ResponseEntity.ok(bays);
 	}
 
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping("/available-lots")
 	public ResponseEntity<List<LotIdProjection>> getLotIdsBySaleOrderItemIdAndBayId(@RequestParam UUID saleOrderItemId,
 			@RequestParam UUID bayId) {
@@ -72,6 +77,7 @@ public class InventoryController {
 		return ResponseEntity.ok(lotIds);
 	}
 
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping("/quantity-on-hand")
 	public ResponseEntity<Integer> getQuantityOnHandBySaleOrderItemIdBayIdAndLotId(@RequestParam UUID saleOrderItemId,
 			@RequestParam UUID bayId, @RequestParam String lotId) {

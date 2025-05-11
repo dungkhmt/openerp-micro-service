@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class SaleOrderCreateRequest {
-    private String userLoginId;
     private Double deliveryFee;
     private Double totalProductCost;
     private Double totalOrderCost;

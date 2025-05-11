@@ -1,18 +1,15 @@
-import axios from "axios";
+import { request } from "../api";
 const fetchRoute = async (coordinates, setRoute, setDistance, setLoadingMap) => {
   setLoadingMap(true);
-
-  try {
-    const response = await axios.post("http://localhost:8082/api/routes/fetch", { coordinates });
-
-    const data = response.data;
-
-    setRoute(data.path);
-    setDistance(data.distance);
-  } catch (error) {
-    console.error("Error fetching route:", error);
-  } finally {
-    setLoadingMap(false);
-  }
+  const payload = { coordinates };
+  request("post", "/routes/fetch", (res) => {
+    if (res.status === 200) {
+      setRoute(res.data.path);
+      setDistance(res.data.distance);
+    } else {
+       alert("Error occurred while loading route !");
+    }
+  }, {}, payload).then(() => setLoadingMap(false));
+  ;
 };
 export default fetchRoute;

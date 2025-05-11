@@ -32,7 +32,6 @@ const AddReceipt = () => {
   const [warehouseId, setWarehouseId] = useState('');
   const [reason, setReason] = useState('');
   const [expectedReceiptDate, setExpectedReceiptDate] = useState('');
-  const [createdBy] = useState('hoanglotar2000');
   const [requestDetails, setRequestDetails] = useState([{ productId: '', quantity: '' }]);
   const [productSuggestions, setProductSuggestions] = useState([]);
   const [productNames, setProductNames] = useState({});
@@ -111,7 +110,6 @@ const AddReceipt = () => {
       warehouseId,
       createdReason: reason,
       expectedReceiptDate,
-      createdBy,
       receiptItemRequests: updatedRequestDetails, 
     };
 

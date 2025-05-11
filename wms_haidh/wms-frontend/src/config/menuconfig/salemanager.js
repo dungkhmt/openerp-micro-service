@@ -6,14 +6,14 @@ export const salemanager = {
     {
       id: "MENU_WMSv2_SALE_MANAGER.PRICE_CONFIG",
       path: "/sale-manager/price-config",
-      isPublic: true,
+      isPublic: false,
       text: "Price Configuration",
       child: [],
     },
     {
       id: "MENU_WMSv2_SALE_MANAGER.ORDERS",
       path: "/sale-manager/sale-order",
-      isPublic: true,
+      isPublic: false,
       text: "Sale Orders",
       child: [],
     },

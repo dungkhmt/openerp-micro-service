@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -51,4 +52,8 @@ public interface DeliveryTripRepository extends JpaRepository<DeliveryTrip, Stri
 	Optional<DeliveryTripGeneralProjection> findDeliveryTripById(@Param("deliveryTripId") String deliveryTripId);
 
 	Page<DeliveryTrip> findByShipmentId(String shipmentId, Pageable pageable);
+
+	@Modifying
+    @Query("UPDATE DeliveryTrip d SET d.status = 'DONE', d.lastUpdatedStamp = CURRENT_TIMESTAMP WHERE d.deliveryTripId = :tripId")
+    int markTripAsDone(@Param("tripId") String tripId);
 }

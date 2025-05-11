@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.controller;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
@@ -9,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +33,7 @@ public class ReceiptBillController {
 
 	private ReceiptBillService receiptBillService;
 	
+	@Secured({"ROLE_WMS_WAREHOUSE_MANAGER","ROLE_WMS_PURCHASE_MANAGER"})
 	@GetMapping
 	public ResponseEntity<Page<ReceiptBillProjection>> getAllReceiptBills(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size) {
@@ -47,16 +50,18 @@ public class ReceiptBillController {
 		}
 	}
 	
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping("/ids")
 	public ResponseEntity<List<String>> getAllReceiptBillIds(@RequestParam UUID requestId) {
 	    List<String> receiptBillIds = receiptBillService.getAllReceiptBillIds(requestId);
 	    return ResponseEntity.ok(receiptBillIds);
 	}
 	
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@PostMapping
-	public ResponseEntity<ReceiptBill> createReceiptBill(@RequestBody ReceiptBillCreateRequest request) {
+	public ResponseEntity<ReceiptBill> createReceiptBill(@RequestBody ReceiptBillCreateRequest request, Principal principal) {
 		ReceiptBill receiptBill = receiptBillService.createReceiptBill(request.getReceiptBillId(),
-				request.getDescription(), request.getCreatedBy(), request.getReceiptItemRequestId());
+				request.getDescription(), principal.getName(), request.getReceiptItemRequestId());
 		return ResponseEntity.ok(receiptBill);
 	}
 	

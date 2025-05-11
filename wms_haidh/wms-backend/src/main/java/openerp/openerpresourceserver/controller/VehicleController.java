@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,11 +24,13 @@ public class VehicleController {
 
     private VehicleService vehicleService;
 
+    @Secured("ROLE_WMS_DELIVERY_MANAGER")
     @GetMapping
     public List<VehicleProjection> getVehicles() {
         return vehicleService.getAllVehicles();
     }
     
+    @Secured("ROLE_WMS_DELIVERY_MANAGER")
     @GetMapping("/{id}")
     public ResponseEntity<VehicleProjection> getVehicleById(@PathVariable UUID id) {
         VehicleProjection vehicle = vehicleService.getVehicleById(id);

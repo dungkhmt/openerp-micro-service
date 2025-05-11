@@ -24,7 +24,8 @@ public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripIt
 			        o.customerName AS customerName,
 			        o.customerPhoneNumber AS customerPhoneNumber,
 			        ca.addressName AS customerAddress,
-			        dti.sequence AS sequence
+			        dti.sequence AS sequence,
+			        dti.status AS status
 			    FROM DeliveryTripItem dti
 			    JOIN Order o ON dti.orderId = o.orderId
 			    JOIN CustomerAddress ca ON o.customerAddressId = ca.customerAddressId
@@ -50,12 +51,25 @@ public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripIt
 			""")
 	Page<DeliveryItemDetailProjection> findDeliveryItemsByTripAndOrder(@Param("deliveryTripId") String deliveryTripId,
 			@Param("orderId") UUID orderId, Pageable pageable);
-	
+
 	@Modifying
 	@Query("UPDATE DeliveryTripItem d SET d.isDeleted = true, d.lastUpdatedStamp = :timestamp WHERE d.deliveryTripId = :deliveryTripId")
 	int markItemsAsDeleted(@Param("deliveryTripId") String deliveryTripId, @Param("timestamp") LocalDateTime timestamp);
 
 	@Query("SELECT d.assignedOrderItemId FROM DeliveryTripItem d WHERE d.deliveryTripId = :deliveryTripId")
-    List<UUID> findIdsByDeliveryTripId(@Param("deliveryTripId") String deliveryTripId);
+	List<UUID> findIdsByDeliveryTripId(@Param("deliveryTripId") String deliveryTripId);
+
+	@Modifying
+	@Query("UPDATE DeliveryTripItem d SET d.status = 'DELIVERED', d.lastUpdatedStamp = CURRENT_TIMESTAMP "
+			+ "WHERE d.deliveryTripId = :deliveryTripId AND d.orderId = :orderId AND d.isDeleted = false")
+	int markItemsAsDelivered(@Param("deliveryTripId") String deliveryTripId, @Param("orderId") UUID orderId);
+
+	@Query("SELECT COUNT(d) FROM DeliveryTripItem d " + "WHERE d.deliveryTripId = :tripId "
+			+ "AND d.status <> 'DELIVERED' " + "AND d.isDeleted = false")
+	long countUndeliveredItems(@Param("tripId") String tripId);
+	
+	@Query("SELECT DISTINCT d.orderId FROM DeliveryTripItem d WHERE d.deliveryTripId = :deliveryTripId")
+	List<UUID> findOrderIdsByDeliveryTripId(@Param("deliveryTripId") String deliveryTripId);
+
 
 }

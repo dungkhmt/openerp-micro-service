@@ -6,7 +6,7 @@ import { Route, Routes, useLocation } from "react-router-dom";
 import { useNotificationState } from "../state/NotificationState";
 import NotFound from "../views/errors/NotFound";
 import { useKeycloak } from "@react-keycloak/web";
-import AdminRouter from "./AdminRouter";
+import WarehouseManagerRouter from "./WarehouseManagerRouter";
 import SaleManagerRouter from "./SaleManagerRouter";
 import CustomerRouter from "./CustomerRouter";
 import DeliveryManagerRouter from "./DeliveryManagerRouter";
@@ -35,7 +35,7 @@ function MainAppRouter() {
 
   useEffect(() => {
     notificationState.open.set(false);
-  }, [location.pathname]);
+  }, [location.pathname, keycloak]);
 
   const renderPrivateRoute = (Component) => {
     if (!keycloak.authenticated) {
@@ -52,7 +52,7 @@ function MainAppRouter() {
           <Routes>
             <Route path="/" element={<NotFound />} />
             <Route path="/director/*" element={renderPrivateRoute(DirectorRouter)} />
-            <Route path="/admin/*" element={renderPrivateRoute(AdminRouter)} />
+            <Route path="/admin/*" element={renderPrivateRoute(WarehouseManagerRouter)} />
             <Route path="/sale-manager/*" element={renderPrivateRoute(SaleManagerRouter)} />
             <Route path="/customer/*" element={renderPrivateRoute(CustomerRouter)} />
             <Route path="/delivery-manager/*" element={renderPrivateRoute(DeliveryManagerRouter)} />

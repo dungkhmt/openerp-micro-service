@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +29,7 @@ public class ProductPriceController {
 
 	private ProductPriceService productPriceService;
 
+	@Secured("ROLE_WMS_SALE_MANAGER")
 	@GetMapping
 	public Page<ProductPrice> getProductPrices(@RequestParam UUID productId, @RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size) {
@@ -35,6 +37,7 @@ public class ProductPriceController {
 		return productPriceService.getProductPricesByProductId(productId, pageable);
 	}
 	
+	@Secured("ROLE_WMS_SALE_MANAGER")
 	@PostMapping
     public ResponseEntity<ProductPrice> createProductPrice(@RequestBody ProductPriceCreateRequest request) {
         ProductPrice created = productPriceService.createProductPrice(request);

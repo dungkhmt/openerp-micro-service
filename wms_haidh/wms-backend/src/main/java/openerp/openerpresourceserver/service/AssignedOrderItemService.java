@@ -39,7 +39,7 @@ public class AssignedOrderItemService {
         return assignedOrderItemRepository.findAllDeliveryOrderItemsByWarehouse(warehouseId,pageable);
     }
 
-	public AssignedOrderItem assignOrderItem(AssignedOrderItemCreateRequest dto) {
+	public AssignedOrderItem assignOrderItem(AssignedOrderItemCreateRequest dto, String userLoginId) {
         // Step 1: Retrieve SaleOrderItem
         SaleOrderItem saleOrderItem = saleOrderItemRepository.findById(dto.getSaleOrderItemId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid SaleOrderItemId"));
@@ -64,7 +64,7 @@ public class AssignedOrderItemService {
         assignedOrderItem.setBayId(dto.getBayId());
         assignedOrderItem.setWarehouseId(dto.getWarehouseId());
         assignedOrderItem.setLotId(dto.getLotId());
-        assignedOrderItem.setAssignedBy(dto.getAssignedBy());
+        assignedOrderItem.setAssignedBy(userLoginId);
         assignedOrderItem.setLastUpdatedStamp(LocalDateTime.now());
         assignedOrderItem.setCreatedStamp(LocalDateTime.now());
         assignedOrderItem.setStatus("CREATED");

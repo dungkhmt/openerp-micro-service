@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import DeliveryTrip from "../views/delivery_staff/DeliveryTrip";
+import DeliveryTrip from "../views/delivery_staff/DeliveryTripList";
 import DeliveryTripDetail from "../views/delivery_staff/DeliveryTripDetail";
 import DeliveryTripItem from "../views/delivery_staff/DeliveryTripItem";
 const PurchasePersonRouter = () => {

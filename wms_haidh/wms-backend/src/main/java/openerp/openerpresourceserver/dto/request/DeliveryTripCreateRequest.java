@@ -24,6 +24,5 @@ public class DeliveryTripCreateRequest {
     private Double distance;
     private List<DeliveryTripItem> items;
     private List<CoordinateDTO> coordinates;
-    private String assignedBy;
 }
 

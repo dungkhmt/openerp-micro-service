@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.controller;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
@@ -9,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,12 +34,14 @@ public class AssignedOrderItemController {
 
 	private AssignedOrderItemService assignedOrderItemService;
 
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping
 	public List<AssignedOrderItemProjection> getAssignedOrderItemsBySaleOrderItemId(
 			@RequestParam UUID saleOrderItemId) {
 		return assignedOrderItemService.getAssignedOrderItemsBySaleOrderItemId(saleOrderItemId);
 	}
 
+	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@GetMapping("/by-warehouse")
 	public ResponseEntity<Page<DeliveryOrderItemProjection>> getAssignedOrderItemsByWarehouseId(
 			@RequestParam UUID warehouseId, @RequestParam(defaultValue = "0") int page,
@@ -48,10 +52,12 @@ public class AssignedOrderItemController {
 		return ResponseEntity.ok(orderItems);
 	}
 
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@PostMapping
-	public ResponseEntity<AssignedOrderItem> assignOrderItem(@RequestBody AssignedOrderItemCreateRequest dto) {
+	public ResponseEntity<AssignedOrderItem> assignOrderItem(@RequestBody AssignedOrderItemCreateRequest dto,
+			Principal principal) {
 		try {
-			AssignedOrderItem assignedOrderItem = assignedOrderItemService.assignOrderItem(dto);
+			AssignedOrderItem assignedOrderItem = assignedOrderItemService.assignOrderItem(dto, principal.getName());
 			return ResponseEntity.ok(assignedOrderItem);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -60,6 +66,7 @@ public class AssignedOrderItemController {
 		}
 	}
 
+	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@PostMapping("/delivery-items")
 	public ResponseEntity<List<DeliveryOrderItemProjection>> getDeliveryOrderItems(
 			@RequestBody List<UUID> assignedOrderItemIds) {

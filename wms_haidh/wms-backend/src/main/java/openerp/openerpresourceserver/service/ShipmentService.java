@@ -40,11 +40,11 @@ public class ShipmentService {
     }
 
     
-    public Shipment createShipment(ShipmentCreateRequest request) {
+    public Shipment createShipment(ShipmentCreateRequest request, String userLoginId) {
         Shipment shipment = new Shipment();
         shipment.setShipmentId(generateShipmentId());
         shipment.setExpectedDeliveryStamp(request.getExpectedDeliveryStamp());
-        shipment.setCreatedBy(request.getCreatedBy());
+        shipment.setCreatedBy(userLoginId);
         shipment.setCreatedStamp(LocalDateTime.now());
         shipment.setLastUpdatedStamp(LocalDateTime.now());
         shipment.setDeleted(false);

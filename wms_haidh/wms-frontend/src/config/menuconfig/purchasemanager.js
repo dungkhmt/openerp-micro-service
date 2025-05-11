@@ -6,14 +6,14 @@ export const purchasemanager = {
     {
       id: "MENU_WMSv2_PURCHASE_MANAGER.PROCESS_RECEIPT",
       path: "/purchase-manager/process-receipts",
-      isPublic: true,
+      isPublic: false,
       text: "Purchase Orders",
       child: [],
     },
     {
-      id: "MENU_WMSv2_PURCHASE_MANAGER.BILL_RECEIPT",
+      id: "MENU_WMSv2_PURCHASE_MANAGER.RECEIPT_BILL",
       path: "/purchase-manager/receipt-bill",
-      isPublic: true,
+      isPublic: false,
       text: "Receipt Bills",
       child: [],
     }

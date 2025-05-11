@@ -177,10 +177,9 @@ const AddTrip = () => {
       totalLocations: deliverySequence.length,
       distance,
       items: submittedData,
-      coordinates,
-      assignedBy: "hoanglotar2000"
+      coordinates
     };
-    console.log(payload);
+    // console.log(payload);
 
     const requestUrl = "/delivery-trips";
 

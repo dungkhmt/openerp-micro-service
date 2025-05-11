@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +30,7 @@ public class AddressDistanceController {
 
 	private AddressDistanceService addressDistanceService;
 
+	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@GetMapping
 	public Page<AddressDistanceProjection> getDistanceList(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "WAREHOUSE") AddressType fromType,
@@ -38,6 +40,7 @@ public class AddressDistanceController {
 		return addressDistanceService.getAllDistances(fromType, toType, fromLocation, toLocation, pageable);
 	}
 
+	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@PostMapping("/update")
 	public ResponseEntity<Boolean> updateDistance(@RequestBody UpdateDistanceRequest request) {
 		try {
@@ -49,6 +52,7 @@ public class AddressDistanceController {
 		}
 	}
 	
+	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@PostMapping("/update-all")
     public ResponseEntity<String> updateDistances() {
         try {

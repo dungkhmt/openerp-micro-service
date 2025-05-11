@@ -6,14 +6,14 @@ export const purchasestaff = {
     {
       id: "MENU_WMSv2_PURCHASE_STAFF.PRODUCT",
       path: "/purchase-staff/products",
-      isPublic: true,
+      isPublic: false,
       text: "Products",
       child: [],
     },
     {
       id: "MENU_WMSv2_PURCHASE_STAFF.RECEIPT",
       path: "/purchase-staff/receipts",
-      isPublic: true,
+      isPublic: false,
       text: "Purchase Orders",
       child: [],
     }

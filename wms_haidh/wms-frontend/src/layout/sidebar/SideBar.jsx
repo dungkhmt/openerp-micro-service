@@ -74,7 +74,6 @@ export default function SideBar(props) {
   const { keycloak } = useKeycloak();
 
   useEffect(() => {
-    console.log(MENUS);
     if (keycloak.authenticated) fetchMenu();
   }, [keycloak.authenticated]);
 

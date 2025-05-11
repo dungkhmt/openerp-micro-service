@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -97,5 +98,11 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 			    ORDER BY profit DESC
 			""")
 	List<CategoryProfitDatapoint> getMonthlyProfitByCategory(@Param("month") String month);
+	
+	@Modifying
+	@Query("UPDATE Order o SET o.status = 'DELIVERING', o.lastUpdatedStamp = CURRENT_TIMESTAMP WHERE o.id IN :orderIds")
+	int updateStatusToDelivering(@Param("orderIds") List<UUID> orderIds);
+
+
 
 }

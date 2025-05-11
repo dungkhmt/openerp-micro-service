@@ -1,6 +1,8 @@
 package openerp.openerpresourceserver.controller;
 
+import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,6 +37,7 @@ public class DeliveryTripController {
 
 	private DeliveryTripService deliveryTripService;
 
+	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@GetMapping
 	public ResponseEntity<?> getDeliveryTrips(@RequestParam(defaultValue = "CREATED") String status,
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
@@ -47,6 +51,7 @@ public class DeliveryTripController {
 		}
 	}
 
+	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@GetMapping("/by-shipment")
 	public ResponseEntity<Page<DeliveryTrip>> getDeliveryTrips(@RequestParam int page, @RequestParam int size,
 			@RequestParam String shipmentId) {
@@ -56,27 +61,30 @@ public class DeliveryTripController {
 		return ResponseEntity.ok(trips);
 	}
 
+	@Secured("ROLE_WMS_DELIVERY_PERSON")
 	@GetMapping("/today")
-	public ResponseEntity<Page<TodayDeliveryTripProjection>> getTodayDeliveryTrips(
-			@RequestParam String deliveryPersonId, @RequestParam(defaultValue = "CREATED") String status,
-			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
+	public ResponseEntity<Page<TodayDeliveryTripProjection>> getTodayDeliveryTrips(Principal principal,
+			@RequestParam(defaultValue = "CREATED") String status, @RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size) {
 
 		Pageable pageable = PageRequest.of(page, size, Sort.by("createdStamp").descending());
-		Page<TodayDeliveryTripProjection> trips = deliveryTripService.getTodayDeliveryTrips(deliveryPersonId, status,
+		Page<TodayDeliveryTripProjection> trips = deliveryTripService.getTodayDeliveryTrips(principal.getName(), status,
 				pageable);
 		return ResponseEntity.ok(trips);
 	}
 
+	@Secured({ "ROLE_WMS_DELIVERY_PERSON", "ROLE_WMS_DELIVERY_MANAGER" })
 	@GetMapping("/{deliveryTripId}/general-info")
 	public ResponseEntity<DeliveryTripGeneralProjection> getDeliveryTripDetail(@PathVariable String deliveryTripId) {
 		DeliveryTripGeneralProjection tripDetail = deliveryTripService.getDeliveryTripById(deliveryTripId);
 		return ResponseEntity.ok(tripDetail);
 	}
 
+	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@PostMapping
-	public ResponseEntity<?> createDeliveryTrip(@RequestBody DeliveryTripCreateRequest payload) {
+	public ResponseEntity<?> createDeliveryTrip(@RequestBody DeliveryTripCreateRequest payload, Principal principal) {
 		try {
-			DeliveryTrip trip = deliveryTripService.createDeliveryTrip(payload);
+			DeliveryTrip trip = deliveryTripService.createDeliveryTrip(payload, principal.getName());
 			return ResponseEntity.ok(trip);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -84,18 +92,21 @@ public class DeliveryTripController {
 		}
 
 	}
-	
+
+	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@PostMapping("/batch")
-	public ResponseEntity<?> createMultipleDeliveryTrips(@RequestBody List<DeliveryTripCreateRequest> payloadList) {
-	    try {
-	        List<DeliveryTrip> trips = deliveryTripService.createDeliveryTrip(payloadList);
-	        return ResponseEntity.ok(trips);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating trips");
-	    }
+	public ResponseEntity<?> createMultipleDeliveryTrips(@RequestBody List<DeliveryTripCreateRequest> payloadList,
+			Principal principal) {
+		try {
+			List<DeliveryTrip> trips = deliveryTripService.createDeliveryTrip(payloadList, principal.getName());
+			return ResponseEntity.ok(trips);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating trips");
+		}
 	}
 
+	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@PostMapping("/{deliveryTripId}/cancel")
 	public ResponseEntity<String> cancelDeliveryTrip(@PathVariable String deliveryTripId) {
 		boolean cancelled = deliveryTripService.cancelDeliveryTrip(deliveryTripId);
@@ -103,6 +114,28 @@ public class DeliveryTripController {
 			return ResponseEntity.ok("Delivery trip cancelled successfully.");
 		} else {
 			return ResponseEntity.badRequest().body("Delivery trip can only be cancelled if it is in CREATED status.");
+		}
+	}
+
+	@Secured("ROLE_WMS_DELIVERY_PERSON")
+	@PostMapping("/{deliveryTripId}/start")
+	public ResponseEntity<String> startDeliveryTrip(@PathVariable String deliveryTripId) {
+		boolean started = deliveryTripService.startDeliveryTrip(deliveryTripId);
+		if (started) {
+			return ResponseEntity.ok("Delivery trip started successfully.");
+		} else {
+			return ResponseEntity.badRequest().body("Delivery trip can only be started if it is in CREATED status.");
+		}
+	}
+
+	@Secured("ROLE_WMS_DELIVERY_PERSON")
+	@PostMapping("/{deliveryTripId}/mark-delivered")
+	public ResponseEntity<String> markAsDelivered(@PathVariable String deliveryTripId, @RequestParam UUID orderId) {
+		try {
+			int updatedCount = deliveryTripService.markAsDelivered(deliveryTripId, orderId);
+			return ResponseEntity.ok("Successfully updated " + updatedCount + " items as delivered.");
+		} catch (Exception e) {
+			return ResponseEntity.status(500).body("An error occurred: " + e.getMessage());
 		}
 	}
 

@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,12 +25,14 @@ public class BayController {
 
 	private BayService bayService;
 
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping
 	public ResponseEntity<List<BayProjection>> getAllBays(@RequestParam UUID warehouseId) {
 		List<BayProjection> warehouses = bayService.getBaysProjectionByWarehouseId(warehouseId);
 		return ResponseEntity.ok(warehouses);
 	}
 	
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping("/full")
     public ResponseEntity<List<Bay>> getBaysByWarehouseId(@RequestParam UUID warehouseId) {
         List<Bay> bays = bayService.getBaysByWarehouseId(warehouseId);

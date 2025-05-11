@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ public class RouteController {
 
     private final RouteService routeService;
 
+    @Secured("ROLE_WMS_DELIVERY_MANAGER")
     @PostMapping("/fetch")
     public ResponseEntity<RoutePathResponse> getRoute(@RequestBody CoordinateRequest request) {
         RoutePathResponse response = routeService.getRoute(request);

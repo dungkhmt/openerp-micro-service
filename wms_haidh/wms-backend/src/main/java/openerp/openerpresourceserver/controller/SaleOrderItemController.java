@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,12 +24,14 @@ import openerp.openerpresourceserver.service.SaleOrderItemService;
 public class SaleOrderItemController {
 
 	private SaleOrderItemService saleOrderItemService;
-	
+
+	@Secured({"ROLE_WMS_WAREHOUSE_MANAGER","ROLE_WMS_ONLINE_CUSTOMER","ROLE_WMS_SALE_MANAGER"})
 	@GetMapping
 	public List<SaleOrderItemProjection> getAllSaleOrderItems(@RequestParam UUID orderId) {
 		return saleOrderItemService.getSaleOrderItems(orderId);
 	}
 	
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping("/{id}")
 	public SaleOrderItemDetailProjection getSaleOrderItemDetail(@PathVariable UUID id) {
 		return saleOrderItemService.getSaleOrderItemDetail(id);

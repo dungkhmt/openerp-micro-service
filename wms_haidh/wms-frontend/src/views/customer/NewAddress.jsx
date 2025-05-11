@@ -39,7 +39,6 @@ const NewAddress = () => {
     }
 
     const payload = {
-      userLoginId: "hoanglotar2000",
       addressName,
       longitude: coordinates.lng,
       latitude: coordinates.lat

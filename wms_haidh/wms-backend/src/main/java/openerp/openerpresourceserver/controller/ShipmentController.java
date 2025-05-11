@@ -1,10 +1,12 @@
 package openerp.openerpresourceserver.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +28,7 @@ public class ShipmentController {
 
 	private ShipmentService shipmentService;
 	
+	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@GetMapping
 	public ResponseEntity<?> getShipments(
 	        @RequestParam(required = false) Integer page,
@@ -41,9 +44,10 @@ public class ShipmentController {
 	    }
 	}
 
+	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@PostMapping
-    public ResponseEntity<Shipment> createShipment(@RequestBody ShipmentCreateRequest request) {
-        Shipment shipment = shipmentService.createShipment(request);
+    public ResponseEntity<Shipment> createShipment(@RequestBody ShipmentCreateRequest request, Principal principal) {
+        Shipment shipment = shipmentService.createShipment(request, principal.getName());
         return ResponseEntity.ok(shipment);
     }
 	

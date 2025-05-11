@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 public class ReceiptBillCreateRequest {
     private String receiptBillId;
     private String description;
-    private String createdBy;
     private UUID receiptItemRequestId;
 }
 
