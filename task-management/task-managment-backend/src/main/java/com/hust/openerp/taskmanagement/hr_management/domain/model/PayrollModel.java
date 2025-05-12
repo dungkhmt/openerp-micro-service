@@ -1,14 +1,13 @@
 package com.hust.openerp.taskmanagement.hr_management.domain.model;
 
-import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceStatus;
-import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceType;
-import com.hust.openerp.taskmanagement.util.WorkTimeCalculator;
+import com.hust.openerp.taskmanagement.entity.User;
+import com.hust.openerp.taskmanagement.hr_management.constant.PayrollStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -16,11 +15,13 @@ import java.util.UUID;
 @Builder
 public class PayrollModel {
     private UUID id;
-    private LocalDate date;
-    private LocalTime startTime;
-    private LocalTime endTime;
-    private String reason;
-    private AbsenceStatus status;
-    private AbsenceType type;
-    private String userId;
+    private String name;
+    private Integer totalWorkDays;
+    private Float workHoursPerDay;
+    private Integer totalHolidayDays;
+    private LocalDate fromdate;
+    private LocalDate thruDate;
+    private User createdBy;
+    private PayrollStatus status;
+    private List<PayrollDetailModel> details;
 }
