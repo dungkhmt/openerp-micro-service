@@ -21,6 +21,7 @@ import { request } from '../../api';
 import { useNavigate, useParams } from 'react-router-dom';
 import { formatPrice, formatDatev2 } from '../../utils/utils';
 import { toast, Toaster } from "react-hot-toast";
+import SaveIcon from '@mui/icons-material/Save';
 
 const PriceConfig = () => {
     const navigate = useNavigate();
@@ -160,24 +161,19 @@ const PriceConfig = () => {
                     <Grid item xs={12}>
                         <Box display="flex" justifyContent="flex-end">
                             <Button
+                                startIcon={<SaveIcon />}
                                 onClick={handleAddPrice}
                                 variant="outlined"
                                 sx={{
-                                    mt: 1,
-                                    color: 'black',
-                                    borderColor: 'black',
-                                    border: '1px solid',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 1,
+                                    marginLeft: 'auto',
+                                    backgroundColor: '#019160',
+                                    color: '#fff',
                                     '&:hover': {
-                                        backgroundColor: 'black',
-                                        color: 'white',
-                                        borderColor: 'black',
-                                        '& .add-icon': {
-                                            color: 'white',
-                                        }
-                                    }
+                                        backgroundColor: '#2fbe8e',
+                                    },
+                                    '&:active': {
+                                        backgroundColor: '#01b075',
+                                    },
                                 }}
                             >
                                 Save

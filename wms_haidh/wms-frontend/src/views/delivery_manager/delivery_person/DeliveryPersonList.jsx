@@ -164,8 +164,8 @@ export default function DeliveryPerson() {
           />
           <div className="flex gap-3">
             <Button
-              className="bg-foreground text-background"
-              endContent={<PlusIcon />}
+              className="bg-[#019160] text-white hover:bg-[#2fbe8e] active:bg-[#01b075]"
+              startContent={<PlusIcon />}
               size="md"
               onPress={handleAdd}
             >

@@ -205,7 +205,7 @@ export default function Distance() {
                 <div className="flex items-center gap-3">
                     <Button
                         size="sm"
-                        className="bg-success text-white"
+                        className="bg-[#019160] text-white hover:bg-[#2fbe8e] active:bg-[#01b075]"
                         onPress={handleAutoUpdate}
                     >
                         Auto Update Distances

@@ -142,16 +142,23 @@ const AddReceipt = () => {
         </Typography>
         <Button
           variant="contained"
-          color="primary"
-          startIcon={<SaveIcon />} 
+          startIcon={<SaveIcon />}
           sx={{
             marginLeft: 'auto',
-            '&:hover': { backgroundColor: 'primary.dark' }
+            backgroundColor: '#019160',
+            color: '#fff',
+            '&:hover': {
+              backgroundColor: '#2fbe8e',
+            },
+            '&:active': {
+              backgroundColor: '#01b075',
+            },
           }}
           onClick={handleSubmit}
         >
           Save
         </Button>
+
 
       </Box>
 
@@ -272,29 +279,31 @@ const AddReceipt = () => {
             <Button
               onClick={handleAddRequestDetail}
               variant="outlined"
-              color="primary"
               sx={{
                 mt: 2,
-                ml: 1,
-                border: '1px solid',
+                border: '1px solid #019160',
+                color: '#019160',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1,
+                transition: 'background-color 0.2s ease, color 0.2s ease',
                 '&:hover': {
-                  backgroundColor: 'primary.main',
-                  color: 'white',
-                  borderColor: 'primary.main',
+                  backgroundColor: '#019160',
+                  color: '#ffffff',
+                  borderColor: '#019160',
                   '& .add-icon': {
-                    color: 'white',
-                  }
-                }
+                    color: '#ffffff',
+                  },
+                },
+                '&:active': {
+                  backgroundColor: '#01b075',
+                  borderColor: '#01b075',
+                },
               }}
             >
-              <AddIcon className="add-icon" sx={{ color: 'primary.main' }} />
+              <AddIcon className="add-icon" sx={{ color: 'inherit' }} />
               Add Product
             </Button>
-
-
           </Paper>
         </Grid>
       </Grid>

@@ -148,13 +148,15 @@ export default function ReceiptList() {
           {/* Add Button */}
           <div className="flex-shrink-0">
             <Button
-              className="bg-foreground text-background"
-              endContent={<PlusIcon />}
+              className="bg-[#019160] text-white hover:bg-[#2fbe8e] active:bg-[#01b075]"
+              startContent={<PlusIcon />}
               size="md"
               onPress={handleAddReceipt}
             >
               {buttonText}
             </Button>
+
+
           </div>
         </div>
 

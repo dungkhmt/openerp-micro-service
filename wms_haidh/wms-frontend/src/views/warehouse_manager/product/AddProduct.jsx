@@ -122,7 +122,15 @@ const ProductForm = () => {
           color="primary"
           startIcon={<SaveIcon />}
           sx={{
-            marginLeft: 'auto'
+            marginLeft: 'auto',
+            backgroundColor: '#019160',
+            color: '#fff',
+            '&:hover': {
+              backgroundColor: '#2fbe8e',
+            },
+            '&:active': {
+              backgroundColor: '#01b075',
+            },
           }}
           onClick={handleSubmit}
         >
@@ -199,7 +207,16 @@ const ProductForm = () => {
                 component="span"
                 startIcon={<PhotoCamera />}
                 sx={{
-                  width:'100%'
+                  width: '100%',
+                  marginLeft: 'auto',
+                  backgroundColor: '#019160',
+                  color: '#fff',
+                  '&:hover': {
+                    backgroundColor: '#2fbe8e',
+                  },
+                  '&:active': {
+                    backgroundColor: '#01b075',
+                  },
                 }}
               >
                 Upload Image

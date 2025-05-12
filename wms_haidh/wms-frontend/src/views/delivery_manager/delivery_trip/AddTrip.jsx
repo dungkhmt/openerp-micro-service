@@ -274,8 +274,16 @@ const AddTrip = () => {
           variant="contained"
           color="primary"
           startIcon={<SaveIcon />}
-          sx={{
-            marginLeft: 'auto'
+           sx={{
+            marginLeft: 'auto',
+            backgroundColor: '#019160',
+            color: '#fff',
+            '&:hover': {
+              backgroundColor: '#2fbe8e',
+            },
+            '&:active': {
+              backgroundColor: '#01b075',
+            },
           }}
           onClick={handleSubmit}
         >

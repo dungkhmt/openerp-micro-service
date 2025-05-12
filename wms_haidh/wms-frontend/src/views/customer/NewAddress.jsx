@@ -71,14 +71,15 @@ const NewAddress = () => {
         </Card>
         <div className="flex justify-center">
           <Button variant="contained" color="primary" sx={{
-            width: "100%",
-            height: "45px",
-            backgroundColor: "black",
-            color: "white",
-            fontSize: "16px",
-            "&:hover": {
-              backgroundColor: "black",
-              opacity: 0.75,
+            width: '100%',
+            marginLeft: 'auto',
+            backgroundColor: '#019160',
+            color: '#fff',
+            '&:hover': {
+              backgroundColor: '#2fbe8e',
+            },
+            '&:active': {
+              backgroundColor: '#01b075',
             },
           }} onClick={handleSubmit}>
             Save Address

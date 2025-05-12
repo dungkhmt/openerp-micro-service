@@ -92,13 +92,18 @@ const RoutingRecommendation = () => {
           variant="contained"
           sx={{
             marginLeft: 'auto',
-            backgroundColor: 'black',
-            color: 'white',
-            '&:hover': { backgroundColor: 'black', opacity: 0.75 }
+            backgroundColor: '#019160',
+            color: '#fff',
+            '&:hover': {
+              backgroundColor: '#2fbe8e',
+            },
+            '&:active': {
+              backgroundColor: '#01b075',
+            },
           }}
           onClick={handleSubmit}
         >
-          Submit
+          Save
         </Button>
       </Box>
 
@@ -145,7 +150,12 @@ const RoutingRecommendation = () => {
                       </FormControl>
                     </Grid>
                     <Grid item xs={2}>
-                      <IconButton onClick={() => handleDeleteTrip(index)}>
+                      <IconButton  sx={{
+                          color: 'grey.600',
+                          '&:hover': {
+                            color: 'error.main',
+                          }
+                        }} onClick={() => handleDeleteTrip(index)}>
                         <DeleteIcon />
                       </IconButton>
                     </Grid>
@@ -158,25 +168,29 @@ const RoutingRecommendation = () => {
               onClick={handleAddTrip}
               variant="outlined"
               sx={{
-                mt: 1,
-                color: 'black',
-                borderColor: 'black',
-                border: '1px solid',
+                mt: 2,
+                border: '1px solid #019160',
+                color: '#019160',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1,
+                transition: 'background-color 0.2s ease, color 0.2s ease',
                 '&:hover': {
-                  backgroundColor: 'black',
-                  color: 'white',
-                  borderColor: 'black',
+                  backgroundColor: '#019160',
+                  color: '#ffffff',
+                  borderColor: '#019160',
                   '& .add-icon': {
-                    color: 'white',
-                  }
-                }
+                    color: '#ffffff',
+                  },
+                },
+                '&:active': {
+                  backgroundColor: '#01b075',
+                  borderColor: '#01b075',
+                },
               }}
             >
-              <AddIcon className="add-icon" sx={{ color: 'black' }} />
-              Add delivery trip
+              <AddIcon className="add-icon" sx={{ color: 'inherit' }} />
+              Add Delivery Trip
             </Button>
           </Paper>
         </Grid>

@@ -24,6 +24,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { request } from "../../../api";
 import { formatPrice } from '../../../utils/utils';
 import { toast, Toaster } from "react-hot-toast";
+import SaveIcon from '@mui/icons-material/Save';
 
 const OrderItem = () => {
   const navigate = useNavigate();
@@ -303,8 +304,19 @@ const OrderItem = () => {
               </Grid>
             </Grid>
             <Box sx={{ mt: 3, textAlign: 'right' }}>
-              <Button variant="contained" color="primary" onClick={handleSubmit}>
-                Submit
+              <Button variant="contained" color="primary" startIcon={<SaveIcon />} sx={{
+                marginLeft: 'auto',
+                backgroundColor: '#019160',
+                color: '#fff',
+                '&:hover': {
+                  backgroundColor: '#2fbe8e',
+                },
+                '&:active': {
+                  backgroundColor: '#01b075',
+                },
+              }}
+                onClick={handleSubmit}>
+                Save
               </Button>
             </Box>
           </Paper>

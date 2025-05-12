@@ -6,6 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { Table, TableHead, TableRow, TableCell, TableBody, TableContainer } from '@mui/material';
+import SaveIcon from '@mui/icons-material/Save';
 
 const RoutingResult = () => {
     const { id } = useParams();
@@ -159,7 +160,7 @@ const RoutingResult = () => {
         const requestUrl = "/delivery-trips/batch";
         request("post", requestUrl, (res) => {
             if (res.status === 200) {
-                navigate(`/delivery-manager/shipments`);
+                navigate(`/delivery-manager/shipments/${id}`);
             }
         }, {}, payload);
     };
@@ -168,7 +169,7 @@ const RoutingResult = () => {
     return (
         <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <IconButton color="primary" onClick={() => navigate('/delivery-manager/shipments')} sx={{ color: 'grey.700', mr: 1 }}>
+                <IconButton color="primary" onClick={() => navigate(`/delivery-manager/shipments/${id}/auto-routing`)} sx={{ color: 'grey.700', mr: 1 }}>
                     <ArrowBackIcon />
                 </IconButton>
                 <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
@@ -176,15 +177,22 @@ const RoutingResult = () => {
                 </Typography>
                 <Button
                     variant="contained"
+                    color="primary"
+                    startIcon={<SaveIcon />}
                     sx={{
                         marginLeft: 'auto',
-                        backgroundColor: 'black',
-                        color: 'white',
-                        '&:hover': { backgroundColor: 'black', opacity: 0.75 }
+                        backgroundColor: '#019160',
+                        color: '#fff',
+                        '&:hover': {
+                            backgroundColor: '#2fbe8e',
+                        },
+                        '&:active': {
+                            backgroundColor: '#01b075',
+                        },
                     }}
                     onClick={handleSubmit}
                 >
-                    Submit
+                    Save
                 </Button>
             </Box>
             {location.state?.routingResult?.totalDistance && (

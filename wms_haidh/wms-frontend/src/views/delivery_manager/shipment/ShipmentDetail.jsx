@@ -72,7 +72,7 @@ const ShipmentDetail = () => {
                 <Box>
                     <Button
                         size="md"
-                        className="bg-success text-white"
+                        className="bg-[#019160] text-white hover:bg-[#2fbe8e] active:bg-[#01b075]"
                         onPress={() => navigate('auto-routing')}
                         startContent={<AutoAwesomeIcon className="w-4 h-4" />}
                     >

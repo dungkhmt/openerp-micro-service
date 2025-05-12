@@ -38,8 +38,8 @@ export default function Shipment() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedSearchTerm(filterValue);  
-    }, 500); 
+      setDebouncedSearchTerm(filterValue);
+    }, 500);
     return () => clearTimeout(timer);
   }, [filterValue]);
 
@@ -144,7 +144,8 @@ export default function Shipment() {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
-            <Button className="bg-foreground text-background" endContent={<PlusIcon />} size="md" onPress={handleOpenModal}>
+            <Button className="bg-[#019160] text-white hover:bg-[#2fbe8e] active:bg-[#01b075]"
+              startContent={<PlusIcon />} size="md" onPress={handleOpenModal}>
               {buttonText}
             </Button>
           </div>

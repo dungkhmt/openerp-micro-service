@@ -103,10 +103,10 @@ const Cart = () => {
                                 >
                                     <div className="flex items-center space-x-4">
                                         <img src={item.imageUrl} alt={item.name} className="w-24 h-24 object-contain" />
-                                        <div className="w-[200px]"> 
+                                        <div className="w-[200px]">
                                             <p
                                                 className="font-semibold whitespace-nowrap overflow-hidden text-ellipsis"
-                                                style={{ maxWidth: "100%" }} 
+                                                style={{ maxWidth: "100%" }}
                                             >
                                                 {item.name}
                                             </p>
@@ -121,7 +121,12 @@ const Cart = () => {
                                         onChange={(e) => handleQuantityChange(item.productId, parseInt(e.target.value) || 1)}
                                         onBlur={() => handleQuantityChange(item.productId, item.quantity || 1)}
                                     />
-                                    <IconButton onClick={() => handleRemoveItem(item.productId)}>
+                                    <IconButton sx={{
+                                        color: 'grey.600',
+                                        '&:hover': {
+                                            color: 'error.main',
+                                        }
+                                    }} onClick={() => handleRemoveItem(item.productId)}>
                                         <DeleteIcon />
                                     </IconButton>
                                 </Card>
