@@ -1,7 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import ProductList from "../views/warehouse_manager/product/ProductList";
 import AddProduct from "../views/warehouse_manager/product/AddProduct";
-import ReceiptBill from "../views/warehouse_manager/receipt/ReceiptBill";
 import ReceiptList from "../views/warehouse_manager/receipt/ReceiptList";
 import ReceiptItem from "../views/warehouse_manager/receipt/ReceiptItem";
 import ReceiptDetail from "../views/warehouse_manager/receipt/ReceiptDetail"
@@ -27,7 +26,6 @@ function WarehouseManagerRouter() {
       <Route path="receipts" element={<ReceiptList />} />
       <Route path="receipts/:id1" element={<ReceiptDetail />} />
       <Route path="receipts/:id1/:id2" element={<ReceiptItem />} />
-      <Route path="receipts/receipt-bill" element={<ReceiptBill />} />
     </Routes>
   );
 }

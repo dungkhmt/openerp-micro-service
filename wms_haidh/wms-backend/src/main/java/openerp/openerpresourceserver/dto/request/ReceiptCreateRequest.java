@@ -17,10 +17,7 @@ public class ReceiptCreateRequest {
 
     private String receiptName;
     private String description;
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate receiptDate;
     private UUID warehouseId;
-    private String createdReason;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate expectedReceiptDate;
     private List<ReceiptItemRequestDTO> receiptItemRequests;  

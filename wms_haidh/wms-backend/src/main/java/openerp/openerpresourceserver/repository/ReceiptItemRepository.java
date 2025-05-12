@@ -19,11 +19,9 @@ public interface ReceiptItemRepository extends JpaRepository<ReceiptItem, UUID> 
                    b.code AS bayCode,
                    r.importPrice AS importPrice,
                    r.expiredDate AS expiredDate,
-                   r.lotId AS lotId,
-                   rb.receiptBillId AS receiptBillId
+                   r.lotId AS lotId
             FROM ReceiptItem r
             JOIN Bay b ON r.bayId = b.bayId
-            LEFT JOIN ReceiptBill rb ON r.receiptBillId = rb.receiptBillId
             WHERE r.receiptItemRequestId = :receiptItemRequestId
            """)
     List<ReceiptItemProjection> findByReceiptItemRequestId(@Param("receiptItemRequestId") UUID receiptItemRequestId);

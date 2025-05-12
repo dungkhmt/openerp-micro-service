@@ -9,6 +9,5 @@ public interface ReceiptItemProjection {
     BigDecimal getImportPrice();
     LocalDateTime getExpiredDate();
     String getLotId();
-    String getReceiptBillId();
 }
 

@@ -226,7 +226,7 @@ const Checkout = () => {
                         }}
                         onClick={() => navigate("/customer/order-history")}
                     >
-                        Go to Homepage
+                        View my orders
                     </Button>
                 </DialogActions>
             </Dialog>

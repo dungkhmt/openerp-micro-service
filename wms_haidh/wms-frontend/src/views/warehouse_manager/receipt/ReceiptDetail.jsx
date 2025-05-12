@@ -32,7 +32,7 @@ const ReceiptDetail = () => {
     <Box sx={{ p: 3 }}>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <IconButton color="primary" onClick={() => navigate('/admin/receipts')} sx={{ color: 'black' }}>
+        <IconButton color="primary" onClick={() => navigate('/admin/receipts')} sx={{ color: 'grey.700', mr: 1 }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>
@@ -77,7 +77,7 @@ const ReceiptDetail = () => {
                             },
                           }}
                         />
-                        <Typography sx={{ ml: 1, fontSize: '0.875rem' }}>{detail.completed}%</Typography>
+                        <Typography sx={{ ml: 1, fontSize: '0.875rem' }}>{Math.round(detail.completed)}%</Typography>
                       </Box>
                     </TableCell>
 

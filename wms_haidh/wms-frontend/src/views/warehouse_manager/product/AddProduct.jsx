@@ -16,6 +16,7 @@ import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router-dom';
 import { request } from "../../../api";
+import SaveIcon from '@mui/icons-material/Save';
 
 const ProductForm = () => {
 
@@ -52,7 +53,7 @@ const ProductForm = () => {
         setDescription(product.description);
         setUom(product.uom);
         setImage(product.imageUrl);
-      }, {}); 
+      }, {});
     }
   }, [id]);
 
@@ -106,7 +107,10 @@ const ProductForm = () => {
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <IconButton color="primary" onClick={() => navigate('/admin/product')} sx={{ color: 'black' }}>
+        <IconButton
+          onClick={() => navigate('/admin/product')}
+          sx={{ color: 'grey.700', mr: 1 }}
+        >
           <ArrowBackIcon />
         </IconButton>
 
@@ -116,18 +120,13 @@ const ProductForm = () => {
         <Button
           variant="contained"
           color="primary"
+          startIcon={<SaveIcon />}
           sx={{
-            marginLeft: 'auto',
-            backgroundColor: 'black',
-            color: 'white',
-            '&:hover': {
-              backgroundColor: 'black', // Giữ màu đen khi hover
-              opacity: 0.75,            // Đặt độ mờ khi hover
-            }
+            marginLeft: 'auto'
           }}
           onClick={handleSubmit}
         >
-          {id ? 'Update Product' : 'Save Product'}
+          Save
         </Button>
 
 
@@ -170,15 +169,15 @@ const ProductForm = () => {
                 ) : (
                   // If it's an existing image URL (from the product data), display that
                   <img
-                  src={image}
-                  alt="Product Preview"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain", // Đảm bảo ảnh vừa vặn với chiều cao và chiều rộng
-                  }}
-                />
-                
+                    src={image}
+                    alt="Product Preview"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain", // Đảm bảo ảnh vừa vặn với chiều cao và chiều rộng
+                    }}
+                  />
+
                 )
               ) : (
                 <Typography variant="body2" sx={{ color: "grey" }}>
@@ -200,13 +199,7 @@ const ProductForm = () => {
                 component="span"
                 startIcon={<PhotoCamera />}
                 sx={{
-                  width: '100%',
-                  backgroundColor: 'black',
-                  color: 'white',
-                  '&:hover': {
-                    backgroundColor: 'black', // Giữ màu đen khi hover
-                    opacity: 0.75,            // Đặt độ mờ khi hover
-                  }
+                  width:'100%'
                 }}
               >
                 Upload Image

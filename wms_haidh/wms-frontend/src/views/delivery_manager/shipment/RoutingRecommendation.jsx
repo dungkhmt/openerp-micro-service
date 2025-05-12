@@ -82,7 +82,7 @@ const RoutingRecommendation = () => {
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <IconButton onClick={() => navigate('/delivery-manager/shipments')} sx={{ color: 'black' }}>
+        <IconButton onClick={() => navigate('/delivery-manager/shipments')} sx={{ color: 'grey.700', mr: 1 }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 1 }}>

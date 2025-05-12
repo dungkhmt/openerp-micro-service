@@ -60,7 +60,7 @@ const NewAddress = () => {
       <div className="w-full space-y-6">
         <BreadcrumbsCustom paths={breadcrumbPaths} />
         <Card className="p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-center">Select Your Address</h3>
+          <h3 className="text-lg font-semibold text-center">Select Your Position</h3>
           <Map enableSelection={true} onSelectLocation={handleSelectLocation} />
           <TextField
             label="Selected Address"

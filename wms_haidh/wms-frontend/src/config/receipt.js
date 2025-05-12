@@ -12,8 +12,6 @@ const columns = [
 const statusOptions = [
   { name: "CREATED", uid: "CREATED" },
   { name: "CANCELLED", uid: "CANCELLED" },
-  { name: "APPROVED", uid: "APPROVED" },
-  { name: "IN PROGRESS", uid: "IN_PROGRESS" },
-  { name: "COMPLETED", uid: "COMPLETED" },
+  { name: "APPROVED", uid: "APPROVED" }
 ];
 export { columns, statusOptions };

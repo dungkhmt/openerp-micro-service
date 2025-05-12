@@ -15,6 +15,7 @@ import Map from '../../components/Map';
 import { formatDate } from '../../utils/utils';
 import PhoneIcon from '@mui/icons-material/Phone';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import MapIcon from '@mui/icons-material/Map';
 
 const DeliveryTripDetail = () => {
   const navigate = useNavigate();
@@ -84,7 +85,7 @@ const DeliveryTripDetail = () => {
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <IconButton color="primary" onClick={() => navigate('/delivery-staff/delivery-trip')} sx={{ color: 'black' }}>
+        <IconButton color="primary" onClick={() => navigate('/delivery-staff/delivery-trip')} sx={{ color: 'grey.700', mr: 1 }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
@@ -164,11 +165,7 @@ const DeliveryTripDetail = () => {
                 {/* Left side: View Items */}
                 <Button
                   variant="contained"
-                  sx={{
-                    backgroundColor: 'black',
-                    color: 'white',
-                    '&:hover': { backgroundColor: 'black', opacity: 0.75 }
-                  }}
+                  color="primary"
                   onClick={() => navigate(`/delivery-staff/delivery-trip/${id}/${item.orderId}`)}
                 >
                   View Items
@@ -195,13 +192,12 @@ const DeliveryTripDetail = () => {
       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button
           variant="contained"
+          color="primary"
           sx={{
-            mt: 4,
-            backgroundColor: 'black',
-            color: 'white',
-            '&:hover': { backgroundColor: 'black', opacity: 0.75 }
+            mt: 4
           }}
           onClick={handleToggleMap}
+          startIcon={<MapIcon />}
         >
           {isMapOpen ? 'Close Map' : 'Open Map'}
         </Button>

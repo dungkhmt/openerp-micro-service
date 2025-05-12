@@ -38,6 +38,7 @@ const OrderItem = () => {
   const [lotId, setLotId] = useState('');
   const [quantityOnHand, setQuantityOnHand] = useState('');
   const [details, setDetails] = useState([]);
+  const remainingQuantity = generalInfo ? Math.round(generalInfo.quantity * (1 - generalInfo.completed / 100)) : 0;
 
   useEffect(() => {
     request("get", `/order-items/${id2}`, (res) => {
@@ -94,7 +95,7 @@ const OrderItem = () => {
       return;
     }
 
-    if (!quantity || quantity > generalInfo.quantity || quantity <= 0) {
+    if (!quantity || quantity > remainingQuantity || quantity <= 0) {
       toast.error("Invalid quantity!");
       return;
     }
@@ -131,11 +132,11 @@ const OrderItem = () => {
     <Box sx={{ p: 3 }}>
       <Toaster />
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <IconButton color="primary" onClick={() => navigate(`/admin/orders/${id1}`)} sx={{ color: 'black' }}>
+        <IconButton color="primary" onClick={() => navigate(`/admin/orders/${id1}`)} sx={{ color: 'grey.700', mr: 1 }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>
-        Pick Assignment
+          Pick Assignment
         </Typography>
       </Box>
 
@@ -174,7 +175,7 @@ const OrderItem = () => {
               }}
             >
               <Typography variant="h4" >
-                {generalInfo ? generalInfo.completed : 0}%
+                {generalInfo ? Math.round(generalInfo.completed) : 0}%
               </Typography>
               <Typography variant="subtitle1" >
                 {generalInfo && generalInfo.completed === 100 ? "Completed" : "In progress"}
@@ -211,6 +212,14 @@ const OrderItem = () => {
               <br />
               {generalInfo?.quantity}
             </Typography>
+            {remainingQuantity > 0 && (
+              <Typography>
+                <b>Qty remaining:</b>
+                <br />
+                {remainingQuantity}
+              </Typography>
+            )
+            }
             <Typography>
               <b>Price Unit:</b>
               <br />

@@ -28,6 +28,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import Map from '../../../components/Map';
 import fetchRoute from '../../../utils/fetchRoute';
 import { formatDate } from '../../../utils/utils';
+import SaveIcon from '@mui/icons-material/Save';
 
 const AddTrip = () => {
   const navigate = useNavigate();
@@ -202,7 +203,7 @@ const AddTrip = () => {
   const handleVehicleChange = (e) => {
     const selectedId = e.target.value;
     setVehicleId(selectedId);
-  
+
     const selectedVehicle = vehicleOptions.find(v => v.vehicleId === selectedId);
     setMaxWeight(selectedVehicle.maxWeight);
 
@@ -263,7 +264,7 @@ const AddTrip = () => {
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <IconButton color="primary" onClick={() => navigate('/delivery-manager/delivery-trip')} sx={{ color: 'black' }}>
+        <IconButton color="primary" onClick={() => navigate('/delivery-manager/delivery-trip')} sx={{ color: 'grey.700', mr: 1 }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
@@ -272,18 +273,13 @@ const AddTrip = () => {
         <Button
           variant="contained"
           color="primary"
+          startIcon={<SaveIcon />}
           sx={{
-            marginLeft: 'auto',
-            backgroundColor: 'black',
-            color: 'white',
-            '&:hover': {
-              backgroundColor: 'black',
-              opacity: 0.75,
-            }
+            marginLeft: 'auto'
           }}
           onClick={handleSubmit}
         >
-          Save Trip
+          Save
         </Button>
       </Box>
       <Box sx={{ mt: 4 }}>
@@ -324,7 +320,7 @@ const AddTrip = () => {
                   ))}
                 </Select>
               </FormControl>
-            </Grid>            
+            </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
                 <InputLabel>Delivery Person</InputLabel>

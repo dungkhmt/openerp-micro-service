@@ -24,8 +24,7 @@ public interface ReceiptRepository extends JpaRepository<Receipt, UUID> {
 			+ "ORDER BY r.lastUpdatedStamp DESC")
 	Page<ReceiptInfoProjection> findReceiptsByStatus(@Param("status") String status, Pageable pageable);
 
-	@Query("SELECT r.receiptName AS receiptName, " + "r.description AS description, " + "r.receiptDate AS receiptDate, "
-			+ "w.name AS warehouseName, " + "r.createdReason AS createdReason, "
+	@Query("SELECT r.receiptName AS receiptName, " + "r.description AS description, " + "w.name AS warehouseName, "
 			+ "r.expectedReceiptDate AS expectedReceiptDate, " + "r.status AS status, " + "r.createdBy AS createdBy, "
 			+ "r.createdStamp AS createdStamp " + "FROM Receipt r "
 			+ "JOIN Warehouse w ON r.warehouseId = w.warehouseId " + "WHERE r.receiptId = :id")

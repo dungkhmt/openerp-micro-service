@@ -22,6 +22,5 @@ public class ReceiptItemCreateRequest {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate expiredDate;
     private UUID receiptItemRequestId;
-    private String receiptBillId;
 }
 

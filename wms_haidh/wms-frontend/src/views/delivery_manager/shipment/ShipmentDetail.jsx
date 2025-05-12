@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Button } from '@nextui-org/react';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
 const ShipmentDetail = () => {
     const navigate = useNavigate();
@@ -27,6 +28,8 @@ const ShipmentDetail = () => {
     const [deliveryTrips, setDeliveryTrips] = useState([]);
     const [loading, setLoading] = useState(false);
     const [totalItems, setTotalItems] = useState(0);
+    const [hasFetched, setHasFetched] = useState(false);
+
 
     useEffect(() => {
         if (id) {
@@ -35,9 +38,14 @@ const ShipmentDetail = () => {
                 setDeliveryTrips(res.data.content);
                 setTotalItems(res.data.totalElements);
                 setLoading(false);
-            }).catch(() => setLoading(false));
+                setHasFetched(true); // đánh dấu là đã load xong lần đầu
+            }).catch(() => {
+                setLoading(false);
+                setHasFetched(true);
+            });
         }
     }, [id, page, rowsPerPage]);
+
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -52,7 +60,7 @@ const ShipmentDetail = () => {
     return (
         <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <IconButton color="primary" onClick={() => navigate('/delivery-manager/shipments')} sx={{ color: 'black' }}>
+                <IconButton color="primary" onClick={() => navigate('/delivery-manager/shipments')} sx={{ color: 'grey.700', mr: 1 }}>
                     <ArrowBackIcon />
                 </IconButton>
                 <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
@@ -60,15 +68,20 @@ const ShipmentDetail = () => {
                 </Typography>
             </Box>
 
-            <Box>
-                <Button
-                    size="sm"
-                    className="bg-success text-white"
-                    onPress={() => navigate('auto-routing')}
-                >
-                    Use routing recommendation
-                </Button>
-            </Box>
+            {hasFetched && !loading && deliveryTrips.length === 0 && (
+                <Box>
+                    <Button
+                        size="md"
+                        className="bg-success text-white"
+                        onPress={() => navigate('auto-routing')}
+                        startContent={<AutoAwesomeIcon className="w-4 h-4" />}
+                    >
+                        Use routing recommendation
+                    </Button>
+                </Box>
+            )}
+
+
 
             <Box sx={{ mt: 1 }}>
                 <Paper elevation={3} sx={{ p: 3, mt: 4 }}>

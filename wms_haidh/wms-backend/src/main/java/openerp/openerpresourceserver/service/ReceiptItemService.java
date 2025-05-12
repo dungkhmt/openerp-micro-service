@@ -20,8 +20,6 @@ public class ReceiptItemService {
 	@Autowired
 	private ReceiptItemRequestService receiptItemRequestService;
 	@Autowired
-	private ReceiptBillService receiptBillService;
-	@Autowired
 	private InventoryService inventoryService;
 
 	public List<ReceiptItemProjection> getItemsByRequestId(UUID receiptItemRequestId) {
@@ -43,7 +41,6 @@ public class ReceiptItemService {
 	            .importPrice(request.getImportPrice())
 	            .expiredDate(expiredDate)
 	            .receiptItemRequestId(request.getReceiptItemRequestId())
-	            .receiptBillId(request.getReceiptBillId())
 	            .receiptId(receiptId)
 	            .createdStamp(LocalDateTime.now())
 	            .lastUpdatedStamp(LocalDateTime.now())
@@ -61,9 +58,6 @@ public class ReceiptItemService {
 	            request.getImportPrice(),
 	            expiredDate
 	    );
-
-	    // Cập nhật tổng giá trị của ReceiptBill
-	    receiptBillService.updateTotalPrice(request.getImportPrice(), request.getQuantity(), request.getReceiptBillId());
 
 	    return savedReceiptItem;
 	}

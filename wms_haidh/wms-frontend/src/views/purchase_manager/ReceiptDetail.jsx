@@ -63,7 +63,7 @@ const ReceiptDetail = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <IconButton color="primary" onClick={() => navigate('/purchase-manager/process-receipts')} sx={{ color: 'black' }}>
+        <IconButton color="primary" onClick={() => navigate('/purchase-manager/process-receipts')} sx={{ color: 'grey.700', mr: 1 }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>
@@ -89,7 +89,6 @@ const ReceiptDetail = () => {
               Details
             </Typography>
             <Typography><b>Created By:</b>  {generalInfo && generalInfo.createdBy}</Typography>
-            <Typography><b>Created Reason:</b>  {generalInfo && generalInfo.createdReason}</Typography>
             <Typography><b>Created Time:</b> {generalInfo && formatDate(generalInfo.createdStamp)}</Typography>
             <Typography><b>Description:</b> {generalInfo && generalInfo.description}</Typography>       
           </Paper>

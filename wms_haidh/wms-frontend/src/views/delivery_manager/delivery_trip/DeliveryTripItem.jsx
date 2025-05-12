@@ -51,7 +51,7 @@ const DeliveryTripItem = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <IconButton color="primary" onClick={() => navigate(`/delivery-manager/delivery-trip/${id1}`)} sx={{ color: 'black' }}>
+        <IconButton color="primary" onClick={() => navigate(`/delivery-manager/delivery-trip/${id1}`)} sx={{ color: 'grey.700', mr: 1 }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>

@@ -70,12 +70,6 @@ public class ReceiptController {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Receipt must contain at least one item.");
 			}
 
-			// Optionally validate or process the LocalDateTime values (e.g., null checks or
-			// defaults)
-			if (receiptRequest.getReceiptDate() == null) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Receipt date cannot be null.");
-			}
-
 			// Proceed with creating receipt
 			Receipt createdReceipt = receiptService.createReceipt(receiptRequest, principal.getName());
 
@@ -94,9 +88,9 @@ public class ReceiptController {
 
 	@Secured("ROLE_WMS_PURCHASE_MANAGER")
 	@PostMapping("/{receiptId}/approve")
-	public ResponseEntity<String> approveReceipt(@PathVariable UUID receiptId, @RequestParam String approvedBy) {
+	public ResponseEntity<String> approveReceipt(@PathVariable UUID receiptId, Principal principal) {
 		try {
-			boolean isApproved = receiptService.approveReceipt(receiptId, approvedBy);
+			boolean isApproved = receiptService.approveReceipt(receiptId, principal.getName());
 
 			if (isApproved) {
 				return ResponseEntity.ok("Receipt approved successfully.");
@@ -111,9 +105,9 @@ public class ReceiptController {
 
 	@Secured("ROLE_WMS_PURCHASE_MANAGER")
 	@PostMapping("/{receiptId}/cancel")
-	public ResponseEntity<String> cancelReceipt(@PathVariable UUID receiptId, @RequestParam String cancelledBy) {
+	public ResponseEntity<String> cancelReceipt(@PathVariable UUID receiptId, Principal principal) {
 		try {
-			boolean isCancelled = receiptService.cancelReceipt(receiptId, cancelledBy);
+			boolean isCancelled = receiptService.cancelReceipt(receiptId, principal.getName());
 
 			if (isCancelled) {
 				return ResponseEntity.ok("Receipt cancelled successfully.");

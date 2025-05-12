@@ -9,13 +9,6 @@ export const purchasemanager = {
       isPublic: false,
       text: "Purchase Orders",
       child: [],
-    },
-    {
-      id: "MENU_WMSv2_PURCHASE_MANAGER.RECEIPT_BILL",
-      path: "/purchase-manager/receipt-bill",
-      isPublic: false,
-      text: "Receipt Bills",
-      child: [],
     }
   ],
 };

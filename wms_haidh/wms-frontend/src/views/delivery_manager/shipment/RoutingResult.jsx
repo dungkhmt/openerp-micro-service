@@ -168,7 +168,7 @@ const RoutingResult = () => {
     return (
         <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <IconButton color="primary" onClick={() => navigate('/delivery-manager/shipments')} sx={{ color: 'black' }}>
+                <IconButton color="primary" onClick={() => navigate('/delivery-manager/shipments')} sx={{ color: 'grey.700', mr: 1 }}>
                     <ArrowBackIcon />
                 </IconButton>
                 <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>

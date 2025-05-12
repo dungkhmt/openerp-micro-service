@@ -41,7 +41,6 @@ public class ReceiptItem {
     private LocalDateTime createdStamp;
 
     private UUID receiptItemRequestId;
-    private String receiptBillId;
 
 }
 

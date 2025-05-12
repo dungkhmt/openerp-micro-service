@@ -34,17 +34,13 @@ public class ReceiptService {
 		// Set timestamps
 		LocalDateTime now = LocalDateTime.now();
 
-		// Convert LocalDate to LocalDateTime
-		LocalDateTime receiptDateTime = request.getReceiptDate() != null ? request.getReceiptDate().atStartOfDay()
-				: null;
 		LocalDateTime expectedReceiptDateTime = request.getExpectedReceiptDate() != null
 				? request.getExpectedReceiptDate().atStartOfDay()
 				: null;
 
 		// Build receipt object
 		Receipt receipt = Receipt.builder().receiptName(request.getReceiptName()).description(request.getDescription())
-				.receiptDate(receiptDateTime) // Converted to LocalDateTime
-				.warehouseId(request.getWarehouseId()).createdReason(request.getCreatedReason())
+				.warehouseId(request.getWarehouseId())
 				.expectedReceiptDate(expectedReceiptDateTime) // Converted to LocalDateTime
 				.status("CREATED").createdBy(userLoginId).createdStamp(now).lastUpdatedStamp(now).build();
 

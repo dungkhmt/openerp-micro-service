@@ -31,11 +31,7 @@ public class Receipt {
 
     private String description; 
 
-    private LocalDateTime receiptDate; 
-
     private UUID warehouseId; 
-
-    private String createdReason; 
 
     private LocalDateTime expectedReceiptDate; 
 

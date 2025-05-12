@@ -22,15 +22,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import { request } from "../../api";
 import { debounce } from '../../utils/utils';
+import SaveIcon from '@mui/icons-material/Save';
 
 const AddReceipt = () => {
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [date, setDate] = useState('');
   const [warehouseList, setWarehouseList] = useState([]);
   const [warehouseId, setWarehouseId] = useState('');
-  const [reason, setReason] = useState('');
   const [expectedReceiptDate, setExpectedReceiptDate] = useState('');
   const [requestDetails, setRequestDetails] = useState([{ productId: '', quantity: '' }]);
   const [productSuggestions, setProductSuggestions] = useState([]);
@@ -100,17 +99,15 @@ const AddReceipt = () => {
 
     const updatedRequestDetails = requestDetails.map(item => ({
       ...item,
-      warehouseId: warehouseId, 
+      warehouseId: warehouseId,
     }));
 
     const receiptData = {
       receiptName: name,
       description,
-      receiptDate: date,
       warehouseId,
-      createdReason: reason,
       expectedReceiptDate,
-      receiptItemRequests: updatedRequestDetails, 
+      receiptItemRequests: updatedRequestDetails,
     };
 
     request(
@@ -133,24 +130,29 @@ const AddReceipt = () => {
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <IconButton onClick={() => navigate('/purchase-staff/receipts')} sx={{ color: 'black' }}>
+        <IconButton
+          onClick={() => navigate('/purchase-staff/receipts')}
+          sx={{ color: 'grey.700', mr: 1 }}
+        >
           <ArrowBackIcon />
         </IconButton>
+
         <Typography variant="h6" sx={{ ml: 1 }}>
           Add New Receipt
         </Typography>
         <Button
           variant="contained"
+          color="primary"
+          startIcon={<SaveIcon />} 
           sx={{
             marginLeft: 'auto',
-            backgroundColor: 'black',
-            color: 'white',
-            '&:hover': { backgroundColor: 'black', opacity: 0.75 }
+            '&:hover': { backgroundColor: 'primary.dark' }
           }}
           onClick={handleSubmit}
         >
-          Save Receipt
+          Save
         </Button>
+
       </Box>
 
       <Grid container spacing={2}>
@@ -158,14 +160,6 @@ const AddReceipt = () => {
           <Paper elevation={3} sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>General Information</Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Receipt Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </Grid>
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
                   <InputLabel id="warehouse-label">Warehouse</InputLabel>
@@ -183,7 +177,24 @@ const AddReceipt = () => {
                   </Select>
                 </FormControl>
               </Grid>
-
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  type="date"
+                  label="Expected Date"
+                  InputLabelProps={{ shrink: true }}
+                  value={expectedReceiptDate}
+                  onChange={(e) => setExpectedReceiptDate(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Receipt Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </Grid>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
@@ -193,36 +204,7 @@ const AddReceipt = () => {
                 />
               </Grid>
 
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Reason"
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                />
-              </Grid>
 
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  type="date"
-                  label="Receipt Date"
-                  InputLabelProps={{ shrink: true }}
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  type="date"
-                  label="Expected Receipt Date"
-                  InputLabelProps={{ shrink: true }}
-                  value={expectedReceiptDate}
-                  onChange={(e) => setExpectedReceiptDate(e.target.value)}
-                />
-              </Grid>
             </Grid>
           </Paper>
         </Grid>
@@ -242,13 +224,22 @@ const AddReceipt = () => {
                         onChange={(e) => handleProductSearch(index, e.target.value)}
                       />
                       {activeSuggestionIndex === index && productSuggestions.length > 0 && (
-                        <List sx={{ position: 'absolute', bgcolor: 'white', zIndex: 1 }}>
+                        <List sx={{ position: 'absolute', bgcolor: 'white', zIndex: 1, boxShadow: 2 }}>
                           {productSuggestions.map((suggestion, i) => (
-                            <ListItemButton key={i} onClick={() => handleProductSelect(index, suggestion)}>
+                            <ListItemButton
+                              key={i}
+                              onClick={() => handleProductSelect(index, suggestion)}
+                              sx={{
+                                '&:hover': {
+                                  backgroundColor: 'grey.100'
+                                }
+                              }}
+                            >
                               <ListItemText primary={suggestion.name} />
                             </ListItemButton>
                           ))}
                         </List>
+
                       )}
                     </Grid>
                     <Grid item xs={3}>
@@ -261,9 +252,18 @@ const AddReceipt = () => {
                       />
                     </Grid>
                     <Grid item xs={1}>
-                      <IconButton onClick={() => handleDeleteRequestDetail(index)}>
+                      <IconButton
+                        onClick={() => handleDeleteRequestDetail(index)}
+                        sx={{
+                          color: 'grey.600',
+                          '&:hover': {
+                            color: 'error.main',
+                          }
+                        }}
+                      >
                         <DeleteIcon />
                       </IconButton>
+
                     </Grid>
                   </Grid>
                 </ListItem>
@@ -272,27 +272,28 @@ const AddReceipt = () => {
             <Button
               onClick={handleAddRequestDetail}
               variant="outlined"
+              color="primary"
               sx={{
-                mt: 1,
-                color: 'black',
-                borderColor: 'black',
+                mt: 2,
+                ml: 1,
                 border: '1px solid',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1,
                 '&:hover': {
-                  backgroundColor: 'black',
+                  backgroundColor: 'primary.main',
                   color: 'white',
-                  borderColor: 'black',
+                  borderColor: 'primary.main',
                   '& .add-icon': {
                     color: 'white',
                   }
                 }
               }}
             >
-              <AddIcon className="add-icon" sx={{ color: 'black' }} />
+              <AddIcon className="add-icon" sx={{ color: 'primary.main' }} />
               Add Product
             </Button>
+
 
           </Paper>
         </Grid>

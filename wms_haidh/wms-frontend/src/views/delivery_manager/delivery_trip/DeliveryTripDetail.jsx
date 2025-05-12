@@ -15,6 +15,7 @@ import Map from '../../../components/Map';
 import { formatDate } from '../../../utils/utils';
 import PhoneIcon from '@mui/icons-material/Phone';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import MapIcon from '@mui/icons-material/Map';
 
 const DeliveryTripDetail = () => {
   const navigate = useNavigate();
@@ -69,7 +70,7 @@ const DeliveryTripDetail = () => {
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <IconButton color="primary" onClick={() => navigate('/delivery-manager/delivery-trip')} sx={{ color: 'black' }}>
+        <IconButton color="primary" onClick={() => navigate('/delivery-manager/delivery-trip')} sx={{ color: 'grey.700', mr: 1 }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
@@ -152,12 +153,8 @@ const DeliveryTripDetail = () => {
                   {/* Left side: View Items */}
                   <Button
                     variant="contained"
-                    sx={{
-                      backgroundColor: 'black',
-                      color: 'white',
-                      '&:hover': { backgroundColor: 'black', opacity: 0.75 }
-                    }}
-                    onClick={() => navigate(`/delivery-staff/delivery-trip/${id}/${item.orderId}`)}
+                    color="primary"
+                    onClick={() => navigate(`/delivery-manager/delivery-trip/${id}/${item.orderId}`)}
                   >
                     View Items
                   </Button>
@@ -176,14 +173,9 @@ const DeliveryTripDetail = () => {
             sx={{
               mt: 4,
               marginLeft: 'auto',
-              backgroundColor: 'black',
-              color: 'white',
-              '&:hover': {
-                backgroundColor: 'black',
-                opacity: 0.75,
-              }
             }}
             onClick={handleToggleMap}
+            startIcon={<MapIcon />}
           >
             {isMapOpen ? "Close Map" : "Open Map"}
           </Button>

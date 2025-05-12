@@ -87,11 +87,10 @@ export default function Home() {
                 />
 
                 <FormControl variant="outlined" sx={{ minWidth: 200, height: "48px" }}>
-                    <InputLabel>Category</InputLabel>
                     <Select
                         value={categoryId}
                         onChange={(e) => setCategoryId(e.target.value)}
-                        label="Category"
+                        aria-label="Category"
                         sx={{ height: "48px" }}
                     >
                         <MenuItem value="all">All categories</MenuItem>

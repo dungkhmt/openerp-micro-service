@@ -16,10 +16,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
+  TextField
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { CircularProgress } from "@nextui-org/react";
@@ -38,11 +35,9 @@ const ReceiptItem = () => {
   const [importPrice, setImportPrice] = useState('');
   const [expiredDate, setExpiredDate] = useState('');
   const [lotId, setLotId] = useState('');
-  const [billOption, setBillOption] = useState('new');
-  const [billName, setBillName] = useState('');
-  const [existingBill, setExistingBill] = useState('');
-  const [existingBills, setExistingBills] = useState([]);
   const [details, setDetails] = useState([]);
+  const remainingQuantity = generalInfo ? Math.round(generalInfo.quantity * (1 - generalInfo.completed / 100)) : 0;
+
 
   useEffect(() => {
     request("get", `/receipt-item-requests/${id2}/general-info`, (res) => {
@@ -57,18 +52,11 @@ const ReceiptItem = () => {
       setDetails(res.data);
     });
 
-    request("get", `/receipt-bills/ids?requestId=${id2}`, (res) => {
-      setExistingBills(res.data);
-    });
   }, [id2]);
-
-  const handleBillOptionChange = (event) => {
-    setBillOption(event.target.value);
-  };
 
   const handleSubmit = () => {
     // Kiểm tra số lượng
-    if (!quantity || quantity > generalInfo.quantity || quantity <= 0) {
+    if (!quantity || quantity > remainingQuantity || quantity <= 0) {
       toast.error("Invalid quantity!");
       return;
     }
@@ -87,30 +75,6 @@ const ReceiptItem = () => {
       return;
     }
 
-    // Kiểm tra bill option
-    if (billOption === 'new' && !billName) {
-      toast.error("Bill name is required for new bill!");
-      return;
-    }
-    if (billOption === 'existing' && !existingBill) {
-      toast.error("Please select an existing bill!");
-      return;
-    }
-
-    // Tạo bill mới nếu cần
-    if (billOption === 'new') {
-      const bilInfo = {
-        receiptBillId: billName,
-        description: "Create new bill",
-        receiptItemRequestId: id2
-      };
-      request("post", `/receipt-bills`, (res) => {
-        if (res.status !== 200) {
-          alert("Error occurred while creating bill!");
-        }
-      }, {}, bilInfo);
-    }
-
     // Tạo payload và gửi
     const payload = {
       quantity,
@@ -118,8 +82,7 @@ const ReceiptItem = () => {
       lotId,
       importPrice,
       expiredDate,
-      receiptItemRequestId: id2,
-      receiptBillId: billOption === 'new' ? billName : existingBill
+      receiptItemRequestId: id2
     };
 
     request("post", `/receipt-items`, (res) => {
@@ -129,9 +92,6 @@ const ReceiptItem = () => {
         });
         request("get", `/receipt-items?requestId=${id2}`, (res) => {
           setDetails(res.data);
-        });
-        request("get", `/receipt-bills/ids?requestId=${id2}`, (res) => {
-          setExistingBills(res.data);
         });
         alert("Add new receipt item successfully!");
       } else {
@@ -145,7 +105,7 @@ const ReceiptItem = () => {
     <Box sx={{ p: 3 }}>
       <Toaster />
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <IconButton color="primary" onClick={() => navigate(`/admin/receipts/${id1}`)} sx={{ color: 'black' }}>
+        <IconButton color="primary" onClick={() => navigate(`/admin/receipts/${id1}`)} sx={{ color: 'grey.700', mr: 1 }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>
@@ -188,7 +148,7 @@ const ReceiptItem = () => {
               }}
             >
               <Typography variant="h4" >
-                {generalInfo ? generalInfo.completed : 0}%
+                {generalInfo ? Math.round(generalInfo.completed) : 0}%
               </Typography>
               <Typography variant="subtitle1" >
                 {generalInfo && generalInfo.completed === 100 ? "Completed" : "In progress"}
@@ -230,6 +190,14 @@ const ReceiptItem = () => {
               <br />
               {generalInfo?.quantity}
             </Typography>
+            {remainingQuantity > 0 && (
+              <Typography>
+                <b>Qty remaining:</b>
+                <br />
+                {remainingQuantity}
+              </Typography>
+            )
+            }
           </Paper>
         </Grid>
 
@@ -243,16 +211,7 @@ const ReceiptItem = () => {
               New receipt item
             </Typography>
             <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Quantity"
-                  type="number"
-                  inputProps={{ min: 1, max: generalInfo.quantity }}
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
-                />
-              </Grid>
+
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
                   <InputLabel>Bay Code</InputLabel>
@@ -268,6 +227,14 @@ const ReceiptItem = () => {
                     ))}
                   </Select>
                 </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Lot ID"
+                  value={lotId}
+                  onChange={(e) => setLotId(e.target.value)}
+                />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -291,63 +258,18 @@ const ReceiptItem = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Lot ID"
-                  value={lotId}
-                  onChange={(e) => setLotId(e.target.value)}
+                  label="Quantity"
+                  type="number"
+                  inputProps={{ min: 1, max: generalInfo.quantity }}
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
                 />
               </Grid>
-              <Grid item xs={12}>
-                <FormControl component="fieldset">
-                  <RadioGroup
-                    row
-                    value={billOption}
-                    onChange={handleBillOptionChange}
-                  >
-                    <FormControlLabel
-                      value="new"
-                      control={<Radio />}
-                      label="Create New Bill"
-                    />
-                    <FormControlLabel
-                      value="existing"
-                      control={<Radio />}
-                      label="Add to Existing Bill"
-                      disabled={existingBills.length === 0}
-                    />
-                  </RadioGroup>
-                </FormControl>
-              </Grid>
-              {billOption === 'new' && (
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Bill ID"
-                    value={billName}
-                    onChange={(e) => setBillName(e.target.value)}
-                  />
-                </Grid>
-              )}
-              {billOption === 'existing' && (
-                <Grid item xs={12}>
-                  <FormControl fullWidth>
-                    <InputLabel>Existing Bill</InputLabel>
-                    <Select
-                      value={existingBill}
-                      onChange={(e) => setExistingBill(e.target.value)}
-                      label="Existing bill"
-                    >
-                      {existingBills.map((bill) => (
-                        <MenuItem key={bill} value={bill}>
-                          {bill}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-              )}
+
             </Grid>
             <Box sx={{ mt: 3, textAlign: 'right' }}>
-              <Button variant="contained" color="primary" onClick={handleSubmit}>
+              <Button variant="contained" color="primary"
+                onClick={handleSubmit}>
                 Submit
               </Button>
             </Box>
@@ -363,23 +285,21 @@ const ReceiptItem = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Lot ID</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Bay Code</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Lot ID</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Import Price</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Expired Date</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Receipt Bill ID</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {details.map((detail, index) => (
                   <TableRow key={index}>
-                    <TableCell>{detail.quantity}</TableCell>
-                    <TableCell>{detail.lotId}</TableCell>
                     <TableCell>{detail.bayCode}</TableCell>
+                    <TableCell>{detail.lotId}</TableCell>
                     <TableCell>{formatPrice(detail.importPrice)}</TableCell>
                     <TableCell>{detail.expiredDate ? formatDate(detail.expiredDate) : "No expiry date"}</TableCell>
-                    <TableCell>{detail.receiptBillId}</TableCell>
+                    <TableCell>{detail.quantity}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
