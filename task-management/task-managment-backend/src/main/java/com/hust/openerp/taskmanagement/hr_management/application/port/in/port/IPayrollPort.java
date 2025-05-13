@@ -1,5 +1,8 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.in.port;
 
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.payroll.filter.IPayrollFilter;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.IPageableRequest;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.PayrollModel;
 
 import java.time.LocalDate;
@@ -11,7 +14,5 @@ public interface IPayrollPort {
     PayrollModel createPayroll(PayrollModel payrollModel);
     void cancelPayroll(UUID id);
     PayrollModel getPayroll(UUID id);
-    List<PayrollModel> getPayrolls(List<String> userIds, LocalDate startDate, LocalDate endDate);
-    PayrollModel getPayrollDetails(UUID payrollId);
-    Map<String, Object> getPayrollConfigureDetails();
+    PageWrapper<PayrollModel> getPayrolls(IPayrollFilter filter, IPageableRequest pageableRequest);
 }

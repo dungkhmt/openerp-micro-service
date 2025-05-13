@@ -1,16 +1,20 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.adapter;
 
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IPayrollPort;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.payroll.filter.IPayrollFilter;
 import com.hust.openerp.taskmanagement.hr_management.constant.PayrollStatus;
 import com.hust.openerp.taskmanagement.hr_management.domain.exception.ApplicationException;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.IPageableRequest;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.PayrollModel;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.PayrollEntity;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository.PayrollRepo;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.specification.PayrollSpecification;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.utils.PageableUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +27,14 @@ public class PayrollAdapter implements IPayrollPort {
     @Override
     public PayrollModel createPayroll(PayrollModel payrollModel) {
         var payrollEntity = new PayrollEntity();
+        payrollEntity.setId(UUID.randomUUID());
+        payrollEntity.setName(payrollModel.getName());
+        payrollEntity.setCreatedBy(payrollEntity.getCreatedBy());
+        payrollEntity.setFromdate(payrollModel.getFromdate());
+        payrollEntity.setThruDate(payrollModel.getThruDate());
+        payrollEntity.setTotalHolidayDays(payrollModel.getTotalHolidayDays());
+        payrollEntity.setWorkHoursPerDay(payrollModel.getWorkHoursPerDay());
+        payrollEntity.setTotalWorkDays(payrollModel.getTotalWorkDays());
         payrollEntity.setStatus(PayrollStatus.ACTIVE);
         return toModel(payrollRepo.save(payrollEntity));
     }
@@ -40,9 +52,11 @@ public class PayrollAdapter implements IPayrollPort {
     }
 
     @Override
-    public List<PayrollModel> getPayrolls(List<String> userIds, LocalDate startDate, LocalDate endDate) {
-        var payrolls = payrollRepo.findAll();
-        return toModels(payrolls);
+    public PageWrapper<PayrollModel> getPayrolls(IPayrollFilter filter, IPageableRequest pageableRequest) {
+        var pageable = PageableUtils.getPageable(pageableRequest);
+        var spec = new PayrollSpecification(filter);
+        var page = payrollRepo.findAll(spec ,pageable);
+        return new PageWrapper<>(PageableUtils.getPageInfo(page), toModels(page.getContent()));
     }
 
     private PayrollEntity getPayrollEntity(UUID id) {

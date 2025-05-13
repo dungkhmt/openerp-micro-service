@@ -39,16 +39,16 @@ public class PayrollEntity extends AuditEntity {
     private Integer totalHolidayDays;
 
     @NotNull
-    @Column(name = "fromdate", nullable = false)
+    @Column(name = "from_date", nullable = false)
     private LocalDate fromdate;
 
     @NotNull
     @Column(name = "thru_date", nullable = false)
     private LocalDate thruDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by")
-    private User createdBy;
+    @Size(max = 60)
+    @Column(name = "created_by", nullable = false, length = 60)
+    private String createdBy;
 
     @NotNull
     @Enumerated(EnumType.STRING)

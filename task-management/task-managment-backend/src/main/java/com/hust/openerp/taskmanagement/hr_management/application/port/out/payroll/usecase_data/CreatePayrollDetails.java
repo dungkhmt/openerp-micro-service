@@ -1,17 +1,15 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.payroll.usecase_data;
 
 import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.PayrollDetailModel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
-@Setter
-@Builder
 @AllArgsConstructor
-public class DeletePayroll implements UseCase {
-    private UUID payrollId;
+public class CreatePayrollDetails implements UseCase {
+    private List<PayrollDetailModel> payrollDetails;
 }

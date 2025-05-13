@@ -21,7 +21,6 @@ public class PayrollModel {
     private Integer totalHolidayDays;
     private LocalDate fromdate;
     private LocalDate thruDate;
-    private User createdBy;
+    private String createdBy;
     private PayrollStatus status;
-    private List<PayrollDetailModel> details;
 }

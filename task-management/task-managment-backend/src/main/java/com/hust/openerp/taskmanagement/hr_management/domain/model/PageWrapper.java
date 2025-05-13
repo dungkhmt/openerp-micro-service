@@ -23,4 +23,8 @@ public class PageWrapper<T> {
                 .pageContent(content)
                 .build();
     }
+
+    public static <K> PageWrapper<K> of(PageInfo pageInfo, List<K> pageContent){
+        return new PageWrapper<K>(pageInfo, pageContent);
+    }
 }

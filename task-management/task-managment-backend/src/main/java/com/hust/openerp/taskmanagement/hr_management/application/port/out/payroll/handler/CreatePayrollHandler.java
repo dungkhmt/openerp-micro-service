@@ -28,7 +28,9 @@ public class CreatePayrollHandler extends ObservableUseCasePublisher
     @Transactional
     public void handle(CreatePayroll useCase) {
         try {
+            //TODO Calculate
             payrollPort.createPayroll(useCase.getPayrollModel());
+            //todo create Details
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new ApplicationException(

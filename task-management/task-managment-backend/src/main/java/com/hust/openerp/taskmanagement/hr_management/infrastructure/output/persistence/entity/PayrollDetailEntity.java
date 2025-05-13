@@ -13,7 +13,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "hr_payroll_details")
-public class PayrollDetailEntity {
+public class PayrollDetailEntity extends AuditEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)

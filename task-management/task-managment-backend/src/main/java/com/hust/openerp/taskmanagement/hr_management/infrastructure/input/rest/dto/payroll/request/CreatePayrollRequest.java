@@ -1,19 +1,20 @@
-package com.hust.openerp.taskmanagement.hr_management.application.port.out.payroll.usecase_data;
+package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.payroll.request;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.payroll.usecase_data.CreatePayroll;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.payroll.usecase_data.GetPayrollList;
 import com.hust.openerp.taskmanagement.hr_management.constant.PayrollStatus;
-import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
-import lombok.Builder;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.PageableRequest;
 import lombok.Getter;
 import lombok.Setter;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.PayrollModel;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Getter
 @Setter
-@Builder
-public class CreatePayroll implements UseCase {
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public class CreatePayrollRequest {
     private String name;
     private Integer totalWorkDays;
     private Float workHoursPerDay;
@@ -23,8 +24,8 @@ public class CreatePayroll implements UseCase {
     private String createdBy;
     private PayrollStatus status;
 
-    public PayrollModel getPayrollModel(){
-        return PayrollModel.builder()
+    public CreatePayroll toUseCase(){
+        return CreatePayroll.builder()
             .name(name)
             .totalWorkDays(totalWorkDays)
             .workHoursPerDay(workHoursPerDay)
