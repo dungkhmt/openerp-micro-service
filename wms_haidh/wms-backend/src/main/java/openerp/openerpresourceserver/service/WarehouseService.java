@@ -33,6 +33,10 @@ public class WarehouseService {
         }
         return warehouseRepository.searchByName(search, pageable);
     }
+    
+    public List<Warehouse> getWarehousesWithCreatedAssignedItemsAndAssignedOrders() {
+        return warehouseRepository.findWarehousesWithCreatedAssignedItemsAndAssignedOrders();
+    }
 
 }
 

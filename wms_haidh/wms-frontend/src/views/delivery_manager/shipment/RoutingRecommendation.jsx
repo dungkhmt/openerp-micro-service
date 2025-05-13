@@ -18,6 +18,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { request } from "../../../api";
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 const RoutingRecommendation = () => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const RoutingRecommendation = () => {
   const [vehicleList, setVehicleList] = useState([]);
 
   useEffect(() => {
-    request("get", "/warehouses", (res) => {
+    request("get", "/warehouses/with-created-assigned-items", (res) => {
       setWarehouseList(res.data);
     }).then();
 
@@ -90,6 +91,7 @@ const RoutingRecommendation = () => {
         </Typography>
         <Button
           variant="contained"
+          startIcon={<PlayArrowIcon />}
           sx={{
             marginLeft: 'auto',
             backgroundColor: '#019160',
@@ -103,7 +105,7 @@ const RoutingRecommendation = () => {
           }}
           onClick={handleSubmit}
         >
-          Save
+          Generate Routing Plan
         </Button>
       </Box>
 
@@ -150,12 +152,12 @@ const RoutingRecommendation = () => {
                       </FormControl>
                     </Grid>
                     <Grid item xs={2}>
-                      <IconButton  sx={{
-                          color: 'grey.600',
-                          '&:hover': {
-                            color: 'error.main',
-                          }
-                        }} onClick={() => handleDeleteTrip(index)}>
+                      <IconButton sx={{
+                        color: 'grey.600',
+                        '&:hover': {
+                          color: 'error.main',
+                        }
+                      }} onClick={() => handleDeleteTrip(index)}>
                         <DeleteIcon />
                       </IconButton>
                     </Grid>

@@ -71,8 +71,8 @@ const NewAddress = () => {
         </Card>
         <div className="flex justify-center">
           <Button variant="contained" color="primary" sx={{
-            width: '100%',
-            marginLeft: 'auto',
+            width: '40%',
+            margin: 'auto',
             backgroundColor: '#019160',
             color: '#fff',
             '&:hover': {

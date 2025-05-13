@@ -147,19 +147,24 @@ public class DeliveryTripService {
 	}
 	
 	@Transactional
-    public int markAsDelivered(String deliveryTripId, UUID orderId) {
-		
-        int updatedCount = deliveryTripItemService.markItemsAsDelivered(deliveryTripId, orderId);     
-        long notYetDelivered = deliveryTripItemService.countUndeliveredItems(deliveryTripId);
-        if (notYetDelivered == 0) {
-            deliveryTripRepository.markTripAsDone(deliveryTripId);
-        }
-        
-        long notYetDeliveredInOrder = deliveryTripItemService.countUndeliveredItemsByOrderId(orderId);
-        if (notYetDeliveredInOrder == 0) {
-            orderService.markOrderAsCompleted(orderId);
-        }
-        return updatedCount;
-    }
+	public int markAsDelivered(String deliveryTripId, UUID orderId) {
+
+	    int updatedCount = deliveryTripItemService.markItemsAsDelivered(deliveryTripId, orderId);     
+
+	    long notYetDeliveredInTrip = deliveryTripItemService.countUndeliveredItems(deliveryTripId);
+	    if (notYetDeliveredInTrip == 0) {
+	        deliveryTripRepository.markTripAsDone(deliveryTripId);
+	    }
+
+	    long assigned = assignedOrderItemService.countAssignedItems(orderId);
+	    long delivered = deliveryTripItemService.countDeliveredItems(orderId);
+	    if (assigned > 0 && assigned == delivered) {
+	        orderService.markOrderAsCompleted(orderId);
+	    }
+
+	    return updatedCount;
+	}
+
+
 
 }

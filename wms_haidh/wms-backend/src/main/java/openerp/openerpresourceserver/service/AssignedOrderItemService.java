@@ -95,5 +95,10 @@ public class AssignedOrderItemService {
 	public List<DeliveryOrderItemProjection> getDeliveryOrderItems(List<UUID> assignedOrderItemIds) {
         return assignedOrderItemRepository.findDeliveryOrderItemsByIds(assignedOrderItemIds);
     }
+	
+	public long countAssignedItems(UUID orderId) {
+        return assignedOrderItemRepository.countAssignedItems(orderId);
+    }
+
 
 }

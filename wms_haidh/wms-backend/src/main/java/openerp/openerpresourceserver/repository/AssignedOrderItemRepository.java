@@ -68,7 +68,7 @@ public interface AssignedOrderItemRepository extends JpaRepository<AssignedOrder
 			FROM AssignedOrderItem a
 			JOIN Order o ON a.orderId = o.orderId
 			JOIN Product p ON a.productId = p.productId
-			WHERE a.status = 'CREATED'
+			WHERE a.status = 'CREATED' AND o.status = 'ASSIGNED'
 			""")
 	List<Item> getAllItems();
 
@@ -87,5 +87,8 @@ public interface AssignedOrderItemRepository extends JpaRepository<AssignedOrder
 			    WHERE a.assignedOrderItemId IN :assignedOrderItemIds
 			""")
 	List<DeliveryOrderItemProjection> findDeliveryOrderItemsByIds(List<UUID> assignedOrderItemIds);
+
+	@Query("SELECT COUNT(a) FROM AssignedOrderItem a WHERE a.orderId = :orderId")
+    long countAssignedItems(@Param("orderId") UUID orderId);
 
 }

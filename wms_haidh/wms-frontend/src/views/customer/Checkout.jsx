@@ -63,7 +63,7 @@ const Checkout = () => {
         if (address === "new") {
             toast.error("Please select a saved address or add a new one.");
             return;
-        }   
+        }
 
         const items = cartItems.map((item) => ({
             productId: item.productId,
@@ -169,12 +169,16 @@ const Checkout = () => {
                         <Button
                             variant="contained"
                             sx={{
-                                width: "40%",
-                                height: "45px",
-                                backgroundColor: "black",
-                                color: "white",
-                                fontSize: "16px",
-                                "&:hover": { backgroundColor: "black", opacity: 0.75 }
+                                width: '40%',
+                                margin: 'auto',
+                                backgroundColor: '#019160',
+                                color: '#fff',
+                                '&:hover': {
+                                    backgroundColor: '#2fbe8e',
+                                },
+                                '&:active': {
+                                    backgroundColor: '#01b075',
+                                },
                             }}
                             onClick={handleSubmit}
                         >
@@ -218,11 +222,15 @@ const Checkout = () => {
                     <Button
                         variant="contained"
                         sx={{
-                            height: "2.8rem",
-                            backgroundColor: "black",
-                            color: "white",
-                            fontSize: "1rem",
-                            "&:hover": { backgroundColor: "black", opacity: 0.75 }
+                            margin: 'auto',
+                            backgroundColor: '#019160',
+                            color: '#fff',
+                            '&:hover': {
+                                backgroundColor: '#2fbe8e',
+                            },
+                            '&:active': {
+                                backgroundColor: '#01b075',
+                            },
                         }}
                         onClick={() => navigate("/customer/order-history")}
                     >

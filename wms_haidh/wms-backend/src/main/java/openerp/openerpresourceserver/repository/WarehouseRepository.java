@@ -14,10 +14,18 @@ import openerp.openerpresourceserver.entity.Warehouse;
 
 @Repository
 public interface WarehouseRepository extends JpaRepository<Warehouse, UUID> {
-	
-    List<Warehouse> findAll();
-    
-    @Query("SELECT w FROM Warehouse w WHERE LOWER(w.name) LIKE LOWER(CONCAT('%', :search, '%'))")
-    Page<Warehouse> searchByName(@Param("search") String search, Pageable pageable);
-}
 
+	List<Warehouse> findAll();
+
+	@Query("SELECT w FROM Warehouse w WHERE LOWER(w.name) LIKE LOWER(CONCAT('%', :search, '%'))")
+	Page<Warehouse> searchByName(@Param("search") String search, Pageable pageable);
+
+	@Query("""
+			    SELECT DISTINCT w
+			    FROM Warehouse w
+			    JOIN AssignedOrderItem aoi ON aoi.warehouseId = w.warehouseId
+			    JOIN Order o ON o.orderId = aoi.orderId
+			    WHERE aoi.status = 'CREATED' AND o.status = 'ASSIGNED'
+			""")
+	List<Warehouse> findWarehousesWithCreatedAssignedItemsAndAssignedOrders();
+}

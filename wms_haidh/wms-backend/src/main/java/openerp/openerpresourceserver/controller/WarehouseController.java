@@ -50,5 +50,12 @@ public class WarehouseController {
 		Page<Warehouse> result = warehouseService.getWarehouses(search, pageable);
 		return ResponseEntity.ok(result);
 	}
+	
+	@Secured("ROLE_WMS_DELIVERY_MANAGER")
+	@GetMapping("/with-created-assigned-items")
+    public ResponseEntity<List<Warehouse>> getRelevantWarehouses() {
+        List<Warehouse> warehouses = warehouseService.getWarehousesWithCreatedAssignedItemsAndAssignedOrders();
+        return ResponseEntity.ok(warehouses);
+    }
 
 }

@@ -329,7 +329,7 @@ export default function Distance() {
 
                     <ModalFooter>
                         <Button onPress={handleCloseModal} variant="light">Cancel</Button>
-                        <Button onPress={handleConfirm} color="primary">Confirm</Button>
+                        <Button className="bg-[#019160] text-white hover:bg-[#2fbe8e] active:bg-[#01b075]" onPress={handleConfirm} color="primary">Confirm</Button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>
