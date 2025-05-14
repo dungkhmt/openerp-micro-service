@@ -1,12 +1,17 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity;
 
 import com.hust.openerp.taskmanagement.hr_management.constant.SalaryType;
+import com.vladmihalcea.hibernate.type.array.DoubleArrayType;
+import com.vladmihalcea.hibernate.type.array.ListArrayType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -35,14 +40,6 @@ public class PayrollDetailEntity extends AuditEntity{
     private SalaryType salaryType;
 
     @NotNull
-    @Column(name = "is_paid_holiday", nullable = false)
-    private Boolean isPaidHoliday = false;
-
-    @NotNull
-    @Column(name = "work_hours", nullable = false)
-    private Float workHours;
-
-    @NotNull
     @Column(name = "pair_leave_hours", nullable = false)
     private Float pairLeaveHours;
 
@@ -53,5 +50,17 @@ public class PayrollDetailEntity extends AuditEntity{
     @NotNull
     @Column(name = "payroll_amount", nullable = false)
     private Integer payrollAmount;
+
+    @Type(ListArrayType.class)
+    @Column(name = "work_hours", columnDefinition = "double precision[]")
+    private List<Double> workHours;
+
+    @Column(name = "absence_hours", columnDefinition = "double precision[]")
+    @Type(ListArrayType.class)
+    private List<Double> absenceHours;
+
+    @NotNull
+    @Column(name = "total_work_hours", nullable = false)
+    private Float totalWorkHours;
 
 }

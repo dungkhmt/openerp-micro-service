@@ -58,17 +58,18 @@ public class PayrollDetailAdapter implements IPayrollDetailPort {
 
     private PayrollDetailModel toModel(PayrollDetailEntity entity) {
         return PayrollDetailModel.builder()
-                .id(entity.getId())
-                .payrollId(entity.getPayrollId())
-                .userId(entity.getUserId())
-                .salary(entity.getSalary())
-                .salaryType(entity.getSalaryType())
-                .isPaidHoliday(entity.getIsPaidHoliday())
-                .workHours(entity.getWorkHours())
-                .pairLeaveHours(entity.getPairLeaveHours())
-                .unpairLeaveHours(entity.getUnpairLeaveHours())
-                .payrollAmount(entity.getPayrollAmount())
-                .build();
+            .id(entity.getId())
+            .payrollId(entity.getPayrollId())
+            .userId(entity.getUserId())
+            .salary(entity.getSalary())
+            .salaryType(entity.getSalaryType())
+            .workHours(entity.getWorkHours())
+            .absenceHours(entity.getAbsenceHours())
+            .pairLeaveHours(entity.getPairLeaveHours())
+            .unpairLeaveHours(entity.getUnpairLeaveHours())
+            .totalWorkHours(entity.getTotalWorkHours())
+            .payrollAmount(entity.getPayrollAmount())
+            .build();
     }
 
     private PayrollDetailEntity toEntity(PayrollDetailModel model) {
@@ -78,8 +79,9 @@ public class PayrollDetailAdapter implements IPayrollDetailPort {
         entity.setUserId(model.getUserId());
         entity.setSalary(model.getSalary());
         entity.setSalaryType(model.getSalaryType());
-        entity.setIsPaidHoliday(model.getIsPaidHoliday());
         entity.setWorkHours(model.getWorkHours());
+        entity.setAbsenceHours(model.getAbsenceHours());
+        entity.setTotalWorkHours(model.getTotalWorkHours());
         entity.setPairLeaveHours(model.getPairLeaveHours());
         entity.setUnpairLeaveHours(model.getUnpairLeaveHours());
         entity.setPayrollAmount(model.getPayrollAmount());

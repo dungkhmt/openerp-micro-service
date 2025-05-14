@@ -1,5 +1,8 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.payroll.handler;
 
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IConfigPort;
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IPayrollDetailPort;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.payroll.service.PayrollCalculator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +21,8 @@ public class CreatePayrollHandler extends ObservableUseCasePublisher
         implements VoidUseCaseHandler<CreatePayroll> {
 
     private final IPayrollPort payrollPort;
+    private final IPayrollDetailPort payrollDetailPort;
+    private final IConfigPort configPort;
 
     @Override
     public void init() {
@@ -28,9 +33,13 @@ public class CreatePayrollHandler extends ObservableUseCasePublisher
     @Transactional
     public void handle(CreatePayroll useCase) {
         try {
-            //TODO Calculate
-            payrollPort.createPayroll(useCase.getPayrollModel());
-            //todo create Details
+            var payrollCalculator = new PayrollCalculator(configPort.getCompanyConfig(), useCase);
+            var payroll = payrollPort.createPayroll(payrollCalculator.getPayrollModel());
+            var payrollDetailsList = payrollCalculator.getPayrollDetailModels();
+            for (var payrollDetail : payrollDetailsList) {
+                payrollDetail.setPayrollId(payroll.getId());
+            }
+            payrollDetailPort.createDetails(payrollDetailsList);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new ApplicationException(

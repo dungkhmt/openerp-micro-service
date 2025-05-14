@@ -19,7 +19,7 @@ public class FindStaff implements IStaffFilter, UseCase {
     private String staffCode;
     private String staffName;
     private String staffEmail;
-    private StaffStatus status;
+    private StaffStatus status = StaffStatus.ACTIVE;
     private IPageableRequest pageableRequest;
     private String departmentCode;
     private String jobPositionCode;

@@ -3,7 +3,6 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.hust.openerp.taskmanagement.hr_management.constant.PayrollStatus;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.JobPositionModel;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.PayrollModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,7 +38,7 @@ public class PayrollResponse {
             .createdBy(model.getCreatedBy())
             .status(model.getStatus())
             .thruDate(model.getThruDate())
-            .fromdate(model.getFromdate())
+            .fromdate(model.getFromDate())
             .build();
     }
 }

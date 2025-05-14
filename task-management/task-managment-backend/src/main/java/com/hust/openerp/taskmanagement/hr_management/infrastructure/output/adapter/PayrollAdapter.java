@@ -30,7 +30,7 @@ public class PayrollAdapter implements IPayrollPort {
         payrollEntity.setId(UUID.randomUUID());
         payrollEntity.setName(payrollModel.getName());
         payrollEntity.setCreatedBy(payrollEntity.getCreatedBy());
-        payrollEntity.setFromdate(payrollModel.getFromdate());
+        payrollEntity.setFromdate(payrollModel.getFromDate());
         payrollEntity.setThruDate(payrollModel.getThruDate());
         payrollEntity.setTotalHolidayDays(payrollModel.getTotalHolidayDays());
         payrollEntity.setWorkHoursPerDay(payrollModel.getWorkHoursPerDay());
@@ -70,7 +70,7 @@ public class PayrollAdapter implements IPayrollPort {
             .id(payrollEntity.getId())
             .name(payrollEntity.getName())
             .createdBy(payrollEntity.getCreatedBy())
-            .fromdate(payrollEntity.getFromdate())
+            .fromDate(payrollEntity.getFromdate())
             .thruDate(payrollEntity.getThruDate())
             .workHoursPerDay(payrollEntity.getWorkHoursPerDay())
             .totalWorkDays(payrollEntity.getTotalWorkDays())

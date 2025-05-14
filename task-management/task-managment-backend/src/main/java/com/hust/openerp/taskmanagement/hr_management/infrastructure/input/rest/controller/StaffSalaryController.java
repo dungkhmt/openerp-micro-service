@@ -1,6 +1,10 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff_salary.usecase_data.GetCurrentStaffSalary;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.DepartmentModel;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.department.request.GetDepartmentRequest;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.department.response.DepartmentResponse;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.salary.request.GetSalaryListRequest;
 import jakarta.validation.Valid;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffDepartmentModel;
@@ -28,6 +32,17 @@ public class StaffSalaryController extends BeanAwareUseCasePublisher {
         var response = StaffSalaryResponse.fromModel(model);
         return ResponseEntity.ok().body(
                 new Resource(response)
+        );
+    }
+
+    @GetMapping("")
+    public ResponseEntity<?> getSalaryList(
+        @Valid @ModelAttribute GetSalaryListRequest request
+    ){
+        var modelPage = publishPageWrapper(StaffSalaryModel.class, request.toUseCase());
+        var responsePage = modelPage.convert(StaffSalaryResponse::fromModel);
+        return ResponseEntity.ok().body(
+            new Resource(responsePage)
         );
     }
 

@@ -15,4 +15,11 @@ public class CompanyConfigModel {
     private LocalTime startLunchTime;
     private LocalTime endLunchTime;
     private Float hourBeforeAnnounceAbsence;
+
+    public Float getTotalWorkTime(){
+        long totalWorkMinutes = java.time.Duration.between(startWorkTime, endWorkTime).toMinutes();
+        long lunchBreakMinutes = java.time.Duration.between(startLunchTime, endLunchTime).toMinutes();
+        long netWorkMinutes = totalWorkMinutes - lunchBreakMinutes;
+        return netWorkMinutes / 60f;
+    }
 }

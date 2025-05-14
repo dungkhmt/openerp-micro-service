@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -16,8 +17,9 @@ public class PayrollDetailModel {
     private String userId;
     private Integer salary;
     private SalaryType salaryType;
-    private Boolean isPaidHoliday;
-    private Float workHours;
+    private List<Double> workHours;
+    private List<Double> absenceHours;
+    private Float totalWorkHours;
     private Float pairLeaveHours;
     private Float unpairLeaveHours;
     private Integer payrollAmount;

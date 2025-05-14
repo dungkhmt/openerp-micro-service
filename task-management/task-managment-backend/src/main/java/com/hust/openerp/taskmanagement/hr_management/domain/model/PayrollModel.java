@@ -1,13 +1,11 @@
 package com.hust.openerp.taskmanagement.hr_management.domain.model;
 
-import com.hust.openerp.taskmanagement.entity.User;
 import com.hust.openerp.taskmanagement.hr_management.constant.PayrollStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -19,7 +17,7 @@ public class PayrollModel {
     private Integer totalWorkDays;
     private Float workHoursPerDay;
     private Integer totalHolidayDays;
-    private LocalDate fromdate;
+    private LocalDate fromDate;
     private LocalDate thruDate;
     private String createdBy;
     private PayrollStatus status;

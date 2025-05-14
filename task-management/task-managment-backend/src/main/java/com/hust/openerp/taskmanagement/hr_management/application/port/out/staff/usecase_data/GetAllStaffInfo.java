@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Getter
 @Setter
+@AllArgsConstructor
 public class GetAllStaffInfo extends FindStaff{
 
 }

@@ -8,31 +8,13 @@ import lombok.Setter;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.PayrollModel;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Getter
 @Setter
 @Builder
 public class CreatePayroll implements UseCase {
     private String name;
-    private Integer totalWorkDays;
-    private Float workHoursPerDay;
-    private Integer totalHolidayDays;
     private LocalDate fromdate;
     private LocalDate thruDate;
     private String createdBy;
-    private PayrollStatus status;
-
-    public PayrollModel getPayrollModel(){
-        return PayrollModel.builder()
-            .name(name)
-            .totalWorkDays(totalWorkDays)
-            .workHoursPerDay(workHoursPerDay)
-            .totalHolidayDays(totalHolidayDays)
-            .fromdate(fromdate)
-            .thruDate(thruDate)
-            .createdBy(createdBy)
-            .status(status)
-            .build();
-    }
 }

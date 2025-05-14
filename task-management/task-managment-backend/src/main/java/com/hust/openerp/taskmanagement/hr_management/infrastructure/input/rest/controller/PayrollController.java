@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.UUID;
 
 @RestController
@@ -24,9 +25,10 @@ public class PayrollController extends BeanAwareUseCasePublisher {
 
     @PostMapping
     public ResponseEntity<?> createPayroll(
+        Principal principal,
         @Valid @RequestBody CreatePayrollRequest request
     ) {
-        publish(request.toUseCase());
+        publish(request.toUseCase(principal.getName()));
         return ResponseEntity.ok().body(
             new Resource()
         );
