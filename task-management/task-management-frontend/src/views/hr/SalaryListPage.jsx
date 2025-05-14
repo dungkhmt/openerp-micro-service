@@ -4,12 +4,25 @@ import {
   Button,
   Grid,
   TextField,
-  Typography
+  Typography,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  Divider,
+  Avatar,
+  IconButton,
+  DialogActions
 } from "@mui/material";
 import { request } from "@/api";
 import SearchSelect from "@/components/item/SearchSelect";
 import Pagination from "@/components/item/Pagination";
 import { useNavigate } from "react-router-dom";
+import EditIcon from "@mui/icons-material/Edit";
+import CloseIcon from "@mui/icons-material/Close";
 import "@/assets/css/EmployeeTable.css";
 
 const SalaryListPage = () => {
@@ -22,6 +35,9 @@ const SalaryListPage = () => {
   const [pageCount, setPageCount] = useState(0);
   const [employees, setEmployees] = useState([]);
   const [salaries, setSalaries] = useState({});
+  const [editingUserId, setEditingUserId] = useState(null);
+  const [editingEmployee, setEditingEmployee] = useState(null);
+  const [editForm, setEditForm] = useState({ salary: '', salary_type: 'MONTHLY' });
 
   const fetchEmployees = async (page = 0, size = itemsPerPage) => {
     return new Promise((resolve) => {
@@ -100,6 +116,37 @@ const SalaryListPage = () => {
     return code;
   };
 
+  const handleEditClick = (userId) => {
+    const salaryInfo = salaries[userId];
+    const employee = employees.find(e => e.user_login_id === userId);
+    setEditForm({
+      salary: salaryInfo?.salary || '',
+      salary_type: salaryInfo?.salary_type || 'MONTHLY'
+    });
+    setEditingEmployee(employee);
+    setEditingUserId(userId);
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditSubmit = () => {
+    request(
+      "put",
+      `/salaries/${editingUserId}`,
+      () => {
+        setEditingUserId(null);
+        handleSearch(currentPage, itemsPerPage);
+      },
+      {
+        onError: (err) => console.error("Failed to update salary", err),
+      },
+      editForm
+    );
+  };
+
   return (
     <Box className="employee-management" sx={{ padding: 3 }}>
       <Typography variant="h5" gutterBottom>Danh sách lương nhân viên</Typography>
@@ -145,7 +192,7 @@ const SalaryListPage = () => {
 
       <div className="table-container" style={{ maxHeight: "500px", overflowY: "auto" }}>
         <table className="employee-table">
-          <thead style={{ position: "sticky", top: 0, background: "#fff", zIndex: 1 }}>
+          <thead style={{ position: "sticky", top: 0, background: "#fff", zIndex: 2 }}>
           <tr>
             <th>#</th>
             <th>Mã NV</th>
@@ -154,6 +201,8 @@ const SalaryListPage = () => {
             <th>Chức vụ</th>
             <th>Lương</th>
             <th>Loại lương</th>
+            <th>Ngày hiệu lực</th>
+            <th></th>
           </tr>
           </thead>
           <tbody>
@@ -180,6 +229,12 @@ const SalaryListPage = () => {
                 <td>{emp.job_position?.job_position_name || "-"}</td>
                 <td>{salaryInfo?.salary?.toLocaleString("vi-VN") || "-"}</td>
                 <td>{mapSalaryType(salaryInfo?.salary_type)}</td>
+                <td>{salaryInfo?.from_date ? new Date(salaryInfo.from_date).toLocaleDateString("vi-VN") : "-"}</td>
+                <td>
+                  <Button size="small" onClick={() => handleEditClick(emp.user_login_id)}>
+                    <EditIcon fontSize="small" />
+                  </Button>
+                </td>
               </tr>
             );
           })}
@@ -197,6 +252,60 @@ const SalaryListPage = () => {
           handleSearch(0, size);
         }}
       />
+
+      <Dialog open={!!editingUserId} onClose={() => setEditingUserId(null)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          Chỉnh sửa lương
+          <IconButton size="small" onClick={() => setEditingUserId(null)}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <Box display="flex" alignItems="center" gap={2} mb={2}>
+            <Avatar src={`https://ui-avatars.com/api/?name=${encodeURIComponent(editingEmployee?.fullname || "")}&background=random`} />
+            <Box>
+              <Typography fontWeight={500}>{editingEmployee?.fullname}</Typography>
+              <Typography variant="body2" color="text.secondary">Mã NV: {getStaffCodeDisplay(editingEmployee?.staff_code)}</Typography>
+            </Box>
+          </Box>
+          <Divider sx={{ mb: 2 }} />
+          <Box mt={4} display="flex" flexDirection="column" gap={2}>
+            <FormControl fullWidth mt={3} >
+              <InputLabel >Loại lương</InputLabel>
+              <Select
+                label="Loại lương"
+                name="salary_type"
+                value={editForm.salary_type}
+                onChange={handleEditChange}
+              >
+                <MenuItem value="MONTHLY">Tháng</MenuItem>
+                <MenuItem value="WEEKLY">Tuần</MenuItem>
+                <MenuItem value="HOURLY">Giờ</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              margin="dense"
+              fullWidth
+              name="salary"
+              label="Lương (₫)"
+              type="text"
+              value={Number(editForm.salary).toLocaleString("vi-VN")}
+              onChange={(e) => {
+                const raw = e.target.value.replace(/[^\d]/g, ""); // bỏ dấu phẩy, ký tự không phải số
+                setEditForm((prev) => ({ ...prev, salary: raw }));
+              }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setEditingUserId(null)} color="inherit">
+            Hủy
+          </Button>
+          <Button variant="contained" onClick={handleEditSubmit}>
+            Lưu
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

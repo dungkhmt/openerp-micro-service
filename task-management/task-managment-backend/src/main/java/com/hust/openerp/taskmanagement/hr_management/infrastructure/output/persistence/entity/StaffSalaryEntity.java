@@ -19,7 +19,7 @@ public class StaffSalaryEntity extends AuditEntity {
     @Column(name = "thru_date")
     private LocalDateTime thruDate;
 
-    @Column(name = "salary")
+    @Column(name = "salary", nullable = false)
     private Integer salary;
 
     @Column(name = "salary_type")
