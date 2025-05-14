@@ -81,7 +81,8 @@ const CheckpointPeriodScreen = () => {
         {
           onError: (err) => console.error("Error fetching periods:", err),
         },
-        payload
+        null,
+        {params: payload}
       );
     } catch (error) {
       console.error("Error fetching periods:", error);
@@ -303,39 +304,40 @@ const CheckpointPeriodScreen = () => {
           />
         </div>
       </div>
-
-      <table {...getTableProps()} className="checkpoint-table">
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
-              {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps()} key={column.id}>
-                  {column.render("Header")}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            return (
-              <tr
-                {...row.getRowProps()}
-                key={row.id}
-                onClick={() => handleRowClick(row.original)} 
-                style={{ cursor: "pointer" }} 
-              >
-                {row.cells.map((cell) => (
-                  <td {...cell.getCellProps()} key={cell.column.id}>
-                    {cell.render("Cell")}
-                  </td>
+      <div style={{maxHeight: "460px", overflowY: "auto"}}>
+        <table {...getTableProps()} className="checkpoint-table">
+          <thead style={{position: "sticky", top: 0, background: "#fff", zIndex: 2}}>
+            {headerGroups.map((headerGroup) => (
+              <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
+                {headerGroup.headers.map((column) => (
+                  <th {...column.getHeaderProps()} key={column.id}>
+                    {column.render("Header")}
+                  </th>
                 ))}
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            ))}
+          </thead>
+          <tbody {...getTableBodyProps()}>
+          {rows.map((row) => {
+            prepareRow(row);
+              return (
+                <tr
+                  {...row.getRowProps()}
+                  key={row.id}
+                  onClick={() => handleRowClick(row.original)}
+                  style={{ cursor: "pointer" }}
+                >
+                  {row.cells.map((cell) => (
+                    <td {...cell.getCellProps()} key={cell.column.id}>
+                      {cell.render("Cell")}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
       <div className="pagination">
         <div className="page-controls">

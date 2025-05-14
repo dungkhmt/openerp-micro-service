@@ -467,33 +467,35 @@ const EmployeeManagement = () => {
 
 
       {viewMode === "table" ? (
-        <table {...getTableProps()} className="employee-table">
-          <thead>
-            {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
-                {headerGroup.headers.map((column) => (
-                  <th {...column.getHeaderProps()} key={column.id}>
-                    {column.render("Header")}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody {...getTableBodyProps()}>
-            {rows.map((row) => {
-              prepareRow(row);
-              return (
-                <tr {...row.getRowProps()} key={row.id}>
-                  {row.cells.map((cell) => (
-                    <td {...cell.getCellProps()} key={cell.column.id}>
-                      {cell.render("Cell")}
-                    </td>
+        <div style={{ maxHeight: "450px", overflowY: "auto" }}>
+          <table {...getTableProps()} className="employee-table">
+            <thead style={{position: "sticky", top: 0, background: "#fff", zIndex: 2}}>
+              {headerGroups.map((headerGroup) => (
+                <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
+                  {headerGroup.headers.map((column) => (
+                    <th {...column.getHeaderProps()} key={column.id}>
+                      {column.render("Header")}
+                    </th>
                   ))}
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              ))}
+            </thead>
+            <tbody {...getTableBodyProps()}>
+            {rows.map((row) => {
+                prepareRow(row);
+                return (
+                  <tr {...row.getRowProps()} key={row.id}>
+                    {row.cells.map((cell) => (
+                      <td {...cell.getCellProps()} key={cell.column.id}>
+                        {cell.render("Cell")}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       ) : (
         <div className="card-view">
           {data.map((employee, index) => (

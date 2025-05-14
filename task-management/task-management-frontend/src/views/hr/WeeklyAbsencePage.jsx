@@ -54,8 +54,8 @@ const WeeklyAbsencePage = () => {
         null,
         {
           params: {
-            department_code: selectedDept?.department_code || null,
-            job_position_code: selectedPos?.code || null,
+            departmentCode: selectedDept?.department_code || null,
+            jobPositionCode: selectedPos?.code || null,
             status: "ACTIVE",
           }
         }

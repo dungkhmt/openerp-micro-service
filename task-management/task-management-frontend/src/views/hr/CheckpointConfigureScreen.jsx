@@ -298,20 +298,20 @@ const CheckpointConfigureScreen = () => {
           />
         </div>
       </div>
-
-      <table {...getTableProps()} className="checkpoint-table">
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
-              {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps()} key={column.id}>
-                  {column.render("Header")}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
+      <div style={{maxHeight: "460px", overflowY: "auto"}}>
+        <table {...getTableProps()} className="checkpoint-table">
+          <thead style={{position: "sticky", top: 0, background: "#fff", zIndex: 2}}>
+            {headerGroups.map((headerGroup) => (
+              <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
+                {headerGroup.headers.map((column) => (
+                  <th {...column.getHeaderProps()} key={column.id}>
+                    {column.render("Header")}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody {...getTableBodyProps()}>
           {rows.map((row) => {
             prepareRow(row);
             return (
@@ -324,9 +324,9 @@ const CheckpointConfigureScreen = () => {
               </tr>
             );
           })}
-        </tbody>
-      </table>
-
+          </tbody>
+        </table>
+      </div>
       <div className="pagination">
         <div className="page-controls">
           <input
