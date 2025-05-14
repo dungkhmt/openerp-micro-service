@@ -39,6 +39,7 @@ import WeeklyAbsencePage from "../views/hr/WeeklyAbsencePage.jsx";
 import CompanyConfigPage from "../views/hr/CompanyConfigPage.jsx";
 import LeavePolicyPage from "../views/hr/LeaveHoursPage.jsx";
 import SalaryConfigPage from "../views/hr/SalaryConfigPage.jsx";
+import SalaryListPage from "../views/hr/SalaryListPage.jsx";
 
 
 export const router = createBrowserRouter([
@@ -199,6 +200,19 @@ export const router = createBrowserRouter([
                   },
                   {
                     path: "salary",
+                    element: <SalaryConfigPage/>,
+                  },
+                ]
+              },
+              {
+                path: "salary",
+                children: [
+                  {
+                    path: "list",
+                    element: <SalaryListPage/>,
+                  },
+                  {
+                    path: "calculate",
                     element: <SalaryConfigPage/>,
                   },
                 ]

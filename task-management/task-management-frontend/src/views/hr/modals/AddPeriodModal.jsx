@@ -97,7 +97,7 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues }) => {
         name: null,
         status: "ACTIVE",
         page: 0,
-        page_size: 100,
+        pageSize: 100,
       };
 
       request(

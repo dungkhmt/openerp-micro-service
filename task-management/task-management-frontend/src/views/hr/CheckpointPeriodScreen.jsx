@@ -63,7 +63,7 @@ const CheckpointPeriodScreen = () => {
       name: searchValue || null,
       status: "ACTIVE",
       page: pageIndex,
-      page_size: pageSize,
+      pageSize: pageSize,
     };
 
     try {

@@ -16,20 +16,10 @@ import java.util.List;
 @Getter
 @Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class GetSalaryListRequest extends BasePageableRequest {
+public class GetSalaryListRequest {
     private List<String> userIds;
 
     public GetAllCurrentStaffSalary toUseCase(){
         return new GetAllCurrentStaffSalary(userIds);
-    }
-
-    @Override
-    public String getSortBy() {
-        return "userId";
-    }
-
-    @Override
-    public SortDirection getOrder() {
-        return SortDirection.DESC;
     }
 }

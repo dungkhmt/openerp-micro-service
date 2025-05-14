@@ -36,11 +36,11 @@ const DepartmentTable = () => {
 
   const fetchData = async (pageIndex, pageSize, searchValue) => {
     const payload = {
-      department_code: null,
-      department_name: searchValue || null,
+      departmentCode: null,
+      departmentName: searchValue || null,
       status: "ACTIVE",
       page: pageIndex,
-      page_size: pageSize,
+      pageSize: pageSize,
     };
 
     try {

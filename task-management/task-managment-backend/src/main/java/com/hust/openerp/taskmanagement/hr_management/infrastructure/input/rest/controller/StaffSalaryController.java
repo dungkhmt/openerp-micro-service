@@ -39,10 +39,9 @@ public class StaffSalaryController extends BeanAwareUseCasePublisher {
     public ResponseEntity<?> getSalaryList(
         @Valid @ModelAttribute GetSalaryListRequest request
     ){
-        var modelPage = publishPageWrapper(StaffSalaryModel.class, request.toUseCase());
-        var responsePage = modelPage.convert(StaffSalaryResponse::fromModel);
+        var list = publishCollection(StaffSalaryModel.class, request.toUseCase());
         return ResponseEntity.ok().body(
-            new Resource(responsePage)
+            new Resource(list.stream().map(StaffSalaryResponse::fromModel).toList())
         );
     }
 

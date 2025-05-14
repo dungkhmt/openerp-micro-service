@@ -61,13 +61,13 @@ const AttendancePage = () => {
         {},
         null,
         {
-          params:        {
+          params: {
             fullname: searchName || null,
-            department_code: selectedDept?.department_code || null,
-            job_position_code: selectedPos?.code || null,
+            departmentCode: selectedDept?.department_code || null,
+            jobPositionCode: selectedPos?.code || null,
             status: "ACTIVE",
             page,
-            page_size: size
+            pageSize: size
           }
         }
 

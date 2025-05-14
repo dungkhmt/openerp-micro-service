@@ -53,11 +53,11 @@ const CheckpointEvaluation = () => {
     setLoading(true);
     const payload = {
       fullname: searchTerm || null,
-      department_code: selectedDepartment?.department_code || null,
-      job_position_code: selectedJobPosition?.code || null,
+      departmentCode: selectedDepartment?.department_code || null,
+      jobPositionCode: selectedJobPosition?.code || null,
       status: "ACTIVE",
       page: pageIndex,
-      page_size: pageSize,
+      pageSize: pageSize,
     };
     try {
       request(

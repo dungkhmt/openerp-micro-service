@@ -49,11 +49,11 @@ const EmployeeManagement = () => {
   const fetchEmployees = async (pageIndex, pageSize, searchValue) => {
     const payload = {
       fullname: searchValue || null,
-      department_code: selectedDepartment?.department_code || null,
-      job_position_code: selectedJobPosition?.code || null,
+      departmentCode: selectedDepartment?.department_code || null,
+      jobPositionCode: selectedJobPosition?.code || null,
       status: "ACTIVE",
       page: pageIndex,
-      page_size: pageSize,
+      pageSize: pageSize,
     };
 
     try {

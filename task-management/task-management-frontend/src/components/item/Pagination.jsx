@@ -59,7 +59,7 @@ const Pagination = ({
           displayEmpty
           className="items-per-page-select"
         >
-          {[10, 15, 20, 50].map((n) => (
+          {[5, 10, 15, 20, 50].map((n) => (
             <MenuItem key={n} value={n}>
               {n}
             </MenuItem>
