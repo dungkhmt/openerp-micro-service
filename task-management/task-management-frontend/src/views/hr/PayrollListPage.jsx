@@ -88,7 +88,7 @@ const PayrollListPage = () => {
     const from = dayjs(newPayroll.fromdate);
     const thru = dayjs(newPayroll.thruDate);
     if (!from.isBefore(thru, "day")) {
-      toast.error("Từ ngày phải nhỏ hơn đến ngày");
+      toast.error("Ngày bắt đầu phải trước ngày kết thúc");
       return;
     }
 
@@ -115,9 +115,6 @@ const PayrollListPage = () => {
     <Box className="employee-management" sx={{ padding: 3 }}>
       <Grid container alignItems="center" justifyContent="space-between" mb={2}>
         <Typography variant="h5">Danh sách kỳ lương</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => setCreateModalOpen(true)}>
-          Tạo mới
-        </Button>
       </Grid>
 
       <Grid container spacing={2} alignItems="center" marginBottom={2}>
@@ -142,6 +139,18 @@ const PayrollListPage = () => {
               <MenuItem value="INACTIVE"><Chip label="INACTIVE" size="small" /></MenuItem>
             </Select>
           </FormControl>
+        </Grid>
+        <Grid item xs={12} md={7}>
+          <Box display="flex" justifyContent="flex-end">
+            <Button
+              sx={{ height: 55, minWidth: 120 }}
+              variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={() => setCreateModalOpen(true)}
+            >
+              Tạo mới
+            </Button>
+          </Box>
         </Grid>
       </Grid>
 

@@ -26,4 +26,5 @@ public class FindStaff implements IStaffFilter, UseCase {
     private List<String> departmentCodes;
     private List<String> jobPositionCodes;
     private String userLoginId;
+    private List<String> userLoginIds;
 }

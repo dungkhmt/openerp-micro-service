@@ -1,6 +1,5 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.payroll.service;
 
-import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IConfigPort;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.absence.usecase_data.GetAbsenceList;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkinout.usecase_data.GetAttendances;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.holiday.usecase_data.GetHolidayList;
@@ -10,12 +9,10 @@ import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff_
 import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceType;
 import com.hust.openerp.taskmanagement.hr_management.constant.JobPositionType;
 import com.hust.openerp.taskmanagement.hr_management.constant.PayrollStatus;
-import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.*;
 import com.hust.openerp.taskmanagement.util.WorkTimeCalculator;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
@@ -34,35 +31,35 @@ public class PayrollCalculator extends BeanAwareUseCasePublisher {
     private final List<PayrollDetailModel> payrollDetailModels;
 
     public PayrollCalculator(
-            CompanyConfigModel companyConfig,
-            CreatePayroll createPayroll
+        CompanyConfigModel companyConfig,
+        CreatePayroll createPayroll
     ) {
         this.createPayroll = createPayroll;
         this.companyConfig = companyConfig;
-        holidayDates = getHolidays(createPayroll.getFromdate(), createPayroll.getThruDate());
+        holidayDates = getHolidays(createPayroll.getFromDate(), createPayroll.getThruDate());
         payrollModel = calculatePayrollModel();
         payrollDetailModels = calculatePayrollDetailsModel();
     }
 
     private PayrollModel calculatePayrollModel() {
         return PayrollModel.builder()
-                .name(createPayroll.getName())
-                .totalWorkDays(getTotalWorkDays(createPayroll.getFromdate(), createPayroll.getThruDate()))
-                .workHoursPerDay(companyConfig.getTotalWorkTime())
-                .totalHolidayDays(holidayDates.size())
-                .fromDate(createPayroll.getFromdate())
-                .thruDate(createPayroll.getThruDate())
-                .createdBy(createPayroll.getCreatedBy())
-                .status(PayrollStatus.ACTIVE)
-                .build();
+            .name(createPayroll.getName())
+            .totalWorkDays(getTotalWorkDays(createPayroll.getFromDate(), createPayroll.getThruDate()))
+            .workHoursPerDay((float) roundToQuarter(companyConfig.getTotalWorkTime()))
+            .totalHolidayDays(holidayDates.size())
+            .fromDate(createPayroll.getFromDate())
+            .thruDate(createPayroll.getThruDate())
+            .createdBy(createPayroll.getCreatedBy())
+            .status(PayrollStatus.ACTIVE)
+            .build();
     }
 
     private List<PayrollDetailModel> calculatePayrollDetailsModel() {
         var staffs = getAllStaffs();
         var userIdOfStaffs = staffs.stream().map(StaffDetailModel::getUserLoginId).toList();
         var salaryMap = getStaffSalaries(userIdOfStaffs);
-        var absenceMap = getStaffAbsences(userIdOfStaffs, createPayroll.getFromdate(), createPayroll.getThruDate());
-        var attendanceMap = getStaffAttendances(userIdOfStaffs, createPayroll.getFromdate(), createPayroll.getThruDate());
+        var absenceMap = getStaffAbsences(userIdOfStaffs, createPayroll.getFromDate(), createPayroll.getThruDate());
+        var attendanceMap = getStaffAttendances(userIdOfStaffs, createPayroll.getFromDate(), createPayroll.getThruDate());
 
         return staffs.stream().map(staff -> {
             var userId = staff.getUserLoginId();
@@ -78,7 +75,7 @@ public class PayrollCalculator extends BeanAwareUseCasePublisher {
             List<Double> workHoursInDays = new ArrayList<>();
             List<Double> absenceHoursInDays = new ArrayList<>();
 
-            LocalDate currentDate = createPayroll.getFromdate();
+            LocalDate currentDate = createPayroll.getFromDate();
             while (!currentDate.isAfter(createPayroll.getThruDate())) {
                 boolean isWeekend = currentDate.getDayOfWeek().getValue() == 6 || currentDate.getDayOfWeek().getValue() == 7;
                 boolean isHoliday = holidayDates.contains(currentDate);
@@ -94,27 +91,30 @@ public class PayrollCalculator extends BeanAwareUseCasePublisher {
                             dayAttendance.getEndTime().toLocalTime(),
                             companyConfig
                         );
+                        dailyWorkHours = roundToQuarter(dailyWorkHours);
                     }
-                }
-                else if (isHoliday && !isWeekend && staff.getJobPosition().getType() == JobPositionType.FULL_TIME) {
-                    dailyWorkHours = companyConfig.getTotalWorkTime();
-                }
 
-                if (absences.containsKey(currentDate)) {
-                    var absenceInDay = absences.get(currentDate);
-                    for (var absence: absenceInDay){
-                        var absenceHours = absence.getDurationTimeAbsence(companyConfig);
-                        dailyAbsenceHours += absenceHours;
-                        if (absence.getType() == AbsenceType.PAID_LEAVE) {
-                            totalPairLeaveHours += absenceHours;
-                        } else {
-                            totalUnpairLeaveHours += absenceHours;
+                    if (absences.containsKey(currentDate)) {
+                        var absenceInDay = absences.get(currentDate);
+                        for (var absence : absenceInDay) {
+                            var absenceHours = roundToQuarter(absence.getDurationTimeAbsence(companyConfig));
+                            dailyAbsenceHours += absenceHours;
+                            if (absence.getType() == AbsenceType.PAID_LEAVE) {
+                                totalPairLeaveHours += (float) absenceHours;
+                            } else {
+                                totalUnpairLeaveHours += (float) absenceHours;
+                            }
                         }
                     }
-
+                } else if (isHoliday && !isWeekend) {
+                    dailyAbsenceHours = roundToQuarter(companyConfig.getTotalWorkTime());
+                    if (staff.getJobPosition().getType() == JobPositionType.FULL_TIME) {
+                        totalPairLeaveHours += (float) dailyAbsenceHours;
+                    }
                 }
-                workHoursInDays.add(dailyWorkHours);
-                absenceHoursInDays.add(dailyAbsenceHours);
+
+                workHoursInDays.add(roundToQuarter(dailyWorkHours));
+                absenceHoursInDays.add(roundToQuarter(dailyAbsenceHours));
                 totalWorkHours += (float) dailyWorkHours;
                 currentDate = currentDate.plusDays(1);
             }
@@ -124,9 +124,10 @@ public class PayrollCalculator extends BeanAwareUseCasePublisher {
                 .salary(salary != null ? salary.getSalary() : 0)
                 .salaryType(salary != null ? salary.getSalaryType() : null)
                 .workHours(workHoursInDays)
+                .totalWorkHours((float) roundToQuarter(totalWorkHours))
                 .absenceHours(absenceHoursInDays)
-                .pairLeaveHours(totalPairLeaveHours)
-                .unpairLeaveHours(totalUnpairLeaveHours)
+                .pairLeaveHours((float) roundToQuarter(totalPairLeaveHours))
+                .unpairLeaveHours((float) roundToQuarter(totalUnpairLeaveHours))
                 .payrollAmount(calculatePayrollAmount(totalWorkHours, totalPairLeaveHours, salary))
                 .build();
         }).toList();
@@ -140,12 +141,12 @@ public class PayrollCalculator extends BeanAwareUseCasePublisher {
         float totalHours = workHours + pairLeaveHours;
         switch (salary.getSalaryType()) {
             case MONTHLY -> {
-                int totalWorkDays = getTotalWorkDays(createPayroll.getFromdate(), createPayroll.getThruDate());
+                int totalWorkDays = getTotalWorkDays(createPayroll.getFromDate(), createPayroll.getThruDate());
                 float totalWorkHours = totalWorkDays * companyConfig.getTotalWorkTime();
                 return Math.round((totalHours / totalWorkHours) * salary.getSalary());
             }
             case WEEKLY -> {
-                int totalWeeks = (int) Math.ceil((float) getTotalWorkDays(createPayroll.getFromdate(), createPayroll.getThruDate()) / 7);
+                int totalWeeks = (int) Math.ceil((float) getTotalWorkDays(createPayroll.getFromDate(), createPayroll.getThruDate()) / 7);
                 float totalWorkHours = totalWeeks * companyConfig.getTotalWorkTime() * 5; // Assuming 5 workdays per week
                 return Math.round((totalHours / totalWorkHours) * salary.getSalary());
             }
@@ -158,13 +159,17 @@ public class PayrollCalculator extends BeanAwareUseCasePublisher {
         }
     }
 
+    private static double roundToQuarter(double value) {
+        return Math.round(value * 4) / 4.0;
+    }
+
     private Integer getTotalWorkDays(LocalDate startDate, LocalDate endDate) {
         int totalWorkDays = 0;
         LocalDate currentDate = startDate;
 
         while (!currentDate.isAfter(endDate)) {
             boolean isWeekend = currentDate.getDayOfWeek().getValue() == 6
-                    || currentDate.getDayOfWeek().getValue() == 7;
+                || currentDate.getDayOfWeek().getValue() == 7;
             boolean isHoliday = holidayDates.contains(currentDate);
 
             if (!isWeekend && !isHoliday) {
@@ -183,55 +188,53 @@ public class PayrollCalculator extends BeanAwareUseCasePublisher {
     }
 
     private Map<String, AttendanceModel> getStaffAttendances(
-            List<String> userIds,
-            LocalDate startDate,
-            LocalDate endDate) {
+        List<String> userIds,
+        LocalDate startDate,
+        LocalDate endDate) {
         var useCase = GetAttendances.builder()
-                .userIds(userIds)
-                .startDate(startDate)
-                .endDate(endDate)
-                .build();
+            .userIds(userIds)
+            .startDate(startDate)
+            .endDate(endDate)
+            .build();
         var attendances = publishCollection(AttendanceModel.class, useCase);
         return attendances.stream()
-                .collect(Collectors.toMap(
-                        AttendanceModel::getUserId,
-                        s -> s,
-                        (oldValue, newValue) -> newValue));
+            .collect(Collectors.toMap(
+                AttendanceModel::getUserId,
+                s -> s,
+                (oldValue, newValue) -> newValue));
     }
 
     private Map<String, List<AbsenceModel>> getStaffAbsences(
-            List<String> userIds,
-            LocalDate startDate,
-            LocalDate endDate) {
+        List<String> userIds,
+        LocalDate startDate,
+        LocalDate endDate) {
         var useCase = GetAbsenceList.builder()
-                .userIds(userIds)
-                .startDate(startDate)
-                .endDate(endDate)
-                .build();
+            .userIds(userIds)
+            .startDate(startDate)
+            .endDate(endDate)
+            .build();
         var absenceList = publishCollection(AbsenceModel.class, useCase);
         return absenceList.stream()
-                .collect(Collectors.groupingBy(AbsenceModel::getUserId));
+            .collect(Collectors.groupingBy(AbsenceModel::getUserId));
     }
 
     private Set<LocalDate> getHolidays(
-            LocalDate startDate,
-            LocalDate endDate) {
+        LocalDate startDate,
+        LocalDate endDate) {
         var useCase = new GetHolidayList(startDate, endDate);
         var model = publish(HolidayListModel.class, useCase);
         return model.getHolidays().values().stream()
-                .flatMap(holiday -> holiday.getDates().stream())
-                .collect(Collectors.toSet());
+            .flatMap(holiday -> holiday.getDates().stream())
+            .collect(Collectors.toSet());
     }
 
     private Map<String, StaffSalaryModel> getStaffSalaries(List<String> userIds) {
         var useCase = new GetAllCurrentStaffSalary(userIds);
         var staffSalaries = publishCollection(StaffSalaryModel.class, useCase);
         return staffSalaries.stream()
-                .collect(Collectors.toMap(
-                        StaffSalaryModel::getUserLoginId,
-                        s -> s,
-                        (oldValue, newValue) -> newValue));
-
+            .collect(Collectors.toMap(
+                StaffSalaryModel::getUserLoginId,
+                s -> s,
+                (oldValue, newValue) -> newValue));
     }
-
 }

@@ -142,6 +142,12 @@ public class StaffAdapter implements IStaffPort {
         return toModels(staffEntities);
     }
 
+    @Override
+    public List<StaffModel> getAllStaffIn(List<String> userLoginIds) {
+        var staffEntities = staffRepo.findByUser_IdIn(userLoginIds);
+        return toModels(staffEntities);
+    }
+
     private StaffModel toModel(StaffEntity staffEntity){
         return StaffModel.builder()
             .staffCode(staffEntity.getStaffCode())

@@ -14,10 +14,13 @@ public class PageableUtils {
         if (request == null || request.getPage() == null || request.getPageSize() == null) {
             return Pageable.unpaged();
         }
+        Sort sort = request.getOrder() == null || request.getSortBy() == null ?
+            Sort.unsorted() : Sort.by(from(request.getOrder()), request.getSortBy());
+
         return PageRequest.of(
             Math.toIntExact(request.getPage()),
             Math.toIntExact(request.getPageSize()),
-            Sort.by(from(request.getOrder()), request.getSortBy())
+            sort
         );
     }
 

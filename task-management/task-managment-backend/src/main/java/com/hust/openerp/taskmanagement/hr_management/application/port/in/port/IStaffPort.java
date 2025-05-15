@@ -22,4 +22,6 @@ public interface IStaffPort extends ICodeGeneratorPort {
     PageWrapper<StaffModel> findStaff(IStaffFilter filter, IPageableRequest pageableRequest);
 
     List<StaffModel> findStaff(IStaffFilter filter);
+
+    List<StaffModel> getAllStaffIn(List<String> userLoginIds);
 }

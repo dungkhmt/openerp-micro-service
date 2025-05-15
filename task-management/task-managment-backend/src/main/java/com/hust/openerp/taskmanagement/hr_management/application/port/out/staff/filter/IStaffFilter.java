@@ -7,6 +7,7 @@ import java.util.List;
 public interface IStaffFilter {
     String getStaffCode();
     String getUserLoginId();
+    List<String> getUserLoginIds();
     String getStaffName();
     StaffStatus getStatus();
     String getStaffEmail();

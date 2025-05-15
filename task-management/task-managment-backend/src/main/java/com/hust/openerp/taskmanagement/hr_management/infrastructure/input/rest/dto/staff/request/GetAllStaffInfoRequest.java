@@ -10,6 +10,8 @@ import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.
 import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.PageableRequest;
 
+import java.util.List;
+
 @Getter
 @Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -17,20 +19,22 @@ public class GetAllStaffInfoRequest extends BasePageableRequest {
     private String fullname;
     private String staffCode;
     private String staffEmail;
-    private StaffStatus status;
+    private StaffStatus status = StaffStatus.ACTIVE;
     private String jobPositionCode;
     private String departmentCode;
+    private List<String> userIds;
 
     public GetAllStaffInfo toUseCase(){
         return GetAllStaffInfo.builder()
-                .staffEmail(staffEmail)
-                .staffCode(staffCode)
-                .staffName(fullname)
-                .status(status)
-                .jobPositionCode(jobPositionCode)
-                .departmentCode(departmentCode)
-                .pageableRequest(this)
-                .build();
+            .staffEmail(staffEmail)
+            .staffCode(staffCode)
+            .staffName(fullname)
+            .status(status)
+            .jobPositionCode(jobPositionCode)
+            .departmentCode(departmentCode)
+            .userLoginIds(userIds)
+            .pageableRequest(this)
+            .build();
     }
 
     @Override
