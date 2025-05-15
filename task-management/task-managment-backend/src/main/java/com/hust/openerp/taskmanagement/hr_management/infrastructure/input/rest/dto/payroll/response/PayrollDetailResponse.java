@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -25,15 +26,26 @@ public class PayrollDetailResponse {
     private String userId;
     private Integer salary;
     private SalaryType salaryType;
-    private Boolean isPaidHoliday;
-    private Float workHours;
+    private List<Double> workHours;
+    private List<Double> absenceHours;
+    private Float totalWorkHours;
     private Float pairLeaveHours;
     private Float unpairLeaveHours;
     private Integer payrollAmount;
 
     public static PayrollDetailResponse fromModel(PayrollDetailModel model) {
         return PayrollDetailResponse.builder()
-
+            .id(model.getId())
+            .payrollId(model.getPayrollId())
+            .userId(model.getUserId())
+            .salary(model.getSalary())
+            .salaryType(model.getSalaryType())
+            .workHours(model.getWorkHours())
+            .absenceHours(model.getAbsenceHours())
+            .totalWorkHours(model.getTotalWorkHours())
+            .pairLeaveHours(model.getPairLeaveHours())
+            .unpairLeaveHours(model.getUnpairLeaveHours())
+            .payrollAmount(model.getPayrollAmount())
             .build();
     }
 }
