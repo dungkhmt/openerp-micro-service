@@ -41,6 +41,7 @@ import LeavePolicyPage from "../views/hr/LeaveHoursPage.jsx";
 import SalaryConfigPage from "../views/hr/SalaryConfigPage.jsx";
 import SalaryListPage from "../views/hr/SalaryListPage.jsx";
 import PayrollListPage from "../views/hr/PayrollListPage.jsx";
+import PayrollDetailPage from "../views/hr/PayrollDetailPage.jsx";
 
 
 export const router = createBrowserRouter([
@@ -213,12 +214,12 @@ export const router = createBrowserRouter([
                     element: <SalaryListPage/>,
                   },
                   {
-                    path: "calculate",
-                    element: <SalaryConfigPage/>,
+                    path: "payrolls",
+                    element: <PayrollListPage/>,
                   },
                   {
-                    path: "history",
-                    element: <PayrollListPage/>,
+                    path: "payrolls/:payrollId",
+                    element: <PayrollDetailPage/>,
                   },
                 ]
               }

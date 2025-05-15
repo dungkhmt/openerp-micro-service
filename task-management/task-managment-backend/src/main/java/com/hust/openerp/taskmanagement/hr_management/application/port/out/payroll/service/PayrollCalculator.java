@@ -91,7 +91,6 @@ public class PayrollCalculator extends BeanAwareUseCasePublisher {
                             dayAttendance.getEndTime().toLocalTime(),
                             companyConfig
                         );
-                        dailyWorkHours = roundToQuarter(dailyWorkHours);
                     }
 
                     if (absences.containsKey(currentDate)) {
@@ -118,16 +117,18 @@ public class PayrollCalculator extends BeanAwareUseCasePublisher {
                 totalWorkHours += (float) dailyWorkHours;
                 currentDate = currentDate.plusDays(1);
             }
-
+            totalWorkHours = (float) roundToQuarter(totalWorkHours);
+            totalPairLeaveHours = (float) roundToQuarter(totalPairLeaveHours);
+            totalUnpairLeaveHours = (float) roundToQuarter(totalUnpairLeaveHours);
             return PayrollDetailModel.builder()
                 .userId(userId)
                 .salary(salary != null ? salary.getSalary() : 0)
                 .salaryType(salary != null ? salary.getSalaryType() : null)
                 .workHours(workHoursInDays)
-                .totalWorkHours((float) roundToQuarter(totalWorkHours))
+                .totalWorkHours(totalWorkHours)
                 .absenceHours(absenceHoursInDays)
-                .pairLeaveHours((float) roundToQuarter(totalPairLeaveHours))
-                .unpairLeaveHours((float) roundToQuarter(totalUnpairLeaveHours))
+                .pairLeaveHours(totalPairLeaveHours)
+                .unpairLeaveHours(totalUnpairLeaveHours)
                 .payrollAmount(calculatePayrollAmount(totalWorkHours, totalPairLeaveHours, salary))
                 .build();
         }).toList();

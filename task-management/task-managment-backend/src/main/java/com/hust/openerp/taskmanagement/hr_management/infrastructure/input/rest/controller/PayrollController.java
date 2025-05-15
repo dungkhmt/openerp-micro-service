@@ -1,6 +1,7 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.payroll.usecase_data.DeletePayroll;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.payroll.usecase_data.GetPayroll;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.PayrollDetailModel;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.PayrollModel;
@@ -39,6 +40,17 @@ public class PayrollController extends BeanAwareUseCasePublisher {
         publish(new DeletePayroll(id));
         return ResponseEntity.ok().body(
             new Resource()
+        );
+    }
+
+    @GetMapping("/{payrollId}")
+    public ResponseEntity<?> getPayroll(
+        @PathVariable UUID payrollId
+    )
+    {
+        var model = publish(PayrollModel.class, new GetPayroll(payrollId));
+        return ResponseEntity.ok().body(
+            new Resource(PayrollResponse.fromModel(model))
         );
     }
 

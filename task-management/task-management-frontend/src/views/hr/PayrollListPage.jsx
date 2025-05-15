@@ -28,11 +28,13 @@ import { useDebounce } from "../../hooks/useDebounce";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import "@/assets/css/EmployeeTable.css";
 
 dayjs.extend(isSameOrBefore);
 
 const PayrollListPage = () => {
+  const navigate = useNavigate();
   const [searchName, setSearchName] = useState("");
   const [statusFilter, setStatusFilter] = useState("ACTIVE");
   const [payrolls, setPayrolls] = useState([]);
@@ -169,6 +171,7 @@ const PayrollListPage = () => {
             <Button
               sx={{ height: 55, minWidth: 120 }}
               variant="contained"
+              color="success"
               startIcon={<AddIcon />}
               onClick={() => setCreateModalOpen(true)}
             >
@@ -195,7 +198,12 @@ const PayrollListPage = () => {
           {payrolls.map((item, index) => (
             <tr key={item.id}>
               <td>{currentPage * itemsPerPage + index + 1}</td>
-              <td>{item.name}</td>
+              <td>
+                <Button variant="text" onClick={() => navigate(`${item.id}`)}
+                        sx={{textTransform: "none", padding: 0, minWidth: 0}}>
+                  <Typography fontWeight={500} color="primary">{item.name}</Typography>
+                </Button>
+              </td>
               <td>{item.fromdate ? new Date(item.fromdate).toLocaleDateString("vi-VN") : "-"}</td>
               <td>{item.thru_date ? new Date(item.thru_date).toLocaleDateString("vi-VN") : "-"}</td>
               <td>{userMap[item.created_by] || item.created_by || "-"}</td>

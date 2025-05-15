@@ -155,13 +155,8 @@ const navigation = [
         icon: "mdi:file-chart-outline",
       },
       {
-        title: "Tính lương",
-        path: "/hr/salary/calculate",
-        icon: "mdi:calculator",
-      },
-      {
         title: "Lịch sử tính lương",
-        path: "/hr/salary/history",
+        path: "/hr/salary/payrolls",
         icon: "mdi:history",
       },
     ]
