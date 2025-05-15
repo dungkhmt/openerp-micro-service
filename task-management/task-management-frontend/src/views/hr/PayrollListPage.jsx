@@ -43,6 +43,7 @@ const PayrollListPage = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [newPayroll, setNewPayroll] = useState({ name: "", fromdate: null, thruDate: null });
+  const [userMap, setUserMap] = useState({});
 
   const debouncedSearchName = useDebounce(searchName, 500);
 
@@ -50,12 +51,35 @@ const PayrollListPage = () => {
     request(
       "get",
       "/payrolls",
-      (res) => {
+      async (res) => {
         const list = res.data.data || [];
         const meta = res.data.meta.page_info || {};
         setPayrolls(list);
         setCurrentPage(meta.page || 0);
         setPageCount(meta.total_page || 1);
+
+        const userIds = [...new Set(list.map(item => item.created_by).filter(Boolean))];
+
+        if (userIds.length > 0) {
+          request(
+            "get",
+            "/staffs/details",
+            (res) => {
+              const userMapResult = {};
+              (res.data.data || []).forEach(user => {
+                userMapResult[user.user_login_id] = user.fullname;
+              });
+              setUserMap(userMapResult);
+            },
+            {},
+            null,
+            {
+              params: {
+                userIds: userIds.join(",")
+              }
+            }
+          );
+        }
       },
       {},
       null,
@@ -145,8 +169,8 @@ const PayrollListPage = () => {
             <Button
               sx={{ height: 55, minWidth: 120 }}
               variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={() => setCreateModalOpen(true)}
+              startIcon={<AddIcon />}
+              onClick={() => setCreateModalOpen(true)}
             >
               Tạo mới
             </Button>
@@ -174,7 +198,7 @@ const PayrollListPage = () => {
               <td>{item.name}</td>
               <td>{item.fromdate ? new Date(item.fromdate).toLocaleDateString("vi-VN") : "-"}</td>
               <td>{item.thru_date ? new Date(item.thru_date).toLocaleDateString("vi-VN") : "-"}</td>
-              <td>{item.created_by || "-"}</td>
+              <td>{userMap[item.created_by] || item.created_by || "-"}</td>
               <td>{renderStatusChip(item.status)}</td>
               <td>
                 {item.status === "ACTIVE" && (
