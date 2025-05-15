@@ -29,7 +29,7 @@ public class PayrollAdapter implements IPayrollPort {
         var payrollEntity = new PayrollEntity();
         payrollEntity.setId(UUID.randomUUID());
         payrollEntity.setName(payrollModel.getName());
-        payrollEntity.setCreatedBy(payrollEntity.getCreatedBy());
+        payrollEntity.setCreatedBy(payrollModel.getCreatedBy());
         payrollEntity.setFromdate(payrollModel.getFromDate());
         payrollEntity.setThruDate(payrollModel.getThruDate());
         payrollEntity.setTotalHolidayDays(payrollModel.getTotalHolidayDays());
