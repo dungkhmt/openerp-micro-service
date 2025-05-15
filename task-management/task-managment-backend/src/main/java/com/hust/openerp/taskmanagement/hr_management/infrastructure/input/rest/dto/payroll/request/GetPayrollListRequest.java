@@ -3,6 +3,7 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.payroll.usecase_data.GetPayrollList;
+import com.hust.openerp.taskmanagement.hr_management.constant.PayrollStatus;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.PageableRequest;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,10 +13,12 @@ import lombok.Setter;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GetPayrollListRequest extends PageableRequest {
     private String searchName;
+    private PayrollStatus status;
 
     public GetPayrollList toUseCase(){
         return GetPayrollList.builder()
             .searchName(searchName)
+            .status(status)
             .pageableRequest(this)
             .build();
     }

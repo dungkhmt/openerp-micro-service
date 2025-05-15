@@ -17,9 +17,5 @@ import java.util.List;
 public class GetPayrollList implements UseCase, IPayrollFilter {
     private String searchName;
     private IPageableRequest pageableRequest;
-
-    @Override
-    public PayrollStatus getStatus() {
-        return PayrollStatus.ACTIVE;
-    }
+    private PayrollStatus status;
 }
