@@ -29,7 +29,9 @@ const AddReceipt = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [warehouseList, setWarehouseList] = useState([]);
+  const [supplierList, setSupplierList] = useState([]);
   const [warehouseId, setWarehouseId] = useState('');
+  const [supplierId, setSupplierId] = useState('');
   const [expectedReceiptDate, setExpectedReceiptDate] = useState('');
   const [requestDetails, setRequestDetails] = useState([{ productId: '', quantity: '' }]);
   const [productSuggestions, setProductSuggestions] = useState([]);
@@ -39,6 +41,9 @@ const AddReceipt = () => {
   useEffect(() => {
     request("get", "/warehouses", (res) => {
       setWarehouseList(res.data);
+    }).then();
+    request("get", "/suppliers", (res) => {
+      setSupplierList(res.data);
     }).then();
   }, []);
 
@@ -106,6 +111,7 @@ const AddReceipt = () => {
       receiptName: name,
       description,
       warehouseId,
+      supplierId,
       expectedReceiptDate,
       receiptItemRequests: updatedRequestDetails,
     };
@@ -159,14 +165,30 @@ const AddReceipt = () => {
           Save
         </Button>
 
-
       </Box>
 
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Paper elevation={3} sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>General Information</Typography>
+            <Typography variant="h6" sx={{ mb: 2 }}>General Information</Typography>
             <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel id="supplier-label">Supplier</InputLabel>
+                  <Select
+                    labelId="supplier-label"
+                    value={supplierId}
+                    onChange={(e) => setSupplierId(e.target.value)}
+                    label="Supplier"
+                  >
+                    {supplierList.map((supplier) => (
+                      <MenuItem key={supplier.supplierId} value={supplier.supplierId}>
+                        {supplier.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
                   <InputLabel id="warehouse-label">Warehouse</InputLabel>
@@ -184,6 +206,15 @@ const AddReceipt = () => {
                   </Select>
                 </FormControl>
               </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Receipt Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
@@ -197,14 +228,6 @@ const AddReceipt = () => {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Receipt Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
                   label="Description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -213,6 +236,8 @@ const AddReceipt = () => {
 
 
             </Grid>
+
+
           </Paper>
         </Grid>
 

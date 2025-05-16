@@ -151,17 +151,22 @@ const ProductPreview = ({ item }) => {
                 disabled={item.quantity === 0}
                 sx={{
                     marginLeft: 'auto',
-                    backgroundColor: 'black',
-                    color: 'white',
+                    backgroundColor: '#019160',
+                    color: '#fff',
                     '&:hover': {
-                        backgroundColor: 'black',
-                        opacity: 0.75,
-                    }
+                        backgroundColor: '#2fbe8e', // màu hover
+                    },
+                    '&:active': {
+                        backgroundColor: '#01b075', // màu khi nhấn
+                    },
                 }}
                 fullWidth
             >
                 Add to cart
             </Button>
+
+
+
 
             <Link to={`/customer/products/${item.productId}`} className="block">
                 <Button

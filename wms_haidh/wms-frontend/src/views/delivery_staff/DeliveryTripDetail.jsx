@@ -16,6 +16,7 @@ import { formatDate } from '../../utils/utils';
 import PhoneIcon from '@mui/icons-material/Phone';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import MapIcon from '@mui/icons-material/Map';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 
 const DeliveryTripDetail = () => {
   const navigate = useNavigate();
@@ -98,17 +99,20 @@ const DeliveryTripDetail = () => {
             color="primary"
             sx={{
               marginLeft: 'auto',
-              backgroundColor: 'black',
-              color: 'white',
+              backgroundColor: '#019160',
+              color: '#fff',
               '&:hover': {
-                backgroundColor: 'black',
-                opacity: 0.75,
+                backgroundColor: '#2fbe8e', // hiệu ứng khi hover
+              },
+              '&:active': {
+                backgroundColor: '#01b075', // hiệu ứng khi nhấn
               }
             }}
             onClick={handleSubmit}
           >
             Start
-          </Button>)
+          </Button>
+          )
         }
       </Box>
 
@@ -165,11 +169,23 @@ const DeliveryTripDetail = () => {
                 {/* Left side: View Items */}
                 <Button
                   variant="contained"
+                  startIcon={<ListAltIcon />}
                   color="primary"
                   onClick={() => navigate(`/delivery-staff/delivery-trip/${id}/${item.orderId}`)}
+                  sx={{
+                    backgroundColor: '#019160',
+                    color: '#fff',
+                    '&:hover': {
+                      backgroundColor: '#2fbe8e', // hiệu ứng hover
+                    },
+                    '&:active': {
+                      backgroundColor: '#01b075', // hiệu ứng nhấn
+                    },
+                  }}
                 >
                   View Items
                 </Button>
+
 
                 {generalInfo && generalInfo.status === 'STARTED' && item.status === 'CREATED' && (
                   <Stack direction="row" spacing={1}>
@@ -194,13 +210,22 @@ const DeliveryTripDetail = () => {
           variant="contained"
           color="primary"
           sx={{
-            mt: 4
+            mt: 4,
+            backgroundColor: '#019160',
+            color: '#fff',
+            '&:hover': {
+              backgroundColor: '#2fbe8e', // hiệu ứng hover
+            },
+            '&:active': {
+              backgroundColor: '#01b075', // hiệu ứng nhấn
+            },
           }}
           onClick={handleToggleMap}
           startIcon={<MapIcon />}
         >
           {isMapOpen ? 'Close Map' : 'Open Map'}
         </Button>
+
       </Box>
 
       {/* Map Section */}

@@ -115,8 +115,8 @@ const ProductDetail = () => {
                             color={product.quantity === 0 ? 'error' : theme.palette.success.main}
                             sx={{
                                 mt: 1,
-                                fontSize: '1rem', 
-                                fontWeight: 600, 
+                                fontSize: '1rem',
+                                fontWeight: 600,
                             }}
                         >
                             {product.quantity === 0 ? 'Sold out' : `Available: ${product.quantity}`}
@@ -143,16 +143,19 @@ const ProductDetail = () => {
                             sx={{
                                 mt: 3,
                                 width: '33%',
-                                backgroundColor: 'black',
-                                color: 'white',
+                                backgroundColor: '#019160',
+                                color: '#fff',
                                 '&:hover': {
-                                    backgroundColor: 'black',
-                                    opacity: 0.75,
+                                    backgroundColor: '#2fbe8e', // hover
+                                },
+                                '&:active': {
+                                    backgroundColor: '#01b075', // nhấn
                                 }
                             }}
                         >
                             Add to cart
                         </Button>
+
                     </Grid>
                 </Grid>
             </Card>

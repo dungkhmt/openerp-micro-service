@@ -5,7 +5,8 @@ import java.time.LocalDateTime;
 public interface ReceiptProjection {
     String getReceiptName();
     String getDescription();
-    String getWarehouseName();  
+    String getWarehouseName(); 
+    String getSupplierName();
     LocalDateTime getExpectedReceiptDate();
     String getStatus();
     String getCreatedBy();

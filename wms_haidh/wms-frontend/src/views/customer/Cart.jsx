@@ -149,17 +149,20 @@ const Cart = () => {
                                 sx={{
                                     width: "100%",
                                     height: "40px",
-                                    backgroundColor: "black",
-                                    color: "white",
+                                    backgroundColor: '#019160',
+                                    color: '#fff',
                                     fontSize: "16px",
-                                    "&:hover": {
-                                        backgroundColor: "black",
-                                        opacity: 0.75,
+                                    '&:hover': {
+                                        backgroundColor: '#2fbe8e', // hover hiệu ứng
+                                    },
+                                    '&:active': {
+                                        backgroundColor: '#01b075', // nhấn
                                     },
                                 }}
                             >
                                 Checkout
                             </Button>
+
                         </Card>
                     )}
                 </div>

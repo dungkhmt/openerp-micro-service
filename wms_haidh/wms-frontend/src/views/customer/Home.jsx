@@ -104,40 +104,45 @@ export default function Home() {
 
 
                 <Button
-                    variant={sorting === "asc" ? "contained" : "outlined"}
+                    variant="contained"
                     onClick={() => setSorting("asc")}
                     sx={{
                         height: "48px",
-                        backgroundColor: sorting === "asc" ? "black" : "transparent",
-                        color: sorting === "asc" ? "white" : "black",
-                        border: "1px solid black",
-                        "&:hover": {
-                            backgroundColor: sorting === "asc" ? "black" : "rgba(0, 0, 0, 0.1)",
-                            opacity: sorting === "asc" ? 0.75 : 1,
-                            borderColor: "black",
+                        backgroundColor: sorting === "asc" ? "#019160" : "transparent",
+                        color: sorting === "asc" ? "#fff" : "#019160",
+                        border: "1px solid #019160",
+                        '&:hover': {
+                            backgroundColor: sorting === "asc" ? "#019160" : "transparent",
+                        },
+                        '&:active': {
+                            backgroundColor: sorting === "asc" ? "#01b075" : "transparent",
                         },
                     }}
                 >
                     Price Asc
                 </Button>
 
+
+
                 <Button
-                    variant={sorting === "desc" ? "contained" : "outlined"}
+                    variant="contained"
                     onClick={() => setSorting("desc")}
                     sx={{
                         height: "48px",
-                        backgroundColor: sorting === "desc" ? "black" : "transparent",
-                        color: sorting === "desc" ? "white" : "black",
-                        border: "1px solid black",
-                        "&:hover": {
-                            backgroundColor: sorting === "desc" ? "black" : "rgba(0, 0, 0, 0.1)",
-                            opacity: sorting === "desc" ? 0.75 : 1,
-                            borderColor: "black",
+                        backgroundColor: sorting === "desc" ? "#019160" : "transparent",
+                        color: sorting === "desc" ? "#fff" : "#019160",
+                        border: "1px solid #019160",
+                        '&:hover': {
+                            backgroundColor: sorting === "desc" ? "#019160" : "transparent",
+                        },
+                        '&:active': {
+                            backgroundColor: sorting === "desc" ? "#01b075" : "transparent",
                         },
                     }}
                 >
                     Price Desc
                 </Button>
+
             </div>
 
 
@@ -160,17 +165,20 @@ export default function Home() {
                     disabled={page === 1}
                     onClick={() => setPage((prev) => prev - 1)}
                     sx={{
-                        backgroundColor: 'black',
-                        color: 'white',
+                        backgroundColor: '#019160',
+                        color: '#fff',
                         '&:hover': {
-                            backgroundColor: 'black',
-                            opacity: 0.75,
+                            backgroundColor: '#019160', 
+                        },
+                        '&:active': {
+                            backgroundColor: '#01b075', 
                         },
                         minWidth: '40px'
                     }}
                 >
                     <ChevronLeftIcon />
                 </Button>
+
 
                 <span className="self-center text-sm">Page {page} of {totalPages}</span>
 
@@ -179,11 +187,13 @@ export default function Home() {
                     disabled={page === totalPages}
                     onClick={() => setPage((prev) => prev + 1)}
                     sx={{
-                        backgroundColor: 'black',
-                        color: 'white',
+                        backgroundColor: '#019160',
+                        color: '#fff',
                         '&:hover': {
-                            backgroundColor: 'black',
-                            opacity: 0.75,
+                            backgroundColor: '#019160', // giữ nguyên khi hover
+                        },
+                        '&:active': {
+                            backgroundColor: '#01b075', // hiệu ứng nhấn
                         },
                         minWidth: '40px'
                     }}

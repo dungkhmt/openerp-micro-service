@@ -79,8 +79,9 @@ const ReceiptDetail = () => {
             </Typography>
             <Typography><b>Receipt Name:</b> {generalInfo && generalInfo.receiptName}</Typography>
             <Typography><b>Warehouse:</b> {generalInfo && generalInfo.warehouseName}</Typography>
+            <Typography><b>Supplier:</b> {generalInfo && generalInfo.supplierName}</Typography>
             <Typography><b>Expected Receipt Date:</b> {generalInfo && formatDate(generalInfo.expectedReceiptDate)}</Typography>
-            <Typography><b>Status:</b> {generalInfo && generalInfo.status}</Typography>
+            
           </Paper>
         </Grid>
         <Grid item xs={12} md={6}>
@@ -88,6 +89,7 @@ const ReceiptDetail = () => {
             <Typography variant="h6" gutterBottom>
               Details
             </Typography>
+            <Typography><b>Status:</b> {generalInfo && generalInfo.status}</Typography>
             <Typography><b>Created By:</b>  {generalInfo && generalInfo.createdBy}</Typography>
             <Typography><b>Created Time:</b> {generalInfo && formatDate(generalInfo.createdStamp)}</Typography>
             <Typography><b>Description:</b> {generalInfo && generalInfo.description}</Typography>       

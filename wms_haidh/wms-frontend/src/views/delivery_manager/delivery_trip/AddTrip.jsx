@@ -96,10 +96,6 @@ const AddTrip = () => {
     fetchRoute(coordinates, setRoute, setDistance, setLoadingMap);
   }, [coordinates, warehouseId]);
 
-
-
-
-
   useEffect(() => {
     request("get", "/warehouses", (res) => {
       setWarehouseOptions(res.data);

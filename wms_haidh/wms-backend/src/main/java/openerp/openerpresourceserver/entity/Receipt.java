@@ -32,6 +32,8 @@ public class Receipt {
     private String description; 
 
     private UUID warehouseId; 
+    
+    private UUID supplierId; 
 
     private LocalDateTime expectedReceiptDate; 
 

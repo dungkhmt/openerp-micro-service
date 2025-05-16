@@ -41,6 +41,7 @@ public class ReceiptService {
 		// Build receipt object
 		Receipt receipt = Receipt.builder().receiptName(request.getReceiptName()).description(request.getDescription())
 				.warehouseId(request.getWarehouseId())
+				.supplierId(request.getSupplierId())
 				.expectedReceiptDate(expectedReceiptDateTime) // Converted to LocalDateTime
 				.status("CREATED").createdBy(userLoginId).createdStamp(now).lastUpdatedStamp(now).build();
 

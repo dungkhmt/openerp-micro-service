@@ -14,7 +14,6 @@ const ProductCategoryReport = () => {
   const [selectedPoints, setSelectedPoints] = useState([]);
   const [monthlyProfit, setMonthlyProfit] = useState('');
   const [totalProfit, setTotalProfit] = useState([]);
-  const [rawData, setRawData] = useState([]);
 
   useEffect(() => {
     request("get", `/reports/monthly-profit`, (res) => {
@@ -32,7 +31,6 @@ const ProductCategoryReport = () => {
     if (selectedMonth) {
       request("get", `/reports/monthly-profit-by-category?month=${selectedMonth}`, (res) => {
         const raw = res.data;
-        setRawData(raw);
 
         const profitEntry = totalProfit.find(p => p.date === selectedMonth);
         const total = profitEntry?.profit || 0;
@@ -118,7 +116,7 @@ const ProductCategoryReport = () => {
         <Grid item xs={12}>
           <Grid container spacing={4} justifyContent="center" alignItems="flex-start">
             <Grid item>
-              <PieChart width={400} height={300}>
+              <PieChart width={400} height={350}>
                 <Pie
                   data={selectedPoints}
                   dataKey="value"
