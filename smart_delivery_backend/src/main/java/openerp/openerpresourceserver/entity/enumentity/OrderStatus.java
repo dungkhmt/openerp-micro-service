@@ -11,6 +11,7 @@ import java.util.Set;
 public enum OrderStatus {
 
     PENDING("Đang xử lý", Collections.emptySet()),
+    PROCESSING("Đang xử lý", Collections.emptySet()),
     ASSIGNED("Đã phân công cho nhân viên thu gom", Set.of(Role.ADMIN, Role.HUB_MANAGER, Role.COLLECTOR)),
     COLLECTED_COLLECTOR("Nhân viên thu gom đã lấy hàng", Set.of(Role.COLLECTOR)),
     COLLECTED_HUB("Đơn hàng đã về Hub nguồn", Set.of(Role.HUB_STAFF)),

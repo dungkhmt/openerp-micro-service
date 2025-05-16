@@ -25,12 +25,16 @@ public class DeliveryTrackingServiceImpl implements DeliveryTrackingService {
 
     private final OrderRepo orderRepo;
     private final AssignOrderShipperRepository assignOrderShipperRepository;
+    private final OrderNotificationService orderNotificationService;
 
     @Override
     @Transactional
     public void updateOrderStatus(UUID orderId, OrderStatus status, String notes) {
         Order order = orderRepo.findById(orderId)
                 .orElseThrow(() -> new NotFoundException("Order not found with ID: " + orderId));
+
+        // Store old status for notification
+        OrderStatus oldStatus = order.getStatus();
 
         // Validate status transition
         if (!OrderStatus.isValidTransition(order.getStatus(), status)) {
@@ -40,6 +44,9 @@ public class DeliveryTrackingServiceImpl implements DeliveryTrackingService {
         // Update order status
         order.setStatus(status);
         orderRepo.save(order);
+
+        // Send notification about status change
+        orderNotificationService.sendOrderStatusChangeNotification(order, oldStatus, status);
 
         // Find current assignment
         List<AssignOrderShipper> assignments = assignOrderShipperRepository.findByOrderId(orderId);

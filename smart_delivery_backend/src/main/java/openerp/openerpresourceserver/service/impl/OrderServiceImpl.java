@@ -195,6 +195,24 @@ public class OrderServiceImpl implements OrderService {
         return orderRepo.findOrderDetailById(orderId);
     }
 
+    // Get order by ID method
+    @Override
+    public List<OrderSummaryDTO> getOrderByUsername(String username) {
+
+        List<Order> orders = orderRepo.findByCreatedBy(username);
+        if(orders.isEmpty()){
+            return Collections.emptyList();
+        }
+        else {
+            List<OrderSummaryDTO> orderSummaries = new ArrayList<>();
+            for (Order order : orders) {
+                // Thêm vào danh sách orderResponses
+                orderSummaries.add(new OrderSummaryDTO(order));
+            }
+            return orderSummaries;
+        }
+    }
+
     // Edit order method
     @Override
     @Transactional
@@ -682,4 +700,11 @@ public class OrderServiceImpl implements OrderService {
         }
         return orderSummaries;
     }
+
+    @Override
+    public List<Order> getCustomerOrders(UUID customerId) {
+        return orderRepo.findBySenderId(customerId);
+    }
+
+
 }

@@ -54,4 +54,9 @@ public interface OrderService {
     List<OrderItemForTripDto> getOrderItemsForTrip(UUID tripId);
 
     List<OrderSummaryDTO> getAllOrdersDeliveredInHub(UUID hubId);
+
+    List<Order> getCustomerOrders(UUID customerId);
+
+
+    List<OrderSummaryDTO> getOrderByUsername(String username);
 }

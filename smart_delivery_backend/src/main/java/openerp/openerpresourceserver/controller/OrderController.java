@@ -56,7 +56,10 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getAllOrdersByHubId(hubId));
     }
 
-
+    @GetMapping("/order/sender/{username}")
+    public ResponseEntity<List<OrderSummaryDTO>> getAllOrdersByCreatedByUsername(@PathVariable String username) {
+        return ResponseEntity.ok(orderService.getOrderByUsername(username));
+    }
 
 
     @GetMapping("/order/hub/today/{hubId}")

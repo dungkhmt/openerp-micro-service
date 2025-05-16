@@ -24,6 +24,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -70,6 +71,4 @@ public class Order {
     @UpdateTimestamp
     private Timestamp updatedAt;
     private String changedBy;
-
-
 }

@@ -4,32 +4,43 @@ import {jwtDecode} from "jwt-decode";
 const authSlice = createSlice({
     name: "auth",
     initialState: {
-        hubId: null,
-        email: null,
         token: null,
-        id: null,
+        isAuthenticated: false,
+        user: {
+            username: null,
+            email: null,
+            role: null,
+            hubId: null
+        }
     },
     reducers: {
         setToken: (state, action) => {
             const token = action.payload;
             state.token = token;
+            state.isAuthenticated = true;
 
             try {
                 const decodedToken = jwtDecode(token);
-                state.hubId = decodedToken?.hub_id || null; // Lấy hubId từ token
-                state.role = decodedToken?.resource_access?.smart_delivery?.roles[0];
-                state.email = decodedToken?.email;
-                state.username = decodedToken?.preferred_username;
-                console.log("Role",state.role);
-
+                state.user = {
+                    username: decodedToken?.preferred_username,
+                    email: decodedToken?.email,
+                    role: decodedToken?.resource_access?.smart_delivery?.roles[0],
+                    hubId: decodedToken?.hub_id || null
+                };
+                console.log("User role:", state.user.role);
             } catch (error) {
                 console.error("Error decoding token:", error);
             }
         },
         clearAuth: (state) => {
             state.token = null;
-            state.hubId = null;
-            state.role = null;
+            state.isAuthenticated = false;
+            state.user = {
+                username: null,
+                email: null,
+                role: null,
+                hubId: null
+            };
         },
     },
 });
