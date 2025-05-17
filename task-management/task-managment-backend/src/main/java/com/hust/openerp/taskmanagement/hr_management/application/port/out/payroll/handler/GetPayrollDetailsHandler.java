@@ -25,6 +25,6 @@ public class GetPayrollDetailsHandler extends ObservableUseCasePublisher
 
     @Override
     public PageWrapper<PayrollDetailModel> handle(GetPayrollDetails useCase) {
-        return payrollDetailPort.getDetails(useCase.getPayrollId(), useCase, useCase.getPageableRequest());
+        return payrollDetailPort.getDetails(useCase, useCase.getPageableRequest());
     }
 }

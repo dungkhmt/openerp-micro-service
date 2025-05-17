@@ -8,7 +8,6 @@ import com.hust.openerp.taskmanagement.hr_management.domain.model.PayrollDetailM
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.PayrollDetailEntity;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository.PayrollDetailRepo;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.specification.PayrollDetailSpecification;
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.specification.PayrollSpecification;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.utils.PageableUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +32,6 @@ public class PayrollDetailAdapter implements IPayrollDetailPort {
 
     @Override
     public PageWrapper<PayrollDetailModel> getDetails(
-        UUID payrollId,
         IPayrollDetailFilter filter,
         IPageableRequest pageableRequest
     )

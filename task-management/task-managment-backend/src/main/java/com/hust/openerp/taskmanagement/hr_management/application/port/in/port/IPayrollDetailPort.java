@@ -10,7 +10,11 @@ import java.util.UUID;
 
 public interface IPayrollDetailPort {
     List<PayrollDetailModel> getDetails(UUID payrollId);
-    PageWrapper<PayrollDetailModel> getDetails(UUID payrollId, IPayrollDetailFilter filter, IPageableRequest pageableRequest);
+    PageWrapper<PayrollDetailModel> getDetails(
+        IPayrollDetailFilter filter,
+        IPageableRequest pageableRequest
+    );
+
     List<PayrollDetailModel> createDetails(List<PayrollDetailModel> payrollDetailModel);
     PayrollDetailModel saveDetail(PayrollDetailModel model);
 }

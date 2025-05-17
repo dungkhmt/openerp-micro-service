@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 public class PayrollDetailSpecification implements Specification<PayrollDetailEntity> {
@@ -18,6 +19,9 @@ public class PayrollDetailSpecification implements Specification<PayrollDetailEn
     @Override
     public Predicate toPredicate(Root<PayrollDetailEntity> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
         var predicates = new ArrayList<Predicate>();
+        if(filter.getPayrollId() != null) {
+            predicates.add(cb.equal(root.get("payrollId"), filter.getPayrollId()));
+        }
         if(filter.getUserLoginIds() != null){
             Predicate predicate = root.get("userId").in(filter.getUserLoginIds());
             predicates.add(predicate);
