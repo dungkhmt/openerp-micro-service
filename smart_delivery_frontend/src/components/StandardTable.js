@@ -302,11 +302,12 @@ const StandardTable = ({
                            actions,
                            deletable,
                            defaultOrderBy = "id", // Thêm prop mới để thiết lập orderBy mặc định
+                           defaultOrder = "asc",  // Add this line with "asc" as default
 
                        }) => {
     const [selected, setSelected] = React.useState([]);
     const [selectedData, setSelectedData] = React.useState([]);
-    const [order, setOrder] = React.useState("asc");
+    const [order, setOrder] = React.useState(defaultOrder); // Use defaultOrder here
     const [orderBy, setOrderBy] = React.useState(defaultOrderBy); // Sử dụng defaultOrderBy
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(

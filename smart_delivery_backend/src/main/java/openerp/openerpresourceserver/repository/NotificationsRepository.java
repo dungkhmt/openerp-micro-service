@@ -17,7 +17,7 @@ public interface NotificationsRepository extends JpaRepository<Notifications, UU
 
     @Query(value = "select cast(id as varchar), content, from_user fromUser, url, first_name firstName, " +
             "last_name lastName, n.status_id statusId, n.created_stamp createdStamp " +
-            "from notifications n " +
+            "from smart_delivery_notifications n " +
             "left join user_login ul on n.from_user = ul.user_login_id " +
             "where n.to_user = ? ",
             nativeQuery = true)
@@ -27,7 +27,7 @@ public interface NotificationsRepository extends JpaRepository<Notifications, UU
             "            select " +
             "            created_stamp " +
             "            from " +
-            "            notifications " +
+            "            smart_delivery_notifications " +
             "            where " +
             "            id = ?2 ) " +
             "            select " +
@@ -40,7 +40,7 @@ public interface NotificationsRepository extends JpaRepository<Notifications, UU
             "            n2.status_id statusId, " +
             "            n2.created_stamp createdStamp " +
             "            from " +
-            "            notifications n2 " +
+            "            smart_delivery_notifications n2 " +
             "            left join user_login ul on " +
             "            n2.from_user = ul.user_login_id, " +
             "            cte " +
@@ -52,13 +52,13 @@ public interface NotificationsRepository extends JpaRepository<Notifications, UU
                     "                    select " +
                     "                    created_stamp " +
                     "                    from " +
-                    "                    notifications " +
+                    "                    smart_delivery_notifications " +
                     "                    where " +
                     "                    id = ?2 ) " +
                     "                    select " +
                     "                    count(n2.id) " +
                     "                    from " +
-                    "                    notifications n2 " +
+                    "                    smart_delivery_notifications n2 " +
                     "                    left join user_login ul on " +
                     "                    n2.from_user = ul.user_login_id, " +
                     "                    cte " +
@@ -77,7 +77,7 @@ public interface NotificationsRepository extends JpaRepository<Notifications, UU
             "            n.status_id statusId, " +
             "            n.created_stamp createdStamp " +
             "            from " +
-            "            notifications n " +
+            "            smart_delivery_notifications n " +
             "            left join user_login ul on " +
             "            n.from_user = ul.user_login_id " +
             "            where " +
@@ -85,7 +85,7 @@ public interface NotificationsRepository extends JpaRepository<Notifications, UU
             nativeQuery = true)
     NotificationProjection findNotificationById(UUID notificationId);
 
-    @Query(value = "select * from notifications n " +
+    @Query(value = "select * from smart_delivery_notifications n " +
             "where to_user = ?1 " +
             "and status_id = ?2 " +
             "and created_stamp <= ?3  ", nativeQuery = true)

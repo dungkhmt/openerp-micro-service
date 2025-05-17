@@ -16,7 +16,7 @@ function DriverList() {
     const [drivers, setDrivers] = useState([]);
     const [openModal, setOpenModal] = useState(false);
     const [selectedDriver, setSelectedDriver] = useState(null);
-    const hubId = useSelector((state) => state.auth.hubId);
+    const hubId = useSelector((state) => state.auth.user?.hubId);
     const role = useSelector((state) => state.auth.role);
 
 

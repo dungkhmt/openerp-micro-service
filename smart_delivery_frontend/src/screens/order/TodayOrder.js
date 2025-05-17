@@ -19,18 +19,20 @@ import {API_PATH} from "../apiPaths";
 const TodayOrder = (props) => {
     const history = useHistory();
     const {path} = useRouteMatch();
-    const username = useSelector((state) => state.auth.username);
-    const role = useSelector((state) => state.auth.role);
+    const username = useSelector((state) => state.auth.user?.username);
+    const role = useSelector((state) => state.auth.user?.role);
     const classes = useStyles();
     const [selectPosition, setSelectPosition] = useState(null);
     const [loading, setLoading] = useState(true);
     const [openModal, setOpenModal] = useState(false);
-    const [hubId, setHubId] = useState();
+    const hubId = useSelector((state) => state.auth.user?.hubId);
     const [hub, setHub] = useState();
     const [nextOrder, setNextOrder] = useState(null);
     const [employeeId, setEmployeeId] = useState(null);
     const [assignmentData, setAssignmentData] = useState([]);
     const [tabValue, setTabValue] = useState('1');
+    const [expandedRows, setExpandedRows] = useState({});
+
     console.log("role",role)
     // Determine if user is collector or shipper
     const isCollector = role === 'COLLECTOR';
@@ -54,8 +56,8 @@ const TodayOrder = (props) => {
 
     const assignmentsEndpoint = useCallback((id) => {
         return isCollector
-            ? `/smdeli/ordermanager/order/assign/collector/today/${id}`
-            : `/smdeli/ordermanager/order/assign/shipper/today/${id}`;
+            ? `/smdeli/ordermanager/order/assign/today/collector/${id}`
+            : `/smdeli/ordermanager/order/assign/today/shipper/${id}`;
     }, [isCollector]);
 
     // Role-specific navigation paths
@@ -69,7 +71,6 @@ const TodayOrder = (props) => {
                 (res) => {
                     console.log(res.data.id);
                     setEmployeeId(res.data.id);
-                    setHubId(res.data.hubId);
                     console.log("hubId", res.data.hubId);
                 }
             );
@@ -123,27 +124,34 @@ const TodayOrder = (props) => {
 
         return (
             <Box sx={{paddingTop: 1.25, paddingLeft:2, paddingBottom: 1.25, paddingRight: 2, backgroundColor: '#f5f5f5', borderRadius: 2, marginBottom: 0.8}}>
-                {<Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                    <Box>
-                        {nextOrderData != null ?
-                            <Typography>Tên {personTypeText}: {nextOrderData?.[nameField]}</Typography> :
-                            "Không có đơn hàng!"}
-                        {nextOrderData != null && <Typography>Địa chỉ: {nextOrderData?.[addressField]}</Typography>}
-                    </Box>
-                    {nextOrderData != null && <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
-                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                            <Typography>Số điện thoại: {nextOrderData?.[phoneField]}</Typography>
-                            <Typography>Số lượng package: {nextOrderData?.numOfItem}</Typography>
+                <Box sx={{display: 'flex', alignItems: 'center', marginBottom: '8px'}}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', marginRight: 2, minWidth: '110px', paddingTop: '4px', color: 'primary.main' }}>
+                        Đơn tiếp theo:
+                    </Typography>
+
+
+                    <Box sx={{width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <Box>
+                            {nextOrderData != null ?
+                                <Typography>Tên {personTypeText}: {nextOrderData?.[nameField]}</Typography> :
+                                "Không có đơn hàng!"}
+                            {nextOrderData != null && <Typography>Địa chỉ: {nextOrderData?.[addressField]}</Typography>}
                         </Box>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={handleGoToDetails}
-                        >
-                            Thao tác
-                        </Button>
-                    </Box>}
-                </Box>}
+                        {nextOrderData != null && <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
+                            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                <Typography>Số điện thoại: {nextOrderData?.[phoneField]}</Typography>
+                                <Typography>Số lượng package: {nextOrderData?.numOfItem}</Typography>
+                            </Box>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleGoToDetails}
+                            >
+                                Thao tác
+                            </Button>
+                        </Box>}
+                    </Box>
+                </Box>
             </Box>
         );
     };
@@ -156,8 +164,10 @@ const TodayOrder = (props) => {
     }, [nextOrderStorageKey]);
 
     useEffect(() => {
-        if (!employeeId) return;
-
+        if (!employeeId) {
+            setLoading(false);  // Still stop loading even if employeeId is not available
+            return;
+        }
         async function fetchData() {
             await request(
                 "get",
@@ -216,8 +226,36 @@ const TodayOrder = (props) => {
     const getTableColumns = () => {
         const commonColumns = [
             {title: "STT", field: "sequenceNumber"},
-            {title: "Mã đơn hàng", field: "orderId"},
-            {title: "Trạng thái", field: "status"},
+            {
+                title: "Mã đơn hàng",
+                field: "orderId",
+                renderCell: (rowData) => {
+                    const isExpanded = expandedRows[rowData.orderId] || false;
+
+                    return (
+                        <Typography
+                            onClick={(e) => {
+                                e.stopPropagation(); // Prevent row selection
+                                setExpandedRows({
+                                    ...expandedRows,
+                                    [rowData.orderId]: !isExpanded
+                                });
+                            }}
+                            sx={{
+                                cursor: 'pointer',
+                                '&:hover': { textDecoration: 'underline' },
+                                maxWidth: isExpanded ? 'none' : '100px',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: isExpanded ? 'normal' : 'nowrap'
+                            }}
+                        >
+                            {rowData.orderId}
+                        </Typography>
+                    );
+                }
+            },
+            {title: "Trạng thái", field: "assignmentStatus"},
             {
                 title: "Thao tác",
                 field: "actions",
@@ -372,39 +410,42 @@ const TodayOrder = (props) => {
                                     </Box>
                                 </Grid>
 
-                                {/* Số điểm dừng đã hoàn thành */}
                                 <Grid item xs={6}>
                                     <Box sx={{ padding: 2, backgroundColor: 'white', borderRadius: 2, textAlign: 'center' }}>
                                         <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                                             Số điểm dừng hoàn thành
                                         </Typography>
                                         <Typography variant="h4" sx={{ color: 'secondary.main' }}>
-                                            {assignmentData?.filter(order => order.assignmentStatus === "COMPLETED").length}
+                                            {assignmentData?.filter(order =>
+                                                order.assignmentStatus === "COMPLETED" ||
+                                                order.assignmentStatus === "FAILED_ONCE"
+                                            ).length}
                                         </Typography>
                                     </Box>
                                 </Grid>
 
                                 {/* Tổng số package */}
+                                {/* Tổng số package */}
                                 <Grid item xs={6}>
                                     <Box sx={{ padding: 2, backgroundColor: 'white', borderRadius: 2, textAlign: 'center' }}>
                                         <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                            Tổng số package
+                                            Tổng số đơn
                                         </Typography>
                                         <Typography variant="h4" sx={{ color: 'primary.main' }}>
-                                            {assignmentData?.reduce((total, order) => total + order.numOfItem, 0)}
+                                            {assignmentData?.length || 0}
                                         </Typography>
                                     </Box>
                                 </Grid>
 
                                 {/* Tổng số package đã thu/giao */}
+                                {/* Tổng số đơn đã thu/giao */}
                                 <Grid item xs={6}>
                                     <Box sx={{ padding: 2, backgroundColor: 'white', borderRadius: 2, textAlign: 'center' }}>
                                         <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                            Tổng số package {packageActionText}
+                                            Tổng số đơn {packageActionText}
                                         </Typography>
                                         <Typography variant="h4" sx={{ color: 'secondary.main' }}>
-                                            {assignmentData?.filter(order => order.assignmentStatus === "COMPLETED")
-                                                .reduce((total, order) => total + order.numOfItem, 0)}
+                                            {assignmentData?.filter(order => order.assignmentStatus === "COMPLETED").length || 0}
                                         </Typography>
                                     </Box>
                                 </Grid>

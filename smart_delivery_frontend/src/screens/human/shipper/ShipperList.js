@@ -15,7 +15,7 @@ import {useSelector} from "react-redux";
 function ColectorList() {
     const [shippers, setShippers] = useState([]);
     const [selectedShipper, setSelectedShipper] = useState(null);
-    const hubId = useSelector((state) => state.auth.hubId);
+    const hubId = useSelector((state) => state.auth.user?.hubId);
     const role = useSelector((state) => state.auth.role);
 
     useEffect(() => {

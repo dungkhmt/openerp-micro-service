@@ -16,9 +16,10 @@ function ColectorList() {
     const [collectors, setCollectors] = useState([]);
     const [openModal, setOpenModal] = useState(false);
     const [selectedCollector, setSelectedCollector] = useState(null);
-    const hubId = useSelector((state) => state.auth.hubId);
+    const hubId = useSelector((state) => state.auth.user?.hubId);
     const auth = useSelector((state) => state.auth);
     const role = useSelector((state) => state.auth.role);
+    console.log("hubid", hubId);
 
     console.log("auth1",auth)
     useEffect(() => {

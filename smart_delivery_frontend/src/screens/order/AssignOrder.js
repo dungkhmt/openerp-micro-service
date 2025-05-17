@@ -35,7 +35,7 @@ const AssignOrder = (props) => {
     const [processingItems, setProcessingItems] = useState([]);
     const [allWarehouses, setAllWarehouses] = useState([]);
     const [tabValue, setTabValue] = useState("1");
-    const hubId = useSelector((state) => state.auth.hubId);
+    const hubId = useSelector((state) => state.auth.user?.hubId);
 
     const [selectedProductId, setSelectedProductId] = useState(null);
     const [selectedProductName, setSelectedProductName] = useState(null);
@@ -106,7 +106,7 @@ const AssignOrder = (props) => {
             );
             await request(
                 "get",
-                `/smdeli/ordermanager/order/assign/today/${hubId}`,
+                `/smdeli/ordermanager/order/assign/collector/today/${hubId}`,
                 (res) => {
                     setAssigmentData(res.data);
                 }
@@ -194,7 +194,7 @@ const AssignOrder = (props) => {
                 },
             },
             {
-                collectors: updatedCollectors,
+                employees: updatedCollectors,
                 orders: orders,
                 hubId: hubId,
             }

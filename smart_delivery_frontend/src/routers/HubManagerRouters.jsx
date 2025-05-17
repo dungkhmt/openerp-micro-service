@@ -25,6 +25,11 @@ export default function HubManagerRouters() {
                     exact
                     path={`${path}/hub/update/:id`}
                 />
+                <Route
+                    component={UpdateHub}
+                    exact
+                    path={`${path}/hub/view/:id`}
+                />
             </Switch>
         </div>
     );

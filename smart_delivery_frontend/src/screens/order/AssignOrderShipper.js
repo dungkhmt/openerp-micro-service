@@ -35,7 +35,7 @@ const AssignOrderShipper = (props) => {
     const [processingItems, setProcessingItems] = useState([]);
     const [allWarehouses, setAllWarehouses] = useState([]);
     const [tabValue, setTabValue] = useState("1");
-    const hubId = useSelector((state) => state.auth.hubId);
+    const hubId = useSelector((state) => state.auth.user?.hubId);
 
     const [selectedProductId, setSelectedProductId] = useState(null);
     const [selectedProductName, setSelectedProductName] = useState(null);

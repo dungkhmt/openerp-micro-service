@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { request } from "api";
-import StandardTable  from "../../components/StandardTable";
+import StandardTable from "../../components/StandardTable";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MapIcon from "@mui/icons-material/Map";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Modal, Box, Typography, Button } from '@mui/material';
 import Maps from 'components/map/map';
-import VisibilityIcon from "@mui/icons-material/Visibility";
+import { useSelector } from "react-redux";
 
 function ListHub() {
     const [hubs, setHubs] = useState([]);
     const [openModal, setOpenModal] = useState(false);
     const [selectedHub, setSelectedHub] = useState(null);
+    const role = useSelector((state) => state.auth.user?.role);
+
+    // Check if user is admin
+    const isAdmin = role === "ADMIN";
 
     useEffect(() => {
         request("get", "/smdeli/hubmanager/hub", (res) => {
@@ -20,101 +25,159 @@ function ListHub() {
         }).then();
     }, []);
 
-    const columns = [
-        {
-            title: "Mã hub",
-            field: "id",
-        },
-        {
-            title: "Tên Hub",
-            field: "name",
-        },
-        {
-            title: "Vị trí",
-            field: "address",
-        },
-        {
-            title: "Xem vị trí",
-            sorting: false,
-            renderCell: (rowData) => (
-                <IconButton
-                    onClick={() => {
-                        handleShowLocation(rowData);
-                    }}
-                    variant="contained"
-                    color="primary"
-                >
-                    <MapIcon />
-                </IconButton>
-            ),
-        },
-        {
-            title: "Thao tác",
-            field: "actions", // Field này vẫn cần để tránh lỗi nếu StandardTable sử dụng nó
-            centerHeader: true,
-            sorting: false,
-            renderCell: (rowData) => ( // Sử dụng renderCell thay vì render
-                <div style={{ display: 'flex', gap: '5px', padding: '0px'}}>
+    // Define columns based on user role
+    const getColumns = () => {
+        const baseColumns = [
+            {
+                title: "Mã hub",
+                field: "id",
+            },
+            {
+                title: "Tên Hub",
+                field: "name",
+            },
+            {
+                title: "Vị trí",
+                field: "address",
+            },
+            {
+                title: "Xem vị trí",
+                sorting: false,
+                renderCell: (rowData) => (
                     <IconButton
-                        style={{ padding: '5px' }}
-                        onClick={() => handleEdit(rowData)}
-                        color="success"
+                        onClick={() => {
+                            handleShowLocation(rowData);
+                        }}
+                        variant="contained"
+                        color="primary"
                     >
-                        <VisibilityIcon />
+                        <MapIcon />
                     </IconButton>
-                    <IconButton
-                        style={{ padding: '5px' }}
-                        onClick={() => handleEdit(rowData)}
-                    >
-                        <EditIcon />
-                    </IconButton>
-                    <IconButton
-                        style={{ padding: '5px' }}
-                        onClick={() => handleDelete(rowData)}
-                        color="error"
-                    >
-                        <DeleteIcon />
-                    </IconButton>
-                </div>
-            ),
-        },
-    ];
+                ),
+            }
+        ];
+
+        // If user is HUB_MANAGER, only add View action
+        if (role === "HUB_MANAGER") {
+            baseColumns.push({
+                title: "Thao tác",
+                field: "actions",
+                centerHeader: true,
+                sorting: false,
+                renderCell: (rowData) => (
+                    <div style={{ display: 'flex', gap: '5px', padding: '0px'}}>
+                        <IconButton
+                            style={{ padding: '5px' }}
+                            onClick={() => handleView(rowData)}
+                            color="primary"
+                        >
+                            <VisibilityIcon />
+                        </IconButton>
+                    </div>
+                ),
+            });
+        }
+        // If user is ADMIN, add all actions (View, Edit, Delete)
+        else if (isAdmin) {
+            baseColumns.push({
+                title: "Thao tác",
+                field: "actions",
+                centerHeader: true,
+                sorting: false,
+                renderCell: (rowData) => (
+                    <div style={{ display: 'flex', gap: '5px', padding: '0px'}}>
+                        <IconButton
+                            style={{ padding: '5px' }}
+                            onClick={() => handleView(rowData)}
+                            color="primary"
+                        >
+                            <VisibilityIcon />
+                        </IconButton>
+                        <IconButton
+                            style={{ padding: '5px' }}
+                            onClick={() => handleEdit(rowData)}
+                            color="success"
+                        >
+                            <EditIcon />
+                        </IconButton>
+                        <IconButton
+                            style={{ padding: '5px' }}
+                            onClick={() => handleDelete(rowData)}
+                            color="error"
+                        >
+                            <DeleteIcon />
+                        </IconButton>
+                    </div>
+                ),
+            });
+        }
+
+        return baseColumns;
+    };
 
     const handleShowLocation = (hub) => {
         setSelectedHub(hub);
         setOpenModal(true);
     };
 
+    const handleView = (hub) => {
+        // Add view functionality - navigate to view page or show details in modal
+        window.location.href = `/hubmanager/hub/view/${hub.id}`;
+    };
+
     const handleEdit = (hub) => {
-        window.location.href = `/hubmanager/hub/update/${hub.id}`;
+        // Only allow admins to edit
+        if (isAdmin) {
+            window.location.href = `/hubmanager/hub/update/${hub.id}`;
+        }
     };
 
     const handleDelete = (hub) => {
-        const isConfirmed = window.confirm(`Bạn có chắc muốn xóa Hub: ${hub.name} - Địa chỉ: ${hub.address}?`);
+        // Only allow admins to delete
+        if (isAdmin) {
+            const isConfirmed = window.confirm(`Bạn có chắc muốn xóa Hub: ${hub.name} - Địa chỉ: ${hub.address}?`);
+            if (isConfirmed) {
+                const data = { id: hub.id };
+                request(
+                    "delete",
+                    `/smdeli/hubmanager/hub/delete`,
+                    (res) => {
+                        if (res.status === 200) {
+                            alert("Xóa hub thành công");
+                            setHubs(hubs.filter(h => h.id !== hub.id));
+                        }
+                    },
+                    {},
+                    data
+                );
+            }
+        }
+    };
 
-        if (isConfirmed) {
-            const data = { id: hub.id };
-
-            request(
-                "delete",
-                `/smdeli/hubmanager/hub/delete`,
-                (res) => {
-                    if (res.status === 200) {
-                        alert("Xóa hub thành công");
-                        setHubs(hubs.filter(h => h.id !== hub.id));
-                    }
-                },
-                {},
-                data
+    // Get AddHub button based on role
+    const renderAddButton = () => {
+        if (isAdmin) {
+            return (
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => window.location.href = '/hubmanager/hub/add'}
+                    style={{ marginBottom: '20px' }}
+                >
+                    Add Hub
+                </Button>
             );
         }
+        return null;
     };
 
     return (
         <div>
+            {renderAddButton()}
+
             <StandardTable
                 title="Hub List"
-                columns={columns}
+                columns={getColumns()}
                 data={hubs}
                 options={{
                     selection: false,
@@ -142,22 +205,20 @@ function ListHub() {
                     border: '2px solid #000',
                     boxShadow: 24,
                     p: 4,
-
-                }}><Box sx={{ height: "10%" }}>
-                    <Typography variant="h6" id="modal-modal-title" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        Vị trí của Hub: {selectedHub?.name}
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={() => setOpenModal(false)}
-                            style={{marginBottom: '1%'  }}
-                        >
-                            Đóng
-                        </Button>
-                    </Typography>
-                </Box>
-
-
+                }}>
+                    <Box sx={{ height: "10%" }}>
+                        <Typography variant="h6" id="modal-modal-title" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            Vị trí của Hub: {selectedHub?.name}
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={() => setOpenModal(false)}
+                                style={{marginBottom: '1%' }}
+                            >
+                                Đóng
+                            </Button>
+                        </Typography>
+                    </Box>
                     <Box sx={{ height: "90%" }}>
                         <Maps selectPosition={{ lat: selectedHub?.latitude, lon: selectedHub?.longitude }} />
                     </Box>

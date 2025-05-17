@@ -27,7 +27,7 @@ const CollectorOrderDetail = () => {
     const assignmentId = location.state?.assignmentId;
 
     // Get role from Redux state
-    const role = useSelector((state) => state.auth.role);
+    const role = useSelector((state) => state.auth.user?.role);
 
     // Determine if user is collector or shipper
     const isCollector = role === 'COLLECTOR';

@@ -16,6 +16,7 @@ import { ReactComponent as Logo } from "./assets/icons/logo.svg";
 import history from "./history.js";
 import { Provider } from 'react-redux';
 import Store from "./state/Store";
+import HubIdLoader from "./utils/HubLoader";
 
 export const theme = createTheme({
   typography: {
@@ -107,34 +108,36 @@ function App() {
   console.log("acessToken", keycloak.token)
 
   return (
-    <ReactKeycloakProvider
-      authClient={keycloak}
-      initOptions={initOptions}
-      LoadingComponent={AppLoading}
-      onEvent={onKeycloakEvent}
-    >
-      <Provider store={Store}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Router history={history}>
-          <Routes />
-          <ToastContainer
-            position="bottom-center"
-            transition={Slide}
-            autoClose={3000}
-            limit={3}
-            hideProgressBar={true}
-            newestOnTop
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
-        </Router>
-      </ThemeProvider>
+      <ReactKeycloakProvider
+          authClient={keycloak}
+          initOptions={initOptions}
+          LoadingComponent={AppLoading}
+          onEvent={onKeycloakEvent}
+      >
+        <Provider store={Store}>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Router history={history}>
+              {/* Add the HubIdLoader component */}
+              <HubIdLoader />
+              <Routes />
+              <ToastContainer
+                  position="bottom-center"
+                  transition={Slide}
+                  autoClose={3000}
+                  limit={3}
+                  hideProgressBar={true}
+                  newestOnTop
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+              />
+            </Router>
+          </ThemeProvider>
         </Provider>
-    </ReactKeycloakProvider>
+      </ReactKeycloakProvider>
   );
 }
 

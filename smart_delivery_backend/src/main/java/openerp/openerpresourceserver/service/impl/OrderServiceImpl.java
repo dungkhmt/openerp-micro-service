@@ -117,6 +117,8 @@ public class OrderServiceImpl implements OrderService {
         orderEntity.setOrderType(orderREQ.getOrderType());
         orderEntity.setOrderType(orderREQ.getOrderType());
         orderEntity.setCreatedBy(principal.getName());
+        orderEntity.setSenderName(orderREQ.getSenderName());
+        orderEntity.setRecipientName(orderREQ.getRecipientName());
         List<OrderItem> orderItems = new ArrayList<>();
         List<OrderItem> items = orderREQ.getItems();
 
@@ -209,7 +211,7 @@ public class OrderServiceImpl implements OrderService {
                 // Thêm vào danh sách orderResponses
                 orderSummaries.add(new OrderSummaryDTO(order));
             }
-            return orderSummaries;
+            return orderSummaries.stream().sorted(Comparator.comparing(OrderSummaryDTO::getCreatedAt)).collect(Collectors.toList());
         }
     }
 
