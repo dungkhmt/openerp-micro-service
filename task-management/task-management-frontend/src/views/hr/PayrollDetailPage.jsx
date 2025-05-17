@@ -1,4 +1,3 @@
-// Improved Payroll Detail Page UI with layout matching uploaded design
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -7,14 +6,13 @@ import {
   TextField,
   Drawer,
   IconButton,
-  Stack,
   Table,
   TableHead,
   TableRow,
   TableCell,
   TableBody,
   TableContainer,
-  Paper
+  Paper,
 } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { request } from "@/api";
@@ -23,7 +21,6 @@ import { useDebounce } from "../../hooks/useDebounce";
 import Pagination from "@/components/item/Pagination";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
-import "@/assets/css/EmployeeTable.css";
 
 dayjs.extend(isSameOrBefore);
 
@@ -37,11 +34,11 @@ const PayrollDetailPage = () => {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(20);
-  const [pageCount, setPageCount] = useState(0);
+  const [pageCount, setPageCount] = useState(1);
 
   useEffect(() => {
     if (!payrollId) return;
-    request("get", `/payrolls/${payrollId}`, res => setPayroll(res.data.data));
+    request("get", `/payrolls/${payrollId}`, (res) => setPayroll(res.data.data));
   }, [payrollId]);
 
   useEffect(() => {
@@ -49,9 +46,12 @@ const PayrollDetailPage = () => {
     request(
       "get",
       `/payrolls/${payrollId}/details`,
-      res => {
+      (res) => {
         const list = res.data.data || [];
+        const meta = res.data.meta.page_info || {};
         setDetails(list);
+        setCurrentPage(meta.page || 0);
+        setPageCount(meta.total_page || 1);
         fetchUsers(list);
       },
       {},
@@ -60,18 +60,18 @@ const PayrollDetailPage = () => {
         params: {
           searchName: debouncedSearch || null,
           page: currentPage,
-          pageSize: itemsPerPage
-        }
+          pageSize: itemsPerPage,
+        },
       }
     );
   }, [payrollId, debouncedSearch, currentPage, itemsPerPage]);
 
-  const fetchUsers = list => {
-    const userIds = [...new Set(list.map(item => item.user_id))];
+  const fetchUsers = (list) => {
+    const userIds = [...new Set(list.map((item) => item.user_id))];
     request(
       "get",
       "/staffs/details",
-      res => {
+      (res) => {
         const map = {};
         for (const staff of res.data.data || []) {
           map[staff.user_login_id] = staff;
@@ -115,7 +115,9 @@ const PayrollDetailPage = () => {
 
       <Drawer anchor="right" open={filtersOpen} onClose={() => setFiltersOpen(false)}>
         <Box p={2} width={300}>
-          <Typography variant="h6" gutterBottom>Bộ lọc</Typography>
+          <Typography variant="h6" gutterBottom>
+            Bộ lọc
+          </Typography>
           <TextField
             fullWidth
             label="Tên nhân viên"
@@ -129,45 +131,133 @@ const PayrollDetailPage = () => {
         <Table stickyHeader size="small">
           <TableHead>
             <TableRow>
-              <TableCell rowSpan={2}>Mã NV</TableCell>
-              <TableCell rowSpan={2}>Họ và tên</TableCell>
-              <TableCell rowSpan={2}>Chức vụ</TableCell>
+              <TableCell
+                rowSpan={2}
+                style={{
+                  position: "sticky",
+                  top: 0,
+                  left: 0,
+                  background: "#f2f2f2",
+                  zIndex: 5,
+                  minWidth: 100,
+                  maxWidth: 100,
+                  textAlign: "center",
+                  verticalAlign: "middle",
+                }}
+              >
+                Mã NV
+              </TableCell>
+              <TableCell
+                rowSpan={2}
+                style={{
+                  position: "sticky",
+                  top: 0,
+                  left: 100,
+                  background: "#f2f2f2",
+                  zIndex: 5,
+                  minWidth: 150,
+                  maxWidth: 150,
+                  textAlign: "center",
+                  verticalAlign: "middle",
+                }}
+              >
+                Họ và tên
+              </TableCell>
+              <TableCell
+                rowSpan={2}
+                style={{
+                  position: "sticky",
+                  top: 0,
+                  textAlign: "center",
+                  background: "#f2f2f2",
+                  zIndex: 4,
+                }}
+              >
+                Chức vụ
+              </TableCell>
               {dateArray.map((d, i) => (
-                <TableCell key={`d-${i}`} align="center">
+                <TableCell key={`d-${i}`} align="center" style={{ position: "sticky", top: 0, background: "#f2f2f2", zIndex: 3 }}>
                   <div>{d.format("DD/MM")}</div>
                   <div style={{ fontSize: 12, color: "#666" }}>{getVietnameseWeekday(d.day())}</div>
                 </TableCell>
               ))}
-              <TableCell rowSpan={2}>Tổng giờ</TableCell>
-              <TableCell rowSpan={2}>Hưởng lương</TableCell>
-              <TableCell rowSpan={2}>Không lương</TableCell>
-              <TableCell rowSpan={2}>Tổng lương (₫)</TableCell>
+              <TableCell rowSpan={2} style={{ position: "sticky", top: 0, background: "#f2f2f2", zIndex: 3 }}>
+                Tổng giờ
+              </TableCell>
+              <TableCell rowSpan={2} style={{ position: "sticky", top: 0, background: "#f2f2f2", zIndex: 3 }}>
+                Hưởng lương
+              </TableCell>
+              <TableCell rowSpan={2} style={{ position: "sticky", top: 0, background: "#f2f2f2", zIndex: 3 }}>
+                Không lương
+              </TableCell>
+              <TableCell rowSpan={2} style={{ position: "sticky", top: 0, background: "#f2f2f2", zIndex: 3 }}>
+                Tổng lương (₫)
+              </TableCell>
             </TableRow>
           </TableHead>
+
           <TableBody>
-            {details.map(d => {
+            {details.map((d) => {
               const user = userMap[d.user_id] || {};
               return (
                 <React.Fragment key={d.id}>
                   <TableRow>
-                    <TableCell rowSpan={2} align="center" className="sticky-col left-col-1">
+                    <TableCell
+                      rowSpan={2}
+                      align="center"
+                      style={{
+                        position: "sticky",
+                        left: 0,
+                        background: "white",
+                        zIndex: 3,
+                        minWidth: 100,
+                        maxWidth: 100,
+                        height: 35
+                      }}
+                    >
                       {user.staff_code || d.user_id}
                     </TableCell>
-                    <TableCell rowSpan={2} align="center" className="sticky-col left-col-2">
+                    <TableCell
+                      rowSpan={2}
+                      align="center"
+                      style={{
+                        position: "sticky",
+                        left: 100,
+                        background: "white",
+                        zIndex: 3,
+                        minWidth: 150,
+                        maxWidth: 150,
+                        height: 80
+                      }}
+                    >
                       {user.fullname || d.user_id}
                     </TableCell>
-                    <TableCell rowSpan={2} align="center">{user.job_position?.job_position_name || "-"}</TableCell>
+                    <TableCell rowSpan={2} align="center">
+                      {user.job_position?.job_position_name || "-"}
+                    </TableCell>
                     {d.work_hours.map((h, i) => (
-                      <TableCell key={`wh-${i}`} align="center">{h}</TableCell>
+                      <TableCell key={`wh-${i}`} align="center">
+                        {h}
+                      </TableCell>
                     ))}
-                    <TableCell rowSpan={2} align="center">{d.total_work_hours}</TableCell>
-                    <TableCell rowSpan={2} align="center">{d.pair_leave_hours}</TableCell>
-                    <TableCell rowSpan={2} align="center">{d.unpair_leave_hours}</TableCell>
-                    <TableCell rowSpan={2} align="center">{d.payroll_amount?.toLocaleString()}</TableCell>
+                    <TableCell rowSpan={2} align="center">
+                      {d.total_work_hours}
+                    </TableCell>
+                    <TableCell rowSpan={2} align="center">
+                      {d.pair_leave_hours}
+                    </TableCell>
+                    <TableCell rowSpan={2} align="center">
+                      {d.unpair_leave_hours}
+                    </TableCell>
+                    <TableCell rowSpan={2} align="center">
+                      {d.payroll_amount?.toLocaleString()}
+                    </TableCell>
                   </TableRow>
                   <TableRow>
                     {d.absence_hours.map((h, i) => (
-                      <TableCell key={`ah-${i}`} align="center">{h}</TableCell>
+                      <TableCell key={`ah-${i}`} align="center">
+                        {h}
+                      </TableCell>
                     ))}
                   </TableRow>
                 </React.Fragment>

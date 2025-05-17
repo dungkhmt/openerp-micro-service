@@ -41,15 +41,17 @@ const Pagination = ({
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 0}
           className="page-button"
+          style={{fontSize: "22px", width: "45px", height: "32px", lineHeight: "30px", padding: 0, textAlign: "center"}}
         >
-          {"<"}
+          &lsaquo;
         </button>
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= pageCount - 1}
           className="page-button"
+          style={{fontSize: "22px", width: "45px", height: "32px", lineHeight: "30px", padding: 0, textAlign: "center"}}
         >
-          {">"}
+          &rsaquo;
         </button>
       </div>
       <div className="items-per-page">
