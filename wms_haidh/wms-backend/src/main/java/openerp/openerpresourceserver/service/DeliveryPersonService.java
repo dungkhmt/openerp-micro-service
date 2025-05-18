@@ -26,39 +26,35 @@ public class DeliveryPersonService {
 	private DeliveryPersonRepository deliveryPersonRepository;
 
 	public List<DeliveryPersonProjection> getAllDeliveryPersons() {
-		return deliveryPersonRepository.findAllDeliveryPersons();
+		return deliveryPersonRepository.findAllAvailableDeliveryPersons();
 	}
 
-	public Page<DeliveryPerson> getAllDeliveryPersons(int page, int size, String search) {
+	public Page<DeliveryPerson> getAllDeliveryPersons(int page, int size, String search, String status) {
 		Pageable pageable = PageRequest.of(page, size);
-		if (search != null && !search.trim().isEmpty()) {
-			return deliveryPersonRepository.findByFullNameContainingIgnoreCase(search, pageable);
-		}
-		return deliveryPersonRepository.findAll(pageable);
+		search = (search == null) ? "" : search.trim();
+		return deliveryPersonRepository.findByFullNameContainingIgnoreCaseAndStatus(search, status, pageable);
+
 	}
-	
+
 	public Optional<DeliveryPerson> getDeliveryPersonById(String userLoginId) {
-        return deliveryPersonRepository.findById(userLoginId);
-    }
-	
+		return deliveryPersonRepository.findById(userLoginId);
+	}
+
 	@Transactional
 	public boolean createDeliveryPerson(DeliveryPersonCreateRequest request) {
-	    Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
+		Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
 
-	    if (optionalUser.isEmpty()) {
-	        return false; 
-	    }
+		if (optionalUser.isEmpty()) {
+			return false;
+		}
 
-	    User user = optionalUser.get();
+		User user = optionalUser.get();
 
-	    DeliveryPerson deliveryPerson = DeliveryPerson.builder()
-	            .userLoginId(user.getId())
-	            .fullName(request.getFullName())
-	            .phoneNumber(request.getPhoneNumber())
-	            .build();
+		DeliveryPerson deliveryPerson = DeliveryPerson.builder().userLoginId(user.getId())
+				.fullName(request.getFullName()).phoneNumber(request.getPhoneNumber()).build();
 
-	    deliveryPersonRepository.save(deliveryPerson);
-	    return true; 
+		deliveryPersonRepository.save(deliveryPerson);
+		return true;
 	}
 
 	public boolean updateDeliveryPerson(DeliveryPerson updatedPerson) {
@@ -71,6 +67,14 @@ public class DeliveryPersonService {
 			return true;
 		}
 		return false;
+	}
+
+	public void updateDeliveryPersonStatus(String userLoginId, String status) {
+		DeliveryPerson person = deliveryPersonRepository.findById(userLoginId)
+				.orElseThrow(() -> new IllegalArgumentException("Delivery person not found !"));
+
+		person.setStatus(status);
+		deliveryPersonRepository.save(person);
 	}
 
 }

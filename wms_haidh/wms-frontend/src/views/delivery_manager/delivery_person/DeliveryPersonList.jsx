@@ -13,15 +13,21 @@ import {
   DropdownMenu,
   DropdownItem,
   Pagination,
-  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter
+  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Select, MenuItem
 } from "@nextui-org/react";
 import { PlusIcon } from "../../../components/icon/PlusIcon";
 import { VerticalDotsIcon } from "../../../components/icon/VerticalDotsIcon";
 import { SearchIcon } from "../../../components/icon/SearchIcon";
-import { columns } from "../../../config/deliveryperson";
+import { columns, statusOptions } from "../../../config/deliveryperson";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../../api";
 import { formatDate } from '../../../utils/utils';
+import { Badge } from "../../../components/button/badge";
+
+const statusColorMap = {
+  BUSY: "warning",
+  AVAILABLE: "success",
+};
 
 const buttonText = "Add New Staff";
 export default function DeliveryPerson() {
@@ -30,6 +36,7 @@ export default function DeliveryPerson() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [filterValue, setFilterValue] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("AVAILABLE");
   const [pages, setPages] = useState(1);
   const [items, setItems] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
@@ -51,12 +58,12 @@ export default function DeliveryPerson() {
   }, [filterValue]);
 
   useEffect(() => {
-    request("get", `/delivery-persons/paged?page=${page - 1}&size=${rowsPerPage}&search=${debouncedSearchTerm}`, (res) => {
+    request("get", `/delivery-persons/paged?page=${page - 1}&size=${rowsPerPage}&search=${debouncedSearchTerm}&status=${statusFilter}`, (res) => {
       setItems(res.data.content);
       setTotalItems(res.data.totalElements);
       setPages(res.data.totalPages);
     }).then();
-  }, [page, rowsPerPage, debouncedSearchTerm]);
+  }, [page, rowsPerPage, debouncedSearchTerm, statusFilter]);
 
   const [selectedKeys, setSelectedKeys] = useState(new Set([]));
 
@@ -64,6 +71,14 @@ export default function DeliveryPerson() {
     const cellValue = item[columnKey];
 
     switch (columnKey) {
+      case "status":
+        return (
+          <div className="w-full flex justify-center">
+            <Badge variant={statusColorMap[item.status]}>
+              {cellValue.replace(/_/g, ' ')}
+            </Badge>
+          </div>
+        );
       case "actions":
         return (
           <div className="relative flex justify-end items-center gap-2">
@@ -136,7 +151,7 @@ export default function DeliveryPerson() {
 
     request("post", requestUrl, (res) => {
       if (res.status === 200) {
-        request("get", `/delivery-persons/paged?page=${page - 1}&size=${rowsPerPage}`, (res) => {
+        request("get", `/delivery-persons/paged?page=${page - 1}&size=${rowsPerPage}&status=${statusFilter}`, (res) => {
           setItems(res.data.content);
           setTotalItems(res.data.totalElements);
           setPages(res.data.totalPages);
@@ -152,33 +167,52 @@ export default function DeliveryPerson() {
   const topContent = useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
-        <div className="flex justify-between gap-3 items-end">
-          <Input
-            isClearable
-            className="w-full sm:max-w-[44%]"
-            placeholder="Search by name..."
-            startContent={<SearchIcon />}
-            value={filterValue}
-            onClear={() => setDebouncedSearchTerm("")}
-            onValueChange={onSearchChange}
-          />
-          <div className="flex gap-3">
-            <Button
-              className="bg-[#019160] text-white hover:bg-[#2fbe8e] active:bg-[#01b075]"
-              startContent={<PlusIcon />}
-              size="md"
-              onPress={handleAdd}
-            >
-              {buttonText}
-            </Button>
+        <div className="flex justify-between items-end">
+          <div className="flex gap-3 w-full max-w-[50%]">
+            <div className="flex-shrink-0 w-[30%]">
+              <Select
+                aria-label="Select status"
+                labelId="status-label"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                defaultSelectedKeys={["AVAILABLE"]}
+                className="w-full"
+              >
+                {statusOptions.map((cat) => (
+                  <MenuItem key={cat.uid} value={cat.uid}>
+                    {cat.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </div>
+
+            <Input
+              isClearable
+              className="w-full"
+              placeholder="Search by name..."
+              startContent={<SearchIcon />}
+              value={filterValue}
+              onClear={() => setDebouncedSearchTerm("")}
+              onValueChange={onSearchChange}
+            />
           </div>
+
+          <Button
+            className="bg-[#019160] text-white hover:bg-[#2fbe8e] active:bg-[#01b075]"
+            startContent={<PlusIcon />}
+            size="md"
+            onPress={handleAdd}
+          >
+            {buttonText}
+          </Button>
         </div>
+
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">Total {totalItems} items</span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
             <select
-              className="bg-transparent outline-none text-default-400 text-small"
+              className="bg-transparent outline-none text-default-400 text-small ml-1"
               onChange={onRowsPerPageChange}
             >
               <option value="5">5</option>
@@ -190,11 +224,17 @@ export default function DeliveryPerson() {
       </div>
     );
   }, [
+    statusFilter,
+    statusOptions,
     filterValue,
     onSearchChange,
     onRowsPerPageChange,
-    totalItems
+    totalItems,
+    handleAdd,
+    buttonText,
   ]);
+
+
 
   const bottomContent = useMemo(() => {
     return (
@@ -257,13 +297,15 @@ export default function DeliveryPerson() {
           {(column) => (
             <TableColumn
               key={column.uid}
-              align={column.uid === "actions" ? "center" : "start"}
+              align={["actions", "status"].includes(column.uid) ? "center" : "start"}
               allowsSorting={column.sortable}
             >
               {column.name}
             </TableColumn>
+
           )}
         </TableHeader>
+
         <TableBody emptyContent={"Loading ..."} items={items}>
           {(item) => (
             <TableRow key={item.userLoginId}>

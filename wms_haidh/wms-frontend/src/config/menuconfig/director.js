@@ -1,7 +1,7 @@
 export const directorRevenue = {
-  id: "MENU_GENERAL",
+  id: "MENU_GENERAL.REVENUE",
   icon: "RevenueIcon",
-  text: "Business Reports",
+  text: "Revenue & Profit",
   child: [
     {
       id: "MENU_GENERAL.REVENUE",
@@ -13,9 +13,9 @@ export const directorRevenue = {
   ],
 };
 export const directorCategory = {
-  id: "MENU_GENERAL",
+  id: "MENU_GENERAL.CATEGORY",
   icon: "CategoryIcon",
-  text: "Business Reports",
+  text: "Top Categories",
   child: [
     {
       id: "MENU_GENERAL.CATEGORY",

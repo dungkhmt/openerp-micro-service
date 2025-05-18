@@ -105,14 +105,14 @@ const RoutingRecommendation = () => {
           }}
           onClick={handleSubmit}
         >
-          Generate Routing Plan
+          Generate Plan
         </Button>
       </Box>
 
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Paper elevation={3} sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>Delivery Trips</Typography>
+            <Typography variant="h6" sx={{ mb: 2 }}>Delivery Trips</Typography>
             <List>
               {deliveryTrips.map((trip, index) => (
                 <ListItem key={index} disablePadding sx={{ mb: 2 }}>
@@ -143,13 +143,20 @@ const RoutingRecommendation = () => {
                           onChange={(e) => handleTripChange(index, 'vehicleId', e.target.value)}
                           label="Vehicle"
                         >
-                          {vehicleList.map((vehicle) => (
-                            <MenuItem key={vehicle.vehicleId} value={vehicle.vehicleId}>
-                              {vehicle.name}
-                            </MenuItem>
-                          ))}
+                          {vehicleList
+                            .filter(vehicle =>
+                              !deliveryTrips.some((trip, i) =>
+                                i !== index && trip.vehicleId === vehicle.vehicleId
+                              )
+                            )
+                            .map(vehicle => (
+                              <MenuItem key={vehicle.vehicleId} value={vehicle.vehicleId}>
+                                {vehicle.name}
+                              </MenuItem>
+                            ))}
                         </Select>
                       </FormControl>
+
                     </Grid>
                     <Grid item xs={2}>
                       <IconButton sx={{

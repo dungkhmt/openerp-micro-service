@@ -1,7 +1,7 @@
 export const salemanagerPriceConfig = {
-  id: "MENU_WMSv2_SALE_MANAGER",
+  id: "MENU_WMSv2_SALE_MANAGER.PRICE_CONFIG",
   icon: "MoneyIcon",
-  text: "Sales Management",
+  text: "Price Configuration",
   child: [
     {
       id: "MENU_WMSv2_SALE_MANAGER.PRICE_CONFIG",
@@ -13,9 +13,9 @@ export const salemanagerPriceConfig = {
   ],
 };
 export const salemanagerOrders = {
-  id: "MENU_WMSv2_SALE_MANAGER",
+  id: "MENU_WMSv2_SALE_MANAGER.ORDERS",
   icon: "SaleOrderIcon",
-  text: "Sales Management",
+  text: "Process Sale Orders",
   child: [
     {
       id: "MENU_WMSv2_SALE_MANAGER.ORDERS",

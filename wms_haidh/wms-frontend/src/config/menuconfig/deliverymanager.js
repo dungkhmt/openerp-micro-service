@@ -1,7 +1,7 @@
 export const deliverymanagerDeliveryPerson = {
-  id: "MENU_WMSv2_DELIVERY_MANAGER",
+  id: "MENU_WMSv2_DELIVERY_MANAGER.DELIVERY_PERSON",
   icon: "StaffIcon",
-  text: "Delivery Management",
+  text: "Delivery Staffs",
   child: [
     {
       id: "MENU_WMSv2_DELIVERY_MANAGER.DELIVERY_PERSON",
@@ -13,9 +13,9 @@ export const deliverymanagerDeliveryPerson = {
   ],
 };
 export const deliverymanagerShipments = {
-  id: "MENU_WMSv2_DELIVERY_MANAGER",
+  id: "MENU_WMSv2_DELIVERY_MANAGER.SHIPMENTS",
   icon: "ShipmentIcon",
-  text: "Delivery Management",
+  text: "Shipments",
   child: [
     {
       id: "MENU_WMSv2_DELIVERY_MANAGER.SHIPMENTS",
@@ -27,9 +27,9 @@ export const deliverymanagerShipments = {
   ],
 };
 export const deliverymanagerDeliveryTrips = {
-  id: "MENU_WMSv2_DELIVERY_MANAGER",
+  id: "MENU_WMSv2_DELIVERY_MANAGER.DELIVERY_TRIPS",
   icon: "DeliveryTripIcon",
-  text: "Delivery Management",
+  text: "Delivery Trips",
   child: [
     {
       id: "MENU_WMSv2_DELIVERY_MANAGER.DELIVERY_TRIPS",
@@ -41,9 +41,9 @@ export const deliverymanagerDeliveryTrips = {
   ],
 };
 export const deliverymanagerDistances = {
-  id: "MENU_WMSv2_DELIVERY_MANAGER",
+  id: "MENU_WMSv2_DELIVERY_MANAGER.DISTANCES",
   icon: "DistanceIcon",
-  text: "Delivery Management",
+  text: "Distances",
   child: [
     {
       id: "MENU_WMSv2_DELIVERY_MANAGER.DISTANCES",

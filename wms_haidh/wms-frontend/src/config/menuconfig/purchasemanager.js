@@ -1,7 +1,7 @@
 export const purchasemanagerSuppliers = {
-  id: "MENU_WMSv2_PURCHASE_MANAGER",
+  id: "MENU_WMSv2_PURCHASE_MANAGER.SUPPLIERS",
   icon: "SupplierIcon",
-  text: "Purchase Management",
+  text: "Suppliers",
   child: [
     {
       id: "MENU_WMSv2_PURCHASE_MANAGER.SUPPLIERS",
@@ -13,9 +13,9 @@ export const purchasemanagerSuppliers = {
   ],
 };
 export const purchasemanagerProcessReceipt = {
-  id: "MENU_WMSv2_PURCHASE_MANAGER",
+  id: "MENU_WMSv2_PURCHASE_MANAGER.PROCESS_RECEIPT",
   icon: "ReceiptIcon",
-  text: "Purchase Management",
+  text: "Process Purchase Orders",
   child: [
     {
       id: "MENU_WMSv2_PURCHASE_MANAGER.PROCESS_RECEIPT",

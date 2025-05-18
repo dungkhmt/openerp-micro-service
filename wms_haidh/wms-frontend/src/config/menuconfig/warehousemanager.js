@@ -1,7 +1,7 @@
 export const warehousemanagerWarehouse = {
-  id: "MENU_WMSv2_ADMIN",
+  id: "MENU_WMSv2_ADMIN.WAREHOUSE",
   icon: "WarehouseIcon",
-  text: "Inventory Management",
+  text: "Warehouses",
   child: [
     {
       id: "MENU_WMSv2_ADMIN.WAREHOUSE",
@@ -13,9 +13,9 @@ export const warehousemanagerWarehouse = {
   ],
 };
 export const warehousemanagerProduct = {
-  id: "MENU_WMSv2_ADMIN",
+  id: "MENU_WMSv2_ADMIN.PRODUCT",
   icon: "ProductIcon",
-  text: "Inventory Management",
+  text: "Products",
   child: [
     {
       id: "MENU_WMSv2_ADMIN.PRODUCT",
@@ -27,9 +27,9 @@ export const warehousemanagerProduct = {
   ],
 };
 export const warehousemanagerInventory = {
-  id: "MENU_WMSv2_ADMIN",
+  id: "MENU_WMSv2_ADMIN.INVENTORY",
   icon: "ProductInventoryIcon",
-  text: "Inventory Management",
+  text: "Inventory",
   child: [
     {
       id: "MENU_WMSv2_ADMIN.INVENTORY",
@@ -41,9 +41,9 @@ export const warehousemanagerInventory = {
   ],
 };
 export const warehousemanagerProcessReceipt = {
-  id: "MENU_WMSv2_ADMIN",
+  id: "MENU_WMSv2_ADMIN.PROCESS_RECEIPT",
   icon: "ReceiptIcon",
-  text: "Inventory Management",
+  text: "Purchase Orders",
   child: [
     {
       id: "MENU_WMSv2_ADMIN.PROCESS_RECEIPT",
@@ -55,9 +55,9 @@ export const warehousemanagerProcessReceipt = {
   ],
 };
 export const warehousemanagerOrder = {
-  id: "MENU_WMSv2_ADMIN",
+  id: "MENU_WMSv2_ADMIN.ORDER",
   icon: "SaleOrderIcon",
-  text: "Inventory Management",
+  text: "Sale Orders",
   child: [
     {
       id: "MENU_WMSv2_ADMIN.ORDER",

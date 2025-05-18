@@ -32,6 +32,7 @@ public class DeliveryTripService {
 	private DeliveryTripPathService deliveryTripPathService;
 	private AssignedOrderItemService assignedOrderItemService;
 	private VehicleService vehicleService;
+	private DeliveryPersonService deliveryPersonService;
 	private OrderService orderService;
 
 	public Page<DeliveryTripProjection> getFilteredDeliveryTrips(String status, Pageable pageable) {
@@ -65,8 +66,9 @@ public class DeliveryTripService {
 				.lastUpdatedStamp(LocalDateTime.now()).isDeleted(false).status("CREATED").build();
 
 		deliveryTripRepository.save(trip);
-		
+
 		vehicleService.updateVehicleStatus(payload.getVehicleId(), "BUSY");
+		deliveryPersonService.updateDeliveryPersonStatus(payload.getDeliveryPersonId(), "BUSY");
 
 		List<DeliveryTripItem> items = payload.getItems().stream()
 				.map(item -> DeliveryTripItem.builder().deliveryTripItemId(deliveryTripItemService.generateTripItemId())
@@ -101,7 +103,8 @@ public class DeliveryTripService {
 				assignedOrderItemService.updateAssignedOrderItemsStatus(assignedOrderItemIds, "CREATED");
 
 				vehicleService.updateVehicleStatus(trip.getVehicleId(), "AVAILABLE");
-				
+				deliveryPersonService.updateDeliveryPersonStatus(trip.getDeliveryPersonId(), "AVAILABLE");
+
 				trip.setStatus("CANCELLED");
 				deliveryTripRepository.save(trip);
 
@@ -110,22 +113,22 @@ public class DeliveryTripService {
 		}
 		return false;
 	}
-	
+
 	@Transactional
 	public boolean startDeliveryTrip(String deliveryTripId) {
 		Optional<DeliveryTrip> optionalTrip = deliveryTripRepository.findById(deliveryTripId);
 
 		if (optionalTrip.isPresent()) {
-			DeliveryTrip trip = optionalTrip.get();		
-			
+			DeliveryTrip trip = optionalTrip.get();
+
 			if ("CREATED".equals(trip.getStatus())) {
-								
+
 				trip.setStatus("STARTED");
 				deliveryTripRepository.save(trip);
-				
+
 				List<UUID> orderIds = deliveryTripItemService.findOrderIdsByDeliveryTripId(deliveryTripId);
 
-	            orderService.markOrdersAsDelivering(orderIds); 
+				orderService.markOrdersAsDelivering(orderIds);
 
 				return true;
 			}
@@ -138,44 +141,41 @@ public class DeliveryTripService {
 	}
 
 	public List<DeliveryTrip> createDeliveryTrip(List<DeliveryTripCreateRequest> payloadList, String userLoginId) {
-	    List<DeliveryTrip> trips = new ArrayList<>();
-	    for (DeliveryTripCreateRequest payload : payloadList) {
-	        DeliveryTrip trip = createDeliveryTrip(payload, userLoginId);
-	        trips.add(trip);
-	    }
-	    return trips;
+		List<DeliveryTrip> trips = new ArrayList<>();
+		for (DeliveryTripCreateRequest payload : payloadList) {
+			DeliveryTrip trip = createDeliveryTrip(payload, userLoginId);
+			trips.add(trip);
+		}
+		return trips;
 	}
-	
+
 	@Transactional
 	public int markAsDelivered(String deliveryTripId, UUID orderId) {
 
-	    int updatedCount = deliveryTripItemService.markItemsAsDelivered(deliveryTripId, orderId);     
+		int updatedCount = deliveryTripItemService.markItemsAsDelivered(deliveryTripId, orderId);
 
-	    long notYetDeliveredInTrip = deliveryTripItemService.countUndeliveredItems(deliveryTripId);
-	    if (notYetDeliveredInTrip == 0) {
+		long notYetDeliveredInTrip = deliveryTripItemService.countUndeliveredItems(deliveryTripId);
+		if (notYetDeliveredInTrip == 0) {
 
-	        DeliveryTrip trip = deliveryTripRepository.findById(deliveryTripId)
-	            .orElseThrow(() -> new IllegalStateException("DeliveryTrip not found with id: " + deliveryTripId));
+			DeliveryTrip trip = deliveryTripRepository.findById(deliveryTripId)
+					.orElseThrow(() -> new IllegalStateException("DeliveryTrip not found with id: " + deliveryTripId));
 
-	        trip.setStatus("DONE");
-	        trip.setLastUpdatedStamp(LocalDateTime.now());
+			trip.setStatus("DONE");
+			trip.setLastUpdatedStamp(LocalDateTime.now());
 
-	        deliveryTripRepository.save(trip);
+			deliveryTripRepository.save(trip);
 
-	        vehicleService.updateVehicleStatus(trip.getVehicleId(), "AVAILABLE");
-	    }
+			vehicleService.updateVehicleStatus(trip.getVehicleId(), "AVAILABLE");
+			deliveryPersonService.updateDeliveryPersonStatus(trip.getDeliveryPersonId(), "AVAILABLE");
+		}
 
-	    long assigned = assignedOrderItemService.countAssignedItems(orderId);
-	    long delivered = deliveryTripItemService.countDeliveredItems(orderId);
-	    if (assigned > 0 && assigned == delivered) {
-	        orderService.markOrderAsCompleted(orderId);
-	    }
+		long assigned = assignedOrderItemService.countAssignedItems(orderId);
+		long delivered = deliveryTripItemService.countDeliveredItems(orderId);
+		if (assigned > 0 && assigned == delivered) {
+			orderService.markOrderAsCompleted(orderId);
+		}
 
-	    return updatedCount;
+		return updatedCount;
 	}
-
-
-
-
 
 }

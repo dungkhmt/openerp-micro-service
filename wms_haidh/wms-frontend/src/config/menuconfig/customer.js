@@ -1,7 +1,7 @@
 export const customerProducts = {
-  id: "MENU_WMSv2_CUSTOMER",
+  id: "MENU_WMSv2_CUSTOMER.PRODUCTS",
   icon: "CustomerProductIcon",
-  text: "Orders",
+  text: "Customer Products",
   child: [
     {
       id: "MENU_WMSv2_CUSTOMER.PRODUCTS",
@@ -13,9 +13,9 @@ export const customerProducts = {
   ],
 };
 export const customerCart = {
-  id: "MENU_WMSv2_CUSTOMER",
+  id: "MENU_WMSv2_CUSTOMER.CART",
   icon: "CartIcon",
-  text: "Orders",
+  text: "Cart",
   child: [
     {
       id: "MENU_WMSv2_CUSTOMER.CART",
@@ -27,9 +27,9 @@ export const customerCart = {
   ],
 };
 export const customerHistory = {
-  id: "MENU_WMSv2_CUSTOMER",
+  id: "MENU_WMSv2_CUSTOMER.HISTORY",
   icon: "HistoryIcon",
-  text: "Orders",
+  text: "History",
   child: [
     {
       id: "MENU_WMSv2_CUSTOMER.HISTORY",

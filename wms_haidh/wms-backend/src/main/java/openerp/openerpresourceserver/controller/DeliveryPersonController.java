@@ -33,14 +33,15 @@ public class DeliveryPersonController {
 	@GetMapping("/paged")
 	public ResponseEntity<Page<DeliveryPerson>> getAllDeliveryPersons(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size,
-			@RequestParam(required = false) String search) {
+			@RequestParam(required = false) String search,
+			@RequestParam(defaultValue = "AVAILABLE") String status) {
 
-		Page<DeliveryPerson> deliveryPersons = deliveryPersonService.getAllDeliveryPersons(page, size, search);
+		Page<DeliveryPerson> deliveryPersons = deliveryPersonService.getAllDeliveryPersons(page, size, search, status);
 		return ResponseEntity.ok(deliveryPersons);
 	}
 	
 	@Secured("ROLE_WMS_DELIVERY_MANAGER")
-	@GetMapping("/all")
+	@GetMapping("/available")
 	public List<DeliveryPersonProjection> getAllDeliveryPersons() {
 		return deliveryPersonService.getAllDeliveryPersons();
 	}

@@ -104,7 +104,7 @@ const AddTrip = () => {
   }, []);
 
   useEffect(() => {
-    request("get", "/delivery-persons/all", (res) => {
+    request("get", "/delivery-persons/available", (res) => {
       setDeliveryPersonOptions(res.data);
     }).then();
   }, []);

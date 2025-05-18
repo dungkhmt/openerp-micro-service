@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.repository;
 
-
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -12,9 +11,10 @@ import openerp.openerpresourceserver.projection.DeliveryPersonProjection;
 
 public interface DeliveryPersonRepository extends JpaRepository<DeliveryPerson, String> {
 
-	@Query("SELECT d.userLoginId AS userLoginId, d.fullName AS fullName, d.phoneNumber AS phoneNumber FROM DeliveryPerson d")
-	List<DeliveryPersonProjection> findAllDeliveryPersons();
+	@Query("SELECT d.userLoginId AS userLoginId, d.fullName AS fullName "
+			+ "FROM DeliveryPerson d WHERE d.status = 'AVAILABLE'")
+	List<DeliveryPersonProjection> findAllAvailableDeliveryPersons();
 
-	Page<DeliveryPerson> findByFullNameContainingIgnoreCase(String search, Pageable pageable);
-	
+	Page<DeliveryPerson> findByFullNameContainingIgnoreCaseAndStatus(String fullName, String status, Pageable pageable);
+
 }

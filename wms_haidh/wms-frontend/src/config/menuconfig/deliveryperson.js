@@ -1,7 +1,7 @@
 export const deliveryperson = {
-  id: "MENU_WMSv2_DELIVERY_PERSON",
+  id: "MENU_WMSv2_DELIVERY_PERSON.DELIVERY_TRIP",
   icon: "DeliveryTripIcon",
-  text: "Delivery Person",
+  text: "Today's Delivery Trips",
   child: [
     {
       id: "MENU_WMSv2_DELIVERY_PERSON.DELIVERY_TRIP",

@@ -1,7 +1,7 @@
 export const purchasestaffProduct = {
-  id: "MENU_WMSv2_PURCHASE_STAFF",
+  id: "MENU_WMSv2_PURCHASE_STAFF.PRODUCT",
   icon: "ProductInventoryIcon",
-  text: "Purchase Requests",
+  text: "Product Inventory",
   child: [
     {
       id: "MENU_WMSv2_PURCHASE_STAFF.PRODUCT",
@@ -13,9 +13,9 @@ export const purchasestaffProduct = {
   ],
 };
 export const purchasestaffReceipt = {
-  id: "MENU_WMSv2_PURCHASE_STAFF",
+  id: "MENU_WMSv2_PURCHASE_STAFF.RECEIPT",
   icon: "ReceiptIcon",
-  text: "Purchase Requests",
+  text: "Create Purchase Orders",
   child: [
     {
       id: "MENU_WMSv2_PURCHASE_STAFF.RECEIPT",
