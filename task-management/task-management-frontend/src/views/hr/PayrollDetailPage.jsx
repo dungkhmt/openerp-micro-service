@@ -13,11 +13,7 @@ import {
   TableBody,
   TableContainer,
   Paper,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-  Button,
+  Button, Chip,
 } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import CloseIcon from "@mui/icons-material/Close";
@@ -55,7 +51,6 @@ const PayrollDetailPage = () => {
     if (!payrollId) return;
     request("get", `/payrolls/${payrollId}`, (res) => setPayroll(res.data.data));
   }, [payrollId]);
-
 
   useEffect(() => {
     if (!payrollId) return;
@@ -96,31 +91,29 @@ const PayrollDetailPage = () => {
       },
       {},
       null,
-      { params: {
-          userIds: userIds.join(",")
-        }
-      }
+      { params: { userIds: userIds.join(",") } }
     );
   };
 
   useEffect(() => {
     if (!payrollId) return;
-    if(searchName == null && department == null && jobPosition == null){
-      setUserFilter(null)
+    if (searchName == null && department == null && jobPosition == null) {
+      setUserFilter(null);
     }
     request(
       "get",
       "/staffs/details",
       (res) => {
-        setUserFilter(res.data.data.map(staff => staff.user_login_id));
+        setUserFilter(res.data.data.map((staff) => staff.user_login_id));
       },
       {},
       null,
-      { params: {
+      {
+        params: {
           fullname: searchName || null,
           departmentCode: department?.department_code || null,
           jobPositionCode: jobPosition?.code || null,
-        }
+        },
       }
     );
   }, [searchName, department, jobPosition]);
@@ -131,8 +124,8 @@ const PayrollDetailPage = () => {
   };
 
   const getDateArray = () => {
-    if (!payroll?.fromdate || !payroll?.thru_date) return [];
-    const from = dayjs(payroll.fromdate);
+    if (!payroll?.from_date || !payroll?.thru_date) return [];
+    const from = dayjs(payroll.from_date);
     const to = dayjs(payroll.thru_date);
     const result = [];
     let current = from;
@@ -145,13 +138,11 @@ const PayrollDetailPage = () => {
 
   const dateArray = getDateArray();
 
-  // Helper to get background color for weekend columns
   const getBgColorForDay = (dayIndex) => {
-    if (dayIndex === 0) return "#fdd"; // CN - pink
-    if (dayIndex === 6) return "#fdd"; // T7 - blue
+    if (dayIndex === 0) return "#fdd";
+    if (dayIndex === 6) return "#fdd";
     return "#f2f2f2";
   };
-
 
   const clearFilters = () => {
     setSearchNameFilter(null);
@@ -159,13 +150,17 @@ const PayrollDetailPage = () => {
     setJobPositionFilter(null);
   };
 
-
   const applyFilters = () => {
     setCurrentPage(0);
-    setSearchName(searchNameFilter)
-    setDepartment(departmentFilter)
-    setJobPosition(jobPositionFilter)
+    setSearchName(searchNameFilter);
+    setDepartment(departmentFilter);
+    setJobPosition(jobPositionFilter);
     setFiltersOpen(false);
+  };
+
+  const renderStatusChip = (status) => {
+    const color = status === "ACTIVE" ? "success" : "default";
+    return <Chip label={status} color={color} size="small" />;
   };
 
   return (
@@ -177,12 +172,86 @@ const PayrollDetailPage = () => {
         </IconButton>
       </Grid>
 
+      <Paper
+        elevation={2}
+        sx={{
+          width: "100%",
+          p: 2,
+          borderRadius: 2,
+          mb: 3,
+          bgcolor: "#f7f9fc",
+        }}
+      >
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} sm={4}>
+            <Typography variant="subtitle2" color="text.secondary" component="span" sx={{ whiteSpace: "nowrap" }}>
+              Tổng số ngày làm việc:
+            </Typography>{" "}
+            <Typography variant="body1" fontWeight={600} component="span">
+              {payroll?.total_work_days ?? "-"} ngày
+              {payroll?.total_work_days && payroll?.work_hours_per_day && (
+                <Typography
+                  component="span"
+                  fontWeight={600}
+                  sx={{ ml: 0.8 }}
+                >
+                  ({(payroll.total_work_days * payroll.work_hours_per_day).toFixed(1)} giờ)
+                </Typography>
+              )}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <Typography variant="subtitle2" color="text.secondary" component="span" sx={{ whiteSpace: "nowrap" }}>
+              Giờ làm việc mỗi ngày:
+            </Typography>{" "}
+            <Typography variant="body1" fontWeight={600} component="span">
+              {payroll?.work_hours_per_day ?? "-"} giờ
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <Typography variant="subtitle2" color="text.secondary" component="span" sx={{ whiteSpace: "nowrap" }}>
+              Tổng số ngày nghỉ lễ:
+            </Typography>{" "}
+            <Typography variant="body1" fontWeight={600} component="span">
+              {payroll?.total_holiday_days ?? "-"} ngày
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <Typography variant="subtitle2" color="text.secondary" component="span" sx={{ whiteSpace: "nowrap" }}>
+              Thời gian:
+            </Typography>{" "}
+            <Typography variant="body1" fontWeight={600} component="span">
+              {payroll?.from_date ? dayjs(payroll.from_date).format("DD/MM/YYYY") : "-"} –{" "}
+              {payroll?.thru_date ? dayjs(payroll.thru_date).format("DD/MM/YYYY") : "-"}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <Box display="inline-flex" alignItems="center" gap={1}>
+              <Typography variant="subtitle2" color="text.secondary" sx={{ whiteSpace: "nowrap" }}>
+                Trạng thái:
+              </Typography>
+              {renderStatusChip(payroll?.status)}
+            </Box>
+          </Grid>
+
+          <Grid item xs={12} sm={4} />
+        </Grid>
+      </Paper>
+
+
+
+
+
       <Drawer anchor="right" open={filtersOpen} onClose={() => setFiltersOpen(false)}>
-        <Box p={2} width={300} display="flex" flexDirection="column" height="100%" sx = {{paddingTop: 12}}>
+        <Box p={2} width={300} display="flex" flexDirection="column" height="100%" sx={{ paddingTop: 12 }}>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
             <Typography variant="h6">Bộ lọc</Typography>
             <IconButton onClick={() => setFiltersOpen(false)} size="small">
-              <CloseIcon/>
+              <CloseIcon />
             </IconButton>
           </Box>
 
@@ -191,7 +260,7 @@ const PayrollDetailPage = () => {
             label="Tên nhân viên"
             value={searchNameFilter}
             onChange={(e) => setSearchNameFilter(e.target.value)}
-            sx={{mb: 3}}
+            sx={{ mb: 3 }}
           />
 
           <SearchSelect
@@ -200,7 +269,7 @@ const PayrollDetailPage = () => {
             value={departmentFilter}
             onChange={setDepartmentFilter}
             getOptionLabel={(item) => item.department_name}
-            sx={{mb: 3}}
+            sx={{ mb: 3 }}
             clearOnEscape
           />
 
@@ -213,30 +282,18 @@ const PayrollDetailPage = () => {
             clearOnEscape
           />
 
-          <Box sx={{mt: "auto", display: "flex", justifyContent: "space-between"}}>
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={() => {
-                clearFilters()
-              }}
-            >
+          <Box sx={{ mt: "auto", display: "flex", justifyContent: "space-between" }}>
+            <Button variant="outlined" color="error" onClick={clearFilters}>
               Xóa hết
             </Button>
-            <Button
-              variant="contained"
-              onClick={() => {
-                applyFilters()
-              }}
-            >
+            <Button variant="contained" onClick={applyFilters}>
               Áp dụng
             </Button>
           </Box>
         </Box>
       </Drawer>
 
-
-      <TableContainer component={Paper} sx={{ overflowX: "auto", maxHeight: 500 }}>
+      <TableContainer component={Paper} sx={{ overflowX: "auto", maxHeight: 460 }}>
         <Table stickyHeader size="small">
           <TableHead>
             <TableRow>
@@ -282,6 +339,18 @@ const PayrollDetailPage = () => {
                   zIndex: 4,
                 }}
               >
+                Phòng ban
+              </TableCell>
+              <TableCell
+                rowSpan={2}
+                style={{
+                  position: "sticky",
+                  top: 0,
+                  textAlign: "center",
+                  background: "#f2f2f2",
+                  zIndex: 4,
+                }}
+              >
                 Chức vụ
               </TableCell>
               <TableCell
@@ -316,25 +385,25 @@ const PayrollDetailPage = () => {
               ))}
               <TableCell
                 rowSpan={2}
-                style={{ position: "sticky", top: 0, background: "#f2f2f2", zIndex: 3 }}
+                style={{ position: "sticky", top: 0, background: "#f2f2f2", zIndex: 3, textAlign: "center",}}
               >
-                Tổng giờ
+                Tổng giờ làm
               </TableCell>
               <TableCell
                 rowSpan={2}
-                style={{ position: "sticky", top: 0, background: "#f2f2f2", zIndex: 3 }}
+                style={{ position: "sticky", top: 0, background: "#f2f2f2", zIndex: 3, textAlign: "center", }}
               >
-                Hưởng lương
+                Nghỉ có lương
               </TableCell>
               <TableCell
                 rowSpan={2}
-                style={{ position: "sticky", top: 0, background: "#f2f2f2", zIndex: 3 }}
+                style={{ position: "sticky", top: 0, background: "#f2f2f2", zIndex: 3, textAlign: "center",}}
               >
-                Không lương
+                Nghỉ không lương
               </TableCell>
               <TableCell
                 rowSpan={2}
-                style={{ position: "sticky", top: 0, background: "#f2f2f2", zIndex: 3 }}
+                style={{ position: "sticky", top: 0, background: "#f2f2f2", zIndex: 3, textAlign: "center", }}
               >
                 Tổng lương (₫)
               </TableCell>
@@ -379,11 +448,12 @@ const PayrollDetailPage = () => {
                       {user.fullname || d.user_id}
                     </TableCell>
                     <TableCell rowSpan={2} align="center">
+                      {user.department?.department_name || "-"}
+                    </TableCell>
+                    <TableCell rowSpan={2} align="center">
                       {user.job_position?.job_position_name || "-"}
                     </TableCell>
-                    <TableCell align="center">
-                      WRK
-                    </TableCell>
+                    <TableCell align="center">WRK</TableCell>
                     {d.work_hours.map((h, i) => (
                       <TableCell key={`wh-${i}`} align="center">
                         {h}
@@ -405,9 +475,7 @@ const PayrollDetailPage = () => {
 
                   {/* Absence hours row */}
                   <TableRow>
-                    <TableCell align="center">
-                      ABS
-                    </TableCell>
+                    <TableCell align="center">ABS</TableCell>
                     {d.absence_hours.map((h, i) => (
                       <TableCell key={`ah-${i}`} align="center">
                         {h}

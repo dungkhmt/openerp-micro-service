@@ -44,7 +44,7 @@ const PayrollListPage = () => {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [newPayroll, setNewPayroll] = useState({ name: "", fromdate: null, thruDate: null });
+  const [newPayroll, setNewPayroll] = useState({ name: "", fromDate: null, thruDate: null });
   const [userMap, setUserMap] = useState({});
 
   const debouncedSearchName = useDebounce(searchName, 500);
@@ -110,8 +110,8 @@ const PayrollListPage = () => {
   };
 
   const handleCreate = () => {
-    if (!newPayroll.name || !newPayroll.fromdate || !newPayroll.thruDate) return;
-    const from = dayjs(newPayroll.fromdate);
+    if (!newPayroll.name || !newPayroll.fromDate || !newPayroll.thruDate) return;
+    const from = dayjs(newPayroll.fromDate);
     const thru = dayjs(newPayroll.thruDate);
     if (!from.isBefore(thru, "day")) {
       toast.error("Ngày bắt đầu phải trước ngày kết thúc");
@@ -120,14 +120,14 @@ const PayrollListPage = () => {
 
     const payload = {
       name: newPayroll.name,
-      from_date: newPayroll.fromdate,
+      from_date: newPayroll.fromDate,
       thru_date: newPayroll.thruDate
     };
 
     request("post", "/payrolls", () => {
       handleSearch();
       setCreateModalOpen(false);
-      setNewPayroll({ name: "", fromdate: null, thruDate: null });
+      setNewPayroll({ name: "", fromDate: null, thruDate: null });
       toast.success("Tạo kỳ lương thành công");
     }, null, payload);
   };
@@ -204,7 +204,7 @@ const PayrollListPage = () => {
                   <Typography fontWeight={500} color="primary">{item.name}</Typography>
                 </Button>
               </td>
-              <td>{item.fromdate ? new Date(item.fromdate).toLocaleDateString("vi-VN") : "-"}</td>
+              <td>{item.from_date ? new Date(item.from_date).toLocaleDateString("vi-VN") : "-"}</td>
               <td>{item.thru_date ? new Date(item.thru_date).toLocaleDateString("vi-VN") : "-"}</td>
               <td>{userMap[item.created_by] || item.created_by || "-"}</td>
               <td>{renderStatusChip(item.status)}</td>
@@ -261,8 +261,8 @@ const PayrollListPage = () => {
               <Stack direction="row" spacing={2}>
                 <DatePicker
                   label="Từ ngày"
-                  value={newPayroll.fromdate ? dayjs(newPayroll.fromdate) : null}
-                  onChange={(date) => setNewPayroll((prev) => ({ ...prev, fromdate: date ? date.format("YYYY-MM-DD") : null }))}
+                  value={newPayroll.fromDate ? dayjs(newPayroll.fromDate) : null}
+                  onChange={(date) => setNewPayroll((prev) => ({ ...prev, fromDate: date ? date.format("YYYY-MM-DD") : null }))}
                   format="DD/MM/YYYY"
                   slotProps={{ textField: { fullWidth: true } }}
                 />
@@ -271,7 +271,7 @@ const PayrollListPage = () => {
                   value={newPayroll.thruDate ? dayjs(newPayroll.thruDate) : null}
                   onChange={(date) => setNewPayroll((prev) => ({ ...prev, thruDate: date ? date.format("YYYY-MM-DD") : null }))}
                   format="DD/MM/YYYY"
-                  minDate={newPayroll.fromdate ? dayjs(newPayroll.fromdate) : undefined}
+                  minDate={newPayroll.fromDate ? dayjs(newPayroll.fromDate) : undefined}
                   slotProps={{ textField: { fullWidth: true } }}
                 />
               </Stack>
@@ -283,7 +283,7 @@ const PayrollListPage = () => {
           <Button
             variant="contained"
             onClick={handleCreate}
-            disabled={!newPayroll.name || !newPayroll.fromdate || !newPayroll.thruDate || !dayjs(newPayroll.fromdate).isBefore(dayjs(newPayroll.thruDate), "day")}
+            disabled={!newPayroll.name || !newPayroll.fromDate || !newPayroll.thruDate || !dayjs(newPayroll.fromDate).isBefore(dayjs(newPayroll.thruDate), "day")}
           >
             Tạo
           </Button>

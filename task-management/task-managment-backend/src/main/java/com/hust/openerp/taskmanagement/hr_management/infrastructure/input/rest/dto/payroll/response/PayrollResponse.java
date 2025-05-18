@@ -23,7 +23,7 @@ public class PayrollResponse {
     private Integer totalWorkDays;
     private Float workHoursPerDay;
     private Integer totalHolidayDays;
-    private LocalDate fromdate;
+    private LocalDate fromDate;
     private LocalDate thruDate;
     private String createdBy;
     private PayrollStatus status;
@@ -38,7 +38,7 @@ public class PayrollResponse {
             .createdBy(model.getCreatedBy())
             .status(model.getStatus())
             .thruDate(model.getThruDate())
-            .fromdate(model.getFromDate())
+            .fromDate(model.getFromDate())
             .build();
     }
 }
