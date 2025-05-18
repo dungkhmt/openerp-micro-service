@@ -1,6 +1,6 @@
-export const warehousemanager = {
+export const warehousemanagerWarehouse = {
   id: "MENU_WMSv2_ADMIN",
-  icon: "AdminIcon",
+  icon: "WarehouseIcon",
   text: "Inventory Management",
   child: [
     {
@@ -9,37 +9,63 @@ export const warehousemanager = {
       isPublic: false,
       text: "Warehouses",
       child: [],
-    },
+    }
+  ],
+};
+export const warehousemanagerProduct = {
+  id: "MENU_WMSv2_ADMIN",
+  icon: "ProductIcon",
+  text: "Inventory Management",
+  child: [
     {
       id: "MENU_WMSv2_ADMIN.PRODUCT",
       path: "/admin/product",
       isPublic: false,
-      icon: "StarBorder",
       text: "Products",
       child: [],
-    },
+    }
+  ],
+};
+export const warehousemanagerInventory = {
+  id: "MENU_WMSv2_ADMIN",
+  icon: "ProductInventoryIcon",
+  text: "Inventory Management",
+  child: [
     {
       id: "MENU_WMSv2_ADMIN.INVENTORY",
       path: "/admin/inventory",
       isPublic: false,
       text: "Inventory",
       child: [],
-    },
+    }
+  ],
+};
+export const warehousemanagerProcessReceipt = {
+  id: "MENU_WMSv2_ADMIN",
+  icon: "ReceiptIcon",
+  text: "Inventory Management",
+  child: [
     {
       id: "MENU_WMSv2_ADMIN.PROCESS_RECEIPT",
       path: "/admin/receipts",
       isPublic: false,
-      icon: "StarBorder",
       text: "Purchase Orders",
       child: [],
     },
+  ],
+};
+export const warehousemanagerOrder = {
+  id: "MENU_WMSv2_ADMIN",
+  icon: "SaleOrderIcon",
+  text: "Inventory Management",
+  child: [
     {
       id: "MENU_WMSv2_ADMIN.ORDER",
       path: "/admin/orders",
       isPublic: false,
-      icon: "StarBorder",
       text: "Sale Orders",
       child: [],
     }
   ],
 };
+

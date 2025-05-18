@@ -17,6 +17,7 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import MapIcon from '@mui/icons-material/Map';
 import ListAltIcon from '@mui/icons-material/ListAlt';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const DeliveryTripDetail = () => {
   const navigate = useNavigate();
@@ -191,11 +192,22 @@ const DeliveryTripDetail = () => {
                   <Stack direction="row" spacing={1}>
                     <Button
                       variant="contained"
-                      color="success"
+                      startIcon={<CheckCircleIcon />}
                       onClick={() => handleMarkDelivered(item.orderId)}
+                      sx={{
+                        backgroundColor: '#019160',
+                        color: '#fff',
+                        '&:hover': {
+                          backgroundColor: '#2fbe8e', // hover
+                        },
+                        '&:active': {
+                          backgroundColor: '#01b075', // active
+                        },
+                      }}
                     >
                       Delivered
                     </Button>
+
                   </Stack>
                 )}
               </Box>

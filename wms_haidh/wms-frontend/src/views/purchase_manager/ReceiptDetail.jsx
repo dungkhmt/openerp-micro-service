@@ -81,7 +81,7 @@ const ReceiptDetail = () => {
             <Typography><b>Warehouse:</b> {generalInfo && generalInfo.warehouseName}</Typography>
             <Typography><b>Supplier:</b> {generalInfo && generalInfo.supplierName}</Typography>
             <Typography><b>Expected Receipt Date:</b> {generalInfo && formatDate(generalInfo.expectedReceiptDate)}</Typography>
-            
+
           </Paper>
         </Grid>
         <Grid item xs={12} md={6}>
@@ -92,7 +92,7 @@ const ReceiptDetail = () => {
             <Typography><b>Status:</b> {generalInfo && generalInfo.status}</Typography>
             <Typography><b>Created By:</b>  {generalInfo && generalInfo.createdBy}</Typography>
             <Typography><b>Created Time:</b> {generalInfo && formatDate(generalInfo.createdStamp)}</Typography>
-            <Typography><b>Description:</b> {generalInfo && generalInfo.description}</Typography>       
+            <Typography><b>Description:</b> {generalInfo && generalInfo.description}</Typography>
           </Paper>
         </Grid>
       </Grid>
@@ -128,9 +128,23 @@ const ReceiptDetail = () => {
           <Button variant="contained" color="error" onClick={handleCancel} sx={{ mr: 2 }}>
             Cancel
           </Button>
-          <Button variant="contained" color="success" onClick={handleApprove}>
+          <Button
+            variant="contained"
+            onClick={handleApprove}
+            sx={{
+              backgroundColor: '#019160',
+              color: '#fff',
+              '&:hover': {
+                backgroundColor: '#2fbe8e',
+              },
+              '&:active': {
+                backgroundColor: '#01b075',
+              },
+            }}
+          >
             Approve
           </Button>
+
         </Box>)}
     </Box>
   );

@@ -50,7 +50,7 @@ function MainAppRouter() {
       <Layout>
         <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
           <Routes>
-            <Route path="/" element={<NotFound />} />
+            <Route path="/" element={<div>Welcome back !</div>} />
             <Route path="/director/*" element={renderPrivateRoute(DirectorRouter)} />
             <Route path="/admin/*" element={renderPrivateRoute(WarehouseManagerRouter)} />
             <Route path="/sale-manager/*" element={renderPrivateRoute(SaleManagerRouter)} />

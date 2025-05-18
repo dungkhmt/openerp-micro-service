@@ -29,6 +29,7 @@ import Map from '../../../components/Map';
 import fetchRoute from '../../../utils/fetchRoute';
 import { formatDate } from '../../../utils/utils';
 import SaveIcon from '@mui/icons-material/Save';
+import { toast, Toaster } from "react-hot-toast";
 
 const AddTrip = () => {
   const navigate = useNavigate();
@@ -152,6 +153,11 @@ const AddTrip = () => {
 
   const handleSubmit = async () => {
 
+    if (totalWeight > maxWeight) {
+      toast.error("Total weight exceeds vehicle load capacity ! ");
+      return;
+    }
+
     const orderSequenceMap = deliverySequence.reduce((acc, item, index) => {
       acc[item.orderId] = index + 1;
       return acc;
@@ -259,6 +265,7 @@ const AddTrip = () => {
 
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
+      <Toaster />
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         <IconButton color="primary" onClick={() => navigate('/delivery-manager/delivery-trip')} sx={{ color: 'grey.700', mr: 1 }}>
           <ArrowBackIcon />
@@ -270,7 +277,7 @@ const AddTrip = () => {
           variant="contained"
           color="primary"
           startIcon={<SaveIcon />}
-           sx={{
+          sx={{
             marginLeft: 'auto',
             backgroundColor: '#019160',
             color: '#fff',
@@ -378,9 +385,14 @@ const AddTrip = () => {
             Assigned Items
           </Typography>
           <div className='mb-4'>
-            <Typography variant="h7" gutterBottom className="text-green-500">
-              Total weight : {totalWeight} / {maxWeight} kg
+            <Typography
+              variant="h7"
+              gutterBottom
+              className={totalWeight > maxWeight ? "text-red-500" : "text-green-500"}
+            >
+              Total weight: {totalWeight} / {maxWeight} kg
             </Typography>
+
           </div>
           <TableContainer>
             <Table>

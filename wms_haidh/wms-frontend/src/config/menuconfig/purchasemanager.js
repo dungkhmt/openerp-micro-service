@@ -1,6 +1,6 @@
-export const purchasemanager = {
+export const purchasemanagerSuppliers = {
   id: "MENU_WMSv2_PURCHASE_MANAGER",
-  icon: "PurchaseManagerIcon",
+  icon: "SupplierIcon",
   text: "Purchase Management",
   child: [
     {
@@ -9,7 +9,14 @@ export const purchasemanager = {
       isPublic: false,
       text: "Suppliers",
       child: [],
-    },
+    }
+  ],
+};
+export const purchasemanagerProcessReceipt = {
+  id: "MENU_WMSv2_PURCHASE_MANAGER",
+  icon: "ReceiptIcon",
+  text: "Purchase Management",
+  child: [
     {
       id: "MENU_WMSv2_PURCHASE_MANAGER.PROCESS_RECEIPT",
       path: "/purchase-manager/process-receipts",

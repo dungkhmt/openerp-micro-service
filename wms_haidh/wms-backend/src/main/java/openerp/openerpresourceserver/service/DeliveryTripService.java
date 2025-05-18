@@ -153,7 +153,16 @@ public class DeliveryTripService {
 
 	    long notYetDeliveredInTrip = deliveryTripItemService.countUndeliveredItems(deliveryTripId);
 	    if (notYetDeliveredInTrip == 0) {
-	        deliveryTripRepository.markTripAsDone(deliveryTripId);
+
+	        DeliveryTrip trip = deliveryTripRepository.findById(deliveryTripId)
+	            .orElseThrow(() -> new IllegalStateException("DeliveryTrip not found with id: " + deliveryTripId));
+
+	        trip.setStatus("DONE");
+	        trip.setLastUpdatedStamp(LocalDateTime.now());
+
+	        deliveryTripRepository.save(trip);
+
+	        vehicleService.updateVehicleStatus(trip.getVehicleId(), "AVAILABLE");
 	    }
 
 	    long assigned = assignedOrderItemService.countAssignedItems(orderId);
@@ -164,6 +173,8 @@ public class DeliveryTripService {
 
 	    return updatedCount;
 	}
+
+
 
 
 

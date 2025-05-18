@@ -134,9 +134,23 @@ const SaleOrderDetail = () => {
           <Button variant="contained" color="error" onClick={handleCancel} sx={{ mr: 2 }}>
             Cancel
           </Button>
-          <Button variant="contained" color="success" onClick={handleApprove}>
+          <Button
+            variant="contained"
+            onClick={handleApprove}
+            sx={{
+              backgroundColor: '#019160',
+              color: '#fff',
+              '&:hover': {
+                backgroundColor: '#2fbe8e',
+              },
+              '&:active': {
+                backgroundColor: '#01b075',
+              },
+            }}
+          >
             Approve
           </Button>
+
         </Box>)}
     </Box >
 

@@ -1,6 +1,6 @@
 export const deliveryperson = {
   id: "MENU_WMSv2_DELIVERY_PERSON",
-  icon: "DeliveryPersonIcon",
+  icon: "DeliveryTripIcon",
   text: "Delivery Person",
   child: [
     {

@@ -16,6 +16,7 @@ import { formatDate } from '../../../utils/utils';
 import PhoneIcon from '@mui/icons-material/Phone';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import MapIcon from '@mui/icons-material/Map';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 
 const DeliveryTripDetail = () => {
   const navigate = useNavigate();
@@ -80,15 +81,9 @@ const DeliveryTripDetail = () => {
           generalInfo && generalInfo.status === 'CREATED' &&
           (<Button
             variant="contained"
-            color="primary"
+            color="error"
             sx={{
-              marginLeft: 'auto',
-              backgroundColor: 'black',
-              color: 'white',
-              '&:hover': {
-                backgroundColor: 'black',
-                opacity: 0.75,
-              }
+              marginLeft: 'auto'
             }}
             onClick={handleSubmit}
           >
@@ -153,8 +148,19 @@ const DeliveryTripDetail = () => {
                   {/* Left side: View Items */}
                   <Button
                     variant="contained"
+                    startIcon={<ListAltIcon />}
                     color="primary"
                     onClick={() => navigate(`/delivery-manager/delivery-trip/${id}/${item.orderId}`)}
+                    sx={{
+                      backgroundColor: '#019160',
+                      color: '#fff',
+                      '&:hover': {
+                        backgroundColor: '#2fbe8e', // hiệu ứng hover
+                      },
+                      '&:active': {
+                        backgroundColor: '#01b075', // hiệu ứng nhấn
+                      },
+                    }}
                   >
                     View Items
                   </Button>
@@ -166,19 +172,27 @@ const DeliveryTripDetail = () => {
         </Paper>
 
 
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
           <Button
             variant="contained"
             color="primary"
             sx={{
               mt: 4,
-              marginLeft: 'auto',
+              backgroundColor: '#019160',
+              color: '#fff',
+              '&:hover': {
+                backgroundColor: '#2fbe8e', // hiệu ứng hover
+              },
+              '&:active': {
+                backgroundColor: '#01b075', // hiệu ứng nhấn
+              },
             }}
             onClick={handleToggleMap}
             startIcon={<MapIcon />}
           >
-            {isMapOpen ? "Close Map" : "Open Map"}
+            {isMapOpen ? 'Close Map' : 'Open Map'}
           </Button>
+
         </Box>
 
         {isMapOpen &&

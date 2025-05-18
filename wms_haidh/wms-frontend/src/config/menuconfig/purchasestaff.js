@@ -1,6 +1,6 @@
-export const purchasestaff = {
+export const purchasestaffProduct = {
   id: "MENU_WMSv2_PURCHASE_STAFF",
-  icon: "PurchaseStaffIcon",
+  icon: "ProductInventoryIcon",
   text: "Purchase Requests",
   child: [
     {
@@ -9,7 +9,14 @@ export const purchasestaff = {
       isPublic: false,
       text: "Products",
       child: [],
-    },
+    }
+  ],
+};
+export const purchasestaffReceipt = {
+  id: "MENU_WMSv2_PURCHASE_STAFF",
+  icon: "ReceiptIcon",
+  text: "Purchase Requests",
+  child: [
     {
       id: "MENU_WMSv2_PURCHASE_STAFF.RECEIPT",
       path: "/purchase-staff/receipts",

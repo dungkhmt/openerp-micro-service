@@ -19,7 +19,7 @@ import openerp.openerpresourceserver.repository.ShipmentRepository;
 public class ShipmentService {
     private final ShipmentRepository shipmentRepository;
 
-    private static final String SHIPMENT_PREFIX = "SP_";
+    private static final String SHIPMENT_PREFIX = "SP";
     private String generateShipmentId() {
         long count = shipmentRepository.count() + 1;
         return String.format(SHIPMENT_PREFIX + "%05d", count);

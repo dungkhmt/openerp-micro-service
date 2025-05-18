@@ -53,7 +53,4 @@ public interface DeliveryTripRepository extends JpaRepository<DeliveryTrip, Stri
 
 	Page<DeliveryTrip> findByShipmentId(String shipmentId, Pageable pageable);
 
-	@Modifying
-    @Query("UPDATE DeliveryTrip d SET d.status = 'DONE', d.lastUpdatedStamp = CURRENT_TIMESTAMP WHERE d.deliveryTripId = :tripId")
-    int markTripAsDone(@Param("tripId") String tripId);
 }

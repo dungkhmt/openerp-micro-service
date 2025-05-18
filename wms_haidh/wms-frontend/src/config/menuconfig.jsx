@@ -1,90 +1,97 @@
-import AirportShuttleIcon from "@mui/icons-material/AirportShuttle";
-import ApartmentSharpIcon from "@mui/icons-material/ApartmentSharp";
-import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
-import AttachMoneySharpIcon from "@mui/icons-material/AttachMoneySharp";
-import BlurOnIcon from "@mui/icons-material/BlurOn";
 import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
-import DescriptionIcon from "@mui/icons-material/Description";
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import EventNoteIcon from "@mui/icons-material/EventNote";
-import FastfoodIcon from "@mui/icons-material/Fastfood";
-import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
-import HomeSharpIcon from "@mui/icons-material/HomeSharp";
-import LocalGroceryStoreIcon from "@mui/icons-material/LocalGroceryStore";
-import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
-import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import PeopleIcon from "@mui/icons-material/People";
-import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
-import PersonIcon from "@mui/icons-material/Person";
-import StarBorder from "@mui/icons-material/StarBorder";
-import StoreMallDirectorySharpIcon from "@mui/icons-material/StoreMallDirectorySharp";
-import { Inventory } from "@mui/icons-material";
 import { LocalShipping } from "@mui/icons-material";
-import { DeliveryDining } from "@mui/icons-material";
+import HistoryIcon from '@mui/icons-material/History';
 import { ShoppingBag } from "@mui/icons-material";
 import { ReceiptLong } from "@mui/icons-material";
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import { Widgets } from "@mui/icons-material";
-import { CiEdit } from "react-icons/ci";
-import { GiTeacher } from "react-icons/gi";
 import { buildMapPathMenu } from "../utils/MenuUtils";
-import { director } from "./menuconfig/director";
-import { warehousemanager } from "./menuconfig/warehousemanager";
-import { salemanager } from "./menuconfig/salemanager";
-import { customer } from "./menuconfig/customer";
-import { deliverymanager } from "./menuconfig/deliverymanager";
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import StackedLineChartIcon from '@mui/icons-material/StackedLineChart';
+import FactCheckIcon from '@mui/icons-material/FactCheck';
+import PieChartIcon from '@mui/icons-material/PieChart';
+import Inventory2Icon from '@mui/icons-material/Inventory2';
+import HandshakeIcon from '@mui/icons-material/Handshake';
+import WarehouseIcon from '@mui/icons-material/Warehouse';
+import WidgetsIcon from '@mui/icons-material/Widgets';
+import GroupsIcon from '@mui/icons-material/Groups';
+import StraightenIcon from '@mui/icons-material/Straighten';
+import CommuteIcon from '@mui/icons-material/Commute';
+
+import { dashboard } from "./menuconfig/dashboard";
+import { directorRevenue } from "./menuconfig/director";
+import { directorCategory } from "./menuconfig/director";
+import { warehousemanagerWarehouse } from "./menuconfig/warehousemanager";
+import { warehousemanagerProduct } from "./menuconfig/warehousemanager";
+import { warehousemanagerInventory } from "./menuconfig/warehousemanager";
+import { warehousemanagerProcessReceipt } from "./menuconfig/warehousemanager";
+import { warehousemanagerOrder } from "./menuconfig/warehousemanager";
+import { purchasestaffProduct } from "./menuconfig/purchasestaff";
+import { purchasestaffReceipt } from "./menuconfig/purchasestaff";
+import { purchasemanagerSuppliers } from "./menuconfig/purchasemanager";
+import { purchasemanagerProcessReceipt } from "./menuconfig/purchasemanager";
+import { salemanagerPriceConfig } from "./menuconfig/salemanager";
+import { salemanagerOrders } from "./menuconfig/salemanager";
+import { deliverymanagerDeliveryPerson } from "./menuconfig/deliverymanager";
+import { deliverymanagerShipments } from "./menuconfig/deliverymanager";
+import { deliverymanagerDeliveryTrips } from "./menuconfig/deliverymanager";
+import { deliverymanagerDistances } from "./menuconfig/deliverymanager";
 import { deliveryperson } from "./menuconfig/deliveryperson";
-import { purchasestaff } from "./menuconfig/purchasestaff";
-import { purchasemanager } from "./menuconfig/purchasemanager";
+import { customerProducts } from "./menuconfig/customer";
+import { customerCart } from "./menuconfig/customer";
+import { customerHistory } from "./menuconfig/customer";
+
 export const MENUS = [];
-MENUS.push(director);
-MENUS.push(warehousemanager);
-MENUS.push(purchasestaff);
-MENUS.push(purchasemanager);
-MENUS.push(salemanager);
-MENUS.push(deliverymanager);
+
+MENUS.push(dashboard);
+
+MENUS.push(directorRevenue);
+MENUS.push(directorCategory);
+
+MENUS.push(warehousemanagerWarehouse);
+MENUS.push(warehousemanagerProduct);
+MENUS.push(warehousemanagerInventory);
+MENUS.push(warehousemanagerProcessReceipt);
+MENUS.push(warehousemanagerOrder);
+
+MENUS.push(purchasestaffProduct);
+MENUS.push(purchasestaffReceipt);
+
+MENUS.push(purchasemanagerSuppliers);
+MENUS.push(purchasemanagerProcessReceipt);
+
+MENUS.push(salemanagerPriceConfig);
+MENUS.push(salemanagerOrders);
+
+MENUS.push(deliverymanagerDeliveryPerson);
+MENUS.push(deliverymanagerShipments);
+MENUS.push(deliverymanagerDeliveryTrips);
+MENUS.push(deliverymanagerDistances);
+
 MENUS.push(deliveryperson);
-MENUS.push(customer);
+
+MENUS.push(customerProducts);
+MENUS.push(customerCart);
+MENUS.push(customerHistory);
+
 
 export const menuIconMap = new Map();
 
-menuIconMap.set("AdminIcon",<Inventory />);
-menuIconMap.set("ApproverIcon",<AssessmentIcon/>);
-menuIconMap.set("CustomerIcon",<ShoppingBag/>);
-menuIconMap.set("DeliveryManagerIcon",<LocalShipping />);
-menuIconMap.set("DeliveryPersonIcon",<DeliveryDining />);
-menuIconMap.set("PurchaseManagerIcon",<ReceiptLong />);
-menuIconMap.set("PurchaseStaffIcon",<ReceiptLong />);
-menuIconMap.set("SaleManagerIcon",<MonetizationOnIcon />);
-
-
-menuIconMap.set("Schedule",<EventNoteIcon />);
-menuIconMap.set("Product",<Widgets />);
-menuIconMap.set("Inventory",<Inventory />);
-menuIconMap.set("Delivery",<LocalShipping />);
-menuIconMap.set("DashboardIcon", <AssessmentIcon />);
-menuIconMap.set("GiTeacher", <GiTeacher size={24} />);
-menuIconMap.set("InboxIcon", <InboxIcon />);
-menuIconMap.set("StarBorder", <StarBorder />);
-menuIconMap.set("PeopleIcon", <PeopleIcon />);
-menuIconMap.set("AirportShuttleIcon", <AirportShuttleIcon />);
-menuIconMap.set("PeopleOutlineIcon", <PeopleOutlineIcon />);
-menuIconMap.set("PersonIcon", <PersonIcon />);
-menuIconMap.set("FormatListNumberedIcon", <FormatListNumberedIcon />);
-menuIconMap.set("DescriptionIcon", <DescriptionIcon />);
-menuIconMap.set("DescriptionOutlinedIcon", <DescriptionOutlinedIcon />);
-menuIconMap.set("ApartmentSharpIcon", <ApartmentSharpIcon />);
-menuIconMap.set("AttachMoneySharpIcon", <AttachMoneySharpIcon />);
-menuIconMap.set("StoreMallDirectorySharpIcon", <StoreMallDirectorySharpIcon />);
-menuIconMap.set("HomeSharpIcon", <HomeSharpIcon />);
-menuIconMap.set("FastfoodIcon", <FastfoodIcon />);
-menuIconMap.set("LocalGroceryStoreIcon", <LocalGroceryStoreIcon />);
-menuIconMap.set("BlurOnIcon", <BlurOnIcon />);
-menuIconMap.set("LocalLibraryIcon", <LocalLibraryIcon />);
-menuIconMap.set("AssignmentOutlinedIcon", <AssignmentOutlinedIcon />);
-menuIconMap.set("ManageAccountsIcon", <ManageAccountsIcon />);
-menuIconMap.set("CiEdit", <CiEdit />);
+menuIconMap.set("DashboardRoundedIcon",<DashboardRoundedIcon />);
+menuIconMap.set("ProductIcon",<WidgetsIcon/>);
+menuIconMap.set("WarehouseIcon",<WarehouseIcon />);
+menuIconMap.set("RevenueIcon",<StackedLineChartIcon/>);
+menuIconMap.set("CategoryIcon",<PieChartIcon/>);
+menuIconMap.set("ProductInventoryIcon",<Inventory2Icon />);
+menuIconMap.set("ReceiptIcon",<ReceiptLong />);
+menuIconMap.set("SupplierIcon",<HandshakeIcon />);
+menuIconMap.set("MoneyIcon",<MonetizationOnIcon/>);
+menuIconMap.set("SaleOrderIcon",<FactCheckIcon/>);
+menuIconMap.set("StaffIcon",<GroupsIcon />);
+menuIconMap.set("ShipmentIcon",<CommuteIcon/>);
+menuIconMap.set("DeliveryTripIcon",<LocalShipping />);
+menuIconMap.set("DistanceIcon",<StraightenIcon />);
+menuIconMap.set("CustomerProductIcon",<ShoppingBag/>);
+menuIconMap.set("CartIcon",<ShoppingCartIcon/>);
+menuIconMap.set("HistoryIcon",<HistoryIcon />);
 
 export const mapPathMenu = buildMapPathMenu(MENUS);

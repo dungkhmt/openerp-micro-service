@@ -1,6 +1,6 @@
-export const director = {
+export const directorRevenue = {
   id: "MENU_GENERAL",
-  icon: "DashboardIcon",
+  icon: "RevenueIcon",
   text: "Business Reports",
   child: [
     {
@@ -9,7 +9,14 @@ export const director = {
       isPublic: false,
       text: "Revenue & Profit",
       child: [],
-    },
+    }
+  ],
+};
+export const directorCategory = {
+  id: "MENU_GENERAL",
+  icon: "CategoryIcon",
+  text: "Business Reports",
+  child: [
     {
       id: "MENU_GENERAL.CATEGORY",
       path: "/director/category",
