@@ -4,6 +4,7 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.absence.usecase_data.CancelAbsence;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.absence.usecase_data.GetAbsence;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.absence.usecase_data.GetAbsenceList;
+import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceStatus;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.AbsenceModel;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.absence.request.AnnounceAbsenceRequest;
@@ -62,7 +63,7 @@ public class AbsenceController extends BeanAwareUseCasePublisher {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getAbsenceList(
+    public ResponseEntity<?> getAbsence(
         @Valid @PathVariable UUID id
     ){
         var useCase = GetAbsence.builder()
@@ -78,12 +79,14 @@ public class AbsenceController extends BeanAwareUseCasePublisher {
     public ResponseEntity<?> getAbsenceList(
         @Valid @RequestParam List<String> userIds,
         @Valid @RequestParam LocalDate startDate,
-        @Valid @RequestParam LocalDate endDate
+        @Valid @RequestParam LocalDate endDate,
+        @Valid @RequestParam(required = false, defaultValue = "ACTIVE") AbsenceStatus status
     ){
         var useCase = GetAbsenceList.builder()
             .userIds(userIds)
             .startDate(startDate)
             .endDate(endDate)
+            .status(status)
             .build();
         var absenceList = publishCollection(AbsenceModel.class, useCase);
         return ResponseEntity.ok().body(
@@ -101,6 +104,7 @@ public class AbsenceController extends BeanAwareUseCasePublisher {
             .userIds(List.of(principal.getName()))
             .startDate(startDate)
             .endDate(endDate)
+            .status(null)
             .build();
         var absenceList = publishCollection(AbsenceModel.class, useCase);
         return ResponseEntity.ok().body(

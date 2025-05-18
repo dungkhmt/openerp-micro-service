@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.in.port;
 
+import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceStatus;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.AbsenceModel;
 
 import java.time.LocalDate;
@@ -15,5 +16,5 @@ public interface IAbsencePort {
 
     AbsenceModel getAbsence(UUID id);
 
-    List<AbsenceModel> getAbsences(List<String> userIds, LocalDate startDate, LocalDate endDate);
+    List<AbsenceModel> getAbsences(List<String> userIds, LocalDate startDate, LocalDate endDate, AbsenceStatus status);
 }

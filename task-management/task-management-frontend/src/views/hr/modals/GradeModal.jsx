@@ -15,6 +15,7 @@ import {
   Alert,
 } from "@mui/material";
 import { request } from "@/api";
+import toast from "react-hot-toast";
 
 const MAX_POINT = 10; // Maximum point per configure
 
@@ -81,14 +82,14 @@ const GradeModal = ({ open, onClose, staff, period }) => {
         })),
       };
       await request("post", "/checkpoints",
-        null, 
-        null, 
+        null,
+        null,
         payload);
-      setSuccess(true); 
+      setSuccess(true);
+      toast.success("Chấm điểm thành công")
       onClose(); 
     } catch (error) {
-      console.error("Error saving grades:", error);
-      alert("Error saving grades.");
+      toast.error("Chấm điểm thất bại");
     } finally {
       setLoading(false);
     }
@@ -191,16 +192,6 @@ const GradeModal = ({ open, onClose, staff, period }) => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Success Snackbar */}
-      <Snackbar
-        open={success}
-        autoHideDuration={6000}
-        onClose={() => setSuccess(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert severity="success">Grades saved successfully!</Alert>
-      </Snackbar>
     </>
   );
 };

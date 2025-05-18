@@ -101,8 +101,8 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues }) => {
       };
 
       request(
-        "post",
-        "/checkpoint/",
+        "get",
+        "/checkpoints/configures",
         (res) => {
           setAvailableConfigures(res.data.data || []);
         },

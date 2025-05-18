@@ -76,10 +76,14 @@ public class AbsenceAdapter implements IAbsencePort {
     }
 
     @Override
-    public List<AbsenceModel> getAbsences(List<String> userIds, LocalDate startDate, LocalDate endDate) {
+    public List<AbsenceModel> getAbsences(List<String> userIds, LocalDate startDate, LocalDate endDate, AbsenceStatus status) {
         var absences = absenceRepo.findAbsencesWithDatesInRange(userIds, startDate, endDate);
+        if(status != null){
+            absences = absences.stream().filter(s -> s.getStatus() == status).toList();
+        }
         return toModels(absences);
     }
+
 
     private AbsenceEntity getAbsenceEntity(UUID id) {
         return absenceRepo.findById(id).orElseThrow(

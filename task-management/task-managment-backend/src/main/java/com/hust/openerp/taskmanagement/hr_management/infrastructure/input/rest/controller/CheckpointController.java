@@ -21,7 +21,7 @@ public class CheckpointController extends BeanAwareUseCasePublisher {
     @PostMapping("")
     public ResponseEntity<?> checkpointStaff(
             Principal principal,
-            @Valid @ModelAttribute CheckpointStaffRequest request
+            @Valid @RequestBody CheckpointStaffRequest request
     ){
         request.setCheckedByUserId(principal.getName());
         var model = publish(CheckpointModel.class, request.toUseCase());

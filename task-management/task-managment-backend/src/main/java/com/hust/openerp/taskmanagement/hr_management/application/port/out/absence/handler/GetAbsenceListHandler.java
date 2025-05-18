@@ -26,6 +26,6 @@ public class GetAbsenceListHandler extends ObservableUseCasePublisher
 
     @Override
     public Collection<AbsenceModel> handle(GetAbsenceList useCase) {
-        return absencePort.getAbsences(useCase.getUserIds(), useCase.getStartDate(), useCase.getEndDate());
+        return absencePort.getAbsences(useCase.getUserIds(), useCase.getStartDate(), useCase.getEndDate(), useCase.getStatus());
     }
 }
