@@ -3,7 +3,7 @@ import { Autocomplete, TextField, CircularProgress } from "@mui/material";
 import { request } from "@/api";
 import debounce from "lodash/debounce";
 
-const SearchSelect = ({
+const  SearchSelect = ({
                         label,
                         fetchUrl,
                         mapFunction = (data) => data,
@@ -14,6 +14,7 @@ const SearchSelect = ({
                         size = 20,
                         multiple = false,
                         textFieldProps = {},
+                        sx ={}
                       }) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -53,6 +54,7 @@ const SearchSelect = ({
 
   return (
     <Autocomplete
+      sx = {sx}
       multiple={multiple}
       options={items}
       getOptionLabel={getOptionLabel}

@@ -15,12 +15,12 @@ import java.util.UUID;
 @Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GetPayrollDetailRequest extends PageableRequest {
-    private List<String> userId;
+    private List<String> userIds;
 
     public GetPayrollDetails toUseCase(UUID payrollId){
         return GetPayrollDetails.builder()
             .payrollId(payrollId)
-            .userLoginIds(userId)
+            .userLoginIds(userIds)
             .pageableRequest(this)
             .build();
     }
