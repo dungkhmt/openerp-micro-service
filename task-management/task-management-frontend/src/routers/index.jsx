@@ -42,6 +42,7 @@ import SalaryConfigPage from "../views/hr/SalaryConfigPage.jsx";
 import SalaryListPage from "../views/hr/SalaryListPage.jsx";
 import PayrollListPage from "../views/hr/PayrollListPage.jsx";
 import PayrollDetailPage from "../views/hr/PayrollDetailPage.jsx";
+import ShiftScheduler from "../views/hr/ShiftScheduler.jsx";
 
 
 export const router = createBrowserRouter([
@@ -205,6 +206,10 @@ export const router = createBrowserRouter([
                     element: <SalaryConfigPage/>,
                   },
                 ]
+              },
+              {
+                path: "shift-scheduler",
+                element: <ShiftScheduler />
               },
               {
                 path: "salary",
