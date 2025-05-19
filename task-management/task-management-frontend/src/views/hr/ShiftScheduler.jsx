@@ -52,6 +52,17 @@ const initialUsers = [
   { id: 't714', name: 'Test User 3', summary: '0h 0m', avatarLetter: 'T4', avatarBgColor: 'info.main' },
   { id: 't34', name: 'Test User 5', summary: '0h 0m', avatarLetter: 'T4', avatarBgColor: 'info.main' },
   { id: 't64', name: 'Test User 9', summary: '0h 0m', avatarLetter: 'T4', avatarBgColor: 'info.main' },
+  // For testing scroll, add more users:
+  { id: 'u4', name: 'NV Đăng Khoa', summary: '0h 0m', avatarLetter: 'ĐK', avatarBgColor: 'error.main' },
+  { id: 'u5', name: 'NV Thu Hà', summary: '0h 0m', avatarLetter: 'TH', avatarBgColor: 'secondary.light' },
+  { id: 'u6', name: 'NV Minh Quân', summary: '0h 0m', avatarLetter: 'MQ', avatarBgColor: 'primary.light' },
+  { id: 'u7', name: 'NV Phương Mai', summary: '0h 0m', avatarLetter: 'PM', avatarBgColor: 'warning.light' },
+  { id: 'u8', name: 'NV Gia Huy', summary: '0h 0m', avatarLetter: 'GH', avatarBgColor: 'success.light' },
+  { id: 'u9', name: 'NV Ngọc Lan', summary: '0h 0m', avatarLetter: 'NL', avatarBgColor: 'info.light' },
+  { id: 'u10', name: 'NV Tiến Dũng', summary: '0h 0m', avatarLetter: 'TD', avatarBgColor: 'error.light' },
+  { id: 'u11', name: 'NV Hoài An', summary: '0h 0m', avatarLetter: 'HA', avatarBgColor: 'secondary.main' },
+  { id: 'u12', name: 'NV Tuấn Kiệt', summary: '0h 0m', avatarLetter: 'TK', avatarBgColor: 'primary.main' },
+
 ];
 
 // Constants for sticky header calculations
@@ -434,6 +445,8 @@ function ShiftsGrid({ currentDate, shifts, users, onAddShift, onDeleteShift, onE
 }
 
 // CalendarHeader.jsx
+// Note: The 'stickyTopOffset' prop is passed but not directly used for the 'top' style here as 'top:0'
+// makes it stick to the top of its nearest scrolling parent.
 function CalendarHeader({ currentDate, stickyTopOffset = 0 }) {
   const weekStartsOn = 1;
   const startDate = startOfWeek(currentDate, { weekStartsOn });
@@ -442,7 +455,7 @@ function CalendarHeader({ currentDate, stickyTopOffset = 0 }) {
     <Grid container sx={{
       bgcolor: 'grey.100', borderBottom: 1, borderColor: 'divider',
       position: 'sticky',
-      top: 0,
+      top: 0, // Sticks to the top of the scrolling Paper container
       zIndex: 10
     }}>
       <Grid item sx={{ width: 160, p: 1, borderRight: 1, borderColor: 'divider', display: 'flex', alignItems: 'center' }}>
@@ -682,7 +695,7 @@ function BulkActionsBar({
 // --- Main Application Component (ShiftScheduler.jsx) ---
 export default function ShiftScheduler() {
   const [currentDate, setCurrentDate] = useState(new Date(new Date().setHours(0,0,0,0)));
-  const [shifts, setShifts] = useState(initialShifts);
+  const [shifts, setShifts] = useState(initialShifts); // Ensure initialShifts is defined globally
   const [users, setUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEditingShift, setCurrentEditingShift] = useState(null);
@@ -699,7 +712,7 @@ export default function ShiftScheduler() {
   const isAnyShiftSelected = selectedShiftIds.length > 0;
 
   useEffect(() => {
-    const updatedUsers = initialUsers.map(user => {
+    const updatedUsers = initialUsers.map(user => { // Ensure initialUsers is defined globally
       const userShifts = shifts.filter(s => s.userId === user.id);
       let totalMs = 0;
       userShifts.forEach(s => {
@@ -708,7 +721,7 @@ export default function ShiftScheduler() {
           const end = parseISO(`${s.day}T${s.endTime}`);
           if(isValid(start) && isValid(end)) {
             let diff = end.getTime() - start.getTime();
-            if (diff < 0) diff += 24 * 60 * 60 * 1000;
+            if (diff < 0) diff += 24 * 60 * 60 * 1000; // Handles overnight shifts
             totalMs += diff;
           }
         }
@@ -763,30 +776,42 @@ export default function ShiftScheduler() {
       return;
     }
 
-    const start = parseISO(`${day}T${startTime}`);
-    const end = parseISO(`${day}T${endTime}`);
+    const parsedDay = parseISO(day);
+    if (!isValid(parsedDay)) {
+      alert("Ngày không hợp lệ. Vui lòng kiểm tra lại định dạng (YYYY-MM-DD).");
+      return;
+    }
+
+    const start = parseISO(`${format(parsedDay, 'yyyy-MM-dd')}T${startTime}`);
+    const end = parseISO(`${format(parsedDay, 'yyyy-MM-dd')}T${endTime}`);
+
 
     if (!isValid(start) || !isValid(end)) {
-      alert("Ngày hoặc giờ không hợp lệ. Vui lòng kiểm tra lại định dạng (Ngày: yyyy-MM-dd, Giờ: HH:mm).");
+      alert("Giờ bắt đầu hoặc kết thúc không hợp lệ. Vui lòng kiểm tra lại định dạng (HH:mm).");
       return;
     }
 
     let durationMs = end.getTime() - start.getTime();
-    if (durationMs < 0) { durationMs += 24 * 60 * 60 * 1000; }
+    if (durationMs < 0) { durationMs += 24 * 60 * 60 * 1000; } // Handles overnight shifts
 
     const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
     const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
 
     const userForColor = users.find(u => u.id === userId);
+    // Ensure TOP_BAR_HEIGHT, BULK_ACTIONS_BAR_HEIGHT etc. are defined globally if used here
     const shiftMuiColor = currentEditingShift?.muiColor ||
       (userForColor?.avatarBgColor?.replace('.main','.light') || 'grey.200');
     const shiftMuiTextColor = currentEditingShift?.muiTextColor ||
       (userForColor?.avatarBgColor?.replace('.main','.darkerText') || 'text.primary');
 
     const shiftData = {
-      userId, day, startTime, endTime,
+      userId,
+      day: format(parsedDay, 'yyyy-MM-dd'), // Ensure day is correctly formatted after validation
+      startTime,
+      endTime,
       duration: `${durationHours}h ${durationMinutes}m`,
-      details, subDetails,
+      details,
+      subDetails,
       muiColor: shiftMuiColor,
       muiTextColor: shiftMuiTextColor,
     };
@@ -848,7 +873,8 @@ export default function ShiftScheduler() {
 
   const handleCopySelectedToNextWeek = useCallback(() => {
     if (!isAnyShiftSelected) return;
-    const nextWeekStartDateFormatted = format(addDays(startOfWeek(currentDate, { weekStartsOn: 1 }), 7), 'dd/MM/yyyy');
+    const weekStartsOn = 1; // Assuming Monday is the start of the week
+    const nextWeekStartDateFormatted = format(addDays(startOfWeek(currentDate, { weekStartsOn }), 7), 'dd/MM/yyyy');
     if (!window.confirm(`Bạn có chắc muốn sao chép ${selectedShiftIds.length} ca đã chọn sang tuần bắt đầu từ ${nextWeekStartDateFormatted} không?`)) return;
 
     const shiftsToCopyDetails = shifts.filter(shift => selectedShiftIds.includes(shift.id));
@@ -867,6 +893,20 @@ export default function ShiftScheduler() {
 
   const dynamicStickyOffset = isAnyShiftSelected ? BULK_ACTIONS_BAR_HEIGHT : 0;
 
+  // Assuming theme.spacing(1) = 8px for padding/margin calculations.
+  // PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER accounts for:
+  // - Parent Box of Paper has py:1 (8px top padding)
+  // - Paper itself has mt:1 (8px margin-top)
+  // - Parent Box of Paper has py:1 (8px bottom padding)
+  const PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER = 8 + 8 + 8; // Total 24px
+
+  // Space occupied by the fixed footer at the bottom
+  // Calculated as: footer actual height (approx. 48px: 24px padding + 24px content) + footer bottom offset (16px) = 64px.
+  // Using 70px for a small visual buffer above the footer. Adjust as needed.
+  const FIXED_FOOTER_RESERVED_SPACE = 70; // px
+
+  const paperContentMaxHeight = `calc(100vh - ${TOP_BAR_HEIGHT}px - ${dynamicStickyOffset}px - ${INFO_BANNERS_TOTAL_HEIGHT}px - ${PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER}px - ${FIXED_FOOTER_RESERVED_SPACE}px)`;
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
       <DragDropContext onDragEnd={onDragEnd}>
@@ -884,9 +924,18 @@ export default function ShiftScheduler() {
             onDeselectAll={handleDeselectAll}
             currentDate={currentDate}
           />
+          {/* This Box has py:1, contributing to PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER */}
           <Box sx={{px: {xs: 0, sm:1, md:2}, py:1}}>
             <InfoBanners currentDate={currentDate} stickyTopOffset={dynamicStickyOffset} />
-            <Paper elevation={2} sx={{ overflow: 'hidden', mt:1 }}>
+            <Paper
+              elevation={2}
+              sx={{
+                mt:1, // This contributes to PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER
+                overflowY: 'auto',
+                maxHeight: paperContentMaxHeight,
+                // overflowX will default to 'visible', allowing inner Box to manage horizontal scroll.
+              }}
+            >
               <CalendarHeader currentDate={currentDate} stickyTopOffset={dynamicStickyOffset} />
               <Box sx={{ overflowX: 'auto' }}>
                 <Box sx={{ minWidth: 1100 }}>
