@@ -34,11 +34,11 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 // Sample initial data for shifts
 const initialShifts = [
-  { id: 's1', userId: 'u1', day: '2025-05-19', startTime: '09:00', endTime: '12:00', duration: '3h 0m', details: 'Morning Shift', subDetails: 'Task A', muiColor: 'success.light', muiTextColor: 'success.darkerText' },
+  { id: 's1', userId: 'u1', day: '2025-05-19', startTime: '09:00', endTime: '12:00', duration: '3h 0m', details: 'Morning Shift with very very very long details to test ellipsis functionality and see if it works as expected', subDetails: 'Task A also has some extended information here to check overflow', muiColor: 'success.light', muiTextColor: 'success.darkerText' },
   { id: 's1-2', userId: 'u1', day: '2025-05-19', startTime: '13:00', endTime: '17:15', duration: '4h 15m', details: 'Afternoon Shift', subDetails: 'Task B', muiColor: 'success.light', muiTextColor: 'success.darkerText' },
-  { id: 's2', userId: 'u2', day: '2025-05-20', startTime: '09:00', endTime: '17:15', duration: '8h 15m', details: 'Frontend task', subDetails: 'UI implementation', muiColor: 'error.light', muiTextColor: 'error.darkerText' },
+  { id: 's2', userId: 'u2', day: '2025-05-20', startTime: '09:00', endTime: '17:15', duration: '8h 15m', details: 'Frontend task with a lot of details that might overflow the container width', subDetails: 'UI implementation and integration with backend APIs', muiColor: 'error.light', muiTextColor: 'error.darkerText' },
   { id: 's3', userId: 'u1', day: '2025-05-21', startTime: '10:00', endTime: '18:30', duration: '8h 30m', details: 'Meeting', subDetails: 'Client discussion', muiColor: 'info.light', muiTextColor: 'info.darkerText' },
-  { id: 's4', userId: 'u3', day: '2025-05-22', startTime: '14:00', endTime: '18:00', duration: '4h 0m', details: 'Support', subDetails: 'Client Calls', muiColor: 'warning.light', muiTextColor: 'warning.darkerText' },
+  { id: 's4', userId: 'u3', day: '2025-05-22', startTime: '14:00', endTime: '18:00', duration: '4h 0m', details: 'Support', subDetails: 'Client Calls for extended period during the afternoon', muiColor: 'warning.light', muiTextColor: 'warning.darkerText' },
 ];
 
 // Sample initial data for users
@@ -54,7 +54,7 @@ const initialUsers = [
 const TOP_BAR_HEIGHT = 61;
 const AVAILABLE_SHIFTS_BANNER_HEIGHT = 36;
 const PROJECTED_SALES_BANNER_HEIGHT = 36;
-const INFO_BANNERS_HEIGHT = -(AVAILABLE_SHIFTS_BANNER_HEIGHT + PROJECTED_SALES_BANNER_HEIGHT);
+const INFO_BANNERS_TOTAL_HEIGHT = AVAILABLE_SHIFTS_BANNER_HEIGHT + PROJECTED_SALES_BANNER_HEIGHT; // Corrected
 const BULK_ACTIONS_BAR_HEIGHT = 50;
 
 
@@ -75,7 +75,7 @@ const getInitials = (name) => {
 // ShiftCard.jsx
 function ShiftCard({
                      shift,
-                     onDeleteShift, // Retained for completeness, though not directly part of visual changes
+                     onDeleteShift,
                      onEditShift,
                      onAddAnotherShift,
                      provided,
@@ -86,6 +86,7 @@ function ShiftCard({
                    }) {
   const [isHovered, setIsHovered] = useState(false);
 
+  // ... (các hàm xử lý giữ nguyên) ...
   const handleCheckboxClick = (e) => {
     e.stopPropagation();
     onToggleSelect(shift.id);
@@ -95,7 +96,6 @@ function ShiftCard({
     if (e.defaultPrevented) {
       return;
     }
-    // Ensure clicks on checkbox or add button don't trigger this
     if (e.target.closest('.selection-checkbox-area') || e.target.closest('.add-action-button-area')) {
       return;
     }
@@ -106,9 +106,7 @@ function ShiftCard({
     }
   };
 
-  // Checkbox visibility logic
   const showCheckbox = (isHovered || isAnyShiftSelected) && !snapshot.isDragging;
-  // Add button visibility logic
   const showAddButtonOnly = isHovered && !isAnyShiftSelected && !snapshot.isDragging;
 
   return (
@@ -122,11 +120,9 @@ function ShiftCard({
         my: 0.5,
         height: 50,
         boxSizing: 'border-box',
-        // Point 2: Updated background color logic
         bgcolor: snapshot.isDragging
           ? 'primary.lighter'
           : (isSelected ? (theme) => alpha(theme.palette.primary.main, 0.12) : 'background.paper'),
-        // Point 4: Updated border logic
         border: isSelected
           ? (theme) => `2px solid ${theme.palette.primary.main}`
           : (theme) => `1px dashed ${alpha(theme.palette.primary.main, 0.5)}`,
@@ -134,8 +130,9 @@ function ShiftCard({
         display: 'flex',
         alignItems: 'center',
         transition: 'background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
-        overflow: 'hidden', // Point 3: Reinforced - ensures content doesn't spill
-        width: '100%',     // Point 3: Ensure card takes full width of its container
+        width: '100%',
+        maxWidth: '100%', // <<< THÊM DÒNG NÀY ĐỂ GIỚI HẠN CHIỀU RỘNG TỐI ĐA
+        overflow: 'hidden',
       }}
     >
       {/* Checkbox Area */}
@@ -145,12 +142,11 @@ function ShiftCard({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          // Point 1: Conditional width for checkbox area
-          width: showCheckbox ? 32 : 0, // Collapses to 0 when checkbox is hidden
+          width: showCheckbox ? 32 : 0,
           flexShrink: 0,
           height: '100%',
           transition: 'width 0.15s ease-in-out',
-          overflow: 'hidden', // Hide checkbox smoothly when width is 0
+          overflow: 'hidden',
         }}
       >
         <Checkbox
@@ -176,14 +172,13 @@ function ShiftCard({
         onClick={handleCardBodyClick}
         sx={{
           flexGrow: 1,
+          minWidth: 0, // Giữ nguyên, rất quan trọng
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          // Point 1: Conditional paddingLeft for content area
-          pl: showCheckbox ? 0.5 : 1.5, // 4px from checkbox area, or 12px from card edge
-          // Point 5: Dynamic right padding
-          pr: showAddButtonOnly ? 4.5 : 1.5, // 36px if add button might show, else 12px
+          pl: showCheckbox ? 0.5 : 1.5,
+          pr: showAddButtonOnly ? 4.5 : 1.5,
           cursor: snapshot.isDragging ? 'grabbing' : (isAnyShiftSelected ? 'pointer' : 'grab'),
           overflow: 'hidden',
           whiteSpace: 'nowrap',
@@ -191,15 +186,56 @@ function ShiftCard({
           transition: 'padding-left 0.15s ease-in-out, padding-right 0.15s ease-in-out',
         }}
       >
-        <Typography variant="caption" component="div" sx={{ fontWeight: 'bold', color: shift.muiTextColor || 'text.primary', fontSize: '0.68rem', lineHeight: 1.3 }}>
+        <Typography
+          variant="caption"
+          component="div"
+          sx={{
+            fontWeight: 'bold',
+            color: shift.muiTextColor || 'text.primary',
+            fontSize: '0.68rem',
+            lineHeight: 1.3,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}
+        >
           {`${shift.startTime} - ${shift.endTime}`}
-          <Typography component="span" variant="caption" sx={{ ml: 0.5, color: shift.muiTextColor, opacity: 0.8, fontSize: '0.65rem' }}>({shift.duration})</Typography>
+          <Typography component="span" variant="caption" sx={{ ml: 0.5, color: shift.muiTextColor, opacity: 0.8, fontSize: '0.65rem' }}>
+            ({shift.duration})
+          </Typography>
         </Typography>
-        <Typography variant="body2" sx={{ fontSize: '0.65rem', color: shift.muiTextColor, textOverflow: 'ellipsis', overflow:'hidden', lineHeight: 1.3 }}>{shift.details}</Typography>
-        {shift.subDetails && <Typography variant="caption" sx={{ fontSize: '0.6rem', color: shift.muiTextColor, opacity: 0.7, textOverflow: 'ellipsis', overflow:'hidden', lineHeight: 1.3 }}>{shift.subDetails}</Typography>}
+        <Typography
+          variant="body2"
+          sx={{
+            fontSize: '0.65rem',
+            color: shift.muiTextColor,
+            lineHeight: 1.3,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}
+        >
+          {shift.details}
+        </Typography>
+        {shift.subDetails && (
+          <Typography
+            variant="caption"
+            sx={{
+              fontSize: '0.6rem',
+              color: shift.muiTextColor,
+              opacity: 0.7,
+              lineHeight: 1.3,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}
+          >
+            {shift.subDetails}
+          </Typography>
+        )}
       </Box>
 
-      {/* "Add" button area */}
+      {/* "Add" button area (giữ nguyên) */}
       <Box
         className="add-action-button-area"
         sx={{
@@ -240,14 +276,13 @@ function ShiftCard({
 }
 
 
-
 // EmptyShiftSlot.jsx
 function EmptyShiftSlot({ onAdd }) {
   return (
     <Paper
       variant="outlined"
       sx={{
-        minHeight: 52, // Keep minHeight as it's a flexible placeholder
+        minHeight: 52,
         m: 0.5,
         display: 'flex',
         alignItems: 'center',
@@ -266,6 +301,7 @@ function EmptyShiftSlot({ onAdd }) {
   );
 }
 
+// DayCell.jsx
 // DayCell.jsx
 function DayCell({ userId, day, shiftsInCell, onAddShift, onDeleteShift, onEditShift, selectedShiftIds, onToggleSelectShift, isAnyShiftSelected }) {
   const droppableId = `user-${userId}-day-${format(day, 'yyyy-MM-dd')}`;
@@ -287,6 +323,7 @@ function DayCell({ userId, day, shiftsInCell, onAddShift, onDeleteShift, onEditS
             flexDirection: 'column',
             bgcolor: snapshot.isDraggingOver ? 'action.focus' : 'transparent',
             transition: 'background-color 0.2s ease',
+            overflow: 'hidden', // <<< THÊM DÒNG NÀY ĐỂ DAYCELL CẮT NỘI DUNG TRÀN
           }}
         >
           {shiftsInCell.length > 0 ? (
@@ -383,14 +420,15 @@ function ShiftsGrid({ currentDate, shifts, users, onAddShift, onDeleteShift, onE
 }
 
 // CalendarHeader.jsx
-function CalendarHeader({ currentDate, stickyTopOffset = 0 }) {
+function CalendarHeader({ currentDate, stickyTopOffset = 0 }) { // stickyTopOffset is dynamicStickyOffset
   const weekStartsOn = 1;
   const startDate = startOfWeek(currentDate, { weekStartsOn });
   const days = Array.from({ length: 7 }).map((_, i) => addDays(startDate, i));
   return (
     <Grid container sx={{
       bgcolor: 'grey.100', borderBottom: 1, borderColor: 'divider',
-      position: 'sticky', top: TOP_BAR_HEIGHT + INFO_BANNERS_HEIGHT + stickyTopOffset,
+      position: 'sticky',
+      top: 0,
       zIndex: 10
     }}>
       <Grid item sx={{ width: 160, p: 1, borderRight: 1, borderColor: 'divider', display: 'flex', alignItems: 'center' }}>
@@ -428,7 +466,7 @@ function TopBar({ currentDate, onPrevWeek, onNextWeek, onToday }) {
 }
 
 // InfoBanners.jsx
-function InfoBanners({ currentDate, stickyTopOffset = 0 }) {
+function InfoBanners({ currentDate, stickyTopOffset = 0 }) { // stickyTopOffset here is dynamicStickyOffset passed from parent
   const weekStartsOn = 1;
   const startDate = startOfWeek(currentDate, { weekStartsOn });
   const days = Array.from({ length: 7 }).map((_, i) => addDays(startDate, i));
@@ -656,7 +694,7 @@ export default function ShiftScheduler() {
           const end = parseISO(`${s.day}T${s.endTime}`);
           if(isValid(start) && isValid(end)) {
             let diff = end.getTime() - start.getTime();
-            if (diff < 0) diff += 24 * 60 * 60 * 1000;
+            if (diff < 0) diff += 24 * 60 * 60 * 1000; // Handles overnight shifts
             totalMs += diff;
           }
         }
@@ -725,7 +763,7 @@ export default function ShiftScheduler() {
     const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
     const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
 
-    const userForColor = users.find(u => u.id === userId);
+    const userForColor = users.find(u => u.id === userId); // Ensure users state is populated for this
     const shiftMuiColor = currentEditingShift?.muiColor ||
       (userForColor?.avatarBgColor?.replace('.main','.light') || 'grey.200');
     const shiftMuiTextColor = currentEditingShift?.muiTextColor ||
@@ -764,8 +802,8 @@ export default function ShiftScheduler() {
     if (!draggedShift) return;
 
     const destParts = destination.droppableId.split('-');
-    const newUserId = destParts[1];
-    const newDay = `${destParts[3]}-${destParts[4]}-${destParts[5]}`;
+    const newUserId = destParts[1]; // e.g., "u1" from "user-u1-day-2025-05-19"
+    const newDay = `${destParts[3]}-${destParts[4]}-${destParts[5]}`; // e.g., "2025-05-19"
 
     setShifts(prevShifts =>
       prevShifts.map(shift =>
@@ -805,13 +843,13 @@ export default function ShiftScheduler() {
       const nextWeekShiftDate = addDays(originalShiftDate, 7);
       return {
         ...shift,
-        id: `s${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        id: `s${Date.now()}-${Math.random().toString(16).slice(2)}`, // New ID for copied shift
         day: format(nextWeekShiftDate, 'yyyy-MM-dd'),
       };
     });
     setShifts(prevShifts => [...prevShifts, ...newCopiedShifts]);
-    setSelectedShiftIds([]);
-  }, [selectedShiftIds, shifts, currentDate, isAnyShiftSelected]); // Removed 'users' as it's not directly used for copying logic here
+    setSelectedShiftIds([]); // Deselect after copying
+  }, [selectedShiftIds, shifts, currentDate, isAnyShiftSelected]);
 
   const dynamicStickyOffset = isAnyShiftSelected ? BULK_ACTIONS_BAR_HEIGHT : 0;
 
@@ -837,13 +875,13 @@ export default function ShiftScheduler() {
             <Paper elevation={2} sx={{ overflow: 'hidden', mt:1 }}>
               <CalendarHeader currentDate={currentDate} stickyTopOffset={dynamicStickyOffset} />
               <Box sx={{ overflowX: 'auto' }}>
-                <Box sx={{ minWidth: 1100 }}>
+                <Box sx={{ minWidth: 1100 }}> {/* Ensures horizontal scroll for the grid content */}
                   <ShiftsGrid
                     currentDate={currentDate}
                     shifts={shifts}
                     users={users}
                     onAddShift={handleOpenModal}
-                    onDeleteShift={handleDeleteSingleShift}
+                    onDeleteShift={handleDeleteSingleShift} // For potential future single delete icon on card
                     onEditShift={(shift) => handleOpenModal(shift.userId, parseISO(shift.day), shift)}
                     selectedShiftIds={selectedShiftIds}
                     onToggleSelectShift={handleToggleSelectShift}
@@ -864,7 +902,7 @@ export default function ShiftScheduler() {
             isOpen={isModalOpen}
             onClose={handleCloseModal}
             onSave={handleSaveShift}
-            users={users}
+            users={users} // Pass the dynamically updated users list
             initialFormState={modalInitialFormState}
             isEditing={!!currentEditingShift}
           />
