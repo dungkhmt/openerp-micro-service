@@ -25,8 +25,6 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import CloseIcon from '@mui/icons-material/Close';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-// import DragIndicatorIcon from '@mui/icons-material/DragIndicator'; // REMOVED as requested
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -56,8 +54,8 @@ const initialUsers = [
 const TOP_BAR_HEIGHT = 61;
 const AVAILABLE_SHIFTS_BANNER_HEIGHT = 36;
 const PROJECTED_SALES_BANNER_HEIGHT = 36;
-const INFO_BANNERS_HEIGHT = AVAILABLE_SHIFTS_BANNER_HEIGHT + PROJECTED_SALES_BANNER_HEIGHT;
-const BULK_ACTIONS_BAR_HEIGHT = 50; // Estimated height for the new bar
+const INFO_BANNERS_HEIGHT = -(AVAILABLE_SHIFTS_BANNER_HEIGHT + PROJECTED_SALES_BANNER_HEIGHT);
+const BULK_ACTIONS_BAR_HEIGHT = 50;
 
 
 // --- Utility Functions ---
@@ -77,151 +75,171 @@ const getInitials = (name) => {
 // ShiftCard.jsx
 function ShiftCard({
                      shift,
-                     onDeleteShift,
+                     onDeleteShift, // Retained for completeness, though not directly part of visual changes
                      onEditShift,
                      onAddAnotherShift,
                      provided,
                      snapshot,
                      isSelected,
                      onToggleSelect,
-                     isAnyShiftSelected // NEW: Global selection mode indicator
+                     isAnyShiftSelected
                    }) {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleCheckboxClick = (e) => {
-    e.stopPropagation(); // Prevent card body click
+    e.stopPropagation();
     onToggleSelect(shift.id);
   };
 
-  // Determine if individual action buttons should be visible
-  const showIndividualActionButtons = isHovered && !isAnyShiftSelected && !snapshot.isDragging;
-  // Determine if checkbox should be visible
-  const showCheckbox = isHovered || isAnyShiftSelected;
-
-  // Click on card body logic
   const handleCardBodyClick = (e) => {
-    // This check is important. react-beautiful-dnd calls onClick after a drag.
-    // `e.defaultPrevented` is usually set by dnd if a drag occurred.
     if (e.defaultPrevented) {
       return;
     }
-    // If the click was on the checkbox area itself, let checkbox handler manage it
-    if (e.target.closest('.selection-checkbox-area')) {
+    // Ensure clicks on checkbox or add button don't trigger this
+    if (e.target.closest('.selection-checkbox-area') || e.target.closest('.add-action-button-area')) {
       return;
     }
-    // If click was on action buttons area, let those buttons handle it
-    if (e.target.closest('.action-buttons')) {
-      return;
-    }
-
-    if (!isAnyShiftSelected) { // Only allow edit click if not in global selection mode
+    if (!isAnyShiftSelected) {
       onEditShift(shift);
     } else {
-      // If in global selection mode, a click on the body (not checkbox or action buttons) toggles selection
       onToggleSelect(shift.id);
     }
   };
 
+  // Checkbox visibility logic
+  const showCheckbox = (isHovered || isAnyShiftSelected) && !snapshot.isDragging;
+  // Add button visibility logic
+  const showAddButtonOnly = isHovered && !isAnyShiftSelected && !snapshot.isDragging;
+
   return (
     <Paper
       ref={provided.innerRef}
-      {...provided.draggableProps} // Draggable props for the entire card
+      {...provided.draggableProps}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       elevation={snapshot.isDragging ? 4 : (isSelected ? 3 : 1)}
       sx={{
-        p: 0.75,
         my: 0.5,
+        height: 50,
+        boxSizing: 'border-box',
+        // Point 2: Updated background color logic
         bgcolor: snapshot.isDragging
           ? 'primary.lighter'
-          : (isSelected ? (theme) => alpha(theme.palette.primary.main, 0.12) : (shift.muiColor || 'grey.200')),
-        border: isSelected ? (theme) => `1px solid ${theme.palette.primary.main}` : `1px solid transparent`,
+          : (isSelected ? (theme) => alpha(theme.palette.primary.main, 0.12) : 'background.paper'),
+        // Point 4: Updated border logic
+        border: isSelected
+          ? (theme) => `2px solid ${theme.palette.primary.main}`
+          : (theme) => `1px dashed ${alpha(theme.palette.primary.main, 0.5)}`,
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
-        transition: 'background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease',
-        overflow: 'hidden',
+        transition: 'background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
+        overflow: 'hidden', // Point 3: Reinforced - ensures content doesn't spill
+        width: '100%',     // Point 3: Ensure card takes full width of its container
       }}
     >
+      {/* Checkbox Area */}
       <Box
-        className="selection-checkbox-area" // Added class for easier targeting in handleCardBodyClick
+        className="selection-checkbox-area"
         sx={{
           display: 'flex',
           alignItems: 'center',
-          pr: 0.25,
-          opacity: showCheckbox ? 1 : 0,
-          transition: 'opacity 0.15s ease-in-out',
-          minWidth: showCheckbox ? 28 : 0, // Approx width of checkbox + padding, or 0
-          height: '100%', // Ensure clickable area for checkbox
+          justifyContent: 'center',
+          // Point 1: Conditional width for checkbox area
+          width: showCheckbox ? 32 : 0, // Collapses to 0 when checkbox is hidden
+          flexShrink: 0,
+          height: '100%',
+          transition: 'width 0.15s ease-in-out',
+          overflow: 'hidden', // Hide checkbox smoothly when width is 0
         }}
       >
-        {/* Render checkbox only when it's supposed to be visible to avoid it taking space */}
-        {showCheckbox && (
-          <Checkbox
-            size="small"
-            checked={isSelected}
-            onChange={handleCheckboxClick}
-            onClick={(e) => e.stopPropagation()} // Ensure this click is isolated
-            icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
-            checkedIcon={<CheckBoxIcon fontSize="small" />}
-            sx={{ p: 0.2 }}
-            tabIndex={showCheckbox ? 0 : -1}
-          />
-        )}
+        <Checkbox
+          size="small"
+          checked={isSelected}
+          onChange={handleCheckboxClick}
+          onClick={(e) => e.stopPropagation()}
+          icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+          checkedIcon={<CheckBoxIcon fontSize="small" />}
+          sx={{
+            p: 0.5,
+            opacity: showCheckbox ? 1 : 0,
+            visibility: showCheckbox ? 'visible' : 'hidden',
+            transition: 'opacity 0.1s ease-in-out, visibility 0.1s ease-in-out',
+          }}
+          tabIndex={showCheckbox ? 0 : -1}
+        />
       </Box>
 
-      {/* Main content area - This is now the drag handle AND click-to-edit/select target */}
+      {/* Main content area */}
       <Box
-        {...provided.dragHandleProps} // Apply drag handle props HERE
+        {...provided.dragHandleProps}
         onClick={handleCardBodyClick}
         sx={{
           flexGrow: 1,
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          // Point 1: Conditional paddingLeft for content area
+          pl: showCheckbox ? 0.5 : 1.5, // 4px from checkbox area, or 12px from card edge
+          // Point 5: Dynamic right padding
+          pr: showAddButtonOnly ? 4.5 : 1.5, // 36px if add button might show, else 12px
           cursor: snapshot.isDragging ? 'grabbing' : (isAnyShiftSelected ? 'pointer' : 'grab'),
-          py: 0.5,
-          pr: showIndividualActionButtons ? '30px' : '2px', // Make space for action buttons if they are visible
           overflow: 'hidden',
           whiteSpace: 'nowrap',
-          userSelect: 'none', // Prevent text selection during drag attempts
+          userSelect: 'none',
+          transition: 'padding-left 0.15s ease-in-out, padding-right 0.15s ease-in-out',
         }}
       >
-        <Typography variant="caption" component="div" sx={{ fontWeight: 'bold', color: shift.muiTextColor || 'text.primary', fontSize: '0.68rem' }}>
+        <Typography variant="caption" component="div" sx={{ fontWeight: 'bold', color: shift.muiTextColor || 'text.primary', fontSize: '0.68rem', lineHeight: 1.3 }}>
           {`${shift.startTime} - ${shift.endTime}`}
-          <Typography variant="caption" sx={{ ml: 0.5, color: shift.muiTextColor, opacity: 0.8, fontSize: '0.65rem' }}>({shift.duration})</Typography>
+          <Typography component="span" variant="caption" sx={{ ml: 0.5, color: shift.muiTextColor, opacity: 0.8, fontSize: '0.65rem' }}>({shift.duration})</Typography>
         </Typography>
-        <Typography variant="body2" sx={{ fontSize: '0.65rem', color: shift.muiTextColor, textOverflow: 'ellipsis', overflow:'hidden' }}>{shift.details}</Typography>
-        {shift.subDetails && <Typography variant="caption" sx={{ fontSize: '0.6rem', color: shift.muiTextColor, opacity: 0.7, textOverflow: 'ellipsis', overflow:'hidden' }}>{shift.subDetails}</Typography>}
+        <Typography variant="body2" sx={{ fontSize: '0.65rem', color: shift.muiTextColor, textOverflow: 'ellipsis', overflow:'hidden', lineHeight: 1.3 }}>{shift.details}</Typography>
+        {shift.subDetails && <Typography variant="caption" sx={{ fontSize: '0.6rem', color: shift.muiTextColor, opacity: 0.7, textOverflow: 'ellipsis', overflow:'hidden', lineHeight: 1.3 }}>{shift.subDetails}</Typography>}
       </Box>
 
-      {/* Individual Action Buttons - Conditionally Visible */}
+      {/* "Add" button area */}
       <Box
-        className="action-buttons"
+        className="add-action-button-area"
         sx={{
           position: 'absolute',
           top: '50%',
+          right: '4px',
           transform: 'translateY(-50%)',
-          right: 2,
-          opacity: showIndividualActionButtons ? 1 : 0,
-          transition: 'opacity 0.15s ease-in-out',
+          width: 28,
+          height: 28,
           display: 'flex',
-          flexDirection: 'column',
-          gap: 0.1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity: showAddButtonOnly ? 1 : 0,
+          visibility: showAddButtonOnly ? 'visible' : 'hidden',
+          transition: 'opacity 0.15s ease-in-out, visibility 0.15s ease-in-out',
           zIndex: 1,
-          pointerEvents: showIndividualActionButtons ? 'auto' : 'none',
+          pointerEvents: showAddButtonOnly ? 'auto' : 'none',
         }}
       >
-        <IconButton size="small" onClick={(e) => {e.stopPropagation(); onAddAnotherShift(shift.userId, parseISO(shift.day))}} sx={{p:0.1, bgcolor: 'rgba(255,255,255,0.8)', '&:hover': {bgcolor: 'rgba(255,255,255,1)'}}} title="Add another shift for this day">
-          <AddCircleOutlineIcon sx={{fontSize: '0.85rem'}} color="success"/>
-        </IconButton>
-        <IconButton size="small" onClick={(e) => {e.stopPropagation(); onEditShift(shift)}} sx={{p:0.1, bgcolor: 'rgba(255,255,255,0.8)', '&:hover': {bgcolor: 'rgba(255,255,255,1)'}}} title="Edit this shift">
-          <SettingsIcon sx={{fontSize: '0.85rem'}} color="primary"/>
-        </IconButton>
-        <IconButton size="small" onClick={(e) => {e.stopPropagation(); onDeleteShift(shift.id)}} sx={{p:0.1, bgcolor: 'rgba(255,255,255,0.8)', '&:hover': {bgcolor: 'rgba(255,255,255,1)'}}} title="Delete this shift">
-          <DeleteForeverIcon sx={{fontSize: '0.85rem'}} color="error"/>
+        <IconButton
+          size="small"
+          onClick={(e) => { e.stopPropagation(); onAddAnotherShift(shift.userId, parseISO(shift.day)); }}
+          sx={{
+            p: 0.3,
+            bgcolor: 'rgba(230,230,230,0.85)',
+            '&:hover': { bgcolor: 'rgba(210,210,210,1)' },
+            borderRadius: '4px',
+            width: '100%',
+            height: '100%',
+          }}
+          title="Thêm ca làm việc khác vào ngày này"
+        >
+          <AddIcon sx={{ fontSize: '1rem' }} color="action" />
         </IconButton>
       </Box>
     </Paper>
   );
 }
+
+
 
 // EmptyShiftSlot.jsx
 function EmptyShiftSlot({ onAdd }) {
@@ -229,7 +247,7 @@ function EmptyShiftSlot({ onAdd }) {
     <Paper
       variant="outlined"
       sx={{
-        minHeight: 52,
+        minHeight: 52, // Keep minHeight as it's a flexible placeholder
         m: 0.5,
         display: 'flex',
         alignItems: 'center',
@@ -279,7 +297,7 @@ function DayCell({ userId, day, shiftsInCell, onAddShift, onDeleteShift, onEditS
                     shift={shift}
                     onDeleteShift={onDeleteShift}
                     onEditShift={onEditShift}
-                    onAddAnotherShift={onAddShift} // This onAddShift is for the "add another" button on the card.
+                    onAddAnotherShift={onAddShift}
                     provided={providedDraggable}
                     snapshot={snapshotDraggable}
                     isSelected={selectedShiftIds.includes(shift.id)}
@@ -290,7 +308,7 @@ function DayCell({ userId, day, shiftsInCell, onAddShift, onDeleteShift, onEditS
               </Draggable>
             ))
           ) : (
-            !snapshot.isDraggingOver && <EmptyShiftSlot onAdd={() => onAddShift(userId, day)} /> // This onAdd is for the empty slot itself.
+            !snapshot.isDraggingOver && <EmptyShiftSlot onAdd={() => onAddShift(userId, day)} />
           )}
           {provided.placeholder}
         </Grid>
@@ -397,7 +415,9 @@ function TopBar({ currentDate, onPrevWeek, onNextWeek, onToday }) {
         <IconButton onClick={onPrevWeek} size="small" aria-label="Previous week"><ChevronLeftIcon /></IconButton>
         <Button onClick={onToday} size="small" variant="outlined" color="inherit" startIcon={<EventNoteIcon />} sx={{ mx: 1, fontSize:'0.75rem', py:0.3}}>Hôm nay</Button>
         <IconButton onClick={onNextWeek} size="small" aria-label="Next week"><ChevronRightIcon /></IconButton>
-        <Typography variant="subtitle1" component="div" sx={{ ml: 2, color:'text.secondary', fontWeight:'medium' }}>{format(currentDate, 'MMMM yyyy' , { locale: vi })}</Typography>
+        <Typography variant="subtitle1" component="div" sx={{ ml: 2, color:'text.secondary', fontWeight:'medium' }}>
+          {format(currentDate, 'MMMM yyyy', { locale: vi })}
+        </Typography>
         <Box sx={{ flexGrow: 1 }} />
         <Button size="small" variant="text" color="inherit" startIcon={<FilterAltIcon />} sx={{textTransform:'none', fontSize:'0.8rem'}}>Lọc</Button>
         <Button size="small" variant="text" color="inherit" startIcon={<FileDownloadIcon />} sx={{textTransform:'none', fontSize:'0.8rem'}}>Xuất</Button>
@@ -498,13 +518,28 @@ function ShiftModal({ isOpen, onClose, onSave, users, initialFormState, isEditin
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <DatePicker label="Ngày" value={formState.day ? parseISO(formState.day) : new Date()} onChange={handleDateChange} slotProps={{ textField: { fullWidth: true, margin: "dense", size:"small", required:true } }}/>
+              <DatePicker
+                label="Ngày"
+                value={formState.day ? parseISO(formState.day) : new Date()}
+                onChange={handleDateChange}
+                slotProps={{ textField: { fullWidth: true, margin: "dense", size:"small", required:true } }}
+              />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TimePicker label="Giờ bắt đầu" value={formState.day && formState.startTime ? parseISO(`${formState.day}T${formState.startTime}`) : null} onChange={(newValue) => handleTimeChange('startTime', newValue)} slotProps={{ textField: { fullWidth: true, margin: "dense", size:"small", required:true } }}/>
+              <TimePicker
+                label="Giờ bắt đầu"
+                value={formState.day && formState.startTime ? parseISO(`${formState.day}T${formState.startTime}`) : null}
+                onChange={(newValue) => handleTimeChange('startTime', newValue)}
+                slotProps={{ textField: { fullWidth: true, margin: "dense", size:"small", required:true } }}
+              />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TimePicker label="Giờ kết thúc" value={formState.day && formState.endTime ? parseISO(`${formState.day}T${formState.endTime}`) : null} onChange={(newValue) => handleTimeChange('endTime', newValue)} slotProps={{ textField: { fullWidth: true, margin: "dense", size:"small", required:true } }}/>
+              <TimePicker
+                label="Giờ kết thúc"
+                value={formState.day && formState.endTime ? parseISO(`${formState.day}T${formState.endTime}`) : null}
+                onChange={(newValue) => handleTimeChange('endTime', newValue)}
+                slotProps={{ textField: { fullWidth: true, margin: "dense", size:"small", required:true } }}
+              />
             </Grid>
             <Grid item xs={12}>
               <TextField margin="dense" required fullWidth id="details" label="Chi tiết chính" name="details" value={formState.details} onChange={handleFormChange} size="small" placeholder="Ví dụ: Họp team, Làm dự án X..."/>
@@ -540,13 +575,13 @@ function BulkActionsBar({
   return (
     <AppBar
       position="sticky"
-      color="default" // Changed from inherit to default for a bit more standard appearance
+      color="default"
       elevation={2}
       sx={{
         top: TOP_BAR_HEIGHT,
         height: BULK_ACTIONS_BAR_HEIGHT,
         zIndex: 19,
-        bgcolor: 'primary.lighter', // Or use theme.palette.background.paper for consistency
+        bgcolor: 'primary.lighter',
         borderBottom: theme => `1px solid ${theme.palette.divider}`
       }}
     >
@@ -581,7 +616,7 @@ function BulkActionsBar({
           size="small"
           variant="outlined"
           onClick={onDeselectAll}
-          color="primary" // Ensure this contrasts with primary.lighter
+          color="primary"
           sx={{borderColor: 'primary.dark', color:'primary.dark'}}
         >
           Bỏ chọn tất cả
@@ -596,10 +631,17 @@ function BulkActionsBar({
 export default function ShiftScheduler() {
   const [currentDate, setCurrentDate] = useState(new Date(new Date().setHours(0,0,0,0)));
   const [shifts, setShifts] = useState(initialShifts);
-  const [users, setUsers] = useState([]); // Initialized empty, populated by useEffect
+  const [users, setUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEditingShift, setCurrentEditingShift] = useState(null);
-  const [modalInitialFormState, setModalInitialFormState] = useState({ userId: '', day: format(new Date(), 'yyyy-MM-dd'), startTime: '09:00', endTime: '17:00', details: '', subDetails: '' });
+  const [modalInitialFormState, setModalInitialFormState] = useState({
+    userId: '',
+    day: format(new Date(), 'yyyy-MM-dd'),
+    startTime: '09:00',
+    endTime: '17:00',
+    details: '',
+    subDetails: ''
+  });
   const [selectedShiftIds, setSelectedShiftIds] = useState([]);
 
   const isAnyShiftSelected = selectedShiftIds.length > 0;
@@ -624,7 +666,7 @@ export default function ShiftScheduler() {
       return { ...user, summary: `${totalHours}h ${totalMinutes}m` };
     });
     setUsers(updatedUsers);
-  }, [shifts]); // Removed initialUsers from deps as it's stable
+  }, [shifts]);
 
 
   const handlePrevWeek = () => setCurrentDate(prev => subDays(prev, 7));
@@ -632,11 +674,6 @@ export default function ShiftScheduler() {
   const handleToday = () => setCurrentDate(new Date(new Date().setHours(0,0,0,0)));
 
   const handleOpenModal = (userId, day, shiftToEdit = null) => {
-    // Prevent opening modal if a drag operation might be concluding or if in selection mode.
-    // This check is primarily for the card body click.
-    // If coming from an explicit edit button, this might not be necessary.
-    // For now, the ShiftCard's handleCardBodyClick already gates on !isAnyShiftSelected for edit.
-
     if (shiftToEdit) {
       setCurrentEditingShift(shiftToEdit);
       setModalInitialFormState({
@@ -688,24 +725,24 @@ export default function ShiftScheduler() {
     const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
     const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
 
-    // Get user specific color for new shifts, or use existing for edited ones
-    const userForColor = users.find(u => u.id === userId); // Find user from the current users state
-    const defaultColor = userForColor ? userForColor.avatarBgColor?.replace('.main','.light') || 'grey.200' : 'grey.200';
-    const defaultTextColor = userForColor ? userForColor.avatarBgColor?.replace('.main','.darkerText') || 'text.primary' : 'text.primary';
-
+    const userForColor = users.find(u => u.id === userId);
+    const shiftMuiColor = currentEditingShift?.muiColor ||
+      (userForColor?.avatarBgColor?.replace('.main','.light') || 'grey.200');
+    const shiftMuiTextColor = currentEditingShift?.muiTextColor ||
+      (userForColor?.avatarBgColor?.replace('.main','.darkerText') || 'text.primary');
 
     const shiftData = {
       userId, day, startTime, endTime,
       duration: `${durationHours}h ${durationMinutes}m`,
       details, subDetails,
-      muiColor: currentEditingShift ? currentEditingShift.muiColor : defaultColor,
-      muiTextColor: currentEditingShift ? currentEditingShift.muiTextColor : defaultTextColor,
+      muiColor: shiftMuiColor,
+      muiTextColor: shiftMuiTextColor,
     };
 
     if (currentEditingShift) {
       setShifts(prevShifts => prevShifts.map(s => s.id === currentEditingShift.id ? { ...s, ...shiftData, id: currentEditingShift.id } : s));
     } else {
-      setShifts(prevShifts => [...prevShifts, { ...shiftData, id: `s${Date.now()}` }]);
+      setShifts(prevShifts => [...prevShifts, { ...shiftData, id: `s${Date.now()}-${Math.random().toString(16).slice(2)}` }]);
     }
     handleCloseModal();
   };
@@ -759,8 +796,8 @@ export default function ShiftScheduler() {
 
   const handleCopySelectedToNextWeek = useCallback(() => {
     if (!isAnyShiftSelected) return;
-    const nextWeekStartDate = format(addDays(startOfWeek(currentDate, { weekStartsOn: 1 }), 7), 'dd/MM/yyyy');
-    if (!window.confirm(`Bạn có chắc muốn sao chép ${selectedShiftIds.length} ca đã chọn sang tuần bắt đầu từ ${nextWeekStartDate} không?`)) return;
+    const nextWeekStartDateFormatted = format(addDays(startOfWeek(currentDate, { weekStartsOn: 1 }), 7), 'dd/MM/yyyy');
+    if (!window.confirm(`Bạn có chắc muốn sao chép ${selectedShiftIds.length} ca đã chọn sang tuần bắt đầu từ ${nextWeekStartDateFormatted} không?`)) return;
 
     const shiftsToCopyDetails = shifts.filter(shift => selectedShiftIds.includes(shift.id));
     const newCopiedShifts = shiftsToCopyDetails.map(shift => {
@@ -774,7 +811,7 @@ export default function ShiftScheduler() {
     });
     setShifts(prevShifts => [...prevShifts, ...newCopiedShifts]);
     setSelectedShiftIds([]);
-  }, [selectedShiftIds, shifts, currentDate, isAnyShiftSelected]);
+  }, [selectedShiftIds, shifts, currentDate, isAnyShiftSelected]); // Removed 'users' as it's not directly used for copying logic here
 
   const dynamicStickyOffset = isAnyShiftSelected ? BULK_ACTIONS_BAR_HEIGHT : 0;
 
@@ -800,14 +837,14 @@ export default function ShiftScheduler() {
             <Paper elevation={2} sx={{ overflow: 'hidden', mt:1 }}>
               <CalendarHeader currentDate={currentDate} stickyTopOffset={dynamicStickyOffset} />
               <Box sx={{ overflowX: 'auto' }}>
-                <Box sx={{ minWidth: 1100 }}> {/* Ensure this minWidth is appropriate */}
+                <Box sx={{ minWidth: 1100 }}>
                   <ShiftsGrid
                     currentDate={currentDate}
                     shifts={shifts}
                     users={users}
-                    onAddShift={handleOpenModal} // For EmptyShiftSlot and AddAnother button on card
-                    onDeleteShift={handleDeleteSingleShift} // For single delete button on card
-                    onEditShift={(shift) => handleOpenModal(shift.userId, parseISO(shift.day), shift)} // For edit button or click
+                    onAddShift={handleOpenModal}
+                    onDeleteShift={handleDeleteSingleShift}
+                    onEditShift={(shift) => handleOpenModal(shift.userId, parseISO(shift.day), shift)}
                     selectedShiftIds={selectedShiftIds}
                     onToggleSelectShift={handleToggleSelectShift}
                     isAnyShiftSelected={isAnyShiftSelected}
@@ -836,4 +873,3 @@ export default function ShiftScheduler() {
     </LocalizationProvider>
   );
 }
-
