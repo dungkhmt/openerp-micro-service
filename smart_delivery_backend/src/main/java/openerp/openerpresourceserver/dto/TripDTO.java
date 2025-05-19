@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import openerp.openerpresourceserver.entity.enumentity.TripStatus;
 
 import java.time.DayOfWeek;
 import java.time.Instant;
@@ -21,7 +22,7 @@ public class TripDTO {
     private String routeCode;
     private LocalDate date;
     private DayOfWeek dayOfWeek;
-    private String status; // "PLANNED", "IN_PROGRESS", "COMPLETED", "CANCELLED"
+    private TripStatus status; // "PLANNED", "IN_PROGRESS", "COMPLETED", "CANCELLED"
     private Instant startTime;
     private Instant endTime;
     private Integer currentStopIndex;

@@ -24,7 +24,7 @@ public class AssignOrderShipperDto {
     private Double recipientLongitude;
     private Double recipientLatitude;
     private OrderStatus orderStatus;
-    private ShipperAssignmentStatus status;
+    private ShipperAssignmentStatus assignmentStatus;
     private Timestamp orderCreatedAt;
 
 }

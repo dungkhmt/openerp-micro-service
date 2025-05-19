@@ -13,6 +13,9 @@ import openerp.openerpresourceserver.service.ShipperAssignmentService;
 import openerp.openerpresourceserver.utils.GAAutoAssign.GAAutoAssign;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
+import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -174,18 +177,26 @@ public class ShipperAssignmentServiceImpl implements ShipperAssignmentService {
 
     @Override
     @Transactional
-    public void updateAssignmentStatus(UUID assignmentId, ShipperAssignmentStatus status) {
+    public void updateAssignmentStatus(Principal principal, UUID assignmentId, ShipperAssignmentStatus status) {
         AssignOrderShipper assignment = assignOrderShipperRepository.findById(assignmentId)
                 .orElseThrow(() -> new NotFoundException("Assignment not found with ID: " + assignmentId));
-
+        Order order = orderRepo.findById(assignment.getOrderId())
+                .orElseThrow(() -> new NotFoundException("Order not found with ID: " + assignment.getOrderId()));
         assignment.setStatus(status);
-
-        // If delivery failed, increment attempt counter
-        if (status == ShipperAssignmentStatus.FAILED_ATTEMPT) {
-            assignment.setDeliveryAttempts(assignment.getDeliveryAttempts() + 1);
+        if(status == ShipperAssignmentStatus.COMPLETED) {
+           order.setChangedBy(principal.getName());
+           order.setStatus(OrderStatus.COMPLETED);
         }
-
+        if(status == ShipperAssignmentStatus.FAILED_ATTEMPT) {
+            order.setChangedBy(principal.getName());
+            order.setStatus(OrderStatus.SHIPPED_FAILED);
+            order.setShipAttemptCount(order.getShipAttemptCount() + 1);
+            if(order.getShipAttemptCount() >= 2) {
+                order.setStatus(OrderStatus.CANCELLED_SHIP);
+            }
+        }
         assignOrderShipperRepository.save(assignment);
+        orderRepo.save(order);
     }
 
     public List<TodayAssignmentShipperDto> getShipperAssignmentsTodayByHub(UUID hubId){
@@ -233,8 +244,16 @@ public class ShipperAssignmentServiceImpl implements ShipperAssignmentService {
             throw new NotFoundException("Shipper not found with ID: " + shipperId);
         }
         // Get all assignments for the shipper
-        List<AssignOrderShipper> assignments = assignOrderShipperRepository.findByShipperId(shipperId);
+        LocalDate today = LocalDate.now();
+        Timestamp startOfDay = Timestamp.valueOf(today.atStartOfDay());
+        Timestamp endOfDay = Timestamp.valueOf(today.plusDays(1).atStartOfDay());
 
+        // Chuyển đối tượng AssignOrderCollector thành TodayAssignmentDto
+        List<AssignOrderShipper> assignments = assignOrderShipperRepository.findByShipperIdAndCreatedAtBetween(
+                shipperId,
+                startOfDay,
+                endOfDay
+        );
         if (assignments.isEmpty()) {
             return new ArrayList<>();
         }
@@ -256,7 +275,7 @@ public class ShipperAssignmentServiceImpl implements ShipperAssignmentService {
                 .shipperId(assignOrderShipper.getShipperId())
                 .shipperName(assignOrderShipper.getShipperName())
                 .sequenceNumber(assignOrderShipper.getSequenceNumber())
-                .status(assignOrderShipper.getStatus())
+                .assignmentStatus(assignOrderShipper.getStatus())
                 .orderStatus(order.getStatus())
                 .recipientName(recipient.getName())
                 .recipientPhone(recipient.getPhone())

@@ -11,10 +11,7 @@ import openerp.openerpresourceserver.cache.RedisCacheService;
 import openerp.openerpresourceserver.context.DistributeContext;
 import openerp.openerpresourceserver.dto.*;
 import openerp.openerpresourceserver.entity.*;
-import openerp.openerpresourceserver.entity.enumentity.CollectorAssignmentStatus;
-import openerp.openerpresourceserver.entity.enumentity.OrderItemStatus;
-import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
-import openerp.openerpresourceserver.entity.enumentity.Role;
+import openerp.openerpresourceserver.entity.enumentity.*;
 import openerp.openerpresourceserver.mapper.OrderMapper;
 import openerp.openerpresourceserver.repository.*;
 import openerp.openerpresourceserver.service.AssignmentService;
@@ -48,7 +45,8 @@ public class OrderServiceImpl implements OrderService {
     private VehicleRepository vehicleRepo;
 
     private final OrderMapper orderMapper = OrderMapper.INSTANCE;
-
+    @Autowired
+    private AssignOrderShipperRepository assignOrderShipperRepository;
     @Autowired
     private AssignOrderCollectorRepository assignOrderCollectorRepository;
     @Autowired
@@ -529,8 +527,8 @@ public class OrderServiceImpl implements OrderService {
                 endOfDay
         );
     }
-
     @Override
+    @Transactional
     public boolean confirmCollectedHub(Principal principal, UUID[] orderIds) {
         List<UUID> orderIdList = Arrays.asList(orderIds);
         if (orderIdList.isEmpty()) {
@@ -541,28 +539,45 @@ public class OrderServiceImpl implements OrderService {
         List<AssignOrderCollector> updatedAssignments = new ArrayList<>();
 
         for (UUID orderId : orderIdList) {
-            Order order = orderRepo.findById(orderId).orElseThrow(() -> new NotFoundException("order not found: " + orderId));
+            // Fetch the order and check it exists
+            Order order = orderRepo.findById(orderId)
+                    .orElseThrow(() -> new NotFoundException("order not found: " + orderId));
+
+            // Check if status is not null before comparison
+            if (order.getStatus() == null) {
+                log.error("Order {} has null status", orderId);
+                throw new RuntimeException("Order has null status");
+            }
+
             if (order.getStatus() != OrderStatus.COLLECTED_COLLECTOR) {
                 throw new RuntimeException("Đơn hàng chưa được collector collect");
             }
-            List<OrderItem> orderItems = orderItemRepo.findAllByOrderId(orderId);
-            for (OrderItem orderItem : orderItems) {
-                orderItem.setStatus(OrderItemStatus.COLLECTED_HUB);
-            }
+
+            // Make sure no null fields before setting new values
             order.setStatus(OrderStatus.COLLECTED_HUB);
-            AssignOrderCollector assignOrderCollector = assignOrderCollectorRepository.findByOrderIdAndStatus(orderId, CollectorAssignmentStatus.COLLECTED);
+
+            // Set the changed by field safely
+            order.setChangedBy(principal != null ? principal.getName() : "system");
+            updatedOrder.add(order);
+
+            // Fetch assignment and check for null
+            AssignOrderCollector assignOrderCollector = assignOrderCollectorRepository
+                    .findByOrderIdAndStatus(orderId, CollectorAssignmentStatus.COLLECTED);
+
             if (assignOrderCollector != null) {
                 assignOrderCollector.setStatus(CollectorAssignmentStatus.COMPLETED);
                 updatedAssignments.add(assignOrderCollector);
-
             }
-            order.setChangedBy(principal.getName());
-            updatedOrder.add(order);
-            orderItemRepo.saveAll(orderItems);
         }
-        orderRepo.saveAll(updatedOrder);
-        assignOrderCollectorRepository.saveAll(updatedAssignments);
 
+        // Save all updated entities
+        if (!updatedOrder.isEmpty()) {
+            orderRepo.saveAll(updatedOrder);
+        }
+
+        if (!updatedAssignments.isEmpty()) {
+            assignOrderCollectorRepository.saveAll(updatedAssignments);
+        }
 
         return true;
     }
@@ -693,7 +708,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public List<OrderSummaryDTO> getAllOrdersDeliveredInHub(UUID hubId){
-        List<Order> orderList = orderRepo.findAllByFinalHubIdAndStatus(hubId, OrderStatus.DELIVERED);
+        List<Order> orderList = orderRepo.findAllByFinalHubIdAndStatus(hubId, OrderStatus.CONFIRMED_IN_FINAL_HUB);
         List<OrderSummaryDTO> orderSummaries = new ArrayList<>();
         for (Order order : orderList) {
             // Thêm vào danh sách orderResponses
@@ -707,6 +722,128 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> getCustomerOrders(UUID customerId) {
         return orderRepo.findBySenderId(customerId);
     }
+    @Override
+    public List<OrderSummaryDTO> getCollectedCollectorOrders(UUID hubId) {
+        // Get orders with status COLLECTED_COLLECTOR at this hub
+        return orderRepo.findByOriginHubIdAndStatus(hubId, OrderStatus.COLLECTED_COLLECTOR)
+                .stream()
+                .map(o -> new OrderSummaryDTO((Order) o))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TripOrderSummaryDto> getDeliveredDriverOrders(UUID hubId) {
+        // Get orders with status DELIVERED_HUB at this hub
+        return orderRepo.findByFinalHubIdAndStatus(hubId, OrderStatus.DELIVERED)
+                .stream()
+                .map(o -> {
+                    TripOrder tripOrder =  tripOrderRepository.findTopByOrderIdOrderByCreatedAtDesc(o.getId());
+                    Trip trip = tripRepository.findById(tripOrder.getTripId()).orElseThrow(() -> new NotFoundException("trip not found " + tripOrder.getTripId()));
+                    Vehicle vehicle = vehicleRepository.findById(trip.getVehicleId()).orElseThrow(() -> new NotFoundException("vehicle not found " + trip.getVehicleId()));
+                    return new TripOrderSummaryDto((Order) o, trip,vehicle);})
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<OrderSummaryDTO> getFailedDeliveryOrders(UUID hubId) {
+        // Get orders with status DELIVERY_FAILED at this hub
+        return orderRepo.findByOriginHubIdAndStatus(hubId, OrderStatus.DELIVERED_FAILED)
+                .stream()
+                .map(o -> new OrderSummaryDTO((Order) o))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean confirmOrdersIntoHub(Principal principal, UUID[] orderIds) {
+        try {
+            for (UUID orderId : orderIds) {
+                Order order = orderRepo.findById(orderId)
+                        .orElseThrow(() -> new RuntimeException("Order not found"));
+
+                // Update status based on current status
+                switch (order.getStatus()) {
+                    case COLLECTED_COLLECTOR:
+                        order.setStatus(OrderStatus.COLLECTED_HUB);
+                        break;
+                    case DELIVERING:
+                        order.setStatus(OrderStatus.DELIVERED);
+                        break;
+                    case DELIVERED:
+                        order.setStatus(OrderStatus.CONFIRMED_IN_FINAL_HUB);
+                        break;
+                    case DELIVERED_FAILED:
+                        order.setStatus(OrderStatus.RETURNED_HUB_AFTER_DELIVERED);
+                        break;
+                    case SHIPPED_FAILED:
+                        order.setStatus(OrderStatus.RETURNED_HUB_AFTER_SHIP_FAIL);
+                        break;
+                                       default:
+                        // Maintain current status or set default
+                        break;
+                }
+                order.setChangedBy(principal.getName());
+
+                orderRepo.save(order);
 
 
+            }
+            return true;
+        } catch (Exception e) {
+            log.error("Error confirming orders into hub", e);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean confirmShipperPickup(Principal principal, UUID shipperId) {
+        try {
+            // Find all assigned orders for this shipper that haven't been picked up
+            List<AssignOrderShipper> assignments = assignOrderShipperRepository
+                    .findByShipperIdAndStatus(shipperId, ShipperAssignmentStatus.ASSIGNED);
+
+            for (AssignOrderShipper assignment : assignments) {
+                assignment.setStatus(ShipperAssignmentStatus.PICKED_UP);
+                assignOrderShipperRepository.save(assignment);
+
+                // Update order status
+                UUID orderId = assignment.getOrderId();
+                Order order = orderRepo.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+                order.setStatus(OrderStatus.SHIPPING);
+                order.setChangedBy(principal.getName());
+                orderRepo.save(order);
+
+
+            }
+            return true;
+        } catch (Exception e) {
+            log.error("Error confirming shipper pickup", e);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean confirmMultipleShipperPickups(Principal principal, UUID[] shipperIds) {
+        try {
+            for (UUID shipperId : shipperIds) {
+                confirmShipperPickup(principal, shipperId);
+            }
+            return true;
+        } catch (Exception e) {
+            log.error("Error confirming multiple shipper pickups", e);
+            return false;
+        }
+    }
+
+    @Override
+    public List<TodayAssignmentShipperDto> getShipperPickupRequests(UUID hubId) {
+        // Get shippers with assigned orders that haven't been picked up yet
+        LocalDate today = LocalDate.now();
+
+        return assignOrderShipperRepository.getShipperAssignmentsTodayByHub(hubId, today)
+                .stream()
+                .filter(assignment -> assignment.getNumOfOrders() > assignment.getNumOfCompleted())
+                .collect(Collectors.toList());
+    }
 }
+
+

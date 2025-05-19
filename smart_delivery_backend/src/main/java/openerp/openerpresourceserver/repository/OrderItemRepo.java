@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,4 +25,5 @@ public interface OrderItemRepo extends JpaRepository<OrderItem, UUID> {
     List<OrderItem> findAllByOriginHubIdAndStatus(@Param("hubId") UUID hubId, @Param("status") OrderItemStatus orderItemStatus);
     @Query("select oi from OrderItem oi where oi.orderItemId in :orderItemIds and oi.status = :orderItemStatus")
     List<OrderItem> findAllByIdAndStatus(@Param("orderItemIds") List<UUID> orderItemIds,@Param("orderItemStatus") OrderItemStatus orderItemStatus);
+
 }

@@ -50,7 +50,7 @@ public class DeliveryAnalyticsServiceImpl implements DeliveryAnalyticsService {
         // Calculate statistics
         int totalAssignments = allAssignments.size();
         int completedDeliveries = (int) allAssignments.stream()
-                .filter(a -> a.getStatus() == ShipperAssignmentStatus.DELIVERED ||
+                .filter(a -> a.getStatus() == ShipperAssignmentStatus.COMPLETED ||
                         (a.getStatus() == ShipperAssignmentStatus.COMPLETED &&
                                 orderRepo.findById(a.getOrderId()).map(Order::getStatus).orElse(null) == OrderStatus.COMPLETED))
                 .count();
@@ -67,7 +67,7 @@ public class DeliveryAnalyticsServiceImpl implements DeliveryAnalyticsService {
 
         // Calculate average delivery time
         double averageDeliveryTime = allAssignments.stream()
-                .filter(a -> a.getStatus() == ShipperAssignmentStatus.DELIVERED || a.getStatus() == ShipperAssignmentStatus.COMPLETED)
+                .filter(a -> a.getStatus() == ShipperAssignmentStatus.COMPLETED || a.getStatus() == ShipperAssignmentStatus.COMPLETED)
                 .mapToLong(a -> {
                     if (a.getCreatedAt() != null && a.getUpdatedAt() != null) {
                         return (a.getUpdatedAt().getTime() - a.getCreatedAt().getTime()) / (60 * 1000); // Convert to minutes
@@ -100,7 +100,7 @@ public class DeliveryAnalyticsServiceImpl implements DeliveryAnalyticsService {
 
             int shipperTotalAssignments = shipperAssignments.size();
             int shipperCompletedDeliveries = (int) shipperAssignments.stream()
-                    .filter(a -> a.getStatus() == ShipperAssignmentStatus.DELIVERED ||
+                    .filter(a -> a.getStatus() == ShipperAssignmentStatus.COMPLETED ||
                             (a.getStatus() == ShipperAssignmentStatus.COMPLETED &&
                                     orderRepo.findById(a.getOrderId()).map(Order::getStatus).orElse(null) == OrderStatus.COMPLETED))
                     .count();
@@ -115,7 +115,7 @@ public class DeliveryAnalyticsServiceImpl implements DeliveryAnalyticsService {
                     (double) shipperCompletedDeliveries / shipperTotalAssignments * 100 : 0;
 
             double shipperAverageDeliveryTime = shipperAssignments.stream()
-                    .filter(a -> a.getStatus() == ShipperAssignmentStatus.DELIVERED || a.getStatus() == ShipperAssignmentStatus.COMPLETED)
+                    .filter(a -> a.getStatus() == ShipperAssignmentStatus.COMPLETED || a.getStatus() == ShipperAssignmentStatus.COMPLETED)
                     .mapToLong(a -> {
                         if (a.getCreatedAt() != null && a.getUpdatedAt() != null) {
                             return (a.getUpdatedAt().getTime() - a.getCreatedAt().getTime()) / (60 * 1000);
@@ -179,7 +179,7 @@ public class DeliveryAnalyticsServiceImpl implements DeliveryAnalyticsService {
         String shipperName = assignments.get(0).getShipperName();
         int totalAssignments = assignments.size();
         int completedDeliveries = (int) assignments.stream()
-                .filter(a -> a.getStatus() == ShipperAssignmentStatus.DELIVERED ||
+                .filter(a -> a.getStatus() == ShipperAssignmentStatus.COMPLETED ||
                         (a.getStatus() == ShipperAssignmentStatus.COMPLETED &&
                                 orderRepo.findById(a.getOrderId()).map(Order::getStatus).orElse(null) == OrderStatus.COMPLETED))
                 .count();
@@ -193,7 +193,7 @@ public class DeliveryAnalyticsServiceImpl implements DeliveryAnalyticsService {
         double successRate = totalAssignments > 0 ? (double) completedDeliveries / totalAssignments * 100 : 0;
 
         double averageDeliveryTime = assignments.stream()
-                .filter(a -> a.getStatus() == ShipperAssignmentStatus.DELIVERED || a.getStatus() == ShipperAssignmentStatus.COMPLETED)
+                .filter(a -> a.getStatus() == ShipperAssignmentStatus.COMPLETED || a.getStatus() == ShipperAssignmentStatus.COMPLETED)
                 .mapToLong(a -> {
                     if (a.getCreatedAt() != null && a.getUpdatedAt() != null) {
                         return (a.getUpdatedAt().getTime() - a.getCreatedAt().getTime()) / (60 * 1000);
@@ -242,7 +242,7 @@ public class DeliveryAnalyticsServiceImpl implements DeliveryAnalyticsService {
         // Calculate statistics (similar to getDeliveryAnalytics but filtered by date)
         int totalAssignments = allAssignments.size();
         int completedDeliveries = (int) allAssignments.stream()
-                .filter(a -> a.getStatus() == ShipperAssignmentStatus.DELIVERED ||
+                .filter(a -> a.getStatus() == ShipperAssignmentStatus.COMPLETED ||
                         (a.getStatus() == ShipperAssignmentStatus.COMPLETED &&
                                 orderRepo.findById(a.getOrderId()).map(Order::getStatus).orElse(null) == OrderStatus.COMPLETED))
                 .count();
@@ -259,7 +259,7 @@ public class DeliveryAnalyticsServiceImpl implements DeliveryAnalyticsService {
 
         // Calculate average delivery time
         double averageDeliveryTime = allAssignments.stream()
-                .filter(a -> a.getStatus() == ShipperAssignmentStatus.DELIVERED || a.getStatus() == ShipperAssignmentStatus.COMPLETED)
+                .filter(a -> a.getStatus() == ShipperAssignmentStatus.COMPLETED || a.getStatus() == ShipperAssignmentStatus.COMPLETED)
                 .mapToLong(a -> {
                     if (a.getCreatedAt() != null && a.getUpdatedAt() != null) {
                         return (a.getUpdatedAt().getTime() - a.getCreatedAt().getTime()) / (60 * 1000);
@@ -292,7 +292,7 @@ public class DeliveryAnalyticsServiceImpl implements DeliveryAnalyticsService {
 
             int shipperTotalAssignments = shipperAssignments.size();
             int shipperCompletedDeliveries = (int) shipperAssignments.stream()
-                    .filter(a -> a.getStatus() == ShipperAssignmentStatus.DELIVERED ||
+                    .filter(a -> a.getStatus() == ShipperAssignmentStatus.COMPLETED ||
                             (a.getStatus() == ShipperAssignmentStatus.COMPLETED &&
                                     orderRepo.findById(a.getOrderId()).map(Order::getStatus).orElse(null) == OrderStatus.COMPLETED))
                     .count();
@@ -307,7 +307,7 @@ public class DeliveryAnalyticsServiceImpl implements DeliveryAnalyticsService {
                     (double) shipperCompletedDeliveries / shipperTotalAssignments * 100 : 0;
 
             double shipperAverageDeliveryTime = shipperAssignments.stream()
-                    .filter(a -> a.getStatus() == ShipperAssignmentStatus.DELIVERED || a.getStatus() == ShipperAssignmentStatus.COMPLETED)
+                    .filter(a -> a.getStatus() == ShipperAssignmentStatus.COMPLETED || a.getStatus() == ShipperAssignmentStatus.COMPLETED)
                     .mapToLong(a -> {
                         if (a.getCreatedAt() != null && a.getUpdatedAt() != null) {
                             return (a.getUpdatedAt().getTime() - a.getCreatedAt().getTime()) / (60 * 1000);

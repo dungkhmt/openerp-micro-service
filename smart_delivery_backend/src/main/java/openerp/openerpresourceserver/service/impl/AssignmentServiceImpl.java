@@ -11,7 +11,10 @@ import openerp.openerpresourceserver.utils.DistanceCalculator.HaversineDistanceC
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -93,11 +96,12 @@ public class AssignmentServiceImpl implements AssignmentService {
     /**
      * Updates the status of a collector assignment and the related order if necessary.
      *
+     * @param principal
      * @param assignmentId The ID of the assignment to update
-     * @param status The new status to set
+     * @param status       The new status to set
      * @throws NotFoundException if the assignment is not found
      */
-    public void updateAssignmentStatus(UUID assignmentId, CollectorAssignmentStatus status) {
+    public void updateAssignmentStatus(Principal principal, UUID assignmentId, CollectorAssignmentStatus status) {
         AssignOrderCollector assignment = assignOrderCollectorRepository.findById(assignmentId)
                 .orElseThrow(() -> new NotFoundException("Assignment not found"));
 
@@ -162,8 +166,8 @@ public class AssignmentServiceImpl implements AssignmentService {
     @Transactional
     @Override
     public void assignOrderItemsToTrip(UUID hubId) {
-        List<OrderItem> pendingOrderItems = orderItemRepo.findAllByOriginHubIdAndStatus(hubId, OrderItemStatus.COLLECTED_HUB);
-        if (pendingOrderItems.isEmpty()) {
+        List<Order> pendingOrders = orderRepo.findAllByOriginHubIdAndStatus(hubId, OrderStatus.COLLECTED_HUB);
+        if (pendingOrders.isEmpty()) {
             log.warn("No pending order item found for this hub");
         } else {
             log.warn("There are manys {}");
@@ -171,28 +175,34 @@ public class AssignmentServiceImpl implements AssignmentService {
             if(!availableTrips.isEmpty()){
                 log.warn("not filtered trips");
             }
-            pendingOrderItems.sort(Comparator.comparing(OrderItem::getCreatedAt));
-            for (OrderItem orderItem : pendingOrderItems) {
-                List<Trip> filteredTrips = filterTripAlignedWithOrderItem(orderItem, availableTrips);
+            pendingOrders.sort(Comparator.comparing(Order::getCreatedAt));
+            for (Order order : pendingOrders) {
+                List<Trip> filteredTrips = filterTripAlignedWithOrder(order, availableTrips);
                 if (filteredTrips.isEmpty()) {
-                    log.warn("No available trips found for order {}", orderItem.getOrderItemId());
+                    log.warn("No available trips found for order {}", order.getId());
                 } else {
 
 
-                    filteredTrips.sort(Comparator.comparing(Trip::getStartTime));
+                    filteredTrips.sort(Comparator.comparing(trip -> {
+                        RouteSchedule routeSchedule = routeScheduleRepository.findById(trip.getRouteScheduleId())
+                                .orElseThrow(() -> new NotFoundException("Route schedule not found"));
+
+                        // Kết hợp với timezone cụ thể
+                        ZoneId zoneId = ZoneId.of("Asia/Ho_Chi_Minh");
+                        LocalDateTime combinedDateTime = trip.getDate().atTime(routeSchedule.getStartTime());
+                        return combinedDateTime.atZone(zoneId).toInstant();
+                    }));
                     Trip bestTrip = filteredTrips.getFirst();
-                    TripItem tripItem = TripItem.builder()
-                            .orderItemId(orderItem.getOrderItemId())
+                    TripOrder tripOrder = TripOrder.builder()
+                            .orderId(order.getId())
                             .tripId(bestTrip.getId()).build();
-                    tripItemRepository.save(tripItem);
+                    tripOrderRepository.save(tripOrder);
                 }
             }
         }
     }
 
-    public List<Trip> filterTripAlignedWithOrderItem(OrderItem orderItem, List<Trip> availableTrips) {
-        Order order = orderRepo.findById(orderItem.getOrderId())
-                .orElseThrow(() -> new NotFoundException("Order not found"));
+    public List<Trip> filterTripAlignedWithOrder(Order order, List<Trip> availableTrips) {
         UUID originHub = order.getOriginHubId();
         UUID finalHub = order.getFinalHubId();
         List<Trip> filteredTrips = new ArrayList<>();

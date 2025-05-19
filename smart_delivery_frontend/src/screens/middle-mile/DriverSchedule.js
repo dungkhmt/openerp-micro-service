@@ -26,7 +26,6 @@ import { useSelector } from 'react-redux';
 import { request } from 'api';
 import { useHistory } from 'react-router-dom';
 import { errorNoti, successNoti } from 'utils/notification';
-
 // Icons
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import DirectionsIcon from '@mui/icons-material/Directions';
@@ -37,22 +36,38 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CheckIcon from '@mui/icons-material/Check';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ScheduleIcon from '@mui/icons-material/Schedule';
+import PauseIcon from '@mui/icons-material/Pause';
+import StopIcon from '@mui/icons-material/Stop';
 
 const DriverSchedule = () => {
     const [loading, setLoading] = useState(true);
     const [trips, setTrips] = useState({
         activeTrips: [],
         scheduledTrips: [],
-        completedTrips: []
+        completedTrips: [],
+        otherTrips: [] // For trips with other statuses
     });
     const [selectedTrip, setSelectedTrip] = useState(null);
     const [tripDetails, setTripDetails] = useState(null);
     const [completionNotes, setCompletionNotes] = useState('');
     const [completeTripDialogOpen, setCompleteTripDialogOpen] = useState(false);
     const [vehicle, setVehicle] = useState(null);
-
     const username = useSelector((state) => state.auth.username);
     const history = useHistory();
+
+    // Helper function to get status color
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'PLANNED': return 'info';
+            case 'IN_PROGRESS': return 'warning';
+            case 'CONFIRMED_IN': return 'warning';
+            case 'CAME_FIRST_STOP': return 'secondary';
+            case 'READY_FOR_PICKUP': return 'primary';
+            case 'COMPLETED': return 'success';
+            case 'CANCELLED': return 'error';
+            default: return 'default';
+        }
+    };
 
     // Fetch all trips and vehicle data on component mount
     useEffect(() => {
@@ -78,9 +93,16 @@ const DriverSchedule = () => {
                     // If the backend returns a flat list of trips, categorize them here
                     const allTrips = res.data || [];
                     const categorizedTrips = {
-                        activeTrips: allTrips.filter(trip => trip.status === 'IN_PROGRESS' || trip.status === 'CONFIRMED_IN'),
+                        activeTrips: allTrips.filter(trip =>
+                            trip.status === 'IN_PROGRESS' ||
+                            trip.status === 'CONFIRMED_IN'
+                        ),
                         scheduledTrips: allTrips.filter(trip => trip.status === 'PLANNED'),
-                        completedTrips: allTrips.filter(trip => trip.status === 'COMPLETED')
+                        completedTrips: allTrips.filter(trip => trip.status === 'COMPLETED'),
+                        // Capture all other statuses that don't fit the above categories
+                        otherTrips: allTrips.filter(trip =>
+                            !['IN_PROGRESS', 'CONFIRMED_IN', 'PLANNED', 'COMPLETED'].includes(trip.status)
+                        )
                     };
                     setTrips(categorizedTrips);
                 }
@@ -90,7 +112,6 @@ const DriverSchedule = () => {
             await request('get', '/smdeli/driver/vehicle', (res) => {
                 setVehicle(res.data);
             });
-
             setLoading(false);
         } catch (error) {
             console.error("Error fetching driver data:", error);
@@ -189,7 +210,6 @@ const DriverSchedule = () => {
             errorNoti("No route schedule selected");
             return;
         }
-
         try {
             request(
                 'post',
@@ -212,6 +232,78 @@ const DriverSchedule = () => {
             errorNoti("Failed to create trip");
         }
     };
+
+    // Render trip item component
+    const renderTripItem = (trip) => (
+        <Paper
+            key={trip.id}
+            elevation={trip.id === selectedTrip ? 3 : 1}
+            sx={{
+                mb: 2,
+                borderLeft: trip.id === selectedTrip ? '4px solid #2196f3' : 'none',
+                bgcolor: trip.id === selectedTrip ? 'action.hover' : 'background.paper'
+            }}
+        >
+            <ListItem
+                button
+                onClick={() => setSelectedTrip(trip.id)}
+            >
+                <ListItemText
+                    primary={
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Typography variant="subtitle1">
+                                {trip.routeName || `Trip #${trip.id.substring(0, 8)}`}
+                                {trip.routeCode && (
+                                    <Typography component="span" variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                                        ({trip.routeCode})
+                                    </Typography>
+                                )}
+                            </Typography>
+                            <Chip
+                                label={trip.status}
+                                color={getStatusColor(trip.status)}
+                                size="small"
+                            />
+                        </Box>
+                    }
+                    secondary={
+                        <Box sx={{ mt: 1 }}>
+                            {trip.dayOfWeek && (
+                                <Typography variant="body2" color="text.secondary">
+                                    Day: {formatDayOfWeek(trip.dayOfWeek)}
+                                </Typography>
+                            )}
+                            <Typography variant="body2" color="text.secondary">
+                                Date: {trip.date}
+                            </Typography>
+                            {trip.status === 'IN_PROGRESS' || trip.status === 'CONFIRMED_IN' ? (
+                                <Typography variant="body2" color="text.secondary">
+                                    Stop {trip.currentStopIndex + 1} of {trip.totalStops}
+                                </Typography>
+                            ) : (
+                                <Typography variant="body2" color="text.secondary">
+                                    Stops: {trip.totalStops}
+                                </Typography>
+                            )}
+                            <Typography variant="body2" color="text.secondary">
+                                Orders: {trip.ordersDelivered || 0}/{trip.ordersCount || 0}
+                            </Typography>
+                            {trip.startTime && (
+                                <Typography variant="body2" color="text.secondary">
+                                    Started: {new Date(trip.startTime).toLocaleTimeString()}
+                                </Typography>
+                            )}
+                            {trip.endTime && (
+                                <Typography variant="body2" color="text.secondary">
+                                    Completed: {new Date(trip.endTime).toLocaleTimeString()}
+                                </Typography>
+                            )}
+                        </Box>
+                    }
+                />
+            </ListItem>
+        </Paper>
+    );
 
     if (loading) {
         return (
@@ -241,66 +333,15 @@ const DriverSchedule = () => {
                             }
                         />
                         <Divider />
-
                         <CardContent>
-                            {/* Active Trips */}
-                            {trips.activeTrips.length > 0 && (
+                            {/* Other Status Trips (CAME_FIRST_STOP, READY_FOR_PICKUP, etc.) - Top Priority */}
+                            {trips.otherTrips.length > 0 && (
                                 <>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, color: 'warning.main' }}>
-                                        In Progress
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, color: 'secondary.main' }}>
+                                        Other Trips ({trips.otherTrips.length})
                                     </Typography>
                                     <List>
-                                        {trips.activeTrips.map(trip => (
-                                            <Paper
-                                                key={trip.id}
-                                                elevation={trip.id === selectedTrip ? 3 : 1}
-                                                sx={{
-                                                    mb: 2,
-                                                    borderLeft: trip.id === selectedTrip ? '4px solid #2196f3' : 'none',
-                                                    bgcolor: trip.id === selectedTrip ? 'action.hover' : 'background.paper'
-                                                }}
-                                            >
-                                                <ListItem
-                                                    button
-                                                    onClick={() => setSelectedTrip(trip.id)}
-                                                >
-                                                    <ListItemText
-                                                        primary={
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                                <Typography variant="subtitle1">
-                                                                    {trip.routeName || `Trip #${trip.id.substring(0, 8)}`}
-                                                                </Typography>
-                                                                <Chip
-                                                                    label={trip.status}
-                                                                    color="warning"
-                                                                    size="small"
-                                                                />
-                                                            </Box>
-                                                        }
-                                                        secondary={
-                                                            <Box sx={{ mt: 1 }}>
-                                                                {trip.dayOfWeek && (
-                                                                    <Typography variant="body2" color="text.secondary">
-                                                                        Day: {formatDayOfWeek(trip.dayOfWeek)}
-                                                                    </Typography>
-                                                                )}
-                                                                <Typography variant="body2" color="text.secondary">
-                                                                    Stop {trip.currentStopIndex + 1} of {trip.totalStops}
-                                                                </Typography>
-                                                                <Typography variant="body2" color="text.secondary">
-                                                                    Orders: {trip.ordersDelivered}/{trip.ordersCount}
-                                                                </Typography>
-                                                                {trip.startTime && (
-                                                                    <Typography variant="body2" color="text.secondary">
-                                                                        Started: {new Date(trip.startTime).toLocaleTimeString()}
-                                                                    </Typography>
-                                                                )}
-                                                            </Box>
-                                                        }
-                                                    />
-                                                </ListItem>
-                                            </Paper>
-                                        ))}
+                                        {trips.otherTrips.map(renderTripItem)}
                                     </List>
                                 </>
                             )}
@@ -308,56 +349,23 @@ const DriverSchedule = () => {
                             {/* Scheduled Trips */}
                             {trips.scheduledTrips.length > 0 && (
                                 <>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: 2, color: 'info.main' }}>
-                                        Scheduled
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: trips.otherTrips.length > 0 ? 2 : 0, color: 'info.main' }}>
+                                        Scheduled ({trips.scheduledTrips.length})
                                     </Typography>
                                     <List>
-                                        {trips.scheduledTrips.map(trip => (
-                                            <Paper
-                                                key={trip.id}
-                                                elevation={trip.id === selectedTrip ? 3 : 1}
-                                                sx={{
-                                                    mb: 2,
-                                                    borderLeft: trip.id === selectedTrip ? '4px solid #2196f3' : 'none',
-                                                    bgcolor: trip.id === selectedTrip ? 'action.hover' : 'background.paper'
-                                                }}
-                                            >
-                                                <ListItem
-                                                    button
-                                                    onClick={() => setSelectedTrip(trip.id)}
-                                                >
-                                                    <ListItemText
-                                                        primary={
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                                <Typography variant="subtitle1">
-                                                                    {trip.routeName} - Code: {trip.routeCode}
-                                                                </Typography>
-                                                                <Chip
-                                                                    label={trip.status}
-                                                                    color="info"
-                                                                    size="small"
-                                                                />
-                                                            </Box>
-                                                        }
-                                                        secondary={
-                                                            <Box sx={{ mt: 1 }}>
-                                                                {trip.dayOfWeek && (
-                                                                    <Typography variant="body2" color="text.secondary">
-                                                                        Day: {formatDayOfWeek(trip.dayOfWeek)}
-                                                                    </Typography>
-                                                                )}
-                                                                <Typography variant="body2" color="text.secondary">
-                                                                    Stops: {trip.totalStops}
-                                                                </Typography>
-                                                                <Typography variant="body2" color="text.secondary">
-                                                                    Orders: {trip.ordersCount}
-                                                                </Typography>
-                                                            </Box>
-                                                        }
-                                                    />
-                                                </ListItem>
-                                            </Paper>
-                                        ))}
+                                        {trips.scheduledTrips.map(renderTripItem)}
+                                    </List>
+                                </>
+                            )}
+
+                            {/* Active Trips */}
+                            {trips.activeTrips.length > 0 && (
+                                <>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: (trips.otherTrips.length > 0 || trips.scheduledTrips.length > 0) ? 2 : 0, color: 'warning.main' }}>
+                                        In Progress ({trips.activeTrips.length})
+                                    </Typography>
+                                    <List>
+                                        {trips.activeTrips.map(renderTripItem)}
                                     </List>
                                 </>
                             )}
@@ -365,81 +373,36 @@ const DriverSchedule = () => {
                             {/* Completed Trips */}
                             {trips.completedTrips.length > 0 && (
                                 <>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: 2, color: 'success.main' }}>
-                                        Completed Today
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: (trips.otherTrips.length > 0 || trips.scheduledTrips.length > 0 || trips.activeTrips.length > 0) ? 2 : 0, color: 'success.main' }}>
+                                        Completed Today ({trips.completedTrips.length})
                                     </Typography>
                                     <List>
-                                        {trips.completedTrips.map(trip => (
-                                            <Paper
-                                                key={trip.id}
-                                                elevation={trip.id === selectedTrip ? 3 : 1}
-                                                sx={{
-                                                    mb: 2,
-                                                    borderLeft: trip.id === selectedTrip ? '4px solid #2196f3' : 'none',
-                                                    bgcolor: trip.id === selectedTrip ? 'action.hover' : 'background.paper'
-                                                }}
-                                            >
-                                                <ListItem
-                                                    button
-                                                    onClick={() => setSelectedTrip(trip.id)}
-                                                >
-                                                    <ListItemText
-                                                        primary={
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                                <Typography variant="subtitle1">
-                                                                    {trip.routeName || `Trip #${trip.id.substring(0, 8)}`}
-                                                                </Typography>
-                                                                <Chip
-                                                                    label={trip.status}
-                                                                    color="success"
-                                                                    size="small"
-                                                                />
-                                                            </Box>
-                                                        }
-                                                        secondary={
-                                                            <Box sx={{ mt: 1 }}>
-                                                                {trip.dayOfWeek && (
-                                                                    <Typography variant="body2" color="text.secondary">
-                                                                        Day: {formatDayOfWeek(trip.dayOfWeek)}
-                                                                    </Typography>
-                                                                )}
-                                                                <Typography variant="body2" color="text.secondary">
-                                                                    Completed at: {new Date(trip.endTime).toLocaleTimeString()}
-                                                                </Typography>
-                                                                <Typography variant="body2" color="text.secondary">
-                                                                    Orders: {trip.ordersDelivered}/{trip.ordersCount}
-                                                                </Typography>
-                                                            </Box>
-                                                        }
-                                                    />
-                                                </ListItem>
-                                            </Paper>
-                                        ))}
+                                        {trips.completedTrips.map(renderTripItem)}
                                     </List>
                                 </>
                             )}
 
-                            {trips.activeTrips.length === 0 && trips.scheduledTrips.length === 0 && trips.completedTrips.length === 0 && (
-                                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 4 }}>
-                                    <ScheduleIcon sx={{ fontSize: 60, color: 'text.disabled', mb: 2 }} />
-                                    <Typography variant="h6" color="text.secondary">No trips scheduled for today</Typography>
-                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                                        Check with your manager for your daily schedule
-                                    </Typography>
-
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        onClick={() => history.push('/driver/create-trip')}
-                                        sx={{ mt: 3 }}
-                                    >
-                                        Create New Trip
-                                    </Button>
-                                </Box>
-                            )}
+                            {/* No trips message */}
+                            {trips.activeTrips.length === 0 && trips.scheduledTrips.length === 0 &&
+                                trips.completedTrips.length === 0 && trips.otherTrips.length === 0 && (
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 4 }}>
+                                        <ScheduleIcon sx={{ fontSize: 60, color: 'text.disabled', mb: 2 }} />
+                                        <Typography variant="h6" color="text.secondary">No trips scheduled for today</Typography>
+                                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                            Check with your manager for your daily schedule
+                                        </Typography>
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={() => history.push('/driver/create-trip')}
+                                            sx={{ mt: 3 }}
+                                        >
+                                            Create New Trip
+                                        </Button>
+                                    </Box>
+                                )}
                         </CardContent>
                     </Card>
-
                 </Grid>
 
                 {/* Trip Details Section */}
@@ -457,10 +420,9 @@ const DriverSchedule = () => {
                                                 <ArrowBackIcon />
                                             </IconButton>
                                             <Typography variant="h6">
-                                                Trip Stops
+                                                Trip Details
                                             </Typography>
                                         </Box>
-
                                         {/* Action buttons based on trip status */}
                                         {tripDetails && (
                                             <Box>
@@ -474,16 +436,15 @@ const DriverSchedule = () => {
                                                         Start Trip
                                                     </Button>
                                                 )}
-                                                {tripDetails.status !== 'PLANNED' && (
-                                                        <Button
-                                                            variant="contained"
-                                                            color="success"
-                                                            startIcon={<CheckIcon />}
-                                                            onClick={() =>history.push(`/middle-mile/driver/route/${tripDetails.routeScheduleId}?tripId=${tripDetails.id}`)
-                                                            }
-                                                        >
-                                                            Details
-                                                        </Button>
+                                                {tripDetails.status !== 'PLANNED' && tripDetails.status !== 'COMPLETED' && (
+                                                    <Button
+                                                        variant="contained"
+                                                        color="success"
+                                                        startIcon={<CheckIcon />}
+                                                        onClick={() => history.push(`/middle-mile/driver/route/${tripDetails.routeScheduleId}?tripId=${tripDetails.id}`)}
+                                                    >
+                                                        Details
+                                                    </Button>
                                                 )}
                                             </Box>
                                         )}
@@ -491,7 +452,6 @@ const DriverSchedule = () => {
                                 }
                             />
                             <Divider />
-
                             {!tripDetails ? (
                                 <CardContent>
                                     <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
@@ -501,12 +461,38 @@ const DriverSchedule = () => {
                             ) : (
                                 <CardContent>
                                     <Grid container spacing={3}>
+                                        {/* Trip Summary */}
+                                        <Grid item xs={12}>
+                                            <Typography variant="h6" gutterBottom>
+                                                Trip Summary
+                                            </Typography>
+                                            <Box sx={{ mb: 2 }}>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    <strong>Route:</strong> {tripDetails.routeName}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    <strong>Route Code:</strong> {tripDetails.routeCode}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    <strong>Date:</strong> {tripDetails.date}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    <strong>Status:</strong>
+                                                    <Chip
+                                                        label={tripDetails.status}
+                                                        color={getStatusColor(tripDetails.status)}
+                                                        size="small"
+                                                        sx={{ ml: 1 }}
+                                                    />
+                                                </Typography>
+                                            </Box>
+                                        </Grid>
 
                                         {/* Stops */}
-                                        <Grid item xs={12} md={12}>
+                                        <Grid item xs={12}>
                                             <Typography variant="h6" gutterBottom>
                                                 <DirectionsIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                                                Stops
+                                                Stops ({tripDetails.currentStopIndex + 1}/{tripDetails.totalStops})
                                             </Typography>
                                             <List sx={{ bgcolor: 'background.paper', borderRadius: 1 }}>
                                                 {tripDetails.stops && tripDetails.stops.map((stop, index) => (
@@ -557,51 +543,6 @@ const DriverSchedule = () => {
                                                 ))}
                                             </List>
                                         </Grid>
-
-                                        {/* Orders */}
-                                        {/*<Grid item xs={12} md={6}>*/}
-                                        {/*    <Typography variant="h6" gutterBottom>*/}
-                                        {/*        <InventoryIcon sx={{ mr: 1, verticalAlign: 'middle' }} />*/}
-                                        {/*        Orders*/}
-                                        {/*    </Typography>*/}
-                                        {/*    <Box sx={{ maxHeight: '60vh', overflow: 'auto' }}>*/}
-                                        {/*        {tripDetails.orders && tripDetails.orders.length > 0 ? (*/}
-                                        {/*            <List sx={{ bgcolor: 'background.paper', borderRadius: 1 }}>*/}
-                                        {/*                {tripDetails.orders.map((order) => (*/}
-                                        {/*                    <Paper key={order.id} sx={{ mb: 1 }}>*/}
-                                        {/*                        <ListItem>*/}
-                                        {/*                            <ListItemText*/}
-                                        {/*                                primary={*/}
-                                        {/*                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>*/}
-                                        {/*                                        <Typography variant="subtitle2">*/}
-                                        {/*                                            #{order.id.substring(0, 8)}...*/}
-                                        {/*                                        </Typography>*/}
-                                        {/*                                        <Chip label={order.status} size="small" />*/}
-                                        {/*                                    </Box>*/}
-                                        {/*                                }*/}
-                                        {/*                                secondary={*/}
-                                        {/*                                    <>*/}
-                                        {/*                                        <Typography variant="body2" color="text.secondary">*/}
-                                        {/*                                            From: {order.senderName}*/}
-                                        {/*                                        </Typography>*/}
-                                        {/*                                        <Typography variant="body2" color="text.secondary">*/}
-                                        {/*                                            To: {order.recipientName}*/}
-                                        {/*                                        </Typography>*/}
-                                        {/*                                        <Typography variant="body2" color="text.secondary">*/}
-                                        {/*                                            Created: {new Date(order.createdAt).toLocaleDateString()}*/}
-                                        {/*                                        </Typography>*/}
-                                        {/*                                    </>*/}
-                                        {/*                                }*/}
-                                        {/*                            />*/}
-                                        {/*                        </ListItem>*/}
-                                        {/*                    </Paper>*/}
-                                        {/*                ))}*/}
-                                        {/*            </List>*/}
-                                        {/*        ) : (*/}
-                                        {/*            <Alert severity="info">No orders associated with this trip</Alert>*/}
-                                        {/*        )}*/}
-                                        {/*    </Box>*/}
-                                        {/*</Grid>*/}
                                     </Grid>
                                 </CardContent>
                             )}

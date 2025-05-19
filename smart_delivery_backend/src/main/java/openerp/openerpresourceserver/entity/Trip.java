@@ -2,12 +2,14 @@ package openerp.openerpresourceserver.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import openerp.openerpresourceserver.entity.enumentity.TripStatus;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.sql.Date;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 /**
@@ -25,12 +27,14 @@ public class Trip {
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
+    @Column(name = "trip_code", unique = true)
+    private String tripCode;
 
     /**
      * Reference to the route this trip is on
      * Note: This now references the Route directly, not RouteVehicle
      */
-    @Column(name = "route_schelude_id", nullable = false)
+    @Column(name = "route_schedule_id", nullable = false)
     private UUID routeScheduleId;
     private UUID vehicleId;
     /**
@@ -54,8 +58,9 @@ public class Trip {
      * Current status of the trip
      * Possible values: "PLANNED", "IN_PROGRESS", "CONFIRMED_IN","COMPLETED", "CANCELLED"
      */
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private String status;
+    private TripStatus status;
 
     /**
      * Current position in the route stop sequence
@@ -107,14 +112,33 @@ public class Trip {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
     private String changedBy;
+
+    @Version
+    private Integer version;
     @PrePersist
     protected void onCreate() {
         createdAt = Instant.now();
         updatedAt = Instant.now();
-    }
-    @Version
-    private Integer version;
 
+        if (tripCode == null || tripCode.isEmpty()) {
+            tripCode = generateTripCode();
+        }
+    }
+
+    private String generateTripCode() {
+        // Format: TR-YYMMDD-ABC
+        String dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd"));
+
+        // Tạo chuỗi ngẫu nhiên gồm 3 ký tự dễ đọc (chữ in hoa + số)
+        String chars = "ABCDEFGHJKLMNPQRSTUVWXYZ123456789";
+        StringBuilder randPart = new StringBuilder();
+        for (int i = 0; i < 3; i++) {
+            int index = (int) (Math.random() * chars.length());
+            randPart.append(chars.charAt(index));
+        }
+
+        return String.format("TR-%s-%s", dateStr, randPart.toString());
+    }
     @PreUpdate
     protected void onUpdate() {
         updatedAt = Instant.now();

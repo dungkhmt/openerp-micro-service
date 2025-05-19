@@ -8,6 +8,7 @@ import openerp.openerpresourceserver.entity.OrderItem;
 import openerp.openerpresourceserver.entity.Trip;
 import openerp.openerpresourceserver.entity.TripItem;
 import openerp.openerpresourceserver.entity.enumentity.OrderItemStatus;
+import openerp.openerpresourceserver.entity.enumentity.TripStatus;
 import openerp.openerpresourceserver.repository.OrderItemRepo;
 import openerp.openerpresourceserver.repository.TripItemRepository;
 import openerp.openerpresourceserver.repository.TripRepository;
@@ -88,7 +89,7 @@ public class TripItemServiceImpl implements TripItemService {
             }
             Trip trip = tripRepository.findById(tripItems.getFirst().getTripId())
                     .orElseThrow(() -> new NotFoundException("Trip not found with ID: " + tripItems.get(0).getTripId()));
-            trip.setStatus("CONFIRMED_IN");
+            trip.setStatus(TripStatus.CONFIRMED_IN);
             // Validate that all trip items exist
             if (tripItems.size() != tripItemIds.size()) {
                 log.error("Some trip items were not found");

@@ -72,33 +72,33 @@ public class TripAssignmentController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(createdTrips);
     }
-    /**
-     * Manually trigger morning trip assignments for a hub
-     */
-    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'SCHEDULER')")
-    @PostMapping("/hubs/{hubId}/morning-assignments")
-    public ResponseEntity<Map<String, Object>> runMorningAssignments(@PathVariable UUID hubId) {
-        int assigned = tripAssignmentService.assignMorningTrips(hubId);
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "assignedOrders", assigned,
-                "message", "Successfully assigned " + assigned + " orders to morning trips"
-        ));
-    }
-
-    /**
-     * Manually trigger evening trip assignments for a hub
-     */
-    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'SCHEDULER')")
-    @PostMapping("/hubs/{hubId}/evening-assignments")
-    public ResponseEntity<Map<String, Object>> runEveningAssignments(@PathVariable UUID hubId) {
-        int assigned = tripAssignmentService.assignEveningTrips(hubId);
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "assignedOrders", assigned,
-                "message", "Successfully assigned " + assigned + " orders to evening trips"
-        ));
-    }
+//    /**
+//     * Manually trigger morning trip assignments for a hub
+//     */
+//    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'SCHEDULER')")
+//    @PostMapping("/hubs/{hubId}/morning-assignments")
+//    public ResponseEntity<Map<String, Object>> runMorningAssignments(@PathVariable UUID hubId) {
+//        int assigned = tripAssignmentService.assignMorningTrips(hubId);
+//        return ResponseEntity.ok(Map.of(
+//                "success", true,
+//                "assignedOrders", assigned,
+//                "message", "Successfully assigned " + assigned + " orders to morning trips"
+//        ));
+//    }
+//
+//    /**
+//     * Manually trigger evening trip assignments for a hub
+//     */
+//    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'SCHEDULER')")
+//    @PostMapping("/hubs/{hubId}/evening-assignments")
+//    public ResponseEntity<Map<String, Object>> runEveningAssignments(@PathVariable UUID hubId) {
+//        int assigned = tripAssignmentService.assignEveningTrips(hubId);
+//        return ResponseEntity.ok(Map.of(
+//                "success", true,
+//                "assignedOrders", assigned,
+//                "message", "Successfully assigned " + assigned + " orders to evening trips"
+//        ));
+//    }
 
     /**
      * Manually assign specific orders to a trip

@@ -116,13 +116,13 @@ public class DriverController {
      */
     @PreAuthorize("hasRole('DRIVER')")
     @GetMapping("/trip/{tripId}/pending-pickups")
-    public ResponseEntity<List<OrderItemForTripDto>> getPendingPickupOrders(
+    public ResponseEntity<List<OrderForTripDto>> getPendingPickupOrders(
             Principal principal,
             @PathVariable UUID tripId) {
         String username = principal.getName();
         System.out.println("DriverController.getAssignedVehicle: " + principal);
 
-        List<OrderItemForTripDto> orders = driverService.getPendingPickupOrderItemsForDriver(username, tripId);
+        List<OrderForTripDto> orders = driverService.getPendingPickupOrdersForDriver(username, tripId);
         return ResponseEntity.ok(orders);
     }
 
@@ -143,9 +143,9 @@ public class DriverController {
      */
     @PreAuthorize("hasRole('DRIVER')")
     @PutMapping("/deliver-orders")
-    public ResponseEntity<Void> deliverOrderItems(@RequestBody List<UUID> orderItemIds, Principal principal) {
+    public ResponseEntity<Void> deliverOrders(@RequestBody List<UUID> orderIds, Principal principal) {
         String username = principal.getName();
-        driverService.deliverOrderItems(username, orderItemIds);
+        driverService.deliverOrders(username, orderIds);
         return ResponseEntity.ok().build();
     }
 
@@ -169,9 +169,9 @@ public class DriverController {
      */
     @PreAuthorize("hasRole('DRIVER')")
     @GetMapping("/current-orders/{tripId}")
-    public ResponseEntity<List<OrderItemForTripDto>> getCurrentOrders(Principal principal,@PathVariable UUID tripId) {
+    public ResponseEntity<List<OrderForTripDto>> getCurrentOrders(Principal principal,@PathVariable UUID tripId) {
         String username = principal.getName();
-        List<OrderItemForTripDto> orders = driverService.getCurrentOrderItemsForDriver(username, tripId);
+        List<OrderForTripDto> orders = driverService.getCurrentOrderItemsForDriver(username, tripId);
         return ResponseEntity.ok(orders);
     }
 

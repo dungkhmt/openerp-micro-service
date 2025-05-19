@@ -1,4 +1,3 @@
-
 package openerp.openerpresourceserver.service.impl;
 
 import jakarta.ws.rs.NotFoundException;
@@ -14,8 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,21 +30,10 @@ public class EmployeeStatisticsServiceImpl implements EmployeeStatisticsService 
 
     @Override
     public EmployeeStatisticsDto getCollectorStatistics(UUID collectorId) {
-        // Check if collector exists
-        Collector collector = collectorRepo.findById(collectorId)
-                .orElseThrow(() -> new NotFoundException("Collector not found with ID: " + collectorId));
-
-        // Get all assignments for this collector
-        List<AssignOrderCollector> allAssignments = assignOrderCollectorRepository.findAll().stream()
-                .filter(assignment -> assignment.getCollectorId().equals(collectorId))
-                .collect(Collectors.toList());
-
-        if (allAssignments.isEmpty()) {
-            // Return empty statistics if no assignments found
-            return createEmptyCollectorStatistics(collector);
-        }
-
-        return calculateCollectorStatistics(collector, allAssignments);
+        // For default statistics, use the last 30 days
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(30);
+        return getCollectorStatisticsByDateRange(collectorId, startDate, endDate);
     }
 
     @Override
@@ -59,7 +46,7 @@ public class EmployeeStatisticsServiceImpl implements EmployeeStatisticsService 
         Timestamp startTimestamp = Timestamp.valueOf(startDate.atStartOfDay());
         Timestamp endTimestamp = Timestamp.valueOf(endDate.plusDays(1).atStartOfDay());
 
-        // Get assignments in date range
+        // Get assignments in date range - using repository method would be more efficient
         List<AssignOrderCollector> assignments = assignOrderCollectorRepository.findAll().stream()
                 .filter(assignment -> assignment.getCollectorId().equals(collectorId) &&
                         assignment.getCreatedAt() != null &&
@@ -88,19 +75,10 @@ public class EmployeeStatisticsServiceImpl implements EmployeeStatisticsService 
 
     @Override
     public EmployeeStatisticsDto getShipperStatistics(UUID shipperId) {
-        // Check if shipper exists
-        Shipper shipper = shipperRepo.findById(shipperId)
-                .orElseThrow(() -> new NotFoundException("Shipper not found with ID: " + shipperId));
-
-        // Get all assignments for this shipper
-        List<AssignOrderShipper> allAssignments = assignOrderShipperRepository.findByShipperId(shipperId);
-
-        if (allAssignments.isEmpty()) {
-            // Return empty statistics if no assignments found
-            return createEmptyShipperStatistics(shipper);
-        }
-
-        return calculateShipperStatistics(shipper, allAssignments);
+        // For default statistics, use the last 30 days
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(30);
+        return getShipperStatisticsByDateRange(shipperId, startDate, endDate);
     }
 
     @Override
@@ -151,9 +129,6 @@ public class EmployeeStatisticsServiceImpl implements EmployeeStatisticsService 
                 .successRate(0.0)
                 .averageCompletionTime(0.0)
                 .assignmentStatusCounts(new HashMap<>())
-                .dailyStats(new EmployeeStatisticsDto.PeriodStatistics(0, 0, 0.0, 0.0))
-                .weeklyStats(new EmployeeStatisticsDto.PeriodStatistics(0, 0, 0.0, 0.0))
-                .monthlyStats(new EmployeeStatisticsDto.PeriodStatistics(0, 0, 0.0, 0.0))
                 .build();
     }
 
@@ -169,9 +144,6 @@ public class EmployeeStatisticsServiceImpl implements EmployeeStatisticsService 
                 .successRate(0.0)
                 .averageCompletionTime(0.0)
                 .assignmentStatusCounts(new HashMap<>())
-                .dailyStats(new EmployeeStatisticsDto.PeriodStatistics(0, 0, 0.0, 0.0))
-                .weeklyStats(new EmployeeStatisticsDto.PeriodStatistics(0, 0, 0.0, 0.0))
-                .monthlyStats(new EmployeeStatisticsDto.PeriodStatistics(0, 0, 0.0, 0.0))
                 .build();
     }
 
@@ -185,7 +157,7 @@ public class EmployeeStatisticsServiceImpl implements EmployeeStatisticsService 
 
         int failedAssignments = (int) assignments.stream()
                 .filter(a -> a.getStatus() == CollectorAssignmentStatus.FAILED ||
-                        a.getStatus() == CollectorAssignmentStatus.CANCELED)
+                        a.getStatus() == CollectorAssignmentStatus.CANCELED || a.getStatus() == CollectorAssignmentStatus.FAILED_ONCE)
                 .count();
 
         int pendingAssignments = totalAssignments - completedAssignments - failedAssignments;
@@ -209,43 +181,6 @@ public class EmployeeStatisticsServiceImpl implements EmployeeStatisticsService 
             statusCounts.put(status.name(), count);
         }
 
-        // Calculate daily statistics
-        LocalDate today = LocalDate.now();
-        Timestamp startOfDay = Timestamp.valueOf(today.atStartOfDay());
-        Timestamp endOfDay = Timestamp.valueOf(today.plusDays(1).atStartOfDay());
-
-        List<AssignOrderCollector> todayAssignments = assignments.stream()
-                .filter(a -> a.getCreatedAt() != null &&
-                        a.getCreatedAt().after(startOfDay) &&
-                        a.getCreatedAt().before(endOfDay))
-                .collect(Collectors.toList());
-
-        EmployeeStatisticsDto.PeriodStatistics dailyStats = calculatePeriodStats(todayAssignments);
-
-        // Calculate weekly statistics
-        LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
-        Timestamp startOfWeekTimestamp = Timestamp.valueOf(startOfWeek.atStartOfDay());
-
-        List<AssignOrderCollector> weeklyAssignments = assignments.stream()
-                .filter(a -> a.getCreatedAt() != null &&
-                        a.getCreatedAt().after(startOfWeekTimestamp) &&
-                        a.getCreatedAt().before(endOfDay))
-                .collect(Collectors.toList());
-
-        EmployeeStatisticsDto.PeriodStatistics weeklyStats = calculatePeriodStats(weeklyAssignments);
-
-        // Calculate monthly statistics
-        LocalDate startOfMonth = today.withDayOfMonth(1);
-        Timestamp startOfMonthTimestamp = Timestamp.valueOf(startOfMonth.atStartOfDay());
-
-        List<AssignOrderCollector> monthlyAssignments = assignments.stream()
-                .filter(a -> a.getCreatedAt() != null &&
-                        a.getCreatedAt().after(startOfMonthTimestamp) &&
-                        a.getCreatedAt().before(endOfDay))
-                .collect(Collectors.toList());
-
-        EmployeeStatisticsDto.PeriodStatistics monthlyStats = calculatePeriodStats(monthlyAssignments);
-
         // Build and return the statistics DTO
         return EmployeeStatisticsDto.builder()
                 .employeeId(collector.getId())
@@ -258,28 +193,7 @@ public class EmployeeStatisticsServiceImpl implements EmployeeStatisticsService 
                 .successRate(successRate)
                 .averageCompletionTime(averageCompletionTime)
                 .assignmentStatusCounts(statusCounts)
-                .dailyStats(dailyStats)
-                .weeklyStats(weeklyStats)
-                .monthlyStats(monthlyStats)
                 .build();
-    }
-
-    private EmployeeStatisticsDto.PeriodStatistics calculatePeriodStats(List<AssignOrderCollector> assignments) {
-        int total = assignments.size();
-
-        int completed = (int) assignments.stream()
-                .filter(a -> a.getStatus() == CollectorAssignmentStatus.COMPLETED)
-                .count();
-
-        double successRate = total > 0 ? (double) completed / total * 100 : 0;
-
-        double avgTime = assignments.stream()
-                .filter(a -> a.getCreatedAt() != null && a.getUpdatedAt() != null)
-                .mapToLong(a -> (a.getUpdatedAt().getTime() - a.getCreatedAt().getTime()) / (60 * 1000))
-                .average()
-                .orElse(0.0);
-
-        return new EmployeeStatisticsDto.PeriodStatistics(total, completed, successRate, avgTime);
     }
 
     private EmployeeStatisticsDto calculateShipperStatistics(Shipper shipper, List<AssignOrderShipper> assignments) {
@@ -287,7 +201,7 @@ public class EmployeeStatisticsServiceImpl implements EmployeeStatisticsService 
         int totalAssignments = assignments.size();
 
         int completedAssignments = (int) assignments.stream()
-                .filter(a -> a.getStatus() == ShipperAssignmentStatus.DELIVERED ||
+                .filter(a -> a.getStatus() == ShipperAssignmentStatus.COMPLETED ||
                         a.getStatus() == ShipperAssignmentStatus.COMPLETED)
                 .count();
 
@@ -318,43 +232,6 @@ public class EmployeeStatisticsServiceImpl implements EmployeeStatisticsService 
             statusCounts.put(status.name(), count);
         }
 
-        // Calculate daily statistics
-        LocalDate today = LocalDate.now();
-        Timestamp startOfDay = Timestamp.valueOf(today.atStartOfDay());
-        Timestamp endOfDay = Timestamp.valueOf(today.plusDays(1).atStartOfDay());
-
-        List<AssignOrderShipper> todayAssignments = assignments.stream()
-                .filter(a -> a.getCreatedAt() != null &&
-                        a.getCreatedAt().after(startOfDay) &&
-                        a.getCreatedAt().before(endOfDay))
-                .collect(Collectors.toList());
-
-        EmployeeStatisticsDto.PeriodStatistics dailyStats = calculateShipperPeriodStats(todayAssignments);
-
-        // Calculate weekly statistics
-        LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
-        Timestamp startOfWeekTimestamp = Timestamp.valueOf(startOfWeek.atStartOfDay());
-
-        List<AssignOrderShipper> weeklyAssignments = assignments.stream()
-                .filter(a -> a.getCreatedAt() != null &&
-                        a.getCreatedAt().after(startOfWeekTimestamp) &&
-                        a.getCreatedAt().before(endOfDay))
-                .collect(Collectors.toList());
-
-        EmployeeStatisticsDto.PeriodStatistics weeklyStats = calculateShipperPeriodStats(weeklyAssignments);
-
-        // Calculate monthly statistics
-        LocalDate startOfMonth = today.withDayOfMonth(1);
-        Timestamp startOfMonthTimestamp = Timestamp.valueOf(startOfMonth.atStartOfDay());
-
-        List<AssignOrderShipper> monthlyAssignments = assignments.stream()
-                .filter(a -> a.getCreatedAt() != null &&
-                        a.getCreatedAt().after(startOfMonthTimestamp) &&
-                        a.getCreatedAt().before(endOfDay))
-                .collect(Collectors.toList());
-
-        EmployeeStatisticsDto.PeriodStatistics monthlyStats = calculateShipperPeriodStats(monthlyAssignments);
-
         // Build and return the statistics DTO
         return EmployeeStatisticsDto.builder()
                 .employeeId(shipper.getId())
@@ -367,28 +244,6 @@ public class EmployeeStatisticsServiceImpl implements EmployeeStatisticsService 
                 .successRate(successRate)
                 .averageCompletionTime(averageCompletionTime)
                 .assignmentStatusCounts(statusCounts)
-                .dailyStats(dailyStats)
-                .weeklyStats(weeklyStats)
-                .monthlyStats(monthlyStats)
                 .build();
-    }
-
-    private EmployeeStatisticsDto.PeriodStatistics calculateShipperPeriodStats(List<AssignOrderShipper> assignments) {
-        int total = assignments.size();
-
-        int completed = (int) assignments.stream()
-                .filter(a -> a.getStatus() == ShipperAssignmentStatus.DELIVERED ||
-                        a.getStatus() == ShipperAssignmentStatus.COMPLETED)
-                .count();
-
-        double successRate = total > 0 ? (double) completed / total * 100 : 0;
-
-        double avgTime = assignments.stream()
-                .filter(a -> a.getCreatedAt() != null && a.getUpdatedAt() != null)
-                .mapToLong(a -> (a.getUpdatedAt().getTime() - a.getCreatedAt().getTime()) / (60 * 1000))
-                .average()
-                .orElse(0.0);
-
-        return new EmployeeStatisticsDto.PeriodStatistics(total, completed, successRate, avgTime);
     }
 }

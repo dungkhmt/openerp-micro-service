@@ -59,4 +59,38 @@ public interface OrderService {
 
 
     List<OrderSummaryDTO> getOrderByUsername(String username);
+    /**
+     * Get orders collected by collectors and brought to hub (for InOrder tab 1)
+     */
+    List<OrderSummaryDTO> getCollectedCollectorOrders(UUID hubId);
+
+    /**
+     * Get orders delivered to hub by drivers from other hubs (for InOrder tab 2)
+     */
+    List<TripOrderSummaryDto> getDeliveredDriverOrders(UUID hubId);
+
+    /**
+     * Get orders with failed delivery attempts (for InOrder tab 3)
+     */
+    List<OrderSummaryDTO> getFailedDeliveryOrders(UUID hubId);
+
+    /**
+     * Confirm orders into hub from various sources
+     */
+    boolean confirmOrdersIntoHub(Principal principal, UUID[] orderIds);
+
+    /**
+     * Confirm single shipper pickup (for OutOrder shipper tab)
+     */
+    boolean confirmShipperPickup(Principal principal, UUID shipperId);
+
+    /**
+     * Confirm multiple shipper pickups (for OutOrder shipper tab)
+     */
+    boolean confirmMultipleShipperPickups(Principal principal, UUID[] shipperIds);
+
+    /**
+     * Get shipper pickup requests - shippers with assigned orders waiting for pickup
+     */
+    List<TodayAssignmentShipperDto> getShipperPickupRequests(UUID hubId);
 }

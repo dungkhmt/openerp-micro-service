@@ -1,17 +1,16 @@
 package openerp.openerpresourceserver.service;
 
 import jakarta.transaction.Transactional;
-import openerp.openerpresourceserver.dto.AssignOrderCollectorDTO;
 import openerp.openerpresourceserver.entity.Order;
 import openerp.openerpresourceserver.entity.enumentity.CollectorAssignmentStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.util.List;
+import java.security.Principal;
 import java.util.UUID;
 
 public interface AssignmentService {
     void assignOrderToHub(Order order);
-    void updateAssignmentStatus(UUID assignmentId, CollectorAssignmentStatus status);
+    void updateAssignmentStatus(Principal principal, UUID assignmentId, CollectorAssignmentStatus status);
 
     @Transactional
     void decreaseVehicleLoad(UUID vehicleId, UUID orderId);

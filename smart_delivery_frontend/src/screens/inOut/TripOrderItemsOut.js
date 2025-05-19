@@ -24,7 +24,7 @@ const TripOrderItemsOut = () => {
     const fetchTripDetails = () => {
         request(
             "get",
-            `smdeli/trip-assignments/trips/${tripId}`,
+            `smdeli/trip-assignments/trips/${tripId}/orders`,
             (res) => {
                 setTripDetails(res.data);
             },

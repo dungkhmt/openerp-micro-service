@@ -13,15 +13,26 @@ public enum OrderStatus {
     PENDING("Đang xử lý", Collections.emptySet()),
     PROCESSING("Đang xử lý", Collections.emptySet()),
     ASSIGNED("Đã phân công cho nhân viên thu gom", Set.of(Role.ADMIN, Role.HUB_MANAGER, Role.COLLECTOR)),
+    CANCELLED_COLLECT("Đã hủy", Set.of(Role.ADMIN, Role.HUB_STAFF)),
     COLLECTED_COLLECTOR("Nhân viên thu gom đã lấy hàng", Set.of(Role.COLLECTOR)),
     COLLECTED_HUB("Đơn hàng đã về Hub nguồn", Set.of(Role.HUB_STAFF)),
+    CONFIRMED_OUT("Đã xác nhận ra ngoài", Set.of(Role.HUB_STAFF)),
     DELIVERING("Đang vận chuyển", Set.of(Role.ADMIN, Role.HUB_STAFF)),
+    DELIVERED_FAILED("Giao hàng không thành công",Set.of(Role.DRIVER, Role.HUB_STAFF)),
+    RETURNED_HUB_AFTER_DELIVERED("Đã trả hàng về Hub", Set.of(Role.ADMIN, Role.HUB_STAFF)),
     DELIVERED("Đã vận chuyển đến Hub đích", Set.of(Role.ADMIN, Role.HUB_STAFF)),
+    CONFIRMED_IN_FINAL_HUB("Đã xác nhận vào Hub đích", Set.of(Role.ADMIN, Role.HUB_STAFF)),
     ASSIGNED_SHIPPER("Đã phân công cho shipper", Set.of(Role.ADMIN, Role.HUB_MANAGER)),
+    CONFIRM_OUT_FOR_PICKUP("Đã xác nhận ra ngoài", Set.of(Role.ADMIN, Role.HUB_STAFF)),
+    SHIPPING("Đang giao hàng", Set.of(Role.ADMIN, Role.SHIPPER)),
     SHIPPED("Đã giao hàng", Set.of(Role.ADMIN, Role.SHIPPER)),
+    SHIPPED_FAILED("Giao hàng thất bại", Set.of(Role.ADMIN, Role.SHIPPER)),
+    RETURNED_HUB_AFTER_SHIP_FAIL("Đã trả hàng", Set.of(Role.ADMIN, Role.HUB_STAFF)),
     COMPLETED("Đã hoàn thành", Set.of(Role.ADMIN)),
+    CANCELLED_SHIP("Đã hủy", Set.of(Role.ADMIN, Role.CUSTOMER)),
     CANCELLED("Đã hủy", Set.of(Role.ADMIN, Role.CUSTOMER)),
-    DELETED("Đã hủy", Set.of(Role.ADMIN, Role.CUSTOMER, Role.HUB_MANAGER));
+    DELETED("Đã xóa", Set.of(Role.ADMIN, Role.CUSTOMER, Role.HUB_MANAGER));
+
     private final String description;
     private final Set<Role> rolesAllowedToUpdate;
 

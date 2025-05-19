@@ -26,4 +26,6 @@ public interface MiddleMileOrderService {
 
 
     List<OrderSummaryMiddleMileDto> getCollectedHubListVehicle(UUID vehicleId, UUID hubId);
+
+    void assignAndConfirmOrdersOut(UUID tripId, List<UUID> orderItemIds);
 }

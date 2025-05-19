@@ -18,10 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/smdeli/ordermanager")
@@ -138,9 +135,9 @@ public class OrderController {
     }
 
     @PutMapping("/order/assignment/collector")
-    public ResponseEntity<?> updateAssignment(@RequestBody UpdateAssignmentRequest request) {
+    public ResponseEntity<?> updateAssignment(@RequestBody UpdateAssignmentRequest request, Principal principal) {
         try {
-            assignmentService.updateAssignmentStatus(request.getAssignmentId(), request.getStatus());
+            assignmentService.updateAssignmentStatus(principal, request.getAssignmentId(), request.getStatus());
             return ResponseEntity.ok("Assignment updated successfully");
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -154,9 +151,9 @@ public class OrderController {
      */
     @PreAuthorize("hasAnyRole('ADMIN', 'SHIPPER')")
     @PutMapping("/order/assignment/shipper")
-    public ResponseEntity<?> updateShipperAssignment(@Valid @RequestBody UpdateShipperAssignmentRequestDto request) {
+    public ResponseEntity<?> updateShipperAssignment(Principal principal,@Valid @RequestBody UpdateShipperAssignmentRequestDto request) {
         try {
-            shipperAssignmentService.updateAssignmentStatus(request.getAssignmentId(), request.getStatus());
+            shipperAssignmentService.updateAssignmentStatus(principal,request.getAssignmentId(), request.getStatus());
             return ResponseEntity.ok("Assignment updated successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -168,12 +165,6 @@ public class OrderController {
     public  ResponseEntity<?> confirmOrderInHub(@PathVariable UUID orderId){
 
         return null;
-    }
-
-    @PreAuthorize("hasAnyRole('HUB_STAFF', 'HUB_MANAGER')")
-    @GetMapping("/order/collected-collector/{hubId}")
-    public  ResponseEntity<List<OrderSummaryDTO>> getCollectedCollectorList(@PathVariable UUID hubId){
-           return ResponseEntity.ok(orderService.getCollectedCollectorList(hubId));
     }
 
     @PreAuthorize("hasAnyRole('HUB_STAFF', 'HUB_MANAGER')")
@@ -215,6 +206,70 @@ public class OrderController {
     @GetMapping("/order/{orderId}/history")
     public ResponseEntity<List<OrderHistoryResponseDto>> getOrderHistory(@PathVariable UUID orderId) {
         return ResponseEntity.ok(orderHistoryService.getOrderHistory(orderId));
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'HUB_STAFF')")
+    @GetMapping("/order/collected-collector/{hubId}")
+    public ResponseEntity<List<OrderSummaryDTO>> getCollectedCollectorOrders(@PathVariable UUID hubId) {
+        return ResponseEntity.ok(orderService.getCollectedCollectorOrders(hubId));
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'HUB_STAFF')")
+    @GetMapping("/order/delivered-driver/{hubId}")
+    public ResponseEntity<List<TripOrderSummaryDto>> getDeliveredDriverOrders(@PathVariable UUID hubId) {
+        return ResponseEntity.ok(orderService.getDeliveredDriverOrders(hubId));
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'HUB_STAFF')")
+    @GetMapping("/order/delivered-failed/{hubId}")
+    public ResponseEntity<List<OrderSummaryDTO>> getFailedDeliveryOrders(@PathVariable UUID hubId) {
+        return ResponseEntity.ok(orderService.getFailedDeliveryOrders(hubId));
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'HUB_STAFF')")
+    @PutMapping("/order/confirm-in-hub/{orderIds}")
+    public ResponseEntity<String> confirmOrdersIntoHub(
+            @PathVariable String orderIds,
+            Principal principal) {
+        String[] ids = orderIds.split(",");
+        UUID[] orderUUIDs = Arrays.stream(ids)
+                .map(UUID::fromString)
+                .toArray(UUID[]::new);
+
+        boolean success = orderService.confirmOrdersIntoHub(principal, orderUUIDs);
+        return success ? ResponseEntity.ok("Success") :
+                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed");
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'HUB_STAFF')")
+    @PutMapping("/order/confirm-shipper-pickup/{shipperId}")
+    public ResponseEntity<String> confirmShipperPickup(
+            @PathVariable UUID shipperId,
+            Principal principal) {
+        boolean success = orderService.confirmShipperPickup(principal, shipperId);
+        return success ? ResponseEntity.ok("Success") :
+                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed");
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'HUB_STAFF')")
+    @PutMapping("/order/confirm-shipper-pickups/{shipperIds}")
+    public ResponseEntity<String> confirmMultipleShipperPickups(
+            @PathVariable String shipperIds,
+            Principal principal) {
+        String[] ids = shipperIds.split(",");
+        UUID[] shipperUUIDs = Arrays.stream(ids)
+                .map(UUID::fromString)
+                .toArray(UUID[]::new);
+
+        boolean success = orderService.confirmMultipleShipperPickups(principal, shipperUUIDs);
+        return success ? ResponseEntity.ok("Success") :
+                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed");
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'HUB_STAFF')")
+    @GetMapping("/order/shipper-pickup-requests/{hubId}")
+    public ResponseEntity<List<TodayAssignmentShipperDto>> getShipperPickupRequests(@PathVariable UUID hubId) {
+        return ResponseEntity.ok(orderService.getShipperPickupRequests(hubId));
     }
 
 }

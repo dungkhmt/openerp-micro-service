@@ -2,6 +2,7 @@ package openerp.openerpresourceserver.repository;
 
 import openerp.openerpresourceserver.entity.Order;
 import openerp.openerpresourceserver.entity.TripOrder;
+import openerp.openerpresourceserver.entity.enumentity.TripStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -57,4 +58,8 @@ public interface TripOrderRepository extends JpaRepository<TripOrder, UUID> {
     List<TripOrder> findAllByTripId(UUID tripId);
 
     List<TripOrder> findAllByTripIdAndIsPickupIsFalse(UUID tripId);
+
+    TripOrder findTopByOrderIdOrderByCreatedAtDesc(UUID orderId);
+
+    TripOrder findByOrderIdAndStatus(UUID id, TripStatus tripStatus);
 }

@@ -57,7 +57,7 @@ const TodayOrder = (props) => {
     const assignmentsEndpoint = useCallback((id) => {
         return isCollector
             ? `/smdeli/ordermanager/order/assign/today/collector/${id}`
-            : `/smdeli/ordermanager/order/assign/today/shipper/${id}`;
+            : `/smdeli/ordermanager/order/assign/shipper/today/${id}`;
     }, [isCollector]);
 
     // Role-specific navigation paths

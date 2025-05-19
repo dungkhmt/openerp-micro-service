@@ -1,6 +1,7 @@
 package openerp.openerpresourceserver.service;
 
-import openerp.openerpresourceserver.dto.OrderItemForTripDto;
+import openerp.openerpresourceserver.dto.OrderForTripDto;
+import openerp.openerpresourceserver.dto.OrderSuggestionDto;
 import openerp.openerpresourceserver.dto.VehicleDto;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
 
@@ -32,9 +33,11 @@ public interface DriverService {
 
 
 
-    List<OrderItemForTripDto> getPendingPickupOrderItemsForDriver(String username, UUID tripId);
+    List<OrderForTripDto> getPendingPickupOrdersForDriver(String username, UUID tripId);
 
-    List<OrderItemForTripDto> getCurrentOrderItemsForDriver(String username, UUID tripId);
+    List<OrderForTripDto> getCurrentOrderItemsForDriver(String username, UUID tripId);
 
-    void deliverOrderItems(String username, List<UUID> orderItemIds);
+    void deliverOrders(String username, List<UUID> orderIds);
+
+    List<OrderSuggestionDto> getSuggestedOrderItemsForTrip(UUID tripId);
 }

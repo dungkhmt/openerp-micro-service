@@ -111,7 +111,7 @@ public class DeliveryConfirmationServiceImpl implements DeliveryConfirmationServ
         }
 
         // Update assignment
-        assignment.setStatus(ShipperAssignmentStatus.DELIVERED);
+        assignment.setStatus(ShipperAssignmentStatus.COMPLETED);
 
         assignOrderShipperRepository.save(assignment);
 

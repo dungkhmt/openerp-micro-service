@@ -22,18 +22,4 @@ public class EmployeeStatisticsDto {
     private Double successRate;
     private Double averageCompletionTime; // In minutes
     private Map<String, Integer> assignmentStatusCounts;
-    private PeriodStatistics dailyStats;
-    private PeriodStatistics weeklyStats;
-    private PeriodStatistics monthlyStats;
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class PeriodStatistics {
-        private Integer totalAssignments;
-        private Integer completedAssignments;
-        private Double successRate;
-        private Double averageCompletionTime; // In minutes
-    }
 }

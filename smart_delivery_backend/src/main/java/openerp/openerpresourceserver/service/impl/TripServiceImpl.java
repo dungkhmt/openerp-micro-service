@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.dto.*;
 import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
+import openerp.openerpresourceserver.entity.enumentity.TripStatus;
 import openerp.openerpresourceserver.entity.enumentity.VehicleStatus;
 import openerp.openerpresourceserver.repository.*;
 import openerp.openerpresourceserver.service.TripService;
@@ -194,7 +195,7 @@ public class TripServiceImpl implements TripService {
         }
 
         // Update trip status
-        trip.setStatus("IN_PROGRESS");
+        trip.setStatus(TripStatus.CAME_FIRST_STOP);
         trip.setStartTime(Instant.now());
         trip.setCurrentStopIndex(0); // Start at first stop
 
@@ -241,7 +242,7 @@ public class TripServiceImpl implements TripService {
         }
 
         // Verify trip is in progress
-        if (!"IN_PROGRESS".equals(trip.getStatus())) {
+        if (!"IN_PROGRESS".equals(trip.getStatus()) && !"CAME_FIRST_STOP".equals(trip.getStatus())) {
             throw new IllegalStateException("Trip is not in progress");
         }
 
@@ -328,8 +329,8 @@ public class TripServiceImpl implements TripService {
         }
 
         // Verify trip is in progress
-        if (! "CONFIRMED_IN".equals(trip.getStatus())) {
-            throw new IllegalStateException("Trip is confirmed in");
+        if (!"CONFIRMED_IN".equals(trip.getStatus())) {
+            throw new IllegalStateException("Trip is not confirmed in!");
         }
 
         // Update any remaining orders
@@ -339,7 +340,7 @@ public class TripServiceImpl implements TripService {
 
         // Update orders to delivered status
         for (Order order : remainingOrders) {
-            order.setStatus(OrderStatus.DELIVERED);
+            order.setStatus(OrderStatus.DELIVERED_FAILED);
         }
         orderRepo.saveAll(remainingOrders);
 
@@ -357,7 +358,7 @@ public class TripServiceImpl implements TripService {
 
         // Complete the trip
         Instant endTime = Instant.now();
-        trip.setStatus("COMPLETED");
+        trip.setStatus(TripStatus.COMPLETED);
         trip.setEndTime(endTime);
         trip.setCompletionNotes(completionNotes);
         trip.setOrdersDelivered(orderRepo.findByTripId(trip.getId()).size());
@@ -426,7 +427,7 @@ public class TripServiceImpl implements TripService {
                         .vehicleId(vehicleDriver.getVehicleId())
                         .driverId(vehicleDriver.getDriverId())
                         .date(tripDate)
-                        .status("PLANNED")
+                        .status(TripStatus.PLANNED)
                         .currentStopIndex(0)
                         .ordersPickedUp(0)
                         .ordersDelivered(0)
@@ -480,7 +481,7 @@ public class TripServiceImpl implements TripService {
                             .vehicleId(vehicleDriver.getVehicleId())
                             .driverId(vehicleDriver.getDriverId())
                             .date(tripDate)
-                            .status("PLANNED")
+                            .status(TripStatus.PLANNED)
                             .currentStopIndex(0)
                             .ordersPickedUp(0)
                             .ordersDelivered(0)
@@ -518,7 +519,7 @@ public class TripServiceImpl implements TripService {
         Trip trip = Trip.builder()
                 .routeScheduleId(routeScheduleId)
                 .driverId(driver.getId())
-                .status("PLANNED")
+                .status(TripStatus.PLANNED)
                 .currentStopIndex(0)
                 .ordersPickedUp(0)
                 .ordersDelivered(0)

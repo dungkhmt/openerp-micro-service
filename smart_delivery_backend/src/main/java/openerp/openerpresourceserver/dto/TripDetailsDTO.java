@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import openerp.openerpresourceserver.entity.enumentity.TripStatus;
 
 import java.time.Instant;
 import java.util.List;
@@ -17,7 +18,7 @@ public class TripDetailsDTO {
     private UUID id;
     private UUID routeId;
     private String routeName;
-    private String status;
+    private TripStatus status;
     private Instant startTime;
     private UUID routeScheduleId;
     private Instant endTime;

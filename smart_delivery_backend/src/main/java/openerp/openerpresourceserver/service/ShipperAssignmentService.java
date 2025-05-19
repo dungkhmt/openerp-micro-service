@@ -3,6 +3,7 @@ package openerp.openerpresourceserver.service;
 import openerp.openerpresourceserver.dto.*;
 import openerp.openerpresourceserver.entity.enumentity.ShipperAssignmentStatus;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +25,7 @@ public interface ShipperAssignmentService {
     /**
      * Update the status of a shipper assignment
      */
-    void updateAssignmentStatus(UUID assignmentId, ShipperAssignmentStatus status);
+    void updateAssignmentStatus(Principal principal, UUID assignmentId, ShipperAssignmentStatus status);
 
     List<TodayAssignmentShipperDto> getShipperAssignmentsTodayByHub(UUID hubId);
 

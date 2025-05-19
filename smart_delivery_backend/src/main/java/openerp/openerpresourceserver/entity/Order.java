@@ -1,30 +1,18 @@
 package openerp.openerpresourceserver.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
-import jakarta.ws.rs.ext.ParamConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
-import openerp.openerpresourceserver.entity.enumentity.VehicleType;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.sound.midi.Receiver;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -58,6 +46,8 @@ public class Order {
     private Double distance;
     private UUID finalHubId;
     private String finalHubName;
+    private Integer collectAttemptCount=0;
+    private Integer shipAttemptCount=0;
     @Version
     private Integer version;
     @CreatedBy
@@ -71,4 +61,8 @@ public class Order {
     @UpdateTimestamp
     private Timestamp updatedAt;
     private String changedBy;
+
+    public double getVolume() {
+        return length * width * height;
+    }
 }

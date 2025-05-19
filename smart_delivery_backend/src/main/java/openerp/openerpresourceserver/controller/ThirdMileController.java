@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -82,9 +83,9 @@ public class ThirdMileController {
      */
     @PreAuthorize("hasAnyRole('ADMIN', 'SHIPPER')")
     @PutMapping("/assignment/shipper")
-    public ResponseEntity<?> updateShipperAssignment(@Valid @RequestBody UpdateShipperAssignmentRequestDto request) {
+    public ResponseEntity<?> updateShipperAssignment(Principal principal, @Valid @RequestBody UpdateShipperAssignmentRequestDto request) {
         try {
-            shipperAssignmentService.updateAssignmentStatus(request.getAssignmentId(), request.getStatus());
+            shipperAssignmentService.updateAssignmentStatus(principal, request.getAssignmentId(), request.getStatus());
             return ResponseEntity.ok("Assignment updated successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

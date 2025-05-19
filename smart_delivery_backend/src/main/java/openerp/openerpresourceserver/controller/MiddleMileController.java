@@ -28,11 +28,29 @@ public class MiddleMileController {
     private final MiddleMileOrderService orderService;
     private final MiddleMileOrderService middleMileOrderService;
     private final AssignmentService assignmentService;
+    private final DriverService driverService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','HUB_MANAGER')")
     @PostMapping("/assign-orders")
     public void assign(){
         assignmentService.assignOrderItemsForTripsForAllHubs();
+    }
+
+    // Get suggested orders for trip
+    @GetMapping("/trip/{tripId}/suggested-orders")
+    public ResponseEntity<List<OrderSuggestionDto>> getSuggestedOrders(@PathVariable UUID tripId) {
+        List<OrderSuggestionDto> suggestions = driverService.getSuggestedOrderItemsForTrip(tripId);
+        return ResponseEntity.ok(suggestions);
+    }
+
+    // Hub staff assigns selected orders to trip
+    @PostMapping("/trip/{tripId}/assign-orders")
+    public ResponseEntity<Void> assignOrdersToTrip(
+            @PathVariable UUID tripId,
+            @RequestBody AssignOrdersRequest request) {
+
+        middleMileOrderService.assignAndConfirmOrdersOut(tripId, request.getOrderIds());
+        return ResponseEntity.ok().build();
     }
     // ===== Route Endpoints =====
     @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER', 'ROUTE_MANAGER')")

@@ -4,8 +4,8 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import openerp.openerpresourceserver.dto.OrderItemForTripDto;
-import openerp.openerpresourceserver.dto.OrderSummaryDTO;
+import openerp.openerpresourceserver.dto.OrderForTripDto;
+import openerp.openerpresourceserver.dto.OrderSuggestionDto;
 import openerp.openerpresourceserver.dto.VehicleDto;
 import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.entity.enumentity.OrderItemStatus;
@@ -19,9 +19,11 @@ import openerp.openerpresourceserver.service.OrderService;
 import openerp.openerpresourceserver.service.TripService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.Temporal;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -70,7 +72,7 @@ public class DriverServiceImpl implements DriverService {
 
 
     @Override
-    public List<OrderItemForTripDto> getPendingPickupOrderItemsForDriver(String username, UUID tripId) {
+    public List<OrderForTripDto> getPendingPickupOrdersForDriver(String username, UUID tripId) {
         // Find driver and vehicle
         Driver driver = driverRepo.findByUsername(username);
         if (driver == null) {
@@ -81,31 +83,30 @@ public class DriverServiceImpl implements DriverService {
         if (vehicleDriver == null) {
             throw new NotFoundException("No vehicle assigned to driver: " + username);
         }
-        List<TripItem> tripItems = tripItemRepository.findAllByTripId(tripId);
-        List<UUID> tripItemIds = tripItems.stream().map(TripItem::getOrderItemId).collect(Collectors.toList());
-        List<OrderItem> orderItems = orderItemRepo.findAllById(tripItemIds);
+        List<TripOrder> tripOrders = tripOrderRepository.findAllByTripId(tripId);
+        List<UUID> tripOrderIds = tripOrders.stream().map(TripOrder::getOrderId).toList();
+        List<Order> orders = orderRepo.findAllById(tripOrderIds);
 
-        return orderItems.stream().map(o -> {
-            OrderItemForTripDto orderItemForTripDto = new OrderItemForTripDto(o);
-            Order order = orderRepo.findById(o.getOrderId()).orElseThrow(() -> new NotFoundException("order not found " + o.getOrderId()));
+        return orders.stream().map(order -> {
+            OrderForTripDto orderForTripDto = new OrderForTripDto(order);
             Sender sender = senderRepo.findById(order.getSenderId()).orElseThrow(() -> new NotFoundException("sender not found " + order.getSenderId()));
             Recipient recipient = recipientRepo.findById(order.getRecipientId()).orElseThrow(() -> new NotFoundException("sender not found " + order.getSenderId()));
-            orderItemForTripDto.setOrderId(order.getId());
-            orderItemForTripDto.setSenderName(order.getSenderName());
-            orderItemForTripDto.setRecipientName(order.getRecipientName());
-            orderItemForTripDto.setSenderPhone(sender.getPhone());
-            orderItemForTripDto.setRecipientPhone(recipient.getPhone());
-            orderItemForTripDto.setSenderAddress(sender.getAddress());
-            orderItemForTripDto.setRecipientAddress(recipient.getAddress());
-            return orderItemForTripDto;
+            orderForTripDto.setId(order.getId());
+            orderForTripDto.setSenderName(order.getSenderName());
+            orderForTripDto.setRecipientName(order.getRecipientName());
+            orderForTripDto.setSenderPhone(sender.getPhone());
+            orderForTripDto.setRecipientPhone(recipient.getPhone());
+            orderForTripDto.setSenderAddress(sender.getAddress());
+            orderForTripDto.setRecipientAddress(recipient.getAddress());
+            return orderForTripDto;
         }).collect(Collectors.toList());
 
     }
 
     @Override
     @Transactional
-    public void pickupOrders(String username, List<UUID> orderItemIds, UUID tripId) {
-        if (orderItemIds == null || orderItemIds.isEmpty()) {
+    public void pickupOrders(String username, List<UUID> orderIds, UUID tripId) {
+        if (orderIds == null || orderIds.isEmpty()) {
             throw new IllegalArgumentException("No orders provided for pickup");
         }
 
@@ -124,24 +125,24 @@ public class DriverServiceImpl implements DriverService {
                 .orElseThrow(() -> new NotFoundException("Vehicle not found with ID: " + vehicleDriver.getVehicleId()));
 
         // Update orders status and assign to driver's vehicle
-        List<OrderItem> orderItems = new ArrayList<>();
-        List<TripItem> tripItems = new ArrayList<>();
-        for (UUID orderItemId : orderItemIds) {
-            OrderItem orderItem = orderItemRepo.findById(orderItemId)
-                    .orElseThrow(() -> new NotFoundException("Order item not found with ID: " + orderItemId));
+        List<Order> orders = new ArrayList<>();
+        List<TripOrder> tripOrders = new ArrayList<>();
+        for (UUID orderId : orderIds) {
+            Order order = orderRepo.findById(orderId)
+                    .orElseThrow(() -> new NotFoundException("Order item not found with ID: " + orderId));
 
             // Verify order is in correct state
-            if (orderItem.getStatus() != OrderItemStatus.CONFIRMED_OUT) {
-                throw new IllegalStateException("Order is not in CONFIRMED_OUT state: " + orderItemId);
+            if (order.getStatus() != OrderStatus.CONFIRMED_OUT) {
+                throw new IllegalStateException("Order is not in CONFIRMED_OUT state: " + orderId);
             }
 
             // Update order
-            orderItem.setStatus(OrderItemStatus.DELIVERING);
+            order.setStatus(OrderStatus.DELIVERING);
 
-            orderItems.add(orderItem);
-            TripItem tripItem = tripItemRepository.findTopByOrderItemIdOrderByCreatedAtDesc(orderItemId);
-            tripItem.setStatus("DELIVERING");
-            tripItems.add(tripItem);
+            orders.add(order);
+            TripOrder tripOrder = tripOrderRepository.findTopByOrderIdOrderByCreatedAtDesc(orderId);
+            tripOrder.setStatus("DELIVERING");
+            tripOrders.add(tripOrder);
 
 
             // Update vehicle status if needed
@@ -150,15 +151,15 @@ public class DriverServiceImpl implements DriverService {
                 vehicleRepo.save(vehicle);
             }
 
-            orderItemRepo.saveAll(orderItems);
-            tripItemRepository.saveAll(tripItems);
+            orderRepo.saveAll(orders);
+            tripOrderRepository.saveAll(tripOrders );
         }
     }
 
     @Override
     @Transactional
-    public void deliverOrderItems(String username, List<UUID> orderItemIds) {
-        if (orderItemIds == null || orderItemIds.isEmpty()) {
+    public void deliverOrders(String username, List<UUID> orderIds) {
+        if (orderIds == null || orderIds.isEmpty()) {
             throw new IllegalArgumentException("No orders provided for delivery");
         }
 
@@ -169,36 +170,36 @@ public class DriverServiceImpl implements DriverService {
         }
 
         // Update orders status
-        List<OrderItem> orderItems = new ArrayList<>();
-        List<TripItem> tripItems = new ArrayList<>();
+        List<Order> orders = new ArrayList<>();
+        List<TripOrder> tripOrders = new ArrayList<>();
 
-        for (UUID orderItemId : orderItemIds) {
-            OrderItem orderItem = orderItemRepo.findById(orderItemId)
-                    .orElseThrow(() -> new NotFoundException("Order not found with ID: " + orderItemId));
+        for (UUID orderId : orderIds) {
+            Order order = orderRepo.findById(orderId)
+                    .orElseThrow(() -> new NotFoundException("Order not found with ID: " + orderId));
 
-            TripItem tripItem = tripItemRepository.findTopByOrderItemIdOrderByCreatedAtDesc(orderItemId);
-            Trip trip = tripRepository.findById(tripItem.getTripId()).orElseThrow(() -> new NotFoundException("Trip not found"));
+            TripOrder tripOrder = tripOrderRepository.findTopByOrderIdOrderByCreatedAtDesc(orderId);
+            Trip trip = tripRepository.findById(tripOrder.getTripId()).orElseThrow(() -> new NotFoundException("Trip not found"));
             RouteSchedule routeSchedule = routeScheduleRepository.findById(trip.getRouteScheduleId()).orElseThrow(() -> new NotFoundException("Route schedule not found"));
             if (!trip.getDriverId().equals(driver.getId())) {
-                throw new IllegalStateException("Order is not assigned to this driver: " + orderItemId);
+                throw new IllegalStateException("Order is not assigned to this driver: " + orderId);
             }
             // Verify order is assigned to this driver
 
 
             // Verify order is in correct state
-            if (orderItem.getStatus() != OrderItemStatus.DELIVERING) {
-                throw new IllegalStateException("Order item is not in DELIVERING state: " + orderItemId);
+            if (order.getStatus() != OrderStatus.DELIVERING) {
+                throw new IllegalStateException("Order item is not in DELIVERING state: " + orderId);
             }
 
             // Update order
-            orderItem.setStatus(OrderItemStatus.DELIVERED);
-            orderItems.add(orderItem);
-            tripItem.setStatus("DELIVERED");
-            tripItems.add(tripItem);
+            order.setStatus(OrderStatus.DELIVERED);
+            orders.add(order);
+            tripOrder.setStatus("DELIVERED");
+            tripOrders.add(tripOrder);
         }
 
-        orderItemRepo.saveAll(orderItems);
-        tripItemRepository.saveAll(tripItems);
+        orderRepo.saveAll(orders);
+        tripOrderRepository.saveAll(tripOrders);
     }
 
     @Override
@@ -230,43 +231,206 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public List<OrderItemForTripDto> getCurrentOrderItemsForDriver(String username, UUID tripId) {
+    public List<OrderForTripDto> getCurrentOrderItemsForDriver(String username, UUID tripId) {
         // Find driver
         Driver driver = driverRepo.findByUsername(username);
         if (driver == null) {
             throw new NotFoundException("Driver not found with username: " + username);
         }
-        List<TripItem> tripItems = tripItemRepository.findAllByTripId(tripId);
-        List<UUID> orderItemIds = tripItems.stream().map(TripItem::getOrderItemId).collect(Collectors.toList());
-        List<OrderItem> driverOrderItems = orderItemRepo.findAllByIdAndStatus(orderItemIds, OrderItemStatus.DELIVERING);
+        List<TripOrder> tripOrders = tripOrderRepository.findAllByTripId(tripId);
+        List<UUID> orderIds = tripOrders.stream().map(TripOrder::getOrderId).collect(Collectors.toList());
+        List<Order> driverOrders = orderRepo.findAllByIdAndStatus(orderIds, OrderStatus.DELIVERING);
 
         RouteStop stop = tripService.getCurrentRouteStop(tripId);
         if (stop == null) {
             throw new IllegalStateException("No current stop found for trip: " + tripId);
         }
         System.out.println("hub id: " + stop.getHubId());
-        driverOrderItems = driverOrderItems.stream().filter(o -> {
-            Order order = orderRepo.findById(o.getOrderId()).orElseThrow(() -> new NotFoundException("order not found " + o.getOrderId()));
-            return order.getFinalHubId().equals(stop.getHubId());
+        driverOrders = driverOrders.stream().filter(o -> {
+            return o.getFinalHubId().equals(stop.getHubId());
         }).toList();
-        return driverOrderItems.stream()
-                .map(this::convertOrderItemToDtoForTrip)
+        return driverOrders.stream()
+                .map(this::convertOrderToDtoForTrip)
                 .collect(Collectors.toList());
     }
 
-    private OrderItemForTripDto convertOrderItemToDtoForTrip(OrderItem orderItem) {
-        OrderItemForTripDto orderItemForTripDto = new OrderItemForTripDto(orderItem);
-        Order order = orderRepo.findById(orderItem.getOrderId()).orElseThrow(() -> new NotFoundException("order not found " + orderItem.getOrderId()));
+    private OrderForTripDto convertOrderToDtoForTrip(Order order) {
+        OrderForTripDto orderForTripDto = new OrderForTripDto(order);
         Sender sender = senderRepo.findById(order.getSenderId()).orElseThrow(() -> new NotFoundException("sender not found " + order.getSenderId()));
         Recipient recipient = recipientRepo.findById(order.getRecipientId()).orElseThrow(() -> new NotFoundException("sender not found " + order.getSenderId()));
-        orderItemForTripDto.setOrderId(order.getId());
-        orderItemForTripDto.setSenderName(order.getSenderName());
-        orderItemForTripDto.setRecipientName(order.getRecipientName());
-        orderItemForTripDto.setSenderPhone(sender.getPhone());
-        orderItemForTripDto.setRecipientPhone(recipient.getPhone());
-        orderItemForTripDto.setSenderAddress(sender.getAddress());
-        orderItemForTripDto.setRecipientAddress(recipient.getAddress());
-        return orderItemForTripDto;
+        orderForTripDto.setId(order.getId());
+        orderForTripDto.setSenderName(order.getSenderName());
+        orderForTripDto.setRecipientName(order.getRecipientName());
+        orderForTripDto.setSenderPhone(sender.getPhone());
+        orderForTripDto.setRecipientPhone(recipient.getPhone());
+        orderForTripDto.setSenderAddress(sender.getAddress());
+        orderForTripDto.setRecipientAddress(recipient.getAddress());
+        return orderForTripDto;
+    }
+    /**
+     * Get suggested order items for a trip based on route and vehicle capacity
+     * Priority: older orders first, within capacity limits
+     */
+    public List<OrderSuggestionDto> getSuggestedOrderItemsForTrip(UUID tripId) {
+        log.info("Getting suggested order items for trip: {}", tripId);
+
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new NotFoundException("Trip not found: " + tripId));
+
+        RouteSchedule routeSchedule = routeScheduleRepository.findById(trip.getRouteScheduleId())
+                .orElseThrow(() -> new NotFoundException("Route schedule not found"));
+
+        // Get vehicle for capacity checking
+        Vehicle vehicle = vehicleRepo.findById(trip.getVehicleId())
+                .orElseThrow(() -> new NotFoundException("Vehicle not found"));
+
+        // Get all route stops in order (pickup + delivery destinations)
+        List<RouteStop> routeStops = routeStopRepository.findByRouteIdOrderByStopSequence(routeSchedule.getRouteId());
+
+        // Calculate current trip load
+        double currentWeight = getCurrentTripWeight(tripId);
+        double currentVolume = getCurrentTripVolume(tripId);
+
+        List<OrderSuggestionDto> suggestions = new ArrayList<>();
+
+        // For each route stop, find orders that need to be delivered there
+        for (RouteStop stop : routeStops) {
+            List<Order> ordersForStop = getOrdersForRouteStop(stop.getHubId(), trip.getDate());
+
+            // Sort orders by creation time (oldest first)
+            ordersForStop.sort(Comparator.comparing(o -> {
+                Order order = orderRepo.findById(o.getId()).orElse(null);
+                return order != null ? order.getCreatedAt() : new Date();
+            }));
+
+            for (Order order : ordersForStop) {
+                // Check if adding this order would exceed capacity
+                if (canFitInVehicle(order, vehicle, currentWeight, currentVolume)) {
+                    OrderSuggestionDto suggestion = createSimpleSuggestion(order, stop, vehicle);
+                    suggestions.add(suggestion);
+
+                    // Update running totals for next calculations
+                    currentWeight += order.getWeight();
+                    currentVolume += order.getVolume();
+
+                    log.debug("Added order {} to suggestions (weight: {}, volume: {})",
+                            order.getId(), order.getWeight());
+                } else {
+                    log.debug("Skipped order {} - exceeds vehicle capacity", order.getId());
+                    // Stop adding more orders from this stop if capacity is reached
+                    break;
+                }
+            }
+        }
+
+        log.info("Found {} order suggestions for trip {} within capacity limits",
+                suggestions.size(), tripId);
+
+        return suggestions;
     }
 
+    /**
+     * Get available orders for a specific route stop
+     */
+    private List<Order> getOrdersForRouteStop(UUID hubId, LocalDate date) {
+        // Get orders that are ready for pickup/delivery at this hub on this date
+        return orderRepo.findByStatusAndFinalHubId(
+                OrderStatus.COLLECTED_HUB,
+                hubId
+
+        );
+    }
+
+    /**
+     * Check if an order can fit in the vehicle without exceeding capacity
+     */
+    private boolean canFitInVehicle(Order orderItem, Vehicle vehicle, double currentWeight, double currentVolume) {
+        // Check weight capacity
+        if (vehicle.getWeightCapacity() != null) {
+            if (currentWeight + orderItem.getWeight() > vehicle.getWeightCapacity()) {
+                return false;
+            }
+        }
+
+        // Check volume capacity
+        if (vehicle.getVolumeCapacity() != null) {
+            if (currentVolume + orderItem.getHeight() * orderItem.getLength() * orderItem.getWidth() > vehicle.getVolumeCapacity()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Create simple suggestion with basic info
+     */
+    private OrderSuggestionDto createSimpleSuggestion(Order order, RouteStop stop, Vehicle vehicle) {
+        OrderSuggestionDto suggestion = new OrderSuggestionDto();
+
+        // Get order details
+
+        // Basic information
+        suggestion.setOrderId(order.getId());
+        suggestion.setWeight(order.getWeight());
+        suggestion.setVolume(order.getVolume());
+
+        // Route information
+        suggestion.setHubId(stop.getHubId());
+        suggestion.setStopSequence(stop.getStopSequence());
+
+        // Priority based on creation time (older = higher priority)
+        int priority = calculateTimePriority(order.getCreatedAt());
+        suggestion.setPriority(priority);
+
+        // Simple fit indication
+        suggestion.setFitScore(100); // If we get here, it means it fits
+
+        // Basic order info for display
+        suggestion.setSenderName(order.getSenderName());
+        suggestion.setRecipientName(order.getRecipientName());
+        suggestion.setCurrentStatus(order.getStatus().name());
+
+        return suggestion;
+    }
+
+    /**
+     * Calculate priority based on creation time - older orders get higher priority
+     */
+    private int calculateTimePriority(Timestamp createdAt) {
+        long hoursOld = java.time.temporal.ChronoUnit.HOURS.between(createdAt.toInstant(), Instant.now());
+
+        // Base priority 50, add 1 point per hour up to max 100
+        int priority = (int) Math.min(50 + hoursOld, 100);
+
+        return priority;
+    }
+
+    /**
+     * Get current total weight of already assigned orders in the trip
+     */
+    private double getCurrentTripWeight(UUID tripId) {
+        List<TripItem> tripItems = tripItemRepository.findAllByTripId(tripId);
+        return tripItems.stream()
+                .filter(tripItem -> !"CANCELLED".equals(tripItem.getStatus()))
+                .mapToDouble(tripItem -> {
+                    OrderItem orderItem = orderItemRepo.findById(tripItem.getOrderItemId()).orElse(null);
+                    return orderItem != null ? orderItem.getWeight() : 0.0;
+                })
+                .sum();
+    }
+
+    /**
+     * Get current total volume of already assigned orders in the trip
+     */
+    private double getCurrentTripVolume(UUID tripId) {
+        List<TripItem> tripItems = tripItemRepository.findAllByTripId(tripId);
+        return tripItems.stream()
+                .filter(tripItem -> !"CANCELLED".equals(tripItem.getStatus()))
+                .mapToDouble(tripItem -> {
+                    OrderItem orderItem = orderItemRepo.findById(tripItem.getOrderItemId()).orElse(null);
+                    return orderItem != null ? orderItem.getHeight()*orderItem.getLength()*orderItem.getWidth() : 0.0;
+                })
+                .sum();
+    }
 }

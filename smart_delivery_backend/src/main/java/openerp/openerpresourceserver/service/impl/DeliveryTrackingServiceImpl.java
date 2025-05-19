@@ -64,7 +64,7 @@ public class DeliveryTrackingServiceImpl implements DeliveryTrackingService {
                     assignmentStatus = ShipperAssignmentStatus.PICKED_UP;
                     break;
                 case COMPLETED:
-                    assignmentStatus = ShipperAssignmentStatus.DELIVERED;
+                    assignmentStatus = ShipperAssignmentStatus.COMPLETED;
                     break;
                 case CANCELLED:
                     assignmentStatus = ShipperAssignmentStatus.CANCELED;

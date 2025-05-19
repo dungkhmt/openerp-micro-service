@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
+import openerp.openerpresourceserver.entity.enumentity.TripStatus;
 import openerp.openerpresourceserver.entity.enumentity.VehicleStatus;
 import openerp.openerpresourceserver.repository.*;
 import openerp.openerpresourceserver.service.TripAssignmentService;
@@ -116,7 +117,7 @@ public class TripAssignmentServiceImpl implements TripAssignmentService {
                     .routeScheduleId(selectedRoute.getRouteId())
                     .driverId(vehicleDriver.getDriverId())
                     .startTime(scheduledInstant)
-                    .status("PLANNED")
+                    .status(TripStatus.PLANNED)
                     .currentStopIndex(0)
                     .ordersPickedUp(0)
                     .ordersDelivered(0)
