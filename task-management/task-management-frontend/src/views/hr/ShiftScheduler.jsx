@@ -47,14 +47,18 @@ const initialUsers = [
   { id: 'u2', name: 'NV Bảo Long', summary: '8h 15m', avatarLetter: 'BL', avatarBgColor: 'primary.main' },
   { id: 'u3', name: 'NV Cẩm Tú', summary: '0h 0m', avatarLetter: 'CT', avatarBgColor: 'warning.main' },
   { id: 'uHPT', name: 'Hieu Phan Trung', summary: '0h 0m', avatarLetter: 'HT', avatarBgColor: 'success.main' },
-  { id: 't4', name: 'Test User 4', summary: '0h 0m', avatarLetter: 'T4', avatarBgColor: 'info.main' },
+  { id: 't77', name: 'Test User 1', summary: '0h 0m', avatarLetter: 'T4', avatarBgColor: 'info.main' },
+  { id: 't74', name: 'Test User 2', summary: '0h 0m', avatarLetter: 'T4', avatarBgColor: 'info.main' },
+  { id: 't714', name: 'Test User 3', summary: '0h 0m', avatarLetter: 'T4', avatarBgColor: 'info.main' },
+  { id: 't34', name: 'Test User 5', summary: '0h 0m', avatarLetter: 'T4', avatarBgColor: 'info.main' },
+  { id: 't64', name: 'Test User 9', summary: '0h 0m', avatarLetter: 'T4', avatarBgColor: 'info.main' },
 ];
 
 // Constants for sticky header calculations
 const TOP_BAR_HEIGHT = 61;
 const AVAILABLE_SHIFTS_BANNER_HEIGHT = 36;
 const PROJECTED_SALES_BANNER_HEIGHT = 36;
-const INFO_BANNERS_TOTAL_HEIGHT = AVAILABLE_SHIFTS_BANNER_HEIGHT + PROJECTED_SALES_BANNER_HEIGHT; // Corrected
+const INFO_BANNERS_TOTAL_HEIGHT = AVAILABLE_SHIFTS_BANNER_HEIGHT + PROJECTED_SALES_BANNER_HEIGHT;
 const BULK_ACTIONS_BAR_HEIGHT = 50;
 
 
@@ -86,7 +90,6 @@ function ShiftCard({
                    }) {
   const [isHovered, setIsHovered] = useState(false);
 
-  // ... (các hàm xử lý giữ nguyên) ...
   const handleCheckboxClick = (e) => {
     e.stopPropagation();
     onToggleSelect(shift.id);
@@ -131,7 +134,7 @@ function ShiftCard({
         alignItems: 'center',
         transition: 'background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
         width: '100%',
-        maxWidth: '100%', // <<< THÊM DÒNG NÀY ĐỂ GIỚI HẠN CHIỀU RỘNG TỐI ĐA
+        maxWidth: '100%',
         overflow: 'hidden',
       }}
     >
@@ -172,7 +175,7 @@ function ShiftCard({
         onClick={handleCardBodyClick}
         sx={{
           flexGrow: 1,
-          minWidth: 0, // Giữ nguyên, rất quan trọng
+          minWidth: 0,
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
@@ -235,7 +238,7 @@ function ShiftCard({
         )}
       </Box>
 
-      {/* "Add" button area (giữ nguyên) */}
+      {/* "Add" button area */}
       <Box
         className="add-action-button-area"
         sx={{
@@ -278,30 +281,41 @@ function ShiftCard({
 
 // EmptyShiftSlot.jsx
 function EmptyShiftSlot({ onAdd }) {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <Paper
-      variant="outlined"
+      elevation={0} // Không có shadow khi ở trạng thái bình thường
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       sx={{
         minHeight: 52,
-        m: 0.5,
+        m: 0.5, // margin y
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        borderColor: 'grey.400',
-        borderStyle: 'dashed',
+        borderWidth: 1, // Luôn có độ dày viền để không bị nhảy layout khi hiện
+        borderStyle: 'dashed', // Kiểu viền luôn là dashed
+        borderColor: isHovered ? 'grey.500' : 'transparent', // Viền trong suốt khi không hover, có màu khi hover
+        bgcolor: isHovered ? 'grey.100' : 'transparent', // Nền trong suốt khi không hover, có màu khi hover
         cursor: 'pointer',
         flexGrow: 1,
-        '&:hover': { bgcolor: 'grey.100', borderColor: 'grey.500' }
+        transition: 'background-color 0.2s ease-in-out, border-color 0.2s ease-in-out',
       }}
       onClick={onAdd}
       title="Thêm ca làm việc mới"
     >
-      <AddIcon color="action" />
+      <AddIcon
+        color="action"
+        sx={{
+          transition: 'opacity 0.2s ease-in-out',
+          opacity: isHovered ? 1 : 0, // Dấu cộng mờ đi/hiện ra
+        }}
+      />
     </Paper>
   );
 }
 
-// DayCell.jsx
 // DayCell.jsx
 function DayCell({ userId, day, shiftsInCell, onAddShift, onDeleteShift, onEditShift, selectedShiftIds, onToggleSelectShift, isAnyShiftSelected }) {
   const droppableId = `user-${userId}-day-${format(day, 'yyyy-MM-dd')}`;
@@ -323,7 +337,7 @@ function DayCell({ userId, day, shiftsInCell, onAddShift, onDeleteShift, onEditS
             flexDirection: 'column',
             bgcolor: snapshot.isDraggingOver ? 'action.focus' : 'transparent',
             transition: 'background-color 0.2s ease',
-            overflow: 'hidden', // <<< THÊM DÒNG NÀY ĐỂ DAYCELL CẮT NỘI DUNG TRÀN
+            overflow: 'hidden', // DayCell cắt nội dung tràn
           }}
         >
           {shiftsInCell.length > 0 ? (
@@ -420,7 +434,7 @@ function ShiftsGrid({ currentDate, shifts, users, onAddShift, onDeleteShift, onE
 }
 
 // CalendarHeader.jsx
-function CalendarHeader({ currentDate, stickyTopOffset = 0 }) { // stickyTopOffset is dynamicStickyOffset
+function CalendarHeader({ currentDate, stickyTopOffset = 0 }) {
   const weekStartsOn = 1;
   const startDate = startOfWeek(currentDate, { weekStartsOn });
   const days = Array.from({ length: 7 }).map((_, i) => addDays(startDate, i));
@@ -454,7 +468,7 @@ function TopBar({ currentDate, onPrevWeek, onNextWeek, onToday }) {
         <Button onClick={onToday} size="small" variant="outlined" color="inherit" startIcon={<EventNoteIcon />} sx={{ mx: 1, fontSize:'0.75rem', py:0.3}}>Hôm nay</Button>
         <IconButton onClick={onNextWeek} size="small" aria-label="Next week"><ChevronRightIcon /></IconButton>
         <Typography variant="subtitle1" component="div" sx={{ ml: 2, color:'text.secondary', fontWeight:'medium' }}>
-          {format(currentDate, 'MMMM yyyy', { locale: vi })}
+          {format(currentDate, 'MMMM yy', { locale: vi })}
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
         <Button size="small" variant="text" color="inherit" startIcon={<FilterAltIcon />} sx={{textTransform:'none', fontSize:'0.8rem'}}>Lọc</Button>
@@ -466,7 +480,7 @@ function TopBar({ currentDate, onPrevWeek, onNextWeek, onToday }) {
 }
 
 // InfoBanners.jsx
-function InfoBanners({ currentDate, stickyTopOffset = 0 }) { // stickyTopOffset here is dynamicStickyOffset passed from parent
+function InfoBanners({ currentDate, stickyTopOffset = 0 }) {
   const weekStartsOn = 1;
   const startDate = startOfWeek(currentDate, { weekStartsOn });
   const days = Array.from({ length: 7 }).map((_, i) => addDays(startDate, i));
@@ -694,7 +708,7 @@ export default function ShiftScheduler() {
           const end = parseISO(`${s.day}T${s.endTime}`);
           if(isValid(start) && isValid(end)) {
             let diff = end.getTime() - start.getTime();
-            if (diff < 0) diff += 24 * 60 * 60 * 1000; // Handles overnight shifts
+            if (diff < 0) diff += 24 * 60 * 60 * 1000;
             totalMs += diff;
           }
         }
@@ -763,7 +777,7 @@ export default function ShiftScheduler() {
     const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
     const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
 
-    const userForColor = users.find(u => u.id === userId); // Ensure users state is populated for this
+    const userForColor = users.find(u => u.id === userId);
     const shiftMuiColor = currentEditingShift?.muiColor ||
       (userForColor?.avatarBgColor?.replace('.main','.light') || 'grey.200');
     const shiftMuiTextColor = currentEditingShift?.muiTextColor ||
@@ -802,8 +816,8 @@ export default function ShiftScheduler() {
     if (!draggedShift) return;
 
     const destParts = destination.droppableId.split('-');
-    const newUserId = destParts[1]; // e.g., "u1" from "user-u1-day-2025-05-19"
-    const newDay = `${destParts[3]}-${destParts[4]}-${destParts[5]}`; // e.g., "2025-05-19"
+    const newUserId = destParts[1];
+    const newDay = `${destParts[3]}-${destParts[4]}-${destParts[5]}`;
 
     setShifts(prevShifts =>
       prevShifts.map(shift =>
@@ -843,12 +857,12 @@ export default function ShiftScheduler() {
       const nextWeekShiftDate = addDays(originalShiftDate, 7);
       return {
         ...shift,
-        id: `s${Date.now()}-${Math.random().toString(16).slice(2)}`, // New ID for copied shift
+        id: `s${Date.now()}-${Math.random().toString(16).slice(2)}`,
         day: format(nextWeekShiftDate, 'yyyy-MM-dd'),
       };
     });
     setShifts(prevShifts => [...prevShifts, ...newCopiedShifts]);
-    setSelectedShiftIds([]); // Deselect after copying
+    setSelectedShiftIds([]);
   }, [selectedShiftIds, shifts, currentDate, isAnyShiftSelected]);
 
   const dynamicStickyOffset = isAnyShiftSelected ? BULK_ACTIONS_BAR_HEIGHT : 0;
@@ -875,13 +889,13 @@ export default function ShiftScheduler() {
             <Paper elevation={2} sx={{ overflow: 'hidden', mt:1 }}>
               <CalendarHeader currentDate={currentDate} stickyTopOffset={dynamicStickyOffset} />
               <Box sx={{ overflowX: 'auto' }}>
-                <Box sx={{ minWidth: 1100 }}> {/* Ensures horizontal scroll for the grid content */}
+                <Box sx={{ minWidth: 1100 }}>
                   <ShiftsGrid
                     currentDate={currentDate}
                     shifts={shifts}
                     users={users}
                     onAddShift={handleOpenModal}
-                    onDeleteShift={handleDeleteSingleShift} // For potential future single delete icon on card
+                    onDeleteShift={handleDeleteSingleShift}
                     onEditShift={(shift) => handleOpenModal(shift.userId, parseISO(shift.day), shift)}
                     selectedShiftIds={selectedShiftIds}
                     onToggleSelectShift={handleToggleSelectShift}
@@ -902,7 +916,7 @@ export default function ShiftScheduler() {
             isOpen={isModalOpen}
             onClose={handleCloseModal}
             onSave={handleSaveShift}
-            users={users} // Pass the dynamically updated users list
+            users={users}
             initialFormState={modalInitialFormState}
             isEditing={!!currentEditingShift}
           />
