@@ -844,6 +844,148 @@ public class OrderServiceImpl implements OrderService {
                 .filter(assignment -> assignment.getNumOfOrders() > assignment.getNumOfCompleted())
                 .collect(Collectors.toList());
     }
+    @Override
+    public List<CollectorOrderHistoryDto> getCollectorOrderHistory(UUID collectorId, LocalDate startDate, LocalDate endDate) {
+        // Set default date range if not provided (last 30 days)
+        if (startDate == null) {
+            startDate = LocalDate.now().minusDays(30);
+        }
+        if (endDate == null) {
+            endDate = LocalDate.now();
+        }
+
+        // Convert dates to timestamps
+        Timestamp startTimestamp = Timestamp.valueOf(startDate.atStartOfDay());
+        Timestamp endTimestamp = Timestamp.valueOf(endDate.plusDays(1).atStartOfDay());
+
+        // Get assignments within date range
+        List<AssignOrderCollector> assignments = assignOrderCollectorRepository.findAll().stream()
+                .filter(assignment -> assignment.getCollectorId().equals(collectorId) &&
+                        assignment.getCreatedAt() != null &&
+                        assignment.getCreatedAt().after(startTimestamp) &&
+                        assignment.getCreatedAt().before(endTimestamp))
+                .sorted(Comparator.comparing(AssignOrderCollector::getCreatedAt).reversed())
+                .collect(Collectors.toList());
+
+        // Map to DTOs with order details
+        return assignments.stream()
+                .map(this::mapToCollectorOrderHistoryDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ShipperOrderHistoryDto> getShipperOrderHistory(UUID shipperId, LocalDate startDate, LocalDate endDate) {
+        // Set default date range if not provided (last 30 days)
+        if (startDate == null) {
+            startDate = LocalDate.now().minusDays(30);
+        }
+        if (endDate == null) {
+            endDate = LocalDate.now();
+        }
+
+        // Convert dates to timestamps
+        Timestamp startTimestamp = Timestamp.valueOf(startDate.atStartOfDay());
+        Timestamp endTimestamp = Timestamp.valueOf(endDate.plusDays(1).atStartOfDay());
+
+        // Get assignments within date range
+        List<AssignOrderShipper> assignments = assignOrderShipperRepository.findByShipperId(shipperId).stream()
+                .filter(assignment -> assignment.getCreatedAt() != null &&
+                        assignment.getCreatedAt().after(startTimestamp) &&
+                        assignment.getCreatedAt().before(endTimestamp))
+                .sorted(Comparator.comparing(AssignOrderShipper::getCreatedAt).reversed())
+                .collect(Collectors.toList());
+
+        // Map to DTOs with order details
+        return assignments.stream()
+                .map(this::mapToShipperOrderHistoryDto)
+                .collect(Collectors.toList());
+    }
+
+    private CollectorOrderHistoryDto mapToCollectorOrderHistoryDto(AssignOrderCollector assignment) {
+        try {
+            Order order = orderRepo.findById(assignment.getOrderId())
+                    .orElseThrow(() -> new NotFoundException("Order not found: " + assignment.getOrderId()));
+
+            Sender sender = senderRepo.findById(order.getSenderId())
+                    .orElseThrow(() -> new NotFoundException("Sender not found: " + order.getSenderId()));
+
+            Recipient recipient = recipientRepo.findById(order.getRecipientId())
+                    .orElseThrow(() -> new NotFoundException("Recipient not found: " + order.getRecipientId()));
+
+            // Count order items
+            List<OrderItem> orderItems = orderItemRepo.findAllByOrderId(order.getId());
+            int numOfItems = orderItems.size();
+            double totalWeight = orderItems.stream().mapToDouble(OrderItem::getWeight).sum();
+
+            return CollectorOrderHistoryDto.builder()
+                    .assignmentId(assignment.getId())
+                    .orderId(assignment.getOrderId())
+                    .collectorId(assignment.getCollectorId())
+                    .collectorName(assignment.getCollectorName())
+                    .sequenceNumber(assignment.getSequenceNumber())
+                    .assignmentStatus(assignment.getStatus())
+                    .orderStatus(order.getStatus())
+                    .senderName(sender.getName())
+                    .senderPhone(sender.getPhone())
+                    .senderAddress(sender.getAddress())
+                    .senderLatitude(sender.getLatitude())
+                    .senderLongitude(sender.getLongitude())
+                    .recipientName(recipient.getName())
+                    .recipientPhone(recipient.getPhone())
+                    .recipientAddress(recipient.getAddress())
+                    .assignmentCreatedAt(assignment.getCreatedAt())
+                    .assignmentUpdatedAt(assignment.getUpdatedAt())
+                    .orderCreatedAt(order.getCreatedAt())
+                    .numOfItems(numOfItems)
+                    .totalWeight(totalWeight)
+                    .notes(assignment.getNotes())
+                    .doneAt(assignment.getUpdatedAt())
+                    .build();
+        } catch (Exception e) {
+            log.error("Error mapping assignment to collector order history DTO: {}", e.getMessage(), e);
+            throw new RuntimeException("Error processing assignment data", e);
+        }
+    }
+
+    private ShipperOrderHistoryDto mapToShipperOrderHistoryDto(AssignOrderShipper assignment) {
+        try {
+            Order order = orderRepo.findById(assignment.getOrderId())
+                    .orElseThrow(() -> new NotFoundException("Order not found: " + assignment.getOrderId()));
+
+            Sender sender = senderRepo.findById(order.getSenderId())
+                    .orElseThrow(() -> new NotFoundException("Sender not found: " + order.getSenderId()));
+
+            Recipient recipient = recipientRepo.findById(order.getRecipientId())
+                    .orElseThrow(() -> new NotFoundException("Recipient not found: " + order.getRecipientId()));
+
+            return ShipperOrderHistoryDto.builder()
+                    .assignmentId(assignment.getId())
+                    .orderId(assignment.getOrderId())
+                    .shipperId(assignment.getShipperId())
+                    .shipperName(assignment.getShipperName())
+                    .sequenceNumber(assignment.getSequenceNumber())
+                    .assignmentStatus(assignment.getStatus())
+                    .orderStatus(order.getStatus())
+                    .senderName(sender.getName())
+                    .senderPhone(sender.getPhone())
+                    .senderAddress(sender.getAddress())
+                    .recipientName(recipient.getName())
+                    .recipientPhone(recipient.getPhone())
+                    .recipientAddress(recipient.getAddress())
+                    .recipientLatitude(recipient.getLatitude())
+                    .recipientLongitude(recipient.getLongitude())
+                    .assignmentCreatedAt(assignment.getCreatedAt())
+                    .assignmentUpdatedAt(assignment.getUpdatedAt())
+                    .orderCreatedAt(order.getCreatedAt())
+                    .deliveryAttempts(assignment.getDeliveryAttempts())
+                        .notes(assignment.getNotes())
+                    .doneAt(assignment.getUpdatedAt())
+                    .build();
+        } catch (Exception e) {
+            log.error("Error mapping assignment to shipper order history DTO: {}", e.getMessage(), e);
+            throw new RuntimeException("Error processing assignment data", e);
+        }
+    }
 }
 
 

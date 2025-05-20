@@ -6,11 +6,13 @@ import openerp.openerpresourceserver.entity.Trip;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
 import openerp.openerpresourceserver.service.DriverService;
 import openerp.openerpresourceserver.service.TripService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -204,5 +206,107 @@ public class DriverController {
         List<RouteStopDto> stops = tripService.getTripStops(tripId, username);
         return ResponseEntity.ok(stops);
     }
+    /**
+     * Get statistics for the currently logged-in driver
+     */
+    @PreAuthorize("hasRole('DRIVER')")
+    @GetMapping("/me")
+    public ResponseEntity<DriverStatisticsDto> getMyDriverStatistics(Principal principal) {
+        DriverStatisticsDto statistics = driverService.getDriverStatisticsByUsername(principal.getName());
+        return ResponseEntity.ok(statistics);
+    }
 
+    /**
+     * Get statistics for the currently logged-in driver within a date range
+     */
+    @PreAuthorize("hasRole('DRIVER')")
+    @GetMapping("/me/range")
+    public ResponseEntity<DriverStatisticsDto> getMyDriverStatisticsByDateRange(
+            Principal principal,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        DriverStatisticsDto statistics = driverService.getDriverStatisticsByDateRange(
+                principal.getName(), startDate, endDate);
+        return ResponseEntity.ok(statistics);
+    }
+
+    /**
+     * Get statistics for a specific driver (admin access)
+     */
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER_MANAGER')")
+    @GetMapping("/{driverId}")
+    public ResponseEntity<DriverStatisticsDto> getDriverStatistics(@PathVariable UUID driverId) {
+        DriverStatisticsDto statistics = driverService.getDriverStatistics(driverId);
+        return ResponseEntity.ok(statistics);
+    }
+
+    /**
+     * Get statistics for a specific driver within a date range (admin access)
+     */
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER_MANAGER')")
+    @GetMapping("/{driverId}/range")
+    public ResponseEntity<DriverStatisticsDto> getDriverStatisticsByDateRange(
+            @PathVariable UUID driverId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        DriverStatisticsDto statistics = driverService.getDriverStatisticsByDateRange(
+                driverId, startDate, endDate);
+        return ResponseEntity.ok(statistics);
+    }
+
+    /**
+     * Get detailed trip history for the current driver
+     */
+    @PreAuthorize("hasRole('DRIVER')")
+    @GetMapping("/me/trip-history")
+    public ResponseEntity<List<TripHistoryDto>> getMyTripHistory(Principal principal,
+                                                                 @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                                 @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        // If dates not provided, default to last 30 days
+        LocalDate start = startDate != null ? startDate : LocalDate.now().minusDays(30);
+        LocalDate end = endDate != null ? endDate : LocalDate.now();
+
+        List<TripHistoryDto> tripHistory = driverService.getDriverTripHistory(
+                principal.getName(), start, end);
+        return ResponseEntity.ok(tripHistory);
+    }
+
+    /**
+     * Get detailed trip history for a specific driver (admin access)
+     */
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER_MANAGER')")
+    @GetMapping("/{driverId}/trip-history")
+    public ResponseEntity<List<TripHistoryDto>> getDriverTripHistory(
+            @PathVariable UUID driverId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        // If dates not provided, default to last 30 days
+        LocalDate start = startDate != null ? startDate : LocalDate.now().minusDays(30);
+        LocalDate end = endDate != null ? endDate : LocalDate.now();
+
+        List<TripHistoryDto> tripHistory = driverService.getDriverTripHistoryById(
+                driverId, start, end);
+        return ResponseEntity.ok(tripHistory);
+    }
+
+    /**
+     * Get performance metrics across all drivers (for management dashboard)
+     */
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER_MANAGER')")
+    @GetMapping("/performance-metrics")
+    public ResponseEntity<List<DriverStatisticsDto>> getDriverPerformanceMetrics(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        // If dates not provided, default to last 30 days
+        LocalDate start = startDate != null ? startDate : LocalDate.now().minusDays(30);
+        LocalDate end = endDate != null ? endDate : LocalDate.now();
+
+        List<DriverStatisticsDto> metrics = driverService.getAllDriverPerformanceMetrics(start, end);
+        return ResponseEntity.ok(metrics);
+    }
 }

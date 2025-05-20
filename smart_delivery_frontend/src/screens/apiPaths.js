@@ -8,6 +8,7 @@ export const API_PATH = {
     COLLECTOR: "/smdeli/humanresource/collector",
     SHIPPER: "/smdeli/humanresource/shipper",
     DRIVER: "/smdeli/humanresource/driver",
+    DRIVER_ORDER: "/smdeli/driver",
     PRODUCT_WAREHOUSE: "/smdeli/hubmanager/warehouse/product",
     PRODUCT: "/smdeli/hubmanager/product",
     PRODUCT_WITHOUT_IMAGE: "/smdeli/hubmanager/product/without-image",

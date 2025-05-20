@@ -34,7 +34,7 @@ public class AssignOrderCollector {
     private String createdBy;
     private String approvedBy;
     private String cancelledBy;
-
+    private String notes;
     @CreationTimestamp
     private Timestamp createdAt;
 

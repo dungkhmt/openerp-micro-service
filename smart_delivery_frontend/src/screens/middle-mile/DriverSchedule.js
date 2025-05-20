@@ -388,17 +388,8 @@ const DriverSchedule = () => {
                                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 4 }}>
                                         <ScheduleIcon sx={{ fontSize: 60, color: 'text.disabled', mb: 2 }} />
                                         <Typography variant="h6" color="text.secondary">No trips scheduled for today</Typography>
-                                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                                            Check with your manager for your daily schedule
-                                        </Typography>
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            onClick={() => history.push('/driver/create-trip')}
-                                            sx={{ mt: 3 }}
-                                        >
-                                            Create New Trip
-                                        </Button>
+
+
                                     </Box>
                                 )}
                         </CardContent>

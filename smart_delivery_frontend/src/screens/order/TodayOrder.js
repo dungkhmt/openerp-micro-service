@@ -311,7 +311,7 @@ const TodayOrder = (props) => {
                             <Tab label="Danh sách đơn hàng" value="1"/>
                             <Tab label="Bản đồ" value="2"/>
                             <Tab label="Tiến trình" value="3"/>
-                            {isShipper && <Tab label="Báo cáo phát" value="4"/>}
+
                         </TabList>
                     </Box>
 
@@ -453,56 +453,7 @@ const TodayOrder = (props) => {
                         </Box>
                     </TabPanel>
 
-                    {/* Shipper-specific tab */}
-                    {isShipper && (
-                        <TabPanel value="4">
-                            <Box sx={{ padding: 2, backgroundColor: '#f5f5f5', borderRadius: 2 }}>
-                                <Typography variant="h6" sx={{ marginBottom: 2 }}>
-                                    Báo cáo giao hàng
-                                </Typography>
-                                <Grid container spacing={2}>
-                                    {/* Giao thành công */}
-                                    <Grid item xs={4}>
-                                        <Box sx={{ padding: 2, backgroundColor: 'white', borderRadius: 2, textAlign: 'center' }}>
-                                            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                                Giao thành công
-                                            </Typography>
-                                            <Typography variant="h4" sx={{ color: '#4caf50' }}>
-                                                {assignmentData?.filter(order => order.assignmentStatus === "COMPLETED").length}
-                                            </Typography>
-                                        </Box>
-                                    </Grid>
 
-                                    {/* Giao không thành công */}
-                                    <Grid item xs={4}>
-                                        <Box sx={{ padding: 2, backgroundColor: 'white', borderRadius: 2, textAlign: 'center' }}>
-                                            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                                Giao không thành công
-                                            </Typography>
-                                            <Typography variant="h4" sx={{ color: '#f44336' }}>
-                                                {assignmentData?.filter(order => order.assignmentStatus === "FAILED").length}
-                                            </Typography>
-                                        </Box>
-                                    </Grid>
-
-                                    {/* Chưa giao */}
-                                    <Grid item xs={4}>
-                                        <Box sx={{ padding: 2, backgroundColor: 'white', borderRadius: 2, textAlign: 'center' }}>
-                                            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                                Chưa giao
-                                            </Typography>
-                                            <Typography variant="h4" sx={{ color: '#ff9800' }}>
-                                                {assignmentData?.filter(order =>
-                                                    order.assignmentStatus !== "COMPLETED" &&
-                                                    order.assignmentStatus !== "FAILED"
-                                                ).length}
-                                            </Typography>
-                                        </Box>
-                                    </Grid>
-                                </Grid>
-                            </Box>
-                        </TabPanel>
-                    )}
                 </TabContext>
             </Box>
         </Fragment>

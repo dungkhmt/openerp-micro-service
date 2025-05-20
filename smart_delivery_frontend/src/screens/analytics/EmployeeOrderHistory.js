@@ -9,6 +9,13 @@ import { errorNoti, successNoti } from "utils/notification";
 import { useHistory } from "react-router";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { useSelector } from "react-redux";
+import {
+    PieChart,
+    Pie,
+    Cell,
+    ResponsiveContainer,
+    Tooltip
+} from 'recharts';
 
 const EmployeeOrderHistory = () => {
     const history = useHistory();
@@ -54,20 +61,25 @@ const EmployeeOrderHistory = () => {
         if (day.length < 2) day = '0' + day;
         return [year, month, day].join('-');
     };
-
-    // Format timestamp for display
     const formatDateTime = (timestamp) => {
         if (!timestamp) return 'N/A';
-        const date = new Date(timestamp);
-        return date.toLocaleString('vi-VN', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
 
+        try {
+            const date = new Date(timestamp);
+
+            // Format as DD/MM/YYYY HH:MM
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+
+            return `${day}/${month}/${year} ${hours}:${minutes}`;
+        } catch (error) {
+            console.error("Error formatting timestamp:", error);
+            return 'Invalid date';
+        }
+    };
     // Get status color
     const getStatusColor = (status) => {
         switch (status) {
@@ -75,6 +87,7 @@ const EmployeeOrderHistory = () => {
                 return 'success';
             case 'FAILED':
             case 'FAILED_ATTEMPT':
+            case 'FAILED_ONCE':
             case 'CANCELED':
                 return 'error';
             case 'ASSIGNED':
@@ -100,12 +113,31 @@ const EmployeeOrderHistory = () => {
             'FAILED': 'Thất bại',
             'FAILED_ATTEMPT': 'Giao hàng thất bại',
             'RETURNED_TO_HUB': 'Trả về hub',
-            'CANCELED': 'Đã hủy'
+            'CANCELED': 'Đã hủy',
+            'FAILED_ONCE': 'Thất bại một lần'
         };
         return statusMap[status] || status;
     };
 
-    // Get employee ID by username using your existing endpoints
+    // Get Order Status text
+    const getOrderStatusText = (status) => {
+        const statusMap = {
+            'PENDING': 'Chờ xử lý',
+            'ASSIGNED': 'Đã phân công',
+            'COLLECTED_COLLECTOR': 'Đã thu gom',
+            'COLLECTED_HUB': 'Đã về hub',
+            'DELIVERING': 'Đang vận chuyển',
+            'DELIVERED': 'Đã giao',
+            'ASSIGNED_SHIPPER': 'Đã phân công shipper',
+            'SHIPPING': 'Đang giao hàng',
+            'COMPLETED': 'Hoàn thành',
+            'CANCELLED': 'Đã hủy',
+            'SHIPPED_FAILED': 'Giao hàng thất bại'
+        };
+        return statusMap[status] || status;
+    };
+
+    // Get employee ID by username using existing endpoints
     const getEmployeeIdByUsername = async () => {
         if (!username) return;
 
@@ -143,7 +175,7 @@ const EmployeeOrderHistory = () => {
         }
     };
 
-    // Fetch order history
+    // Fetch order history using the new endpoints
     const fetchOrderHistory = async () => {
         if (!employeeId) {
             setLoading(false);
@@ -153,10 +185,15 @@ const EmployeeOrderHistory = () => {
         setLoading(true);
         let endpoint;
 
+        // Build endpoint with date parameters
+        const startDateParam = formatDateForApi(startDate);
+        const endDateParam = formatDateForApi(endDate);
+        const dateParams = `?startDate=${startDateParam}&endDate=${endDateParam}`;
+
         if (isCollector) {
-            endpoint = `/smdeli/ordermanager/order/assign/today/collector/${employeeId}`;
+            endpoint = `/smdeli/ordermanager/order/history/collector/${employeeId}${dateParams}`;
         } else if (isShipper) {
-            endpoint = `/smdeli/ordermanager/order/assign/shipper/today/${employeeId}`;
+            endpoint = `/smdeli/ordermanager/order/history/shipper/${employeeId}${dateParams}`;
         }
 
         if (endpoint) {
@@ -164,8 +201,50 @@ const EmployeeOrderHistory = () => {
                 "get",
                 endpoint,
                 (res) => {
-                    setOrderHistory(res.data || []);
-                    setFilteredHistory(res.data || []);
+                    // Format dates before setting state
+                    const formattedData = (res.data || []).map(item => {
+                        // Make a copy of the item to avoid mutating the original
+                        const formattedItem = { ...item };
+
+                        // Format the orderCreatedAt date
+                        if (formattedItem.orderCreatedAt) {
+                            try {
+                                const date = new Date(formattedItem.orderCreatedAt);
+                                const day = String(date.getDate()).padStart(2, '0');
+                                const month = String(date.getMonth() + 1).padStart(2, '0');
+                                const year = date.getFullYear();
+                                const hours = String(date.getHours()).padStart(2, '0');
+                                const minutes = String(date.getMinutes()).padStart(2, '0');
+
+                                // Replace the ISO timestamp with formatted version
+                                formattedItem.orderCreatedAt = `${day}/${month}/${year} ${hours}:${minutes}`;
+                            } catch (error) {
+                                console.error("Error formatting orderCreatedAt:", error);
+                            }
+                        }
+
+                        // Also format the doneAt date
+                        if (formattedItem.doneAt) {
+                            try {
+                                const date = new Date(formattedItem.doneAt);
+                                const day = String(date.getDate()).padStart(2, '0');
+                                const month = String(date.getMonth() + 1).padStart(2, '0');
+                                const year = date.getFullYear();
+                                const hours = String(date.getHours()).padStart(2, '0');
+                                const minutes = String(date.getMinutes()).padStart(2, '0');
+
+                                // Replace the ISO timestamp with formatted version
+                                formattedItem.doneAt = `${day}/${month}/${year} ${hours}:${minutes}`;
+                            } catch (error) {
+                                console.error("Error formatting doneAt:", error);
+                            }
+                        }
+
+                        return formattedItem;
+                    });
+
+                    setOrderHistory(formattedData);
+                    setFilteredHistory(formattedData);
                     setLoading(false);
                 },
                 {
@@ -215,14 +294,21 @@ const EmployeeOrderHistory = () => {
         }
     }, [username, role]);
 
-    // Fetch order history when employeeId is available
+    // Fetch order history when employeeId is available or date range changes
     useEffect(() => {
         if (employeeId) {
             fetchOrderHistory();
         }
-    }, [employeeId]);
+    }, [employeeId, startDate, endDate]);
 
-    // Prepare table columns for collectors
+    // Handle date range change
+    const handleDateRangeChange = () => {
+        if (employeeId) {
+            fetchOrderHistory();
+        }
+    };
+
+    // Prepare table columns for collectors - SIMPLIFIED TO SHOW KEY DATA ONLY
     const collectorColumns = [
         {
             title: "Mã đơn hàng",
@@ -233,61 +319,15 @@ const EmployeeOrderHistory = () => {
                 </Typography>
             )
         },
-        { title: "Số thứ tự", field: "sequenceNumber" },
+        { title: "STT", field: "sequenceNumber" },
         { title: "Tên người gửi", field: "senderName" },
         { title: "Số điện thoại", field: "senderPhone" },
-        { title: "Địa chỉ lấy hàng", field: "senderAddress" },
         {
-            title: "Trạng thái đơn hàng",
-            field: "status",
-            render: (rowData) => (
-                <Chip
-                    label={getStatusText(rowData.status)}
-                    color={getStatusColor(rowData.status)}
-                    size="small"
-                />
-            )
-        },
-        {
-            title: "Trạng thái phân công",
-            field: "assignmentStatus",
-            render: (rowData) => (
-                <Chip
-                    label={getStatusText(rowData.assignmentStatus)}
-                    color={getStatusColor(rowData.assignmentStatus)}
-                    size="small"
-                />
-            )
-        },
-        {
-            title: "Thời gian tạo",
-            field: "orderCreatedAt",
-            render: (rowData) => formatDateTime(rowData.orderCreatedAt)
-        },
-        { title: "Số lượng item", field: "numOfItem" }
-    ];
-
-    // Prepare table columns for shippers
-    const shipperColumns = [
-        {
-            title: "Mã đơn hàng",
-            field: "orderId",
-            render: (rowData) => (
-                <Typography variant="body2" style={{ fontFamily: 'monospace' }}>
-                    {rowData.orderId.toString().substring(0, 8)}...
-                </Typography>
-            )
-        },
-        { title: "Số thứ tự", field: "sequenceNumber" },
-        { title: "Tên người nhận", field: "recipientName" },
-        { title: "Số điện thoại", field: "recipientPhone" },
-        { title: "Địa chỉ giao hàng", field: "recipientAddress" },
-        {
-            title: "Trạng thái đơn hàng",
+            title: "Trạng thái đơn",
             field: "orderStatus",
             render: (rowData) => (
                 <Chip
-                    label={getStatusText(rowData.orderStatus)}
+                    label={getOrderStatusText(rowData.orderStatus)}
                     color={getStatusColor(rowData.orderStatus)}
                     size="small"
                 />
@@ -305,11 +345,77 @@ const EmployeeOrderHistory = () => {
             )
         },
         {
-            title: "Thời gian tạo",
-            field: "orderCreatedAt",
-            render: (rowData) => formatDateTime(rowData.orderCreatedAt)
+            title: "Thời gian xong",
+            field: "doneAt",
+            render: (rowData) => formatDateTime(rowData.doneAt)
         }
     ];
+
+    // Prepare table columns for shippers - SIMPLIFIED TO SHOW KEY DATA ONLY
+    const shipperColumns = [
+        {
+            title: "Mã đơn hàng",
+            field: "orderId",
+            render: (rowData) => (
+                <Typography variant="body2" style={{ fontFamily: 'monospace' }}>
+                    {rowData.orderId.toString().substring(0, 8)}...
+                </Typography>
+            )
+        },
+        { title: "STT", field: "sequenceNumber" },
+        { title: "Tên người nhận", field: "recipientName" },
+        { title: "Số điện thoại", field: "recipientPhone" },
+        {
+            title: "Trạng thái đơn",
+            field: "orderStatus",
+            render: (rowData) => (
+                <Chip
+                    label={getOrderStatusText(rowData.orderStatus)}
+                    color={getStatusColor(rowData.orderStatus)}
+                    size="small"
+                />
+            )
+        },
+        {
+            title: "Trạng thái phân công",
+            field: "assignmentStatus",
+            render: (rowData) => (
+                <Chip
+                    label={getStatusText(rowData.assignmentStatus)}
+                    color={getStatusColor(rowData.assignmentStatus)}
+                    size="small"
+                />
+            )
+        },
+        {
+            title: "Thời gian xong",
+            field: "doneAt",
+            render: (rowData) => formatDateTime(rowData.doneAt)
+        }
+    ];
+
+    // Generate data for status pie chart
+    const prepareStatusData = () => {
+        const statusCounts = {};
+        filteredHistory.forEach(item => {
+            if (statusCounts[item.assignmentStatus]) {
+                statusCounts[item.assignmentStatus]++;
+            } else {
+                statusCounts[item.assignmentStatus] = 1;
+            }
+        });
+
+        return Object.entries(statusCounts)
+            .filter(([status, count]) => count > 0)
+            .map(([status, count]) => ({
+                name: getStatusText(status),
+                value: count,
+                status: status
+            }));
+    };
+
+    // Colors for pie chart
+    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#FF6384'];
 
     // Get unique statuses for filter dropdown
     const getUniqueStatuses = () => {
@@ -326,6 +432,8 @@ const EmployeeOrderHistory = () => {
         const completed = filteredHistory.filter(item => item.assignmentStatus === 'COMPLETED').length;
         const failed = filteredHistory.filter(item =>
             item.assignmentStatus === 'FAILED' ||
+            item.assignmentStatus === 'FAILED_ONCE' ||
+
             item.assignmentStatus === 'FAILED_ATTEMPT' ||
             item.assignmentStatus === 'CANCELED'
         ).length;
@@ -340,9 +448,9 @@ const EmployeeOrderHistory = () => {
         <LoadingScreen />
     ) : (
         <Fragment>
-            <Box className={classes.bodyBox}>
+            <Box className={classes.bodyBox} style={{ width: '100%', maxWidth: '100%' }}>
                 <TabContext value={tabValue}>
-                    <Box sx={{ borderBottom: 0, borderColor: "divider" }}>
+                    <Box sx={{ borderBottom: 0, borderColor: "divider", width: '100%' }}>
                         <TabList onChange={(event, newValue) => setTabValue(newValue)}>
                             <Tab label="Lịch sử đơn hàng" value="1" />
                             <Tab label="Thống kê tổng quan" value="2" />
@@ -350,8 +458,28 @@ const EmployeeOrderHistory = () => {
                     </Box>
 
                     {/* Filter Controls */}
-                    <Box sx={{ mb: 2, p: 2, backgroundColor: '#f5f5f5', borderRadius: 2 }}>
+                    <Box sx={{ mb: 2, p: 2, backgroundColor: '#f5f5f5', borderRadius: 2, width: '100%' }}>
                         <Grid container spacing={2} alignItems="center">
+                            <Grid item xs={12} md={3}>
+                                <TextField
+                                    label="Từ ngày"
+                                    type="date"
+                                    fullWidth
+                                    value={formatDateForInput(startDate)}
+                                    onChange={(e) => setStartDate(new Date(e.target.value))}
+                                    InputLabelProps={{ shrink: true }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={3}>
+                                <TextField
+                                    label="Đến ngày"
+                                    type="date"
+                                    fullWidth
+                                    value={formatDateForInput(endDate)}
+                                    onChange={(e) => setEndDate(new Date(e.target.value))}
+                                    InputLabelProps={{ shrink: true }}
+                                />
+                            </Grid>
                             <Grid item xs={12} md={3}>
                                 <FormControl fullWidth>
                                     <InputLabel>Trạng thái</InputLabel>
@@ -369,21 +497,12 @@ const EmployeeOrderHistory = () => {
                                     </Select>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    label="Tìm kiếm (Mã đơn hàng, tên khách hàng)"
-                                    fullWidth
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    placeholder="Nhập để tìm kiếm..."
-                                />
-                            </Grid>
                             <Grid item xs={12} md={3}>
                                 <Button
                                     variant="contained"
                                     color="primary"
                                     fullWidth
-                                    onClick={fetchOrderHistory}
+                                    onClick={handleDateRangeChange}
                                 >
                                     Làm mới
                                 </Button>
@@ -392,145 +511,224 @@ const EmployeeOrderHistory = () => {
                     </Box>
 
                     {/* Order History Tab */}
-                    <TabPanel value="1">
+                    <TabPanel value="1" sx={{ padding: 0, width: '100%' }}>
                         {filteredHistory.length > 0 ? (
-                            <>
-                                <Typography variant="h6" gutterBottom>
-                                    Lịch sử đơn hàng - {isCollector ? 'Nhân viên thu gom' : 'Nhân viên giao hàng'}
-                                </Typography>
-                                <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                                    Tổng cộng: {filteredHistory.length} đơn hàng
-                                </Typography>
+                            <Box sx={{ width: '100%' }}>
 
-                                <StandardTable
-                                    columns={isCollector ? collectorColumns : shipperColumns}
-                                    data={filteredHistory}
-                                    options={{
-                                        search: false,
-                                        paging: true,
-                                        pageSize: 10,
-                                        pageSizeOptions: [5, 10, 20, 50],
-                                        sorting: true,
-                                        headerStyle: {
-                                            fontWeight: 'bold',
-                                            backgroundColor: '#f5f5f5'
-                                        },
-                                        rowStyle: {
-                                            fontSize: '0.875rem'
-                                        }
-                                    }}
-                                />
-                            </>
+
+                                <Box sx={{ width: '100%', overflowX: 'auto', mt: 0, pt: 0 }}>
+                                    <StandardTable
+                                        title={<><Typography variant="h6" gutterBottom>
+                                            Lịch sử đơn hàng - {isCollector ? 'Nhân viên thu gom' : 'Nhân viên giao hàng'}
+                                        </Typography>
+                                            <Typography variant="subtitle2" color="textSecondary" gutterBottom>
+                                            Tổng cộng: {filteredHistory.length} đơn hàng
+                                        ({formatDateForApi(startDate)} - {formatDateForApi(endDate)})
+                                </Typography></>}
+                                        columns={isCollector ? collectorColumns : shipperColumns}
+                                        data={filteredHistory}
+                                        options={{
+                                            search: true,
+                                            searchFieldAlignment: "left",
+                                            searchFieldStyle: { width: '100%' },
+                                            searchFieldVariant: "outlined",
+                                            searchPlaceholder: "Tìm kiếm đơn hàng...",
+                                            paging: true,
+                                            pageSize: 10,
+                                            pageSizeOptions: [5, 10, 20, 50],
+                                            sorting: true,
+                                            headerStyle: {
+                                                fontWeight: 'bold',
+                                                backgroundColor: '#f5f5f5'
+                                            },
+                                            rowStyle: {
+                                                fontSize: '0.875rem'
+                                            },
+                                            maxBodyHeight: '600px',
+                                            minBodyHeight: '400px',
+                                            fixedColumns: {
+                                                left: 2
+                                            }
+                                        }}
+                                    />
+                                </Box>
+                            </Box>
                         ) : (
                             <Box sx={{ textAlign: 'center', p: 4 }}>
                                 <Typography variant="h6">
                                     Không có dữ liệu lịch sử đơn hàng
                                 </Typography>
                                 <Typography variant="body2" color="textSecondary">
-                                    Chưa có đơn hàng nào được phân công cho bạn
+                                    Chưa có đơn hàng nào được phân công cho bạn trong khoảng thời gian này
                                 </Typography>
                             </Box>
                         )}
                     </TabPanel>
 
                     {/* Summary Statistics Tab */}
-                    <TabPanel value="2">
-                        <Typography variant="h6" gutterBottom>
-                            Thống kê tổng quan
-                        </Typography>
+                    <TabPanel value="2" sx={{ padding: 0, width: '100%' }}>
+                        <Box sx={{ width: '100%' }}>
+                            <Typography variant="h6" gutterBottom>
+                                Thống kê tổng quan ({formatDateForApi(startDate)} - {formatDateForApi(endDate)})
+                            </Typography>
 
-                        <Grid container spacing={2}>
-                            {/* Summary Cards */}
-                            <Grid item xs={12} md={3}>
-                                <Paper sx={{ p: 2, textAlign: 'center', height: '100%' }}>
-                                    <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                        Tổng số đơn
-                                    </Typography>
-                                    <Typography variant="h3" sx={{ color: 'primary.main' }}>
-                                        {summaryStats.total}
-                                    </Typography>
-                                </Paper>
-                            </Grid>
-                            <Grid item xs={12} md={3}>
-                                <Paper sx={{ p: 2, textAlign: 'center', height: '100%' }}>
-                                    <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                        Đơn hoàn thành
-                                    </Typography>
-                                    <Typography variant="h4" sx={{ color: 'success.main' }}>
-                                        {summaryStats.completed}
-                                    </Typography>
-                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                        {summaryStats.total > 0 ?
-                                            ((summaryStats.completed / summaryStats.total) * 100).toFixed(1) : 0}% tổng số đơn
-                                    </Typography>
-                                </Paper>
-                            </Grid>
-                            <Grid item xs={12} md={3}>
-                                <Paper sx={{ p: 2, textAlign: 'center', height: '100%' }}>
-                                    <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                        Đơn thất bại
-                                    </Typography>
-                                    <Typography variant="h4" sx={{ color: 'error.main' }}>
-                                        {summaryStats.failed}
-                                    </Typography>
-                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                        {summaryStats.total > 0 ?
-                                            ((summaryStats.failed / summaryStats.total) * 100).toFixed(1) : 0}% tổng số đơn
-                                    </Typography>
-                                </Paper>
-                            </Grid>
-                            <Grid item xs={12} md={3}>
-                                <Paper sx={{ p: 2, textAlign: 'center', height: '100%' }}>
-                                    <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                        Đơn đang xử lý
-                                    </Typography>
-                                    <Typography variant="h4" sx={{ color: 'warning.main' }}>
-                                        {summaryStats.pending}
-                                    </Typography>
-                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                        {summaryStats.total > 0 ?
-                                            ((summaryStats.pending / summaryStats.total) * 100).toFixed(1) : 0}% tổng số đơn
-                                    </Typography>
-                                </Paper>
-                            </Grid>
+                            <Grid container spacing={2}>
+                                {/* Summary Cards */}
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <Paper sx={{ p: 2, textAlign: 'center', height: '100%' }}>
+                                        <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                                            Tổng số đơn
+                                        </Typography>
+                                        <Typography variant="h3" sx={{ color: 'primary.main' }}>
+                                            {summaryStats.total}
+                                        </Typography>
+                                    </Paper>
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <Paper sx={{ p: 2, textAlign: 'center', height: '100%' }}>
+                                        <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                                            Đơn hoàn thành
+                                        </Typography>
+                                        <Typography variant="h4" sx={{ color: 'success.main' }}>
+                                            {summaryStats.completed}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                            {summaryStats.total > 0 ?
+                                                ((summaryStats.completed / summaryStats.total) * 100).toFixed(1) : 0}% tổng số đơn
+                                        </Typography>
+                                    </Paper>
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <Paper sx={{ p: 2, textAlign: 'center', height: '100%' }}>
+                                        <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                                            Đơn thất bại
+                                        </Typography>
+                                        <Typography variant="h4" sx={{ color: 'error.main' }}>
+                                            {summaryStats.failed}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                            {summaryStats.total > 0 ?
+                                                ((summaryStats.failed / summaryStats.total) * 100).toFixed(1) : 0}% tổng số đơn
+                                        </Typography>
+                                    </Paper>
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <Paper sx={{ p: 2, textAlign: 'center', height: '100%' }}>
+                                        <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                                            Đơn đang xử lý
+                                        </Typography>
+                                        <Typography variant="h4" sx={{ color: 'warning.main' }}>
+                                            {summaryStats.pending}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                            {summaryStats.total > 0 ?
+                                                ((summaryStats.pending / summaryStats.total) * 100).toFixed(1) : 0}% tổng số đơn
+                                        </Typography>
+                                    </Paper>
+                                </Grid>
 
-                            {/* Status Distribution */}
-                            <Grid item xs={12}>
-                                <Paper sx={{ p: 2 }}>
-                                    <Typography variant="h6" gutterBottom>
-                                        Chi tiết trạng thái
-                                    </Typography>
-                                    <Grid container spacing={2}>
-                                        {getUniqueStatuses().map((status) => {
-                                            const count = filteredHistory.filter(item => item.assignmentStatus === status).length;
-                                            const percentage = summaryStats.total > 0 ?
-                                                ((count / summaryStats.total) * 100).toFixed(1) : 0;
+                                {/* Status Distribution with Pie Chart */}
+                                <Grid item xs={12} md={6}>
+                                    <Paper sx={{ p: 2 }}>
+                                        <Typography variant="h6" gutterBottom>
+                                            Phân bố trạng thái (Biểu đồ)
+                                        </Typography>
+                                        <Box sx={{ height: 300 }}>
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <PieChart>
+                                                    <Pie
+                                                        data={prepareStatusData()}
+                                                        cx="50%"
+                                                        cy="50%"
+                                                        labelLine={false}
+                                                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+                                                        outerRadius={100}
+                                                        fill="#8884d8"
+                                                        dataKey="value"
+                                                    >
+                                                        {prepareStatusData().map((entry, index) => (
+                                                            <Cell
+                                                                key={`cell-${index}`}
+                                                                fill={COLORS[index % COLORS.length]}
+                                                            />
+                                                        ))}
+                                                    </Pie>
+                                                    <Tooltip
+                                                        formatter={(value, name) => [value, name]}
+                                                        labelFormatter={() => ''}
+                                                    />
+                                                </PieChart>
+                                            </ResponsiveContainer>
+                                        </Box>
+                                    </Paper>
+                                </Grid>
 
-                                            return (
-                                                <Grid item xs={12} sm={6} md={4} key={status}>
-                                                    <Box sx={{
-                                                        p: 2,
-                                                        border: '1px solid #e0e0e0',
-                                                        borderRadius: 1,
-                                                        textAlign: 'center'
-                                                    }}>
-                                                        <Chip
-                                                            label={getStatusText(status)}
-                                                            color={getStatusColor(status)}
-                                                            sx={{ mb: 1 }}
-                                                        />
-                                                        <Typography variant="h5">{count}</Typography>
-                                                        <Typography variant="body2" color="textSecondary">
-                                                            {percentage}% tổng số
-                                                        </Typography>
-                                                    </Box>
-                                                </Grid>
-                                            );
-                                        })}
-                                    </Grid>
-                                </Paper>
+                                {/* Status Distribution Table */}
+                                <Grid item xs={12} md={6}>
+                                    <Paper sx={{ p: 2 }}>
+                                        <Typography variant="h6" gutterBottom>
+                                            Chi tiết trạng thái
+                                        </Typography>
+                                        <Grid container spacing={2}>
+                                            {getUniqueStatuses().map((status) => {
+                                                const count = filteredHistory.filter(item => item.assignmentStatus === status).length;
+                                                const percentage = summaryStats.total > 0 ?
+                                                    ((count / summaryStats.total) * 100).toFixed(1) : 0;
+
+                                                return (
+                                                    <Grid item xs={12} sm={6} md={12} key={status}>
+                                                        <Box sx={{
+                                                            p: 2,
+                                                            border: '1px solid #e0e0e0',
+                                                            borderRadius: 1,
+                                                            textAlign: 'center'
+                                                        }}>
+                                                            <Chip
+                                                                label={getStatusText(status)}
+                                                                color={getStatusColor(status)}
+                                                                sx={{ mb: 1 }}
+                                                            />
+                                                            <Typography variant="h5">{count}</Typography>
+                                                            <Typography variant="body2" color="textSecondary">
+                                                                {percentage}% tổng số
+                                                            </Typography>
+                                                        </Box>
+                                                    </Grid>
+                                                );
+                                            })}
+                                        </Grid>
+                                    </Paper>
+                                </Grid>
+
+                                {/* Date Range Summary */}
+                                <Grid item xs={12}>
+                                    <Paper sx={{ p: 2 }}>
+                                        <Typography variant="h6" gutterBottom>
+                                            Hiệu suất theo thời gian
+                                        </Typography>
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={12} md={4}>
+                                                <Typography variant="body1" fontWeight="bold">
+                                                    Khoảng thời gian: {formatDateForApi(startDate)} đến {formatDateForApi(endDate)}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={12} md={4}>
+                                                <Typography variant="body1">
+                                                    Tỷ lệ hoàn thành: {summaryStats.total > 0 ?
+                                                    ((summaryStats.completed / summaryStats.total) * 100).toFixed(1) : 0}%
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={12} md={4}>
+                                                <Typography variant="body1">
+                                                    Trung bình đơn/ngày: {summaryStats.total > 0 ?
+                                                    (summaryStats.total / Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)))).toFixed(1) : 0}
+                                                </Typography>
+                                            </Grid>
+                                        </Grid>
+                                    </Paper>
+                                </Grid>
                             </Grid>
-                        </Grid>
+                        </Box>
                     </TabPanel>
                 </TabContext>
             </Box>

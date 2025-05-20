@@ -2,8 +2,8 @@ import { Route, Switch, useRouteMatch } from "react-router-dom";
 import CreateHub from "../screens/hub/createHub";
 import ListHub from "../screens/hub/ListHub";
 import UpdateHub from "../screens/hub/UpdateHub";
-import EmployeeStatistics from "../screens/analytics/EmployeeStatistics";
 import EmployeeOrderHistory from "../screens/analytics/EmployeeOrderHistory";
+import DriverTripHistory from "../screens/analytics/DriverTripHistory";
 
 export default function StatisticsRouter() {
     let { path } = useRouteMatch();
@@ -13,15 +13,15 @@ export default function StatisticsRouter() {
         <div>
             <Switch>
                 <Route
-                    component={EmployeeStatistics}
-                    exact
-                    path={`${path}/me`}
-                />
-                <Route
                 component={EmployeeOrderHistory}
                 exact
-                path={`${path}/order/history`}
+                path={`${path}/me`}
             />
+                <Route
+                    component={DriverTripHistory}
+                    exact
+                    path={`${path}/driver`}
+                />
             </Switch>
         </div>
     );

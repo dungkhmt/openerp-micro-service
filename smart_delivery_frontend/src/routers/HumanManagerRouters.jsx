@@ -6,7 +6,6 @@ import DriverList from "../screens/human/driver/DriverList";
 import createEmployee from "../screens/human/createEmployee";
 import UpdateCollector from "../screens/human/collector/UpdateCollector";
 import UpdateShipper from "../screens/human/shipper/UpdateShipper";
-import EmployeeStatistics from "../screens/analytics/EmployeeStatistics";
 
 
 export default function HumanManagerRouters() {

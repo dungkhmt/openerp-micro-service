@@ -44,6 +44,7 @@ import {
 import { request } from '../../api';
 import { API_PATH } from '../apiPaths';
 import { errorNoti, successNoti } from '../../utils/notification';
+import { useSelector } from "react-redux";
 
 // Custom styles
 const useStyles = {
@@ -129,6 +130,7 @@ const DriverTripHistory = () => {
     const [tripDetails, setTripDetails] = useState(null);
     const [openTripDialog, setOpenTripDialog] = useState(false);
     const [loadingDetails, setLoadingDetails] = useState(false);
+    const username = useSelector((state) => state.auth.username);
 
     // Fetch data on component mount
     useEffect(() => {
@@ -155,7 +157,7 @@ const DriverTripHistory = () => {
         try {
             await request(
                 "get",
-                `${API_PATH.DRIVER}/trips/today`,
+                `${API_PATH.DRIVER_ORDER}/trips/today`,
                 (res) => {
                     setTrips(prev => ({ ...prev, today: res.data }));
                 },
@@ -173,7 +175,7 @@ const DriverTripHistory = () => {
         try {
             await request(
                 "get",
-                `${API_PATH.DRIVER}/trips`,
+                `${API_PATH.DRIVER_ORDER}/trips`,
                 (res) => {
                     setTrips(prev => ({ ...prev, all: res.data }));
                 },
@@ -191,7 +193,7 @@ const DriverTripHistory = () => {
         try {
             await request(
                 "get",
-                `${API_PATH.DRIVER}/vehicle`,
+                `${API_PATH.DRIVER_ORDER}/vehicle`,
                 (res) => {
                     setVehicle(res.data);
                 },
@@ -206,8 +208,6 @@ const DriverTripHistory = () => {
     };
 
     const calculateStatistics = () => {
-        // This would typically be calculated from the trips data
-        // For now, we'll use placeholder logic
         const allTrips = trips.all;
         const completedTrips = allTrips.filter(trip => trip.status === 'COMPLETED').length;
         const activeTrips = allTrips.filter(trip => trip.status === 'IN_PROGRESS').length;
@@ -232,7 +232,7 @@ const DriverTripHistory = () => {
         try {
             await request(
                 "get",
-                `${API_PATH.DRIVER}/trips/${tripId}`,
+                `${API_PATH.DRIVER_ORDER}/trips/${tripId}`,
                 (res) => {
                     setTripDetails(res.data);
                     setOpenTripDialog(true);

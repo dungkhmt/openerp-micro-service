@@ -8,6 +8,7 @@ import openerp.openerpresourceserver.entity.Vehicle;
 import org.springframework.http.ResponseEntity;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -93,4 +94,7 @@ public interface OrderService {
      * Get shipper pickup requests - shippers with assigned orders waiting for pickup
      */
     List<TodayAssignmentShipperDto> getShipperPickupRequests(UUID hubId);
+    // New methods for order history
+    List<CollectorOrderHistoryDto> getCollectorOrderHistory(UUID collectorId, LocalDate startDate, LocalDate endDate);
+    List<ShipperOrderHistoryDto> getShipperOrderHistory(UUID shipperId, LocalDate startDate, LocalDate endDate);
 }

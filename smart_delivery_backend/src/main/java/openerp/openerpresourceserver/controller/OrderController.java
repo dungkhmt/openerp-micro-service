@@ -11,6 +11,7 @@ import openerp.openerpresourceserver.service.OrderHistoryService;
 import openerp.openerpresourceserver.service.OrderService;
 import openerp.openerpresourceserver.service.ShipperAssignmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -133,7 +134,28 @@ public class OrderController {
     public ResponseEntity<List<AssignOrderCollectorDTO>> getAssignmentTodayByCollectorId(@PathVariable UUID collectorId) {
         return ResponseEntity.ok(orderService.getAssignmentTodayByCollectorId(collectorId));
     }
-
+    /**
+     * Get order history for collector with order details
+     */
+    @PreAuthorize("hasRole('COLLECTOR')")
+    @GetMapping("/order/history/collector/{collectorId}")
+    public ResponseEntity<List<CollectorOrderHistoryDto>> getCollectorOrderHistory(
+            @PathVariable UUID collectorId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return ResponseEntity.ok(orderService.getCollectorOrderHistory(collectorId, startDate, endDate));
+    }
+    /**
+     * Get order history for shipper with order details
+     */
+    @PreAuthorize("hasRole('SHIPPER')")
+    @GetMapping("/order/history/shipper/{shipperId}")
+    public ResponseEntity<List<ShipperOrderHistoryDto>> getShipperOrderHistory(
+            @PathVariable UUID shipperId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return ResponseEntity.ok(orderService.getShipperOrderHistory(shipperId, startDate, endDate));
+    }
     @PutMapping("/order/assignment/collector")
     public ResponseEntity<?> updateAssignment(@RequestBody UpdateAssignmentRequest request, Principal principal) {
         try {

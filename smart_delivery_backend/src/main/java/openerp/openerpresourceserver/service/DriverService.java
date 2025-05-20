@@ -1,10 +1,9 @@
 package openerp.openerpresourceserver.service;
 
-import openerp.openerpresourceserver.dto.OrderForTripDto;
-import openerp.openerpresourceserver.dto.OrderSuggestionDto;
-import openerp.openerpresourceserver.dto.VehicleDto;
+import openerp.openerpresourceserver.dto.*;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,4 +39,38 @@ public interface DriverService {
     void deliverOrders(String username, List<UUID> orderIds);
 
     List<OrderSuggestionDto> getSuggestedOrderItemsForTrip(UUID tripId);
+    /**
+     * Get driver statistics by username
+     */
+    DriverStatisticsDto getDriverStatisticsByUsername(String username);
+
+    /**
+     * Get driver statistics by username for a specific date range
+     */
+    DriverStatisticsDto getDriverStatisticsByDateRange(String username, LocalDate startDate, LocalDate endDate);
+
+    /**
+     * Get driver statistics by driver ID
+     */
+    DriverStatisticsDto getDriverStatistics(UUID driverId);
+
+    /**
+     * Get driver statistics by driver ID for a specific date range
+     */
+    DriverStatisticsDto getDriverStatisticsByDateRange(UUID driverId, LocalDate startDate, LocalDate endDate);
+
+    /**
+     * Get driver trip history by username
+     */
+    List<TripHistoryDto> getDriverTripHistory(String username, LocalDate startDate, LocalDate endDate);
+
+    /**
+     * Get driver trip history by driver ID
+     */
+    List<TripHistoryDto> getDriverTripHistoryById(UUID driverId, LocalDate startDate, LocalDate endDate);
+
+    /**
+     * Get performance metrics for all drivers
+     */
+    List<DriverStatisticsDto> getAllDriverPerformanceMetrics(LocalDate startDate, LocalDate endDate);
 }

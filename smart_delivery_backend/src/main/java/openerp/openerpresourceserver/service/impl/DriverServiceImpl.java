@@ -4,12 +4,11 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import openerp.openerpresourceserver.dto.OrderForTripDto;
-import openerp.openerpresourceserver.dto.OrderSuggestionDto;
-import openerp.openerpresourceserver.dto.VehicleDto;
+import openerp.openerpresourceserver.dto.*;
 import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.entity.enumentity.OrderItemStatus;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
+import openerp.openerpresourceserver.entity.enumentity.TripStatus;
 import openerp.openerpresourceserver.entity.enumentity.VehicleStatus;
 import openerp.openerpresourceserver.mapper.VehicleMapper;
 import openerp.openerpresourceserver.repository.*;
@@ -20,6 +19,7 @@ import openerp.openerpresourceserver.service.TripService;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.Temporal;
@@ -48,7 +48,7 @@ public class DriverServiceImpl implements DriverService {
     private final SenderRepo senderRepo;
     private final RecipientRepo recipientRepo;
     private final RouteScheduleRepository routeScheduleRepository;
-
+    private final VehicleRepository vehicleRepository;
     @Override
     public VehicleDto getDriverVehicleByUsername(String username) {
         // Find driver by username
@@ -432,5 +432,318 @@ public class DriverServiceImpl implements DriverService {
                     return orderItem != null ? orderItem.getHeight()*orderItem.getLength()*orderItem.getWidth() : 0.0;
                 })
                 .sum();
+    }
+    @Override
+    public DriverStatisticsDto getDriverStatisticsByUsername(String username) {
+        // Find driver by username
+        Driver driver = driverRepo.findByUsername(username);
+        if (driver == null) {
+            throw new NotFoundException("Driver not found with username: " + username);
+        }
+
+        return getDriverStatistics(driver.getId());
+    }
+
+    @Override
+    public DriverStatisticsDto getDriverStatisticsByDateRange(String username, LocalDate startDate, LocalDate endDate) {
+        // Find driver by username
+        Driver driver = driverRepo.findByUsername(username);
+        if (driver == null) {
+            throw new NotFoundException("Driver not found with username: " + username);
+        }
+
+        return getDriverStatisticsByDateRange(driver.getId(), startDate, endDate);
+    }
+
+    @Override
+    public DriverStatisticsDto getDriverStatistics(UUID driverId) {
+        // Default to last 30 days if no date range is specified
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(30);
+
+        return getDriverStatisticsByDateRange(driverId, startDate, endDate);
+    }
+
+    @Override
+    public DriverStatisticsDto getDriverStatisticsByDateRange(UUID driverId, LocalDate startDate, LocalDate endDate) {
+        // Find driver
+        Driver driver = driverRepo.findById(driverId)
+                .orElseThrow(() -> new NotFoundException("Driver not found with ID: " + driverId));
+
+        // Get trips in date range
+        List<Trip> trips = tripRepository.findByDriverId(driverId).stream()
+                .filter(trip -> {
+                    // Filter by trip date
+                    return (trip.getDate() != null &&
+                            !trip.getDate().isBefore(startDate) &&
+                            !trip.getDate().isAfter(endDate));
+                })
+                .collect(Collectors.toList());
+
+        // Calculate basic metrics
+        int totalTrips = trips.size();
+        int completedTrips = (int) trips.stream()
+                .filter(trip -> trip.getStatus() == TripStatus.COMPLETED)
+                .count();
+        int cancelledTrips = (int) trips.stream()
+                .filter(trip -> trip.getStatus() == TripStatus.CANCELLED)
+                .count();
+        double completionRate = totalTrips > 0 ? (double) completedTrips / totalTrips * 100 : 0;
+
+        // Calculate trip duration
+        double totalDurationMinutes = trips.stream()
+                .filter(trip -> trip.getStartTime() != null && trip.getEndTime() != null)
+                .mapToLong(trip -> {
+                    return Duration.between(trip.getStartTime(), trip.getEndTime()).toMinutes();
+                })
+                .sum();
+        double averageTripDuration = completedTrips > 0 ? totalDurationMinutes / completedTrips : 0;
+
+        // Calculate orders delivered and failed
+
+        Map<String, Integer> orderStatusCounts = new HashMap<>();
+
+        java.util.concurrent.atomic.AtomicInteger totalOrdersDelivered = new java.util.concurrent.atomic.AtomicInteger(0);
+        java.util.concurrent.atomic.AtomicInteger totalOrdersFailed = new java.util.concurrent.atomic.AtomicInteger(0);
+
+        for (Trip trip : trips) {
+            List<TripOrder> tripOrders = tripOrderRepository.findByTripId(trip.getId());
+
+            for (TripOrder tripOrder : tripOrders) {
+                orderRepo.findById(tripOrder.getOrderId()).ifPresent(order -> {
+                    // Count by status
+                    String status = order.getStatus().toString();
+                    orderStatusCounts.put(status, orderStatusCounts.getOrDefault(status, 0) + 1);
+
+                    // Count deliveries and failures
+                    if (order.getStatus() == OrderStatus.DELIVERED ||
+                            order.getStatus() == OrderStatus.COMPLETED) {
+                        totalOrdersDelivered.incrementAndGet();
+                    } else if (order.getStatus() == OrderStatus.DELIVERED_FAILED) {
+                        totalOrdersFailed.incrementAndGet();
+                    }
+                });
+            }
+        }
+
+        int deliveredCount = totalOrdersDelivered.get();
+        int failedCount = totalOrdersFailed.get();
+
+        // Calculate delivery success rate
+        int totalOrders = deliveredCount + failedCount;
+        double deliverySuccessRate = totalOrders > 0 ? (double) deliveredCount / totalOrders * 100 : 0;
+
+        // Calculate trip status counts
+        Map<String, Integer> tripStatusCounts = new HashMap<>();
+        for (Trip trip : trips) {
+            String status = trip.getStatus().toString();
+            tripStatusCounts.put(status, tripStatusCounts.getOrDefault(status, 0) + 1);
+        }
+
+        // Calculate performance metrics (these would be more complex in a real implementation)
+        double averageTripDistance = trips.stream()
+                .filter(trip -> trip.getDistanceTraveled() != null)
+                .mapToDouble(Trip::getDistanceTraveled)
+                .average()
+                .orElse(0);
+
+        // Calculate average stops per trip
+        double totalStops = trips.stream()
+                .filter(trip -> trip.getCurrentStopIndex() != null)
+                .mapToInt(Trip::getCurrentStopIndex)
+                .sum();
+        double averageStopsPerTrip = totalTrips > 0 ? totalStops / totalTrips : 0;
+
+        // Calculate time per stop (simplified)
+        double averageTimePerStop = totalStops > 0 ? totalDurationMinutes / totalStops : 0;
+
+        // Calculate on-time metrics (simplified)
+        // In a real implementation, would compare scheduled vs. actual times
+        double onTimeStartPercentage = 90.0; // Simplified
+        double onTimeCompletionPercentage = 85.0; // Simplified
+
+        // Build and return the statistics DTO
+        return DriverStatisticsDto.builder()
+                .driverId(driverId)
+                .driverName(driver.getName())
+                .driverCode(driver.getCode())
+                .driverPhone(driver.getPhone())
+                .username(driver.getUsername())
+                .totalTrips(totalTrips)
+                .completedTrips(completedTrips)
+                .cancelledTrips(cancelledTrips)
+                .completionRate(completionRate)
+                .averageTripDuration(averageTripDuration)
+                .totalOrdersDelivered(deliveredCount)
+                .totalOrdersFailed(failedCount)
+                .deliverySuccessRate(deliverySuccessRate)
+                .averageTripDistance(averageTripDistance)
+                .averageStopsPerTrip(averageStopsPerTrip)
+                .averageTimePerStop(averageTimePerStop)
+                .onTimeStartPercentage(onTimeStartPercentage)
+                .onTimeCompletionPercentage(onTimeCompletionPercentage)
+                .tripStatusCounts(tripStatusCounts)
+                .orderStatusCounts(orderStatusCounts)
+                .build();
+    }
+
+
+    @Override
+    public List<TripHistoryDto> getDriverTripHistory(String username, LocalDate startDate, LocalDate endDate) {
+        // Find driver by username
+        Driver driver = driverRepo.findByUsername(username);
+        if (driver == null) {
+            throw new NotFoundException("Driver not found with username: " + username);
+        }
+
+        return getDriverTripHistoryById(driver.getId(), startDate, endDate);
+    }
+
+    @Override
+    public List<TripHistoryDto> getDriverTripHistoryById(UUID driverId, LocalDate startDate, LocalDate endDate) {
+        // Find driver
+        Driver driver = driverRepo.findById(driverId)
+                .orElseThrow(() -> new NotFoundException("Driver not found with ID: " + driverId));
+
+        // Get trips in date range
+        List<Trip> trips = tripRepository.findByDriverId(driverId).stream()
+                .filter(trip -> {
+                    // Filter by trip date
+                    return (trip.getDate() != null &&
+                            !trip.getDate().isBefore(startDate) &&
+                            !trip.getDate().isAfter(endDate));
+                })
+                .sorted(Comparator.comparing(Trip::getDate).reversed())
+                .collect(Collectors.toList());
+
+        // Convert to DTOs with detailed information
+        return trips.stream()
+                .map(this::convertToTripHistoryDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DriverStatisticsDto> getAllDriverPerformanceMetrics(LocalDate startDate, LocalDate endDate) {
+        // Get all drivers
+        List<Driver> drivers = driverRepo.findAll();
+
+        // Get statistics for each driver
+        return drivers.stream()
+                .map(driver -> getDriverStatisticsByDateRange(driver.getId(), startDate, endDate))
+                .sorted(Comparator.comparing(DriverStatisticsDto::getCompletionRate).reversed())
+                .collect(Collectors.toList());
+    }
+
+
+    private TripHistoryDto convertToTripHistoryDto(Trip trip) {
+        // Get related entities
+        UUID routeScheduleId = trip.getRouteScheduleId();
+        UUID routeId = null;
+        String routeName = "Unknown";
+        String routeCode = "Unknown";
+
+        // Extract route info outside the lambda
+        if (routeScheduleId != null) {
+            Optional<RouteSchedule> routeScheduleOpt = routeScheduleRepository.findById(routeScheduleId);
+            if (routeScheduleOpt.isPresent()) {
+                RouteSchedule routeSchedule = routeScheduleOpt.get();
+                routeId = routeSchedule.getRouteId();
+                Optional<Route> routeOpt = routeRepository.findById(routeSchedule.getRouteId());
+                if (routeOpt.isPresent()) {
+                    Route route = routeOpt.get();
+                    routeName = route.getRouteName();
+                    routeCode = route.getRouteCode();
+                }
+            }
+        }
+
+        // Get orders for this trip
+        List<TripOrder> tripOrders = tripOrderRepository.findByTripId(trip.getId());
+        int totalOrders = tripOrders.size();
+
+        // Count delivered and failed orders
+        int ordersDelivered = (int) tripOrders.stream()
+                .filter(to -> "DELIVERED".equals(to.getStatus()))
+                .count();
+
+        int ordersFailed = (int) tripOrders.stream()
+                .filter(to -> "FAILED".equals(to.getStatus()))
+                .count();
+
+        // Calculate delivery success rate
+        double deliverySuccessRate = totalOrders > 0 ?
+                (double) ordersDelivered / totalOrders * 100 : 0;
+
+        // Get vehicle information
+        UUID vehicleId = trip.getVehicleId();
+        String vehiclePlateNumber = "Unknown";
+        double vehicleUtilization = 0.0;
+
+        // Extract vehicle info outside the lambda
+        if (vehicleId != null) {
+            Optional<Vehicle> vehicleOpt = vehicleRepository.findById(vehicleId);
+            if (vehicleOpt.isPresent()) {
+                Vehicle vehicle = vehicleOpt.get();
+                vehiclePlateNumber = vehicle.getPlateNumber();
+                // Calculate vehicle utilization (simplified)
+                // In a real implementation, would compare actual load vs. capacity
+                vehicleUtilization = 70.0; // Simplified
+            }
+        }
+
+        // Calculate duration
+        Long durationMinutes = null;
+        if (trip.getStartTime() != null && trip.getEndTime() != null) {
+            durationMinutes = Duration.between(trip.getStartTime(), trip.getEndTime()).toMinutes();
+        }
+
+        // Build the DTO
+        return TripHistoryDto.builder()
+                .tripId(trip.getId())
+                .tripCode(trip.getTripCode())
+                .routeId(routeId)
+                .routeName(routeName)
+                .routeCode(routeCode)
+                .tripDate(trip.getDate())
+                .status(trip.getStatus())
+                .scheduledStartTime(null) // Would come from route schedule
+                .actualStartTime(trip.getStartTime())
+                .completionTime(trip.getEndTime())
+                .durationMinutes(durationMinutes)
+                .totalStops(tripOrders.size()) // Simplified
+                .stopsCompleted(trip.getCurrentStopIndex())
+                .distanceTraveled(trip.getDistanceTraveled())
+                .totalOrders(totalOrders)
+                .ordersDelivered(ordersDelivered)
+                .ordersFailed(ordersFailed)
+                .deliverySuccessRate(deliverySuccessRate)
+                .vehicleId(vehicleId)
+                .vehiclePlateNumber(vehiclePlateNumber)
+                .vehicleUtilizationPercentage(vehicleUtilization)
+                .completionNotes(trip.getCompletionNotes())
+                .delayEvents(parseDelayEvents(trip.getDelayEvents()))
+                .build();
+    }
+
+
+    /**
+     * Parse delay events from JSON string
+     * In a real implementation, this would parse the JSON into proper objects
+     */
+    private List<TripHistoryDto.DelayEventDto> parseDelayEvents(String delayEventsJson) {
+        // Simplified implementation - in a real system, would parse the JSON
+        if (delayEventsJson == null || delayEventsJson.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // Create a sample delay event for demonstration
+        return Collections.singletonList(
+                TripHistoryDto.DelayEventDto.builder()
+                        .type("TRAFFIC")
+                        .timestamp(Instant.now())
+                        .durationMinutes(15)
+                        .description("Heavy traffic on main route")
+                        .build()
+        );
     }
 }

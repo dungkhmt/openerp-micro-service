@@ -4,15 +4,9 @@ export const statistics = {
     text: "Thống kê",
     child: [
         {
-            id: "MENU_STATISTICS.STATISTICS",
+            id: "MENU_STATISTICS.HISTORY",
             path: "/statistics/me",
             text: "Thống kê",
-            child: [],
-        },
-        {
-            id: "MENU_STATISTICS.HISTORY",
-            path: "/statistics/order/history",
-            text: "Lịch sử đơn hàng",
             child: [],
         },
     ]
