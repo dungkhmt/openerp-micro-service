@@ -1,3 +1,6 @@
+// ==============
+// ShiftModal.jsx
+// ==============
 import React, {useEffect, useState} from "react";
 import {format, isValid, parseISO} from "date-fns";
 import {
@@ -14,6 +17,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close.js";
 import {DatePicker, TimePicker} from "@mui/x-date-pickers";
+import { UNASSIGNED_SHIFT_USER_ID } from "./ShiftScheduler.jsx"; // Import new constant
 
 const modalStyle = {
   position: 'absolute',
@@ -29,17 +33,35 @@ const modalStyle = {
 };
 
 
-export default function ShiftModal({ isOpen, onClose, onSave, users, initialFormState, isEditing }) {
+export default function ShiftModal({
+                                     isOpen,
+                                     onClose,
+                                     onSave,
+                                     users,
+                                     initialFormState,
+                                     isEditing,
+                                     isUnassignedTemplateMode, // NEW PROP: True if creating/editing unassigned shift TEMPLATE
+                                     unassignedShiftBeingEdited // NEW PROP: Details of unassigned shift being edited/assigned from
+                                   }) {
   const [formState, setFormState] = useState(initialFormState);
 
   useEffect(() => {
-    // Ensure userIds is always an array and note is initialized
-    setFormState({
+    let currentInitialState = {
       ...initialFormState,
       userIds: Array.isArray(initialFormState.userIds) ? initialFormState.userIds : [],
-      note: initialFormState.note || ''
-    });
-  }, [initialFormState]);
+      note: initialFormState.note || '',
+      slots: initialFormState.slots !== undefined ? initialFormState.slots : 1, // Ensure slots is part of state
+    };
+    // If editing an unassigned shift, userIds should be empty to prompt selection for assignment,
+    // unless isUnassignedTemplateMode is explicitly for template editing without assignment intent yet.
+    if (unassignedShiftBeingEdited && !currentInitialState.userIds.includes(UNASSIGNED_SHIFT_USER_ID)) {
+      // currentInitialState.userIds = []; // Clear userIds to make user select for assignment.
+      // Or, keep it if modal is dual purpose.
+      // For now, let ShiftScheduler handle initialUserIds logic.
+    }
+
+    setFormState(currentInitialState);
+  }, [initialFormState, unassignedShiftBeingEdited]);
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -67,34 +89,59 @@ export default function ShiftModal({ isOpen, onClose, onSave, users, initialForm
     onSave(formState);
   };
 
+  const effectiveIsUnassignedTemplateMode = isUnassignedTemplateMode || (formState.userIds && formState.userIds.includes(UNASSIGNED_SHIFT_USER_ID));
+
+
+  // Determine modal title
+  let modalTitle = isEditing ? "Chỉnh sửa ca làm việc" : "Thêm ca làm việc";
+  if (effectiveIsUnassignedTemplateMode && !unassignedShiftBeingEdited) {
+    modalTitle = "Thêm ca chờ gán";
+  } else if (unassignedShiftBeingEdited) {
+    modalTitle = `Gán ca / Sửa ca chờ gán (${unassignedShiftBeingEdited.slots} slot còn lại)`;
+  }
+
+
   return (
-    <Modal open={isOpen} onClose={onClose} aria-labelledby="shift-modal-title" aria-describedby="shift-modal-description">
+    <Modal open={isOpen} onClose={onClose} aria-labelledby="shift-modal-title">
       <Box sx={modalStyle}>
         <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2}}>
-          <Typography id="shift-modal-title" variant="h6" component="h2">{isEditing ? "Chỉnh sửa ca làm việc" : "Thêm ca làm việc"}</Typography>
+          <Typography id="shift-modal-title" variant="h6" component="h2">{modalTitle}</Typography>
           <IconButton onClick={onClose} size="small"><CloseIcon /></IconButton>
         </Box>
         <Box component="form" onSubmit={handleSubmit} noValidate>
           <Grid container spacing={2}>
-            <Grid item xs={12}> {/* Changed to full width for better multi-select display */}
+            <Grid item xs={12}>
               <FormControl fullWidth margin="dense" required>
-                <InputLabel id="user-select-label" sx={{fontSize:'0.9rem'}}>Nhân viên (chọn một hoặc nhiều)</InputLabel>
+                <InputLabel id="user-select-label" sx={{fontSize:'0.9rem'}}>
+                  {unassignedShiftBeingEdited ? "Gán cho nhân viên (để trống nếu chỉ sửa ca chờ)" : "Nhân viên"}
+                </InputLabel>
                 <Select
                   labelId="user-select-label"
-                  id="userIds" // CHANGED
-                  name="userIds" // CHANGED
-                  multiple // ADDED
-                  value={formState.userIds || []} // Ensure value is always an array
-                  label="Nhân viên (chọn một hoặc nhiều)" // UPDATED LABEL
+                  id="userIds"
+                  name="userIds"
+                  multiple
+                  value={formState.userIds || []}
+                  label={unassignedShiftBeingEdited ? "Gán cho nhân viên (để trống nếu chỉ sửa ca chờ)" : "Nhân viên"}
                   onChange={handleFormChange}
                   size="small"
+                  disabled={effectiveIsUnassignedTemplateMode && !unassignedShiftBeingEdited} // Disable if defining template unless it's for assignment
                   renderValue={(selected) => {
                     if (!selected || selected.length === 0) {
-                      return <em>Chọn nhân viên</em>;
+                      return <em>{unassignedShiftBeingEdited ? "Chọn nhân viên để gán" : (effectiveIsUnassignedTemplateMode ? "Ca chờ gán (Unassigned)" : "Chọn nhân viên")}</em>;
+                    }
+                    if (selected.includes(UNASSIGNED_SHIFT_USER_ID) && effectiveIsUnassignedTemplateMode) {
+                      return "Ca chờ gán (Unassigned)";
                     }
                     return selected.map(id => users.find(u => u.id === id)?.name || id).join(', ');
                   }}
                 >
+                  {/* Option for Unassigned only if explicitly in that mode and not assigning from existing */}
+                  {isUnassignedTemplateMode && !unassignedShiftBeingEdited && (
+                    <MenuItem key={UNASSIGNED_SHIFT_USER_ID} value={UNASSIGNED_SHIFT_USER_ID}>
+                      <Checkbox checked={(formState.userIds || []).indexOf(UNASSIGNED_SHIFT_USER_ID) > -1} size="small" />
+                      <ListItemText primary="Tạoเป็น Ca chờ gán (Unassigned)" />
+                    </MenuItem>
+                  )}
                   {users.map(user => (
                     <MenuItem key={user.id} value={user.id}>
                       <Checkbox checked={(formState.userIds || []).indexOf(user.id) > -1} size="small" />
@@ -104,7 +151,26 @@ export default function ShiftModal({ isOpen, onClose, onSave, users, initialForm
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6}>
+
+            { (effectiveIsUnassignedTemplateMode || unassignedShiftBeingEdited) && (
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  margin="dense"
+                  fullWidth
+                  id="slots"
+                  label="Số lượng Slot"
+                  name="slots"
+                  type="number"
+                  value={formState.slots || 1}
+                  onChange={handleFormChange}
+                  size="small"
+                  InputProps={{ inputProps: { min: 1 } }}
+                  helperText={unassignedShiftBeingEdited ? `Đang có: ${unassignedShiftBeingEdited.slots}` : "Số ca có thể được gán"}
+                />
+              </Grid>
+            )}
+
+            <Grid item xs={12} sm={ (effectiveIsUnassignedTemplateMode || unassignedShiftBeingEdited) ? 6 : 12}> {/* Adjust width if slots field is shown */}
               <DatePicker
                 label="Ngày"
                 value={formState.day ? parseISO(formState.day) : new Date()}
@@ -141,7 +207,6 @@ export default function ShiftModal({ isOpen, onClose, onSave, users, initialForm
                 size="small"
                 multiline
                 rows={3}
-                placeholder="Thêm ghi chú cho ca làm việc (không bắt buộc)..."
               />
             </Grid>
           </Grid>
