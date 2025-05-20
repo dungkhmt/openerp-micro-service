@@ -88,13 +88,16 @@ const getInitials = (name) => {
 // --- Child Components ---
 
 // ShiftCard.jsx
+// ShiftCard.jsx
+// ... (các import và phần đầu của component giữ nguyên)
+
 function ShiftCard({
                      shift,
-                     onDeleteShift,
+                     onDeleteShift, // Prop is part of the interface, though not directly used in this specific display logic
                      onEditShift,
                      onAddAnotherShift,
-                     provided,
-                     snapshot,
+                     provided,      // From react-beautiful-dnd
+                     snapshot,      // From react-beautiful-dnd
                      isSelected,
                      onToggleSelect,
                      isAnyShiftSelected
@@ -102,24 +105,28 @@ function ShiftCard({
   const [isHovered, setIsHovered] = useState(false);
 
   const handleCheckboxClick = (e) => {
-    e.stopPropagation();
+    e.stopPropagation(); // Prevent card click when clicking checkbox
     onToggleSelect(shift.id);
   };
 
   const handleCardBodyClick = (e) => {
+    // If the click was on the checkbox or add button's interactive area, don't process.
     if (e.defaultPrevented) {
       return;
     }
+    // Check if the click target is within the checkbox or add button specifically by class or structure if needed
     if (e.target.closest('.selection-checkbox-area') || e.target.closest('.add-action-button-area')) {
       return;
     }
-    if (!isAnyShiftSelected) {
+
+    if (!isAnyShiftSelected) { // If no shifts are selected globally, clicking a card edits it
       onEditShift(shift);
-    } else {
+    } else { // If some shifts are already selected, clicking a card toggles its selection state
       onToggleSelect(shift.id);
     }
   };
 
+  // Determine visibility of checkbox and add button
   const showCheckbox = (isHovered || isAnyShiftSelected) && !snapshot.isDragging;
   const showAddButtonOnly = isHovered && !isAnyShiftSelected && !snapshot.isDragging;
 
@@ -132,31 +139,31 @@ function ShiftCard({
       elevation={snapshot.isDragging ? 4 : (isSelected ? 3 : 1)}
       sx={{
         my: 0.5,
-        height: 50,
+        height: 50, // Fixed height for the card
         boxSizing: 'border-box',
         bgcolor: snapshot.isDragging
-          ? 'primary.lighter'
+          ? 'primary.lighter' // Custom color when dragging
           : (isSelected ? (theme) => alpha(theme.palette.primary.main, 0.12) : 'background.paper'),
         border: isSelected
           ? (theme) => `2px solid ${theme.palette.primary.main}`
-          : (theme) => `1px dashed ${alpha(theme.palette.primary.main, 0.5)}`,
-        position: 'relative',
+          : (theme) => `1px dashed ${alpha(theme.palette.primary.main, 0.5)}`, // Subtle border
+        position: 'relative', // For absolute positioning of add button
         display: 'flex',
         alignItems: 'center',
         transition: 'background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
         width: '100%',
         maxWidth: '100%',
-        overflow: 'hidden',
+        overflow: 'hidden', // Important for ellipsis and layout
       }}
     >
       {/* Checkbox Area */}
       <Box
-        className="selection-checkbox-area"
+        className="selection-checkbox-area" // Class for click target detection
         sx={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          width: showCheckbox ? 32 : 0,
+          width: showCheckbox ? 32 : 0, // Animate width for checkbox appearance
           flexShrink: 0,
           height: '100%',
           transition: 'width 0.15s ease-in-out',
@@ -166,47 +173,49 @@ function ShiftCard({
         <Checkbox
           size="small"
           checked={isSelected}
-          onChange={handleCheckboxClick}
-          onClick={(e) => e.stopPropagation()}
+          onChange={handleCheckboxClick} // Use specific handler
+          onClick={(e) => e.stopPropagation()} // Prevent card click
           icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
           checkedIcon={<CheckBoxIcon fontSize="small" />}
           sx={{
-            p: 0.5,
+            p: 0.5, // Padding for checkbox
             opacity: showCheckbox ? 1 : 0,
             visibility: showCheckbox ? 'visible' : 'hidden',
             transition: 'opacity 0.1s ease-in-out, visibility 0.1s ease-in-out',
           }}
-          tabIndex={showCheckbox ? 0 : -1}
+          tabIndex={showCheckbox ? 0 : -1} // Accessibility
         />
       </Box>
 
-      {/* Main content area */}
+      {/* Main content area (Draggable Handle + Clickable Body) */}
       <Box
-        {...provided.dragHandleProps}
-        onClick={handleCardBodyClick}
+        {...provided.dragHandleProps} // Make this area the drag handle
+        onClick={handleCardBodyClick}  // Make this area clickable for edit/select
         sx={{
           flexGrow: 1,
-          minWidth: 0,
+          minWidth: 0, // For ellipsis to work correctly in flex children
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
+          // Adjust padding based on checkbox/add button visibility
           pl: showCheckbox ? 0.5 : 1.5,
-          pr: showAddButtonOnly ? 4.5 : 1.5,
+          pr: showAddButtonOnly ? 4.5 : 1.5, // More padding if add button is the only visible action
           cursor: snapshot.isDragging ? 'grabbing' : (isAnyShiftSelected ? 'pointer' : 'grab'),
-          overflow: 'hidden',
-          whiteSpace: 'nowrap',
-          userSelect: 'none',
+          overflow: 'hidden', // Crucial for text overflow ellipsis
+          whiteSpace: 'nowrap', // Prevent wrapping for title elements, ellipsis will handle
+          userSelect: 'none', // Prevent text selection during drag
           transition: 'padding-left 0.15s ease-in-out, padding-right 0.15s ease-in-out',
         }}
       >
+        {/* Line 1: Time and Duration */}
         <Typography
           variant="caption"
           component="div"
           sx={{
             fontWeight: 'bold',
             color: shift.muiTextColor || 'text.primary',
-            fontSize: '0.68rem',
+            fontSize: '0.68rem', // Slightly larger for primary info
             lineHeight: 1.3,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
@@ -218,69 +227,70 @@ function ShiftCard({
             ({shift.duration})
           </Typography>
         </Typography>
-        <Typography
-          variant="body2"
-          sx={{
-            fontSize: '0.65rem',
-            color: shift.muiTextColor,
-            lineHeight: 1.3,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
-          }}
-        >
-          {shift.details}
-        </Typography>
-        {shift.subDetails && (
+
+        {/* Line 2: Note (replaces details and subDetails) */}
+        {/* Conditionally render if shift.note exists and is not empty */}
+        {shift.note && shift.note.trim() !== '' && (
           <Typography
-            variant="caption"
+            variant="body2" // Using body2 as 'details' was
             sx={{
-              fontSize: '0.6rem',
-              color: shift.muiTextColor,
-              opacity: 0.7,
+              fontSize: '0.65rem',
+              // Apply the theme color string directly. MUI's sx prop will resolve it.
+              color: shift.muiTextColor ? shift.muiTextColor : 'text.secondary',
+              // Apply opacity directly to make the themed color slightly transparent.
+              // If using the fallback 'text.secondary', opacity is 1 (no change).
+              opacity: shift.muiTextColor ? 0.85 : 1.0,
               lineHeight: 1.3,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis'
+              whiteSpace: 'nowrap',    // Ensure single line for ellipsis
+              overflow: 'hidden',      // Required for ellipsis
+              textOverflow: 'ellipsis', // Show ellipsis if text overflows
+              // mt: 0.1, // Optional: small margin-top if needed
             }}
+            title={shift.note} // Show full note on hover
           >
-            {shift.subDetails}
+            {shift.note}
           </Typography>
         )}
+
+        {/* The old shift.subDetails Typography block is intentionally removed */}
+
       </Box>
 
-      {/* "Add" button area */}
+      {/* "Add" button area (conditionally visible) */}
       <Box
-        className="add-action-button-area"
+        className="add-action-button-area" // Class for click target detection
         sx={{
           position: 'absolute',
           top: '50%',
-          right: '4px',
+          right: '4px', // Position from the right edge
           transform: 'translateY(-50%)',
-          width: 28,
-          height: 28,
+          width: 28,  // Fixed width for the button container
+          height: 28, // Fixed height for the button container
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          opacity: showAddButtonOnly ? 1 : 0,
+          opacity: showAddButtonOnly ? 1 : 0, // Control visibility with opacity
           visibility: showAddButtonOnly ? 'visible' : 'hidden',
           transition: 'opacity 0.15s ease-in-out, visibility 0.15s ease-in-out',
-          zIndex: 1,
-          pointerEvents: showAddButtonOnly ? 'auto' : 'none',
+          zIndex: 1, // Ensure it's above other content if overlapping
+          pointerEvents: showAddButtonOnly ? 'auto' : 'none', // Only interactive when visible
         }}
       >
         <IconButton
           size="small"
-          onClick={(e) => { e.stopPropagation(); onAddAnotherShift(shift.userId, parseISO(shift.day)); }}
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent card click
+            onAddAnotherShift(shift.userId, parseISO(shift.day));
+          }}
           sx={{
-            p: 0.3,
-            bgcolor: 'rgba(230,230,230,0.85)',
-            '&:hover': { bgcolor: 'rgba(210,210,210,1)' },
-            borderRadius: '4px',
+            p: 0.3, // Small padding for the icon button
+            bgcolor: 'rgba(230,230,230,0.85)', // Semi-transparent background
+            '&:hover': { bgcolor: 'rgba(210,210,210,1)' }, // Darker on hover
+            borderRadius: '4px', // Slightly rounded corners
             width: '100%',
             height: '100%',
           }}
-          title="Thêm ca làm việc khác vào ngày này"
+          title="Thêm ca làm việc khác vào ngày này" // Tooltip
         >
           <AddIcon sx={{ fontSize: '1rem' }} color="action" />
         </IconButton>
@@ -531,11 +541,13 @@ const modalStyle = {
   borderRadius: 1,
 };
 
+
 function ShiftModal({ isOpen, onClose, onSave, users, initialFormState, isEditing }) {
   const [formState, setFormState] = useState(initialFormState);
 
   useEffect(() => {
-    setFormState(initialFormState);
+    // Đảm bảo 'note' được khởi tạo đúng cách từ initialFormState
+    setFormState({ ...initialFormState, note: initialFormState.note || '' });
   }, [initialFormState]);
 
   const handleFormChange = (e) => {
@@ -606,11 +618,21 @@ function ShiftModal({ isOpen, onClose, onSave, users, initialFormState, isEditin
                 slotProps={{ textField: { fullWidth: true, margin: "dense", size:"small", required:true } }}
               />
             </Grid>
+
             <Grid item xs={12}>
-              <TextField margin="dense" required fullWidth id="details" label="Chi tiết chính" name="details" value={formState.details} onChange={handleFormChange} size="small" placeholder="Ví dụ: Họp team, Làm dự án X..."/>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField margin="dense" fullWidth id="subDetails" label="Chi tiết phụ (không bắt buộc)" name="subDetails" value={formState.subDetails} onChange={handleFormChange} size="small" placeholder="Ví dụ: Chuẩn bị slide, Fix bug Y..."/>
+              <TextField
+                margin="dense"
+                fullWidth
+                id="note"
+                label="Ghi chú"
+                name="note"
+                value={formState.note || ''}
+                onChange={handleFormChange}
+                size="small"
+                multiline
+                rows={3}
+                placeholder="Thêm ghi chú cho ca làm việc (không bắt buộc)..."
+              />
             </Grid>
           </Grid>
           <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
@@ -695,24 +717,25 @@ function BulkActionsBar({
 // --- Main Application Component (ShiftScheduler.jsx) ---
 export default function ShiftScheduler() {
   const [currentDate, setCurrentDate] = useState(new Date(new Date().setHours(0,0,0,0)));
-  const [shifts, setShifts] = useState(initialShifts); // Ensure initialShifts is defined globally
+  const [shifts, setShifts] = useState(initialShifts); // initialShifts đã được cập nhật ở trên
   const [users, setUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEditingShift, setCurrentEditingShift] = useState(null);
+
+  // MODIFIED: Cập nhật modalInitialFormState
   const [modalInitialFormState, setModalInitialFormState] = useState({
     userId: '',
     day: format(new Date(), 'yyyy-MM-dd'),
     startTime: '09:00',
     endTime: '17:00',
-    details: '',
-    subDetails: ''
+    note: '' // Thay thế details và subDetails
   });
   const [selectedShiftIds, setSelectedShiftIds] = useState([]);
 
   const isAnyShiftSelected = selectedShiftIds.length > 0;
 
   useEffect(() => {
-    const updatedUsers = initialUsers.map(user => { // Ensure initialUsers is defined globally
+    const updatedUsers = initialUsers.map(user => {
       const userShifts = shifts.filter(s => s.userId === user.id);
       let totalMs = 0;
       userShifts.forEach(s => {
@@ -721,7 +744,7 @@ export default function ShiftScheduler() {
           const end = parseISO(`${s.day}T${s.endTime}`);
           if(isValid(start) && isValid(end)) {
             let diff = end.getTime() - start.getTime();
-            if (diff < 0) diff += 24 * 60 * 60 * 1000; // Handles overnight shifts
+            if (diff < 0) diff += 24 * 60 * 60 * 1000;
             totalMs += diff;
           }
         }
@@ -738,6 +761,7 @@ export default function ShiftScheduler() {
   const handleNextWeek = () => setCurrentDate(prev => addDays(prev, 7));
   const handleToday = () => setCurrentDate(new Date(new Date().setHours(0,0,0,0)));
 
+  // MODIFIED: Cập nhật handleOpenModal
   const handleOpenModal = (userId, day, shiftToEdit = null) => {
     if (shiftToEdit) {
       setCurrentEditingShift(shiftToEdit);
@@ -746,8 +770,7 @@ export default function ShiftScheduler() {
         day: shiftToEdit.day,
         startTime: shiftToEdit.startTime,
         endTime: shiftToEdit.endTime,
-        details: shiftToEdit.details,
-        subDetails: shiftToEdit.subDetails || '',
+        note: shiftToEdit.note || '', // Sử dụng trường note
       });
     } else {
       setCurrentEditingShift(null);
@@ -756,8 +779,7 @@ export default function ShiftScheduler() {
         day: format(day || new Date(), 'yyyy-MM-dd'),
         startTime: '09:00',
         endTime: '17:00',
-        details: '',
-        subDetails: '',
+        note: '', // Khởi tạo note rỗng
       });
     }
     setIsModalOpen(true);
@@ -768,11 +790,13 @@ export default function ShiftScheduler() {
     setCurrentEditingShift(null);
   };
 
+  // MODIFIED: Cập nhật handleSaveShift
   const handleSaveShift = (formData) => {
-    const { userId, day, startTime, endTime, details, subDetails } = formData;
+    const { userId, day, startTime, endTime, note } = formData; // Lấy trường note
 
-    if (!userId || !day || !startTime || !endTime || !details) {
-      alert("Vui lòng điền đầy đủ các trường bắt buộc: Nhân viên, Ngày, Giờ bắt đầu, Giờ kết thúc, Chi tiết chính.");
+    // Bỏ kiểm tra bắt buộc cho 'details', vì 'note' không bắt buộc
+    if (!userId || !day || !startTime || !endTime) {
+      alert("Vui lòng điền đầy đủ các trường bắt buộc: Nhân viên, Ngày, Giờ bắt đầu, Giờ kết thúc.");
       return;
     }
 
@@ -785,20 +809,18 @@ export default function ShiftScheduler() {
     const start = parseISO(`${format(parsedDay, 'yyyy-MM-dd')}T${startTime}`);
     const end = parseISO(`${format(parsedDay, 'yyyy-MM-dd')}T${endTime}`);
 
-
     if (!isValid(start) || !isValid(end)) {
       alert("Giờ bắt đầu hoặc kết thúc không hợp lệ. Vui lòng kiểm tra lại định dạng (HH:mm).");
       return;
     }
 
     let durationMs = end.getTime() - start.getTime();
-    if (durationMs < 0) { durationMs += 24 * 60 * 60 * 1000; } // Handles overnight shifts
+    if (durationMs < 0) { durationMs += 24 * 60 * 60 * 1000; }
 
     const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
     const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
 
     const userForColor = users.find(u => u.id === userId);
-    // Ensure TOP_BAR_HEIGHT, BULK_ACTIONS_BAR_HEIGHT etc. are defined globally if used here
     const shiftMuiColor = currentEditingShift?.muiColor ||
       (userForColor?.avatarBgColor?.replace('.main','.light') || 'grey.200');
     const shiftMuiTextColor = currentEditingShift?.muiTextColor ||
@@ -806,18 +828,17 @@ export default function ShiftScheduler() {
 
     const shiftData = {
       userId,
-      day: format(parsedDay, 'yyyy-MM-dd'), // Ensure day is correctly formatted after validation
+      day: format(parsedDay, 'yyyy-MM-dd'),
       startTime,
       endTime,
       duration: `${durationHours}h ${durationMinutes}m`,
-      details,
-      subDetails,
+      note, // Thêm trường note vào dữ liệu ca
       muiColor: shiftMuiColor,
       muiTextColor: shiftMuiTextColor,
     };
 
     if (currentEditingShift) {
-      setShifts(prevShifts => prevShifts.map(s => s.id === currentEditingShift.id ? { ...s, ...shiftData, id: currentEditingShift.id } : s));
+      setShifts(prevShifts => prevShifts.map(s => s.id === currentEditingShift.id ? { ...s, ...shiftData } : s));
     } else {
       setShifts(prevShifts => [...prevShifts, { ...shiftData, id: `s${Date.now()}-${Math.random().toString(16).slice(2)}` }]);
     }
@@ -873,7 +894,7 @@ export default function ShiftScheduler() {
 
   const handleCopySelectedToNextWeek = useCallback(() => {
     if (!isAnyShiftSelected) return;
-    const weekStartsOn = 1; // Assuming Monday is the start of the week
+    const weekStartsOn = 1;
     const nextWeekStartDateFormatted = format(addDays(startOfWeek(currentDate, { weekStartsOn }), 7), 'dd/MM/yyyy');
     if (!window.confirm(`Bạn có chắc muốn sao chép ${selectedShiftIds.length} ca đã chọn sang tuần bắt đầu từ ${nextWeekStartDateFormatted} không?`)) return;
 
@@ -892,19 +913,8 @@ export default function ShiftScheduler() {
   }, [selectedShiftIds, shifts, currentDate, isAnyShiftSelected]);
 
   const dynamicStickyOffset = isAnyShiftSelected ? BULK_ACTIONS_BAR_HEIGHT : 0;
-
-  // Assuming theme.spacing(1) = 8px for padding/margin calculations.
-  // PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER accounts for:
-  // - Parent Box of Paper has py:1 (8px top padding)
-  // - Paper itself has mt:1 (8px margin-top)
-  // - Parent Box of Paper has py:1 (8px bottom padding)
-  const PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER = 8 + 8 + 8; // Total 24px
-
-  // Space occupied by the fixed footer at the bottom
-  // Calculated as: footer actual height (approx. 48px: 24px padding + 24px content) + footer bottom offset (16px) = 64px.
-  // Using 70px for a small visual buffer above the footer. Adjust as needed.
-  const FIXED_FOOTER_RESERVED_SPACE = 70; // px
-
+  const PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER = 8 + 8 + 8;
+  const FIXED_FOOTER_RESERVED_SPACE = 70;
   const paperContentMaxHeight = `calc(100vh - ${TOP_BAR_HEIGHT}px - ${dynamicStickyOffset}px - ${INFO_BANNERS_TOTAL_HEIGHT}px - ${PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER}px - ${FIXED_FOOTER_RESERVED_SPACE}px)`;
 
   return (
@@ -924,16 +934,14 @@ export default function ShiftScheduler() {
             onDeselectAll={handleDeselectAll}
             currentDate={currentDate}
           />
-          {/* This Box has py:1, contributing to PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER */}
           <Box sx={{px: {xs: 0, sm:1, md:2}, py:1}}>
             <InfoBanners currentDate={currentDate} stickyTopOffset={dynamicStickyOffset} />
             <Paper
               elevation={2}
               sx={{
-                mt:1, // This contributes to PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER
+                mt:1,
                 overflowY: 'auto',
                 maxHeight: paperContentMaxHeight,
-                // overflowX will default to 'visible', allowing inner Box to manage horizontal scroll.
               }}
             >
               <CalendarHeader currentDate={currentDate} stickyTopOffset={dynamicStickyOffset} />
