@@ -12,6 +12,7 @@ import {
   Typography
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close.js";
+import {WEEK_STARTS_ON} from "./ShiftScheduler.jsx";
 
 const copyModalStyle = {
   position: 'absolute',
