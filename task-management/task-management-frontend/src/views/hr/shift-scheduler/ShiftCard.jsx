@@ -13,11 +13,11 @@ import { UNASSIGNED_SHIFT_USER_ID } from "./ShiftScheduler.jsx";
 const EMPLOYEE_SHIFT_TEXT_COLOR = '#673ab7';
 const EMPLOYEE_SHIFT_BACKGROUND_COLOR_LIGHT = '#f3e5f5';
 
-// Define styles for time_off cards
-const TIME_OFF_CARD_BACKGROUND_COLOR = 'grey.200'; // Softer grey
-const TIME_OFF_CARD_BORDER_COLOR = 'grey.400'; //
-const TIME_OFF_CARD_TEXT_COLOR = 'text.secondary'; //
-const TIME_OFF_CARD_NOTE_TEXT_COLOR = 'text.disabled'; //
+// Cập nhật màu sắc cho time_off cards
+const TIME_OFF_CARD_BACKGROUND_COLOR = '#ef9a9a';
+const TIME_OFF_CARD_BORDER_COLOR = '#e57373';
+const TIME_OFF_CARD_TEXT_COLOR = '#000000';
+const TIME_OFF_CARD_NOTE_TEXT_COLOR = 'rgba(0, 0, 0, 0.8)';
 
 
 export default function ShiftCard({
