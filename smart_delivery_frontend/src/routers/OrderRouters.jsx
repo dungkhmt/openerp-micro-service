@@ -37,6 +37,11 @@ export default function OrderRouters() {
                     path={`${path}/update/:id`}
                 />
                 <Route
+                    component={UpdateOrder}
+                    exact
+                    path={`${path}/view/:id`}
+                />
+                <Route
                     component={AssignOrder}
                     exact
                     path={`${path}/assign/collector`}
@@ -81,11 +86,7 @@ export default function OrderRouters() {
                     exact
                     path={`${path}/trip/items/:tripId/in`}
                 />
-                <Route
-                    component={EmployeeStatistics}
-                    exact
-                    path={`${path}/statistics`}
-                />
+
             </Switch>
         </div>
     );

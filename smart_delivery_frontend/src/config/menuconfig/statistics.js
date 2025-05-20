@@ -1,11 +1,20 @@
 export const statistics = {
     id: "MENU_STATISTICS",
     icon: "BarChartIcon",
-    text: "STATISTICS",
-    child: [ {
-        id: "MENU_STATISTICS.STATISTICS",
-        text: "Thống kê",
-        child: [],
-    },]
+    text: "Thống kê",
+    child: [
+        {
+            id: "MENU_STATISTICS.STATISTICS",
+            path: "/statistics/me",
+            text: "Thống kê",
+            child: [],
+        },
+        {
+            id: "MENU_STATISTICS.HISTORY",
+            path: "/statistics/order/history",
+            text: "Lịch sử đơn hàng",
+            child: [],
+        },
+    ]
 
 };
