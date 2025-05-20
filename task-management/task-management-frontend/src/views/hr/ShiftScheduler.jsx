@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { startOfWeek, addDays, format, subDays, parseISO, isSameDay, isValid } from 'date-fns';
+import { startOfWeek, addDays, format, subDays, parseISO, isSameDay, isValid, addWeeks, differenceInCalendarDays, getDay } from 'date-fns';
 import vi from 'date-fns/locale/vi'; // Vietnamese locale for date-fns
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 // MUI Core Components
 import {
   AppBar, Toolbar, Typography, Button, IconButton, Container, Grid, Paper, Box,
-  Modal, TextField, Select, MenuItem, FormControl, InputLabel, Checkbox, Avatar
+  Modal, TextField, Select, MenuItem, FormControl, InputLabel, Checkbox, Avatar,
+  List, ListItem, ListItemButton, ListItemText, ListItemIcon, FormGroup, FormControlLabel, CircularProgress
 } from '@mui/material';
 import { alpha } from '@mui/material/styles'; // For transparent colors
 import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
@@ -28,17 +29,18 @@ import CloseIcon from '@mui/icons-material/Close';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import IndeterminateCheckBoxIcon from '@mui/icons-material/IndeterminateCheckBox';
 
 
 // --- Initial Data and Constants (MUST be defined before ShiftScheduler component) ---
 
 // Sample initial data for shifts
 const initialShifts = [
-  { id: 's1', userId: 'u1', day: '2025-05-19', startTime: '09:00', endTime: '12:00', duration: '3h 0m', details: 'Morning Shift with very very very long details to test ellipsis functionality and see if it works as expected', subDetails: 'Task A also has some extended information here to check overflow', muiColor: 'success.light', muiTextColor: 'success.darkerText' },
-  { id: 's1-2', userId: 'u1', day: '2025-05-19', startTime: '13:00', endTime: '17:15', duration: '4h 15m', details: 'Afternoon Shift', subDetails: 'Task B', muiColor: 'success.light', muiTextColor: 'success.darkerText' },
-  { id: 's2', userId: 'u2', day: '2025-05-20', startTime: '09:00', endTime: '17:15', duration: '8h 15m', details: 'Frontend task with a lot of details that might overflow the container width', subDetails: 'UI implementation and integration with backend APIs', muiColor: 'error.light', muiTextColor: 'error.darkerText' },
-  { id: 's3', userId: 'u1', day: '2025-05-21', startTime: '10:00', endTime: '18:30', duration: '8h 30m', details: 'Meeting', subDetails: 'Client discussion', muiColor: 'info.light', muiTextColor: 'info.darkerText' },
-  { id: 's4', userId: 'u3', day: '2025-05-22', startTime: '14:00', endTime: '18:00', duration: '4h 0m', details: 'Support', subDetails: 'Client Calls for extended period during the afternoon', muiColor: 'warning.light', muiTextColor: 'warning.darkerText' },
+  { id: 's1', userId: 'u1', day: '2025-05-19', startTime: '09:00', endTime: '12:00', duration: '3h 0m', note: 'Morning Shift with very very very long details to test ellipsis functionality and see if it works as expected', muiColor: 'success.light', muiTextColor: 'success.darkerText' },
+  { id: 's1-2', userId: 'u1', day: '2025-05-19', startTime: '13:00', endTime: '17:15', duration: '4h 15m', note: 'Afternoon Shift', muiColor: 'success.light', muiTextColor: 'success.darkerText' },
+  { id: 's2', userId: 'u2', day: '2025-05-20', startTime: '09:00', endTime: '17:15', duration: '8h 15m', note: 'Frontend task with a lot of details that might overflow the container width', muiColor: 'error.light', muiTextColor: 'error.darkerText' },
+  { id: 's3', userId: 'u1', day: '2025-05-21', startTime: '10:00', endTime: '18:30', duration: '8h 30m', note: 'Meeting', muiColor: 'info.light', muiTextColor: 'info.darkerText' },
+  { id: 's4', userId: 'u3', day: '2025-05-22', startTime: '14:00', endTime: '18:00', duration: '4h 0m', note: 'Support', muiColor: 'warning.light', muiTextColor: 'warning.darkerText' },
 ];
 
 // Sample initial data for users
@@ -71,7 +73,7 @@ const AVAILABLE_SHIFTS_BANNER_HEIGHT = 36;
 const PROJECTED_SALES_BANNER_HEIGHT = 36;
 const INFO_BANNERS_TOTAL_HEIGHT = AVAILABLE_SHIFTS_BANNER_HEIGHT + PROJECTED_SALES_BANNER_HEIGHT;
 const BULK_ACTIONS_BAR_HEIGHT = 50;
-
+const WEEK_STARTS_ON = 1; // Monday
 
 // --- Utility Functions ---
 const getInitials = (name) => {
@@ -88,16 +90,13 @@ const getInitials = (name) => {
 // --- Child Components ---
 
 // ShiftCard.jsx
-// ShiftCard.jsx
-// ... (các import và phần đầu của component giữ nguyên)
-
 function ShiftCard({
                      shift,
-                     onDeleteShift, // Prop is part of the interface, though not directly used in this specific display logic
+                     onDeleteShift,
                      onEditShift,
                      onAddAnotherShift,
-                     provided,      // From react-beautiful-dnd
-                     snapshot,      // From react-beautiful-dnd
+                     provided,
+                     snapshot,
                      isSelected,
                      onToggleSelect,
                      isAnyShiftSelected
@@ -105,28 +104,25 @@ function ShiftCard({
   const [isHovered, setIsHovered] = useState(false);
 
   const handleCheckboxClick = (e) => {
-    e.stopPropagation(); // Prevent card click when clicking checkbox
+    e.stopPropagation();
     onToggleSelect(shift.id);
   };
 
   const handleCardBodyClick = (e) => {
-    // If the click was on the checkbox or add button's interactive area, don't process.
     if (e.defaultPrevented) {
       return;
     }
-    // Check if the click target is within the checkbox or add button specifically by class or structure if needed
     if (e.target.closest('.selection-checkbox-area') || e.target.closest('.add-action-button-area')) {
       return;
     }
 
-    if (!isAnyShiftSelected) { // If no shifts are selected globally, clicking a card edits it
+    if (!isAnyShiftSelected) {
       onEditShift(shift);
-    } else { // If some shifts are already selected, clicking a card toggles its selection state
+    } else {
       onToggleSelect(shift.id);
     }
   };
 
-  // Determine visibility of checkbox and add button
   const showCheckbox = (isHovered || isAnyShiftSelected) && !snapshot.isDragging;
   const showAddButtonOnly = isHovered && !isAnyShiftSelected && !snapshot.isDragging;
 
@@ -139,31 +135,30 @@ function ShiftCard({
       elevation={snapshot.isDragging ? 4 : (isSelected ? 3 : 1)}
       sx={{
         my: 0.5,
-        height: 50, // Fixed height for the card
+        height: 50,
         boxSizing: 'border-box',
         bgcolor: snapshot.isDragging
-          ? 'primary.lighter' // Custom color when dragging
+          ? 'primary.lighter'
           : (isSelected ? (theme) => alpha(theme.palette.primary.main, 0.12) : 'background.paper'),
         border: isSelected
           ? (theme) => `2px solid ${theme.palette.primary.main}`
-          : (theme) => `1px dashed ${alpha(theme.palette.primary.main, 0.5)}`, // Subtle border
-        position: 'relative', // For absolute positioning of add button
+          : (theme) => `1px dashed ${alpha(theme.palette.primary.main, 0.5)}`,
+        position: 'relative',
         display: 'flex',
         alignItems: 'center',
         transition: 'background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
         width: '100%',
         maxWidth: '100%',
-        overflow: 'hidden', // Important for ellipsis and layout
+        overflow: 'hidden',
       }}
     >
-      {/* Checkbox Area */}
       <Box
-        className="selection-checkbox-area" // Class for click target detection
+        className="selection-checkbox-area"
         sx={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          width: showCheckbox ? 32 : 0, // Animate width for checkbox appearance
+          width: showCheckbox ? 32 : 0,
           flexShrink: 0,
           height: '100%',
           transition: 'width 0.15s ease-in-out',
@@ -173,49 +168,46 @@ function ShiftCard({
         <Checkbox
           size="small"
           checked={isSelected}
-          onChange={handleCheckboxClick} // Use specific handler
-          onClick={(e) => e.stopPropagation()} // Prevent card click
+          onChange={handleCheckboxClick}
+          onClick={(e) => e.stopPropagation()}
           icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
           checkedIcon={<CheckBoxIcon fontSize="small" />}
           sx={{
-            p: 0.5, // Padding for checkbox
+            p: 0.5,
             opacity: showCheckbox ? 1 : 0,
             visibility: showCheckbox ? 'visible' : 'hidden',
             transition: 'opacity 0.1s ease-in-out, visibility 0.1s ease-in-out',
           }}
-          tabIndex={showCheckbox ? 0 : -1} // Accessibility
+          tabIndex={showCheckbox ? 0 : -1}
         />
       </Box>
 
-      {/* Main content area (Draggable Handle + Clickable Body) */}
       <Box
-        {...provided.dragHandleProps} // Make this area the drag handle
-        onClick={handleCardBodyClick}  // Make this area clickable for edit/select
+        {...provided.dragHandleProps}
+        onClick={handleCardBodyClick}
         sx={{
           flexGrow: 1,
-          minWidth: 0, // For ellipsis to work correctly in flex children
+          minWidth: 0,
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          // Adjust padding based on checkbox/add button visibility
           pl: showCheckbox ? 0.5 : 1.5,
-          pr: showAddButtonOnly ? 4.5 : 1.5, // More padding if add button is the only visible action
+          pr: showAddButtonOnly ? 4.5 : 1.5,
           cursor: snapshot.isDragging ? 'grabbing' : (isAnyShiftSelected ? 'pointer' : 'grab'),
-          overflow: 'hidden', // Crucial for text overflow ellipsis
-          whiteSpace: 'nowrap', // Prevent wrapping for title elements, ellipsis will handle
-          userSelect: 'none', // Prevent text selection during drag
+          overflow: 'hidden',
+          whiteSpace: 'nowrap',
+          userSelect: 'none',
           transition: 'padding-left 0.15s ease-in-out, padding-right 0.15s ease-in-out',
         }}
       >
-        {/* Line 1: Time and Duration */}
         <Typography
           variant="caption"
           component="div"
           sx={{
             fontWeight: 'bold',
             color: shift.muiTextColor || 'text.primary',
-            fontSize: '0.68rem', // Slightly larger for primary info
+            fontSize: '0.68rem',
             lineHeight: 1.3,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
@@ -228,69 +220,59 @@ function ShiftCard({
           </Typography>
         </Typography>
 
-        {/* Line 2: Note (replaces details and subDetails) */}
-        {/* Conditionally render if shift.note exists and is not empty */}
         {shift.note && shift.note.trim() !== '' && (
           <Typography
-            variant="body2" // Using body2 as 'details' was
+            variant="body2"
             sx={{
               fontSize: '0.65rem',
-              // Apply the theme color string directly. MUI's sx prop will resolve it.
               color: shift.muiTextColor ? shift.muiTextColor : 'text.secondary',
-              // Apply opacity directly to make the themed color slightly transparent.
-              // If using the fallback 'text.secondary', opacity is 1 (no change).
               opacity: shift.muiTextColor ? 0.85 : 1.0,
               lineHeight: 1.3,
-              whiteSpace: 'nowrap',    // Ensure single line for ellipsis
-              overflow: 'hidden',      // Required for ellipsis
-              textOverflow: 'ellipsis', // Show ellipsis if text overflows
-              // mt: 0.1, // Optional: small margin-top if needed
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }}
-            title={shift.note} // Show full note on hover
+            title={shift.note}
           >
             {shift.note}
           </Typography>
         )}
-
-        {/* The old shift.subDetails Typography block is intentionally removed */}
-
       </Box>
 
-      {/* "Add" button area (conditionally visible) */}
       <Box
-        className="add-action-button-area" // Class for click target detection
+        className="add-action-button-area"
         sx={{
           position: 'absolute',
           top: '50%',
-          right: '4px', // Position from the right edge
+          right: '4px',
           transform: 'translateY(-50%)',
-          width: 28,  // Fixed width for the button container
-          height: 28, // Fixed height for the button container
+          width: 28,
+          height: 28,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          opacity: showAddButtonOnly ? 1 : 0, // Control visibility with opacity
+          opacity: showAddButtonOnly ? 1 : 0,
           visibility: showAddButtonOnly ? 'visible' : 'hidden',
           transition: 'opacity 0.15s ease-in-out, visibility 0.15s ease-in-out',
-          zIndex: 1, // Ensure it's above other content if overlapping
-          pointerEvents: showAddButtonOnly ? 'auto' : 'none', // Only interactive when visible
+          zIndex: 1,
+          pointerEvents: showAddButtonOnly ? 'auto' : 'none',
         }}
       >
         <IconButton
           size="small"
           onClick={(e) => {
-            e.stopPropagation(); // Prevent card click
+            e.stopPropagation();
             onAddAnotherShift(shift.userId, parseISO(shift.day));
           }}
           sx={{
-            p: 0.3, // Small padding for the icon button
-            bgcolor: 'rgba(230,230,230,0.85)', // Semi-transparent background
-            '&:hover': { bgcolor: 'rgba(210,210,210,1)' }, // Darker on hover
-            borderRadius: '4px', // Slightly rounded corners
+            p: 0.3,
+            bgcolor: 'rgba(230,230,230,0.85)',
+            '&:hover': { bgcolor: 'rgba(210,210,210,1)' },
+            borderRadius: '4px',
             width: '100%',
             height: '100%',
           }}
-          title="Thêm ca làm việc khác vào ngày này" // Tooltip
+          title="Thêm ca làm việc khác vào ngày này"
         >
           <AddIcon sx={{ fontSize: '1rem' }} color="action" />
         </IconButton>
@@ -306,19 +288,19 @@ function EmptyShiftSlot({ onAdd }) {
 
   return (
     <Paper
-      elevation={0} // Không có shadow khi ở trạng thái bình thường
+      elevation={0}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       sx={{
         minHeight: 52,
-        m: 0.5, // margin y
+        m: 0.5,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 1, // Luôn có độ dày viền để không bị nhảy layout khi hiện
-        borderStyle: 'dashed', // Kiểu viền luôn là dashed
-        borderColor: isHovered ? 'grey.500' : 'transparent', // Viền trong suốt khi không hover, có màu khi hover
-        bgcolor: isHovered ? 'grey.100' : 'transparent', // Nền trong suốt khi không hover, có màu khi hover
+        borderWidth: 1,
+        borderStyle: 'dashed',
+        borderColor: isHovered ? 'grey.500' : 'transparent',
+        bgcolor: isHovered ? 'grey.100' : 'transparent',
         cursor: 'pointer',
         flexGrow: 1,
         transition: 'background-color 0.2s ease-in-out, border-color 0.2s ease-in-out',
@@ -330,7 +312,7 @@ function EmptyShiftSlot({ onAdd }) {
         color="action"
         sx={{
           transition: 'opacity 0.2s ease-in-out',
-          opacity: isHovered ? 1 : 0, // Dấu cộng mờ đi/hiện ra
+          opacity: isHovered ? 1 : 0,
         }}
       />
     </Paper>
@@ -358,7 +340,7 @@ function DayCell({ userId, day, shiftsInCell, onAddShift, onDeleteShift, onEditS
             flexDirection: 'column',
             bgcolor: snapshot.isDraggingOver ? 'action.focus' : 'transparent',
             transition: 'background-color 0.2s ease',
-            overflow: 'hidden', // DayCell cắt nội dung tràn
+            overflow: 'hidden',
           }}
         >
           {shiftsInCell.length > 0 ? (
@@ -391,8 +373,7 @@ function DayCell({ userId, day, shiftsInCell, onAddShift, onDeleteShift, onEditS
 
 // UserRow.jsx
 function UserRow({ user, currentDate, shifts, onAddShift, onDeleteShift, onEditShift, selectedShiftIds, onToggleSelectShift, isAnyShiftSelected }) {
-  const weekStartsOn = 1;
-  const startDate = startOfWeek(currentDate, { weekStartsOn });
+  const startDate = startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON });
   const daysOfWeek = Array.from({ length: 7 }).map((_, i) => addDays(startDate, i));
 
   return (
@@ -455,20 +436,34 @@ function ShiftsGrid({ currentDate, shifts, users, onAddShift, onDeleteShift, onE
 }
 
 // CalendarHeader.jsx
-// Note: The 'stickyTopOffset' prop is passed but not directly used for the 'top' style here as 'top:0'
-// makes it stick to the top of its nearest scrolling parent.
-function CalendarHeader({ currentDate, stickyTopOffset = 0 }) {
-  const weekStartsOn = 1;
-  const startDate = startOfWeek(currentDate, { weekStartsOn });
+function CalendarHeader({
+                          currentDate,
+                          stickyTopOffset = 0,
+                          onToggleSelectAll,
+                          isAllSelectedInView,
+                          isIndeterminateInView
+                        }) {
+  const startDate = startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON });
   const days = Array.from({ length: 7 }).map((_, i) => addDays(startDate, i));
   return (
     <Grid container sx={{
       bgcolor: 'grey.100', borderBottom: 1, borderColor: 'divider',
       position: 'sticky',
-      top: 0, // Sticks to the top of the scrolling Paper container
+      top: 0,
       zIndex: 10
     }}>
-      <Grid item sx={{ width: 160, p: 1, borderRight: 1, borderColor: 'divider', display: 'flex', alignItems: 'center' }}>
+      <Grid item sx={{ width: 160, p: 0.5, borderRight: 1, borderColor: 'divider', display: 'flex', alignItems: 'center' }}>
+        <Checkbox
+          size="small"
+          checked={isAllSelectedInView}
+          indeterminate={isIndeterminateInView && !isAllSelectedInView}
+          onChange={onToggleSelectAll}
+          icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+          checkedIcon={<CheckBoxIcon fontSize="small" />}
+          indeterminateIcon={<IndeterminateCheckBoxIcon fontSize="small" />}
+          sx={{mr: 0.5, p:0.25}}
+          title={isAllSelectedInView ? "Bỏ chọn tất cả ca trong tuần" : (isIndeterminateInView ? "Chọn tất cả ca trong tuần" : "Chọn tất cả ca trong tuần")}
+        />
         <Typography variant="caption" sx={{ fontWeight: 'medium', textTransform: 'uppercase', color: 'text.secondary' }}>Nhân viên</Typography>
       </Grid>
       {days.map(day => (
@@ -491,7 +486,7 @@ function TopBar({ currentDate, onPrevWeek, onNextWeek, onToday }) {
         <Button onClick={onToday} size="small" variant="outlined" color="inherit" startIcon={<EventNoteIcon />} sx={{ mx: 1, fontSize:'0.75rem', py:0.3}}>Hôm nay</Button>
         <IconButton onClick={onNextWeek} size="small" aria-label="Next week"><ChevronRightIcon /></IconButton>
         <Typography variant="subtitle1" component="div" sx={{ ml: 2, color:'text.secondary', fontWeight:'medium' }}>
-          {format(currentDate, 'MMMM yy', { locale: vi })}
+          {format(currentDate, 'MMMM yyyy', { locale: vi })}
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
         <Button size="small" variant="text" color="inherit" startIcon={<FilterAltIcon />} sx={{textTransform:'none', fontSize:'0.8rem'}}>Lọc</Button>
@@ -504,8 +499,7 @@ function TopBar({ currentDate, onPrevWeek, onNextWeek, onToday }) {
 
 // InfoBanners.jsx
 function InfoBanners({ currentDate, stickyTopOffset = 0 }) {
-  const weekStartsOn = 1;
-  const startDate = startOfWeek(currentDate, { weekStartsOn });
+  const startDate = startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON });
   const days = Array.from({ length: 7 }).map((_, i) => addDays(startDate, i));
   return (
     <Box sx={{position: 'sticky', top: TOP_BAR_HEIGHT + stickyTopOffset, zIndex: 15}}>
@@ -546,7 +540,6 @@ function ShiftModal({ isOpen, onClose, onSave, users, initialFormState, isEditin
   const [formState, setFormState] = useState(initialFormState);
 
   useEffect(() => {
-    // Đảm bảo 'note' được khởi tạo đúng cách từ initialFormState
     setFormState({ ...initialFormState, note: initialFormState.note || '' });
   }, [initialFormState]);
 
@@ -649,15 +642,12 @@ function ShiftModal({ isOpen, onClose, onSave, users, initialFormState, isEditin
 function BulkActionsBar({
                           selectedCount,
                           onDeleteSelected,
-                          onCopySelectedToNextWeek,
+                          onOpenCopyModal, // MODIFIED: Renamed prop
                           onDeselectAll,
-                          currentDate
                         }) {
   if (selectedCount === 0) {
     return null;
   }
-
-  const nextWeekStartDate = format(addDays(startOfWeek(currentDate, { weekStartsOn: 1 }), 7), 'dd/MM/yyyy');
 
   return (
     <AppBar
@@ -692,11 +682,11 @@ function BulkActionsBar({
             variant="contained"
             color="secondary"
             startIcon={<ContentCopyIcon />}
-            onClick={onCopySelectedToNextWeek}
+            onClick={onOpenCopyModal} // MODIFIED: Using new prop
             sx={{ mr: 1, color:'white' }}
-            title={`Sao chép sang tuần bắt đầu ${nextWeekStartDate}`}
+            title="Sao chép các ca đã chọn" // MODIFIED: Updated title
           >
-            Chép sang tuần sau
+            Sao chép {/* MODIFIED: Changed text */}
           </Button>
         </Box>
         <Button
@@ -713,24 +703,139 @@ function BulkActionsBar({
   );
 }
 
+// CopyShiftsModal.jsx
+const copyModalStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: { xs: '90%', sm: 400 }, // Smaller width for this modal
+  maxHeight: '80vh',
+  bgcolor: 'background.paper',
+  border: '1px solid #ccc',
+  boxShadow: 24,
+  p: 3,
+  borderRadius: 1,
+  display: 'flex',
+  flexDirection: 'column'
+};
+
+function CopyShiftsModal({ isOpen, onClose, onConfirmCopy, currentDate, numSelectedShifts }) {
+  const [selectedWeeks, setSelectedWeeks] = useState([]);
+  const [weekOptions, setWeekOptions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+
+  useEffect(() => {
+    if (isOpen) {
+      const options = [];
+      // Generate options for the next 12 weeks, starting from the week *after* the current one
+      const startOfNextWeek = startOfWeek(addDays(currentDate, 7), { weekStartsOn: WEEK_STARTS_ON });
+      for (let i = 0; i < 12; i++) {
+        const weekStartDate = addWeeks(startOfNextWeek, i);
+        const weekEndDate = addDays(weekStartDate, 6);
+        options.push({
+          value: weekStartDate.toISOString(), // Store ISO string as value
+          label: `Tuần ${format(weekStartDate, 'dd/MM')} - ${format(weekEndDate, 'dd/MM/yyyy')}`,
+        });
+      }
+      setWeekOptions(options);
+      setSelectedWeeks([]); // Reset selected weeks when modal opens
+    }
+  }, [isOpen, currentDate]);
+
+  const handleToggleWeek = (weekValue) => {
+    setSelectedWeeks((prev) =>
+      prev.includes(weekValue)
+        ? prev.filter((w) => w !== weekValue)
+        : [...prev, weekValue]
+    );
+  };
+
+  const handleConfirm = async () => {
+    if (selectedWeeks.length === 0) {
+      alert("Vui lòng chọn ít nhất một tuần để sao chép.");
+      return;
+    }
+    setIsLoading(true);
+    // Convert ISO strings back to Date objects for the callback
+    const targetWeekStartDates = selectedWeeks.map(isoString => parseISO(isoString));
+    await onConfirmCopy(targetWeekStartDates);
+    setIsLoading(false);
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <Modal open={isOpen} onClose={onClose} aria-labelledby="copy-shifts-modal-title">
+      <Box sx={copyModalStyle}>
+        <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexShrink: 0}}>
+          <Typography id="copy-shifts-modal-title" variant="h6" component="h2">
+            Sao chép {numSelectedShifts} ca
+          </Typography>
+          <IconButton onClick={onClose} size="small" disabled={isLoading}><CloseIcon /></IconButton>
+        </Box>
+
+        <Typography variant="body2" sx={{mb:1}}>Chọn (các) tuần muốn sao chép đến:</Typography>
+
+        <Box sx={{ overflowY: 'auto', mb: 2, flexGrow: 1 }}>
+          <List dense>
+            {weekOptions.map((option) => (
+              <ListItem key={option.value} disablePadding>
+                <ListItemButton onClick={() => handleToggleWeek(option.value)} dense disabled={isLoading}>
+                  <ListItemIcon sx={{minWidth: 32}}>
+                    <Checkbox
+                      edge="start"
+                      checked={selectedWeeks.includes(option.value)}
+                      tabIndex={-1}
+                      disableRipple
+                      size="small"
+                      disabled={isLoading}
+                    />
+                  </ListItemIcon>
+                  <ListItemText primary={option.label} primaryTypographyProps={{fontSize: '0.9rem'}}/>
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+
+        <Box sx={{ mt: 'auto', display: 'flex', justifyContent: 'flex-end', gap: 1, flexShrink: 0, pt:1, borderTop: '1px solid', borderColor:'divider' }}>
+          <Button onClick={onClose} variant="outlined" color="inherit" disabled={isLoading}>Hủy</Button>
+          <Button
+            onClick={handleConfirm}
+            variant="contained"
+            color="primary"
+            disabled={isLoading || selectedWeeks.length === 0}
+            startIcon={isLoading ? <CircularProgress size={16} color="inherit"/> : null}
+          >
+            {isLoading ? "Đang sao chép..." : `Sao chép (${selectedWeeks.length} tuần)`}
+          </Button>
+        </Box>
+      </Box>
+    </Modal>
+  );
+}
+
 
 // --- Main Application Component (ShiftScheduler.jsx) ---
 export default function ShiftScheduler() {
   const [currentDate, setCurrentDate] = useState(new Date(new Date().setHours(0,0,0,0)));
-  const [shifts, setShifts] = useState(initialShifts); // initialShifts đã được cập nhật ở trên
+  const [shifts, setShifts] = useState(initialShifts);
   const [users, setUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEditingShift, setCurrentEditingShift] = useState(null);
-
-  // MODIFIED: Cập nhật modalInitialFormState
   const [modalInitialFormState, setModalInitialFormState] = useState({
     userId: '',
     day: format(new Date(), 'yyyy-MM-dd'),
     startTime: '09:00',
     endTime: '17:00',
-    note: '' // Thay thế details và subDetails
+    note: ''
   });
   const [selectedShiftIds, setSelectedShiftIds] = useState([]);
+  const [isCopyModalOpen, setIsCopyModalOpen] = useState(false); // State for new copy modal
+
 
   const isAnyShiftSelected = selectedShiftIds.length > 0;
 
@@ -761,7 +866,6 @@ export default function ShiftScheduler() {
   const handleNextWeek = () => setCurrentDate(prev => addDays(prev, 7));
   const handleToday = () => setCurrentDate(new Date(new Date().setHours(0,0,0,0)));
 
-  // MODIFIED: Cập nhật handleOpenModal
   const handleOpenModal = (userId, day, shiftToEdit = null) => {
     if (shiftToEdit) {
       setCurrentEditingShift(shiftToEdit);
@@ -770,7 +874,7 @@ export default function ShiftScheduler() {
         day: shiftToEdit.day,
         startTime: shiftToEdit.startTime,
         endTime: shiftToEdit.endTime,
-        note: shiftToEdit.note || '', // Sử dụng trường note
+        note: shiftToEdit.note || '',
       });
     } else {
       setCurrentEditingShift(null);
@@ -779,7 +883,7 @@ export default function ShiftScheduler() {
         day: format(day || new Date(), 'yyyy-MM-dd'),
         startTime: '09:00',
         endTime: '17:00',
-        note: '', // Khởi tạo note rỗng
+        note: '',
       });
     }
     setIsModalOpen(true);
@@ -790,11 +894,9 @@ export default function ShiftScheduler() {
     setCurrentEditingShift(null);
   };
 
-  // MODIFIED: Cập nhật handleSaveShift
   const handleSaveShift = (formData) => {
-    const { userId, day, startTime, endTime, note } = formData; // Lấy trường note
+    const { userId, day, startTime, endTime, note } = formData;
 
-    // Bỏ kiểm tra bắt buộc cho 'details', vì 'note' không bắt buộc
     if (!userId || !day || !startTime || !endTime) {
       alert("Vui lòng điền đầy đủ các trường bắt buộc: Nhân viên, Ngày, Giờ bắt đầu, Giờ kết thúc.");
       return;
@@ -832,7 +934,7 @@ export default function ShiftScheduler() {
       startTime,
       endTime,
       duration: `${durationHours}h ${durationMinutes}m`,
-      note, // Thêm trường note vào dữ liệu ca
+      note,
       muiColor: shiftMuiColor,
       muiTextColor: shiftMuiTextColor,
     };
@@ -862,13 +964,17 @@ export default function ShiftScheduler() {
     if (!draggedShift) return;
 
     const destParts = destination.droppableId.split('-');
-    const newUserId = destParts[1];
-    const newDay = `${destParts[3]}-${destParts[4]}-${destParts[5]}`;
+    const newUserId = destParts[1]; // Assuming format user-USERID-day-YYYY-MM-DD
+    const newDayString = `${destParts[3]}-${destParts[4]}-${destParts[5]}`;
+
+    const userForColor = users.find(u => u.id === newUserId);
+    const newMuiColor = userForColor?.avatarBgColor?.replace('.main','.light') || 'grey.200';
+    const newMuiTextColor = userForColor?.avatarBgColor?.replace('.main','.darkerText') || 'text.primary';
 
     setShifts(prevShifts =>
       prevShifts.map(shift =>
         shift.id === draggableId
-          ? { ...shift, userId: newUserId, day: newDay }
+          ? { ...shift, userId: newUserId, day: newDayString, muiColor: newMuiColor, muiTextColor: newMuiTextColor }
           : shift
       )
     );
@@ -892,30 +998,99 @@ export default function ShiftScheduler() {
     setSelectedShiftIds([]);
   }, [selectedShiftIds, isAnyShiftSelected]);
 
-  const handleCopySelectedToNextWeek = useCallback(() => {
+  // --- "Select All" in current view logic ---
+  const getAllShiftIdsInCurrentView = useCallback(() => {
+    const weekStart = startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON });
+    const weekEnd = addDays(weekStart, 6);
+    const idsInView = [];
+    shifts.forEach(shift => {
+      if (isValid(parseISO(shift.day))) {
+        const shiftDate = parseISO(shift.day);
+        if (shiftDate >= weekStart && shiftDate <= weekEnd) {
+          // Check if the user of the shift is in the current list of users (implicitly all users are shown)
+          if (users.find(u => u.id === shift.userId)) {
+            idsInView.push(shift.id);
+          }
+        }
+      }
+    });
+    return idsInView;
+  }, [shifts, users, currentDate]);
+
+  const allShiftIdsInView = getAllShiftIdsInCurrentView();
+  const selectedShiftsInViewCount = allShiftIdsInView.filter(id => selectedShiftIds.includes(id)).length;
+
+  const isAllSelectedInView = allShiftIdsInView.length > 0 && selectedShiftsInViewCount === allShiftIdsInView.length;
+  const isIndeterminateInView = selectedShiftsInViewCount > 0 && selectedShiftsInViewCount < allShiftIdsInView.length;
+
+  const handleToggleSelectAllInView = useCallback(() => {
+    const idsInView = getAllShiftIdsInCurrentView();
+    if (isAllSelectedInView) { // If all are selected, deselect them
+      setSelectedShiftIds(prev => prev.filter(id => !idsInView.includes(id)));
+    } else { // Else (none or some are selected), select all in view
+      setSelectedShiftIds(prev => [...new Set([...prev, ...idsInView])]);
+    }
+  }, [getAllShiftIdsInCurrentView, isAllSelectedInView]);
+
+
+  // --- Enhanced Copy Logic ---
+  const handleOpenCopyModal = () => {
     if (!isAnyShiftSelected) return;
-    const weekStartsOn = 1;
-    const nextWeekStartDateFormatted = format(addDays(startOfWeek(currentDate, { weekStartsOn }), 7), 'dd/MM/yyyy');
-    if (!window.confirm(`Bạn có chắc muốn sao chép ${selectedShiftIds.length} ca đã chọn sang tuần bắt đầu từ ${nextWeekStartDateFormatted} không?`)) return;
+    setIsCopyModalOpen(true);
+  };
+
+  const handleCloseCopyModal = () => {
+    setIsCopyModalOpen(false);
+  };
+
+  const handleConfirmCopyToWeeks = useCallback(async (targetWeekStartDates) => {
+    if (!isAnyShiftSelected || targetWeekStartDates.length === 0) return;
 
     const shiftsToCopyDetails = shifts.filter(shift => selectedShiftIds.includes(shift.id));
-    const newCopiedShifts = shiftsToCopyDetails.map(shift => {
-      const originalShiftDate = parseISO(shift.day);
-      const nextWeekShiftDate = addDays(originalShiftDate, 7);
-      return {
-        ...shift,
-        id: `s${Date.now()}-${Math.random().toString(16).slice(2)}`,
-        day: format(nextWeekShiftDate, 'yyyy-MM-dd'),
-      };
+    let newCopiedShifts = [];
+
+    targetWeekStartDates.forEach(targetWeekStartDate => {
+      shiftsToCopyDetails.forEach(shift => {
+        const originalShiftDate = parseISO(shift.day);
+        if (!isValid(originalShiftDate)) return;
+
+        const startOfOriginalWeek = startOfWeek(originalShiftDate, { weekStartsOn: WEEK_STARTS_ON });
+
+        // Calculate the day index within its week (0 for Monday, 1 for Tuesday, etc.)
+        // getDay returns 0 for Sunday, 1 for Monday .. 6 for Saturday. Adjust if WEEK_STARTS_ON is different.
+        // For WEEK_STARTS_ON = 1 (Monday):
+        // Monday: getDay = 1 -> index = 0
+        // Sunday: getDay = 0 -> index = 6
+        let dayIndexOfWeek = getDay(originalShiftDate);
+        if (WEEK_STARTS_ON === 1) { // Monday is start of week
+          dayIndexOfWeek = (dayIndexOfWeek === 0) ? 6 : dayIndexOfWeek - 1;
+        }
+        // else if WEEK_STARTS_ON === 0 (Sunday is start of week), dayIndexOfWeek is already correct.
+
+        const newShiftDate = addDays(targetWeekStartDate, dayIndexOfWeek);
+
+        newCopiedShifts.push({
+          ...shift,
+          id: `s${Date.now()}-${Math.random().toString(16).slice(2)}-${newCopiedShifts.length}`, // Ensure unique ID
+          day: format(newShiftDate, 'yyyy-MM-dd'),
+        });
+      });
     });
+
+    // Simulate API delay for demo
+    await new Promise(resolve => setTimeout(resolve, 500));
+
     setShifts(prevShifts => [...prevShifts, ...newCopiedShifts]);
-    setSelectedShiftIds([]);
-  }, [selectedShiftIds, shifts, currentDate, isAnyShiftSelected]);
+    setSelectedShiftIds([]); // Deselect all after copying
+    // No need to close modal here, onConfirmCopy in modal does it.
+  }, [selectedShiftIds, shifts, isAnyShiftSelected]);
+
 
   const dynamicStickyOffset = isAnyShiftSelected ? BULK_ACTIONS_BAR_HEIGHT : 0;
-  const PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER = 8 + 8 + 8;
-  const FIXED_FOOTER_RESERVED_SPACE = 70;
+  const PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER = 8 + 8 + 8; // px + mt + py for Box containing Paper
+  const FIXED_FOOTER_RESERVED_SPACE = 70; // Approximate height for the fixed footer
   const paperContentMaxHeight = `calc(100vh - ${TOP_BAR_HEIGHT}px - ${dynamicStickyOffset}px - ${INFO_BANNERS_TOTAL_HEIGHT}px - ${PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER}px - ${FIXED_FOOTER_RESERVED_SPACE}px)`;
+
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
@@ -930,11 +1105,10 @@ export default function ShiftScheduler() {
           <BulkActionsBar
             selectedCount={selectedShiftIds.length}
             onDeleteSelected={handleDeleteSelectedShifts}
-            onCopySelectedToNextWeek={handleCopySelectedToNextWeek}
+            onOpenCopyModal={handleOpenCopyModal} // MODIFIED
             onDeselectAll={handleDeselectAll}
-            currentDate={currentDate}
           />
-          <Box sx={{px: {xs: 0, sm:1, md:2}, py:1}}>
+          <Box sx={{px: {xs: 0, sm:1, md:2}, py:1}}> {/* Added py:1 for consistent spacing */}
             <InfoBanners currentDate={currentDate} stickyTopOffset={dynamicStickyOffset} />
             <Paper
               elevation={2}
@@ -944,9 +1118,15 @@ export default function ShiftScheduler() {
                 maxHeight: paperContentMaxHeight,
               }}
             >
-              <CalendarHeader currentDate={currentDate} stickyTopOffset={dynamicStickyOffset} />
-              <Box sx={{ overflowX: 'auto' }}>
-                <Box sx={{ minWidth: 1100 }}>
+              <CalendarHeader
+                currentDate={currentDate}
+                stickyTopOffset={dynamicStickyOffset}
+                onToggleSelectAll={handleToggleSelectAllInView}
+                isAllSelectedInView={isAllSelectedInView}
+                isIndeterminateInView={isIndeterminateInView}
+              />
+              <Box sx={{ overflowX: 'auto' }}> {/* Ensures horizontal scroll for content if needed */}
+                <Box sx={{ minWidth: 1100 }}> {/* Minimum width for the grid content */}
                   <ShiftsGrid
                     currentDate={currentDate}
                     shifts={shifts}
@@ -977,8 +1157,16 @@ export default function ShiftScheduler() {
             initialFormState={modalInitialFormState}
             isEditing={!!currentEditingShift}
           />
+          <CopyShiftsModal
+            isOpen={isCopyModalOpen}
+            onClose={handleCloseCopyModal}
+            onConfirmCopy={handleConfirmCopyToWeeks}
+            currentDate={currentDate}
+            numSelectedShifts={selectedShiftIds.length}
+          />
         </Container>
       </DragDropContext>
     </LocalizationProvider>
   );
 }
+
