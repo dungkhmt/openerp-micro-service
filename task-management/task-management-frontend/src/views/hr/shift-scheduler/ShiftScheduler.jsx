@@ -2,7 +2,7 @@
 // ShiftScheduler.jsx
 // ==============
 import React, {useCallback, useEffect, useState} from 'react';
-import {addDays, format, getDay, isValid, parseISO, startOfWeek, subDays} from 'date-fns';
+import {addDays, format, getDay, isValid, parseISO, startOfWeek, subDays, isEqual} from 'date-fns'; // Added isEqual
 import vi from 'date-fns/locale/vi';
 import {DragDropContext} from 'react-beautiful-dnd';
 import {Box, Container, Paper, Typography, Checkbox} from '@mui/material';
@@ -18,7 +18,8 @@ import InfoBanners from "./InfoBanners.jsx";
 import BulkActionsBar from "./BulkActionBar.jsx";
 import TopBar from "./TopBar.jsx";
 import UnassignedShiftsRow from "./UnassignedShiftsRow.jsx";
-import DeleteConfirmationModal from "../modals/DeleteConfirmationModal.jsx";
+import SchedulingConflictModal from "./SchedulingConflictModal.jsx";
+import DeleteConfirmationModal from "../modals/DeleteConfirmationModal.jsx"; // Import conflict modal
 
 export const TOP_BAR_HEIGHT = 61;
 export const AVAILABLE_SHIFTS_BANNER_HEIGHT = 36;
@@ -39,25 +40,57 @@ const initialShifts = [
 ];
 
 const initialUsers = [
-  { id: 'u1', name: 'NV Ánh Nguyệt', summary: '8h 15m', avatarLetter: 'AN', avatarBgColor: 'secondary.main' },
-  { id: 'u2', name: 'NV Bảo Long', summary: '8h 15m', avatarLetter: 'BL', avatarBgColor: 'primary.main' },
-  { id: 'u3', name: 'NV Cẩm Tú', summary: '0h 0m', avatarLetter: 'CT', avatarBgColor: 'warning.main' },
-  { id: 'uHPT', name: 'Hieu Phan Trung', summary: '0h 0m', avatarLetter: 'HT', avatarBgColor: 'success.main' },
-  { id: 't77', name: 'Test User 1', summary: '0h 0m', avatarLetter: 'T4', avatarBgColor: 'info.main' },
-  { id: 't74', name: 'Test User 2', summary: '0h 0m', avatarLetter: 'T4', avatarBgColor: 'info.main' },
-  { id: 't714', name: 'Test User 3', summary: '0h 0m', avatarLetter: 'T4', avatarBgColor: 'info.main' },
-  { id: 't34', name: 'Test User 5', summary: '0h 0m', avatarLetter: 'T4', avatarBgColor: 'info.main' },
-  { id: 't64', name: 'Test User 9', summary: '0h 0m', avatarLetter: 'T4', avatarBgColor: 'info.main' },
-  { id: 'u4', name: 'NV Đăng Khoa', summary: '0h 0m', avatarLetter: 'ĐK', avatarBgColor: 'error.main' },
-  { id: 'u5', name: 'NV Thu Hà', summary: '0h 0m', avatarLetter: 'TH', avatarBgColor: 'secondary.light' },
-  { id: 'u6', name: 'NV Minh Quân', summary: '0h 0m', avatarLetter: 'MQ', avatarBgColor: 'primary.light' },
-  { id: 'u7', name: 'NV Phương Mai', summary: '0h 0m', avatarLetter: 'PM', avatarBgColor: 'warning.light' },
-  { id: 'u8', name: 'NV Gia Huy', summary: '0h 0m', avatarLetter: 'GH', avatarBgColor: 'success.light' },
-  { id: 'u9', name: 'NV Ngọc Lan', summary: '0h 0m', avatarLetter: 'NL', avatarBgColor: 'info.light' },
-  { id: 'u10', name: 'NV Tiến Dũng', summary: '0h 0m', avatarLetter: 'TD', avatarBgColor: 'error.light' },
-  { id: 'u11', name: 'NV Hoài An', summary: '0h 0m', avatarLetter: 'HA', avatarBgColor: 'secondary.main' },
-  { id: 'u12', name: 'NV Tuấn Kiệt', summary: '0h 0m', avatarLetter: 'TK', avatarBgColor: 'primary.main' },
+  { id: 'u1', name: 'NV Ánh Nguyệt', summary: '', avatarLetter: 'AN', avatarBgColor: 'secondary.main' },
+  { id: 'u2', name: 'NV Bảo Long', summary: '', avatarLetter: 'BL', avatarBgColor: 'primary.main' },
+  { id: 'u3', name: 'NV Cẩm Tú', summary: '', avatarLetter: 'CT', avatarBgColor: 'warning.main' },
 ];
+
+// --- Conflict Detection Helper ---
+const detectConflicts = (shiftToCheck, allShifts, targetUserId, usersList, currentShiftIdToExclude = null) => {
+  const conflicts = [];
+  if (!shiftToCheck.day || !shiftToCheck.startTime || !shiftToCheck.endTime || !targetUserId) {
+    return conflicts; // Not enough info to check
+  }
+
+  const startA_raw = parseISO(`${shiftToCheck.day}T${shiftToCheck.startTime}`);
+  const endA_raw = parseISO(`${shiftToCheck.day}T${shiftToCheck.endTime}`);
+
+  if (!isValid(startA_raw) || !isValid(endA_raw)) {
+    return [];
+  }
+  // Adjust for overnight shifts for comparison range (A ends on next day if end time < start time)
+  const startA = startA_raw;
+  const endA = endA_raw < startA_raw ? addDays(endA_raw, 1) : endA_raw;
+
+  allShifts.forEach(existingShift => {
+    if (existingShift.userId !== targetUserId) return;
+    if (currentShiftIdToExclude && existingShift.id === currentShiftIdToExclude) return;
+    if (!existingShift.day || !existingShift.startTime || !existingShift.endTime) return;
+
+    const startB_raw = parseISO(`${existingShift.day}T${existingShift.startTime}`);
+    const endB_raw = parseISO(`${existingShift.day}T${existingShift.endTime}`);
+
+    if (!isValid(startB_raw) || !isValid(endB_raw)) return;
+
+    const startB = startB_raw;
+    const endB = endB_raw < startB_raw ? addDays(endB_raw, 1) : endB_raw;
+
+    // Check for overlap: (StartA < EndB) and (EndA > StartB)
+    if (startA < endB && endA > startB) {
+      const user = usersList.find(u => u.id === targetUserId);
+      conflicts.push({
+        type: 'TimeOverlap',
+        shiftId: existingShift.id,
+        userName: user ? user.name : targetUserId,
+        day: format(parseISO(existingShift.day), 'EEE, MMM dd', { locale: vi }),
+        timeRange: `${existingShift.startTime} - ${existingShift.endTime}`,
+        message: `Trùng với ca làm việc của ${user ? user.name : 'NV này'} (${existingShift.startTime} - ${existingShift.endTime} ngày ${format(parseISO(existingShift.day), 'dd/MM', { locale: vi })})`
+      });
+    }
+  });
+  return conflicts;
+};
+
 
 export default function ShiftScheduler() {
   const [currentDate, setCurrentDate] = useState(new Date(new Date('2025-05-19').setHours(0,0,0,0)));
@@ -78,6 +111,11 @@ export default function ShiftScheduler() {
   const [isDeleteSingleModalOpen, setIsDeleteSingleModalOpen] = useState(false);
   const [shiftIdToDelete, setShiftIdToDelete] = useState(null);
   const [isDeleteSelectedModalOpen, setIsDeleteSelectedModalOpen] = useState(false);
+
+  // State for Scheduling Conflict Modal
+  const [schedulingConflicts, setSchedulingConflicts] = useState([]);
+  const [isConflictModalOpen, setIsConflictModalOpen] = useState(false);
+  const [pendingShiftOperation, setPendingShiftOperation] = useState(null); // { action: 'save' | 'drag', data: relevantData }
 
 
   const isAnyShiftSelected = selectedShiftIds.length > 0;
@@ -155,27 +193,9 @@ export default function ShiftScheduler() {
     setModalOpeningContext(null);
   };
 
-  const handleSaveShift = (formData) => {
-    // ... (handleSaveShift logic from previous full response)
-    const { userIds: rawUserIds, day, startTime, endTime, note, slots: formSlots, _initiatedAsNewUnassignedContext } = formData;
+  const proceedWithSaveShift = (formDataToSave, editingShiftOriginalId) => {
+    const { userIds: rawUserIds, day, startTime, endTime, note, slots: formSlots, _initiatedAsNewUnassignedContext } = formDataToSave;
     const userIds = rawUserIds || [];
-
-    if (userIds.length === 0 && !_initiatedAsNewUnassignedContext && !(currentEditingShift && currentEditingShift.userId === UNASSIGNED_SHIFT_USER_ID && userIds.length === 0) ) {
-      alert("Vui lòng chọn ít nhất một nhân viên.");
-      return;
-    }
-    if (!day || !startTime || !endTime) {
-      alert("Vui lòng điền đầy đủ Ngày, Giờ bắt đầu và Giờ kết thúc."); return;
-    }
-    try {
-      if(!isValid(parseISO(day))) throw new Error("Invalid day format");
-      if(!/^\d{2}:\d{2}$/.test(startTime) || !/^\d{2}:\d{2}$/.test(endTime)) throw new Error("Invalid time format (HH:mm)");
-      if(!isValid(parseISO(`${day}T${startTime}`))) throw new Error("Invalid start time value");
-      if(!isValid(parseISO(`${day}T${endTime}`))) throw new Error("Invalid end time value");
-    } catch (e) {
-      alert(`Dữ liệu ngày giờ không hợp lệ: ${e.message}.`);
-      return;
-    }
 
     const newDuration = calculateDuration(day, startTime, endTime);
     const shiftBaseData = { day, startTime, endTime, note, duration: newDuration };
@@ -191,13 +211,11 @@ export default function ShiftScheduler() {
 
     if (_initiatedAsNewUnassignedContext) {
       let slotsForThisNewUnassignedOp = totalInitialSlotsDefined;
-
       if (actualUserIdsToAssign.length > 0) {
         for (const selectedUserId of actualUserIdsToAssign) {
           const userForColor = users.find(u => u.id === selectedUserId);
           const muiColor = userForColor?.avatarBgColor?.replace('.main', '.light') || 'grey.200';
           const muiTextColor = userForColor?.avatarBgColor?.replace('.main', '.darkerText') || 'text.primary';
-
           newShiftsCreatedForUsers.push({
             ...shiftBaseData, userId: selectedUserId, muiColor, muiTextColor,
             id: `s${Date.now()}-${Math.random().toString(16).slice(2)}-${selectedUserId}`,
@@ -205,7 +223,6 @@ export default function ShiftScheduler() {
           assignedCountThisAction++;
         }
       }
-
       const remainingSlotsForTemplate = slotsForThisNewUnassignedOp - assignedCountThisAction;
       let newUnassignedShiftTemplate = null;
       if (remainingSlotsForTemplate > 0) {
@@ -216,7 +233,6 @@ export default function ShiftScheduler() {
           muiColor: 'grey.300', muiTextColor: 'text.primary',
         };
       }
-
       setShifts(prevShifts => {
         let updatedShifts = [...prevShifts, ...newShiftsCreatedForUsers];
         if (newUnassignedShiftTemplate) {
@@ -224,11 +240,9 @@ export default function ShiftScheduler() {
         }
         return updatedShifts;
       });
-
-    } else if (currentEditingShift && currentEditingShift.userId === UNASSIGNED_SHIFT_USER_ID) {
+    } else if (editingShiftOriginalId && currentEditingShift && currentEditingShift.userId === UNASSIGNED_SHIFT_USER_ID) {
       let slotsAvailableInExistingTemplate = parseInt(currentEditingShift.slots, 10);
       let newTotalSlotsForTemplateDefinition = totalInitialSlotsDefined;
-
       if (actualUserIdsToAssign.length > 0) {
         for (const selectedUserId of actualUserIdsToAssign) {
           if (slotsAvailableInExistingTemplate <= 0) break;
@@ -243,36 +257,26 @@ export default function ShiftScheduler() {
           assignedCountThisAction++;
         }
       }
-
       setShifts(prevShifts => {
         let finalTemplateSlots = newTotalSlotsForTemplateDefinition - assignedCountThisAction;
         if (formSlots === undefined || formSlots === null || isNaN(parseInt(formSlots,10))) {
           finalTemplateSlots = parseInt(currentEditingShift.slots, 10) - assignedCountThisAction;
         }
         if (finalTemplateSlots < 0) finalTemplateSlots = 0;
-
-        let updatedShifts = prevShifts.map(s => {
-          if (s.id === currentEditingShift.id) {
-            return { ...s, ...shiftBaseData, slots: finalTemplateSlots };
-          }
-          return s;
-        });
-
-        if (finalTemplateSlots <= 0 && currentEditingShift) {
-          updatedShifts = updatedShifts.filter(s => s.id !== currentEditingShift.id);
+        let updatedShifts = prevShifts.map(s => (s.id === editingShiftOriginalId) ? { ...s, ...shiftBaseData, slots: finalTemplateSlots } : s);
+        if (finalTemplateSlots <= 0) {
+          updatedShifts = updatedShifts.filter(s => s.id !== editingShiftOriginalId);
         }
         return [...updatedShifts, ...newShiftsCreatedForUsers];
       });
-
-    } else {
+    } else { // Regular user shift add/edit
       let newShiftsToAdd_regular = [];
       let shiftsToUpdateDetails_regular = [];
       let originalShiftToDeleteId_regular = null;
-
-      if (currentEditingShift) {
+      if (editingShiftOriginalId && currentEditingShift) {
         const originalUserIdOfEditedShift = currentEditingShift.userId;
         if (actualUserIdsToAssign.length === 0 && currentEditingShift.userId !== UNASSIGNED_SHIFT_USER_ID) {
-          originalShiftToDeleteId_regular = currentEditingShift.id;
+          originalShiftToDeleteId_regular = editingShiftOriginalId;
         } else {
           let originalUserStillSelected = false;
           actualUserIdsToAssign.forEach(selectedUserId => {
@@ -280,22 +284,19 @@ export default function ShiftScheduler() {
             const muiColor = userForColor?.avatarBgColor?.replace('.main', '.light') || 'grey.200';
             const muiTextColor = userForColor?.avatarBgColor?.replace('.main', '.darkerText') || 'text.primary';
             const completeShiftData = { ...shiftBaseData, userId: selectedUserId, muiColor, muiTextColor };
-
             if (selectedUserId === originalUserIdOfEditedShift) {
-              shiftsToUpdateDetails_regular.push({ id: currentEditingShift.id, data: completeShiftData });
+              shiftsToUpdateDetails_regular.push({ id: editingShiftOriginalId, data: completeShiftData });
               originalUserStillSelected = true;
             } else {
               newShiftsToAdd_regular.push({ ...completeShiftData, id: `s${Date.now()}-${Math.random().toString(16).slice(2)}-${selectedUserId}` });
             }
           });
           if (!originalUserStillSelected && currentEditingShift.userId !== UNASSIGNED_SHIFT_USER_ID) {
-            originalShiftToDeleteId_regular = currentEditingShift.id;
+            originalShiftToDeleteId_regular = editingShiftOriginalId;
           }
         }
-      } else {
-        if (actualUserIdsToAssign.length === 0) {
-          alert("Vui lòng chọn ít nhất một nhân viên."); return;
-        }
+      } else { // Adding new shift(s) for users
+        if (actualUserIdsToAssign.length === 0) { alert("Vui lòng chọn ít nhất một nhân viên."); return; }
         actualUserIdsToAssign.forEach(selectedUserId => {
           const userForColor = users.find(u => u.id === selectedUserId);
           const muiColor = userForColor?.avatarBgColor?.replace('.main','.light') || 'grey.200';
@@ -306,7 +307,6 @@ export default function ShiftScheduler() {
           });
         });
       }
-
       setShifts(prevShifts => {
         let result = [...prevShifts];
         if (originalShiftToDeleteId_regular) {
@@ -318,16 +318,52 @@ export default function ShiftScheduler() {
         return [...result, ...newShiftsToAdd_regular];
       });
     }
-    handleCloseModal();
+    handleCloseModal(); // Ensure this is called after state updates.
   };
 
-  // MODIFIED: Opens confirmation modal
+
+  const handleSaveShift = (formData) => {
+    const { userIds: rawUserIds, day, startTime, endTime, _initiatedAsNewUnassignedContext } = formData;
+    const userIds = rawUserIds || [];
+    const actualUserIdsToAssign = userIds.filter(uid => users.find(u => u.id === uid));
+    let editingId = currentEditingShift ? currentEditingShift.id : null;
+
+    let allDetectedConflicts = [];
+
+    // Perform conflict check for each user being assigned or for the user of an edited shift
+    if (_initiatedAsNewUnassignedContext && actualUserIdsToAssign.length > 0) {
+      actualUserIdsToAssign.forEach(userId => {
+        allDetectedConflicts.push(...detectConflicts({ day, startTime, endTime }, shifts, userId, users, null));
+      });
+    } else if (currentEditingShift && currentEditingShift.userId !== UNASSIGNED_SHIFT_USER_ID) { // Editing an existing user's shift
+      // If userIds in form is different from currentEditingShift.userId, it means reassignment or multi-assignment
+      actualUserIdsToAssign.forEach(userId => {
+        allDetectedConflicts.push(...detectConflicts({ day, startTime, endTime }, shifts, userId, users, editingId));
+      });
+    } else if (!currentEditingShift && actualUserIdsToAssign.length > 0 && !_initiatedAsNewUnassignedContext) { // Adding new shift to user(s)
+      actualUserIdsToAssign.forEach(userId => {
+        allDetectedConflicts.push(...detectConflicts({ day, startTime, endTime }, shifts, userId, users, null));
+      });
+    }
+    // Note: Conflict detection for editing an UNASSIGNED shift's time/date doesn't make sense unless it's being assigned.
+    // If assigning an existing unassigned shift, that's covered by the `currentEditingShift.userId === UNASSIGNED_SHIFT_USER_ID` block inside proceedWithSaveShift.
+
+    if (allDetectedConflicts.length > 0) {
+      setSchedulingConflicts(allDetectedConflicts);
+      setPendingShiftOperation({ action: 'save', data: formData, editingShiftId: editingId });
+      setIsConflictModalOpen(true);
+      // Do NOT close the main shift modal here, user might want to cancel from conflict modal and return to edit
+      return;
+    }
+    proceedWithSaveShift(formData, editingId);
+    // handleCloseModal(); // This is now called within proceedWithSaveShift or if no conflicts
+  };
+
   const handleDeleteSingleShift = (shiftId) => {
     setShiftIdToDelete(shiftId);
     setIsDeleteSingleModalOpen(true);
   };
 
-  // New handler for actual single shift deletion after confirmation
   const confirmDeleteSingleShift = () => {
     if (shiftIdToDelete) {
       setShifts(prevShifts => prevShifts.filter(shift => shift.id !== shiftIdToDelete));
@@ -337,30 +373,24 @@ export default function ShiftScheduler() {
     setIsDeleteSingleModalOpen(false);
   };
 
-  // MODIFIED: Opens confirmation modal
   const handleDeleteSelectedShifts = useCallback(() => {
     if (!isAnyShiftSelected || selectedShiftIds.length === 0) return;
     setIsDeleteSelectedModalOpen(true);
   }, [selectedShiftIds, isAnyShiftSelected]);
 
-  // New handler for actual selected shifts deletion after confirmation
   const confirmDeleteSelectedShifts = () => {
     setShifts(prevShifts => prevShifts.filter(shift => !selectedShiftIds.includes(shift.id)));
     setSelectedShiftIds([]);
     setIsDeleteSelectedModalOpen(false);
   };
 
-  const onDragEnd = (result) => {
-    const { source, destination, draggableId } = result;
+  const proceedWithDragEnd = (dragResult) => {
+    const { source, destination, draggableId } = dragResult;
+    const draggedShiftOriginal = shifts.find(shift => shift.id === draggableId); // Re-find, as shifts might have changed if coming from pending op
+    if(!draggedShiftOriginal) return;
 
-    if (!destination || !destination.droppableId) { return; }
-    if (source.droppableId === destination.droppableId && source.index === destination.index) { return; }
-
-    const draggedShiftOriginal = shifts.find(shift => shift.id === draggableId);
-    if (!draggedShiftOriginal) { return; }
 
     const destParts = destination.droppableId.split('-');
-    if (destParts.length < 6 || destParts[0] !== 'user') { return; }
     const newDestUserId = destParts[1];
     const newDestDayString = `${destParts[3]}-${destParts[4]}-${destParts[5]}`;
 
@@ -369,86 +399,114 @@ export default function ShiftScheduler() {
       const userForColor = users.find(u => u.id === targetUserId);
       const newMuiColor = userForColor?.avatarBgColor?.replace('.main', '.light') || 'grey.200';
       const newMuiTextColor = userForColor?.avatarBgColor?.replace('.main', '.darkerText') || 'text.primary';
-
       setShifts(prevShifts => {
-        let sourceTemplateProcessed = false;
-        const updatedShiftList = prevShifts.map(s => {
-          if (s.id === draggableId) {
-            sourceTemplateProcessed = true;
-            return s.slots > 1 ? { ...s, slots: s.slots - 1 } : null;
-          }
+        let sourceFound = false;
+        const listAfterTemplateUpdate = prevShifts.map(s => {
+          if (s.id === draggableId) { sourceFound = true; return s.slots > 1 ? { ...s, slots: s.slots - 1 } : null; }
           return s;
         }).filter(Boolean);
-
-        if (!sourceTemplateProcessed) return prevShifts;
-
+        if (!sourceFound) return prevShifts;
         const newAssignedShift = {
           ...draggedShiftOriginal,
           id: `s${Date.now()}-${Math.random().toString(16).slice(2)}-assigned-${targetUserId}`,
           userId: targetUserId, day: newDestDayString, slots: undefined,
           muiColor: newMuiColor, muiTextColor: newMuiTextColor,
         };
-        return [...updatedShiftList, newAssignedShift];
+        return [...listAfterTemplateUpdate, newAssignedShift];
       });
-    }
-    else if (draggedShiftOriginal.userId !== UNASSIGNED_SHIFT_USER_ID && newDestUserId === UNASSIGNED_SHIFT_USER_ID) {
+    } else if (draggedShiftOriginal.userId !== UNASSIGNED_SHIFT_USER_ID && newDestUserId === UNASSIGNED_SHIFT_USER_ID) {
       setShifts(prevShifts => {
-        const remainingShifts = prevShifts.filter(s => s.id !== draggableId);
-        const newUnassignedShiftTemplate = {
+        const listWithoutOld = prevShifts.filter(s => s.id !== draggableId);
+        const newUnassigned = {
           id: `s${Date.now()}-unassigned-${Math.random().toString(16).slice(2)}`,
-          userId: UNASSIGNED_SHIFT_USER_ID,
-          day: newDestDayString,
-          startTime: draggedShiftOriginal.startTime,
-          endTime: draggedShiftOriginal.endTime,
-          duration: draggedShiftOriginal.duration,
-          note: draggedShiftOriginal.note,
-          slots: 1,
-          muiColor: 'grey.300',
-          muiTextColor: 'text.primary',
+          userId: UNASSIGNED_SHIFT_USER_ID, day: newDestDayString,
+          startTime: draggedShiftOriginal.startTime, endTime: draggedShiftOriginal.endTime,
+          duration: draggedShiftOriginal.duration, note: draggedShiftOriginal.note, slots: 1,
+          muiColor: 'grey.300', muiTextColor: 'text.primary',
         };
-        return [...remainingShifts, newUnassignedShiftTemplate];
+        return [...listWithoutOld, newUnassigned];
       });
-    }
-    else if (draggedShiftOriginal.userId === UNASSIGNED_SHIFT_USER_ID && newDestUserId === UNASSIGNED_SHIFT_USER_ID) {
-      setShifts(prevShifts =>
-        prevShifts.map(shift => {
-          if (shift.id === draggableId) {
-            return {
-              ...shift,
-              day: newDestDayString,
-              muiColor: 'grey.300',
-              muiTextColor: 'text.primary',
-            };
-          }
-          return shift;
-        })
-      );
-    }
-    else if (draggedShiftOriginal.userId !== UNASSIGNED_SHIFT_USER_ID && newDestUserId !== UNASSIGNED_SHIFT_USER_ID) {
-      setShifts(prevShifts =>
-        prevShifts.map(shift => {
-          if (shift.id === draggableId) {
-            const userForColor = users.find(u => u.id === newDestUserId);
-            const newMuiColor = userForColor?.avatarBgColor?.replace('.main', '.light') || 'grey.200';
-            const newMuiTextColor = userForColor?.avatarBgColor?.replace('.main', '.darkerText') || 'text.primary';
-            return {
-              ...shift,
-              day: newDestDayString,
-              userId: newDestUserId,
-              muiColor: newMuiColor,
-              muiTextColor: newMuiTextColor,
-              slots: undefined,
-            };
-          }
-          return shift;
-        })
-      );
+    } else if (draggedShiftOriginal.userId === UNASSIGNED_SHIFT_USER_ID && newDestUserId === UNASSIGNED_SHIFT_USER_ID) {
+      setShifts(prevShifts => prevShifts.map(s => (s.id === draggableId) ? { ...s, day: newDestDayString, muiColor: 'grey.300', muiTextColor: 'text.primary' } : s));
+    } else if (draggedShiftOriginal.userId !== UNASSIGNED_SHIFT_USER_ID && newDestUserId !== UNASSIGNED_SHIFT_USER_ID) {
+      setShifts(prevShifts => prevShifts.map(s => {
+        if (s.id === draggableId) {
+          const userColor = users.find(u => u.id === newDestUserId);
+          return {
+            ...s, day: newDestDayString, userId: newDestUserId,
+            muiColor: userColor?.avatarBgColor?.replace('.main', '.light') || 'grey.200',
+            muiTextColor: userColor?.avatarBgColor?.replace('.main', '.darkerText') || 'text.primary',
+            slots: undefined,
+          };
+        }
+        return s;
+      }));
     }
   };
 
+  const onDragEnd = (result) => {
+    const { source, destination, draggableId } = result;
+    if (!destination || !destination.droppableId || (source.droppableId === destination.droppableId && source.index === destination.index)) {
+      return;
+    }
+    const draggedShift = shifts.find(shift => shift.id === draggableId);
+    if (!draggedShift) return;
+
+    const destParts = destination.droppableId.split('-');
+    if (destParts.length < 6 || destParts[0] !== 'user') return;
+    const newDestUserId = destParts[1];
+    const newDestDayString = `${destParts[3]}-${destParts[4]}-${destParts[5]}`;
+
+    // Determine if this drag operation could cause a conflict for a specific user
+    let potentialConflictUserId = null;
+    let shiftDetailsForCheck = {
+      day: newDestDayString,
+      startTime: draggedShift.startTime,
+      endTime: draggedShift.endTime,
+      id: draggedShift.id // For excluding itself
+    };
+
+    if (newDestUserId !== UNASSIGNED_SHIFT_USER_ID) { // Moving to a specific user
+      potentialConflictUserId = newDestUserId;
+    } else if (draggedShift.userId !== UNASSIGNED_SHIFT_USER_ID && newDestUserId === UNASSIGNED_SHIFT_USER_ID) {
+      // Moving a user's shift to unassigned - no conflict check needed for target (unassigned)
+    } else if (draggedShift.userId === UNASSIGNED_SHIFT_USER_ID && newDestUserId === UNASSIGNED_SHIFT_USER_ID) {
+      // Moving unassigned within unassigned - no user conflict check needed
+    }
+
+
+    if (potentialConflictUserId) {
+      const detectedConflicts = detectConflicts(shiftDetailsForCheck, shifts, potentialConflictUserId, users, draggedShift.id);
+      if (detectedConflicts.length > 0) {
+        setSchedulingConflicts(detectedConflicts);
+        setPendingShiftOperation({ action: 'drag', data: result });
+        setIsConflictModalOpen(true);
+        return;
+      }
+    }
+    proceedWithDragEnd(result);
+  };
+
+  const handleConflictModalClose = () => {
+    setIsConflictModalOpen(false);
+    setSchedulingConflicts([]);
+    setPendingShiftOperation(null);
+  };
+
+  const handleConflictModalConfirm = () => {
+    if (pendingShiftOperation) {
+      if (pendingShiftOperation.action === 'save') {
+        proceedWithSaveShift(pendingShiftOperation.data, pendingShiftOperation.editingShiftId);
+      } else if (pendingShiftOperation.action === 'drag') {
+        proceedWithDragEnd(pendingShiftOperation.data);
+      }
+    }
+    handleConflictModalClose();
+  };
+
+  // --- Other Callbacks (Selection, Copy) ---
   const handleToggleSelectShift = useCallback((shiftId) => { setSelectedShiftIds(prev => prev.includes(shiftId) ? prev.filter(id => id !== shiftId) : [...prev, shiftId]); }, []);
   const handleDeselectAll = useCallback(() => { setSelectedShiftIds([]); }, []);
-  // handleDeleteSelectedShifts is now modified above to use modal
   const getAllShiftIdsInCurrentView = useCallback(() => { const weekStart = startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }); const weekEnd = addDays(weekStart, 6); const ids = []; shifts.forEach(s => { if (isValid(parseISO(s.day))) { const d = parseISO(s.day); if (d >= weekStart && d <= weekEnd && (users.find(u => u.id === s.userId) || s.userId === UNASSIGNED_SHIFT_USER_ID)) ids.push(s.id); } }); return ids; }, [shifts, users, currentDate]);
   const allShiftIdsInView = getAllShiftIdsInCurrentView();
   const selectedShiftsInViewCount = allShiftIdsInView.filter(id => selectedShiftIds.includes(id)).length;
@@ -469,12 +527,7 @@ export default function ShiftScheduler() {
       <DragDropContext onDragEnd={onDragEnd}>
         <Container maxWidth={false} disableGutters sx={{ bgcolor: 'grey.200', minHeight: '100vh' }}>
           <TopBar currentDate={currentDate} onPrevWeek={handlePrevWeek} onNextWeek={handleNextWeek} onToday={handleToday} />
-          <BulkActionsBar
-            selectedCount={selectedShiftIds.length}
-            onDeleteSelected={handleDeleteSelectedShifts} // This now opens the modal
-            onOpenCopyModal={handleOpenCopyModal}
-            onDeselectAll={handleDeselectAll}
-          />
+          <BulkActionsBar selectedCount={selectedShiftIds.length} onDeleteSelected={handleDeleteSelectedShifts} onOpenCopyModal={handleOpenCopyModal} onDeselectAll={handleDeselectAll}/>
           <Box sx={{px: {xs: 0, sm:1, md:2}, py:1}}>
             <InfoBanners currentDate={currentDate} stickyTopOffset={dynamicStickyOffset} />
             <Paper elevation={2} sx={{ mt:1, overflowY: 'auto', maxHeight: paperContentMaxHeight }}>
@@ -484,8 +537,7 @@ export default function ShiftScheduler() {
                 shifts={shifts.filter(s => s.userId === UNASSIGNED_SHIFT_USER_ID)}
                 onAddShift={(userId, day) => handleOpenModal(UNASSIGNED_SHIFT_USER_ID, day)}
                 onEditShift={(shift) => handleOpenModal(null, null, shift)}
-                onDeleteShift={handleDeleteSingleShift} // This now opens the modal
-                selectedShiftIds={selectedShiftIds}
+                onDeleteShift={handleDeleteSingleShift} selectedShiftIds={selectedShiftIds}
                 onToggleSelectShift={handleToggleSelectShift} isAnyShiftSelected={isAnyShiftSelected}
                 isSticky={unassignedRowSticky} onToggleSticky={() => setUnassignedRowSticky(prev => !prev)}
                 stickyTopOffset={CALENDAR_HEADER_HEIGHT}
@@ -497,7 +549,7 @@ export default function ShiftScheduler() {
                     shifts={shifts.filter(s => s.userId !== UNASSIGNED_SHIFT_USER_ID)}
                     users={users}
                     onAddShift={(userId, day) => handleOpenModal(userId, day)}
-                    onDeleteShift={handleDeleteSingleShift} // This now opens the modal
+                    onDeleteShift={handleDeleteSingleShift}
                     onEditShift={(shift) => handleOpenModal(shift.userId, parseISO(shift.day), shift)}
                     selectedShiftIds={selectedShiftIds} onToggleSelectShift={handleToggleSelectShift}
                     isAnyShiftSelected={isAnyShiftSelected}
@@ -537,7 +589,12 @@ export default function ShiftScheduler() {
             cancelLabel="Hủy bỏ"
             confirmLabel="Xóa tất cả"
           />
-
+          <SchedulingConflictModal
+            open={isConflictModalOpen}
+            onClose={handleConflictModalClose}
+            onConfirm={handleConflictModalConfirm}
+            conflicts={schedulingConflicts}
+          />
         </Container>
       </DragDropContext>
     </LocalizationProvider>
