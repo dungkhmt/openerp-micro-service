@@ -9,6 +9,7 @@ import {Box, Container, Paper, Typography, Checkbox} from '@mui/material';
 import {LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+
 import CopyShiftsModal from "./CopyShiftsModal.jsx";
 import ShiftModal from "./ShiftModal.jsx";
 import CalendarHeader from "./CalendarHeader.jsx";
@@ -17,6 +18,7 @@ import InfoBanners from "./InfoBanners.jsx";
 import BulkActionsBar from "./BulkActionBar.jsx";
 import TopBar from "./TopBar.jsx";
 import UnassignedShiftsRow from "./UnassignedShiftsRow.jsx";
+import DeleteConfirmationModal from "../modals/DeleteConfirmationModal.jsx";
 
 export const TOP_BAR_HEIGHT = 61;
 export const AVAILABLE_SHIFTS_BANNER_HEIGHT = 36;
@@ -59,7 +61,7 @@ const initialUsers = [
 
 export default function ShiftScheduler() {
   const [currentDate, setCurrentDate] = useState(new Date(new Date('2025-05-19').setHours(0,0,0,0)));
-  const [shifts, setShifts] = useState(initialShifts);
+  const [shifts, setShifts] = useState(initialShifts.map(s => s.userId === '---UNASSIGNED---' ? {...s, userId: UNASSIGNED_SHIFT_USER_ID} : s));
   const [users, setUsers] = useState(initialUsers);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEditingShift, setCurrentEditingShift] = useState(null);
@@ -71,6 +73,12 @@ export default function ShiftScheduler() {
   const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
   const [unassignedRowSticky, setUnassignedRowSticky] = useState(true);
   const [modalOpeningContext, setModalOpeningContext] = useState(null);
+
+  // State for Delete Confirmation Modals
+  const [isDeleteSingleModalOpen, setIsDeleteSingleModalOpen] = useState(false);
+  const [shiftIdToDelete, setShiftIdToDelete] = useState(null);
+  const [isDeleteSelectedModalOpen, setIsDeleteSelectedModalOpen] = useState(false);
+
 
   const isAnyShiftSelected = selectedShiftIds.length > 0;
 
@@ -148,6 +156,7 @@ export default function ShiftScheduler() {
   };
 
   const handleSaveShift = (formData) => {
+    // ... (handleSaveShift logic from previous full response)
     const { userIds: rawUserIds, day, startTime, endTime, note, slots: formSlots, _initiatedAsNewUnassignedContext } = formData;
     const userIds = rawUserIds || [];
 
@@ -312,11 +321,33 @@ export default function ShiftScheduler() {
     handleCloseModal();
   };
 
-  const handleDeleteSingleShift = (shiftIdToDelete) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa ca làm việc này không?")) {
+  // MODIFIED: Opens confirmation modal
+  const handleDeleteSingleShift = (shiftId) => {
+    setShiftIdToDelete(shiftId);
+    setIsDeleteSingleModalOpen(true);
+  };
+
+  // New handler for actual single shift deletion after confirmation
+  const confirmDeleteSingleShift = () => {
+    if (shiftIdToDelete) {
       setShifts(prevShifts => prevShifts.filter(shift => shift.id !== shiftIdToDelete));
       setSelectedShiftIds(prevSelected => prevSelected.filter(id => id !== shiftIdToDelete));
+      setShiftIdToDelete(null);
     }
+    setIsDeleteSingleModalOpen(false);
+  };
+
+  // MODIFIED: Opens confirmation modal
+  const handleDeleteSelectedShifts = useCallback(() => {
+    if (!isAnyShiftSelected || selectedShiftIds.length === 0) return;
+    setIsDeleteSelectedModalOpen(true);
+  }, [selectedShiftIds, isAnyShiftSelected]);
+
+  // New handler for actual selected shifts deletion after confirmation
+  const confirmDeleteSelectedShifts = () => {
+    setShifts(prevShifts => prevShifts.filter(shift => !selectedShiftIds.includes(shift.id)));
+    setSelectedShiftIds([]);
+    setIsDeleteSelectedModalOpen(false);
   };
 
   const onDragEnd = (result) => {
@@ -333,7 +364,6 @@ export default function ShiftScheduler() {
     const newDestUserId = destParts[1];
     const newDestDayString = `${destParts[3]}-${destParts[4]}-${destParts[5]}`;
 
-    // Scenario 1: An Unassigned Shift is dragged to a User's row (Assignment)
     if (draggedShiftOriginal.userId === UNASSIGNED_SHIFT_USER_ID && newDestUserId !== UNASSIGNED_SHIFT_USER_ID) {
       const targetUserId = newDestUserId;
       const userForColor = users.find(u => u.id === targetUserId);
@@ -361,7 +391,6 @@ export default function ShiftScheduler() {
         return [...updatedShiftList, newAssignedShift];
       });
     }
-    // Scenario 2: A User's Shift is dragged to the Unassigned Row (Create New Unassigned Template)
     else if (draggedShiftOriginal.userId !== UNASSIGNED_SHIFT_USER_ID && newDestUserId === UNASSIGNED_SHIFT_USER_ID) {
       setShifts(prevShifts => {
         const remainingShifts = prevShifts.filter(s => s.id !== draggableId);
@@ -380,15 +409,13 @@ export default function ShiftScheduler() {
         return [...remainingShifts, newUnassignedShiftTemplate];
       });
     }
-    // Scenario 3: An Unassigned Shift is moved within the Unassigned Row
     else if (draggedShiftOriginal.userId === UNASSIGNED_SHIFT_USER_ID && newDestUserId === UNASSIGNED_SHIFT_USER_ID) {
       setShifts(prevShifts =>
         prevShifts.map(shift => {
           if (shift.id === draggableId) {
             return {
-              ...shift, // Preserves ID, slots, note, times, etc.
-              day: newDestDayString, // Only day changes
-              // Ensure unassigned styling is maintained
+              ...shift,
+              day: newDestDayString,
               muiColor: 'grey.300',
               muiTextColor: 'text.primary',
             };
@@ -397,7 +424,6 @@ export default function ShiftScheduler() {
         })
       );
     }
-    // Scenario 4: A User's Shift is moved to another User's row or their own different day
     else if (draggedShiftOriginal.userId !== UNASSIGNED_SHIFT_USER_ID && newDestUserId !== UNASSIGNED_SHIFT_USER_ID) {
       setShifts(prevShifts =>
         prevShifts.map(shift => {
@@ -422,7 +448,7 @@ export default function ShiftScheduler() {
 
   const handleToggleSelectShift = useCallback((shiftId) => { setSelectedShiftIds(prev => prev.includes(shiftId) ? prev.filter(id => id !== shiftId) : [...prev, shiftId]); }, []);
   const handleDeselectAll = useCallback(() => { setSelectedShiftIds([]); }, []);
-  const handleDeleteSelectedShifts = useCallback(() => { if (!isAnyShiftSelected || !window.confirm(`Xóa ${selectedShiftIds.length} ca đã chọn?`)) return; setShifts(prev => prev.filter(s => !selectedShiftIds.includes(s.id))); setSelectedShiftIds([]); }, [selectedShiftIds, isAnyShiftSelected]);
+  // handleDeleteSelectedShifts is now modified above to use modal
   const getAllShiftIdsInCurrentView = useCallback(() => { const weekStart = startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }); const weekEnd = addDays(weekStart, 6); const ids = []; shifts.forEach(s => { if (isValid(parseISO(s.day))) { const d = parseISO(s.day); if (d >= weekStart && d <= weekEnd && (users.find(u => u.id === s.userId) || s.userId === UNASSIGNED_SHIFT_USER_ID)) ids.push(s.id); } }); return ids; }, [shifts, users, currentDate]);
   const allShiftIdsInView = getAllShiftIdsInCurrentView();
   const selectedShiftsInViewCount = allShiftIdsInView.filter(id => selectedShiftIds.includes(id)).length;
@@ -443,7 +469,12 @@ export default function ShiftScheduler() {
       <DragDropContext onDragEnd={onDragEnd}>
         <Container maxWidth={false} disableGutters sx={{ bgcolor: 'grey.200', minHeight: '100vh' }}>
           <TopBar currentDate={currentDate} onPrevWeek={handlePrevWeek} onNextWeek={handleNextWeek} onToday={handleToday} />
-          <BulkActionsBar selectedCount={selectedShiftIds.length} onDeleteSelected={handleDeleteSelectedShifts} onOpenCopyModal={handleOpenCopyModal} onDeselectAll={handleDeselectAll}/>
+          <BulkActionsBar
+            selectedCount={selectedShiftIds.length}
+            onDeleteSelected={handleDeleteSelectedShifts} // This now opens the modal
+            onOpenCopyModal={handleOpenCopyModal}
+            onDeselectAll={handleDeselectAll}
+          />
           <Box sx={{px: {xs: 0, sm:1, md:2}, py:1}}>
             <InfoBanners currentDate={currentDate} stickyTopOffset={dynamicStickyOffset} />
             <Paper elevation={2} sx={{ mt:1, overflowY: 'auto', maxHeight: paperContentMaxHeight }}>
@@ -453,7 +484,8 @@ export default function ShiftScheduler() {
                 shifts={shifts.filter(s => s.userId === UNASSIGNED_SHIFT_USER_ID)}
                 onAddShift={(userId, day) => handleOpenModal(UNASSIGNED_SHIFT_USER_ID, day)}
                 onEditShift={(shift) => handleOpenModal(null, null, shift)}
-                onDeleteShift={handleDeleteSingleShift} selectedShiftIds={selectedShiftIds}
+                onDeleteShift={handleDeleteSingleShift} // This now opens the modal
+                selectedShiftIds={selectedShiftIds}
                 onToggleSelectShift={handleToggleSelectShift} isAnyShiftSelected={isAnyShiftSelected}
                 isSticky={unassignedRowSticky} onToggleSticky={() => setUnassignedRowSticky(prev => !prev)}
                 stickyTopOffset={CALENDAR_HEADER_HEIGHT}
@@ -465,7 +497,7 @@ export default function ShiftScheduler() {
                     shifts={shifts.filter(s => s.userId !== UNASSIGNED_SHIFT_USER_ID)}
                     users={users}
                     onAddShift={(userId, day) => handleOpenModal(userId, day)}
-                    onDeleteShift={handleDeleteSingleShift}
+                    onDeleteShift={handleDeleteSingleShift} // This now opens the modal
                     onEditShift={(shift) => handleOpenModal(shift.userId, parseISO(shift.day), shift)}
                     selectedShiftIds={selectedShiftIds} onToggleSelectShift={handleToggleSelectShift}
                     isAnyShiftSelected={isAnyShiftSelected}
@@ -477,6 +509,7 @@ export default function ShiftScheduler() {
           <Paper elevation={3} sx={{ position: 'fixed', bottom: 16, right: 16, p: 1.5, display: 'flex', alignItems: 'center', borderRadius: 2 }}>
             <AccessTimeFilledIcon color="primary" sx={{mr:1}}/> <Typography variant="caption">Bật đồng hồ chấm công</Typography> <Checkbox size="small" sx={{ml:0.5, p:0.2}}/>
           </Paper>
+
           <ShiftModal
             isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleSaveShift}
             users={users} initialFormState={modalInitialFormState}
@@ -485,6 +518,26 @@ export default function ShiftScheduler() {
             unassignedShiftBeingEdited={currentEditingShift && currentEditingShift.userId === UNASSIGNED_SHIFT_USER_ID ? currentEditingShift : null}
           />
           <CopyShiftsModal isOpen={isCopyModalOpen} onClose={handleCloseCopyModal} onConfirmCopy={handleConfirmCopyToWeeks} currentDate={currentDate} numSelectedShifts={selectedShiftIds.length} />
+
+          <DeleteConfirmationModal
+            open={isDeleteSingleModalOpen}
+            onClose={() => { setIsDeleteSingleModalOpen(false); setShiftIdToDelete(null); }}
+            onSubmit={confirmDeleteSingleShift}
+            title="Xác nhận xóa ca"
+            info="Bạn có chắc chắn muốn xóa ca làm việc này không?"
+            cancelLabel="Hủy bỏ"
+            confirmLabel="Xóa"
+          />
+          <DeleteConfirmationModal
+            open={isDeleteSelectedModalOpen}
+            onClose={() => setIsDeleteSelectedModalOpen(false)}
+            onSubmit={confirmDeleteSelectedShifts}
+            title="Xác nhận xóa các ca đã chọn"
+            info={`Bạn có chắc chắn muốn xóa ${selectedShiftIds.length} ca đã chọn không?`}
+            cancelLabel="Hủy bỏ"
+            confirmLabel="Xóa tất cả"
+          />
+
         </Container>
       </DragDropContext>
     </LocalizationProvider>
