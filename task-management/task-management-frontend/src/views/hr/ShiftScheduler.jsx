@@ -351,7 +351,7 @@ function DayCell({ userId, day, shiftsInCell, onAddShift, onDeleteShift, onEditS
                     shift={shift}
                     onDeleteShift={onDeleteShift}
                     onEditShift={onEditShift}
-                    onAddAnotherShift={onAddShift}
+                    onAddAnotherShift={onAddShift} // Pass onAddShift for adding another shift for the specific user/day
                     provided={providedDraggable}
                     snapshot={snapshotDraggable}
                     isSelected={selectedShiftIds.includes(shift.id)}
@@ -449,7 +449,7 @@ function CalendarHeader({
     <Grid container sx={{
       bgcolor: 'grey.100', borderBottom: 1, borderColor: 'divider',
       position: 'sticky',
-      top: 0,
+      top: 0, // This top will be dynamically adjusted by parent if BulkActionsBar is visible
       zIndex: 10
     }}>
       <Grid item sx={{ width: 160, p: 0.5, borderRight: 1, borderColor: 'divider', display: 'flex', alignItems: 'center' }}>
@@ -540,7 +540,12 @@ function ShiftModal({ isOpen, onClose, onSave, users, initialFormState, isEditin
   const [formState, setFormState] = useState(initialFormState);
 
   useEffect(() => {
-    setFormState({ ...initialFormState, note: initialFormState.note || '' });
+    // Ensure userIds is always an array and note is initialized
+    setFormState({
+      ...initialFormState,
+      userIds: Array.isArray(initialFormState.userIds) ? initialFormState.userIds : [],
+      note: initialFormState.note || ''
+    });
   }, [initialFormState]);
 
   const handleFormChange = (e) => {
@@ -573,17 +578,36 @@ function ShiftModal({ isOpen, onClose, onSave, users, initialFormState, isEditin
     <Modal open={isOpen} onClose={onClose} aria-labelledby="shift-modal-title" aria-describedby="shift-modal-description">
       <Box sx={modalStyle}>
         <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2}}>
-          <Typography id="shift-modal-title" variant="h6" component="h2">{isEditing ? "Chỉnh sửa ca làm việc" : "Thêm ca làm việc mới"}</Typography>
+          <Typography id="shift-modal-title" variant="h6" component="h2">{isEditing ? "Chỉnh sửa ca làm việc" : "Thêm ca làm việc"}</Typography>
           <IconButton onClick={onClose} size="small"><CloseIcon /></IconButton>
         </Box>
         <Box component="form" onSubmit={handleSubmit} noValidate>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12}> {/* Changed to full width for better multi-select display */}
               <FormControl fullWidth margin="dense" required>
-                <InputLabel id="user-select-label" sx={{fontSize:'0.9rem'}}>Nhân viên</InputLabel>
-                <Select labelId="user-select-label" id="userId" name="userId" value={formState.userId} label="Nhân viên" onChange={handleFormChange} size="small">
-                  <MenuItem value="" disabled><em>Chọn nhân viên</em></MenuItem>
-                  {users.map(user => (<MenuItem key={user.id} value={user.id}>{user.name}</MenuItem>))}
+                <InputLabel id="user-select-label" sx={{fontSize:'0.9rem'}}>Nhân viên (chọn một hoặc nhiều)</InputLabel>
+                <Select
+                  labelId="user-select-label"
+                  id="userIds" // CHANGED
+                  name="userIds" // CHANGED
+                  multiple // ADDED
+                  value={formState.userIds || []} // Ensure value is always an array
+                  label="Nhân viên (chọn một hoặc nhiều)" // UPDATED LABEL
+                  onChange={handleFormChange}
+                  size="small"
+                  renderValue={(selected) => {
+                    if (!selected || selected.length === 0) {
+                      return <em>Chọn nhân viên</em>;
+                    }
+                    return selected.map(id => users.find(u => u.id === id)?.name || id).join(', ');
+                  }}
+                >
+                  {users.map(user => (
+                    <MenuItem key={user.id} value={user.id}>
+                      <Checkbox checked={(formState.userIds || []).indexOf(user.id) > -1} size="small" />
+                      <ListItemText primary={user.name} />
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
@@ -642,7 +666,7 @@ function ShiftModal({ isOpen, onClose, onSave, users, initialFormState, isEditin
 function BulkActionsBar({
                           selectedCount,
                           onDeleteSelected,
-                          onOpenCopyModal, // MODIFIED: Renamed prop
+                          onOpenCopyModal,
                           onDeselectAll,
                         }) {
   if (selectedCount === 0) {
@@ -682,11 +706,11 @@ function BulkActionsBar({
             variant="contained"
             color="secondary"
             startIcon={<ContentCopyIcon />}
-            onClick={onOpenCopyModal} // MODIFIED: Using new prop
+            onClick={onOpenCopyModal}
             sx={{ mr: 1, color:'white' }}
-            title="Sao chép các ca đã chọn" // MODIFIED: Updated title
+            title="Sao chép các ca đã chọn"
           >
-            Sao chép {/* MODIFIED: Changed text */}
+            Sao chép
           </Button>
         </Box>
         <Button
@@ -709,7 +733,7 @@ const copyModalStyle = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: { xs: '90%', sm: 400 }, // Smaller width for this modal
+  width: { xs: '90%', sm: 400 },
   maxHeight: '80vh',
   bgcolor: 'background.paper',
   border: '1px solid #ccc',
@@ -729,18 +753,17 @@ function CopyShiftsModal({ isOpen, onClose, onConfirmCopy, currentDate, numSelec
   useEffect(() => {
     if (isOpen) {
       const options = [];
-      // Generate options for the next 12 weeks, starting from the week *after* the current one
       const startOfNextWeek = startOfWeek(addDays(currentDate, 7), { weekStartsOn: WEEK_STARTS_ON });
       for (let i = 0; i < 12; i++) {
         const weekStartDate = addWeeks(startOfNextWeek, i);
         const weekEndDate = addDays(weekStartDate, 6);
         options.push({
-          value: weekStartDate.toISOString(), // Store ISO string as value
+          value: weekStartDate.toISOString(),
           label: `Tuần ${format(weekStartDate, 'dd/MM')} - ${format(weekEndDate, 'dd/MM/yyyy')}`,
         });
       }
       setWeekOptions(options);
-      setSelectedWeeks([]); // Reset selected weeks when modal opens
+      setSelectedWeeks([]);
     }
   }, [isOpen, currentDate]);
 
@@ -758,7 +781,6 @@ function CopyShiftsModal({ isOpen, onClose, onConfirmCopy, currentDate, numSelec
       return;
     }
     setIsLoading(true);
-    // Convert ISO strings back to Date objects for the callback
     const targetWeekStartDates = selectedWeeks.map(isoString => parseISO(isoString));
     await onConfirmCopy(targetWeekStartDates);
     setIsLoading(false);
@@ -827,14 +849,14 @@ export default function ShiftScheduler() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEditingShift, setCurrentEditingShift] = useState(null);
   const [modalInitialFormState, setModalInitialFormState] = useState({
-    userId: '',
+    userIds: [], // CHANGED: from userId to userIds (array)
     day: format(new Date(), 'yyyy-MM-dd'),
     startTime: '09:00',
     endTime: '17:00',
     note: ''
   });
   const [selectedShiftIds, setSelectedShiftIds] = useState([]);
-  const [isCopyModalOpen, setIsCopyModalOpen] = useState(false); // State for new copy modal
+  const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
 
 
   const isAnyShiftSelected = selectedShiftIds.length > 0;
@@ -866,11 +888,11 @@ export default function ShiftScheduler() {
   const handleNextWeek = () => setCurrentDate(prev => addDays(prev, 7));
   const handleToday = () => setCurrentDate(new Date(new Date().setHours(0,0,0,0)));
 
-  const handleOpenModal = (userId, day, shiftToEdit = null) => {
+  const handleOpenModal = (userIdForPreselection, day, shiftToEdit = null) => {
     if (shiftToEdit) {
       setCurrentEditingShift(shiftToEdit);
       setModalInitialFormState({
-        userId: shiftToEdit.userId,
+        userIds: [shiftToEdit.userId], // Set as array with the single user
         day: shiftToEdit.day,
         startTime: shiftToEdit.startTime,
         endTime: shiftToEdit.endTime,
@@ -879,7 +901,7 @@ export default function ShiftScheduler() {
     } else {
       setCurrentEditingShift(null);
       setModalInitialFormState({
-        userId: userId || '',
+        userIds: userIdForPreselection ? [userIdForPreselection] : [], // Set as array or empty array
         day: format(day || new Date(), 'yyyy-MM-dd'),
         startTime: '09:00',
         endTime: '17:00',
@@ -895,10 +917,14 @@ export default function ShiftScheduler() {
   };
 
   const handleSaveShift = (formData) => {
-    const { userId, day, startTime, endTime, note } = formData;
+    const { userIds, day, startTime, endTime, note } = formData; // userIds is now an array
 
-    if (!userId || !day || !startTime || !endTime) {
-      alert("Vui lòng điền đầy đủ các trường bắt buộc: Nhân viên, Ngày, Giờ bắt đầu, Giờ kết thúc.");
+    if (!userIds || userIds.length === 0) {
+      alert("Vui lòng chọn ít nhất một nhân viên.");
+      return;
+    }
+    if (!day || !startTime || !endTime) {
+      alert("Vui lòng điền đầy đủ Ngày, Giờ bắt đầu và Giờ kết thúc.");
       return;
     }
 
@@ -917,35 +943,92 @@ export default function ShiftScheduler() {
     }
 
     let durationMs = end.getTime() - start.getTime();
-    if (durationMs < 0) { durationMs += 24 * 60 * 60 * 1000; }
+    if (durationMs < 0) { durationMs += 24 * 60 * 60 * 1000; } // Handles overnight shifts within the same day entry
 
     const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
     const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
 
-    const userForColor = users.find(u => u.id === userId);
-    const shiftMuiColor = currentEditingShift?.muiColor ||
-      (userForColor?.avatarBgColor?.replace('.main','.light') || 'grey.200');
-    const shiftMuiTextColor = currentEditingShift?.muiTextColor ||
-      (userForColor?.avatarBgColor?.replace('.main','.darkerText') || 'text.primary');
-
-    const shiftData = {
-      userId,
+    const shiftBaseData = {
       day: format(parsedDay, 'yyyy-MM-dd'),
       startTime,
       endTime,
       duration: `${durationHours}h ${durationMinutes}m`,
       note,
-      muiColor: shiftMuiColor,
-      muiTextColor: shiftMuiTextColor,
     };
 
-    if (currentEditingShift) {
-      setShifts(prevShifts => prevShifts.map(s => s.id === currentEditingShift.id ? { ...s, ...shiftData } : s));
-    } else {
-      setShifts(prevShifts => [...prevShifts, { ...shiftData, id: `s${Date.now()}-${Math.random().toString(16).slice(2)}` }]);
+    let newShiftsToAdd = [];
+    let shiftsToUpdateDetails = []; // Store {id, data} for updates
+    let originalShiftToDeleteId = null;
+
+
+    if (currentEditingShift) { // Editing mode
+      const originalUserIdOfEditedShift = currentEditingShift.userId;
+      let originalUserStillSelected = false;
+
+      userIds.forEach(selectedUserId => {
+        const userForColor = users.find(u => u.id === selectedUserId);
+        const muiColor = userForColor?.avatarBgColor?.replace('.main', '.light') || 'grey.200';
+        const muiTextColor = userForColor?.avatarBgColor?.replace('.main', '.darkerText') || 'text.primary';
+
+        const completeShiftData = {
+          ...shiftBaseData,
+          userId: selectedUserId,
+          muiColor,
+          muiTextColor,
+        };
+
+        if (selectedUserId === originalUserIdOfEditedShift) {
+          // This user's shift is the one being edited, mark for update
+          shiftsToUpdateDetails.push({ id: currentEditingShift.id, data: completeShiftData });
+          originalUserStillSelected = true;
+        } else {
+          // This is an additional user selected during edit, create a new shift for them
+          newShiftsToAdd.push({ ...completeShiftData, id: `s${Date.now()}-${Math.random().toString(16).slice(2)}-${selectedUserId}` });
+        }
+      });
+
+      // If the original user of the edited shift was deselected, mark the original shift for deletion
+      if (!originalUserStillSelected) {
+        originalShiftToDeleteId = currentEditingShift.id;
+      }
+
+    } else { // Adding new shift(s) mode
+      userIds.forEach(selectedUserId => {
+        const userForColor = users.find(u => u.id === selectedUserId);
+        const muiColor = userForColor?.avatarBgColor?.replace('.main','.light') || 'grey.200';
+        const muiTextColor = userForColor?.avatarBgColor?.replace('.main','.darkerText') || 'text.primary';
+        newShiftsToAdd.push({
+          ...shiftBaseData,
+          userId: selectedUserId,
+          muiColor,
+          muiTextColor,
+          id: `s${Date.now()}-${Math.random().toString(16).slice(2)}-${selectedUserId}`
+        });
+      });
     }
+
+    setShifts(prevShifts => {
+      let updatedShifts = [...prevShifts];
+
+      // 1. Remove original shift if its user was deselected during edit
+      if (originalShiftToDeleteId) {
+        updatedShifts = updatedShifts.filter(s => s.id !== originalShiftToDeleteId);
+      }
+
+      // 2. Apply updates to existing shifts
+      shiftsToUpdateDetails.forEach(updateInfo => {
+        updatedShifts = updatedShifts.map(s => s.id === updateInfo.id ? { ...s, ...updateInfo.data } : s);
+      });
+
+      // 3. Add newly created shifts
+      updatedShifts = [...updatedShifts, ...newShiftsToAdd];
+
+      return updatedShifts;
+    });
+
     handleCloseModal();
   };
+
 
   const handleDeleteSingleShift = (shiftIdToDelete) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa ca làm việc này không?")) {
@@ -964,7 +1047,7 @@ export default function ShiftScheduler() {
     if (!draggedShift) return;
 
     const destParts = destination.droppableId.split('-');
-    const newUserId = destParts[1]; // Assuming format user-USERID-day-YYYY-MM-DD
+    const newUserId = destParts[1];
     const newDayString = `${destParts[3]}-${destParts[4]}-${destParts[5]}`;
 
     const userForColor = users.find(u => u.id === newUserId);
@@ -998,7 +1081,6 @@ export default function ShiftScheduler() {
     setSelectedShiftIds([]);
   }, [selectedShiftIds, isAnyShiftSelected]);
 
-  // --- "Select All" in current view logic ---
   const getAllShiftIdsInCurrentView = useCallback(() => {
     const weekStart = startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON });
     const weekEnd = addDays(weekStart, 6);
@@ -1007,7 +1089,6 @@ export default function ShiftScheduler() {
       if (isValid(parseISO(shift.day))) {
         const shiftDate = parseISO(shift.day);
         if (shiftDate >= weekStart && shiftDate <= weekEnd) {
-          // Check if the user of the shift is in the current list of users (implicitly all users are shown)
           if (users.find(u => u.id === shift.userId)) {
             idsInView.push(shift.id);
           }
@@ -1025,15 +1106,13 @@ export default function ShiftScheduler() {
 
   const handleToggleSelectAllInView = useCallback(() => {
     const idsInView = getAllShiftIdsInCurrentView();
-    if (isAllSelectedInView) { // If all are selected, deselect them
+    if (isAllSelectedInView) {
       setSelectedShiftIds(prev => prev.filter(id => !idsInView.includes(id)));
-    } else { // Else (none or some are selected), select all in view
+    } else {
       setSelectedShiftIds(prev => [...new Set([...prev, ...idsInView])]);
     }
   }, [getAllShiftIdsInCurrentView, isAllSelectedInView]);
 
-
-  // --- Enhanced Copy Logic ---
   const handleOpenCopyModal = () => {
     if (!isAnyShiftSelected) return;
     setIsCopyModalOpen(true);
@@ -1054,41 +1133,31 @@ export default function ShiftScheduler() {
         const originalShiftDate = parseISO(shift.day);
         if (!isValid(originalShiftDate)) return;
 
-        const startOfOriginalWeek = startOfWeek(originalShiftDate, { weekStartsOn: WEEK_STARTS_ON });
-
-        // Calculate the day index within its week (0 for Monday, 1 for Tuesday, etc.)
-        // getDay returns 0 for Sunday, 1 for Monday .. 6 for Saturday. Adjust if WEEK_STARTS_ON is different.
-        // For WEEK_STARTS_ON = 1 (Monday):
-        // Monday: getDay = 1 -> index = 0
-        // Sunday: getDay = 0 -> index = 6
         let dayIndexOfWeek = getDay(originalShiftDate);
-        if (WEEK_STARTS_ON === 1) { // Monday is start of week
+        if (WEEK_STARTS_ON === 1) {
           dayIndexOfWeek = (dayIndexOfWeek === 0) ? 6 : dayIndexOfWeek - 1;
         }
-        // else if WEEK_STARTS_ON === 0 (Sunday is start of week), dayIndexOfWeek is already correct.
 
         const newShiftDate = addDays(targetWeekStartDate, dayIndexOfWeek);
 
         newCopiedShifts.push({
           ...shift,
-          id: `s${Date.now()}-${Math.random().toString(16).slice(2)}-${newCopiedShifts.length}`, // Ensure unique ID
+          id: `s${Date.now()}-${Math.random().toString(16).slice(2)}-${newCopiedShifts.length}`,
           day: format(newShiftDate, 'yyyy-MM-dd'),
         });
       });
     });
 
-    // Simulate API delay for demo
     await new Promise(resolve => setTimeout(resolve, 500));
 
     setShifts(prevShifts => [...prevShifts, ...newCopiedShifts]);
-    setSelectedShiftIds([]); // Deselect all after copying
-    // No need to close modal here, onConfirmCopy in modal does it.
+    setSelectedShiftIds([]);
   }, [selectedShiftIds, shifts, isAnyShiftSelected]);
 
 
   const dynamicStickyOffset = isAnyShiftSelected ? BULK_ACTIONS_BAR_HEIGHT : 0;
-  const PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER = 8 + 8 + 8; // px + mt + py for Box containing Paper
-  const FIXED_FOOTER_RESERVED_SPACE = 70; // Approximate height for the fixed footer
+  const PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER = 8 + 8 + 8;
+  const FIXED_FOOTER_RESERVED_SPACE = 70;
   const paperContentMaxHeight = `calc(100vh - ${TOP_BAR_HEIGHT}px - ${dynamicStickyOffset}px - ${INFO_BANNERS_TOTAL_HEIGHT}px - ${PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER}px - ${FIXED_FOOTER_RESERVED_SPACE}px)`;
 
 
@@ -1105,10 +1174,10 @@ export default function ShiftScheduler() {
           <BulkActionsBar
             selectedCount={selectedShiftIds.length}
             onDeleteSelected={handleDeleteSelectedShifts}
-            onOpenCopyModal={handleOpenCopyModal} // MODIFIED
+            onOpenCopyModal={handleOpenCopyModal}
             onDeselectAll={handleDeselectAll}
           />
-          <Box sx={{px: {xs: 0, sm:1, md:2}, py:1}}> {/* Added py:1 for consistent spacing */}
+          <Box sx={{px: {xs: 0, sm:1, md:2}, py:1}}>
             <InfoBanners currentDate={currentDate} stickyTopOffset={dynamicStickyOffset} />
             <Paper
               elevation={2}
@@ -1116,22 +1185,24 @@ export default function ShiftScheduler() {
                 mt:1,
                 overflowY: 'auto',
                 maxHeight: paperContentMaxHeight,
+                // The CalendarHeader inside will manage its own sticky position relative to this Paper
               }}
             >
               <CalendarHeader
                 currentDate={currentDate}
-                stickyTopOffset={dynamicStickyOffset}
+                // No direct stickyTopOffset here, as it's relative to Paper's scroll container.
+                // It will stick to top:0 of this scrollable Paper.
                 onToggleSelectAll={handleToggleSelectAllInView}
                 isAllSelectedInView={isAllSelectedInView}
                 isIndeterminateInView={isIndeterminateInView}
               />
-              <Box sx={{ overflowX: 'auto' }}> {/* Ensures horizontal scroll for content if needed */}
-                <Box sx={{ minWidth: 1100 }}> {/* Minimum width for the grid content */}
+              <Box sx={{ overflowX: 'auto' }}>
+                <Box sx={{ minWidth: 1100 }}>
                   <ShiftsGrid
                     currentDate={currentDate}
                     shifts={shifts}
                     users={users}
-                    onAddShift={handleOpenModal}
+                    onAddShift={handleOpenModal} // Note: onAddShift in DayCell passes (userId, day), onAddAnotherShift in ShiftCard passes (shift.userId, day)
                     onDeleteShift={handleDeleteSingleShift}
                     onEditShift={(shift) => handleOpenModal(shift.userId, parseISO(shift.day), shift)}
                     selectedShiftIds={selectedShiftIds}
