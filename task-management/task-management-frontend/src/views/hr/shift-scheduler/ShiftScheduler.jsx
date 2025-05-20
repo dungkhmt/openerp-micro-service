@@ -32,11 +32,13 @@ export const WEEK_STARTS_ON = 1;
 export const UNASSIGNED_SHIFT_USER_ID = 'UNASSIGNED';
 
 const initialShifts = [
-  { id: 's1', userId: 'u1', day: '2025-05-19', startTime: '09:00', endTime: '12:00', duration: '3h 0m', note: 'Morning Shift u1', muiColor: 'success.light', muiTextColor: 'success.darkerText' },
-  { id: 's1-2', userId: 'u1', day: '2025-05-19', startTime: '13:00', endTime: '17:15', duration: '4h 15m', note: 'Afternoon Shift u1', muiColor: 'success.light', muiTextColor: 'success.darkerText' },
-  { id: 's2', userId: 'u2', day: '2025-05-20', startTime: '09:00', endTime: '17:15', duration: '8h 15m', note: 'Frontend task u2', muiColor: 'error.light', muiTextColor: 'error.darkerText' },
-  { id: 's-unassigned-tue', userId: UNASSIGNED_SHIFT_USER_ID, day: '2025-05-20', startTime: '10:00', endTime: '14:00', duration: '4h 0m', note: 'General Task Tue', slots: 3, muiColor: 'grey.300', muiTextColor: 'text.primary' },
-  { id: 's-unassigned-wed', userId: UNASSIGNED_SHIFT_USER_ID, day: '2025-05-21', startTime: '15:00', endTime: '18:00', duration: '3h 0m', note: 'Evening Cover Wed', slots: 1, muiColor: 'grey.300', muiTextColor: 'text.primary' },
+  { id: 's1', userId: 'u1', day: '2025-05-19', startTime: '09:00', endTime: '12:00', duration: '3h 0m', note: 'Morning Shift u1', muiColor: 'success.light', muiTextColor: 'success.darkerText', type: 'regular' },
+  { id: 's1-2', userId: 'u1', day: '2025-05-19', startTime: '13:00', endTime: '17:15', duration: '4h 15m', note: 'Afternoon Shift u1', muiColor: 'success.light', muiTextColor: 'success.darkerText', type: 'regular' },
+  { id: 's2', userId: 'u2', day: '2025-05-20', startTime: '09:00', endTime: '17:15', duration: '8h 15m', note: 'Frontend task u2', muiColor: 'error.light', muiTextColor: 'error.darkerText', type: 'regular' },
+  { id: 's-unassigned-tue', userId: UNASSIGNED_SHIFT_USER_ID, day: '2025-05-20', startTime: '10:00', endTime: '14:00', duration: '4h 0m', note: 'General Task Tue', slots: 3, muiColor: 'grey.300', muiTextColor: 'text.primary', type: 'unassigned' },
+  { id: 's-unassigned-wed', userId: UNASSIGNED_SHIFT_USER_ID, day: '2025-05-21', startTime: '15:00', endTime: '18:00', duration: '3h 0m', note: 'Evening Cover Wed', slots: 1, muiColor: 'grey.300', muiTextColor: 'text.primary', type: 'unassigned' },
+  { id: 'to1-u1', userId: 'u1', day: '2025-05-22', startTime: '00:00', endTime: '23:59', duration: '24h 0m', note: 'Day Off', type: 'time_off' },
+  { id: 'to2-u2', userId: 'u2', day: '2025-05-23', startTime: '09:00', endTime: '13:00', duration: '4h 0m', note: 'Doctor Appointment', type: 'time_off' },
 ];
 
 const initialUsers = [
@@ -63,8 +65,11 @@ const detectConflicts = (shiftToCheck, allShifts, targetUserId, usersList, curre
   const endA = endA_raw < startA_raw ? addDays(endA_raw, 1) : endA_raw;
 
   allShifts.forEach(existingShift => {
+    // Only check against shifts of the same user
     if (existingShift.userId !== targetUserId) return;
+    // Exclude the shift being checked/moved if it's an existing shift
     if (currentShiftIdToExclude && existingShift.id === currentShiftIdToExclude) return;
+    // Ensure existing shift has necessary time properties
     if (!existingShift.day || !existingShift.startTime || !existingShift.endTime) return;
 
     const startB_raw = parseISO(`${existingShift.day}T${existingShift.startTime}`);
@@ -78,13 +83,14 @@ const detectConflicts = (shiftToCheck, allShifts, targetUserId, usersList, curre
     // Check for overlap: (StartA < EndB) and (EndA > StartB)
     if (startA < endB && endA > startB) {
       const user = usersList.find(u => u.id === targetUserId);
+      const conflictingShiftType = existingShift.type === 'time_off' ? 'lịch nghỉ' : 'ca làm việc';
       conflicts.push({
         type: 'TimeOverlap',
         shiftId: existingShift.id,
         userName: user ? user.name : targetUserId,
         day: format(parseISO(existingShift.day), 'EEE, MMM dd', { locale: vi }),
         timeRange: `${existingShift.startTime} - ${existingShift.endTime}`,
-        message: `Trùng với ca làm việc của ${user ? user.name : 'NV này'} (${existingShift.startTime} - ${existingShift.endTime} ngày ${format(parseISO(existingShift.day), 'dd/MM', { locale: vi })})`
+        message: `Trùng với ${conflictingShiftType} của ${user ? user.name : 'NV này'} (${existingShift.startTime} - ${existingShift.endTime} ngày ${format(parseISO(existingShift.day), 'dd/MM', { locale: vi })})`
       });
     }
   });
@@ -94,7 +100,13 @@ const detectConflicts = (shiftToCheck, allShifts, targetUserId, usersList, curre
 
 export default function ShiftScheduler() {
   const [currentDate, setCurrentDate] = useState(new Date(new Date('2025-05-19').setHours(0,0,0,0)));
-  const [shifts, setShifts] = useState(initialShifts.map(s => s.userId === '---UNASSIGNED---' ? {...s, userId: UNASSIGNED_SHIFT_USER_ID} : s));
+  const [shifts, setShifts] = useState(initialShifts.map(s => {
+    const baseShift = s.userId === '---UNASSIGNED---' ? {...s, userId: UNASSIGNED_SHIFT_USER_ID} : s;
+    if (!baseShift.type) { // Ensure type is set, default to regular or unassigned
+      baseShift.type = baseShift.userId === UNASSIGNED_SHIFT_USER_ID ? 'unassigned' : 'regular';
+    }
+    return baseShift;
+  }));
   const [users, setUsers] = useState(initialUsers);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEditingShift, setCurrentEditingShift] = useState(null);
@@ -134,7 +146,8 @@ export default function ShiftScheduler() {
 
   useEffect(() => {
     const updatedUsersSummary = initialUsers.map(user => {
-      const userShifts = shifts.filter(s => s.userId === user.id && s.userId !== UNASSIGNED_SHIFT_USER_ID);
+      // Exclude 'time_off' shifts from work hour calculation
+      const userShifts = shifts.filter(s => s.userId === user.id && s.userId !== UNASSIGNED_SHIFT_USER_ID && s.type !== 'time_off'); //
       let totalMs = 0;
       userShifts.forEach(s => {
         if (s.day && s.startTime && s.endTime) {
@@ -159,6 +172,8 @@ export default function ShiftScheduler() {
   const handleToday = () => setCurrentDate(new Date(new Date().setHours(0,0,0,0)));
 
   const handleOpenModal = (userIdForPreselection, day, shiftToEdit = null) => {
+    // Note: This function would need modification if you intend to create/edit 'time_off' shifts via the modal.
+    // For now, it assumes modal is for 'regular' or 'unassigned' shifts.
     let context = null;
     if (shiftToEdit) {
       setCurrentEditingShift(shiftToEdit);
@@ -170,6 +185,7 @@ export default function ShiftScheduler() {
         endTime: shiftToEdit.endTime,
         note: shiftToEdit.note || '',
         slots: shiftToEdit.slots !== undefined ? shiftToEdit.slots : 1,
+        // type: shiftToEdit.type || (shiftToEdit.userId === UNASSIGNED_SHIFT_USER_ID ? 'unassigned' : 'regular') // If modal handles type
       });
     } else {
       setCurrentEditingShift(null);
@@ -181,6 +197,7 @@ export default function ShiftScheduler() {
         endTime: '17:00',
         note: '',
         slots: context === 'newUnassigned' ? 1 : 1,
+        // type: context === 'newUnassigned' ? 'unassigned' : 'regular' // If modal handles type
       });
     }
     setModalOpeningContext(context);
@@ -197,8 +214,13 @@ export default function ShiftScheduler() {
     const { userIds: rawUserIds, day, startTime, endTime, note, slots: formSlots, _initiatedAsNewUnassignedContext } = formDataToSave;
     const userIds = rawUserIds || [];
 
+    // Assuming type is 'regular' or 'unassigned' if not specified.
+    // If modal were to set type, it would come from formDataToSave.type
+    const shiftType = currentEditingShift?.type || (_initiatedAsNewUnassignedContext ? 'unassigned' : 'regular');
+
+
     const newDuration = calculateDuration(day, startTime, endTime);
-    const shiftBaseData = { day, startTime, endTime, note, duration: newDuration };
+    const shiftBaseData = { day, startTime, endTime, note, duration: newDuration, type: shiftType }; // Persist type
 
     let totalInitialSlotsDefined = parseInt(formSlots, 10);
     if (isNaN(totalInitialSlotsDefined) || totalInitialSlotsDefined < 0) {
@@ -209,7 +231,7 @@ export default function ShiftScheduler() {
     let newShiftsCreatedForUsers = [];
     let assignedCountThisAction = 0;
 
-    if (_initiatedAsNewUnassignedContext) {
+    if (_initiatedAsNewUnassignedContext) { // Creating new shift(s) from unassigned context modal
       let slotsForThisNewUnassignedOp = totalInitialSlotsDefined;
       if (actualUserIdsToAssign.length > 0) {
         for (const selectedUserId of actualUserIdsToAssign) {
@@ -217,7 +239,7 @@ export default function ShiftScheduler() {
           const muiColor = userForColor?.avatarBgColor?.replace('.main', '.light') || 'grey.200';
           const muiTextColor = userForColor?.avatarBgColor?.replace('.main', '.darkerText') || 'text.primary';
           newShiftsCreatedForUsers.push({
-            ...shiftBaseData, userId: selectedUserId, muiColor, muiTextColor,
+            ...shiftBaseData, userId: selectedUserId, muiColor, muiTextColor, type: 'regular', // Assigning creates a regular shift
             id: `s${Date.now()}-${Math.random().toString(16).slice(2)}-${selectedUserId}`,
           });
           assignedCountThisAction++;
@@ -230,7 +252,7 @@ export default function ShiftScheduler() {
           ...shiftBaseData,
           id: `s${Date.now()}-${Math.random().toString(16).slice(2)}-unassigned`,
           userId: UNASSIGNED_SHIFT_USER_ID, slots: remainingSlotsForTemplate,
-          muiColor: 'grey.300', muiTextColor: 'text.primary',
+          muiColor: 'grey.300', muiTextColor: 'text.primary', type: 'unassigned', // Explicitly unassigned
         };
       }
       setShifts(prevShifts => {
@@ -240,42 +262,56 @@ export default function ShiftScheduler() {
         }
         return updatedShifts;
       });
-    } else if (editingShiftOriginalId && currentEditingShift && currentEditingShift.userId === UNASSIGNED_SHIFT_USER_ID) {
+    } else if (editingShiftOriginalId && currentEditingShift && currentEditingShift.userId === UNASSIGNED_SHIFT_USER_ID) { // Editing an existing unassigned shift (e.g., assigning it)
       let slotsAvailableInExistingTemplate = parseInt(currentEditingShift.slots, 10);
-      let newTotalSlotsForTemplateDefinition = totalInitialSlotsDefined;
-      if (actualUserIdsToAssign.length > 0) {
+      let newTotalSlotsForTemplateDefinition = totalInitialSlotsDefined; // How many slots the unassigned shift should now have (if time/note changed)
+
+      if (actualUserIdsToAssign.length > 0) { // If users are selected for assignment
         for (const selectedUserId of actualUserIdsToAssign) {
-          if (slotsAvailableInExistingTemplate <= 0) break;
+          if (slotsAvailableInExistingTemplate <= 0 && !currentEditingShift.allowOverAssign) break; // Or similar logic
           const userForColor = users.find(u => u.id === selectedUserId);
           const muiColor = userForColor?.avatarBgColor?.replace('.main', '.light') || 'grey.200';
           const muiTextColor = userForColor?.avatarBgColor?.replace('.main', '.darkerText') || 'text.primary';
           newShiftsCreatedForUsers.push({
-            ...shiftBaseData, userId: selectedUserId, muiColor, muiTextColor,
+            ...shiftBaseData, // This carries the time/date/note from the modal
+            userId: selectedUserId, muiColor, muiTextColor, type: 'regular', // Assigned shift is 'regular'
             id: `s${Date.now()}-${Math.random().toString(16).slice(2)}-${selectedUserId}`,
           });
-          slotsAvailableInExistingTemplate--;
+          if (slotsAvailableInExistingTemplate > 0) slotsAvailableInExistingTemplate--;
           assignedCountThisAction++;
         }
       }
       setShifts(prevShifts => {
-        let finalTemplateSlots = newTotalSlotsForTemplateDefinition - assignedCountThisAction;
-        if (formSlots === undefined || formSlots === null || isNaN(parseInt(formSlots,10))) {
+        // Determine final slots for the template being edited.
+        // If 'slots' field was explicitly changed in modal, use that as the new base for the template.
+        // Otherwise, just reduce by assigned count.
+        let finalTemplateSlots;
+        if (formSlots !== undefined && formSlots !== null && !isNaN(parseInt(formSlots,10))) { // If 'slots' field was interacted with
+          finalTemplateSlots = newTotalSlotsForTemplateDefinition - assignedCountThisAction;
+        } else { // 'slots' field was not changed, just reduce original by assigned count
           finalTemplateSlots = parseInt(currentEditingShift.slots, 10) - assignedCountThisAction;
         }
+
         if (finalTemplateSlots < 0) finalTemplateSlots = 0;
-        let updatedShifts = prevShifts.map(s => (s.id === editingShiftOriginalId) ? { ...s, ...shiftBaseData, slots: finalTemplateSlots } : s);
-        if (finalTemplateSlots <= 0) {
+
+        let updatedShifts = prevShifts.map(s =>
+          (s.id === editingShiftOriginalId)
+            ? { ...s, ...shiftBaseData, slots: finalTemplateSlots, type: 'unassigned' } // Update time/note, and new slot count
+            : s
+        );
+        if (finalTemplateSlots <= 0) { // If template has no slots left, remove it
           updatedShifts = updatedShifts.filter(s => s.id !== editingShiftOriginalId);
         }
         return [...updatedShifts, ...newShiftsCreatedForUsers];
       });
-    } else { // Regular user shift add/edit
+    } else { // Regular user shift add/edit (not time_off, not unassigned context)
       let newShiftsToAdd_regular = [];
       let shiftsToUpdateDetails_regular = [];
       let originalShiftToDeleteId_regular = null;
-      if (editingShiftOriginalId && currentEditingShift) {
+
+      if (editingShiftOriginalId && currentEditingShift && currentEditingShift.type !== 'time_off') { // Editing a regular user shift
         const originalUserIdOfEditedShift = currentEditingShift.userId;
-        if (actualUserIdsToAssign.length === 0 && currentEditingShift.userId !== UNASSIGNED_SHIFT_USER_ID) {
+        if (actualUserIdsToAssign.length === 0 && currentEditingShift.userId !== UNASSIGNED_SHIFT_USER_ID) { // User was removed
           originalShiftToDeleteId_regular = editingShiftOriginalId;
         } else {
           let originalUserStillSelected = false;
@@ -283,30 +319,33 @@ export default function ShiftScheduler() {
             const userForColor = users.find(u => u.id === selectedUserId);
             const muiColor = userForColor?.avatarBgColor?.replace('.main', '.light') || 'grey.200';
             const muiTextColor = userForColor?.avatarBgColor?.replace('.main', '.darkerText') || 'text.primary';
-            const completeShiftData = { ...shiftBaseData, userId: selectedUserId, muiColor, muiTextColor };
+            const completeShiftData = { ...shiftBaseData, userId: selectedUserId, muiColor, muiTextColor, type: 'regular' };
+
             if (selectedUserId === originalUserIdOfEditedShift) {
               shiftsToUpdateDetails_regular.push({ id: editingShiftOriginalId, data: completeShiftData });
               originalUserStillSelected = true;
-            } else {
+            } else { // Shift assigned to a new/additional user
               newShiftsToAdd_regular.push({ ...completeShiftData, id: `s${Date.now()}-${Math.random().toString(16).slice(2)}-${selectedUserId}` });
             }
           });
-          if (!originalUserStillSelected && currentEditingShift.userId !== UNASSIGNED_SHIFT_USER_ID) {
+          if (!originalUserStillSelected && currentEditingShift.userId !== UNASSIGNED_SHIFT_USER_ID) { // Original user was deselected
             originalShiftToDeleteId_regular = editingShiftOriginalId;
           }
         }
-      } else { // Adding new shift(s) for users
+      } else if (!editingShiftOriginalId) { // Adding new shift(s) for users (not from unassigned context)
         if (actualUserIdsToAssign.length === 0) { alert("Vui lòng chọn ít nhất một nhân viên."); return; }
         actualUserIdsToAssign.forEach(selectedUserId => {
           const userForColor = users.find(u => u.id === selectedUserId);
           const muiColor = userForColor?.avatarBgColor?.replace('.main','.light') || 'grey.200';
           const muiTextColor = userForColor?.avatarBgColor?.replace('.main','.darkerText') || 'text.primary';
           newShiftsToAdd_regular.push({
-            ...shiftBaseData, userId: selectedUserId, muiColor, muiTextColor,
+            ...shiftBaseData, userId: selectedUserId, muiColor, muiTextColor, type: 'regular',
             id: `s${Date.now()}-${Math.random().toString(16).slice(2)}-${selectedUserId}`
           });
         });
       }
+      // If currentEditingShift.type === 'time_off', this block is skipped, as time_off editing is not handled by this modal flow.
+
       setShifts(prevShifts => {
         let result = [...prevShifts];
         if (originalShiftToDeleteId_regular) {
@@ -318,11 +357,15 @@ export default function ShiftScheduler() {
         return [...result, ...newShiftsToAdd_regular];
       });
     }
-    handleCloseModal(); // Ensure this is called after state updates.
+    handleCloseModal();
   };
 
 
   const handleSaveShift = (formData) => {
+    // This function primarily handles 'regular' and 'unassigned' shifts from the modal.
+    // 'time_off' shifts are assumed to be managed elsewhere or pre-initialized.
+    // If 'time_off' shifts were to be created/edited via this modal, this function and ShiftModal.jsx would need 'type' handling.
+
     const { userIds: rawUserIds, day, startTime, endTime, _initiatedAsNewUnassignedContext } = formData;
     const userIds = rawUserIds || [];
     const actualUserIdsToAssign = userIds.filter(uid => users.find(u => u.id === uid));
@@ -331,35 +374,38 @@ export default function ShiftScheduler() {
     let allDetectedConflicts = [];
 
     // Perform conflict check for each user being assigned or for the user of an edited shift
-    if (_initiatedAsNewUnassignedContext && actualUserIdsToAssign.length > 0) {
+    if (_initiatedAsNewUnassignedContext && actualUserIdsToAssign.length > 0) { // New unassigned context, assigning to users
       actualUserIdsToAssign.forEach(userId => {
         allDetectedConflicts.push(...detectConflicts({ day, startTime, endTime }, shifts, userId, users, null));
       });
-    } else if (currentEditingShift && currentEditingShift.userId !== UNASSIGNED_SHIFT_USER_ID) { // Editing an existing user's shift
-      // If userIds in form is different from currentEditingShift.userId, it means reassignment or multi-assignment
-      actualUserIdsToAssign.forEach(userId => {
-        allDetectedConflicts.push(...detectConflicts({ day, startTime, endTime }, shifts, userId, users, editingId));
+    } else if (currentEditingShift && currentEditingShift.userId !== UNASSIGNED_SHIFT_USER_ID && currentEditingShift.type !== 'time_off') { // Editing an existing user's regular shift
+      actualUserIdsToAssign.forEach(userId => { // Check for all users this shift is being (re)assigned to
+        const idToExclude = userId === currentEditingShift.userId ? editingId : null; // Exclude self only if user hasn't changed
+        allDetectedConflicts.push(...detectConflicts({ day, startTime, endTime }, shifts, userId, users, idToExclude));
       });
-    } else if (!currentEditingShift && actualUserIdsToAssign.length > 0 && !_initiatedAsNewUnassignedContext) { // Adding new shift to user(s)
+    } else if (currentEditingShift && currentEditingShift.userId === UNASSIGNED_SHIFT_USER_ID && actualUserIdsToAssign.length > 0) { // Assigning an existing unassigned shift to user(s)
+      actualUserIdsToAssign.forEach(userId => {
+        allDetectedConflicts.push(...detectConflicts({ day, startTime, endTime }, shifts, userId, users, null)); // New shift for this user
+      });
+    } else if (!currentEditingShift && actualUserIdsToAssign.length > 0 && !_initiatedAsNewUnassignedContext) { // Adding new regular shift to user(s) directly
       actualUserIdsToAssign.forEach(userId => {
         allDetectedConflicts.push(...detectConflicts({ day, startTime, endTime }, shifts, userId, users, null));
       });
     }
-    // Note: Conflict detection for editing an UNASSIGNED shift's time/date doesn't make sense unless it's being assigned.
-    // If assigning an existing unassigned shift, that's covered by the `currentEditingShift.userId === UNASSIGNED_SHIFT_USER_ID` block inside proceedWithSaveShift.
+
 
     if (allDetectedConflicts.length > 0) {
       setSchedulingConflicts(allDetectedConflicts);
       setPendingShiftOperation({ action: 'save', data: formData, editingShiftId: editingId });
       setIsConflictModalOpen(true);
-      // Do NOT close the main shift modal here, user might want to cancel from conflict modal and return to edit
       return;
     }
     proceedWithSaveShift(formData, editingId);
-    // handleCloseModal(); // This is now called within proceedWithSaveShift or if no conflicts
   };
 
   const handleDeleteSingleShift = (shiftId) => {
+    // Add check if shift is 'time_off' if they are truly undeletable by any means
+    // For now, this function is generic.
     setShiftIdToDelete(shiftId);
     setIsDeleteSingleModalOpen(true);
   };
@@ -386,15 +432,15 @@ export default function ShiftScheduler() {
 
   const proceedWithDragEnd = (dragResult) => {
     const { source, destination, draggableId } = dragResult;
-    const draggedShiftOriginal = shifts.find(shift => shift.id === draggableId); // Re-find, as shifts might have changed if coming from pending op
-    if(!draggedShiftOriginal) return;
+    const draggedShiftOriginal = shifts.find(shift => shift.id === draggableId);
+    if(!draggedShiftOriginal || draggedShiftOriginal.type === 'time_off') return; // Time off shifts are not draggable
 
 
     const destParts = destination.droppableId.split('-');
     const newDestUserId = destParts[1];
     const newDestDayString = `${destParts[3]}-${destParts[4]}-${destParts[5]}`;
 
-    if (draggedShiftOriginal.userId === UNASSIGNED_SHIFT_USER_ID && newDestUserId !== UNASSIGNED_SHIFT_USER_ID) {
+    if (draggedShiftOriginal.userId === UNASSIGNED_SHIFT_USER_ID && newDestUserId !== UNASSIGNED_SHIFT_USER_ID) { // Assigning an unassigned shift
       const targetUserId = newDestUserId;
       const userForColor = users.find(u => u.id === targetUserId);
       const newMuiColor = userForColor?.avatarBgColor?.replace('.main', '.light') || 'grey.200';
@@ -405,30 +451,36 @@ export default function ShiftScheduler() {
           if (s.id === draggableId) { sourceFound = true; return s.slots > 1 ? { ...s, slots: s.slots - 1 } : null; }
           return s;
         }).filter(Boolean);
-        if (!sourceFound) return prevShifts;
+
+        if (!sourceFound) return prevShifts; // Should not happen if draggableId is valid
+
         const newAssignedShift = {
           ...draggedShiftOriginal,
           id: `s${Date.now()}-${Math.random().toString(16).slice(2)}-assigned-${targetUserId}`,
-          userId: targetUserId, day: newDestDayString, slots: undefined,
+          userId: targetUserId, day: newDestDayString, slots: undefined, // Assigned shifts don't have slots
           muiColor: newMuiColor, muiTextColor: newMuiTextColor,
+          type: 'regular', // When an unassigned shift is dragged to a user, it becomes a regular shift
         };
         return [...listAfterTemplateUpdate, newAssignedShift];
       });
-    } else if (draggedShiftOriginal.userId !== UNASSIGNED_SHIFT_USER_ID && newDestUserId === UNASSIGNED_SHIFT_USER_ID) {
+    } else if (draggedShiftOriginal.userId !== UNASSIGNED_SHIFT_USER_ID && newDestUserId === UNASSIGNED_SHIFT_USER_ID) { // Moving a regular shift to unassigned
       setShifts(prevShifts => {
         const listWithoutOld = prevShifts.filter(s => s.id !== draggableId);
         const newUnassigned = {
+          // ...draggedShiftOriginal, // Spread first to keep times, note etc.
           id: `s${Date.now()}-unassigned-${Math.random().toString(16).slice(2)}`,
           userId: UNASSIGNED_SHIFT_USER_ID, day: newDestDayString,
-          startTime: draggedShiftOriginal.startTime, endTime: draggedShiftOriginal.endTime,
-          duration: draggedShiftOriginal.duration, note: draggedShiftOriginal.note, slots: 1,
+          startTime: draggedShiftOriginal.startTime, endTime: draggedShiftOriginal.endTime, // explicit
+          duration: draggedShiftOriginal.duration, note: draggedShiftOriginal.note,
+          slots: 1, // Becomes a new unassigned template with 1 slot
           muiColor: 'grey.300', muiTextColor: 'text.primary',
+          type: 'unassigned', // Explicitly unassigned
         };
         return [...listWithoutOld, newUnassigned];
       });
-    } else if (draggedShiftOriginal.userId === UNASSIGNED_SHIFT_USER_ID && newDestUserId === UNASSIGNED_SHIFT_USER_ID) {
-      setShifts(prevShifts => prevShifts.map(s => (s.id === draggableId) ? { ...s, day: newDestDayString, muiColor: 'grey.300', muiTextColor: 'text.primary' } : s));
-    } else if (draggedShiftOriginal.userId !== UNASSIGNED_SHIFT_USER_ID && newDestUserId !== UNASSIGNED_SHIFT_USER_ID) {
+    } else if (draggedShiftOriginal.userId === UNASSIGNED_SHIFT_USER_ID && newDestUserId === UNASSIGNED_SHIFT_USER_ID) { // Moving unassigned within unassigned row
+      setShifts(prevShifts => prevShifts.map(s => (s.id === draggableId) ? { ...s, day: newDestDayString, muiColor: 'grey.300', muiTextColor: 'text.primary', type: 'unassigned' } : s));
+    } else if (draggedShiftOriginal.userId !== UNASSIGNED_SHIFT_USER_ID && newDestUserId !== UNASSIGNED_SHIFT_USER_ID) { // Moving a regular shift between users or days
       setShifts(prevShifts => prevShifts.map(s => {
         if (s.id === draggableId) {
           const userColor = users.find(u => u.id === newDestUserId);
@@ -436,7 +488,8 @@ export default function ShiftScheduler() {
             ...s, day: newDestDayString, userId: newDestUserId,
             muiColor: userColor?.avatarBgColor?.replace('.main', '.light') || 'grey.200',
             muiTextColor: userColor?.avatarBgColor?.replace('.main', '.darkerText') || 'text.primary',
-            slots: undefined,
+            slots: undefined, // Ensure slots is undefined for regular shifts
+            type: 'regular', // Ensure type is regular
           };
         }
         return s;
@@ -450,33 +503,37 @@ export default function ShiftScheduler() {
       return;
     }
     const draggedShift = shifts.find(shift => shift.id === draggableId);
-    if (!draggedShift) return;
+    if (!draggedShift || draggedShift.type === 'time_off') { // Do not process drag for time_off shifts
+      return;
+    }
 
     const destParts = destination.droppableId.split('-');
-    if (destParts.length < 6 || destParts[0] !== 'user') return;
+    if (destParts.length < 6 || destParts[0] !== 'user') return; // Basic validation of droppableId format
     const newDestUserId = destParts[1];
     const newDestDayString = `${destParts[3]}-${destParts[4]}-${destParts[5]}`;
 
-    // Determine if this drag operation could cause a conflict for a specific user
+
     let potentialConflictUserId = null;
-    let shiftDetailsForCheck = {
+    let shiftDetailsForCheck = { // The shift as it would be after the drop
       day: newDestDayString,
       startTime: draggedShift.startTime,
       endTime: draggedShift.endTime,
-      id: draggedShift.id // For excluding itself
+      // id: draggedShift.id // Exclude itself only if not changing user or type logic fundamentally alters "self"
     };
 
-    if (newDestUserId !== UNASSIGNED_SHIFT_USER_ID) { // Moving to a specific user
+    // Determine whose schedule to check for conflicts
+    if (newDestUserId !== UNASSIGNED_SHIFT_USER_ID) { // Moving to a specific user's row (or within it)
       potentialConflictUserId = newDestUserId;
-    } else if (draggedShift.userId !== UNASSIGNED_SHIFT_USER_ID && newDestUserId === UNASSIGNED_SHIFT_USER_ID) {
-      // Moving a user's shift to unassigned - no conflict check needed for target (unassigned)
-    } else if (draggedShift.userId === UNASSIGNED_SHIFT_USER_ID && newDestUserId === UNASSIGNED_SHIFT_USER_ID) {
-      // Moving unassigned within unassigned - no user conflict check needed
     }
-
+    // No conflict check needed if moving *to* UNASSIGNED_SHIFT_USER_ID row, or moving *within* UNASSIGNED_SHIFT_USER_ID row.
 
     if (potentialConflictUserId) {
-      const detectedConflicts = detectConflicts(shiftDetailsForCheck, shifts, potentialConflictUserId, users, draggedShift.id);
+      // If dragging an unassigned shift to a user, it's a new assignment, so no currentShiftIdToExclude.
+      // If dragging a user's own shift, exclude that original instance *if it's not changing users*.
+      // If changing users, it's like a new shift for the target user, so don't exclude.
+      const idToExcludeForConflictCheck = (draggedShift.userId === potentialConflictUserId) ? draggedShift.id : null;
+
+      const detectedConflicts = detectConflicts(shiftDetailsForCheck, shifts, potentialConflictUserId, users, idToExcludeForConflictCheck);
       if (detectedConflicts.length > 0) {
         setSchedulingConflicts(detectedConflicts);
         setPendingShiftOperation({ action: 'drag', data: result });
@@ -505,9 +562,35 @@ export default function ShiftScheduler() {
   };
 
   // --- Other Callbacks (Selection, Copy) ---
-  const handleToggleSelectShift = useCallback((shiftId) => { setSelectedShiftIds(prev => prev.includes(shiftId) ? prev.filter(id => id !== shiftId) : [...prev, shiftId]); }, []);
+  const handleToggleSelectShift = useCallback((shiftId) => {
+    const shiftToToggle = shifts.find(s => s.id === shiftId);
+    if (shiftToToggle && shiftToToggle.type === 'time_off') return; // Do not select time_off shifts
+
+    setSelectedShiftIds(prev =>
+      prev.includes(shiftId) ? prev.filter(id => id !== shiftId) : [...prev, shiftId]
+    );
+  }, [shifts]);
+
   const handleDeselectAll = useCallback(() => { setSelectedShiftIds([]); }, []);
-  const getAllShiftIdsInCurrentView = useCallback(() => { const weekStart = startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }); const weekEnd = addDays(weekStart, 6); const ids = []; shifts.forEach(s => { if (isValid(parseISO(s.day))) { const d = parseISO(s.day); if (d >= weekStart && d <= weekEnd && (users.find(u => u.id === s.userId) || s.userId === UNASSIGNED_SHIFT_USER_ID)) ids.push(s.id); } }); return ids; }, [shifts, users, currentDate]);
+
+  const getAllShiftIdsInCurrentView = useCallback(() => {
+    const weekStart = startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON });
+    const weekEnd = addDays(weekStart, 6);
+    const ids = [];
+    shifts.forEach(s => {
+      // Exclude 'time_off' shifts from being part of "select all" logic
+      if (s.type === 'time_off') return; //
+
+      if (isValid(parseISO(s.day))) {
+        const d = parseISO(s.day);
+        if (d >= weekStart && d <= weekEnd && (users.find(u => u.id === s.userId) || s.userId === UNASSIGNED_SHIFT_USER_ID)) {
+          ids.push(s.id);
+        }
+      }
+    });
+    return ids;
+  }, [shifts, users, currentDate]); //
+
   const allShiftIdsInView = getAllShiftIdsInCurrentView();
   const selectedShiftsInViewCount = allShiftIdsInView.filter(id => selectedShiftIds.includes(id)).length;
   const isAllSelectedInView = allShiftIdsInView.length > 0 && selectedShiftsInViewCount === allShiftIdsInView.length;
@@ -515,7 +598,7 @@ export default function ShiftScheduler() {
   const handleToggleSelectAllInView = useCallback(() => { const idsInView = getAllShiftIdsInCurrentView(); if (isAllSelectedInView) setSelectedShiftIds(prev => prev.filter(id => !idsInView.includes(id))); else setSelectedShiftIds(prev => [...new Set([...prev, ...idsInView])]); }, [getAllShiftIdsInCurrentView, isAllSelectedInView]);
   const handleOpenCopyModal = () => { if (!isAnyShiftSelected) return; setIsCopyModalOpen(true); };
   const handleCloseCopyModal = () => { setIsCopyModalOpen(false); };
-  const handleConfirmCopyToWeeks = useCallback(async (targetWeekStartDates) => { if (!isAnyShiftSelected || targetWeekStartDates.length === 0) return; const toCopy = shifts.filter(s => selectedShiftIds.includes(s.id)); let newCopies = []; targetWeekStartDates.forEach(weekStart => { toCopy.forEach(s => { const origDate = parseISO(s.day); if (!isValid(origDate)) return; let dayIdx = getDay(origDate); if (WEEK_STARTS_ON === 1) dayIdx = (dayIdx === 0) ? 6 : dayIdx - 1; const newDate = addDays(weekStart, dayIdx); newCopies.push({...s, id: `s${Date.now()}-${Math.random().toString(16).slice(2)}-${newCopies.length}`, day: format(newDate, 'yyyy-MM-dd')}); }); }); await new Promise(r => setTimeout(r, 100)); setShifts(prev => [...prev, ...newCopies]); setSelectedShiftIds([]); }, [selectedShiftIds, shifts, isAnyShiftSelected]);
+  const handleConfirmCopyToWeeks = useCallback(async (targetWeekStartDates) => { if (!isAnyShiftSelected || targetWeekStartDates.length === 0) return; const toCopy = shifts.filter(s => selectedShiftIds.includes(s.id) && s.type !== 'time_off' /* Don't copy time_off? Or handle as needed */); let newCopies = []; targetWeekStartDates.forEach(weekStart => { toCopy.forEach(s => { const origDate = parseISO(s.day); if (!isValid(origDate)) return; let dayIdx = getDay(origDate); if (WEEK_STARTS_ON === 1) dayIdx = (dayIdx === 0) ? 6 : dayIdx - 1; const newDate = addDays(weekStart, dayIdx); newCopies.push({...s, id: `s${Date.now()}-${Math.random().toString(16).slice(2)}-${newCopies.length}`, day: format(newDate, 'yyyy-MM-dd')}); }); }); await new Promise(r => setTimeout(r, 100)); setShifts(prev => [...prev, ...newCopies]); setSelectedShiftIds([]); }, [selectedShiftIds, shifts, isAnyShiftSelected]);
 
   const dynamicStickyOffset = isAnyShiftSelected ? BULK_ACTIONS_BAR_HEIGHT : 0;
   const PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER = 8 + 8 + 8;
@@ -534,7 +617,7 @@ export default function ShiftScheduler() {
               <CalendarHeader currentDate={currentDate} onToggleSelectAll={handleToggleSelectAllInView} isAllSelectedInView={isAllSelectedInView} isIndeterminateInView={isIndeterminateInView} />
               <UnassignedShiftsRow
                 currentDate={currentDate}
-                shifts={shifts.filter(s => s.userId === UNASSIGNED_SHIFT_USER_ID)}
+                shifts={shifts.filter(s => s.userId === UNASSIGNED_SHIFT_USER_ID)} // type 'unassigned'
                 onAddShift={(userId, day) => handleOpenModal(UNASSIGNED_SHIFT_USER_ID, day)}
                 onEditShift={(shift) => handleOpenModal(null, null, shift)}
                 onDeleteShift={handleDeleteSingleShift} selectedShiftIds={selectedShiftIds}
@@ -546,11 +629,14 @@ export default function ShiftScheduler() {
                 <Box sx={{ minWidth: 1100 }}>
                   <ShiftsGrid
                     currentDate={currentDate}
-                    shifts={shifts.filter(s => s.userId !== UNASSIGNED_SHIFT_USER_ID)}
+                    shifts={shifts.filter(s => s.userId !== UNASSIGNED_SHIFT_USER_ID)} // 'regular' and 'time_off' types
                     users={users}
-                    onAddShift={(userId, day) => handleOpenModal(userId, day)}
+                    onAddShift={(userId, day) => handleOpenModal(userId, day)} // This opens modal for regular shifts
                     onDeleteShift={handleDeleteSingleShift}
-                    onEditShift={(shift) => handleOpenModal(shift.userId, parseISO(shift.day), shift)}
+                    onEditShift={(shift) => {
+                      if (shift.type === 'time_off') return; // Prevent editing 'time_off' via modal for now
+                      handleOpenModal(shift.userId, parseISO(shift.day), shift);
+                    }}
                     selectedShiftIds={selectedShiftIds} onToggleSelectShift={handleToggleSelectShift}
                     isAnyShiftSelected={isAnyShiftSelected}
                   />
@@ -565,7 +651,7 @@ export default function ShiftScheduler() {
           <ShiftModal
             isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleSaveShift}
             users={users} initialFormState={modalInitialFormState}
-            isEditing={!!currentEditingShift}
+            isEditing={!!currentEditingShift && currentEditingShift.type !== 'time_off'} // Modal doesn't edit time_off for now
             isUnassignedContext={modalOpeningContext === 'newUnassigned' || modalOpeningContext === 'editUnassigned'}
             unassignedShiftBeingEdited={currentEditingShift && currentEditingShift.userId === UNASSIGNED_SHIFT_USER_ID ? currentEditingShift : null}
           />

@@ -13,23 +13,14 @@ export default function DayCell({
                                   userId,
                                   day,
                                   shiftsInCell,
-                                  onAddShift,
-                                  onDeleteShift, // This prop is passed but ShiftCard doesn't have a delete button
-                                  onEditShift,
+                                  onAddShift, // (userId, day) => handleOpenModal(userId, day) OR (UNASSIGNED_ID, day) => handleOpenModal(UNASSIGNED_ID, day)
+                                  onDeleteShift,
+                                  onEditShift, // (shift) => handleOpenModal(null, null, shift)
                                   selectedShiftIds,
-                                  onToggleSelectShift,
+                                  onToggleSelectShift, // (shiftId) => setSelectedShiftIds(...)
                                   isAnyShiftSelected
                                 }) {
   const droppableId = `user-${userId}-day-${format(day, 'yyyy-MM-dd')}`;
-
-  // DEBUGGING LOG FOR EMPTY SHIFT SLOT IN UNASSIGNED ROW
-  if (userId === UNASSIGNED_SHIFT_USER_ID) {
-    // This will log for each day cell in the unassigned row
-    // console.log(
-    //   `[DayCell UNASSIGNED] Day: ${format(day, 'yyyy-MM-dd')}, shiftsInCell Count: ${shiftsInCell.length}`,
-    //   // shiftsInCell // Uncomment to see the actual shifts objects
-    // );
-  }
 
   return (
     <Droppable droppableId={droppableId} type="SHIFT">
@@ -44,9 +35,9 @@ export default function DayCell({
             borderRight: 1,
             borderColor: 'divider',
             '&:last-child': { borderRight: 0 },
-            minHeight: 60, // From original
+            minHeight: 60,
             display: 'flex',
-            flexDirection: 'column', // This makes shifts stack vertically
+            flexDirection: 'column',
             bgcolor: snapshot.isDraggingOver ? 'action.focus' : 'transparent',
             transition: 'background-color 0.2s ease',
             overflow: 'hidden',
@@ -54,30 +45,38 @@ export default function DayCell({
         >
           {shiftsInCell.length > 0 ? (
             shiftsInCell.map((shift, index) => (
-              <Draggable key={shift.id} draggableId={shift.id} index={index}>
+              <Draggable
+                key={shift.id}
+                draggableId={shift.id}
+                index={index}
+                isDragDisabled={shift.type === 'time_off'} // Disable dragging for time_off shifts
+              >
                 {(providedDraggable, snapshotDraggable) => (
                   <ShiftCard
                     shift={shift}
-                    // onDeleteShift={onDeleteShift} // ShiftCard currently doesn't have a delete button
-                    onEditShift={onEditShift}
-                    // onAddAnotherShift is for user shifts, handled by ShiftCard's internal button
-                    // The new onAddShift prop is for the new "+" button ON an unassigned ShiftCard
-                    onAddAnotherShift={userId !== UNASSIGNED_SHIFT_USER_ID ? onAddShift : undefined}
-                    onAddShift={onAddShift} // Pass onAddShift prop for the new button in ShiftCard (for unassigned)
+                    shiftType={shift.type || (shift.userId === UNASSIGNED_SHIFT_USER_ID ? 'unassigned' : 'regular')} // Pass shift type
+                    onEditShift={onEditShift} // Passed to ShiftCard
+                    // onAddAnotherShift is for the "+" button on a user's REGULAR or TIME_OFF shift card
+                    // It should trigger adding a NEW REGULAR shift for that user/day.
+                    // `onAddShift` (from DayCell props) is (userId, day) => handleOpenModal(userId, day)
+                    onAddAnotherShift={userId !== UNASSIGNED_SHIFT_USER_ID ? () => onAddShift(userId, day) : undefined}
+                    // onAddShift (new name) is for the "+" button on an UNASSIGNED shift card
+                    // It should trigger adding a NEW UNASSIGNED shift template for that day.
+                    // `onAddShift` (from DayCell props) is (UNASSIGNED_ID, day) => handleOpenModal(UNASSIGNED_ID, day)
+                    onAddShiftToUnassignedDay={userId === UNASSIGNED_SHIFT_USER_ID ? () => onAddShift(UNASSIGNED_SHIFT_USER_ID, day) : undefined}
                     provided={providedDraggable}
                     snapshot={snapshotDraggable}
                     isSelected={selectedShiftIds.includes(shift.id)}
-                    onToggleSelect={onToggleSelectShift}
+                    onToggleSelect={onToggleSelectShift} // Passed to ShiftCard
                     isAnyShiftSelected={isAnyShiftSelected}
                   />
                 )}
               </Draggable>
             ))
           ) : (
-            // Show EmptyShiftSlot if no shifts in this cell AND not currently dragging over this cell
             !snapshot.isDraggingOver && <EmptyShiftSlot onAdd={() => onAddShift(userId, day)} />
           )}
-          {provided.placeholder} {/* This is for react-beautiful-dnd */}
+          {provided.placeholder}
         </Grid>
       )}
     </Droppable>
