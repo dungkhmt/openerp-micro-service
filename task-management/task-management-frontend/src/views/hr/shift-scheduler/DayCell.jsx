@@ -14,7 +14,7 @@ export default function DayCell({
                                   day,
                                   shiftsInCell,
                                   onAddShift,
-                                  onDeleteShift,
+                                  onDeleteShift, // This prop is passed but ShiftCard doesn't have a delete button
                                   onEditShift,
                                   selectedShiftIds,
                                   onToggleSelectShift,
@@ -25,10 +25,10 @@ export default function DayCell({
   // DEBUGGING LOG FOR EMPTY SHIFT SLOT IN UNASSIGNED ROW
   if (userId === UNASSIGNED_SHIFT_USER_ID) {
     // This will log for each day cell in the unassigned row
-    console.log(
-      `[DayCell UNASSIGNED] Day: ${format(day, 'yyyy-MM-dd')}, shiftsInCell Count: ${shiftsInCell.length}`,
-      // shiftsInCell // Uncomment to see the actual shifts objects
-    );
+    // console.log(
+    //   `[DayCell UNASSIGNED] Day: ${format(day, 'yyyy-MM-dd')}, shiftsInCell Count: ${shiftsInCell.length}`,
+    //   // shiftsInCell // Uncomment to see the actual shifts objects
+    // );
   }
 
   return (
@@ -46,10 +46,10 @@ export default function DayCell({
             '&:last-child': { borderRight: 0 },
             minHeight: 60, // From original
             display: 'flex',
-            flexDirection: 'column',
+            flexDirection: 'column', // This makes shifts stack vertically
             bgcolor: snapshot.isDraggingOver ? 'action.focus' : 'transparent',
             transition: 'background-color 0.2s ease',
-            overflow: 'hidden', // To prevent content from pushing cell height excessively
+            overflow: 'hidden',
           }}
         >
           {shiftsInCell.length > 0 ? (
@@ -58,9 +58,12 @@ export default function DayCell({
                 {(providedDraggable, snapshotDraggable) => (
                   <ShiftCard
                     shift={shift}
-                    onDeleteShift={onDeleteShift} // onDeleteShift prop on ShiftCard is not standard, DayCell receives it.
+                    // onDeleteShift={onDeleteShift} // ShiftCard currently doesn't have a delete button
                     onEditShift={onEditShift}
-                    onAddAnotherShift={onAddShift}
+                    // onAddAnotherShift is for user shifts, handled by ShiftCard's internal button
+                    // The new onAddShift prop is for the new "+" button ON an unassigned ShiftCard
+                    onAddAnotherShift={userId !== UNASSIGNED_SHIFT_USER_ID ? onAddShift : undefined}
+                    onAddShift={onAddShift} // Pass onAddShift prop for the new button in ShiftCard (for unassigned)
                     provided={providedDraggable}
                     snapshot={snapshotDraggable}
                     isSelected={selectedShiftIds.includes(shift.id)}
@@ -71,9 +74,10 @@ export default function DayCell({
               </Draggable>
             ))
           ) : (
+            // Show EmptyShiftSlot if no shifts in this cell AND not currently dragging over this cell
             !snapshot.isDraggingOver && <EmptyShiftSlot onAdd={() => onAddShift(userId, day)} />
           )}
-          {provided.placeholder}
+          {provided.placeholder} {/* This is for react-beautiful-dnd */}
         </Grid>
       )}
     </Droppable>

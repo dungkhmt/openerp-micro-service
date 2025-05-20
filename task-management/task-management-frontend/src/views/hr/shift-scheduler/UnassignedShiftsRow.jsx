@@ -1,13 +1,18 @@
 // ==============
-// UnassignedShiftsRow.jsx (NEW FILE)
+// UnassignedShiftsRow.jsx
 // ==============
 import React from 'react';
-import { Grid, Typography, Box, IconButton, Paper } from '@mui/material';
+import { Grid, Typography, IconButton, Paper } from '@mui/material';
 import { addDays, format, startOfWeek } from 'date-fns';
 import PushPinIcon from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
-import DayCell from './DayCell.jsx'; // Assuming DayCell can handle unassigned shifts
-import { WEEK_STARTS_ON, UNASSIGNED_SHIFT_USER_ID, UNASSIGNED_ROW_HEIGHT } from './ShiftScheduler.jsx';
+import DayCell from './DayCell.jsx';
+import {
+  WEEK_STARTS_ON,
+  UNASSIGNED_SHIFT_USER_ID,
+  UNASSIGNED_ROW_HEIGHT, // Used for minHeight
+  CALENDAR_HEADER_HEIGHT // Used for sticky top offset
+} from './ShiftScheduler.jsx';
 
 export default function UnassignedShiftsRow({
                                               currentDate,
@@ -20,7 +25,6 @@ export default function UnassignedShiftsRow({
                                               isAnyShiftSelected,
                                               isSticky,
                                               onToggleSticky,
-                                              stickyTopOffset = 0,
                                             }) {
   const startDate = startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON });
   const daysOfWeek = Array.from({ length: 7 }).map((_, i) => addDays(startDate, i));
@@ -31,49 +35,62 @@ export default function UnassignedShiftsRow({
       square
       sx={{
         position: isSticky ? 'sticky' : 'relative',
-        top: isSticky ? stickyTopOffset : undefined,
-        zIndex: isSticky ? 12 : 1, // Above user rows if sticky, below calendar header
-        bgcolor: 'grey.50',
+        top: isSticky ? CALENDAR_HEADER_HEIGHT : undefined, // Sticks below CalendarHeader
+        zIndex: isSticky ? 12 : 1, // Ensure it's above user rows if sticky, below calendar header
+        bgcolor: 'grey.50', // A slightly different background for the unassigned row
         borderBottom: 1,
         borderColor: 'divider',
-        height: UNASSIGNED_ROW_HEIGHT,
-        minHeight: UNASSIGNED_ROW_HEIGHT,
+        minHeight: UNASSIGNED_ROW_HEIGHT, // Maintain a minimum height
+        height: 'auto', // Allow height to grow based on content (tallest DayCell)
         boxSizing: 'border-box',
       }}
     >
-      <Grid container sx={{ height: '100%'}}>
+      <Grid container sx={{ height: '100%' /* Grid container tries to fill Paper's height */ }}>
         <Grid
           item
           sx={{
-            width: 160, // Matches CalendarHeader user column width
+            width: 160, // Matches CalendarHeader user/title column width
             p: 1,
             borderRight: 1,
             borderColor: 'divider',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            bgcolor: 'grey.100',
+            bgcolor: 'grey.100', // Distinct background for the title cell of this row
+            alignSelf: 'stretch', // Ensures this title cell stretches vertically with the row
           }}
         >
-          <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'text.secondary', textTransform: 'uppercase' }}>
+          <Typography
+            variant="caption"
+            sx={{
+              fontWeight: 'bold',
+              color: 'text.secondary',
+              textTransform: 'uppercase'
+            }}
+          >
             Ca chờ gán
           </Typography>
-          <IconButton onClick={onToggleSticky} size="small" title={isSticky ? "Bỏ ghim hàng này" : "Ghim hàng này"}>
+          <IconButton
+            onClick={onToggleSticky}
+            size="small"
+            title={isSticky ? "Bỏ ghim hàng này" : "Ghim hàng này"}
+          >
             {isSticky ? <PushPinIcon fontSize="small" color="primary"/> : <PushPinOutlinedIcon fontSize="small" />}
           </IconButton>
         </Grid>
         {daysOfWeek.map(day => {
           const dayString = format(day, 'yyyy-MM-dd');
+          // Filter shifts for the current day within this row's already filtered unassigned shifts
           const shiftsInCell = shifts.filter(shift => shift.day === dayString);
           return (
             <DayCell
-              key={day.toISOString()}
-              userId={UNASSIGNED_SHIFT_USER_ID} // Special ID for unassigned DayCells
+              key={`${UNASSIGNED_SHIFT_USER_ID}-${day.toISOString()}`} // Ensure a unique key
+              userId={UNASSIGNED_SHIFT_USER_ID}
               day={day}
               shiftsInCell={shiftsInCell}
-              onAddShift={onAddShift} // onAddShift(UNASSIGNED_SHIFT_USER_ID, day) will be called
+              onAddShift={onAddShift}
               onDeleteShift={onDeleteShift}
-              onEditShift={onEditShift} // onEditShift(shift)
+              onEditShift={onEditShift}
               selectedShiftIds={selectedShiftIds}
               onToggleSelectShift={onToggleSelectShift}
               isAnyShiftSelected={isAnyShiftSelected}
