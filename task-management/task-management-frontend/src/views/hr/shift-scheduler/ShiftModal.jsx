@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close.js";
 import {DatePicker, TimePicker} from "@mui/x-date-pickers";
-import { UNASSIGNED_SHIFT_USER_ID } from "./ShiftScheduler.jsx"; // Import new constant
+import { UNASSIGNED_SHIFT_USER_ID } from "./ShiftScheduler.jsx"; // Assuming this is correctly defined
 
 const modalStyle = {
   position: 'absolute',
@@ -32,36 +32,37 @@ const modalStyle = {
   borderRadius: 1,
 };
 
-
 export default function ShiftModal({
                                      isOpen,
                                      onClose,
                                      onSave,
                                      users,
                                      initialFormState,
-                                     isEditing,
-                                     isUnassignedTemplateMode, // NEW PROP: True if creating/editing unassigned shift TEMPLATE
-                                     unassignedShiftBeingEdited // NEW PROP: Details of unassigned shift being edited/assigned from
+                                     isEditing, // True if currentEditingShift is set
+                                     // This prop signals if the modal was opened with an "unassigned shift" context
+                                     // (either creating a new one or editing/assigning an existing one)
+                                     isUnassignedContext,
+                                     unassignedShiftBeingEdited // The unassigned shift object if editing/assigning one
                                    }) {
   const [formState, setFormState] = useState(initialFormState);
 
   useEffect(() => {
-    let currentInitialState = {
-      ...initialFormState,
-      userIds: Array.isArray(initialFormState.userIds) ? initialFormState.userIds : [],
-      note: initialFormState.note || '',
-      slots: initialFormState.slots !== undefined ? initialFormState.slots : 1, // Ensure slots is part of state
-    };
-    // If editing an unassigned shift, userIds should be empty to prompt selection for assignment,
-    // unless isUnassignedTemplateMode is explicitly for template editing without assignment intent yet.
-    if (unassignedShiftBeingEdited && !currentInitialState.userIds.includes(UNASSIGNED_SHIFT_USER_ID)) {
-      // currentInitialState.userIds = []; // Clear userIds to make user select for assignment.
-      // Or, keep it if modal is dual purpose.
-      // For now, let ShiftScheduler handle initialUserIds logic.
+    let defaultUserIds = Array.isArray(initialFormState.userIds) ? initialFormState.userIds : [];
+
+    // If opening to "Add New Unassigned Shift (and optionally assign employees)",
+    // userIds should start empty to allow selection.
+    if (isUnassignedContext && !isEditing) {
+      defaultUserIds = [];
     }
 
-    setFormState(currentInitialState);
-  }, [initialFormState, unassignedShiftBeingEdited]);
+    setFormState({
+      ...initialFormState,
+      userIds: defaultUserIds,
+      note: initialFormState.note || '',
+      slots: initialFormState.slots !== undefined ? initialFormState.slots : 1,
+    });
+  }, [initialFormState, isUnassignedContext, isEditing]);
+
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -69,37 +70,54 @@ export default function ShiftModal({
   };
 
   const handleDateChange = (newDate) => {
-    if (isValid(newDate)) {
-      setFormState(prev => ({ ...prev, day: format(newDate, 'yyyy-MM-dd')}));
-    } else {
-      setFormState(prev => ({ ...prev, day: ''}));
-    }
+    setFormState(prev => ({ ...prev, day: isValid(newDate) ? format(newDate, 'yyyy-MM-dd') : '' }));
   };
 
   const handleTimeChange = (name, newTime) => {
-    if (isValid(newTime)) {
-      setFormState(prev => ({ ...prev, [name]: format(newTime, 'HH:mm')}));
-    } else {
-      setFormState(prev => ({ ...prev, [name]: ''}));
-    }
+    setFormState(prev => ({ ...prev, [name]: isValid(newTime) ? format(newTime, 'HH:mm') : '' }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(formState);
+    const submissionData = {
+      ...formState,
+      // Flag to help handleSaveShift understand the original intent
+      _initiatedAsNewUnassignedContext: isUnassignedContext && !isEditing,
+    };
+    onSave(submissionData);
   };
 
-  const effectiveIsUnassignedTemplateMode = isUnassignedTemplateMode || (formState.userIds && formState.userIds.includes(UNASSIGNED_SHIFT_USER_ID));
-
-
-  // Determine modal title
-  let modalTitle = isEditing ? "Chỉnh sửa ca làm việc" : "Thêm ca làm việc";
-  if (effectiveIsUnassignedTemplateMode && !unassignedShiftBeingEdited) {
-    modalTitle = "Thêm ca chờ gán";
+  let modalTitle = "Thêm ca làm việc"; // Default for adding a regular user shift
+  if (isUnassignedContext && !isEditing) {
+    modalTitle = "Thêm ca mới (tùy chọn gán)"; // Title for new unassigned/assignable shift
   } else if (unassignedShiftBeingEdited) {
-    modalTitle = `Gán ca / Sửa ca chờ gán (${unassignedShiftBeingEdited.slots} slot còn lại)`;
+    // Syntax error was here, ensuring correct template literal:
+    modalTitle = `Gán ca / Sửa ca chờ gán (${unassignedShiftBeingEdited.slots || 0} slot còn lại)`;
+  } else if (isEditing) {
+    modalTitle = "Chỉnh sửa ca làm việc";
   }
 
+  const getDatePickerValue = () => {
+    if (formState.day) {
+      const parsedDate = parseISO(formState.day);
+      return isValid(parsedDate) ? parsedDate : null;
+    }
+    return null;
+  };
+
+  const getTimePickerValue = (timeString) => {
+    if (formState.day && timeString) {
+      const parsedDateTime = parseISO(`${formState.day}T${timeString}`);
+      return isValid(parsedDateTime) ? parsedDateTime : null;
+    }
+    return null;
+  };
+
+  const formKey = isEditing
+    ? (unassignedShiftBeingEdited ? `edit-unassigned-${unassignedShiftBeingEdited.id}` : `edit-user-${(initialFormState.userIds && initialFormState.userIds[0]) || 'new'}`)
+    : (isUnassignedContext ? 'add-new-unassigned-context' : 'add-new-user');
+
+  const showSlotsField = isUnassignedContext; // Show slots if dealing with unassigned context at all
 
   return (
     <Modal open={isOpen} onClose={onClose} aria-labelledby="shift-modal-title">
@@ -108,12 +126,12 @@ export default function ShiftModal({
           <Typography id="shift-modal-title" variant="h6" component="h2">{modalTitle}</Typography>
           <IconButton onClick={onClose} size="small"><CloseIcon /></IconButton>
         </Box>
-        <Box component="form" onSubmit={handleSubmit} noValidate>
+        <Box component="form" key={formKey} onSubmit={handleSubmit} noValidate>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <FormControl fullWidth margin="dense" required>
+              <FormControl fullWidth margin="dense" required={!showSlotsField || (formState.userIds && formState.userIds.length > 0)}> {/* Required if not unassigned or if users are selected */}
                 <InputLabel id="user-select-label" sx={{fontSize:'0.9rem'}}>
-                  {unassignedShiftBeingEdited ? "Gán cho nhân viên (để trống nếu chỉ sửa ca chờ)" : "Nhân viên"}
+                  Nhân viên {showSlotsField ? "(Để trống nếu chỉ tạo ca chờ)" : ""}
                 </InputLabel>
                 <Select
                   labelId="user-select-label"
@@ -121,27 +139,17 @@ export default function ShiftModal({
                   name="userIds"
                   multiple
                   value={formState.userIds || []}
-                  label={unassignedShiftBeingEdited ? "Gán cho nhân viên (để trống nếu chỉ sửa ca chờ)" : "Nhân viên"}
+                  label={`Nhân viên ${showSlotsField ? "(Để trống nếu chỉ tạo ca chờ)" : ""}`}
                   onChange={handleFormChange}
                   size="small"
-                  disabled={effectiveIsUnassignedTemplateMode && !unassignedShiftBeingEdited} // Disable if defining template unless it's for assignment
+                  // Dropdown is now always enabled if modal is open
                   renderValue={(selected) => {
                     if (!selected || selected.length === 0) {
-                      return <em>{unassignedShiftBeingEdited ? "Chọn nhân viên để gán" : (effectiveIsUnassignedTemplateMode ? "Ca chờ gán (Unassigned)" : "Chọn nhân viên")}</em>;
-                    }
-                    if (selected.includes(UNASSIGNED_SHIFT_USER_ID) && effectiveIsUnassignedTemplateMode) {
-                      return "Ca chờ gán (Unassigned)";
+                      return <em>{showSlotsField ? "Gán cho NV hoặc để trống" : "Chọn nhân viên"}</em>;
                     }
                     return selected.map(id => users.find(u => u.id === id)?.name || id).join(', ');
                   }}
                 >
-                  {/* Option for Unassigned only if explicitly in that mode and not assigning from existing */}
-                  {isUnassignedTemplateMode && !unassignedShiftBeingEdited && (
-                    <MenuItem key={UNASSIGNED_SHIFT_USER_ID} value={UNASSIGNED_SHIFT_USER_ID}>
-                      <Checkbox checked={(formState.userIds || []).indexOf(UNASSIGNED_SHIFT_USER_ID) > -1} size="small" />
-                      <ListItemText primary="Tạoเป็น Ca chờ gán (Unassigned)" />
-                    </MenuItem>
-                  )}
                   {users.map(user => (
                     <MenuItem key={user.id} value={user.id}>
                       <Checkbox checked={(formState.userIds || []).indexOf(user.id) > -1} size="small" />
@@ -152,46 +160,47 @@ export default function ShiftModal({
               </FormControl>
             </Grid>
 
-            { (effectiveIsUnassignedTemplateMode || unassignedShiftBeingEdited) && (
+            {showSlotsField && (
               <Grid item xs={12} sm={6}>
                 <TextField
                   margin="dense"
                   fullWidth
                   id="slots"
-                  label="Số lượng Slot"
+                  label="Tổng Slot ban đầu"
                   name="slots"
                   type="number"
-                  value={formState.slots || 1}
+                  value={formState.slots || '1'}
                   onChange={handleFormChange}
                   size="small"
+                  InputLabelProps={{ shrink: true }}
                   InputProps={{ inputProps: { min: 1 } }}
-                  helperText={unassignedShiftBeingEdited ? `Đang có: ${unassignedShiftBeingEdited.slots}` : "Số ca có thể được gán"}
+                  helperText={unassignedShiftBeingEdited ? `Đang sửa ca chờ (${unassignedShiftBeingEdited.slots} slot)` : "Nếu gán NV, slot sẽ giảm"}
                 />
               </Grid>
             )}
 
-            <Grid item xs={12} sm={ (effectiveIsUnassignedTemplateMode || unassignedShiftBeingEdited) ? 6 : 12}> {/* Adjust width if slots field is shown */}
+            <Grid item xs={12} sm={showSlotsField ? 6 : 12}>
               <DatePicker
                 label="Ngày"
-                value={formState.day ? parseISO(formState.day) : new Date()}
+                value={getDatePickerValue()}
                 onChange={handleDateChange}
-                slotProps={{ textField: { fullWidth: true, margin: "dense", size:"small", required:true } }}
+                slotProps={{ textField: { fullWidth: true, margin: "dense", size:"small", required:true, InputLabelProps: { shrink: true } } }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TimePicker
                 label="Giờ bắt đầu"
-                value={formState.day && formState.startTime ? parseISO(`${formState.day}T${formState.startTime}`) : null}
+                value={getTimePickerValue(formState.startTime)}
                 onChange={(newValue) => handleTimeChange('startTime', newValue)}
-                slotProps={{ textField: { fullWidth: true, margin: "dense", size:"small", required:true } }}
+                slotProps={{ textField: { fullWidth: true, margin: "dense", size:"small", required:true, InputLabelProps: { shrink: true } } }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TimePicker
                 label="Giờ kết thúc"
-                value={formState.day && formState.endTime ? parseISO(`${formState.day}T${formState.endTime}`) : null}
+                value={getTimePickerValue(formState.endTime)}
                 onChange={(newValue) => handleTimeChange('endTime', newValue)}
-                slotProps={{ textField: { fullWidth: true, margin: "dense", size:"small", required:true } }}
+                slotProps={{ textField: { fullWidth: true, margin: "dense", size:"small", required:true, InputLabelProps: { shrink: true } } }}
               />
             </Grid>
 
@@ -207,6 +216,8 @@ export default function ShiftModal({
                 size="small"
                 multiline
                 rows={3}
+                InputLabelProps={{ shrink: true }}
+                placeholder="Thêm ghi chú (không bắt buộc)..."
               />
             </Grid>
           </Grid>
