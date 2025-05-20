@@ -6,6 +6,7 @@ import {format, isValid, parseISO} from "date-fns";
 import {
   Box, Button,
   Checkbox,
+  Chip, // Import Chip
   FormControl,
   Grid,
   IconButton,
@@ -17,7 +18,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close.js";
 import {DatePicker, TimePicker} from "@mui/x-date-pickers";
-import { UNASSIGNED_SHIFT_USER_ID } from "./ShiftScheduler.jsx"; // Assuming this is correctly defined
+import { UNASSIGNED_SHIFT_USER_ID } from "./ShiftScheduler.jsx";
 
 const modalStyle = {
   position: 'absolute',
@@ -38,23 +39,17 @@ export default function ShiftModal({
                                      onSave,
                                      users,
                                      initialFormState,
-                                     isEditing, // True if currentEditingShift is set
-                                     // This prop signals if the modal was opened with an "unassigned shift" context
-                                     // (either creating a new one or editing/assigning an existing one)
+                                     isEditing,
                                      isUnassignedContext,
-                                     unassignedShiftBeingEdited // The unassigned shift object if editing/assigning one
+                                     unassignedShiftBeingEdited
                                    }) {
   const [formState, setFormState] = useState(initialFormState);
 
   useEffect(() => {
     let defaultUserIds = Array.isArray(initialFormState.userIds) ? initialFormState.userIds : [];
-
-    // If opening to "Add New Unassigned Shift (and optionally assign employees)",
-    // userIds should start empty to allow selection.
     if (isUnassignedContext && !isEditing) {
       defaultUserIds = [];
     }
-
     setFormState({
       ...initialFormState,
       userIds: defaultUserIds,
@@ -63,10 +58,21 @@ export default function ShiftModal({
     });
   }, [initialFormState, isUnassignedContext, isEditing]);
 
-
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setFormState(prev => ({ ...prev, [name]: value }));
+    if (name === "userIds" && typeof value === 'string') {
+      setFormState(prev => ({...prev, [name]: value.split(',')}));
+    } else {
+      setFormState(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  // Handler for deleting a user chip
+  const handleUserChipDelete = (userIdToDelete) => {
+    setFormState(prev => ({
+      ...prev,
+      userIds: prev.userIds.filter(id => id !== userIdToDelete)
+    }));
   };
 
   const handleDateChange = (newDate) => {
@@ -81,17 +87,15 @@ export default function ShiftModal({
     e.preventDefault();
     const submissionData = {
       ...formState,
-      // Flag to help handleSaveShift understand the original intent
       _initiatedAsNewUnassignedContext: isUnassignedContext && !isEditing,
     };
     onSave(submissionData);
   };
 
-  let modalTitle = "Thêm ca làm việc"; // Default for adding a regular user shift
+  let modalTitle = "Thêm ca làm việc";
   if (isUnassignedContext && !isEditing) {
-    modalTitle = "Thêm ca mới (tùy chọn gán)"; // Title for new unassigned/assignable shift
+    modalTitle = "Thêm ca mới (tùy chọn gán)";
   } else if (unassignedShiftBeingEdited) {
-    // Syntax error was here, ensuring correct template literal:
     modalTitle = `Gán ca / Sửa ca chờ gán (${unassignedShiftBeingEdited.slots || 0} slot còn lại)`;
   } else if (isEditing) {
     modalTitle = "Chỉnh sửa ca làm việc";
@@ -117,7 +121,7 @@ export default function ShiftModal({
     ? (unassignedShiftBeingEdited ? `edit-unassigned-${unassignedShiftBeingEdited.id}` : `edit-user-${(initialFormState.userIds && initialFormState.userIds[0]) || 'new'}`)
     : (isUnassignedContext ? 'add-new-unassigned-context' : 'add-new-user');
 
-  const showSlotsField = isUnassignedContext; // Show slots if dealing with unassigned context at all
+  const showSlotsField = isUnassignedContext;
 
   return (
     <Modal open={isOpen} onClose={onClose} aria-labelledby="shift-modal-title">
@@ -129,12 +133,12 @@ export default function ShiftModal({
         <Box component="form" key={formKey} onSubmit={handleSubmit} noValidate>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <FormControl fullWidth margin="dense" required={!showSlotsField || (formState.userIds && formState.userIds.length > 0)}> {/* Required if not unassigned or if users are selected */}
-                <InputLabel id="user-select-label" sx={{fontSize:'0.9rem'}}>
+              <FormControl fullWidth margin="dense" required={!showSlotsField || (formState.userIds && formState.userIds.length > 0)}>
+                <InputLabel id="user-select-label-chip" sx={{fontSize:'0.9rem'}}>
                   Nhân viên {showSlotsField ? "(Để trống nếu chỉ tạo ca chờ)" : ""}
                 </InputLabel>
                 <Select
-                  labelId="user-select-label"
+                  labelId="user-select-label-chip"
                   id="userIds"
                   name="userIds"
                   multiple
@@ -142,12 +146,33 @@ export default function ShiftModal({
                   label={`Nhân viên ${showSlotsField ? "(Để trống nếu chỉ tạo ca chờ)" : ""}`}
                   onChange={handleFormChange}
                   size="small"
-                  // Dropdown is now always enabled if modal is open
-                  renderValue={(selected) => {
-                    if (!selected || selected.length === 0) {
-                      return <em>{showSlotsField ? "Gán cho NV hoặc để trống" : "Chọn nhân viên"}</em>;
-                    }
-                    return selected.map(id => users.find(u => u.id === id)?.name || id).join(', ');
+                  renderValue={(selectedUserIds) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {selectedUserIds.map((userId) => {
+                        const user = users.find(u => u.id === userId);
+                        return (
+                          <Chip
+                            key={userId}
+                            label={user ? user.name : userId}
+                            size="small"
+                            onDelete={() => handleUserChipDelete(userId)} // ADDED onDelete handler
+                            onMouseDown={(event) => { // Prevent modal from closing on chip delete click
+                              event.stopPropagation();
+                            }}
+                          />
+                        );
+                      })}
+                      {(!selectedUserIds || selectedUserIds.length === 0) &&
+                        <em>{showSlotsField ? "Gán cho NV hoặc để trống" : "Chọn nhân viên"}</em>
+                      }
+                    </Box>
+                  )}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 224,
+                      },
+                    },
                   }}
                 >
                   {users.map(user => (
