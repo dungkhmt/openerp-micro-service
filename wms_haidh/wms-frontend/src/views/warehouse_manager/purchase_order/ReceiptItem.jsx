@@ -306,15 +306,23 @@ const ReceiptItem = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {details.map((detail, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{detail.bayCode}</TableCell>
-                    <TableCell>{detail.lotId}</TableCell>
-                    <TableCell>{formatPrice(detail.importPrice)}</TableCell>
-                    <TableCell>{detail.expiredDate ? formatDate(detail.expiredDate) : "No expiry date"}</TableCell>
-                    <TableCell>{detail.quantity}</TableCell>
+                {details.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center">
+                      No receipt items found.
+                    </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  details.map((detail, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{detail.bayCode}</TableCell>
+                      <TableCell>{detail.lotId}</TableCell>
+                      <TableCell>{formatPrice(detail.importPrice)}</TableCell>
+                      <TableCell>{detail.expiredDate ? formatDate(detail.expiredDate) : "No expiry date"}</TableCell>
+                      <TableCell>{detail.quantity}</TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </TableContainer>

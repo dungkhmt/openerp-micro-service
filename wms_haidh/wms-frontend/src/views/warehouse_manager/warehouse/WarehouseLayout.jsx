@@ -9,6 +9,7 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router-dom';
 import { request } from "../../../api";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 const WarehouseLayout = () => {
     const navigate = useNavigate();
@@ -26,6 +27,10 @@ const WarehouseLayout = () => {
             }, {});
         }
     }, [id]);
+
+    const handleCopy = (text) => {
+        navigator.clipboard.writeText(text);
+    };
 
     const renderBays = () => {
         if (!warehouseInfo) return null;
@@ -76,9 +81,31 @@ const WarehouseLayout = () => {
 
             {warehouseInfo && (
                 <>
-                    <Typography variant="subtitle1" gutterBottom>
-                        {warehouseInfo.name} - {warehouseInfo.code}
-                    </Typography>
+                    <Box sx={{ mb: 2 }}>
+                        <Paper elevation={2} sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                            <Typography variant="h6">
+                                {warehouseInfo.name} ({warehouseInfo.code})
+                            </Typography>
+                            <Typography variant="body2">
+                                <strong>Address:</strong> {warehouseInfo.address}
+                                <IconButton size="small" onClick={() => handleCopy(warehouseInfo.address)}>
+                                    <ContentCopyIcon fontSize="inherit" />
+                                </IconButton>
+                            </Typography>
+                            <Typography variant="body2">
+                                <strong>Dimensions:</strong> {warehouseInfo.width}m (W) × {warehouseInfo.length}m (L)
+                            </Typography>
+                            <Typography variant="body2">
+                                <strong>Area:</strong> {warehouseInfo.width * warehouseInfo.length} m²
+                            </Typography>
+                            <Typography variant="body2">
+                                <strong>Coordinates:</strong> ({warehouseInfo.latitude.toFixed(6)}, {warehouseInfo.longitude.toFixed(6)})
+                                <IconButton size="small" onClick={() => handleCopy(`${warehouseInfo.latitude}, ${warehouseInfo.longitude}`)}>
+                                    <ContentCopyIcon fontSize="inherit" />
+                                </IconButton>
+                            </Typography>
+                        </Paper>
+                    </Box>
 
                     <Paper elevation={3} sx={{
                         p: 2,

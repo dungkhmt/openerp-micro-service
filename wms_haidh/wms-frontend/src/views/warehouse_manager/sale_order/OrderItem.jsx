@@ -340,16 +340,23 @@ const OrderItem = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {details.map((detail, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{detail.warehouseName}</TableCell>
-                    <TableCell>{detail.bayCode}</TableCell>
-                    <TableCell>{detail.lotId}</TableCell>
-                    <TableCell>{detail.quantity}</TableCell>
-                    <TableCell>{detail.status}</TableCell>
-
+                {details.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center">
+                      No assigned order items found.
+                    </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  details.map((detail, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{detail.warehouseName}</TableCell>
+                      <TableCell>{detail.bayCode}</TableCell>
+                      <TableCell>{detail.lotId}</TableCell>
+                      <TableCell>{detail.quantity}</TableCell>
+                      <TableCell>{detail.status}</TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </TableContainer>

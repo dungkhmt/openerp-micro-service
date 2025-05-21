@@ -37,10 +37,15 @@ const InventoryList = () => {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [totalItems, setTotalItems] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [bayInfo, setBayInfo] = useState(null);
 
     // Load lotId list
     useEffect(() => {
         if (id2) {
+            request("get", `/bays/${id2}`, (res) => {
+                setBayInfo(res.data);
+            });
+
             request('get', `/inventory/lot-ids?bayId=${id2}`, (res) => {
                 setLotIds(res.data);
             });
@@ -84,9 +89,23 @@ const InventoryList = () => {
                     <ArrowBackIcon />
                 </IconButton>
                 <Typography variant="h6" sx={{ ml: 2 }}>
-                    Inventory By Bay
+                    Inventory Details
                 </Typography>
             </Box>
+
+            {
+                bayInfo && (
+                    <Box sx={{ mb: 2 }}>
+                        <Paper elevation={2} sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                            <Typography variant="h6">
+                                Bay code: {bayInfo.code}
+                            </Typography>
+                        </Paper>
+                    </Box>
+                )
+            }
+
+
 
             <Paper elevation={3} sx={{ p: 3 }}>
                 <Typography variant="h6" sx={{ mb: 2 }}>
