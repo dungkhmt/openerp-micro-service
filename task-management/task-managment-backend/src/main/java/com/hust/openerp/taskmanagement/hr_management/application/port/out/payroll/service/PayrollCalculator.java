@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -86,9 +87,11 @@ public class PayrollCalculator extends BeanAwareUseCasePublisher {
                 if (!isWeekend && !isHoliday) {
                     if (attendance != null && attendance.getAttendances().containsKey(currentDate)) {
                         var dayAttendance = attendance.getAttendances().get(currentDate);
+                        LocalTime startTime = dayAttendance.getStartTime() != null ? dayAttendance.getStartTime().toLocalTime() : null;
+                        LocalTime endTime = dayAttendance.getEndTime() != null ? dayAttendance.getEndTime().toLocalTime() : null;
                         dailyWorkHours = WorkTimeCalculator.calculateWorkTimeByHours(
-                            dayAttendance.getStartTime().toLocalTime(),
-                            dayAttendance.getEndTime().toLocalTime(),
+                            startTime,
+                            endTime,
                             companyConfig
                         );
                     }
@@ -109,6 +112,9 @@ public class PayrollCalculator extends BeanAwareUseCasePublisher {
                     dailyAbsenceHours = roundToQuarter(companyConfig.getTotalWorkTime());
                     if (staff.getJobPosition().getType() == JobPositionType.FULL_TIME) {
                         totalPairLeaveHours += (float) dailyAbsenceHours;
+                    }
+                    else {
+                        totalUnpairLeaveHours += (float) dailyAbsenceHours;
                     }
                 }
 

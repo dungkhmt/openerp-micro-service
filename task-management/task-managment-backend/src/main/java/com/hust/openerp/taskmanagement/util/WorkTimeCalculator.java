@@ -11,6 +11,7 @@ public class WorkTimeCalculator {
         LocalTime endTime,
         CompanyConfigModel companyConfig
     ) {
+        if(startTime == null || endTime == null) return 0f;
         if (endTime.isBefore(startTime)) {
 
             return 0f;

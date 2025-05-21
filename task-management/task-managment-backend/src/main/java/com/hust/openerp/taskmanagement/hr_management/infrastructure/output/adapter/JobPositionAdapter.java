@@ -106,6 +106,7 @@ public class JobPositionAdapter implements IJobPositionPort {
             .name(jobPosition.getPositionName())
             .description(jobPosition.getDescription())
             .type(jobPosition.getType())
+            .status(jobPosition.getStatus())
             .build();
     }
 

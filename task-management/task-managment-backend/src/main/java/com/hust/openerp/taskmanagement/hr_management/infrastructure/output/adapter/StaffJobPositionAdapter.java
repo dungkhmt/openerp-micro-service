@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.adapter;
 
+import com.hust.openerp.taskmanagement.hr_management.constant.JobPositionType;
 import lombok.RequiredArgsConstructor;
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IStaffJobPositionPort;
 import com.hust.openerp.taskmanagement.hr_management.constant.JobPositionStatus;
@@ -69,6 +70,7 @@ public class StaffJobPositionAdapter implements IStaffJobPositionPort {
                 .jobPosition(JobPositionModel.builder()
                         .code(projection.getJobPositionCode())
                         .name(projection.getJobPositionName())
+                        .type(JobPositionType.valueOf(projection.getType()))
                         .description(projection.getDescription())
                         .status(JobPositionStatus.valueOf(projection.getStatus()))
                         .build())

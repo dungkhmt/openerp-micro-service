@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface StaffJobPositionRepo extends IBaseRepository<StaffJobPositionEntity, StaffJobPositionId>  {
     @Query(value = "SELECT sjp.user_id AS userLoginId, jp.position_code AS jobPositionCode, " +
             "jp.position_name AS jobPositionName, jp.description AS description, " +
-            "jp.status AS status, sjp.from_date AS fromDate, sjp.thru_date AS thruDate " +
+            "jp.status AS status, jp.type AS type, sjp.from_date AS fromDate, sjp.thru_date AS thruDate " +
             "FROM hr_staff_job_position sjp " +
             "JOIN hr_job_position jp ON sjp.position_code = jp.position_code " +
             "WHERE sjp.user_id = :userId " +
@@ -29,7 +29,7 @@ public interface StaffJobPositionRepo extends IBaseRepository<StaffJobPositionEn
 
     @Query(value = "SELECT sjp.user_id AS userLoginId, jp.position_code AS jobPositionCode, " +
             "jp.position_name AS jobPositionName, jp.description AS description, " +
-            "jp.status AS status, sjp.from_date AS fromDate, sjp.thru_date AS thruDate " +
+            "jp.status AS status, jp.type AS type, sjp.from_date AS fromDate, sjp.thru_date AS thruDate " +
             "FROM hr_staff_job_position sjp " +
             "JOIN hr_job_position jp ON sjp.position_code = jp.position_code " +
             "WHERE sjp.user_id = :userId " +
@@ -38,7 +38,7 @@ public interface StaffJobPositionRepo extends IBaseRepository<StaffJobPositionEn
 
     @Query(value = "SELECT sjp.user_id AS userLoginId, jp.position_code AS jobPositionCode, " +
             "jp.position_name AS jobPositionName, jp.description AS description, " +
-            "jp.status AS status, sjp.from_date AS fromDate, sjp.thru_date AS thruDate " +
+            "jp.status AS status, jp.type AS type, sjp.from_date AS fromDate, sjp.thru_date AS thruDate " +
             "FROM hr_staff_job_position sjp " +
             "JOIN hr_job_position jp ON sjp.position_code = jp.position_code " +
             "WHERE sjp.user_id IN (:userIds) " +

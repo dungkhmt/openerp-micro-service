@@ -8,6 +8,7 @@ public interface StaffJobPositionProjection {
     String getJobPositionName();
     String getDescription();
     String getStatus();
+    String getType();
     LocalDate getFromDate();
     LocalDate getThruDate();
 }
