@@ -1,29 +1,53 @@
-import {AppBar, Box, Button, IconButton, Toolbar, Typography} from "@mui/material";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft.js";
-import EventNoteIcon from "@mui/icons-material/EventNote.js";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight.js";
+// ==============
+// TopBar.jsx
+// ==============
+import React from "react";
+import {AppBar, Box, Button, IconButton, Toolbar, Tooltip, Typography} from "@mui/material";
 import {format} from "date-fns";
 import vi from "date-fns/locale/vi";
-import FilterAltIcon from "@mui/icons-material/FilterAlt.js";
-import FileDownloadIcon from "@mui/icons-material/FileDownload.js";
-import SettingsIcon from "@mui/icons-material/Settings.js";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft.js";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight.js";
+import TodayIcon from "@mui/icons-material/Today.js";
+import FilterListIcon from "@mui/icons-material/FilterList.js"; // Import FilterListIcon
 import {TOP_BAR_HEIGHT} from "./ShiftScheduler.jsx";
 
-export default function TopBar({ currentDate, onPrevWeek, onNextWeek, onToday }) {
+export default function TopBar({ currentDate, onPrevWeek, onNextWeek, onToday, onOpenFilterDrawer }) { // Add onOpenFilterDrawer prop
   return (
-    <AppBar position="sticky" color="default" elevation={1} sx={{zIndex: 20, height: TOP_BAR_HEIGHT}}>
-      <Toolbar variant="dense">
-        <Typography variant="h6" component="div" sx={{ flexGrow: 0.1, mr:1, fontSize:'1.1rem', color:'text.primary' }}>Lịch làm việc</Typography>
-        <IconButton onClick={onPrevWeek} size="small" aria-label="Previous week"><ChevronLeftIcon /></IconButton>
-        <Button onClick={onToday} size="small" variant="outlined" color="inherit" startIcon={<EventNoteIcon />} sx={{ mx: 1, fontSize:'0.75rem', py:0.3}}>Hôm nay</Button>
-        <IconButton onClick={onNextWeek} size="small" aria-label="Next week"><ChevronRightIcon /></IconButton>
-        <Typography variant="subtitle1" component="div" sx={{ ml: 2, color:'text.secondary', fontWeight:'medium' }}>
-          {format(currentDate, 'MMMM yyyy', { locale: vi })}
+    <AppBar
+      position="sticky"
+      color="default"
+      elevation={1}
+      sx={{ height: TOP_BAR_HEIGHT, bgcolor: 'background.paper', zIndex: 20, borderBottom: theme => `1px solid ${theme.palette.divider}`}}
+    >
+      <Toolbar variant="dense" sx={{ justifyContent: 'space-between', alignItems: 'center', height: '100%' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Tooltip title="Tuần trước">
+            <IconButton onClick={onPrevWeek} size="small" sx={{mr: 0.5}}>
+              <KeyboardArrowLeftIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Tuần sau">
+            <IconButton onClick={onNextWeek} size="small" sx={{mr: 1}}>
+              <KeyboardArrowRightIcon />
+            </IconButton>
+          </Tooltip>
+          <Button onClick={onToday} variant="outlined" size="small" startIcon={<TodayIcon />} sx={{textTransform: 'none', color: 'text.primary', borderColor: 'grey.400'}}>
+            Hôm nay
+          </Button>
+        </Box>
+
+        <Typography variant="h6" component="div" sx={{ fontWeight: 'medium', color:'text.primary' }}>
+          {format(currentDate, "'Tháng' M, yyyy", { locale: vi })}
         </Typography>
-        <Box sx={{ flexGrow: 1 }} />
-        <Button size="small" variant="text" color="inherit" startIcon={<FilterAltIcon />} sx={{textTransform:'none', fontSize:'0.8rem'}}>Lọc</Button>
-        <Button size="small" variant="text" color="inherit" startIcon={<FileDownloadIcon />} sx={{textTransform:'none', fontSize:'0.8rem'}}>Xuất</Button>
-        <IconButton color="inherit" size="small"><SettingsIcon /></IconButton>
+
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {/* Add other buttons here if needed */}
+          <Tooltip title="Lọc nhân viên">
+            <IconButton onClick={onOpenFilterDrawer} size="small" sx={{ml: 1}}>
+              <FilterListIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </Toolbar>
     </AppBar>
   );

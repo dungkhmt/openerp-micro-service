@@ -1,19 +1,24 @@
 // ==============
 // ShiftScheduler.jsx
 // ==============
-import React, {useCallback, useEffect, useState, useMemo} from 'react'; // Added useMemo
-import {addDays, format, getDay, isValid, parseISO, startOfWeek, subDays, isEqual, endOfWeek} from 'date-fns';
+import React, {useCallback, useEffect, useState, useMemo} from 'react';
+import {addDays, format, getDay, isValid, parseISO, startOfWeek, subDays, endOfWeek} from 'date-fns';
 import vi from 'date-fns/locale/vi';
 import {DragDropContext} from 'react-beautiful-dnd';
-import {Box, Container, Paper, Typography, Checkbox, CircularProgress} from '@mui/material'; // Added CircularProgress
+import {
+  Box, Container, Paper, Typography, Checkbox, CircularProgress,
+  Drawer, TextField, Button, IconButton, Autocomplete, Grid // Added MUI components for filter drawer
+} from '@mui/material';
 import {LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+import CloseIcon from "@mui/icons-material/Close.js"; // For Filter Drawer
+import FilterListIcon from "@mui/icons-material/FilterList"; // Used in TopBar
 
 import CopyShiftsModal from "./CopyShiftsModal.jsx";
 import ShiftModal from "./ShiftModal.jsx";
 import CalendarHeader from "./CalendarHeader.jsx";
-import ShiftsGrid from "./ShiftsGrid.jsx"; // Will be updated
+import ShiftsGrid from "./ShiftsGrid.jsx";
 import InfoBanners from "./InfoBanners.jsx";
 import BulkActionsBar from "./BulkActionBar.jsx";
 import TopBar from "./TopBar.jsx";
@@ -25,16 +30,14 @@ import toast from "react-hot-toast";
 
 export const TOP_BAR_HEIGHT = 61;
 export const AVAILABLE_SHIFTS_BANNER_HEIGHT = 36;
-// export const PROJECTED_SALES_BANNER_HEIGHT = 0; // Already commented out in original InfoBanners
-export const INFO_BANNERS_TOTAL_HEIGHT = AVAILABLE_SHIFTS_BANNER_HEIGHT; // Adjusted
+export const INFO_BANNERS_TOTAL_HEIGHT = AVAILABLE_SHIFTS_BANNER_HEIGHT;
 export const BULK_ACTIONS_BAR_HEIGHT = 50;
 export const CALENDAR_HEADER_HEIGHT = 57;
 export const UNASSIGNED_ROW_HEIGHT = 60;
 export const WEEK_STARTS_ON = 1;
 export const UNASSIGNED_SHIFT_USER_ID = 'UNASSIGNED';
-export const DEPARTMENT_HEADER_ROW_HEIGHT = 25; // New constant for department row
-export const USER_ROW_MIN_HEIGHT = 60; // Existing, for user rows in grid
-
+export const DEPARTMENT_HEADER_ROW_HEIGHT = 25;
+export const USER_ROW_MIN_HEIGHT = 60;
 
 const initialUnassignedShifts = [
   //{ id: 's-unassigned-tue', userId: UNASSIGNED_SHIFT_USER_ID, day: '2025-05-20', startTime: '10:00', endTime: '14:00', note: 'General Task Tue', slots: 3, muiColor: 'grey.300', muiTextColor: 'text.primary', type: 'unassigned' },
@@ -47,7 +50,7 @@ const calculateDuration = (day, startTime, endTime) => {
   const end = parseISO(`${day}T${endTime}`);
   if (!isValid(start) || !isValid(end)) return '0h 0m';
   let durationMs = end.getTime() - start.getTime();
-  if (durationMs < 0) { durationMs += 24 * 60 * 60 * 1000; } // Handles overnight shifts
+  if (durationMs < 0) { durationMs += 24 * 60 * 60 * 1000; }
   const h = Math.floor(durationMs / (1000 * 60 * 60));
   const m = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
   return `${h}h ${m}m`;
@@ -114,15 +117,13 @@ const detectConflicts = (shiftToCheck, allShifts, targetUserId, usersList, curre
 
 
 export default function ShiftScheduler() {
-  const [currentDate, setCurrentDate] = useState(new Date(new Date('2025-05-19').setHours(0,0,0,0))); // Ensure it matches mock data for initial view
-  const [shifts, setShifts] = useState([]); // Initialize with empty array, will be populated by API calls
-
+  const [currentDate, setCurrentDate] = useState(new Date(new Date('2025-05-19').setHours(0,0,0,0)));
+  const [shifts, setShifts] = useState([]);
   const [rawUsers, setRawUsers] = useState([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
-  const [isLoadingShifts, setIsLoadingShifts] = useState(true); // New loading state for all shifts
+  const [isLoadingShifts, setIsLoadingShifts] = useState(true);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // ... (other states remain the same)
   const [currentEditingShift, setCurrentEditingShift] = useState(null);
   const [modalInitialFormState, setModalInitialFormState] = useState({
     userIds: [], day: format(new Date(), 'yyyy-MM-dd'), startTime: '09:00',
@@ -141,20 +142,72 @@ export default function ShiftScheduler() {
   const [isConflictModalOpen, setIsConflictModalOpen] = useState(false);
   const [pendingShiftOperation, setPendingShiftOperation] = useState(null);
 
+  // State for User Filters
+  const [isFilterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const [nameFilterInput, setNameFilterInput] = useState("");
+  const [departmentFilterInput, setDepartmentFilterInput] = useState(null); // Stores selected department object
+  const [jobPositionFilterInput, setJobPositionFilterInput] = useState(null); // Stores selected job position object
+
+  const [appliedNameFilter, setAppliedNameFilter] = useState("");
+  const [appliedDepartmentFilter, setAppliedDepartmentFilter] = useState(null);
+  const [appliedJobPositionFilter, setAppliedJobPositionFilter] = useState(null);
+
+  const [departmentOptions, setDepartmentOptions] = useState([]);
+  const [jobPositionOptions, setJobPositionOptions] = useState([]);
+
 
   const isAnyShiftSelected = selectedShiftIds.length > 0;
 
-  // Derived state for users with work hours
+  // Derive unique department and job position options from rawUsers for filter Autocomplete
+  useEffect(() => {
+    if (rawUsers.length > 0) {
+      const uniqueDepartments = rawUsers.reduce((acc, user) => {
+        if (user.departmentCode && user.departmentName && !acc.find(d => d.code === user.departmentCode)) {
+          acc.push({ code: user.departmentCode, name: user.departmentName });
+        }
+        return acc;
+      }, []);
+      setDepartmentOptions(uniqueDepartments.sort((a, b) => a.name.localeCompare(b.name)));
+
+      const uniqueJobPositions = rawUsers.reduce((acc, user) => {
+        if (user.jobPositionName && !acc.find(jp => jp.name === user.jobPositionName)) {
+          // Using jobPositionName as 'code' for simplicity if no specific jobPositionCode is readily available/used for filtering
+          acc.push({ code: user.jobPositionName, name: user.jobPositionName });
+        }
+        return acc;
+      }, []);
+      setJobPositionOptions(uniqueJobPositions.sort((a,b) => a.name.localeCompare(b.name)));
+    }
+  }, [rawUsers]);
+
+
+  // Derived state for users with work hours, now including filtering
   const allUsers = useMemo(() => {
-    return rawUsers.map(user => ({
+    let filteredUsers = rawUsers;
+
+    if (appliedNameFilter) {
+      filteredUsers = filteredUsers.filter(user =>
+        user.name.toLowerCase().includes(appliedNameFilter.toLowerCase())
+      );
+    }
+    if (appliedDepartmentFilter) {
+      filteredUsers = filteredUsers.filter(user =>
+        user.departmentCode === appliedDepartmentFilter.code
+      );
+    }
+    if (appliedJobPositionFilter) {
+      filteredUsers = filteredUsers.filter(user =>
+        user.jobPositionName === appliedJobPositionFilter.name // Filter by name as code might not be distinct or available
+      );
+    }
+
+    return filteredUsers.map(user => ({
       ...user,
       workHoursSummary: calculateUserWorkHours(user.id, shifts)
     }));
-  }, [rawUsers, shifts]);
+  }, [rawUsers, shifts, appliedNameFilter, appliedDepartmentFilter, appliedJobPositionFilter]);
 
-  // Grouped users for the grid
   const groupedUsersForGrid = useMemo(() => {
-    // ... (same as previous version)
     if (isLoadingUsers || allUsers.length === 0) return [];
     const groups = {};
     allUsers.forEach(user => {
@@ -178,14 +231,14 @@ export default function ShiftScheduler() {
   }, [allUsers, isLoadingUsers]);
 
 
-  // Function to fetch absences (time off)
   const fetchAbsences = async (userIds, start, end) => {
+    // ... (implementation as in provided ShiftScheduler.jsx)
     if (!userIds || userIds.length === 0) return [];
     return new Promise((resolve) => {
       const params = new URLSearchParams();
       userIds.forEach(id => params.append("userIds", id));
-      params.append("startDate", start); // format YYYY-MM-DD
-      params.append("endDate", end);     // format YYYY-MM-DD
+      params.append("startDate", start);
+      params.append("endDate", end);
 
       request(
         "get",
@@ -193,24 +246,20 @@ export default function ShiftScheduler() {
         (res) => resolve(res.data?.data || []),
         (err) => {
           console.error("Failed to fetch absences:", err);
-          resolve([]); // Resolve with empty array on error
+          resolve([]);
         },
         null
       );
     });
   };
 
-  // Function to fetch regular shifts (TODO: Implement actual API call)
   const fetchRegularShifts = async (userIds, start, end) => {
+    // ... (implementation as in provided ShiftScheduler.jsx)
     console.log("TODO: Fetch regular shifts from API for users:", userIds, "between", start, "and", end);
-    // This is where you'd call your actual API for regular schedules
-    // For now, returning an empty array as per requirement
-    await new Promise(r => setTimeout(r, 50)); // Simulate API delay
-    return []; // Placeholder
+    await new Promise(r => setTimeout(r, 50));
+    return [];
   };
 
-
-  // Fetch all data (users, then shifts for the current week)
   useEffect(() => {
     const fetchInitialData = async () => {
       setIsLoadingUsers(true);
@@ -232,7 +281,7 @@ export default function ShiftScheduler() {
       } finally {
         setIsLoadingUsers(false);
       }
-      
+
       if (fetchedUsers.length > 0) {
         const userIds = fetchedUsers.map(u => u.id);
         const weekStart = format(startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }), 'yyyy-MM-dd');
@@ -240,7 +289,7 @@ export default function ShiftScheduler() {
         try {
           const [absencesData, regularShiftsData] = await Promise.all([
             fetchAbsences(userIds, weekStart, weekEnd),
-            fetchRegularShifts(userIds, weekStart, weekEnd) // TODO: Implement this
+            fetchRegularShifts(userIds, weekStart, weekEnd)
           ]);
 
           const timeOffShifts = absencesData.map(absence => ({
@@ -254,9 +303,8 @@ export default function ShiftScheduler() {
             duration: calculateDuration(absence.date, absence.start_time.substring(0,5), absence.end_time.substring(0,5))
           }));
 
-          // TODO: Transform regularShiftsData if its structure is different
           const processedRegularShifts = regularShiftsData.map(rs => ({
-            ...rs, // Spread existing properties
+            ...rs,
             duration: rs.duration || calculateDuration(rs.day, rs.startTime, rs.endTime),
             type: 'regular'
           }));
@@ -270,28 +318,26 @@ export default function ShiftScheduler() {
 
         } catch (error) {
           console.error("Failed to fetch shifts (absences or regular):", error);
-          setShifts(initialUnassignedShifts.map(s => ({...s, duration: calculateDuration(s.day, s.startTime, s.endTime)}))); // Fallback to only unassigned
+          setShifts(initialUnassignedShifts.map(s => ({...s, duration: calculateDuration(s.day, s.startTime, s.endTime)})));
         } finally {
           setIsLoadingShifts(false);
         }
       } else {
-        // No users fetched, so no user-specific shifts to fetch
         setShifts(initialUnassignedShifts.map(s => ({...s, duration: calculateDuration(s.day, s.startTime, s.endTime)})));
         setIsLoadingShifts(false);
       }
     };
 
     fetchInitialData();
-  }, [currentDate]); // Refetch when currentDate (week) changes
+  }, [currentDate]);
 
 
-  // --- Event Handlers & Logic (Keep existing handlers, ensure they use the new 'shifts' state) ---
   const handlePrevWeek = () => setCurrentDate(prev => subDays(prev, 7));
   const handleNextWeek = () => setCurrentDate(prev => addDays(prev, 7));
   const handleToday = () => setCurrentDate(new Date(new Date().setHours(0,0,0,0)));
 
   const handleOpenModal = (userIdForPreselection, day, shiftToEdit = null) => {
-    // ... (same as previous version)
+    // ... (implementation as in provided ShiftScheduler.jsx)
     let context = null;
     if (shiftToEdit) {
       setCurrentEditingShift(shiftToEdit);
@@ -321,14 +367,14 @@ export default function ShiftScheduler() {
   };
 
   const handleCloseModal = () => {
-    // ... (same as previous version)
+    // ... (implementation as in provided ShiftScheduler.jsx)
     setIsModalOpen(false);
     setCurrentEditingShift(null);
     setModalOpeningContext(null);
   };
 
   const proceedWithSaveShift = (formDataToSave, editingShiftOriginalId) => {
-    // ... (same as previous version, ensure duration is calculated for new/updated shifts)
+    // ... (implementation as in provided ShiftScheduler.jsx)
     const { userIds: rawUserIds, day, startTime, endTime, note, slots: formSlots, _initiatedAsNewUnassignedContext } = formDataToSave;
     const userIds = rawUserIds || [];
     const shiftType = currentEditingShift?.type || (_initiatedAsNewUnassignedContext ? 'unassigned' : 'regular');
@@ -340,7 +386,7 @@ export default function ShiftScheduler() {
       totalInitialSlotsDefined = (_initiatedAsNewUnassignedContext || (currentEditingShift && currentEditingShift.userId === UNASSIGNED_SHIFT_USER_ID)) ? 1 : 0;
     }
 
-    const actualUserIdsToAssign = userIds.filter(uid => allUsers.find(u => u.id === uid));
+    const actualUserIdsToAssign = userIds.filter(uid => rawUsers.find(u => u.id === uid)); // Use rawUsers for check
     let newShiftsCreatedForUsers = [];
     let assignedCountThisAction = 0;
 
@@ -450,29 +496,29 @@ export default function ShiftScheduler() {
   };
 
   const handleSaveShift = (formData) => {
-    // ... (same as previous version)
+    // ... (implementation as in provided ShiftScheduler.jsx)
     const { userIds: rawUserIds, day, startTime, endTime, _initiatedAsNewUnassignedContext } = formData;
     const userIds = rawUserIds || [];
-    const actualUserIdsToAssign = userIds.filter(uid => allUsers.find(u => u.id === uid));
+    const actualUserIdsToAssign = userIds.filter(uid => rawUsers.find(u => u.id === uid)); // Use rawUsers
     let editingId = currentEditingShift ? currentEditingShift.id : null;
     let allDetectedConflicts = [];
 
     if (_initiatedAsNewUnassignedContext && actualUserIdsToAssign.length > 0) {
       actualUserIdsToAssign.forEach(userId => {
-        allDetectedConflicts.push(...detectConflicts({ day, startTime, endTime }, shifts, userId, allUsers, null));
+        allDetectedConflicts.push(...detectConflicts({ day, startTime, endTime }, shifts, userId, rawUsers, null)); // Use rawUsers
       });
     } else if (currentEditingShift && currentEditingShift.userId !== UNASSIGNED_SHIFT_USER_ID && currentEditingShift.type !== 'time_off') {
       actualUserIdsToAssign.forEach(userId => {
         const idToExclude = userId === currentEditingShift.userId ? editingId : null;
-        allDetectedConflicts.push(...detectConflicts({ day, startTime, endTime }, shifts, userId, allUsers, idToExclude));
+        allDetectedConflicts.push(...detectConflicts({ day, startTime, endTime }, shifts, userId, rawUsers, idToExclude)); // Use rawUsers
       });
     } else if (currentEditingShift && currentEditingShift.userId === UNASSIGNED_SHIFT_USER_ID && actualUserIdsToAssign.length > 0) {
       actualUserIdsToAssign.forEach(userId => {
-        allDetectedConflicts.push(...detectConflicts({ day, startTime, endTime }, shifts, userId, allUsers, null));
+        allDetectedConflicts.push(...detectConflicts({ day, startTime, endTime }, shifts, userId, rawUsers, null)); // Use rawUsers
       });
     } else if (!currentEditingShift && actualUserIdsToAssign.length > 0 && !_initiatedAsNewUnassignedContext) {
       actualUserIdsToAssign.forEach(userId => {
-        allDetectedConflicts.push(...detectConflicts({ day, startTime, endTime }, shifts, userId, allUsers, null));
+        allDetectedConflicts.push(...detectConflicts({ day, startTime, endTime }, shifts, userId, rawUsers, null)); // Use rawUsers
       });
     }
 
@@ -485,11 +531,11 @@ export default function ShiftScheduler() {
     proceedWithSaveShift(formData, editingId);
   };
 
-  const handleDeleteSingleShift = (shiftId) => { /* ... (same) ... */
+  const handleDeleteSingleShift = (shiftId) => {
     setShiftIdToDelete(shiftId);
     setIsDeleteSingleModalOpen(true);
   };
-  const confirmDeleteSingleShift = () => { /* ... (same) ... */
+  const confirmDeleteSingleShift = () => {
     if (shiftIdToDelete) {
       setShifts(prevShifts => prevShifts.filter(shift => shift.id !== shiftIdToDelete));
       setSelectedShiftIds(prevSelected => prevSelected.filter(id => id !== shiftIdToDelete));
@@ -497,17 +543,19 @@ export default function ShiftScheduler() {
     }
     setIsDeleteSingleModalOpen(false);
   };
-  const handleDeleteSelectedShifts = useCallback(() => { /* ... (same) ... */
+  const handleDeleteSelectedShifts = useCallback(() => {
     if (!isAnyShiftSelected || selectedShiftIds.length === 0) return;
     setIsDeleteSelectedModalOpen(true);
   }, [selectedShiftIds, isAnyShiftSelected]);
-  const confirmDeleteSelectedShifts = () => { /* ... (same) ... */
+
+  const confirmDeleteSelectedShifts = () => {
     setShifts(prevShifts => prevShifts.filter(shift => !selectedShiftIds.includes(shift.id)));
     setSelectedShiftIds([]);
     setIsDeleteSelectedModalOpen(false);
   };
 
-  const proceedWithDragEnd = (dragResult) => { /* ... (same, ensure duration is handled) ... */
+  const proceedWithDragEnd = (dragResult) => {
+    // ... (implementation as in provided ShiftScheduler.jsx)
     const { source, destination, draggableId } = dragResult;
     const draggedShiftOriginal = shifts.find(shift => shift.id === draggableId);
     if(!draggedShiftOriginal || draggedShiftOriginal.type === 'time_off') return;
@@ -565,7 +613,8 @@ export default function ShiftScheduler() {
       }));
     }
   };
-  const onDragEnd = (result) => { /* ... (same) ... */
+  const onDragEnd = (result) => {
+    // ... (implementation as in provided ShiftScheduler.jsx)
     const { source, destination, draggableId } = result;
     if (!destination || !destination.droppableId || (source.droppableId === destination.droppableId && source.index === destination.index)) {
       return;
@@ -591,7 +640,7 @@ export default function ShiftScheduler() {
 
     if (potentialConflictUserId) {
       const idToExcludeForConflictCheck = (draggedShift.userId === potentialConflictUserId && draggedShift.day === newDestDayString) ? draggedShift.id : null;
-      const detectedConflicts = detectConflicts(shiftDetailsForCheck, shifts, potentialConflictUserId, allUsers, idToExcludeForConflictCheck);
+      const detectedConflicts = detectConflicts(shiftDetailsForCheck, shifts, potentialConflictUserId, rawUsers, idToExcludeForConflictCheck); // Use rawUsers
       if (detectedConflicts.length > 0) {
         setSchedulingConflicts(detectedConflicts);
         setPendingShiftOperation({ action: 'drag', data: result });
@@ -602,12 +651,12 @@ export default function ShiftScheduler() {
     proceedWithDragEnd(result);
   };
 
-  const handleConflictModalClose = () => { /* ... (same) ... */
+  const handleConflictModalClose = () => {
     setIsConflictModalOpen(false);
     setSchedulingConflicts([]);
     setPendingShiftOperation(null);
   };
-  const handleConflictModalConfirm = () => { /* ... (same) ... */
+  const handleConflictModalConfirm = () => {
     if (pendingShiftOperation) {
       if (pendingShiftOperation.action === 'save') {
         proceedWithSaveShift(pendingShiftOperation.data, pendingShiftOperation.editingShiftId);
@@ -617,37 +666,39 @@ export default function ShiftScheduler() {
     }
     handleConflictModalClose();
   };
-  const handleToggleSelectShift = useCallback((shiftId) => { /* ... (same) ... */
+  const handleToggleSelectShift = useCallback((shiftId) => {
     const shiftToToggle = shifts.find(s => s.id === shiftId);
     if (shiftToToggle && shiftToToggle.type === 'time_off') return;
     setSelectedShiftIds(prev =>
       prev.includes(shiftId) ? prev.filter(id => id !== shiftId) : [...prev, shiftId]
     );
   }, [shifts]);
+
   const handleDeselectAll = useCallback(() => { setSelectedShiftIds([]); }, []);
-  const getAllShiftIdsInCurrentView = useCallback(() => { /* ... (same) ... */
+
+  const getAllShiftIdsInCurrentView = useCallback(() => {
     const weekStart = startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON });
-    const weekEnd = addDays(weekStart, 6);
+    const weekEndRange = addDays(weekStart, 6); // Renamed to avoid conflict
     const ids = [];
     shifts.forEach(s => {
-      if (s.type === 'time_off') return; // Do not include time_off shifts in bulk selection
+      if (s.type === 'time_off') return;
       if (isValid(parseISO(s.day))) {
         const d = parseISO(s.day);
-        // Check if shift's user is in the current (possibly filtered) list of allUsers or if it's an unassigned shift
-        if (d >= weekStart && d <= weekEnd && (allUsers.find(u => u.id === s.userId) || s.userId === UNASSIGNED_SHIFT_USER_ID)) {
+        // Check if shift's user is in the current filtered list of allUsers or if it's an unassigned shift
+        if (d >= weekStart && d <= weekEndRange && (allUsers.find(u => u.id === s.userId) || s.userId === UNASSIGNED_SHIFT_USER_ID)) {
           ids.push(s.id);
         }
       }
     });
     return ids;
-  }, [shifts, allUsers, currentDate]);
+  }, [shifts, allUsers, currentDate]); // allUsers is now filtered
 
   const allShiftIdsInView = getAllShiftIdsInCurrentView();
   const selectedShiftsInViewCount = allShiftIdsInView.filter(id => selectedShiftIds.includes(id)).length;
   const isAllSelectedInView = allShiftIdsInView.length > 0 && selectedShiftsInViewCount === allShiftIdsInView.length;
   const isIndeterminateInView = selectedShiftsInViewCount > 0 && selectedShiftsInViewCount < allShiftIdsInView.length;
 
-  const handleToggleSelectAllInView = useCallback(() => { /* ... (same) ... */
+  const handleToggleSelectAllInView = useCallback(() => {
     const idsInView = getAllShiftIdsInCurrentView();
     if (isAllSelectedInView) {
       setSelectedShiftIds(prev => prev.filter(id => !idsInView.includes(id)));
@@ -655,9 +706,10 @@ export default function ShiftScheduler() {
       setSelectedShiftIds(prev => [...new Set([...prev, ...idsInView])]);
     }
   }, [getAllShiftIdsInCurrentView, isAllSelectedInView]);
-  const handleOpenCopyModal = () => { /* ... (same) ... */ if (!isAnyShiftSelected) return; setIsCopyModalOpen(true); };
-  const handleCloseCopyModal = () => { /* ... (same) ... */ setIsCopyModalOpen(false); };
-  const handleConfirmCopyToWeeks = useCallback(async (targetWeekStartDates) => { /* ... (same, ensure duration) ... */
+
+  const handleOpenCopyModal = () => { if (!isAnyShiftSelected) return; setIsCopyModalOpen(true); };
+  const handleCloseCopyModal = () => { setIsCopyModalOpen(false); };
+  const handleConfirmCopyToWeeks = useCallback(async (targetWeekStartDates) => {
     if (!isAnyShiftSelected || targetWeekStartDates.length === 0) return;
     const toCopy = shifts.filter(s => selectedShiftIds.includes(s.id) && s.type !== 'time_off');
     let newCopies = [];
@@ -682,28 +734,123 @@ export default function ShiftScheduler() {
     setSelectedShiftIds([]);
   }, [selectedShiftIds, shifts, isAnyShiftSelected]);
 
-  // --- Layout Calculations ---
+
+  // Filter Drawer Handlers
+  const handleOpenFilterDrawer = () => {
+    // Initialize drawer inputs with current applied filters
+    setNameFilterInput(appliedNameFilter);
+    setDepartmentFilterInput(appliedDepartmentFilter);
+    setJobPositionFilterInput(appliedJobPositionFilter);
+    setFilterDrawerOpen(true);
+  };
+
+  const handleCloseFilterDrawer = () => {
+    setFilterDrawerOpen(false);
+  };
+
+  const handleApplyFilters = () => {
+    setAppliedNameFilter(nameFilterInput);
+    setAppliedDepartmentFilter(departmentFilterInput);
+    setAppliedJobPositionFilter(jobPositionFilterInput);
+    handleCloseFilterDrawer();
+  };
+
+  const handleClearFilters = () => {
+    setNameFilterInput("");
+    setDepartmentFilterInput(null);
+    setJobPositionFilterInput(null);
+    // To see the effect immediately, also clear applied filters and re-apply
+    setAppliedNameFilter("");
+    setAppliedDepartmentFilter(null);
+    setAppliedJobPositionFilter(null);
+    // Optionally close drawer or leave it open for user to click "Apply"
+    // handleCloseFilterDrawer();
+  };
+
   const dynamicStickyOffset = isAnyShiftSelected ? BULK_ACTIONS_BAR_HEIGHT : 0;
-  // ... (other layout constants are the same)
   const PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER = 8 + 8 + 8;
   const FIXED_FOOTER_RESERVED_SPACE = 70;
   const paperContentMaxHeight = `calc(100vh - ${TOP_BAR_HEIGHT}px - ${dynamicStickyOffset}px - ${INFO_BANNERS_TOTAL_HEIGHT}px - ${PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER}px - ${FIXED_FOOTER_RESERVED_SPACE}px)`;
 
-
-  // --- Render ---
   const mainContentLoading = isLoadingUsers || isLoadingShifts;
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
       <DragDropContext onDragEnd={onDragEnd}>
         <Container maxWidth={false} disableGutters sx={{ bgcolor: 'grey.200', minHeight: '100vh' }}>
-          <TopBar currentDate={currentDate} onPrevWeek={handlePrevWeek} onNextWeek={handleNextWeek} onToday={handleToday} />
+          <TopBar
+            currentDate={currentDate}
+            onPrevWeek={handlePrevWeek}
+            onNextWeek={handleNextWeek}
+            onToday={handleToday}
+            onOpenFilterDrawer={handleOpenFilterDrawer} // Pass handler to TopBar
+          />
           <BulkActionsBar selectedCount={selectedShiftIds.length} onDeleteSelected={handleDeleteSelectedShifts} onOpenCopyModal={handleOpenCopyModal} onDeselectAll={handleDeselectAll}/>
+
+          {/* Filter Drawer */}
+          <Drawer anchor="right" open={isFilterDrawerOpen} onClose={handleCloseFilterDrawer}>
+            <Box sx={{ width: 300, p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6">Lọc nhân viên</Typography>
+                <IconButton onClick={handleCloseFilterDrawer} size="small">
+                  <CloseIcon />
+                </IconButton>
+              </Box>
+
+              <TextField
+                label="Tên nhân viên"
+                variant="outlined"
+                size="small"
+                fullWidth
+                value={nameFilterInput}
+                onChange={(e) => setNameFilterInput(e.target.value)}
+                sx={{ mb: 2 }}
+              />
+
+              <Autocomplete
+                options={departmentOptions}
+                getOptionLabel={(option) => option.name}
+                value={departmentFilterInput}
+                onChange={(event, newValue) => {
+                  setDepartmentFilterInput(newValue);
+                }}
+                isOptionEqualToValue={(option, value) => option.code === value.code}
+                renderInput={(params) => (
+                  <TextField {...params} label="Phòng ban" variant="outlined" size="small" fullWidth />
+                )}
+                sx={{ mb: 2 }}
+              />
+
+              <Autocomplete
+                options={jobPositionOptions}
+                getOptionLabel={(option) => option.name}
+                value={jobPositionFilterInput}
+                onChange={(event, newValue) => {
+                  setJobPositionFilterInput(newValue);
+                }}
+                isOptionEqualToValue={(option, value) => option.name === value.name}
+                renderInput={(params) => (
+                  <TextField {...params} label="Chức vụ" variant="outlined" size="small" fullWidth />
+                )}
+                sx={{ mb: 2 }}
+              />
+
+              <Box sx={{ mt: 'auto', display: 'flex', justifyContent: 'space-between', gap: 1 }}>
+                <Button variant="outlined" onClick={handleClearFilters} color="inherit" sx={{textTransform: 'none'}}>
+                  Xóa bộ lọc
+                </Button>
+                <Button variant="contained" onClick={handleApplyFilters} sx={{textTransform: 'none'}}>
+                  Áp dụng
+                </Button>
+              </Box>
+            </Box>
+          </Drawer>
+
           <Box sx={{px: {xs: 0, sm:1, md:2}, py:1}}>
             <InfoBanners currentDate={currentDate} stickyTopOffset={dynamicStickyOffset} />
             <Paper elevation={2} sx={{ mt:1, overflowY: 'auto', maxHeight: paperContentMaxHeight }}>
               <CalendarHeader currentDate={currentDate} onToggleSelectAll={handleToggleSelectAllInView} isAllSelectedInView={isAllSelectedInView} isIndeterminateInView={isIndeterminateInView} />
-              {!mainContentLoading && ( // Only render UnassignedShiftsRow if not loading main content
+              {!mainContentLoading && (
                 <UnassignedShiftsRow
                   currentDate={currentDate}
                   shifts={shifts.filter(s => s.userId === UNASSIGNED_SHIFT_USER_ID)}
@@ -722,12 +869,11 @@ export default function ShiftScheduler() {
                       <CircularProgress />
                       <Typography sx={{ml: 2}}>Đang tải dữ liệu lịch làm việc...</Typography>
                     </Box>
-                  ) : groupedUsersForGrid.length > 0 || shifts.some(s => s.userId === UNASSIGNED_SHIFT_USER_ID) ? ( // Check if there are any users OR unassigned shifts to display
+                  ) : groupedUsersForGrid.length > 0 || shifts.some(s => s.userId === UNASSIGNED_SHIFT_USER_ID) ? (
                     <ShiftsGrid
                       currentDate={currentDate}
-                      // Pass only assigned user shifts to ShiftsGrid, unassigned are handled by UnassignedShiftsRow
                       shifts={shifts.filter(s => s.userId !== UNASSIGNED_SHIFT_USER_ID)}
-                      groupedUsers={groupedUsersForGrid}
+                      groupedUsers={groupedUsersForGrid} // This will now be filtered
                       onAddShift={(userId, day) => handleOpenModal(userId, day)}
                       onDeleteShift={handleDeleteSingleShift}
                       onEditShift={(shift) => {
@@ -738,8 +884,14 @@ export default function ShiftScheduler() {
                       isAnyShiftSelected={isAnyShiftSelected}
                     />
                   ) : (
-                    <Box display="flex" justifyContent="center" alignItems="center" sx={{ height: 100, p:2 }}>
-                      <Typography color="text.secondary">Không có nhân viên hoặc ca làm việc nào để hiển thị cho tuần này.</Typography>
+                    <Box display="flex" justifyContent="center" alignItems="center" sx={{ height: 100, p:2, flexDirection: 'column' }}>
+                      <Typography color="text.secondary">Không có nhân viên nào khớp với bộ lọc.</Typography>
+                      { (appliedNameFilter || appliedDepartmentFilter || appliedJobPositionFilter) &&
+                        <Button variant="text" size="small" onClick={handleClearFilters} sx={{mt:1, textTransform:'none'}}>Xóa bộ lọc?</Button>
+                      }
+                      { !(appliedNameFilter || appliedDepartmentFilter || appliedJobPositionFilter) && rawUsers.length === 0 && !isLoadingUsers &&
+                        <Typography color="text.secondary" sx={{mt:0.5}}>Không có nhân viên nào trong hệ thống.</Typography>
+                      }
                     </Box>
                   )}
                 </Box>
@@ -750,19 +902,18 @@ export default function ShiftScheduler() {
             <AccessTimeFilledIcon color="primary" sx={{mr:1}}/> <Typography variant="caption">Bật đồng hồ chấm công</Typography> <Checkbox size="small" sx={{ml:0.5, p:0.2}}/>
           </Paper>
 
-          {/* Modals */}
-          <ShiftModal /* ... (props same as previous) ... */
+          <ShiftModal
             isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleSaveShift}
-            users={allUsers}
+            users={rawUsers} // Pass rawUsers (unfiltered) to modal for selection
             initialFormState={modalInitialFormState}
             isEditing={!!currentEditingShift && currentEditingShift.type !== 'time_off'}
             isUnassignedContext={modalOpeningContext === 'newUnassigned' || modalOpeningContext === 'editUnassigned'}
             unassignedShiftBeingEdited={currentEditingShift && currentEditingShift.userId === UNASSIGNED_SHIFT_USER_ID ? currentEditingShift : null}
           />
-          <CopyShiftsModal /* ... (props same as previous) ... */
+          <CopyShiftsModal
             isOpen={isCopyModalOpen} onClose={handleCloseCopyModal} onConfirmCopy={handleConfirmCopyToWeeks} currentDate={currentDate} numSelectedShifts={selectedShiftIds.length}
           />
-          <DeleteConfirmationModal /* ... (props same as previous for single delete) ... */
+          <DeleteConfirmationModal
             open={isDeleteSingleModalOpen}
             onClose={() => { setIsDeleteSingleModalOpen(false); setShiftIdToDelete(null); }}
             onSubmit={confirmDeleteSingleShift}
@@ -771,7 +922,7 @@ export default function ShiftScheduler() {
             cancelLabel="Hủy bỏ"
             confirmLabel="Xóa"
           />
-          <DeleteConfirmationModal /* ... (props same as previous for bulk delete) ... */
+          <DeleteConfirmationModal
             open={isDeleteSelectedModalOpen}
             onClose={() => setIsDeleteSelectedModalOpen(false)}
             onSubmit={confirmDeleteSelectedShifts}
@@ -780,7 +931,7 @@ export default function ShiftScheduler() {
             cancelLabel="Hủy bỏ"
             confirmLabel="Xóa tất cả"
           />
-          <SchedulingConflictModal /* ... (props same as previous) ... */
+          <SchedulingConflictModal
             open={isConflictModalOpen}
             onClose={handleConflictModalClose}
             onConfirm={handleConflictModalConfirm}
@@ -791,3 +942,4 @@ export default function ShiftScheduler() {
     </LocalizationProvider>
   );
 }
+
