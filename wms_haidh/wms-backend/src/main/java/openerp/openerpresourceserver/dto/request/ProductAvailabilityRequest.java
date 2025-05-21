@@ -11,14 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductCreateRequest {
+public class ProductAvailabilityRequest {
     private UUID productId;
-    private String code;
-    private String name;
-    private String description;
-    private double height;
-    private double weight;
-    private String uom;
-    private UUID categoryId;
+    private double quantity;
 }
 

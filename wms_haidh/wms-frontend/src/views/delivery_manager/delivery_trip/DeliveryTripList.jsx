@@ -29,8 +29,7 @@ const statusColorMap = {
   DONE: "success",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["deliveryTripId", "deliveryPersonName", "distance", "totalLocations", "status", "description", "actions"];
-const buttonText = "Create New Trip";
+const buttonText = "Create delivery trip";
 export default function DeliveryTrip() {
 
   const [page, setPage] = useState(1);
@@ -48,21 +47,12 @@ export default function DeliveryTrip() {
     }).then();
   }, [page, rowsPerPage, statusFilter]);
 
-  const visibleColumns = useMemo(() => {
-    const updatedColumns = new Set(INITIAL_VISIBLE_COLUMNS);
-    return updatedColumns;
-  }, [statusFilter]);
-
-  const headerColumns = useMemo(() => {
-    if (visibleColumns === "all") return columns;
-
-    return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
-  }, [visibleColumns]);
-
   const renderCell = useCallback((item, columnKey) => {
     const cellValue = item[columnKey];
 
     switch (columnKey) {
+      case "distance":
+        return Math.round(cellValue);
       case "status":
         return (
           <Badge variant={statusColorMap[item.status]}>{cellValue.replace(/_/g, ' ')}</Badge>
@@ -216,7 +206,7 @@ export default function DeliveryTrip() {
       topContent={topContent}
       topContentPlacement="outside"
     >
-      <TableHeader columns={headerColumns}>
+      <TableHeader columns={columns}>
         {(column) => (
           <TableColumn
             key={column.uid}

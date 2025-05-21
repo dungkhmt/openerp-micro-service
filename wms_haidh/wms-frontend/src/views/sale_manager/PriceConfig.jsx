@@ -114,7 +114,7 @@ const PriceConfig = () => {
 
             <Paper sx={{ p: 3, mb: 4 }}>
                 <Typography variant="h6" gutterBottom>
-                    Add New Price
+                    Add new price
                 </Typography>
                 <Grid container spacing={2}>
                     {/* Row 1: Price + Description */}

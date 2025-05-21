@@ -34,8 +34,6 @@ public class DeliveryTripItem {
 
     private int quantity;
 
-    private boolean isDeleted;
-
     private String status;
 
     private LocalDateTime lastUpdatedStamp;

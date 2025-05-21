@@ -17,6 +17,7 @@ const Checkout = () => {
     const [cartItems, setCartItems] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
 
+
     const breadcrumbPaths = [
         { label: "Home", link: "/" },
         { label: "Cart", link: "/customer/cart" },
@@ -24,8 +25,10 @@ const Checkout = () => {
     ];
 
     const totalCost = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const deliveryFee = 20000;
+    const totalWeight = cartItems.reduce((sum, item) => sum + item.weight * item.quantity, 0);
+    const deliveryFee = totalWeight * 5000;
     const totalOrderCost = totalCost + deliveryFee;
+
 
     useEffect(() => {
         request("get", `/customer-addresses`, (res) => {
@@ -84,14 +87,24 @@ const Checkout = () => {
             items
         };
 
-        request("post", "/orders", (res) => {
-            if (res.status === 200) {
+        request(
+            "post",
+            "/orders",
+            (res) => {
                 sessionStorage.removeItem("cart");
                 setOpenDialog(true);
-            } else {
-                toast.error("Error occurred!");
-            }
-        }, {}, payload);
+            },
+            {
+                onError: (e) => {
+                    const msg = e?.response?.data || "Error occured!";
+                    toast.error(msg);
+                },
+            },
+            payload
+        );
+
+
+
     };
 
     return (
@@ -123,6 +136,7 @@ const Checkout = () => {
                                 <TableRow>
                                     <TableCell>Product</TableCell>
                                     <TableCell align="center">Quantity</TableCell>
+                                    <TableCell align="center">Uom</TableCell>
                                     <TableCell align="center">Unit Price</TableCell>
                                     <TableCell align="center">Total</TableCell>
                                 </TableRow>
@@ -135,6 +149,7 @@ const Checkout = () => {
                                             {item.name}
                                         </TableCell>
                                         <TableCell align="center">{item.quantity}</TableCell>
+                                        <TableCell align="center">{item.uom}</TableCell>
                                         <TableCell align="center">{formatPrice(item.price)}</TableCell>
                                         <TableCell align="center">{formatPrice(item.price * item.quantity)}</TableCell>
                                     </TableRow>

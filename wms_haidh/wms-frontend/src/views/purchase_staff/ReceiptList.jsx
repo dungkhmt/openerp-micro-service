@@ -30,7 +30,7 @@ const statusColorMap = {
 
 
 const INITIAL_VISIBLE_COLUMNS = ["receiptName", "warehouseName", "expectedReceiptDate", "status", "createdBy", "approvedBy", "cancelledBy", "actions"];
-const buttonText = "Create Receipt";
+const buttonText = "Create purchase order";
 export default function ReceiptList() {
 
   const [page, setPage] = useState(1);

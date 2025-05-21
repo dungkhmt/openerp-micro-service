@@ -10,6 +10,7 @@ import { TextField } from "@mui/material";
 import Divider from "@mui/material/Divider";
 import Button from "@mui/material/Button";
 import { formatPrice } from "../../utils/utils";
+import { request } from "../../api";
 
 const ProductPreview = ({ item }) => {
     const [quantity, setQuantity] = useState(1);
@@ -21,20 +22,43 @@ const ProductPreview = ({ item }) => {
     const handleDecrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
 
     const handleAddToCart = () => {
-        if (quantity > item.quantity) {
-            toast.error("Order quantity exceeds available quantity!");
-            return;
-        }
         const cartItems = JSON.parse(sessionStorage.getItem("cart")) || [];
         const existingItemIndex = cartItems.findIndex(cartItem => cartItem.productId === item.productId);
-        if (existingItemIndex !== -1) {
-            cartItems[existingItemIndex].quantity += quantity;
-        } else {
-            cartItems.push({ ...item, quantity });
-        }
-        sessionStorage.setItem("cart", JSON.stringify(cartItems));
-        toast.success("Product added to cart");
+        const existingQuantity = existingItemIndex !== -1 ? cartItems[existingItemIndex].quantity : 0;
+
+        const totalQuantity = existingQuantity + quantity;
+
+        request(
+            "post",
+            "/product-warehouses/check-inventory",
+            (res) => {
+                if (!res.data) {
+                    toast.error("Not enough stock for this product!");
+                    return;
+                }
+
+                // Nếu còn hàng, tiếp tục thêm vào cart
+                if (existingItemIndex !== -1) {
+                    cartItems[existingItemIndex].quantity = totalQuantity;
+                } else {
+                    cartItems.push({
+                        ...item,
+                        quantity,
+                    });
+                }
+
+                sessionStorage.setItem("cart", JSON.stringify(cartItems));
+                toast.success("Product added to cart");
+            }, {},
+            {
+                productId: item.productId,
+                quantity: totalQuantity,
+            }
+        );
     };
+
+
+
 
     const handleQuantityChange = (e) => {
         let value = e.target.value.replace(/\D/g, ""); // Chỉ giữ số

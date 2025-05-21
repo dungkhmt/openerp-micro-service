@@ -7,6 +7,8 @@ import { toast, Toaster } from "react-hot-toast";
 import BreadcrumbsCustom from "../../components/BreadcrumbsCustom";
 import { useNavigate } from "react-router-dom";
 import { formatPrice } from "../../utils/utils";
+import { request } from "../../api";
+
 const QuantityControl = ({ quantity, onIncrease, onDecrease, onChange, onBlur }) => (
     <div className="flex items-center space-x-2">
         <IconButton
@@ -68,12 +70,32 @@ const Cart = () => {
     }, []);
 
     const handleQuantityChange = (id, value) => {
-        const updatedCart = cartItems.map((item) =>
-            item.productId === id ? { ...item, quantity: Math.max(1, Math.min(999, value)) } : item
+        const newQuantity = Math.max(1, Math.min(999, value));
+
+        request(
+            "post",
+            `/product-warehouses/check-inventory`,
+            (res) => {
+                if (!res.data) {
+                    toast.error("Not enough stock for this product!");
+                    return;
+                }
+
+                setCartItems((prevCart) => {
+                    const updatedCart = prevCart.map((item) =>
+                        item.productId === id ? { ...item, quantity: newQuantity } : item
+                    );
+                    sessionStorage.setItem("cart", JSON.stringify(updatedCart));
+                    return updatedCart;
+                });
+            }, {},
+            {
+                productId: id,
+                quantity: newQuantity,
+            }
         );
-        setCartItems(updatedCart);
-        sessionStorage.setItem("cart", JSON.stringify(updatedCart));
     };
+
 
     const handleRemoveItem = (id) => {
         const updatedCart = cartItems.filter((item) => item.productId !== id);

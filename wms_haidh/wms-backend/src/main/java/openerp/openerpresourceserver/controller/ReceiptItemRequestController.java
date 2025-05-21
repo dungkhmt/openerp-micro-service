@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.projection.BayProjection;
+import openerp.openerpresourceserver.projection.ReceiptItemRequestDetailProjection;
 import openerp.openerpresourceserver.projection.ReceiptItemRequestProjection;
 import openerp.openerpresourceserver.service.ReceiptItemRequestService;
 
@@ -41,7 +42,7 @@ public class ReceiptItemRequestController {
 
 	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping("/{id}/general-info")
-	public ResponseEntity<ReceiptItemRequestProjection> getReceiptItemRequestDetail(@PathVariable UUID id) {
+	public ResponseEntity<ReceiptItemRequestDetailProjection> getReceiptItemRequestDetail(@PathVariable UUID id) {
 		return receiptItemRequestService.getReceiptItemRequestDetail(id).map(ResponseEntity::ok)
 				.orElse(ResponseEntity.notFound().build());
 	}

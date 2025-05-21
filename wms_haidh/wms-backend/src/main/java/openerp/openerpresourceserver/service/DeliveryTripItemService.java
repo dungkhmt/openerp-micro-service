@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,12 +43,6 @@ public class DeliveryTripItemService {
 	}
 
 	@Transactional
-	public int markItemsAsDeleted(String deliveryTripId) {
-		LocalDateTime now = LocalDateTime.now();
-		return deliveryTripItemRepository.markItemsAsDeleted(deliveryTripId, now);
-	}
-
-	@Transactional
 	public void saveAllItems(List<DeliveryTripItem> items) {
 		deliveryTripItemRepository.saveAll(items);
 	}
@@ -64,7 +57,7 @@ public class DeliveryTripItemService {
 	}
 
 	public long countDeliveredItems(UUID orderId) {
-		return deliveryTripItemRepository.countDeliveredItems(orderId);
+		return deliveryTripItemRepository.countDeliveredItemsByOrderId(orderId);
 	}
 
 	public List<UUID> findOrderIdsByDeliveryTripId(String deliveryTripId) {

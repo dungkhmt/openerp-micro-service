@@ -37,6 +37,8 @@ const AddReceipt = () => {
   const [productSuggestions, setProductSuggestions] = useState([]);
   const [productNames, setProductNames] = useState({});
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(null);
+  const [productUOMs, setProductUOMs] = useState({});
+
 
   useEffect(() => {
     request("get", "/warehouses", (res) => {
@@ -72,9 +74,11 @@ const AddReceipt = () => {
     setRequestDetails(updatedDetails);
 
     setProductNames((prev) => ({ ...prev, [index]: product.name }));
+    setProductUOMs((prev) => ({ ...prev, [index]: product.uom })); 
     setProductSuggestions([]);
     setActiveSuggestionIndex(null);
   };
+
 
   const handleAddRequestDetail = () => {
     setRequestDetails([...requestDetails, { productId: '', quantity: '' }]);
@@ -144,7 +148,7 @@ const AddReceipt = () => {
         </IconButton>
 
         <Typography variant="h6" sx={{ ml: 1 }}>
-          Add New Receipt
+          New Purchase Order
         </Typography>
         <Button
           variant="contained"
@@ -170,7 +174,7 @@ const AddReceipt = () => {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Paper elevation={3} sx={{ p: 3 }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>General Information</Typography>
+            <Typography variant="h6" sx={{ mb: 2 }}>General information</Typography>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
@@ -248,7 +252,7 @@ const AddReceipt = () => {
               {requestDetails.map((detail, index) => (
                 <ListItem key={index} disablePadding sx={{ mb: 2 }}>
                   <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={8}>
+                    <Grid item xs={6}>
                       <TextField
                         fullWidth
                         label="Product Name"
@@ -261,20 +265,15 @@ const AddReceipt = () => {
                             <ListItemButton
                               key={i}
                               onClick={() => handleProductSelect(index, suggestion)}
-                              sx={{
-                                '&:hover': {
-                                  backgroundColor: 'grey.100'
-                                }
-                              }}
+                              sx={{ '&:hover': { backgroundColor: 'grey.100' } }}
                             >
                               <ListItemText primary={suggestion.name} />
                             </ListItemButton>
                           ))}
                         </List>
-
                       )}
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={2}>
                       <TextField
                         fullWidth
                         label="Quantity"
@@ -283,21 +282,27 @@ const AddReceipt = () => {
                         onChange={(e) => handleRequestDetailChange(index, 'quantity', e.target.value)}
                       />
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={2}>
+                      <TextField
+                        fullWidth
+                        label="UOM"
+                        value={productUOMs[index] || ''}
+                        InputProps={{ readOnly: true }}
+                      />
+                    </Grid>
+                    <Grid item xs={2}>
                       <IconButton
                         onClick={() => handleDeleteRequestDetail(index)}
                         sx={{
                           color: 'grey.600',
-                          '&:hover': {
-                            color: 'error.main',
-                          }
+                          '&:hover': { color: 'error.main' },
                         }}
                       >
                         <DeleteIcon />
                       </IconButton>
-
                     </Grid>
                   </Grid>
+
                 </ListItem>
               ))}
             </List>

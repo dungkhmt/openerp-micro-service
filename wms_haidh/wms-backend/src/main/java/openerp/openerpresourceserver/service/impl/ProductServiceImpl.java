@@ -37,7 +37,7 @@ public class ProductServiceImpl implements ProductService {
 	public Page<ProductGeneralProjection> getAllProductGeneral(String searchTerm, Pageable pageable) {
 		return productRepository.findProductGeneral(searchTerm, pageable);
 	}
-	
+
 	@Override
 	public Page<ProductInventoryProjection> getAllProductInventory(String searchTerm, Pageable pageable) {
 		return productRepository.findProductInventory(searchTerm, pageable);
@@ -63,6 +63,15 @@ public class ProductServiceImpl implements ProductService {
 		return product;
 	}
 
+	@Override
+	public String getProductNameById(UUID productId) {
+		Product product = productRepository.findById(productId).orElse(null);
+		if (product != null) {
+			return product.getName();
+		}
+		return null;
+	}
+
 	public boolean createProduct(ProductCreateRequest productDto, MultipartFile imageFile) {
 		try {
 			Optional<Product> existingProduct = productRepository.findByCode(productDto.getCode());
@@ -76,7 +85,6 @@ public class ProductServiceImpl implements ProductService {
 			newProduct.setCode(productDto.getCode());
 			newProduct.setWeight(productDto.getWeight());
 			newProduct.setHeight(productDto.getHeight());
-			newProduct.setArea(productDto.getArea());
 			newProduct.setDescription(productDto.getDescription());
 			newProduct.setUom(productDto.getUom());
 
@@ -111,7 +119,6 @@ public class ProductServiceImpl implements ProductService {
 			existingProduct.setCode(productDto.getCode());
 			existingProduct.setWeight(productDto.getWeight());
 			existingProduct.setHeight(productDto.getHeight());
-			existingProduct.setArea(productDto.getArea());
 			existingProduct.setDescription(productDto.getDescription());
 			existingProduct.setUom(productDto.getUom());
 
@@ -142,28 +149,26 @@ public class ProductServiceImpl implements ProductService {
 	public List<ProductNameProjection> searchProductNames(String searchTerm) {
 		return productRepository.findProductNamesByName(searchTerm);
 	}
-	
+
 	@Override
 	public Page<ProductProjection> getProducts(Pageable pageable, String searchTerm, UUID categoryId) {
-        String baseUrl = "http://localhost:8082";
-        if (categoryId != null) {
-            return productRepository.findAllProductsByCategory(pageable, baseUrl, searchTerm, categoryId);
-        } else {
-            return productRepository.findAllProductsWithoutCategory(pageable, baseUrl, searchTerm);
-        }
-    }
-	
+		String baseUrl = "http://localhost:8082";
+		if (categoryId != null) {
+			return productRepository.findAllProductsByCategory(pageable, baseUrl, searchTerm, categoryId);
+		} else {
+			return productRepository.findAllProductsWithoutCategory(pageable, baseUrl, searchTerm);
+		}
+	}
+
 	@Override
 	public ProductDetailProjection getProductDetail(UUID productId) {
 		String baseUrl = "http://localhost:8082";
-        return productRepository.findProductDetailById(productId, baseUrl);
-    }
-	
+		return productRepository.findProductDetailById(productId, baseUrl);
+	}
+
 	@Override
 	public Page<ProductPriceProjection> getProductsWithPrice(Pageable pageable, String search) {
-        return productRepository.findAllWithPrice(pageable, search);
-    }
-
-	
+		return productRepository.findAllWithPrice(pageable, search);
+	}
 
 }

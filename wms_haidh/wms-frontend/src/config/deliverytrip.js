@@ -1,6 +1,7 @@
 const columns = [
-    { name: "DELIVERY TRIP ID", uid: "deliveryTripId" },
+    { name: "DELIVERY TRIP ID", uid: "deliveryTripId" }, 
     { name: "DELIVERY PERSON", uid: "deliveryPersonName" },
+    { name: "DEPARTURE WAREHOUSE", uid: "warehouseName" },
     { name: "DISTANCE (M)", uid: "distance" },
     { name: "TOTAL LOCATIONS", uid: "totalLocations" },
     { name: "STATUS", uid: "status" },

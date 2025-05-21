@@ -67,7 +67,7 @@ const ReceiptDetail = () => {
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>
-          Receipt Details
+          Purchase Order Details
         </Typography>
       </Box>
 
@@ -77,10 +77,10 @@ const ReceiptDetail = () => {
             <Typography variant="h6" gutterBottom>
               General
             </Typography>
-            <Typography><b>Receipt Name:</b> {generalInfo && generalInfo.receiptName}</Typography>
+            <Typography><b>Receipt name:</b> {generalInfo && generalInfo.receiptName}</Typography>
             <Typography><b>Warehouse:</b> {generalInfo && generalInfo.warehouseName}</Typography>
             <Typography><b>Supplier:</b> {generalInfo && generalInfo.supplierName}</Typography>
-            <Typography><b>Expected Receipt Date:</b> {generalInfo && formatDate(generalInfo.expectedReceiptDate)}</Typography>
+            <Typography><b>Expected receipt date:</b> {generalInfo && formatDate(generalInfo.expectedReceiptDate)}</Typography>
 
           </Paper>
         </Grid>
@@ -90,8 +90,8 @@ const ReceiptDetail = () => {
               Details
             </Typography>
             <Typography><b>Status:</b> {generalInfo && generalInfo.status}</Typography>
-            <Typography><b>Created By:</b>  {generalInfo && generalInfo.createdBy}</Typography>
-            <Typography><b>Created Time:</b> {generalInfo && formatDate(generalInfo.createdStamp)}</Typography>
+            <Typography><b>Created by:</b>  {generalInfo && generalInfo.createdBy}</Typography>
+            <Typography><b>Created time:</b> {generalInfo && formatDate(generalInfo.createdStamp)}</Typography>
             <Typography><b>Description:</b> {generalInfo && generalInfo.description}</Typography>
           </Paper>
         </Grid>
@@ -100,7 +100,7 @@ const ReceiptDetail = () => {
       <Box sx={{ mt: 4 }}>
         <Paper elevation={3} sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
-            Receipt Items
+            Purchase order items
           </Typography>
           <TableContainer>
             <Table>
@@ -108,6 +108,7 @@ const ReceiptDetail = () => {
                 <TableRow>
                   <TableCell sx={{ fontWeight: 'bold' }}>Product Name</TableCell>
                   <TableCell align="center" sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>Unit</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -115,6 +116,7 @@ const ReceiptDetail = () => {
                   <TableRow key={index}>
                     <TableCell>{item.productName}</TableCell>
                     <TableCell sx={{ textAlign: 'center' }}>{item.quantity}</TableCell>
+                    <TableCell sx={{ textAlign: 'center' }}>{item.uom}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

@@ -48,6 +48,8 @@ export default function DeliveryTrip() {
     const cellValue = item[columnKey];
 
     switch (columnKey) {
+      case "distance":
+        return Math.round(cellValue);
       case "status":
         return (
           <Badge variant={statusColorMap[item.status]}>{cellValue.replace(/_/g, ' ')}</Badge>

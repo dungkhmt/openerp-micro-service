@@ -16,78 +16,54 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
+  TextField
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { CircularProgress } from "@nextui-org/react";
 import { useNavigate, useParams } from 'react-router-dom';
 import { request } from "../../../api";
-import { formatPrice } from '../../../utils/utils';
+import { formatDate, formatPrice } from '../../../utils/utils';
 import { toast, Toaster } from "react-hot-toast";
 import SaveIcon from '@mui/icons-material/Save';
 
-const OrderItem = () => {
+const ReceiptItem = () => {
   const navigate = useNavigate();
   const { id1, id2 } = useParams();
   const [generalInfo, setGeneralInfo] = useState(null);
-  const [warehouseOptions, setWarehouseOptions] = useState([]);
   const [bayOptions, setBayOptions] = useState([]);
-  const [lotIds, setLotIds] = useState([]);
   const [quantity, setQuantity] = useState('');
-  const [warehouseId, setWarehouseId] = useState('');
-  const [bayId, setBayId] = useState('');
+  const [bayCode, setBayCode] = useState('');
+  const [importPrice, setImportPrice] = useState('');
+  const [expiredDate, setExpiredDate] = useState('');
   const [lotId, setLotId] = useState('');
-  const [quantityOnHand, setQuantityOnHand] = useState('');
   const [details, setDetails] = useState([]);
   const remainingQuantity = generalInfo ? Math.round(generalInfo.quantity * (1 - generalInfo.completed / 100)) : 0;
 
+
   useEffect(() => {
-    request("get", `/order-items/${id2}`, (res) => {
+    request("get", `/receipt-item-requests/${id2}/general-info`, (res) => {
       setGeneralInfo(res.data);
     });
 
-    request("get", `/inventory/available-warehouses?saleOrderItemId=${id2}`, (res) => {
-      setWarehouseOptions(res.data);
+    request("get", `/receipt-item-requests/${id2}/bays`, (res) => {
+      setBayOptions(res.data);
     });
 
-    request("get", `/assigned-order-items?saleOrderItemId=${id2}`, (res) => {
+    request("get", `/receipt-items?requestId=${id2}`, (res) => {
       setDetails(res.data);
     });
 
   }, [id2]);
 
-  useEffect(() => {
-    if (warehouseId) {
-      request("get", `/inventory/available-bays?saleOrderItemId=${id2}&warehouseId=${warehouseId}`, (res) => {
-        setBayOptions(res.data);
-      }).then();
-    }
-  }, [warehouseId]);
-
-  useEffect(() => {
-    if (bayId) {
-      request("get", `/inventory/available-lots?saleOrderItemId=${id2}&bayId=${bayId}`, (res) => {
-        setLotIds(res.data);
-      }).then();
-    }
-  }, [bayId]);
-
-  useEffect(() => {
-    if (lotId) {
-      request("get", `/inventory/quantity-on-hand?saleOrderItemId=${id2}&bayId=${bayId}&lotId=${lotId}`, (res) => {
-        setQuantityOnHand(res.data);
-      }).then();
-    }
-  }, [lotId]);
-
   const handleSubmit = () => {
-    // Kiểm tra các trường bắt buộc
-    if (!warehouseId) {
-      toast.error("Warehouse is required!");
+    // Kiểm tra số lượng
+    if (!quantity || quantity > remainingQuantity || quantity <= 0) {
+      toast.error("Invalid quantity!");
       return;
     }
 
-    if (!bayId) {
+    // Kiểm tra các trường bắt buộc
+    if (!bayCode) {
       toast.error("Bay code is required!");
       return;
     }
@@ -95,49 +71,46 @@ const OrderItem = () => {
       toast.error("Lot ID is required!");
       return;
     }
-
-    if (!quantity || quantity > remainingQuantity || quantity <= 0) {
-      toast.error("Invalid quantity!");
+    if (!importPrice || importPrice <= 0) {
+      toast.error("Invalid import price!");
       return;
     }
 
-    if (quantity > quantityOnHand) {
-      toast.error("Quantity exceeds available quantity !");
-      return;
-    }
-
+    // Tạo payload và gửi
     const payload = {
-      warehouseId,
-      bayId,
-      lotId,
       quantity,
-      saleOrderItemId: id2
+      bayId: bayCode,
+      lotId,
+      importPrice,
+      expiredDate,
+      receiptItemRequestId: id2
     };
-    // console.log(payload);
-    request("post", `/assigned-order-items`, (res) => {
+
+    request("post", `/receipt-items`, (res) => {
       if (res.status === 200) {
-        request("get", `/order-items/${id2}`, (res) => {
+        request("get", `/receipt-item-requests/${id2}/general-info`, (res) => {
           setGeneralInfo(res.data);
         });
-        request("get", `/assigned-order-items?saleOrderItemId=${id2}`, (res) => {
+        request("get", `/receipt-items?requestId=${id2}`, (res) => {
           setDetails(res.data);
         });
-        alert("Assign successfully!")
+        alert("Create new purchase order successfully!");
       } else {
-        alert("Error occcured while assigning order item!");
+        alert("Error occurred while creating receipt item!");
       }
     }, {}, payload);
   };
+
 
   return (
     <Box sx={{ p: 3 }}>
       <Toaster />
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <IconButton color="primary" onClick={() => navigate(`/admin/orders/${id1}`)} sx={{ color: 'grey.700', mr: 1 }}>
+        <IconButton color="primary" onClick={() => navigate(`/admin/receipts/${id1}`)} sx={{ color: 'grey.700', mr: 1 }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>
-          Pick Assignment
+          Putaway
         </Typography>
       </Box>
 
@@ -201,7 +174,7 @@ const OrderItem = () => {
                 marginBottom: 2, // Khoảng cách bên dưới
               }}
             >
-              Order item
+              Purchase order item
             </Typography>
             <Typography>
               <b>Product:</b>
@@ -209,22 +182,24 @@ const OrderItem = () => {
               {generalInfo?.productName}
             </Typography>
             <Typography>
-              <b>Quantity:</b>
+              <b>Warehouse:</b>
               <br />
+              {generalInfo?.warehouseName}
+            </Typography>
+            <Typography>
+              <b>Quantity: </b>
               {generalInfo?.quantity}
             </Typography>
             {remainingQuantity > 0 && (
               <Typography>
-                <b>Qty remaining:</b>
-                <br />
+                <b>Qty remaining: </b>
                 {remainingQuantity}
               </Typography>
             )
             }
             <Typography>
-              <b>Price Unit:</b>
-              <br />
-              {generalInfo && formatPrice(generalInfo.priceUnit)}
+              <b>Unit of measure: </b>
+              {generalInfo?.uom}
             </Typography>
           </Paper>
         </Grid>
@@ -236,37 +211,16 @@ const OrderItem = () => {
         <Box sx={{ mt: 4 }}>
           <Paper elevation={3} sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
-              Assign order
+              New receipt item
             </Typography>
-            <div className='mb-4'>
-              <Typography variant="h7" gutterBottom className="text-green-500">
-                Quantity on hand : {quantityOnHand}
-              </Typography>
-            </div>
-
             <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Warehouse</InputLabel>
-                  <Select
-                    value={warehouseId}
-                    onChange={(e) => setWarehouseId(e.target.value)}
-                    label="Warehouse"
-                  >
-                    {warehouseOptions.map((wh) => (
-                      <MenuItem key={wh.warehouseId} value={wh.warehouseId}>
-                        {wh.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
+
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
                   <InputLabel>Bay Code</InputLabel>
                   <Select
-                    value={bayId}
-                    onChange={(e) => setBayId(e.target.value)}
+                    value={bayCode}
+                    onChange={(e) => setBayCode(e.target.value)}
                     label="Bay Code"
                   >
                     {bayOptions.map((bay) => (
@@ -278,30 +232,43 @@ const OrderItem = () => {
                 </FormControl>
               </Grid>
               <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Lot ID</InputLabel>
-                  <Select
-                    value={lotId}
-                    onChange={(e) => setLotId(e.target.value)}
-                    label="Lot ID"
-                  >
-                    {lotIds.map((lot) => (
-                      <MenuItem key={lot.lotId} value={lot.lotId}>
-                        {lot.lotId}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                <TextField
+                  fullWidth
+                  label="Lot ID"
+                  value={lotId}
+                  onChange={(e) => setLotId(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Import Price"
+                  type="number"
+                  value={importPrice}
+                  onChange={(e) => setImportPrice(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Expired Date (Optional)"
+                  type="date"
+                  InputLabelProps={{ shrink: true }}
+                  value={expiredDate}
+                  onChange={(e) => setExpiredDate(e.target.value)}
+                />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   label="Quantity"
                   type="number"
+                  inputProps={{ min: 1, max: generalInfo.quantity }}
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
                 />
               </Grid>
+
             </Grid>
             <Box sx={{ mt: 3, textAlign: 'right' }}>
               <Button variant="contained" color="primary" startIcon={<SaveIcon />} sx={{
@@ -325,28 +292,27 @@ const OrderItem = () => {
       <Box sx={{ mt: 4 }}>
         <Paper elevation={3} sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
-            Detail Information
+            Receipt items
           </Typography>
           <TableContainer>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Warehouse</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Bay Code</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Lot ID</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Import Price</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Expired Date</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {details.map((detail, index) => (
                   <TableRow key={index}>
-                    <TableCell>{detail.warehouseName}</TableCell>
                     <TableCell>{detail.bayCode}</TableCell>
                     <TableCell>{detail.lotId}</TableCell>
+                    <TableCell>{formatPrice(detail.importPrice)}</TableCell>
+                    <TableCell>{detail.expiredDate ? formatDate(detail.expiredDate) : "No expiry date"}</TableCell>
                     <TableCell>{detail.quantity}</TableCell>
-                    <TableCell>{detail.status}</TableCell>
-
                   </TableRow>
                 ))}
               </TableBody>
@@ -358,4 +324,4 @@ const OrderItem = () => {
   );
 };
 
-export default OrderItem;
+export default ReceiptItem;

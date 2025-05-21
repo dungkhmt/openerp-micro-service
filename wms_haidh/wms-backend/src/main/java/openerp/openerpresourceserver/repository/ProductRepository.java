@@ -37,7 +37,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 					+ "WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
 	Page<ProductGeneralProjection> findProductGeneral(String searchTerm, Pageable pageable);
 
-	@Query("SELECT p.productId AS productId, p.name AS name FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+	@Query("SELECT p.productId AS productId, p.name AS name, p.uom AS uom FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
 	List<ProductNameProjection> findProductNamesByName(@Param("searchTerm") String searchTerm);
 
 	Optional<Product> findByCode(String code);
@@ -48,7 +48,9 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 			    p.name AS name,
 			    CONCAT(:baseUrl, '/api/images/', p.imageId) AS imageUrl,
 			    pr.price AS price,
-			    SUM(w.quantityOnHand) AS quantity
+			    SUM(w.quantityOnHand) AS quantity,
+			    p.uom AS uom,
+			    p.weight AS weight
 			FROM Product p
 			JOIN ProductPrice pr ON p.productId = pr.productId
 			    AND pr.startDate <= CURRENT_DATE
@@ -67,7 +69,9 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 			    p.name AS name,
 			    CONCAT(:baseUrl, '/api/images/', p.imageId) AS imageUrl,
 			    pr.price AS price,
-			    SUM(w.quantityOnHand) AS quantity
+			    SUM(w.quantityOnHand) AS quantity,
+			    p.uom AS uom,
+			    p.weight AS weight
 			FROM Product p
 			JOIN ProductPrice pr ON p.productId = pr.productId
 			    AND pr.startDate <= CURRENT_DATE
@@ -80,13 +84,13 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 			@Param("searchTerm") String searchTerm);
 
 	@Query("SELECT p.productId AS productId, p.code AS code, p.name AS name, p.description AS description, "
-			+ "p.height AS height, p.weight AS weight, p.area AS area, p.uom AS uom, "
+			+ "p.height AS height, p.weight AS weight, p.uom AS uom, "
 			+ "CONCAT(:baseUrl, '/api/images/', p.imageId) AS imageUrl, "
 			+ "(SELECT pr.price FROM ProductPrice pr WHERE pr.productId = p.productId "
 			+ "AND pr.startDate <= CURRENT_DATE AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_DATE)) AS price, "
 			+ "SUM(w.quantityOnHand) AS quantity " + "FROM Product p "
 			+ "JOIN ProductWarehouse w ON p.productId = w.productId " + "WHERE p.productId = :productId "
-			+ "GROUP BY p.productId, p.code, p.name, p.description, p.height, p.weight, p.area, p.uom, p.imageId")
+			+ "GROUP BY p.productId, p.code, p.name, p.description, p.height, p.weight, p.uom, p.imageId")
 	ProductDetailProjection findProductDetailById(@Param("productId") UUID productId, @Param("baseUrl") String baseUrl);
 
 	@Query("""

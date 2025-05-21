@@ -29,7 +29,7 @@ const statusColorMap = {
   AVAILABLE: "success",
 };
 
-const buttonText = "Add New Staff";
+const buttonText = "Add new staff";
 export default function DeliveryPerson() {
 
   const [page, setPage] = useState(1);

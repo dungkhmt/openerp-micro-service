@@ -23,7 +23,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../../api";
 import { formatDate } from '../../../utils/utils';
 
-const buttonText = "Add Product";
+const buttonText = "Add product";
 export default function ProductList() {
 
   const [page, setPage] = useState(1);

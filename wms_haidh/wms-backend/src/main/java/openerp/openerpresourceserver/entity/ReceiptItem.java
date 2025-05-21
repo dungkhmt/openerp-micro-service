@@ -32,7 +32,7 @@ public class ReceiptItem {
     private int quantity;
     private UUID bayId;
     private String lotId;
-    private double importPrice;
+    private double importPrice; // in VND
     
     private LocalDateTime expiredDate;
 

@@ -33,11 +33,9 @@ public class InventoryItem {
     private int quantityOnHandTotal;
     private double importPrice;
     private String currencyUomId; 
-    private LocalDateTime datetimeReceived;
     private LocalDateTime expireDate;
     private LocalDateTime lastUpdatedStamp;
     private LocalDateTime createdStamp;
     private String description; 
-    private boolean isInitQuantity; 
 }
 

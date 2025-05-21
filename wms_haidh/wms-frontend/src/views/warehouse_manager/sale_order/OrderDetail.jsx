@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
+  Grid,
   Typography,
   Paper,
   IconButton,
@@ -16,14 +17,24 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useNavigate, useParams } from 'react-router-dom';
 import { request } from "../../../api";
+import { formatDate, formatPrice } from '../../../utils/utils';
 
-const ReceiptDetail = () => {
+const OrderDetail = () => {
   const navigate = useNavigate();
   const { id1 } = useParams();
+  const [generalInfo, setGeneralInfo] = useState(null);
+  const [customerInfo, setCustomerInfo] = useState(null);
   const [details, setDetails] = useState([]);
 
   useEffect(() => {
-    request("get", `/receipt-item-requests?receiptId=${id1}`, (res) => {
+    request('get', `/orders/${id1}`, (res) => {
+      setGeneralInfo(res.data);
+    });
+
+    request('get', `/orders/${id1}/customer-address`, (res) => {
+      setCustomerInfo(res.data);
+    });
+    request("get", `/order-items?orderId=${id1}`, (res) => {
       setDetails(res.data);
     });
   }, [id1]);
@@ -32,13 +43,34 @@ const ReceiptDetail = () => {
     <Box sx={{ p: 3 }}>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <IconButton color="primary" onClick={() => navigate('/admin/receipts')} sx={{ color: 'grey.700', mr: 1 }}>
+        <IconButton color="primary" onClick={() => navigate('/admin/orders')} sx={{ color: 'grey.700', mr: 1 }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>
-          Purchase order items
+          Sale Order Detail
         </Typography>
       </Box>
+
+      <Paper elevation={3} sx={{ p: 3 }}>
+        <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+          General information
+        </Typography>
+        {generalInfo && customerInfo &&  (
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <Typography><strong>Order date:</strong> {formatDate(generalInfo.orderDate)}</Typography>
+              <Typography><strong>Order type:</strong> {generalInfo.orderType}</Typography>
+              <Typography><strong>Status:</strong> {generalInfo.status}</Typography>
+              <Typography><strong>Description:</strong> {generalInfo.description}</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography><strong>Customer name:</strong> {generalInfo.customerName}</Typography>
+              <Typography><strong>Address:</strong> {customerInfo.addressName}</Typography>
+            </Grid>
+          </Grid>
+        )}
+
+      </Paper>
 
       {/* Table */}
       <Box sx={{ mt: 4 }}>
@@ -49,7 +81,7 @@ const ReceiptDetail = () => {
                 <TableRow>
                   <TableCell sx={{ fontWeight: 'bold' }}>Product Name</TableCell>
                   <TableCell align="center" sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>Warehouse</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>Unit</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Completed</TableCell>
                   <TableCell align="center" sx={{ fontWeight: 'bold' }}>Action</TableCell>
                 </TableRow>
@@ -59,17 +91,17 @@ const ReceiptDetail = () => {
                   <TableRow key={index}>
                     <TableCell>{detail.productName}</TableCell>
                     <TableCell sx={{ textAlign: 'center' }}>{detail.quantity}</TableCell>
-                    <TableCell sx={{ textAlign: 'center' }}>{detail.warehouseName}</TableCell>
+                    <TableCell sx={{ textAlign: 'center' }}>{detail.uom}</TableCell>
 
                     {/* Progress Bar */}
                     <TableCell sx={{ textAlign: 'center' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', width: '150px' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', width: '150px' }}> {/* Tăng chiều dài lên 150px */}
                         <LinearProgress
                           variant="determinate"
                           value={detail.completed}
                           sx={{
-                            width: '100px',  
-                            height: 6,      
+                            width: '100px',
+                            height: 6,
                             borderRadius: 5,
                             backgroundColor: '#E0E0E0', // Màu xám cho phần chưa hoàn thành
                             '& .MuiLinearProgress-bar': {
@@ -81,15 +113,17 @@ const ReceiptDetail = () => {
                       </Box>
                     </TableCell>
 
+
                     {/* Action Icon */}
                     <TableCell sx={{ textAlign: 'center' }}>
                       <IconButton
                         color="primary"
-                        onClick={() => navigate(`/admin/receipts/${id1}/${detail.receiptItemRequestId}`)}
+                        onClick={() => navigate(`/admin/orders/${id1}/${detail.saleOrderItemId}`)}
                       >
                         <VisibilityIcon />
                       </IconButton>
                     </TableCell>
+
                   </TableRow>
                 ))}
               </TableBody>
@@ -101,4 +135,4 @@ const ReceiptDetail = () => {
   );
 };
 
-export default ReceiptDetail;
+export default OrderDetail;

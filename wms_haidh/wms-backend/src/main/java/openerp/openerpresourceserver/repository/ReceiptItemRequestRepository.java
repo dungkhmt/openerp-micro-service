@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import openerp.openerpresourceserver.entity.ReceiptItemRequest;
+import openerp.openerpresourceserver.projection.ReceiptItemRequestDetailProjection;
 import openerp.openerpresourceserver.projection.ReceiptItemRequestProjection;
 
 @Repository
@@ -21,10 +22,9 @@ public interface ReceiptItemRequestRepository extends JpaRepository<ReceiptItemR
 			 SELECT r.receiptItemRequestId AS receiptItemRequestId,
 			        r.quantity AS quantity,
 			        r.completed AS completed,
-			        w.name AS warehouseName,
-			        p.name AS productName
+			        p.name AS productName,
+			        p.uom AS uom
 			 FROM ReceiptItemRequest r
-			 JOIN Warehouse w ON r.warehouseId = w.warehouseId
 			 JOIN Product p ON r.productId = p.productId
 			 WHERE r.receiptId = :receiptId
 			 ORDER BY r.lastUpdated DESC
@@ -34,15 +34,14 @@ public interface ReceiptItemRequestRepository extends JpaRepository<ReceiptItemR
 	@Query("""
 			 SELECT r.quantity AS quantity,
 			        r.completed AS completed,
-			        rc.expectedReceiptDate AS expectedReceiptDate,
-			        w.name AS warehouseName,
-			        p.name AS productName
+			        p.name AS productName,
+			        p.uom AS uom,
+			        w.name AS warehouseName
 			 FROM ReceiptItemRequest r
-			 JOIN Warehouse w ON r.warehouseId = w.warehouseId
-			 JOIN Receipt rc ON r.receiptId = rc.receiptId
 			 JOIN Product p ON r.productId = p.productId
+			 JOIN Warehouse w ON r.warehouseId = w.warehouseId
 			 WHERE r.receiptItemRequestId = :receiptItemRequestId
 			""")
-	Optional<ReceiptItemRequestProjection> findDetailById(@Param("receiptItemRequestId") UUID receiptItemRequestId);
+	Optional<ReceiptItemRequestDetailProjection> findDetailById(@Param("receiptItemRequestId") UUID receiptItemRequestId);
 
 }

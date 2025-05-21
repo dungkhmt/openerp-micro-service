@@ -32,9 +32,9 @@ public class Order {
 
 	private double deliveryFee;
 
-	private double totalProductCost;
+	private double totalProductCost; // in VND
 
-	private double totalOrderCost;
+	private double totalOrderCost; // in VND
 
 	private UUID customerAddressId;
 

@@ -28,7 +28,7 @@ public class Vehicle {
     
     private String licensePlate;
     private String description;
-    private double maxWeight;
+    private double maxWeight; // in kg
     private String status;
 }
 

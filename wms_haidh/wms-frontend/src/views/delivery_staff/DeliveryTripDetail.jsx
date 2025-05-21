@@ -124,13 +124,13 @@ const DeliveryTripDetail = () => {
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <Typography><strong>Warehouse:</strong> {generalInfo.warehouseName}</Typography>
-              <Typography><strong>Delivery Person:</strong> {generalInfo.deliveryPersonName}</Typography>
-              <Typography><strong>Total Weight:</strong> {generalInfo.totalWeight} kg</Typography>
+              <Typography><strong>Delivery person:</strong> {generalInfo.deliveryPersonName}</Typography>
+              <Typography><strong>Total weight:</strong> {generalInfo.totalWeight} kg</Typography>
               <Typography><strong>Vehicle:</strong> {generalInfo.vehicleName}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography><strong>Expected Delivery:</strong> {formatDate(generalInfo.expectedDeliveryStamp)}</Typography>
-              <Typography><strong>Total Locations:</strong> {generalInfo.totalLocations}</Typography>
+              <Typography><strong>Expected delivery:</strong> {formatDate(generalInfo.expectedDeliveryStamp)}</Typography>
+              <Typography><strong>Total locations:</strong> {generalInfo.totalLocations}</Typography>
               <Typography><strong>Status:</strong> {generalInfo.status}</Typography>
               <Typography><strong>Description:</strong> {generalInfo.description}</Typography>
             </Grid>
@@ -140,7 +140,7 @@ const DeliveryTripDetail = () => {
 
       {/* Delivery Cards */}
       <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
-        <Typography variant="h6" gutterBottom>Delivery Sequence</Typography>
+        <Typography variant="h6" gutterBottom>Delivery sequence</Typography>
         <Typography className="text-green-500" sx={{ mb: 2 }}>
           Total locations: {deliverySequence.length}
         </Typography>
@@ -246,7 +246,7 @@ const DeliveryTripDetail = () => {
           <Grid item xs={12}>
             <Paper elevation={3} sx={{ p: 3, height: 540 }}>
               <Typography variant="h6" gutterBottom align="center">
-                Delivery Route
+                Delivery route
               </Typography>
               <Typography variant="h6" gutterBottom align="center" className="text-green-500">
                 Distance : {(generalInfo?.distance / 1000).toFixed(2)} km

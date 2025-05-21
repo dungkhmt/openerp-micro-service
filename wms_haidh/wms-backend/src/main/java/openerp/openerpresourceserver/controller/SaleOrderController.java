@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
@@ -52,14 +53,14 @@ public class SaleOrderController {
 		return ResponseEntity.ok(orders);
 	}
 
-	@Secured({"ROLE_WMS_SALE_MANAGER","ROLE_WMS_ONLINE_CUSTOMER"})
+	@Secured({"ROLE_WMS_WAREHOUSE_MANAGER","ROLE_WMS_SALE_MANAGER","ROLE_WMS_ONLINE_CUSTOMER"})
 	@GetMapping("/{orderId}")
 	public ResponseEntity<Order> getOrderById(@PathVariable UUID orderId) {
 		Order order = orderService.getOrderById(orderId);
 		return ResponseEntity.ok(order);
 	}
 
-	@Secured({"ROLE_WMS_SALE_MANAGER","ROLE_WMS_DELIVERY_MANAGER","ROLE_WMS_ONLINE_CUSTOMER"})
+	@Secured({"ROLE_WMS_WAREHOUSE_MANAGER","ROLE_WMS_SALE_MANAGER","ROLE_WMS_DELIVERY_MANAGER","ROLE_WMS_ONLINE_CUSTOMER"})
 	@GetMapping("/{orderId}/customer-address")
 	public ResponseEntity<CustomerOrderProjection> getCustomerOrderById(@PathVariable UUID orderId) {
 		Optional<CustomerOrderProjection> order = orderService.getCustomerOrderById(orderId);
@@ -69,8 +70,12 @@ public class SaleOrderController {
 	@Secured("ROLE_WMS_ONLINE_CUSTOMER")
 	@PostMapping
 	public ResponseEntity<String> createOrder(@RequestBody SaleOrderCreateRequest request, Principal principal) {
-	    Order order = orderService.placeOrder(request, principal.getName()); 
-	    return ResponseEntity.ok("Order created with ID: " + order.getOrderId());
+	    try {
+	        Order order = orderService.placeOrder(request, principal.getName());
+	        return ResponseEntity.ok("Order created with ID: " + order.getOrderId());
+	    } catch (RuntimeException e) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+	    }
 	}
 
 	@Secured("ROLE_WMS_SALE_MANAGER")

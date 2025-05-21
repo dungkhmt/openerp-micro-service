@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -31,16 +32,16 @@ import openerp.openerpresourceserver.service.InventoryService;
 public class InventoryController {
 
 	private InventoryService inventoryService;
-	
+
 	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping
-	public ResponseEntity<Page<InventoryItemProjection>> getInventoryItems(
-			@RequestParam(required = false) UUID warehouseId, @RequestParam(required = false) UUID bayId,
+	public ResponseEntity<Page<InventoryItemProjection>> getInventoryItems(@RequestParam UUID bayId,
+			@RequestParam(required = false) String lotId, @RequestParam(required = false) String search,
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
 		try {
 
-			Pageable pageable = PageRequest.of(page, size);
-			Page<InventoryItemProjection> inventoryItems = inventoryService.getInventoryItems(warehouseId, bayId,
+			Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "lastUpdatedStamp"));
+			Page<InventoryItemProjection> inventoryItems = inventoryService.getInventoryItems(bayId, lotId, search,
 					pageable);
 
 			return ResponseEntity.ok(inventoryItems);
@@ -54,7 +55,7 @@ public class InventoryController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
-	
+
 	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping("/available-warehouses")
 	public List<Warehouse> getDistinctWarehousesWithStock(@RequestParam UUID saleOrderItemId) {
@@ -83,6 +84,13 @@ public class InventoryController {
 			@RequestParam UUID bayId, @RequestParam String lotId) {
 		return inventoryService.getQuantityOnHandBySaleOrderItemIdBayIdAndLotId(saleOrderItemId, bayId, lotId)
 				.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+	}
+
+	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
+	@GetMapping("/lot-ids")
+	public ResponseEntity<List<String>> getLotIdsByBayId(@RequestParam UUID bayId) {
+		List<String> lotIds = inventoryService.getDistinctLotIdsByBayId(bayId);
+		return ResponseEntity.ok(lotIds);
 	}
 
 }

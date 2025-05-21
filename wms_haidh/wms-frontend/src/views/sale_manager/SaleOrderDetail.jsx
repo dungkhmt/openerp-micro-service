@@ -68,7 +68,7 @@ const SaleOrderDetail = () => {
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>
-          Order Details
+          Sale Order Details
         </Typography>
       </Box>
 
@@ -76,15 +76,15 @@ const SaleOrderDetail = () => {
         <Grid item xs={12} md={6}>
           <Paper elevation={3} sx={{ p: 3, height: 300 }}>
             <Typography variant="h6" gutterBottom>
-              General Information
+              Order information
             </Typography>
-            <Typography><b>Order Date:</b> {generalInfo && formatDate(generalInfo.orderDate)}</Typography>
-            <Typography><b>Delivery Fee:</b> {generalInfo && formatPrice(generalInfo.deliveryFee)}</Typography>
-            <Typography><b>Total Product Cost:</b> {generalInfo && formatPrice(generalInfo.totalProductCost)}</Typography>
-            <Typography><b>Total Order Cost:</b> {generalInfo && formatPrice(generalInfo.totalOrderCost)}</Typography>
+            <Typography><b>Order date:</b> {generalInfo && formatDate(generalInfo.orderDate)}</Typography>
+            <Typography><b>Delivery fee:</b> {generalInfo && formatPrice(generalInfo.deliveryFee)}</Typography>
+            <Typography><b>Total product cost:</b> {generalInfo && formatPrice(generalInfo.totalProductCost)}</Typography>
+            <Typography><b>Total order cost:</b> {generalInfo && formatPrice(generalInfo.totalOrderCost)}</Typography>
             <Typography><b>Description:</b> {generalInfo && generalInfo.description}</Typography>
-            <Typography><b>Payment Type:</b> {generalInfo && generalInfo.paymentType}</Typography>
-            <Typography><b>Order Type:</b> {generalInfo && generalInfo.orderType}</Typography>
+            <Typography><b>Payment type:</b> {generalInfo && generalInfo.paymentType}</Typography>
+            <Typography><b>Order type:</b> {generalInfo && generalInfo.orderType}</Typography>
             <Typography><b>Status:</b> {generalInfo && generalInfo.status}</Typography>
           </Paper>
         </Grid>
@@ -92,10 +92,10 @@ const SaleOrderDetail = () => {
         <Grid item xs={12} md={6}>
           <Paper elevation={3} sx={{ p: 3, height: 300 }}>
             <Typography variant="h6" gutterBottom>
-              Customer Information
+              Customer information
             </Typography>
-            <Typography><b>Customer Name:</b>  <br />{generalInfo && generalInfo.customerName}</Typography>
-            <Typography><b>Phone Number:</b>  <br />{generalInfo && generalInfo.customerPhoneNumber}</Typography>
+            <Typography><b>Customer name:</b>  <br />{generalInfo && generalInfo.customerName}</Typography>
+            <Typography><b>Phone number:</b>  <br />{generalInfo && generalInfo.customerPhoneNumber}</Typography>
             <Typography><b>Address:</b>  <br />{customerInfo && customerInfo.addressName}</Typography>
           </Paper>
         </Grid>
@@ -104,7 +104,7 @@ const SaleOrderDetail = () => {
       <Box sx={{ mt: 4 }}>
         <Paper elevation={3} sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
-            Order Items
+            Sale order items
           </Typography>
           <TableContainer>
             <Table>
@@ -112,6 +112,7 @@ const SaleOrderDetail = () => {
                 <TableRow>
                   <TableCell sx={{ fontWeight: 'bold' }}>Product Name</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Unit</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Price Unit</TableCell>
                 </TableRow>
               </TableHead>
@@ -120,6 +121,7 @@ const SaleOrderDetail = () => {
                   <TableRow key={index}>
                     <TableCell>{item.productName}</TableCell>
                     <TableCell>{item.quantity}</TableCell>
+                    <TableCell>{item.uom}</TableCell>
                     <TableCell>{formatPrice(item.priceUnit)}</TableCell>
                   </TableRow>
                 ))}

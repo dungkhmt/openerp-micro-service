@@ -33,9 +33,9 @@ public class SaleOrderItem {
 
     private int quantity;
 
-    private double priceUnit;
+    private double priceUnit; // in VND
     
-    private double completed;
+    private double completed; // in percentage
     
     private LocalDateTime lastUpdated;
 }

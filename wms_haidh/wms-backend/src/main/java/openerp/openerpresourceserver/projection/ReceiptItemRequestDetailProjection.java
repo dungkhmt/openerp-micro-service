@@ -3,7 +3,7 @@ package openerp.openerpresourceserver.projection;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public interface ReceiptItemRequestProjection {
+public interface ReceiptItemRequestDetailProjection {
 	UUID getReceiptItemRequestId();
 
 	int getQuantity();
@@ -13,4 +13,6 @@ public interface ReceiptItemRequestProjection {
 	String getProductName();
 	
 	String getUom();
+	
+	String getWarehouseName();
 }

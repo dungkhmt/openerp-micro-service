@@ -31,8 +31,13 @@ const WarehouseLayout = () => {
         if (!warehouseInfo) return null;
 
         return bays.map((bay) => (
-            <Tooltip key={bay.bayId} title={bay.code} arrow>
+            <Tooltip
+                key={bay.bayId}
+                title={`Length: ${bay.xlong}, Width: ${bay.ylong}`}
+                arrow
+            >
                 <Box
+                    onClick={() => navigate(`${bay.bayId}`)}
                     sx={{
                         gridColumn: `${bay.x + 1} / span ${bay.xlong}`,
                         gridRow: `${bay.y + 1} / span ${bay.ylong}`,
@@ -44,7 +49,11 @@ const WarehouseLayout = () => {
                         fontWeight: 'bold',
                         color: '#fff',
                         boxShadow: 1,
-                        border: '1px solid #42a5f5'
+                        border: '1px solid #42a5f5',
+                        cursor: 'pointer', // Đổi con trỏ khi hover
+                        '&:hover': {
+                            backgroundColor: '#64b5f6',
+                        }
                     }}
                 >
                     {bay.code}
@@ -52,6 +61,7 @@ const WarehouseLayout = () => {
             </Tooltip>
         ));
     };
+
 
     return (
         <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>

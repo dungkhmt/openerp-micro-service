@@ -44,7 +44,7 @@ public interface AssignedOrderItemRepository extends JpaRepository<AssignedOrder
 			        aoi.orderId AS orderId,
 			        p.name AS productName,
 			        p.weight AS weight,
-			        aoi.originalQuantity AS originalQuantity,
+			        aoi.quantity AS originalQuantity,
 			        b.code AS bayCode,
 			        aoi.lotId AS lotId
 			    FROM AssignedOrderItem aoi
@@ -78,7 +78,7 @@ public interface AssignedOrderItemRepository extends JpaRepository<AssignedOrder
 			        a.orderId AS orderId,
 			        p.name AS productName,
 			        p.weight AS weight,
-			        a.originalQuantity AS originalQuantity,
+			        a.quantity AS originalQuantity,
 			        b.code AS bayCode,
 			        a.lotId AS lotId
 			    FROM AssignedOrderItem a

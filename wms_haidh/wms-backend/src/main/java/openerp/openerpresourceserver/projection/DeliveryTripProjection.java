@@ -7,6 +7,8 @@ public interface DeliveryTripProjection {
     String getDeliveryTripId();
 
     String getDeliveryPersonName();
+    
+    String getWarehouseName();
 
     BigDecimal getDistance();
 
@@ -14,5 +16,4 @@ public interface DeliveryTripProjection {
 
     String getStatus();
 
-    String getDescription();
 }

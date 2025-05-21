@@ -125,17 +125,14 @@ export default function Distance() {
         const cellValue = item[columnKey];
         switch (columnKey) {
             case "fromLocationName":
-                return (
-                    <div className="max-w-[300px] whitespace-nowrap overflow-hidden text-ellipsis">
-                        {cellValue}
-                    </div>
-                );
             case "toLocationName":
                 return (
                     <div className="max-w-[300px] whitespace-nowrap overflow-hidden text-ellipsis">
                         {cellValue}
                     </div>
                 );
+            case "distance":
+                return Math.round(cellValue);
             case "actions":
                 return (
                     <div className="relative flex justify-end items-center gap-2">

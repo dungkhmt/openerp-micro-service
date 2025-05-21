@@ -382,7 +382,7 @@ const AddTrip = () => {
         </Paper>
         <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
           <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-            Assigned Items
+            Assigned order items
           </Typography>
           <div className='mb-4'>
             <Typography
@@ -465,7 +465,7 @@ const AddTrip = () => {
         </Paper>
         <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
           <Typography variant="h6" gutterBottom>
-            Delivery Sequence (Drag & Drop)
+            Delivery sequence (Drag & Drop)
           </Typography>
           <div className='mb-4'>
             <Typography variant="h7" gutterBottom className="text-green-500">

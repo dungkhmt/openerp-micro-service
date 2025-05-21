@@ -57,7 +57,7 @@ const OrderHistory = () => {
             <Box>
                 <Paper elevation={3} sx={{ p: 3, mt: 3 }}>
                     <Typography variant="h6" gutterBottom>
-                        My Orders
+                        My orders
                     </Typography>
                     <Typography variant="subtitle1" gutterBottom className="text-green-500">
                         Total orders: {totalItems}
@@ -66,9 +66,9 @@ const OrderHistory = () => {
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell align="center">Order date</TableCell>
-                                    <TableCell align="center">Customer name</TableCell>
-                                    <TableCell align="center">Total order cost</TableCell>
+                                    <TableCell align="center">Order Date</TableCell>
+                                    <TableCell align="center">Customer Name</TableCell>
+                                    <TableCell align="center">Total Order Cost</TableCell>
                                     <TableCell align="center">Status</TableCell>
                                     <TableCell align="center">Action</TableCell>
                                 </TableRow>

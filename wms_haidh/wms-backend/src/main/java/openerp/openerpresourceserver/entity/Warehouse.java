@@ -25,8 +25,8 @@ public class Warehouse {
 
     private String name;
     private String code;
-    private double width;
-    private double length;
+    private double width; // in meters
+    private double length; // in meters
     private String address;
     private Double longitude;
     private Double latitude;

@@ -22,7 +22,7 @@ import { columns } from "../../config/supplier";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../api";
 
-const buttonText = "Add New Supplier";
+const buttonText = "Add supplier";
 export default function SupplierList() {
 
   const [page, setPage] = useState(1);

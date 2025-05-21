@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 public interface TodayDeliveryTripProjection {
 
 	String getDeliveryTripId();
+	
+	String getWarehouseName();
 
 	BigDecimal getDistance();
 
@@ -12,5 +14,4 @@ public interface TodayDeliveryTripProjection {
 
 	String getStatus();
 
-	String getDescription();
 }

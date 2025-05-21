@@ -47,7 +47,6 @@ public class ShipmentService {
         shipment.setCreatedBy(userLoginId);
         shipment.setCreatedStamp(LocalDateTime.now());
         shipment.setLastUpdatedStamp(LocalDateTime.now());
-        shipment.setDeleted(false);
         return shipmentRepository.save(shipment);
     }
 }

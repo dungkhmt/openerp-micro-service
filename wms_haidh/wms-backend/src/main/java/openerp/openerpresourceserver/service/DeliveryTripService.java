@@ -63,7 +63,7 @@ public class DeliveryTripService {
 				.description(payload.getDescription()).shipmentId(payload.getShipmentId())
 				.totalWeight(payload.getTotalWeight()).totalLocations(payload.getTotalLocations())
 				.distance(payload.getDistance()).createdBy(userLoginId).createdStamp(LocalDateTime.now())
-				.lastUpdatedStamp(LocalDateTime.now()).isDeleted(false).status("CREATED").build();
+				.lastUpdatedStamp(LocalDateTime.now()).status("CREATED").build();
 
 		deliveryTripRepository.save(trip);
 
@@ -74,7 +74,7 @@ public class DeliveryTripService {
 				.map(item -> DeliveryTripItem.builder().deliveryTripItemId(deliveryTripItemService.generateTripItemId())
 						.deliveryTripId(tripId).orderId(item.getOrderId())
 						.assignedOrderItemId(item.getAssignedOrderItemId()).sequence(item.getSequence())
-						.quantity(item.getQuantity()).status("CREATED").isDeleted(false)
+						.quantity(item.getQuantity()).status("CREATED")
 						.createdStamp(LocalDateTime.now()).lastUpdatedStamp(LocalDateTime.now()).build())
 				.toList();
 
@@ -97,7 +97,6 @@ public class DeliveryTripService {
 
 			if ("CREATED".equals(trip.getStatus())) {
 
-				deliveryTripItemService.markItemsAsDeleted(deliveryTripId);
 				List<UUID> assignedOrderItemIds = deliveryTripItemService.findIdsByDeliveryTripId(deliveryTripId);
 
 				assignedOrderItemService.updateAssignedOrderItemsStatus(assignedOrderItemIds, "CREATED");
@@ -152,13 +151,17 @@ public class DeliveryTripService {
 	@Transactional
 	public int markAsDelivered(String deliveryTripId, UUID orderId) {
 
+		DeliveryTrip trip = deliveryTripRepository.findById(deliveryTripId)
+				.orElseThrow(() -> new IllegalStateException("DeliveryTrip not found with id: " + deliveryTripId));
+
+		if (!"STARTED".equals(trip.getStatus())) {
+			throw new IllegalStateException("Cannot mark items as delivered for this trip.");
+		}
+
 		int updatedCount = deliveryTripItemService.markItemsAsDelivered(deliveryTripId, orderId);
 
 		long notYetDeliveredInTrip = deliveryTripItemService.countUndeliveredItems(deliveryTripId);
 		if (notYetDeliveredInTrip == 0) {
-
-			DeliveryTrip trip = deliveryTripRepository.findById(deliveryTripId)
-					.orElseThrow(() -> new IllegalStateException("DeliveryTrip not found with id: " + deliveryTripId));
 
 			trip.setStatus("DONE");
 			trip.setLastUpdatedStamp(LocalDateTime.now());

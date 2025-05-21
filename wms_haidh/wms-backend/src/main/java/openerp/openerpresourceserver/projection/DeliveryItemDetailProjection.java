@@ -9,6 +9,8 @@ public interface DeliveryItemDetailProjection {
     String getProductName();
 
     BigDecimal getWeight();
+    
+    String getUom();
 
     Integer getQuantity();
 

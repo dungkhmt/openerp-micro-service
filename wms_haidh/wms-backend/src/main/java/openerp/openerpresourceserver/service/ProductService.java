@@ -39,5 +39,7 @@ public interface ProductService {
 
 	Page<ProductPriceProjection> getProductsWithPrice(Pageable pageable, String search);
 
+	String getProductNameById(UUID productId);
+
 }
 

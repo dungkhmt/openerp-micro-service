@@ -101,6 +101,7 @@ const OrderDetail = () => {
                                 <TableRow>
                                     <TableCell sx={{ fontWeight: 'bold' }}>Product Name</TableCell>
                                     <TableCell align="center" sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: 'bold' }}>Unit</TableCell>
                                     <TableCell align="center" sx={{ fontWeight: 'bold' }}>Price Unit</TableCell>
                                 </TableRow>
                             </TableHead>
@@ -109,6 +110,7 @@ const OrderDetail = () => {
                                     <TableRow key={index}>
                                         <TableCell >{item.productName}</TableCell>
                                         <TableCell align="center">{item.quantity}</TableCell>
+                                        <TableCell align="center">{item.uom}</TableCell>
                                         <TableCell align="center">{formatPrice(item.priceUnit)}</TableCell>
                                     </TableRow>
                                 ))}

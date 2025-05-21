@@ -1,9 +1,9 @@
 const columns = [
     { name: "DELIVERY TRIP ID", uid: "deliveryTripId" },
+    { name: "DEPARTURE WAREHOUSE", uid: "warehouseName" },
     { name: "DISTANCE (M)", uid: "distance" },
     { name: "TOTAL LOCATIONS", uid: "totalLocations" },
     { name: "STATUS", uid: "status" },
-    { name: "DESCRIPTION", uid: "description" },
     { name: "ACTIONS", uid: "actions" }
   ];
   

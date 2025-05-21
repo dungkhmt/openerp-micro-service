@@ -14,11 +14,13 @@ import openerp.openerpresourceserver.dto.request.AssignedOrderItemCreateRequest;
 import openerp.openerpresourceserver.dto.request.Item;
 import openerp.openerpresourceserver.entity.AssignedOrderItem;
 import openerp.openerpresourceserver.entity.InventoryItem;
+import openerp.openerpresourceserver.entity.Order;
 import openerp.openerpresourceserver.entity.SaleOrderItem;
 import openerp.openerpresourceserver.projection.AssignedOrderItemProjection;
 import openerp.openerpresourceserver.projection.DeliveryOrderItemProjection;
 import openerp.openerpresourceserver.repository.AssignedOrderItemRepository;
 import openerp.openerpresourceserver.repository.InventoryItemRepository;
+import openerp.openerpresourceserver.repository.OrderRepository;
 import openerp.openerpresourceserver.repository.SaleOrderItemRepository;
 
 @Service
@@ -28,6 +30,8 @@ public class AssignedOrderItemService {
 	private AssignedOrderItemRepository assignedOrderItemRepository;
 	@Autowired
 	private SaleOrderItemRepository saleOrderItemRepository;
+	@Autowired
+	private OrderRepository orderRepository;
 	@Autowired
 	private InventoryItemRepository inventoryItemRepository;
 
@@ -43,7 +47,12 @@ public class AssignedOrderItemService {
         // Step 1: Retrieve SaleOrderItem
         SaleOrderItem saleOrderItem = saleOrderItemRepository.findById(dto.getSaleOrderItemId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid SaleOrderItemId"));
+        Order order = orderRepository.findById(saleOrderItem.getOrderId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid OrderId"));
 
+        if (!"APPROVED".equals(order.getStatus()) && !"IN_PROGRESS".equals(order.getStatus())) {
+			throw new IllegalStateException("This order can not be assigned.");
+		}
         // Step 2: Retrieve productId from SaleOrderItem
         UUID productId = saleOrderItem.getProductId();
 
@@ -69,7 +78,6 @@ public class AssignedOrderItemService {
         assignedOrderItem.setCreatedStamp(LocalDateTime.now());
         assignedOrderItem.setStatus("CREATED");
         assignedOrderItem.setInventoryItemId(inventoryItem.getInventoryItemId());
-        assignedOrderItem.setOriginalQuantity(saleOrderItem.getQuantity());
 
         // Save the AssignedOrderItem
         assignedOrderItemRepository.save(assignedOrderItem);
@@ -77,8 +85,6 @@ public class AssignedOrderItemService {
         // Update inventory quantity
         inventoryItem.setQuantityOnHandTotal(inventoryItem.getQuantityOnHandTotal() - dto.getQuantity());
         inventoryItemRepository.save(inventoryItem);
-        
-//        orderService.distributeOrder(saleOrderItem.getOrderId());
 
         return assignedOrderItem;
     }

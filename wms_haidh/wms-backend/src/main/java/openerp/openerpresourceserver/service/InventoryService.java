@@ -23,82 +23,73 @@ import openerp.openerpresourceserver.repository.WarehouseRepository;
 @Service
 public class InventoryService {
 	@Autowired
-    private InventoryItemRepository inventoryItemRepository;
+	private InventoryItemRepository inventoryItemRepository;
 	@Autowired
-    private InventoryItemDetailRepository inventoryItemDetailRepository;
+	private InventoryItemDetailRepository inventoryItemDetailRepository;
 	@Autowired
-    private WarehouseRepository warehouseRepository;
-    @Autowired
-    private BayService bayService;
+	private WarehouseRepository warehouseRepository;
+	@Autowired
+	private BayService bayService;
 
-    public void updateInventory(UUID productId, int quantity, UUID bayId, String lotId, double importPrice, LocalDateTime expiredDate) {
-        // Tìm InventoryItem dựa trên productId, lotId, bayId
-        Optional<InventoryItem> existingItem = inventoryItemRepository.findByProductIdAndLotIdAndBayId(productId, lotId, bayId);
+	public void updateInventory(UUID productId, int quantity, UUID bayId, String lotId, double importPrice,
+			LocalDateTime expiredDate) {
+		// Tìm InventoryItem dựa trên productId, lotId, bayId
+		Optional<InventoryItem> existingItem = inventoryItemRepository.findByProductIdAndLotIdAndBayId(productId, lotId,
+				bayId);
 
-        InventoryItem inventoryItem;
-        LocalDateTime now = LocalDateTime.now();
-        if (existingItem.isPresent()) {
-            // Cập nhật số lượng tồn kho nếu đã tồn tại
-            inventoryItem = existingItem.get();
-            inventoryItem.setQuantityOnHandTotal(inventoryItem.getQuantityOnHandTotal() + quantity);
-            inventoryItem.setLastUpdatedStamp(LocalDateTime.now());
-        } else {
-            // Tạo mới InventoryItem
-        	UUID warehouseId = bayService.getWarehouseIdByBayId(bayId);
-            inventoryItem = InventoryItem.builder()
-                    .productId(productId)
-                    .bayId(bayId)
-                    .warehouseId(warehouseId)
-                    .lotId(lotId)
-                    .quantityOnHandTotal(quantity)
-                    .importPrice(importPrice)
-                    .currencyUomId("VND")
-                    .datetimeReceived(now)
-                    .expireDate(expiredDate)
-                    .createdStamp(now)
-                    .lastUpdatedStamp(now)
-                    .build();
-        }
+		InventoryItem inventoryItem;
+		LocalDateTime now = LocalDateTime.now();
+		if (existingItem.isPresent()) {
+			// Cập nhật số lượng tồn kho nếu đã tồn tại
+			inventoryItem = existingItem.get();
+			inventoryItem.setQuantityOnHandTotal(inventoryItem.getQuantityOnHandTotal() + quantity);
+			inventoryItem.setLastUpdatedStamp(LocalDateTime.now());
+		} else {
+			// Tạo mới InventoryItem
+			UUID warehouseId = bayService.getWarehouseIdByBayId(bayId);
+			inventoryItem = InventoryItem.builder().productId(productId).bayId(bayId).warehouseId(warehouseId)
+					.lotId(lotId).quantityOnHandTotal(quantity).importPrice(importPrice).currencyUomId("VND")
+					.expireDate(expiredDate).createdStamp(now).lastUpdatedStamp(now).build();
+		}
 
-        // Lưu InventoryItem
-        inventoryItem = inventoryItemRepository.save(inventoryItem);
+		// Lưu InventoryItem
+		inventoryItem = inventoryItemRepository.save(inventoryItem);
 
-        // Tạo và lưu InventoryItemDetail
-        InventoryItemDetail inventoryItemDetail = InventoryItemDetail.builder()
-                .inventoryItemId(inventoryItem.getInventoryItemId())
-                .quantityOnHandDiff(quantity)
-                .effectiveDate(now)
-                .build();
+		// Tạo và lưu InventoryItemDetail
+		InventoryItemDetail inventoryItemDetail = InventoryItemDetail.builder()
+				.inventoryItemId(inventoryItem.getInventoryItemId()).quantityOnHandDiff(quantity).effectiveDate(now)
+				.build();
 
-        inventoryItemDetailRepository.save(inventoryItemDetail);
-    }
-    
-    public Page<InventoryItemProjection> getInventoryItems(UUID warehouseId, UUID bayId, Pageable pageable) {
-        if (bayId != null) {
-            return inventoryItemRepository.findInventoryItemsByBay(bayId, pageable);
-        } else if (warehouseId != null) {
-            return inventoryItemRepository.findInventoryItemsByWarehouse(warehouseId, pageable);
-        } else {
-            return inventoryItemRepository.findAllInventoryItems(pageable);
-        }
-    }
-    
-    public List<Warehouse> getDistinctWarehousesWithStockBySaleOrderItemId(UUID saleOrderItemId) {
-        List<UUID> warehouseIds = inventoryItemRepository.findDistinctWarehouseIdsWithStockBySaleOrderItemId(saleOrderItemId);
-        return warehouseRepository.findAllById(warehouseIds);
-    }
-    
-    public List<BayProjection> getBaysWithProductsInSaleOrder(UUID saleOrderItemId, UUID warehouseId) {
-        return inventoryItemRepository.findBayProjectionsBySaleOrderItemIdAndWarehouseId(saleOrderItemId, warehouseId);
-    }
-    
-    public List<LotIdProjection> getLotIdsBySaleOrderItemIdAndBayId(UUID saleOrderItemId, UUID bayId) {
-        return inventoryItemRepository.findLotIdsBySaleOrderItemIdAndBayId(saleOrderItemId, bayId);
-    }
-    
-    public Optional<Integer> getQuantityOnHandBySaleOrderItemIdBayIdAndLotId(
-            UUID saleOrderItemId, UUID bayId, String lotId) {
-        return inventoryItemRepository.findQuantityOnHandBySaleOrderItemIdBayIdAndLotId(
-                saleOrderItemId, bayId, lotId);
-    }
+		inventoryItemDetailRepository.save(inventoryItemDetail);
+	}
+
+	public Page<InventoryItemProjection> getInventoryItems(UUID bayId, String lotId, String search, Pageable pageable) {
+		if (lotId.equals("all"))
+			return inventoryItemRepository.findAllInventoryItems(bayId, search, pageable);
+		else
+			return inventoryItemRepository.findInventoryItems(bayId, lotId, search, pageable);
+	}
+
+	public List<Warehouse> getDistinctWarehousesWithStockBySaleOrderItemId(UUID saleOrderItemId) {
+		List<UUID> warehouseIds = inventoryItemRepository
+				.findDistinctWarehouseIdsWithStockBySaleOrderItemId(saleOrderItemId);
+		return warehouseRepository.findAllById(warehouseIds);
+	}
+
+	public List<BayProjection> getBaysWithProductsInSaleOrder(UUID saleOrderItemId, UUID warehouseId) {
+		return inventoryItemRepository.findBayProjectionsBySaleOrderItemIdAndWarehouseId(saleOrderItemId, warehouseId);
+	}
+
+	public List<LotIdProjection> getLotIdsBySaleOrderItemIdAndBayId(UUID saleOrderItemId, UUID bayId) {
+		return inventoryItemRepository.findLotIdsBySaleOrderItemIdAndBayId(saleOrderItemId, bayId);
+	}
+
+	public Optional<Integer> getQuantityOnHandBySaleOrderItemIdBayIdAndLotId(UUID saleOrderItemId, UUID bayId,
+			String lotId) {
+		return inventoryItemRepository.findQuantityOnHandBySaleOrderItemIdBayIdAndLotId(saleOrderItemId, bayId, lotId);
+	}
+
+	public List<String> getDistinctLotIdsByBayId(UUID bayId) {
+		return inventoryItemRepository.findDistinctLotIdsByBayId(bayId);
+	}
 }

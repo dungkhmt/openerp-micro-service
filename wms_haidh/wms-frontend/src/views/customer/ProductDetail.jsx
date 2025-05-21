@@ -68,20 +68,42 @@ const ProductDetail = () => {
     const handleDecrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
 
     const handleAddToCart = () => {
-        if (quantity > product.quantity) {
-            toast.error("Order quantity exceeds available quantity!");
-            return;
-        }
         const cartItems = JSON.parse(sessionStorage.getItem("cart")) || [];
-        const existingItemIndex = cartItems.findIndex(cartItem => cartItem.productId === product.productId);
-        if (existingItemIndex !== -1) {
-            cartItems[existingItemIndex].quantity += quantity;
-        } else {
-            cartItems.push({ ...product, quantity });
-        }
-        sessionStorage.setItem("cart", JSON.stringify(cartItems));
-        toast.success("Product added to cart");
+        const existingItemIndex = cartItems.findIndex(cartItem => cartItem.productId === id);
+        const existingQuantity = existingItemIndex !== -1 ? cartItems[existingItemIndex].quantity : 0;
+
+        const totalQuantity = existingQuantity + quantity;
+
+        request(
+            "post",
+            "/product-warehouses/check-inventory",
+            (res) => {
+                if (!res.data) {
+                    toast.error("Not enough stock for this product!");
+                    return;
+                }
+
+                // Nếu còn hàng, tiếp tục thêm vào cart
+                if (existingItemIndex !== -1) {
+                    cartItems[existingItemIndex].quantity = totalQuantity;
+                } else {
+                    cartItems.push({
+                        ...product,
+                        quantity,
+                    });
+                }
+
+                sessionStorage.setItem("cart", JSON.stringify(cartItems));
+                toast.success("Product added to cart");
+            }, {},
+            {
+                productId: id,
+                quantity: totalQuantity,
+            }
+        );
     };
+
+
 
     const breadcrumbPaths = [
         { label: "Home", link: "/" },
@@ -100,9 +122,26 @@ const ProductDetail = () => {
                         <div style={{ marginTop: '16px' }}>
                             <Typography variant="body1" sx={{ fontWeight: 'bold', marginBottom: '10px' }}>Specifications:</Typography>
                             <Grid container spacing={2}>
-                                <Grid item xs={6}><Typography variant="body2">Height: {product.height}</Typography></Grid>
-                                <Grid item xs={6}><Typography variant="body2">Weight: {product.weight}</Typography></Grid>
-                                <Grid item xs={6}><Typography variant="body2">Area: {product.area}</Typography></Grid>
+                                <Grid item xs={6}>
+                                    <Typography variant="body2">
+                                        Height: {
+                                            product.height >= 100
+                                                ? `${(product.height / 100).toFixed(2)} m`
+                                                : `${product.height} cm`
+                                        }
+                                    </Typography>
+                                </Grid>
+
+                                <Grid item xs={6}>
+                                    <Typography variant="body2">
+                                        Weight: {
+                                            product.weight < 1
+                                                ? `${(product.weight * 1000).toFixed(0)} g`
+                                                : `${product.weight} kg`
+                                        }
+                                    </Typography>
+                                </Grid>
+
                                 <Grid item xs={6}><Typography variant="body2">Unit: {product.uom}</Typography></Grid>
                             </Grid>
                         </div>

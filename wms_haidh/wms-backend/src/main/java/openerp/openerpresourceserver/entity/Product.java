@@ -29,15 +29,14 @@ public class Product {
     private String code;
     private String name;
     private String description;
-    private double height;
-    private double weight;
-    private double area;
+    private double height;  // in cm
+    private double weight; // in kg
     private String uom;
     private UUID categoryId;
     private String imageId; 
     private LocalDateTime dateUpdated;
     
-    @Transient // Không lưu trường này vào database
+    @Transient 
     private String imageUrl;
 
 }

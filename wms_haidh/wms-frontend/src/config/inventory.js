@@ -1,7 +1,6 @@
 const columns = [
     { name: "PRODUCT NAME", uid: "productName" },
     { name: "LOT ID", uid: "lotId" },
-    { name: "BAY CODE", uid: "bayCode" },
     { name: "QUANTITY ON HAND", uid: "quantityOnHandTotal" },
     { name: "LAST UPDATED", uid: "lastUpdatedStamp" },
   ];

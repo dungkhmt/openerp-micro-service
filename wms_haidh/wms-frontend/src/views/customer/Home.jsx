@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { TextField, MenuItem, Select, FormControl, InputLabel, InputAdornment } from "@mui/material";
+import { TextField, MenuItem, Select, FormControl, InputAdornment, IconButton } from "@mui/material";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import SearchIcon from '@mui/icons-material/Search';
+import CloseIcon from '@mui/icons-material/Close';
 import { Toaster } from "react-hot-toast";
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -73,10 +74,21 @@ export default function Home() {
                         height: "48px"
                     }}
                     placeholder="Search by name ..."
+                    value={search}
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
                                 <SearchIcon />
+                            </InputAdornment>
+                        ),
+                        endAdornment: search && (
+                            <InputAdornment position="end">
+                                <IconButton
+                                    size="small"
+                                    onClick={() => setSearch('')}
+                                >
+                                    <CloseIcon fontSize="small" />
+                                </IconButton>
                             </InputAdornment>
                         ),
                         sx: {
@@ -168,10 +180,10 @@ export default function Home() {
                         backgroundColor: '#019160',
                         color: '#fff',
                         '&:hover': {
-                            backgroundColor: '#019160', 
+                            backgroundColor: '#019160',
                         },
                         '&:active': {
-                            backgroundColor: '#01b075', 
+                            backgroundColor: '#01b075',
                         },
                         minWidth: '40px'
                     }}

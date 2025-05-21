@@ -19,6 +19,7 @@ public interface SaleOrderItemRepository extends JpaRepository<SaleOrderItem, UU
 			    SELECT soi.saleOrderItemId AS saleOrderItemId,
 			           p.name AS productName,
 			           soi.quantity AS quantity,
+			           p.uom AS uom,
 			           soi.priceUnit AS priceUnit,
 			           soi.completed AS completed
 			    FROM SaleOrderItem soi
@@ -29,15 +30,20 @@ public interface SaleOrderItemRepository extends JpaRepository<SaleOrderItem, UU
 	List<SaleOrderItemProjection> findSaleOrderItems(@Param("orderId") UUID id);
 
 	@Query("""
-			    SELECT p.name AS productName,
-			           soi.quantity AS quantity,
-			           soi.priceUnit AS priceUnit,
-			           soi.completed AS completed
-			    FROM SaleOrderItem soi
-			    JOIN Product p ON soi.productId = p.productId
-			    WHERE soi.saleOrderItemId = :id
-			""")
-	SaleOrderItemDetailProjection findSaleOrderItemDetailById(@Param("id") UUID id);
+		    SELECT p.name AS productName,
+		           soi.quantity AS quantity,
+		           soi.priceUnit AS priceUnit,
+		           p.uom AS uom,
+		           soi.completed AS completed,
+		           ca.addressName AS addressName
+		    FROM SaleOrderItem soi
+		    JOIN Product p ON soi.productId = p.productId
+		    JOIN Order o ON soi.orderId = o.orderId
+		    JOIN CustomerAddress ca ON o.customerAddressId = ca.customerAddressId
+		    WHERE soi.saleOrderItemId = :id
+		""")
+		SaleOrderItemDetailProjection findSaleOrderItemDetailById(@Param("id") UUID id);
+
 
 	@Query("""
 			    SELECT soi.productId

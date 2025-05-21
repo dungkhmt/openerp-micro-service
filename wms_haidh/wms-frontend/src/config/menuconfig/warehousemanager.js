@@ -26,20 +26,6 @@ export const warehousemanagerProduct = {
     }
   ],
 };
-export const warehousemanagerInventory = {
-  id: "MENU_WMSv2_ADMIN.INVENTORY",
-  icon: "ProductInventoryIcon",
-  text: "Inventory",
-  child: [
-    {
-      id: "MENU_WMSv2_ADMIN.INVENTORY",
-      path: "/admin/inventory",
-      isPublic: false,
-      text: "Inventory",
-      child: [],
-    }
-  ],
-};
 export const warehousemanagerProcessReceipt = {
   id: "MENU_WMSv2_ADMIN.PROCESS_RECEIPT",
   icon: "ReceiptIcon",

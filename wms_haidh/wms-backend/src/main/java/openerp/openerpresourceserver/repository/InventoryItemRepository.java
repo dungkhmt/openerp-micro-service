@@ -18,25 +18,38 @@ import openerp.openerpresourceserver.projection.LotIdProjection;
 
 @Repository
 public interface InventoryItemRepository extends JpaRepository<InventoryItem, UUID> {
+
 	Optional<InventoryItem> findByProductIdAndLotIdAndBayId(UUID productId, String lotId, UUID bayId);
 
-	@Query("SELECT i.inventoryItemId AS inventoryItemId, p.name AS productName, b.code AS bayCode, i.lotId AS lotId, i.quantityOnHandTotal AS quantityOnHandTotal,"
-			+ " i.lastUpdatedStamp AS lastUpdatedStamp " + "FROM InventoryItem i "
-			+ "JOIN Product p ON i.productId = p.productId " + "JOIN Bay b ON i.bayId = b.bayId "
-			+ "ORDER BY i.lastUpdatedStamp DESC")
-	Page<InventoryItemProjection> findAllInventoryItems(Pageable pageable);
+	@Query("""
+			SELECT
+			    i.inventoryItemId AS inventoryItemId,
+			    p.name AS productName,
+			    i.lotId AS lotId,
+			    i.quantityOnHandTotal AS quantityOnHandTotal,
+			    i.lastUpdatedStamp AS lastUpdatedStamp
+			FROM InventoryItem i
+			JOIN Product p ON i.productId = p.productId
+			WHERE i.bayId = :bayId
+			AND i.lotId = :lotId
+			AND (:search IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')))
+			""")
+	Page<InventoryItemProjection> findInventoryItems(@Param("bayId") UUID bayId, @Param("lotId") String lotId,
+			@Param("search") String search, Pageable pageable);
 
-	@Query("SELECT i.inventoryItemId AS inventoryItemId, p.name AS productName, b.code AS bayCode, i.lotId AS lotId, i.quantityOnHandTotal AS quantityOnHandTotal, i.lastUpdatedStamp AS lastUpdatedStamp "
-			+ "FROM InventoryItem i " + "JOIN Product p ON i.productId = p.productId "
-			+ "JOIN Bay b ON i.bayId = b.bayId " + "WHERE i.warehouseId = :warehouseId "
-			+ "ORDER BY i.lastUpdatedStamp DESC")
-	Page<InventoryItemProjection> findInventoryItemsByWarehouse(@Param("warehouseId") UUID warehouseId,
-			Pageable pageable);
-
-	@Query("SELECT i.inventoryItemId AS inventoryItemId, p.name AS productName, b.code AS bayCode, i.lotId AS lotId, i.quantityOnHandTotal AS quantityOnHandTotal, i.lastUpdatedStamp AS lastUpdatedStamp "
-			+ "FROM InventoryItem i " + "JOIN Product p ON i.productId = p.productId "
-			+ "JOIN Bay b ON i.bayId = b.bayId " + "WHERE i.bayId = :bayId " + "ORDER BY i.lastUpdatedStamp DESC")
-	Page<InventoryItemProjection> findInventoryItemsByBay(@Param("bayId") UUID bayId, Pageable pageable);
+	@Query("""
+			SELECT
+			    i.inventoryItemId AS inventoryItemId,
+			    p.name AS productName,
+			    i.lotId AS lotId,
+			    i.quantityOnHandTotal AS quantityOnHandTotal,
+			    i.lastUpdatedStamp AS lastUpdatedStamp
+			FROM InventoryItem i
+			JOIN Product p ON i.productId = p.productId
+			WHERE i.bayId = :bayId
+			AND (:search IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')))
+			""")
+	Page<InventoryItemProjection> findAllInventoryItems(UUID bayId, String search, Pageable pageable);
 
 	@Query("""
 			    SELECT DISTINCT ii.warehouseId
@@ -45,6 +58,7 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, UU
 			        SELECT soi.productId FROM SaleOrderItem soi WHERE soi.saleOrderItemId = :saleOrderItemId
 			    ) AND ii.quantityOnHandTotal > 0
 			""")
+
 	List<UUID> findDistinctWarehouseIdsWithStockBySaleOrderItemId(@Param("saleOrderItemId") UUID saleOrderItemId);
 
 	@Query("""
@@ -84,6 +98,12 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, UU
 			""")
 	Optional<Integer> findQuantityOnHandBySaleOrderItemIdBayIdAndLotId(@Param("saleOrderItemId") UUID saleOrderItemId,
 			@Param("bayId") UUID bayId, @Param("lotId") String lotId);
-	
+
+	@Query("""
+			SELECT DISTINCT i.lotId
+			FROM InventoryItem i
+			WHERE i.bayId = :bayId
+			""")
+	List<String> findDistinctLotIdsByBayId(@Param("bayId") UUID bayId);
 
 }

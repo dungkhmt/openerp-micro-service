@@ -28,9 +28,9 @@ public class DeliveryTrip {
 
     private String deliveryPersonId;
 
-    private double distance;
+    private double distance;  // in meters
 
-    private double totalWeight;
+    private double totalWeight; // in kg
 
     private int totalLocations;
 
@@ -39,8 +39,6 @@ public class DeliveryTrip {
     private LocalDateTime createdStamp;
 
     private String createdBy;
-
-    private boolean isDeleted;
 
     private String shipmentId;
 

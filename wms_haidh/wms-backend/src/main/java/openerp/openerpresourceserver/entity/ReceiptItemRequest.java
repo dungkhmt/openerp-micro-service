@@ -31,7 +31,7 @@ public class ReceiptItemRequest {
     private UUID productId;        
     private int quantity;         
     private UUID warehouseId;   
-    private double completed;
+    private double completed; // in percentage
     private LocalDateTime lastUpdated;
 }
 

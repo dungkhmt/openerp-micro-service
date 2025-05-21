@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,6 +39,7 @@ public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripIt
 			        p.name AS productName,
 			        p.weight AS weight,
 			        dti.quantity AS quantity,
+			        p.uom AS uom,
 			        b.code AS bayCode,
 			        aoi.lotId AS lotId
 			    FROM DeliveryTripItem dti
@@ -52,33 +52,22 @@ public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripIt
 	Page<DeliveryItemDetailProjection> findDeliveryItemsByTripAndOrder(@Param("deliveryTripId") String deliveryTripId,
 			@Param("orderId") UUID orderId, Pageable pageable);
 
-	@Modifying
-	@Query("UPDATE DeliveryTripItem d SET d.isDeleted = true, d.lastUpdatedStamp = :timestamp WHERE d.deliveryTripId = :deliveryTripId")
-	int markItemsAsDeleted(@Param("deliveryTripId") String deliveryTripId, @Param("timestamp") LocalDateTime timestamp);
-
 	@Query("SELECT d.assignedOrderItemId FROM DeliveryTripItem d WHERE d.deliveryTripId = :deliveryTripId")
 	List<UUID> findIdsByDeliveryTripId(@Param("deliveryTripId") String deliveryTripId);
-
-	@Modifying
-	@Query("UPDATE DeliveryTripItem d SET d.status = 'DELIVERED', d.lastUpdatedStamp = CURRENT_TIMESTAMP "
-			+ "WHERE d.deliveryTripId = :deliveryTripId AND d.orderId = :orderId AND d.isDeleted = false")
-	int markItemsAsDelivered(@Param("deliveryTripId") String deliveryTripId, @Param("orderId") UUID orderId);
-
-	@Query("SELECT COUNT(d) FROM DeliveryTripItem d " + "WHERE d.deliveryTripId = :tripId "
-			+ "AND d.status <> 'DELIVERED' " + "AND d.isDeleted = false")
-	long countUndeliveredItems(@Param("tripId") String tripId);
-
-	@Query("SELECT COUNT(d) FROM DeliveryTripItem d " + "WHERE d.orderId = :orderId " + "AND d.status <> 'DELIVERED' "
-			+ "AND d.isDeleted = false")
-	long countUndeliveredItemsByOrderId(@Param("orderId") UUID orderId);
 
 	@Query("SELECT DISTINCT d.orderId FROM DeliveryTripItem d WHERE d.deliveryTripId = :deliveryTripId")
 	List<UUID> findOrderIdsByDeliveryTripId(@Param("deliveryTripId") String deliveryTripId);
 
-	@Query("""
-			    SELECT COUNT(d) FROM DeliveryTripItem d
-			    WHERE d.orderId = :orderId AND d.status = 'DELIVERED' AND d.isDeleted = false
-			""")
-	long countDeliveredItems(@Param("orderId") UUID orderId);
+	@Modifying
+	@Query("UPDATE DeliveryTripItem d SET d.status = 'DELIVERED', d.lastUpdatedStamp = CURRENT_TIMESTAMP "
+			+ "WHERE d.deliveryTripId = :deliveryTripId AND d.orderId = :orderId")
+	int markItemsAsDelivered(@Param("deliveryTripId") String deliveryTripId, @Param("orderId") UUID orderId);
+
+	@Query("SELECT COUNT(d) FROM DeliveryTripItem d " + "WHERE d.deliveryTripId = :tripId "
+			+ "AND d.status <> 'DELIVERED' ")
+	long countUndeliveredItems(@Param("tripId") String tripId);
+
+	@Query("SELECT COUNT(d) FROM DeliveryTripItem d " + "WHERE d.orderId = :orderId AND d.status = 'DELIVERED' ")
+	long countDeliveredItemsByOrderId(@Param("orderId") UUID orderId);
 
 }

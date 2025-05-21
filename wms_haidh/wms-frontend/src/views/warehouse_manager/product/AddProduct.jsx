@@ -28,7 +28,6 @@ const ProductForm = () => {
   const [code, setCode] = useState('');
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
-  const [area, setArea] = useState('');
   const [description, setDescription] = useState('');
   const [uom, setUom] = useState('');
 
@@ -49,7 +48,6 @@ const ProductForm = () => {
         setCode(product.code);
         setWeight(product.weight);
         setHeight(product.height);
-        setArea(product.area);
         setDescription(product.description);
         setUom(product.uom);
         setImage(product.imageUrl);
@@ -83,7 +81,6 @@ const ProductForm = () => {
       code,
       weight,
       height,
-      area,
       description,
       uom
     });
@@ -145,7 +142,7 @@ const ProductForm = () => {
         <Grid item xs={12} md={4}>
           <Paper elevation={3} sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
-              Product Image
+              Product image
             </Typography>
             <Box
               sx={{
@@ -219,7 +216,7 @@ const ProductForm = () => {
                   },
                 }}
               >
-                Upload Image
+                Upload image
               </Button>
 
 
@@ -230,7 +227,7 @@ const ProductForm = () => {
         <Grid item xs={12} md={8}>
           <Paper elevation={3} sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
-              General Information
+              General information
             </Typography>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
@@ -271,7 +268,7 @@ const ProductForm = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Weight"
+                  label="Weight (kg)"
                   placeholder="Enter weight"
                   type="number"
                   value={weight}
@@ -281,7 +278,7 @@ const ProductForm = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Height"
+                  label="Height (cm)"
                   placeholder="Enter height"
                   type="number"
                   value={height}
@@ -291,11 +288,10 @@ const ProductForm = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Area"
-                  placeholder="Enter area"
-                  type="number"
-                  value={area}
-                  onChange={(e) => setArea(e.target.value)}
+                  label="Unit of Measure"
+                  placeholder="Enter unit of measure"
+                  value={uom}
+                  onChange={(e) => setUom(e.target.value)}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -309,15 +305,7 @@ const ProductForm = () => {
                   onChange={(e) => setDescription(e.target.value)}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Unit of Measure"
-                  placeholder="Enter unit of measure"
-                  value={uom}
-                  onChange={(e) => setUom(e.target.value)}
-                />
-              </Grid>
+              
             </Grid>
           </Paper>
 

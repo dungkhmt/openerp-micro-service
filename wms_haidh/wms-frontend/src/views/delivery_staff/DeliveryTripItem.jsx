@@ -61,7 +61,7 @@ const DeliveryTripItem = () => {
 
       <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
         <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-          Delivery Items
+          Delivery items
         </Typography>
         <div className='mb-4'>
           <Typography variant="h7" gutterBottom className="text-green-500">
@@ -73,8 +73,9 @@ const DeliveryTripItem = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Product</TableCell>
-                <TableCell>Weight</TableCell>
+                <TableCell>Weight (kg)</TableCell>
                 <TableCell>Quantity</TableCell>
+                <TableCell>Unit</TableCell>
                 <TableCell>Bay Code</TableCell>
                 <TableCell>Lot ID</TableCell>
               </TableRow>
@@ -84,6 +85,9 @@ const DeliveryTripItem = () => {
                 ? Array.from({ length: rowsPerPage }).map((_, index) => (
                   <TableRow key={`skeleton-${index}`}>
                     <TableCell width={200}>
+                      <Skeleton variant="text" />
+                    </TableCell>
+                    <TableCell width={100}>
                       <Skeleton variant="text" />
                     </TableCell>
                     <TableCell width={100}>
@@ -105,6 +109,7 @@ const DeliveryTripItem = () => {
                     <TableCell width={200}>{detail.productName}</TableCell>
                     <TableCell width={100}>{detail.weight}</TableCell>
                     <TableCell width={100}>{detail.quantity}</TableCell>
+                    <TableCell width={100}>{detail.uom}</TableCell>
                     <TableCell width={120}>{detail.bayCode}</TableCell>
                     <TableCell width={120}>{detail.lotId}</TableCell>
                   </TableRow>

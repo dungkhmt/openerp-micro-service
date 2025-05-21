@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.dto.request.SaleOrderCreateRequest;
+import openerp.openerpresourceserver.dto.request.SaleOrderItemDTO;
 import openerp.openerpresourceserver.entity.Order;
 import openerp.openerpresourceserver.projection.CustomerOrderProjection;
 import openerp.openerpresourceserver.projection.OrderProjection;
@@ -23,6 +24,8 @@ public class OrderService {
 
 	private final OrderRepository orderRepository;
 	private final SaleOrderItemService saleOrderItemService;
+	private final ProductWarehouseService productWarehouseService;
+	private final ProductService productService;
 
 	public Page<OrderProjection> getOrders(String status, Pageable pageable) {
 
@@ -97,8 +100,19 @@ public class OrderService {
 
 	@Transactional
 	public Order placeOrder(SaleOrderCreateRequest request, String userLoginId) {
+		
+		for (SaleOrderItemDTO item : request.getItems()) {
+			boolean available = productWarehouseService.isProductAvailable(item.getProductId(), item.getQuantity());
+			if (!available) {
+				String name = productService.getProductNameById(item.getProductId());
+				throw new RuntimeException("Not enough stock for product: " + name);
+			}
+		}
+
 		Order order = createOrder(request, userLoginId);
+
 		saleOrderItemService.createItems(request.getItems(), order.getOrderId());
+
 		return order;
 	}
 

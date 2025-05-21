@@ -49,6 +49,5 @@ public class AssignedOrderItem {
 
     private UUID inventoryItemId;
 
-    private int originalQuantity;
 }
 

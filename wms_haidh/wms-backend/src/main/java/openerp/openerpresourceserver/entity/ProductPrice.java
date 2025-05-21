@@ -24,7 +24,7 @@ public class ProductPrice {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID productPriceId;
     private UUID productId;
-    private double price;
+    private double price; // in VND
     private String description;
     private LocalDate startDate;
     private LocalDate endDate;

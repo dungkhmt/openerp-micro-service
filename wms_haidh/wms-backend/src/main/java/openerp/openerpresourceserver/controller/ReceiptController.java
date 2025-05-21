@@ -53,7 +53,7 @@ public class ReceiptController {
 		}
 	}
 
-	@Secured({"ROLE_WMS_PURCHASE_STAFF","ROLE_WMS_PURCHASE_MANAGER"})
+	@Secured({"ROLE_WMS_WAREHOUSE_MANAGER","ROLE_WMS_PURCHASE_STAFF","ROLE_WMS_PURCHASE_MANAGER"})
 	@GetMapping("/{id}")
 	public ResponseEntity<ReceiptProjection> getReceiptDetailsById(@PathVariable UUID id) {
         return receiptService.getReceiptDetailsById(id)

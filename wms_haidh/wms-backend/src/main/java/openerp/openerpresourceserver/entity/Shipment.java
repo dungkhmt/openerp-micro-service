@@ -15,10 +15,8 @@ import java.time.LocalDateTime;
 public class Shipment {
     @Id
     private String shipmentId;
-
     private LocalDateTime expectedDeliveryStamp;
     private LocalDateTime createdStamp;
     private LocalDateTime lastUpdatedStamp;
     private String createdBy;
-    private boolean isDeleted;
 }

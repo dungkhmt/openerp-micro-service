@@ -22,7 +22,6 @@ import { directorRevenue } from "./menuconfig/director";
 import { directorCategory } from "./menuconfig/director";
 import { warehousemanagerWarehouse } from "./menuconfig/warehousemanager";
 import { warehousemanagerProduct } from "./menuconfig/warehousemanager";
-import { warehousemanagerInventory } from "./menuconfig/warehousemanager";
 import { warehousemanagerProcessReceipt } from "./menuconfig/warehousemanager";
 import { warehousemanagerOrder } from "./menuconfig/warehousemanager";
 import { purchasestaffProduct } from "./menuconfig/purchasestaff";
@@ -49,7 +48,6 @@ MENUS.push(directorCategory);
 
 MENUS.push(warehousemanagerWarehouse);
 MENUS.push(warehousemanagerProduct);
-MENUS.push(warehousemanagerInventory);
 MENUS.push(warehousemanagerProcessReceipt);
 MENUS.push(warehousemanagerOrder);
 
@@ -81,7 +79,6 @@ menuIconMap.set("ProductIcon",<WidgetsIcon/>);
 menuIconMap.set("WarehouseIcon",<WarehouseIcon />);
 menuIconMap.set("RevenueIcon",<StackedLineChartIcon/>);
 menuIconMap.set("CategoryIcon",<PieChartIcon/>);
-menuIconMap.set("ProductInventoryIcon",<Inventory2Icon />);
 menuIconMap.set("ReceiptIcon",<ReceiptLong />);
 menuIconMap.set("SupplierIcon",<HandshakeIcon />);
 menuIconMap.set("MoneyIcon",<MonetizationOnIcon/>);

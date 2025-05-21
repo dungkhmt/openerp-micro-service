@@ -10,7 +10,6 @@ public interface ProductDetailProjection {
     String getDescription();
     BigDecimal getHeight();
     BigDecimal getWeight();
-    BigDecimal getArea();
     String getUom();
     String getImageUrl(); 
     BigDecimal getPrice(); 

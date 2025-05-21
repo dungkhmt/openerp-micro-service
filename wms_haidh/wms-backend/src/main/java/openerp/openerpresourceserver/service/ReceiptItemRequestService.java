@@ -12,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 import openerp.openerpresourceserver.dto.request.ReceiptItemRequestDTO;
 import openerp.openerpresourceserver.entity.ReceiptItemRequest;
 import openerp.openerpresourceserver.projection.BayProjection;
+import openerp.openerpresourceserver.projection.ReceiptItemRequestDetailProjection;
 import openerp.openerpresourceserver.projection.ReceiptItemRequestProjection;
 import openerp.openerpresourceserver.repository.ReceiptItemRequestRepository;
 
@@ -38,7 +39,7 @@ public class ReceiptItemRequestService {
         return receiptItemRequestRepository.findAllWithDetails(receiptId);
     }
     
-    public Optional<ReceiptItemRequestProjection> getReceiptItemRequestDetail(UUID receiptItemRequestId) {
+    public Optional<ReceiptItemRequestDetailProjection> getReceiptItemRequestDetail(UUID receiptItemRequestId) {
         return receiptItemRequestRepository.findDetailById(receiptItemRequestId);
     }
     

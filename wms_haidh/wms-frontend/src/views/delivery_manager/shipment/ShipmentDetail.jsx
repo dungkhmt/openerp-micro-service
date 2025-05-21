@@ -86,7 +86,7 @@ const ShipmentDetail = () => {
             <Box sx={{ mt: 1 }}>
                 <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
                     <Typography variant="h6" gutterBottom>
-                        Delivery Trips
+                        Delivery trips
                     </Typography>
                     <div className='mb-4'>
                         <Typography variant="h7" gutterBottom className="text-green-500">
@@ -138,7 +138,7 @@ const ShipmentDetail = () => {
                                     ) : deliveryTrips.map((trip) => (
                                         <TableRow key={trip.deliveryTripId}>
                                             <TableCell sx={{ textAlign: 'center' }} width={150}>{trip.deliveryTripId}</TableCell>
-                                            <TableCell sx={{ textAlign: 'center' }} width={150}>{trip.distance}</TableCell>
+                                            <TableCell sx={{ textAlign: 'center' }} width={150}>{Math.round(trip.distance)}</TableCell>
                                             <TableCell sx={{ textAlign: 'center' }} width={150}>{trip.totalLocations}</TableCell>
                                             <TableCell sx={{ textAlign: 'center' }} width={150}>{trip.status}</TableCell>
                                             <TableCell width={200}>{trip.description}</TableCell>
