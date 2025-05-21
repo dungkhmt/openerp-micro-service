@@ -35,10 +35,13 @@ public interface AssignOrderCollectorRepository extends JpaRepository<AssignOrde
             "JOIN Sender s ON o.senderId = s.senderId " +
             "WHERE a.collectorId = :collectorId " +
             "AND a.createdAt BETWEEN :startDate AND :endDate")
-    List<AssignOrderCollectorDTO> findByCollectorIdAndCreatedAtBetween(
+    List<AssignOrderCollectorDTO> findByCollectorIdAndCreatedAtBetween1(
             @Param("collectorId") UUID collectorId,
             @Param("startDate") Timestamp startDate,
             @Param("endDate") Timestamp endDate);
-
+    List<AssignOrderCollector> findByCollectorIdAndCreatedAtBetween(
+            @Param("collectorId") UUID collectorId,
+            @Param("startDate") Timestamp startDate,
+            @Param("endDate") Timestamp endDate);
     AssignOrderCollector findByOrderIdAndStatus(UUID orderId, CollectorAssignmentStatus status);
 }

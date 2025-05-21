@@ -15,4 +15,6 @@ public interface CollectorRepo extends JpaRepository<Collector, UUID> {
     Collector findByEmail(String email);
 
     Collector findByUsername(String username);
+
+    List<Collector> findAllByHubId(UUID hubId);
 }

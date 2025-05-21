@@ -77,8 +77,7 @@ public class OrderServiceImpl implements OrderService {
     private RouteScheduleRepository routeScheduleRepository;
     @Autowired
     private TripRepository tripRepository;
-    @Autowired
-    private TripItemRepository tripItemRepository;
+
     @Autowired
     private RedisCacheService redisCacheService;
 
@@ -478,13 +477,18 @@ public class OrderServiceImpl implements OrderService {
         LocalDate today = LocalDate.now();
         Timestamp startOfDay = Timestamp.valueOf(today.atStartOfDay());
         Timestamp endOfDay = Timestamp.valueOf(today.plusDays(1).atStartOfDay());
+        List<Collector> collectors = collectorRepo.findAllByHubId(hubId);
 
-        // Giả sử bạn lấy danh sách assignments từ repository
-        List<AssignOrderCollector> assignments = assignOrderCollectorRepository.findByHubIdAndCreatedAtBetween(
-                hubId,
-                startOfDay,
-                endOfDay
-        );
+        List<AssignOrderCollector> assignments = new ArrayList<>();
+        for(Collector collector : collectors){
+            List<AssignOrderCollector> assignOrderShippers = assignOrderCollectorRepository
+                    .findByCollectorIdAndCreatedAtBetween(
+                            collector.getId(),
+                            startOfDay,
+                            endOfDay
+                    );
+            assignments.addAll(assignOrderShippers);
+        }
 
 
         // Chuyển đối tượng AssignOrderCollector thành TodayAssignmentDto
@@ -521,7 +525,7 @@ public class OrderServiceImpl implements OrderService {
         Timestamp endOfDay = Timestamp.valueOf(today.plusDays(1).atStartOfDay());
 
         // Chuyển đối tượng AssignOrderCollector thành TodayAssignmentDto
-        return assignOrderCollectorRepository.findByCollectorIdAndCreatedAtBetween(
+        return assignOrderCollectorRepository.findByCollectorIdAndCreatedAtBetween1(
                 collectorId,
                 startOfDay,
                 endOfDay
@@ -651,35 +655,35 @@ public class OrderServiceImpl implements OrderService {
      *
      * @return List of optimal orders that match the route, sorted by age
      */
-    @Override
-    public List<OrderItemForTripDto> getOrderItemsForTrip(UUID tripId) {
-
-        List<TripItem> tripItems = tripItemRepository.findByTripId(tripId);
-        if (tripItems.isEmpty()) {
-            log.warn("No order item found for this trip");
-            return Collections.emptyList();
-        }
-
-        List<OrderItem> orderItems = tripItems.stream().map(tripItem -> orderItemRepo.findById(tripItem.getOrderItemId()).orElse(null)).collect(Collectors.toList());
-
-        List<OrderItemForTripDto> orderItemForTripDtos = orderItems.stream().map(o -> {
-            OrderItemForTripDto orderItemForTripDto = new OrderItemForTripDto(o);
-            Order order = orderRepo.findById(o.getOrderId()).orElseThrow(() -> new NotFoundException("order not found " + o.getOrderId()));
-            Sender sender = senderRepo.findById(order.getSenderId()).orElseThrow(() -> new NotFoundException("sender not found " + order.getSenderId()));
-            Recipient recipient = recipientRepo.findById(order.getRecipientId()).orElseThrow(() -> new NotFoundException("sender not found " + order.getSenderId()));
-            orderItemForTripDto.setOrderId(order.getId());
-            orderItemForTripDto.setSenderName(order.getSenderName());
-            orderItemForTripDto.setRecipientName(order.getRecipientName());
-            orderItemForTripDto.setSenderPhone(sender.getPhone());
-            orderItemForTripDto.setRecipientPhone(recipient.getPhone());
-            orderItemForTripDto.setSenderAddress(sender.getAddress());
-            orderItemForTripDto.setRecipientAddress(recipient.getAddress());
-            return orderItemForTripDto;
-        }).collect(Collectors.toList());
-
-
-        return orderItemForTripDtos;
-    }
+//    @Override
+//    public List<OrderItemForTripDto> getOrderItemsForTrip(UUID tripId) {
+//
+//        List<TripItem> tripItems = tripItemRepository.findByTripId(tripId);
+//        if (tripItems.isEmpty()) {
+//            log.warn("No order item found for this trip");
+//            return Collections.emptyList();
+//        }
+//
+//        List<OrderItem> orderItems = tripItems.stream().map(tripItem -> orderItemRepo.findById(tripItem.getOrderItemId()).orElse(null)).collect(Collectors.toList());
+//
+//        List<OrderItemForTripDto> orderItemForTripDtos = orderItems.stream().map(o -> {
+//            OrderItemForTripDto orderItemForTripDto = new OrderItemForTripDto(o);
+//            Order order = orderRepo.findById(o.getOrderId()).orElseThrow(() -> new NotFoundException("order not found " + o.getOrderId()));
+//            Sender sender = senderRepo.findById(order.getSenderId()).orElseThrow(() -> new NotFoundException("sender not found " + order.getSenderId()));
+//            Recipient recipient = recipientRepo.findById(order.getRecipientId()).orElseThrow(() -> new NotFoundException("sender not found " + order.getSenderId()));
+//            orderItemForTripDto.setOrderId(order.getId());
+//            orderItemForTripDto.setSenderName(order.getSenderName());
+//            orderItemForTripDto.setRecipientName(order.getRecipientName());
+//            orderItemForTripDto.setSenderPhone(sender.getPhone());
+//            orderItemForTripDto.setRecipientPhone(recipient.getPhone());
+//            orderItemForTripDto.setSenderAddress(sender.getAddress());
+//            orderItemForTripDto.setRecipientAddress(recipient.getAddress());
+//            return orderItemForTripDto;
+//        }).collect(Collectors.toList());
+//
+//
+//        return orderItemForTripDtos;
+//    }
 
 
     public Double getOrderWeight(UUID orderId) {
@@ -782,7 +786,16 @@ public class OrderServiceImpl implements OrderService {
                         break;
                 }
                 order.setChangedBy(principal.getName());
+                TripOrder tripOrder = tripOrderRepository.findTopByOrderIdOrderByCreatedAtDesc(order.getId());
+                if (tripOrder != null) {
+                    tripOrder.setStatus("COMPLETED");
+                    tripOrderRepository.save(tripOrder);
+                }
+                Trip trip = tripRepository.findById(tripOrder.getTripId()).orElseThrow(() -> new NotFoundException("trip not found " + tripOrder.getTripId()));
+                trip.setStatus(TripStatus.CONFIRMED_IN);
 
+                tripRepository.save(trip);
+                tripOrderRepository.save(tripOrder);
                 orderRepo.save(order);
 
 

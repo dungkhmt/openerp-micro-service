@@ -45,6 +45,7 @@ import { request } from '../../api';
 import { API_PATH } from '../apiPaths';
 import { errorNoti, successNoti } from '../../utils/notification';
 import { useSelector } from "react-redux";
+import TripStatusTimeline from './TripStatusTimeline';
 
 // Custom styles
 const useStyles = {
@@ -555,6 +556,9 @@ const DriverTripHistory = () => {
                         </Box>
                     ) : tripDetails ? (
                         <Box>
+                            {/* Trip Status Timeline - New component */}
+                            <TripStatusTimeline trip={tripDetails} />
+
                             {/* Trip Information */}
                             <Typography variant="h6" gutterBottom>
                                 Thông tin chuyến đi

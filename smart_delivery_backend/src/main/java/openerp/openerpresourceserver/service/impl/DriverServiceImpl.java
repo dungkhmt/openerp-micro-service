@@ -43,7 +43,6 @@ public class DriverServiceImpl implements DriverService {
     private final TripOrderRepository tripOrderRepository;
     private final TripRepository tripRepository;
     private final TripService tripService;
-    private final TripItemRepository tripItemRepository;
     private final OrderItemRepo orderItemRepo;
     private final SenderRepo senderRepo;
     private final RecipientRepo recipientRepo;
@@ -123,6 +122,7 @@ public class DriverServiceImpl implements DriverService {
 
         Vehicle vehicle = vehicleRepo.findById(vehicleDriver.getVehicleId())
                 .orElseThrow(() -> new NotFoundException("Vehicle not found with ID: " + vehicleDriver.getVehicleId()));
+        Trip trip = tripRepository.findById(tripId).orElseThrow(() -> new NotFoundException("Trip not found"));
 
         // Update orders status and assign to driver's vehicle
         List<Order> orders = new ArrayList<>();
@@ -144,7 +144,6 @@ public class DriverServiceImpl implements DriverService {
             tripOrder.setStatus("DELIVERING");
             tripOrders.add(tripOrder);
 
-
             // Update vehicle status if needed
             if (vehicle.getStatus() == VehicleStatus.AVAILABLE) {
                 vehicle.setStatus(VehicleStatus.TRANSITING);
@@ -152,6 +151,9 @@ public class DriverServiceImpl implements DriverService {
             }
 
             orderRepo.saveAll(orders);
+            trip.setStatus(TripStatus.PICKED_UP);
+            trip.setChangedBy(username);
+            tripRepository.save(trip);
             tripOrderRepository.saveAll(tripOrders );
         }
     }
@@ -168,18 +170,16 @@ public class DriverServiceImpl implements DriverService {
         if (driver == null) {
             throw new NotFoundException("Driver not found with username: " + username);
         }
-
         // Update orders status
         List<Order> orders = new ArrayList<>();
         List<TripOrder> tripOrders = new ArrayList<>();
-
+        Trip trip = null;
         for (UUID orderId : orderIds) {
             Order order = orderRepo.findById(orderId)
                     .orElseThrow(() -> new NotFoundException("Order not found with ID: " + orderId));
 
             TripOrder tripOrder = tripOrderRepository.findTopByOrderIdOrderByCreatedAtDesc(orderId);
-            Trip trip = tripRepository.findById(tripOrder.getTripId()).orElseThrow(() -> new NotFoundException("Trip not found"));
-            RouteSchedule routeSchedule = routeScheduleRepository.findById(trip.getRouteScheduleId()).orElseThrow(() -> new NotFoundException("Route schedule not found"));
+            trip = tripRepository.findById(tripOrder.getTripId()).orElseThrow(() -> new NotFoundException("Trip not found"));
             if (!trip.getDriverId().equals(driver.getId())) {
                 throw new IllegalStateException("Order is not assigned to this driver: " + orderId);
             }
@@ -197,7 +197,11 @@ public class DriverServiceImpl implements DriverService {
             tripOrder.setStatus("DELIVERED");
             tripOrders.add(tripOrder);
         }
-
+        if(trip != null) {
+            trip.setStatus(TripStatus.DELIVERED);
+            trip.setChangedBy(username);
+            tripRepository.save(trip);
+        }
         orderRepo.saveAll(orders);
         tripOrderRepository.saveAll(tripOrders);
     }
@@ -410,12 +414,12 @@ public class DriverServiceImpl implements DriverService {
      * Get current total weight of already assigned orders in the trip
      */
     private double getCurrentTripWeight(UUID tripId) {
-        List<TripItem> tripItems = tripItemRepository.findAllByTripId(tripId);
-        return tripItems.stream()
-                .filter(tripItem -> !"CANCELLED".equals(tripItem.getStatus()))
-                .mapToDouble(tripItem -> {
-                    OrderItem orderItem = orderItemRepo.findById(tripItem.getOrderItemId()).orElse(null);
-                    return orderItem != null ? orderItem.getWeight() : 0.0;
+        List<TripOrder> tripOrders = tripOrderRepository.findAllByTripId(tripId);
+        return tripOrders.stream()
+                .filter(tripOrder -> !"CANCELLED".equals(tripOrder.getStatus()))
+                .mapToDouble(tripOrder -> {
+                    Order order = orderRepo.findById(tripOrder.getOrderId()).orElse(null);
+                    return order != null ? order.getWeight() : 0.0;
                 })
                 .sum();
     }
@@ -424,12 +428,12 @@ public class DriverServiceImpl implements DriverService {
      * Get current total volume of already assigned orders in the trip
      */
     private double getCurrentTripVolume(UUID tripId) {
-        List<TripItem> tripItems = tripItemRepository.findAllByTripId(tripId);
-        return tripItems.stream()
+        List<TripOrder> tripOrders = tripOrderRepository.findAllByTripId(tripId);
+        return tripOrders.stream()
                 .filter(tripItem -> !"CANCELLED".equals(tripItem.getStatus()))
-                .mapToDouble(tripItem -> {
-                    OrderItem orderItem = orderItemRepo.findById(tripItem.getOrderItemId()).orElse(null);
-                    return orderItem != null ? orderItem.getHeight()*orderItem.getLength()*orderItem.getWidth() : 0.0;
+                .mapToDouble(tripOrder -> {
+                    Order order = orderRepo.findById(tripOrder.getOrderId()).orElse(null);
+                    return order != null ? order.getVolume() : 0.0;
                 })
                 .sum();
     }

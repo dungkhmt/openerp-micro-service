@@ -52,7 +52,6 @@ public interface OrderService {
     boolean confirmOutHub(Principal principal, UUID[] orderIds,  UUID vehicleId);
 
 
-    List<OrderItemForTripDto> getOrderItemsForTrip(UUID tripId);
 
     List<OrderSummaryDTO> getAllOrdersDeliveredInHub(UUID hubId);
 

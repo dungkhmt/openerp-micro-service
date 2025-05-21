@@ -35,7 +35,6 @@ public class AssignmentServiceImpl implements AssignmentService {
     @Autowired private DriverRepo driverRepo;
     @Autowired private TripRepository tripRepository;
     @Autowired private TripOrderRepository tripOrderRepository;
-    @Autowired private TripItemRepository tripItemRepository;
 
     @Autowired private RouteScheduleRepository routeScheduleRepository;
     @Autowired private RouteStopRepository routeStopRepository;

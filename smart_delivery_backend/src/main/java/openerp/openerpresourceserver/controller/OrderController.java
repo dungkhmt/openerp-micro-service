@@ -216,11 +216,7 @@ public class OrderController {
                     new ResponseEntity<>("FAIL", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        @PreAuthorize("hasAnyRole('ROUTE_MANAGER', 'DRIVER', 'HUB_STAFF')")
-        @GetMapping("/middle-mile/for-out/{tripId}")
-        public ResponseEntity<List<OrderItemForTripDto>> getMiddleMileOrdersForOut(@PathVariable  UUID tripId) {
-            return ResponseEntity.ok(orderService.getOrderItemsForTrip(tripId));
-        }
+
 
     /**
      * Get the complete history of an order

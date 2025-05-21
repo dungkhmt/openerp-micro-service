@@ -18,7 +18,8 @@ import {
     DialogActions,
     DialogContent,
     DialogContentText,
-    DialogTitle
+    DialogTitle,
+    Alert
 } from '@mui/material';
 import { useParams, useHistory, useLocation } from 'react-router-dom';
 import { request } from 'api';
@@ -33,7 +34,6 @@ import MyLocationIcon from '@mui/icons-material/MyLocation';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { errorNoti, successNoti } from 'utils/notification';
-
 // Import the map component from your codebase
 import { EnhancedMap } from 'components/map/EnhancedMap';
 
@@ -56,11 +56,16 @@ const DriverRouteMap = () => {
     const [currentStop, setCurrentStop] = useState(null);
     const [activeTrip, setActiveTrip] = useState(null);
     const [confirmArrivalDialog, setConfirmArrivalDialog] = useState(false);
+    const [confirmDoneStopDialog, setConfirmDoneStopDialog] = useState(false);
     const [selectedHub, setSelectedHub] = useState(null);
     const [operationType, setOperationType] = useState(null);
     const [confirmCompleteTripDialogOpen, setConfirmCompleteTripDialogOpen] = useState(false);
     const [processingComplete, setProcessingComplete] = useState(false);
     const [canCompleteTrip, setCanCompleteTrip] = useState(false);
+    const [isDoneStop, setIsDoneStop] = useState(false);
+    const [isCameStop, setIsCameStop] = useState(false);
+    const [isLastStop, setIsLastStop] = useState(false);
+
     // Map points and assignments
     const [mapPoints, setMapPoints] = useState([]);
     const [assignments, setAssignments] = useState([]);
@@ -68,10 +73,8 @@ const DriverRouteMap = () => {
     // Load data on component mount
     useEffect(() => {
         fetchRouteData();
-
         // Set up periodic location updates
         const locationInterval = setInterval(updateCurrentLocation, 30000); // Update every 30 seconds
-
         return () => {
             clearInterval(locationInterval);
         };
@@ -98,7 +101,6 @@ const DriverRouteMap = () => {
     const fetchRouteData = async () => {
         try {
             setLoading(true);
-
             // If we have tripId, fetch trip details directly
             if (tripId) {
                 await fetchTripDetails();
@@ -106,13 +108,10 @@ const DriverRouteMap = () => {
                 // Get route vehicle details from schedule-assignments
                 await fetchRouteVehicleAssignment();
             }
-
             // Get driver's hub
             await fetchDriverHub();
-
             // Get current location
             updateCurrentLocation();
-
             setLoading(false);
         } catch (error) {
             console.error("Error fetching route data:", error);
@@ -131,13 +130,32 @@ const DriverRouteMap = () => {
                 if (tripRes.data && tripRes.data.currentStopIndex !== undefined) {
                     setCurrentStop(tripRes.data.currentStopIndex + 1); // Convert to 1-based for display
                 }
-                if(tripRes.data.status === 'CONFIRMED_IN') {
-                    setCanCompleteTrip(true)
+
+                // Check if this is the last stop
+                if (tripRes.data && tripRes.data.stops &&
+                    tripRes.data.currentStopIndex === tripRes.data.stops.length - 1) {
+                    setIsLastStop(true);
                 }
+
+                // Set status flags based on trip status
+                if (tripRes.data.status === 'CONFIRMED_IN') {
+                    setCanCompleteTrip(true);
+                    setIsCameStop(false);
+                    setIsDoneStop(false);
+                } else if (tripRes.data.status === 'CAME_STOP' ||
+                    tripRes.data.status === 'CAME_FIRST_STOP' ||
+                    tripRes.data.status === 'DELIVERED' ||
+                    tripRes.data.status === 'PICKED_UP') {
+                    setIsCameStop(true);
+                    setIsDoneStop(false);
+                } else if (tripRes.data.status === 'DONE_STOP') {
+                    setIsDoneStop(true);
+                    setIsCameStop(false);
+                }
+
                 // Extract stop sequence
                 if (tripRes.data && tripRes.data.stops) {
                     setStopSequence(tripRes.data.stops);
-
                     // Create map points from stops
                     const points = tripRes.data.stops.map(stop => ({
                         lat: stop.latitude || 0,
@@ -150,17 +168,13 @@ const DriverRouteMap = () => {
                 }
 
                 // Set orders from trip
-                if (tripRes.data ) {
+                if (tripRes.data) {
                     setOrders(tripRes.data.stops);
-
                     // Find next order to be delivered (first DELIVERING order)
-                    console.log("ds",tripRes.data.stops);
                     const nextToDeliver = tripRes.data.stops[tripRes.data.currentStopIndex];
-                    console.log("ds",nextToDeliver);
                     if (nextToDeliver) {
                         setNextOrder(nextToDeliver);
                     }
-
                     // Create assignments for map component
                     const orderAssignments = tripRes.data.stops.map(stop => ({
                         id: stop.id,
@@ -184,14 +198,11 @@ const DriverRouteMap = () => {
             // First try to use schedule assignments endpoint
             await request('get', `/smdeli/schedule-assignments/driver/get`, (res) => {
                 const assignments = res.data || [];
-
                 // Find the specific assignment
                 const assignment = assignments.find(a =>
                     a.id === routeVehicleId || a.routeScheduleId === routeVehicleId);
-
                 if (assignment) {
                     setRouteVehicle(assignment);
-
                     // Get route details if route ID exists
                     if (assignment.routeId) {
                         fetchRouteDetails(assignment.routeId);
@@ -205,7 +216,6 @@ const DriverRouteMap = () => {
             });
         } catch (error) {
             console.error("Error fetching route vehicle assignment:", error);
-
             // Fallback to check if the routeVehicleId is actually a scheduleId
             try {
                 fetchScheduleDetails(routeVehicleId);
@@ -235,15 +245,12 @@ const DriverRouteMap = () => {
             // Get route details
             await request('get', `/smdeli/middle-mile/routes/${routeId}`, (routeRes) => {
                 setRoute(routeRes.data);
-
                 // Get route stops
                 request('get', `/smdeli/middle-mile/routes/${routeId}/stops`, (stopsRes) => {
                     const stops = stopsRes.data || [];
-
                     // If we don't already have stops from a trip, use these
                     if (stopSequence.length === 0) {
                         setStopSequence(stops);
-
                         // Create map points from stops
                         const points = stops.map(stop => ({
                             lat: stop.hubLatitude,
@@ -252,10 +259,8 @@ const DriverRouteMap = () => {
                             hubId: stop.hubId,
                             sequence: stop.stopSequence
                         }));
-
                         setMapPoints(points);
                     }
-
                     // Try to get orders using the trip assignment controller endpoint
                     if (tripId) {
                         request('get', `/smdeli/trip-assignments/trips/${tripId}/orders`, (ordersRes) => {
@@ -302,30 +307,49 @@ const DriverRouteMap = () => {
     };
 
     const handleCompleteTrip = () => {
-        // Check if we're at the final stop
-        if (currentStop < stopSequence.length) {
-            errorNoti("You must be at the final stop to complete this trip");
+        if (!canCompleteTrip) {
+            errorNoti("Trip must be confirmed in before completing");
             return;
         }
 
-        if (window.confirm("Are you sure you want to complete this trip? This will mark all orders as delivered.")) {
-            const endpoint = tripId
-                ? `/smdeli/driver/trips/${tripId}/complete`
-                : `/smdeli/driver/trips/${tripId}/complete`;
+        request(
+            'post',
+            `/smdeli/driver/trips/${tripId}/complete`,
+            () => {
+                successNoti("Trip completed successfully");
+                history.push('/middle-mile/driver/dashboard');
+            },
+            {
+                401: () => errorNoti("Unauthorized action"),
+                400: () => errorNoti("Unable to complete trip")
+            }
+        );
+    };
 
-            request(
-                'post',
-                endpoint,
-                () => {
-                    successNoti("Trip completed successfully");
-                    history.push('/middle-mile/driver/dashboard');
-                },
-                {
-                    401: () => errorNoti("Unauthorized action"),
-                    400: () => errorNoti("Unable to complete trip")
-                }
-            );
+    // Handle Done Stop
+    const handleDoneStop = () => {
+        if (!isCameStop) {
+            errorNoti("Trip must be in CAME_STOP or similar status before marking as done");
+            return;
         }
+
+        request(
+            'post',
+            `/smdeli/driver/trips/${tripId}/doneStop`,
+            () => {
+                successNoti("Stop marked as done successfully");
+                setIsDoneStop(true);
+                setIsCameStop(false);
+                // Refresh trip data
+                fetchTripDetails();
+            },
+            {
+                401: () => errorNoti("Unauthorized action"),
+                400: () => errorNoti("Unable to mark stop as done"),
+                409: (e) => errorNoti("Please process the order(s) at this stop!"),
+
+            }
+        );
     };
 
     // Start a new trip
@@ -338,7 +362,6 @@ const DriverRouteMap = () => {
             `/smdeli/driver/trip/start`,
             (res) => {
                 successNoti("Trip started successfully");
-
                 // If we got a trip ID back, navigate to the trip with ID
                 if (res.data && res.data.id) {
                     const newTripId = res.data.id;
@@ -355,45 +378,66 @@ const DriverRouteMap = () => {
             { routeVehicleId: scheduleIdToUse }
         );
     };
-    // Prompt for completing trip or opening confirmation dialog
-    const promptCompleteTrip = () => {
-        if (!canCompleteTrip) {
-            errorNoti("Trip status must be CONFIRMED_IN to complete the trip", "error");
-            return;
-        }
 
-        setConfirmCompleteTripDialogOpen(true);
-    };
     // Advance to next stop
-    const handleAdvanceToNextStop = () => {
-        if (!tripId) {
-            errorNoti("No active trip found");
+    const handleCameNextStop = () => {
+        if (!tripId || !isDoneStop) {
+            errorNoti(isDoneStop ? "Error advancing to next stop" : "Trip must be in DONE_STOP status before advancing");
             return;
         }
 
-        request(
-            'post',
-            `/smdeli/driver/trips/${tripId}/advance`,
-            (res) => {
-                successNoti("Advanced to next stop successfully");
-                setActiveTrip(res.data);
-                setCurrentStop(res.data.currentStopIndex + 1); // Convert to 1-based index
+        try {
+            setLoading(true);
 
-                // Refresh the full trip data
-                fetchTripDetails();
-            },
-            {
-                401: () => errorNoti("Unauthorized action"),
-                400: () => errorNoti("Unable to advance to next stop")
+            // Find next stop hub ID
+            const nextStopIndex = activeTrip.currentStopIndex + 1;
+            if (nextStopIndex >= stopSequence.length) {
+                errorNoti("No more stops to advance to");
+                setLoading(false);
+                return;
             }
-        );
+
+            const nextStop = stopSequence[nextStopIndex];
+            if (!nextStop || !nextStop.hubId) {
+                errorNoti("Next stop information is missing");
+                setLoading(false);
+                return;
+            }
+
+            // Call the API to advance to next stop
+            request(
+                'post',
+                `/smdeli/driver/trips/${tripId}/advance?hubId=${nextStop.hubId}`,
+                () => {
+                    successNoti("Arrived at next stop");
+                    setIsDoneStop(false);
+                    setIsCameStop(true);
+
+                    // Check if this is the last stop
+                    if (nextStopIndex === stopSequence.length - 1) {
+                        setIsLastStop(true);
+                    }
+
+                    // Refresh trip data
+                    fetchTripDetails();
+                },
+                {
+                    401: () => errorNoti("Unauthorized action"),
+                    400: (err) => errorNoti(err.response?.data?.message || "Failed to arrive at next stop")
+                }
+            );
+        } catch (error) {
+            console.error("Error arriving at next stop:", error);
+            errorNoti("Failed to arrive at next stop");
+        } finally {
+            setLoading(false);
+        }
     };
 
     // Handle arrival at a hub
     const handleArrivalAtHub = (hubId, stopNumber) => {
         // Find the hub details
         const hub = stopSequence.find(stop => stop.hubId === hubId);
-
         if (!hub) {
             errorNoti("Hub information not found");
             return;
@@ -447,7 +491,6 @@ const DriverRouteMap = () => {
                 <Typography variant="h4">
                     Route Map: {activeTrip?.routeName || 'Loading...'}
                 </Typography>
-
                 <Box sx={{ display: 'flex', gap: 2 }}>
                     <Button
                         variant="outlined"
@@ -456,16 +499,16 @@ const DriverRouteMap = () => {
                     >
                         View Orders
                     </Button>
-
-                    {tripId ? (
-                        <Button
-                            variant="contained"
-                            color="success"
-                            onClick={handleCompleteTrip}
-                            disabled={ !canCompleteTrip}
-                        >
-                            Complete Trip
-                        </Button>
+                    {activeTrip ? (
+                        canCompleteTrip ? (
+                            <Button
+                                variant="contained"
+                                color="success"
+                                onClick={handleCompleteTrip}
+                            >
+                                Complete Trip
+                            </Button>
+                        ) : null
                     ) : (
                         <Button
                             variant="contained"
@@ -488,26 +531,43 @@ const DriverRouteMap = () => {
                         color: 'white',
                         display: 'flex',
                         justifyContent: 'space-between',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: 2
                     }}
                 >
                     <Box>
                         <Typography variant="h6">
-                            Active Trip - Stop {currentStop} of {stopSequence.length}
+                            Active Trip - Stop {currentStop} of {stopSequence.length}{isLastStop ? " (Final Stop)" : ""}
                         </Typography>
                         <Typography variant="body2">
-                            Started: {new Date(activeTrip.startTime).toLocaleString()}
+                            Started: {activeTrip.startTime ? new Date(activeTrip.startTime).toLocaleString() : 'Not started'}
+                        </Typography>
+                        <Typography variant="body2">
+                            Status: {activeTrip.status}
                         </Typography>
                     </Box>
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                        {isCameStop && (
+                            <Button
+                                variant="contained"
+                                color="info"
+                                onClick={handleDoneStop}
+                            >
+                                Done Stop
+                            </Button>
+                        )}
 
-                    {/*<Button*/}
-                    {/*    variant="contained"*/}
-                    {/*    color="secondary"*/}
-                    {/*    onClick={handleAdvanceToNextStop}*/}
-                    {/*    disabled={currentStop >= stopSequence.length}*/}
-                    {/*>*/}
-                    {/*    Next Stop*/}
-                    {/*</Button>*/}
+                        {isDoneStop && !isLastStop && (
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                onClick={handleCameNextStop}
+                            >
+                                Came Next Stop
+                            </Button>
+                        )}
+                    </Box>
                 </Paper>
             )}
 
@@ -522,23 +582,21 @@ const DriverRouteMap = () => {
                                 </Typography>
                             </Box>
                             <Divider sx={{ mb: 2 }} />
-
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle2" color="text.secondary">
                                         Route
                                     </Typography>
                                     <Typography variant="body1" gutterBottom>
-                                        {activeTrip?.routeName}
+                                        {activeTrip?.routeName || "Not assigned"}
                                     </Typography>
                                 </Grid>
-
                                 <Grid item xs={6}>
                                     <Typography variant="subtitle2" color="text.secondary">
                                         Orders
                                     </Typography>
                                     <Typography variant="body1">
-                                        Picked up: {activeTrip?.ordersCount}  Delivered: {activeTrip?.ordersDelivered}
+                                        Picked up: {activeTrip?.ordersCount || 0}  Delivered: {activeTrip?.ordersDelivered || 0}
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={6}>
@@ -546,15 +604,71 @@ const DriverRouteMap = () => {
                                         Status
                                     </Typography>
                                     <Chip
-                                        label={activeTrip?.status}
+                                        label={activeTrip?.status || "Not started"}
                                         color={
-                                            activeTrip?.status === 'IN_PROGRESS' ? 'warning' :
-                                                activeTrip?.status === 'COMPLETED' ? 'success' : 'primary'
+                                            !activeTrip ? 'default' :
+                                                activeTrip?.status === 'CAME_FIRST_STOP' ? 'info' :
+                                                    activeTrip?.status === 'DONE_STOP' ? 'warning' :
+                                                        activeTrip?.status === 'CAME_STOP' ? 'info' :
+                                                            activeTrip?.status === 'PICKED_UP' ? 'primary' :
+                                                                activeTrip?.status === 'DELIVERED' ? 'secondary' :
+                                                                    activeTrip?.status === 'CONFIRMED_IN' ? 'warning' :
+                                                                        activeTrip?.status === 'COMPLETED' ? 'success' : 'default'
                                         }
                                         size="small"
                                     />
                                 </Grid>
                             </Grid>
+                        </CardContent>
+                    </Card>
+
+                    {/* Flow info card */}
+                    <Card sx={{ mb: 3 }}>
+                        <CardContent>
+                            <Typography variant="h6" gutterBottom>
+                                Trip Flow
+                            </Typography>
+                            <Divider sx={{ mb: 2 }} />
+                            <Alert severity="info" sx={{ mb: 2 }}>
+                                Follow these steps at each stop:
+                            </Alert>
+                            <List>
+                                <ListItem>
+                                    <Chip size="small" label="1" color="primary" sx={{ mr: 1, minWidth: 28 }} />
+                                    <ListItemText
+                                        primary="Arrived at hub"
+                                        secondary="Click 'Proceed' to handle pickups/deliveries"
+                                    />
+                                </ListItem>
+                                <ListItem>
+                                    <Chip size="small" label="2" color="primary" sx={{ mr: 1, minWidth: 28 }} />
+                                    <ListItemText
+                                        primary="Process orders"
+                                        secondary="Pick up or deliver orders at the hub"
+                                    />
+                                </ListItem>
+                                <ListItem>
+                                    <Chip size="small" label="3" color="primary" sx={{ mr: 1, minWidth: 28 }} />
+                                    <ListItemText
+                                        primary="Done Stop"
+                                        secondary="Click when finished at current stop"
+                                    />
+                                </ListItem>
+                                <ListItem>
+                                    <Chip size="small" label="4" color="primary" sx={{ mr: 1, minWidth: 28 }} />
+                                    <ListItemText
+                                        primary="Came Next Stop"
+                                        secondary="Click when arriving at next stop"
+                                    />
+                                </ListItem>
+                                <ListItem>
+                                    <Chip size="small" label="5" color="primary" sx={{ mr: 1, minWidth: 28 }} />
+                                    <ListItemText
+                                        primary="Complete Trip"
+                                        secondary="Click at final stop when confirmed in"
+                                    />
+                                </ListItem>
+                            </List>
                         </CardContent>
                     </Card>
 
@@ -567,7 +681,6 @@ const DriverRouteMap = () => {
                                 </Typography>
                             </Box>
                             <Divider sx={{ mb: 2 }} />
-
                             <List sx={{ maxHeight: 400, overflow: 'auto' }}>
                                 {stopSequence.map((stop) => {
                                     // Determine stop status
@@ -630,7 +743,7 @@ const DriverRouteMap = () => {
                                             </Box>
 
                                             {/* Add action buttons for hub operations when at current stop */}
-                                            {isCurrent && activeTrip && (
+                                            {isCurrent && activeTrip && isCameStop && (
                                                 <Button
                                                     variant="contained"
                                                     color="primary"
@@ -639,9 +752,9 @@ const DriverRouteMap = () => {
                                                     startIcon={isOriginHub ? <LocalShippingIcon /> : <CheckCircleIcon />}
                                                     onClick={() => handleArrivalAtHub(stop.hubId, stopNumber)}
                                                 >
-                                                    { isOriginHub
-                                                        ? "I've arrived - Pickup Orders"
-                                                        : "I've arrived - Deliver Orders"}
+                                                    {isOriginHub
+                                                        ? "Process Pickup Orders"
+                                                        : "Process Delivery Orders"}
                                                 </Button>
                                             )}
 
@@ -682,9 +795,8 @@ const DriverRouteMap = () => {
                                     hub={hub}
                                     currentLocation={currentLocation}
                                     currentStop={currentStop}
-                                    nextPointLabel="Điểm tiếp theo" // Add this line to specify the Vietnamese label
+                                    nextPointLabel="Next Stop"
                                 />
-
                             ) : (
                                 <Box
                                     display="flex"
@@ -712,10 +824,10 @@ const DriverRouteMap = () => {
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        You've arrived at {selectedHub?.hubName}.
+                        You're at {selectedHub?.hubName}.
                         {operationType === 'pickup'
-                            ? ' Ready to pick up orders from this hub?'
-                            : ' Ready to deliver orders to this hub?'
+                            ? ' Ready to process orders for pickup?'
+                            : ' Ready to process orders for delivery?'
                         }
                     </DialogContentText>
                 </DialogContent>
@@ -728,6 +840,31 @@ const DriverRouteMap = () => {
                         startIcon={operationType === 'pickup' ? <LocalShippingIcon /> : <CheckCircleIcon />}
                     >
                         Proceed
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Complete Trip Confirmation Dialog */}
+            <Dialog
+                open={confirmCompleteTripDialogOpen}
+                onClose={() => setConfirmCompleteTripDialogOpen(false)}
+                maxWidth="sm"
+                fullWidth
+            >
+                <DialogTitle>Complete Trip</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to complete this trip? This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setConfirmCompleteTripDialogOpen(false)}>Cancel</Button>
+                    <Button
+                        onClick={handleCompleteTrip}
+                        variant="contained"
+                        color="primary"
+                    >
+                        Complete Trip
                     </Button>
                 </DialogActions>
             </Dialog>

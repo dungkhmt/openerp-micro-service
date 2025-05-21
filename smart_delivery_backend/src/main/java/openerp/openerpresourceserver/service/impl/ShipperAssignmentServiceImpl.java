@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -204,13 +205,26 @@ public class ShipperAssignmentServiceImpl implements ShipperAssignmentService {
         if (!hubRepo.existsById(hubId)) {
             throw new NotFoundException("Hub not found with ID: " + hubId);
         }
+        // Get today's date at start of day
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.plusDays(1).atStartOfDay().minusSeconds(1);
+
+        // Convert LocalDateTime to Timestamp
+        Timestamp startTimestamp = Timestamp.valueOf(startOfDay);
+        Timestamp endTimestamp = Timestamp.valueOf(endOfDay);
         // Get all shippers
         List<Shipper> shippers = shipperRepo.findAllByHubId(hubId);
         if(shippers.isEmpty()) return new ArrayList<>();
         // Get all assignments for the hub
         List<AssignOrderShipper> assignments = new ArrayList<>();
         for(Shipper shipper : shippers){
-            List<AssignOrderShipper> assignOrderShippers = assignOrderShipperRepository.findByShipperId(shipper.getId());
+            List<AssignOrderShipper> assignOrderShippers = assignOrderShipperRepository
+                    .findByShipperIdAndCreatedAtBetween(
+                            shipper.getId(),
+                            startTimestamp,
+                            endTimestamp
+                    );
              assignments.addAll(assignOrderShippers);
         }
 

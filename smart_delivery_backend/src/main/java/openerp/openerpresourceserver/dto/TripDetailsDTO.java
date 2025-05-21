@@ -28,4 +28,7 @@ public class TripDetailsDTO {
     private Integer ordersDelivered;
     private List<TripStopDTO> stops;
     private List<OrderSummaryDTO> orders;
+    private List<TripStatusChangeDTO> statusHistory;
+
+
 }

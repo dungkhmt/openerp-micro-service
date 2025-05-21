@@ -10,6 +10,7 @@ import openerp.openerpresourceserver.entity.enumentity.TripStatus;
 import openerp.openerpresourceserver.entity.enumentity.VehicleStatus;
 import openerp.openerpresourceserver.repository.*;
 import openerp.openerpresourceserver.service.TripService;
+import org.locationtech.jts.triangulate.tri.Tri;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,7 @@ public class TripServiceImpl implements TripService {
     private final RouteScheduleRepository routeScheduleRepository;
     private final ScheduleVehicleAssignmentRepository scheduleVehicleAssignmentRepository;
     private final OrderItemRepo orderItemRepo;
+    private final TripHistoryRepository tripHistoryRepository;
     /**
      * Get all trips for a driver categorized as active, scheduled, or completed
      */
@@ -168,6 +170,395 @@ public class TripServiceImpl implements TripService {
                 .build();
     }
 
+    @Override
+    public TripHistoryResponseDto getTripHistoryWithDetails(UUID tripId) {
+        // Lấy thông tin trip hiện tại
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new NotFoundException("Trip not found with ID: " + tripId));
+
+        // Lấy tất cả lịch sử của trip
+        List<TripHistory> tripHistories = tripHistoryRepository.findByTripIdOrderByCreatedAtAsc(tripId);
+
+        // Lấy thông tin route và các điểm dừng
+        RouteSchedule routeSchedule = routeScheduleRepository.findById(trip.getRouteScheduleId())
+                .orElseThrow(() -> new NotFoundException("Route schedule not found"));
+
+        Route route = routeRepository.findById(routeSchedule.getRouteId())
+                .orElseThrow(() -> new NotFoundException("Route not found"));
+
+        List<RouteStop> routeStops = routeStopRepository.findByRouteIdOrderByStopSequence(route.getRouteId());
+
+        // Map thông tin điểm dừng vào lịch sử
+        List<TripHistoryEntryDto> historyEntries = new ArrayList<>();
+
+        // Thêm trạng thái lập kế hoạch từ thời điểm tạo trip
+        historyEntries.add(TripHistoryEntryDto.builder()
+                .id(UUID.randomUUID())
+                .status("PLANNED")
+                .timestamp(trip.getCreatedAt())
+                .changedBy(trip.getChangedBy())
+                .currentStopIndex(0)
+                .notes("Chuyến đi được tạo")
+                .build());
+
+        // Thêm các mục lịch sử từ bảng TripHistory
+        for (TripHistory history : tripHistories) {
+            TripHistoryEntryDto entry = TripHistoryEntryDto.builder()
+                    .id(history.getId())
+                    .status(history.getStatus())
+                    .timestamp(history.getCreatedAt())
+                    .changedBy(history.getChangedBy())
+                    .currentStopIndex(history.getCurrentStopIndex())
+                    .notes(history.getNotes())
+                    .build();
+
+            // Thêm thông tin về điểm dừng hiện tại nếu có
+            if (history.getCurrentStopIndex() != null && history.getCurrentStopIndex() < routeStops.size()) {
+                RouteStop stop = routeStops.get(history.getCurrentStopIndex());
+                Hub hub = hubRepo.findById(stop.getHubId()).orElse(null);
+
+                if (hub != null) {
+                    entry.setCurrentStopName(hub.getName());
+                    entry.setCurrentStopAddress(hub.getAddress());
+                }
+            }
+
+            historyEntries.add(entry);
+        }
+
+        // Thêm trạng thái hiện tại nếu khác với trạng thái lịch sử cuối cùng
+        if (tripHistories.isEmpty() || !tripHistories.get(tripHistories.size() - 1).getStatus().equals(trip.getStatus().toString())) {
+            TripHistoryEntryDto currentEntry = TripHistoryEntryDto.builder()
+                    .id(UUID.randomUUID())
+                    .status(trip.getStatus().toString())
+                    .timestamp(trip.getUpdatedAt())
+                    .changedBy(trip.getChangedBy())
+                    .currentStopIndex(trip.getCurrentStopIndex())
+                    .notes("Trạng thái hiện tại")
+                    .build();
+
+            // Thêm thông tin về điểm dừng hiện tại
+            if (trip.getCurrentStopIndex() != null && trip.getCurrentStopIndex() < routeStops.size()) {
+                RouteStop stop = routeStops.get(trip.getCurrentStopIndex());
+                Hub hub = hubRepo.findById(stop.getHubId()).orElse(null);
+
+                if (hub != null) {
+                    currentEntry.setCurrentStopName(hub.getName());
+                    currentEntry.setCurrentStopAddress(hub.getAddress());
+                }
+            }
+
+            historyEntries.add(currentEntry);
+        }
+
+        // Sắp xếp các mục lịch sử theo thời gian
+        historyEntries.sort(Comparator.comparing(TripHistoryEntryDto::getTimestamp));
+
+        // Tạo stop timeline
+        List<TripStopTimelineDto> stopTimeline = new ArrayList<>();
+
+        for (int i = 0; i < routeStops.size(); i++) {
+            RouteStop stop = routeStops.get(i);
+            Hub hub = hubRepo.findById(stop.getHubId()).orElse(null);
+
+            if (hub != null) {
+                TripStopTimelineDto stopEntry = TripStopTimelineDto.builder()
+                        .stopIndex(i)
+                        .stopSequence(stop.getStopSequence())
+                        .hubId(hub.getHubId())
+                        .hubName(hub.getName())
+                        .address(hub.getAddress())
+                        .build();
+
+                // Xác định trạng thái điểm dừng
+                if (i < trip.getCurrentStopIndex()) {
+                    stopEntry.setStatus("COMPLETED");
+
+                    // Tìm thời gian đến điểm dừng này từ lịch sử
+                    for (TripHistory history : tripHistories) {
+                        if (history.getCurrentStopIndex() != null && history.getCurrentStopIndex() == i + 1) {
+                            stopEntry.setArrivalTime(history.getCreatedAt());
+                            break;
+                        }
+                    }
+                } else if (i == trip.getCurrentStopIndex()) {
+                    stopEntry.setStatus("CURRENT");
+                    stopEntry.setArrivalTime(trip.getLastStopArrivalTime());
+                } else {
+                    stopEntry.setStatus("PENDING");
+                }
+
+                stopTimeline.add(stopEntry);
+            }
+        }
+
+        // Tính toán các thống kê
+        long totalDurationMinutes = 0;
+        if (trip.getStartTime() != null && trip.getEndTime() != null) {
+            totalDurationMinutes = Duration.between(trip.getStartTime(), trip.getEndTime()).toMinutes();
+        } else if (trip.getStartTime() != null) {
+            totalDurationMinutes = Duration.between(trip.getStartTime(), Instant.now()).toMinutes();
+        }
+
+        // Đếm số đơn hàng đã giao và tổng số
+        List<TripOrder> tripOrders = tripOrderRepository.findByTripId(tripId);
+        int totalOrders = tripOrders.size();
+        int deliveredOrders = (int) tripOrders.stream()
+                .filter(to -> "DELIVERED".equals(to.getStatus()))
+                .count();
+
+        // Tạo response DTO
+        return TripHistoryResponseDto.builder()
+                .tripId(trip.getId())
+                .tripCode(trip.getTripCode())
+                .routeId(route.getRouteId())
+                .routeName(route.getRouteName())
+                .routeCode(route.getRouteCode())
+                .currentStatus(trip.getStatus().toString())
+                .createdAt(trip.getCreatedAt())
+                .startTime(trip.getStartTime())
+                .endTime(trip.getEndTime())
+                .currentStopIndex(trip.getCurrentStopIndex())
+                .totalStops(routeStops.size())
+                .totalDurationMinutes(totalDurationMinutes)
+                .totalOrders(totalOrders)
+                .deliveredOrders(deliveredOrders)
+                .completionNotes(trip.getCompletionNotes())
+                .historyEntries(historyEntries)
+                .stopTimeline(stopTimeline)
+                .build();
+    }
+    // Add this new method to retrieve trip history for frontend visualization
+    @Override
+    public List<TripHistoryDetailDto> getTripHistoryDetails(UUID tripId) {
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new NotFoundException("Trip not found with ID: " + tripId));
+
+        List<TripHistory> tripHistories = tripHistoryRepository.findByTripIdOrderByCreatedAtAsc(tripId);
+
+        // Retrieve route information
+        RouteSchedule routeSchedule = routeScheduleRepository.findById(trip.getRouteScheduleId())
+                .orElseThrow(() -> new NotFoundException("Route schedule not found"));
+        Route route = routeRepository.findById(routeSchedule.getRouteId())
+                .orElseThrow(() -> new NotFoundException("Route not found"));
+
+        List<RouteStop> routeStops = routeStopRepository.findByRouteIdOrderByStopSequence(route.getRouteId());
+
+        // Map trip histories to DTOs with added context
+        return tripHistories.stream().map(history -> {
+            TripHistoryDetailDto dto = new TripHistoryDetailDto();
+            dto.setId(history.getId());
+            dto.setTripId(history.getTripId());
+            dto.setCreatedAt(history.getCreatedAt());
+            dto.setStatus(history.getStatus());
+            dto.setChangedBy(history.getChangedBy());
+            dto.setCurrentStopIndex(history.getCurrentStopIndex());
+
+            // Add context about the stop if available
+            if (history.getCurrentStopIndex() != null && history.getCurrentStopIndex() < routeStops.size()) {
+                RouteStop stop = routeStops.get(history.getCurrentStopIndex());
+                Hub hub = hubRepo.findById(stop.getHubId()).orElse(null);
+                if (hub != null) {
+                    dto.setStopHubName(hub.getName());
+                    dto.setStopAddress(hub.getAddress());
+                }
+            }
+
+            // Determine next status (useful for UI visualization)
+            if (tripHistories.indexOf(history) < tripHistories.size() - 1) {
+                dto.setNextStatus(tripHistories.get(tripHistories.indexOf(history) + 1).getStatus());
+            } else {
+                dto.setNextStatus(trip.getStatus().toString());
+            }
+
+            // Calculate duration to next status
+            if (tripHistories.indexOf(history) < tripHistories.size() - 1) {
+                TripHistory nextHistory = tripHistories.get(tripHistories.indexOf(history) + 1);
+                long durationMinutes = Duration.between(history.getCreatedAt(), nextHistory.getCreatedAt()).toMinutes();
+                dto.setDurationToNextStatus(durationMinutes);
+            }
+
+            // Add additional context based on status
+            switch (history.getStatus()) {
+                case "PLANNED":
+                    dto.setContextInfo("Trip scheduled");
+                    break;
+                case "CAME_FIRST_STOP":
+                    dto.setContextInfo("Driver arrived at first stop");
+                    break;
+                case "IN_PROGRESS":
+                    dto.setContextInfo("Trip in progress");
+                    break;
+                case "CAME_LAST_STOP":
+                    dto.setContextInfo("Driver arrived at final stop");
+                    break;
+                case "CONFIRMED_IN":
+                    dto.setContextInfo("Trip confirmed at destination hub");
+                    break;
+                case "COMPLETED":
+                    // Calculate total trip duration
+                    if (trip.getStartTime() != null && trip.getEndTime() != null) {
+                        long tripDuration = Duration.between(trip.getStartTime(), trip.getEndTime()).toMinutes();
+                        dto.setContextInfo("Trip completed in " + tripDuration + " minutes");
+                    } else {
+                        dto.setContextInfo("Trip completed");
+                    }
+                    break;
+                default:
+                    dto.setContextInfo("");
+            }
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    // Add this new method to get a timeline-friendly representation of trip status changes
+    @Override
+    public TripTimelineDto getTripTimeline(UUID tripId) {
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new NotFoundException("Trip not found with ID: " + tripId));
+
+        List<TripHistory> histories = tripHistoryRepository.findByTripIdOrderByCreatedAtAsc(tripId);
+
+        // Get all route stops for this trip
+        RouteSchedule routeSchedule = routeScheduleRepository.findById(trip.getRouteScheduleId())
+                .orElseThrow(() -> new NotFoundException("Route schedule not found"));
+        List<RouteStop> routeStops = routeStopRepository.findByRouteIdOrderByStopSequence(routeSchedule.getRouteId());
+        List<Hub> hubs = routeStops.stream()
+                .map(stop -> hubRepo.findById(stop.getHubId()).orElse(null))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        // Create timeline events
+        List<TripTimelineEventDto> events = new ArrayList<>();
+
+        // Add planned event (first event)
+        events.add(TripTimelineEventDto.builder()
+                .status("PLANNED")
+                .timestamp(trip.getCreatedAt())
+                .title("Trip Scheduled")
+                .description("Trip was scheduled for " + trip.getDate())
+                .hubName(null)  // No hub yet
+                .completed(true)
+                .build());
+
+        // Add start event
+        if (trip.getStartTime() != null) {
+            events.add(TripTimelineEventDto.builder()
+                    .status("CAME_FIRST_STOP")
+                    .timestamp(trip.getStartTime())
+                    .title("Trip Started")
+                    .description("Driver arrived at first hub: " +
+                            (hubs.size() > 0 ? hubs.get(0).getName() : "Unknown"))
+                    .hubName(hubs.size() > 0 ? hubs.get(0).getName() : null)
+                    .completed(true)
+                    .build());
+        }
+
+        // Add stop events based on history and current trip state
+        if (trip.getStatus() == TripStatus.IN_PROGRESS ||
+                trip.getStatus() == TripStatus.CAME_LAST_STOP ||
+                trip.getStatus() == TripStatus.CONFIRMED_IN ||
+                trip.getStatus() == TripStatus.COMPLETED) {
+
+            for (int i = 1; i <= trip.getCurrentStopIndex(); i++) {
+                if (i < hubs.size()) {
+                    // Find timestamp from history if possible
+                    Instant timestamp = null;
+                    String notes = "";
+
+                    for (TripHistory history : histories) {
+                        if (history.getCurrentStopIndex() != null && history.getCurrentStopIndex() == i) {
+                            timestamp = history.getCreatedAt();
+                            notes = history.getNotes() != null ? history.getNotes() : "";
+                            break;
+                        }
+                    }
+
+                    if (timestamp == null) {
+                        // No exact match found, estimate based on trip start time and current time
+                        if (trip.getStartTime() != null) {
+                            long totalDuration = Duration.between(trip.getStartTime(), Instant.now()).toMinutes();
+                            long estimatedMinutesPerStop = totalDuration / Math.max(1, trip.getCurrentStopIndex());
+                            timestamp = trip.getStartTime().plus(Duration.ofMinutes(estimatedMinutesPerStop * i));
+                        } else {
+                            timestamp = Instant.now().minus(Duration.ofMinutes(30 * (trip.getCurrentStopIndex() - i)));
+                        }
+                    }
+
+                    events.add(TripTimelineEventDto.builder()
+                            .status("STOP_" + i)
+                            .timestamp(timestamp)
+                            .title("Arrived at Stop " + i)
+                            .description("Driver arrived at " + hubs.get(i).getName() + (notes.isEmpty() ? "" : ": " + notes))
+                            .hubName(hubs.get(i).getName())
+                            .completed(true)
+                            .build());
+                }
+            }
+        }
+
+        // Add remaining stops that haven't been visited yet
+        for (int i = trip.getCurrentStopIndex() + 1; i < hubs.size(); i++) {
+            events.add(TripTimelineEventDto.builder()
+                    .status("STOP_" + i)
+                    .timestamp(null)  // No timestamp since not reached yet
+                    .title("Stop " + i)
+                    .description(hubs.get(i).getName())
+                    .hubName(hubs.get(i).getName())
+                    .completed(false)
+                    .build());
+        }
+
+        // Add completion event
+        if (trip.getStatus() == TripStatus.COMPLETED) {
+            events.add(TripTimelineEventDto.builder()
+                    .status("COMPLETED")
+                    .timestamp(trip.getEndTime())
+                    .title("Trip Completed")
+                    .description(trip.getCompletionNotes() != null ? trip.getCompletionNotes() : "Trip successfully completed")
+                    .hubName(hubs.size() > 0 ? hubs.get(hubs.size() - 1).getName() : null)
+                    .completed(true)
+                    .build());
+        } else if (trip.getStatus() == TripStatus.CANCELLED) {
+            // Add cancelled event if applicable
+            events.add(TripTimelineEventDto.builder()
+                    .status("CANCELLED")
+                    .timestamp(trip.getEndTime() != null ? trip.getEndTime() : Instant.now())
+                    .title("Trip Cancelled")
+                    .description(trip.getCompletionNotes() != null ? trip.getCompletionNotes() : "Trip was cancelled")
+                    .hubName(null)
+                    .completed(true)
+                    .build());
+        } else if (trip.getStatus() != TripStatus.PLANNED) {
+            // Add future completion event
+            events.add(TripTimelineEventDto.builder()
+                    .status("COMPLETION")
+                    .timestamp(null)  // No timestamp since not completed yet
+                    .title("Trip Completion")
+                    .description("Pending completion")
+                    .hubName(hubs.size() > 0 ? hubs.get(hubs.size() - 1).getName() : null)
+                    .completed(false)
+                    .build());
+        }
+
+        // Sort events by timestamp
+        events.sort(Comparator.comparing(
+                event -> event.getTimestamp() != null ? event.getTimestamp() : Instant.MAX
+        ));
+
+        // Build and return the timeline
+        return TripTimelineDto.builder()
+                .tripId(trip.getId())
+                .tripCode(trip.getTripCode())
+                .currentStatus(trip.getStatus().toString())
+                .startTime(trip.getStartTime())
+                .endTime(trip.getEndTime())
+                .currentStopIndex(trip.getCurrentStopIndex())
+                .totalStops(routeStops.size())
+                .events(events)
+                .build();
+    }
     /**
      * Start a scheduled trip
      */
@@ -190,7 +581,7 @@ public class TripServiceImpl implements TripService {
         }
 
         // Verify trip is in PLANNED status
-        if (!"PLANNED".equals(trip.getStatus())) {
+        if (!TripStatus.PLANNED.equals(trip.getStatus())) {
             throw new IllegalStateException("Trip is not in PLANNED status");
         }
 
@@ -223,7 +614,7 @@ public class TripServiceImpl implements TripService {
      */
     @Transactional
     @Override
-    public TripDetailsDTO advanceToNextStop(UUID tripId, String username) {
+    public TripDetailsDTO arrivedInNextStop(UUID tripId, UUID hubId, String username) {
         // Find driver by username
         Driver driver = driverRepo.findByUsername(username);
         if (driver == null) {
@@ -242,12 +633,28 @@ public class TripServiceImpl implements TripService {
         }
 
         // Verify trip is in progress
-        if (!"IN_PROGRESS".equals(trip.getStatus()) && !"CAME_FIRST_STOP".equals(trip.getStatus())) {
+        if (!TripStatus.DONE_STOP.equals(trip.getStatus()) && !TripStatus.CAME_STOP.equals(trip.getStatus()) && !TripStatus.IN_PROGRESS.equals(trip.getStatus()) && !TripStatus.PICKED_UP.equals(trip.getStatus()) && !TripStatus.CAME_FIRST_STOP.equals(trip.getStatus())  && !TripStatus.CONFIRMED_IN.equals(trip.getStatus())) {
             throw new IllegalStateException("Trip is not in progress");
         }
 
         // Get route stops to check if we're at the last stop
         List<RouteStop> stops = routeStopRepository.findByRouteIdOrderByStopSequence(routeSchedule.getRouteId());
+
+        if(TripStatus.PICKED_UP.equals(trip.getStatus())) {
+            trip.setStatus(TripStatus.CAME_STOP);
+        }
+        else if(TripStatus.CONFIRMED_IN.equals(trip.getStatus())) {
+            trip.setStatus(TripStatus.CAME_STOP);
+        }
+        else if(TripStatus.DONE_STOP.equals(trip.getStatus())) {
+            trip.setStatus(TripStatus.CAME_STOP);
+        }
+        //check if the hubId is the next stop
+
+            RouteStop nextStop1 = stops.get(trip.getCurrentStopIndex() + 1);
+            if (!nextStop1.getHubId().equals(hubId))
+                throw new IllegalArgumentException("Not at the expected next stop");
+
 
         // Check if already at last stop
         if (trip.getCurrentStopIndex() >= stops.size() - 1) {
@@ -273,27 +680,25 @@ public class TripServiceImpl implements TripService {
 //            order.setStatus(OrderStatus.DELIVERING);
 //        }
 
-        // For orders that are being delivered to this stop, update status
-        List<Order> deliveredOrders = orderRepo.findByTripId(trip.getId()).stream()
-                .filter(order -> {
-                    // If this is a delivery stop for the order
-                    return order.getFinalHubId() != null &&
-                            order.getFinalHubId().equals(currentStop.getHubId()) &&
-                            order.getStatus() == OrderStatus.DELIVERING;
-                })
-                .collect(Collectors.toList());
-
+//        // For orders that are being delivered to this stop, update status
+//        List<Order> deliveredOrders = orderRepo.findByTripId(trip.getId()).stream()
+//                .filter(order -> {
+//                    // If this is a delivery stop for the order
+//                    return order.getFinalHubId() != null &&
+//                            order.getFinalHubId().equals(currentStop.getHubId()) &&
+//                            order.getStatus() == OrderStatus.DELIVERING;
+//                })
+//                .collect(Collectors.toList());
+//
 //        // Update orders status to DELIVERED
 //        for (Order order : deliveredOrders) {
 //            order.setStatus(OrderStatus.DELIVERED);
 //        }
 //
 //        // Save all updated orders
-//        orderRepo.saveAll(ordersToUpdate);
 //        orderRepo.saveAll(deliveredOrders);
-
+//
 //        // Update trip stats
-//        trip.setOrdersPickedUp((trip.getOrdersPickedUp() != null ? trip.getOrdersPickedUp() : 0) + ordersToUpdate.size());
 //        trip.setOrdersDelivered((trip.getOrdersDelivered() != null ? trip.getOrdersDelivered() : 0) + deliveredOrders.size());
 
         // Advance to next stop
@@ -307,6 +712,73 @@ public class TripServiceImpl implements TripService {
         return getTripDetailsForDriver(updatedTrip.getId(), username);
     }
 
+
+    @Transactional
+    @Override
+    public TripDetailsDTO doneStop(UUID tripId, String username) {
+        // Find driver by username
+        Driver driver = driverRepo.findByUsername(username);
+        if (driver == null) {
+            throw new NotFoundException("Driver not found with username: " + username);
+        }
+
+        // Get the trip
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new NotFoundException("Trip not found with ID: " + tripId));
+
+        RouteSchedule routeSchedule = routeScheduleRepository.findById(trip.getRouteScheduleId()).orElseThrow(() -> new NotFoundException("Route not found"));
+
+        // Verify driver is assigned to this trip
+        if (!trip.getDriverId().equals(driver.getId())) {
+            throw new IllegalArgumentException("Driver is not assigned to this trip");
+        }
+
+        // Verify trip is in progress
+        if (TripStatus.CONFIRMED_IN.equals(trip.getStatus())) {
+            // Get route stops to check if we're at the last stop
+            List<RouteStop> stops = routeStopRepository.findByRouteIdOrderByStopSequence(routeSchedule.getRouteId());
+
+
+
+            // done stop
+            trip.setStatus(TripStatus.DONE_STOP);
+            trip.setChangedBy(username);
+            Trip updatedTrip = tripRepository.save(trip);
+
+            // Return updated trip details
+            return getTripDetailsForDriver(updatedTrip.getId(), username);
+        }
+        else if (TripStatus.CAME_STOP.equals(trip.getStatus()) ) {
+            // Get route stops to check if we're at the last stop
+            List<RouteStop> stops = routeStopRepository.findByRouteIdOrderByStopSequence(routeSchedule.getRouteId());
+
+
+            RouteStop currentStop = stops.get(trip.getCurrentStopIndex());
+            // Check to see if there are any orders to be delivered at this stop
+            List<TripOrder> tripOrders = tripOrderRepository.findByTripIdAndStatusOrderByCreatedAtDescAndHubId(trip.getId(),currentStop.getHubId(), "DELIVERING");
+            if(!tripOrders.isEmpty()) {
+                throw new IllegalStateException("Cannot skip stop with orders to be delivered");
+            }
+            // done stop
+            trip.setStatus(TripStatus.DONE_STOP);
+            trip.setChangedBy(username);
+            Trip updatedTrip = tripRepository.save(trip);
+            return getTripDetailsForDriver(updatedTrip.getId(), username);
+        }
+        else if (TripStatus.PICKED_UP.equals(trip.getStatus()) ) {
+            // Get route stops to check if we're at the last stop
+
+            // done stop
+            trip.setStatus(TripStatus.DONE_STOP);
+            trip.setChangedBy(username);
+            Trip updatedTrip = tripRepository.save(trip);
+            return getTripDetailsForDriver(updatedTrip.getId(), username);
+        }
+
+        // Save updated trip
+        throw new IllegalStateException("Cannot done stop");
+        // Return updated trip details
+    }
     /**
      * Complete a trip
      */
@@ -329,7 +801,7 @@ public class TripServiceImpl implements TripService {
         }
 
         // Verify trip is in progress
-        if (!"CONFIRMED_IN".equals(trip.getStatus())) {
+        if (!TripStatus.CONFIRMED_IN.equals(trip.getStatus())) {
             throw new IllegalStateException("Trip is not confirmed in!");
         }
 

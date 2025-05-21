@@ -18,11 +18,20 @@ public interface TripService {
 
     TripDetailsDTO getTripDetailsForDriver(UUID tripId, String username);
 
+    // Add this new method to retrieve trip history for frontend visualization
+    List<TripHistoryDetailDto> getTripHistoryDetails(UUID tripId);
+
+    // Add this new method to get a timeline-friendly representation of trip status changes
+    TripTimelineDto getTripTimeline(UUID tripId);
+
     @Transactional
     TripDetailsDTO startTrip(UUID tripId, String username);
 
     @Transactional
-    TripDetailsDTO advanceToNextStop(UUID tripId, String username);
+    TripDetailsDTO arrivedInNextStop(UUID tripId, UUID hubId, String username);
+
+    @Transactional
+    TripDetailsDTO doneStop(UUID tripId, String username);
 
     @Transactional
     TripSummaryDTO completeTrip(UUID tripId, String username, String completionNotes);
@@ -49,4 +58,6 @@ public interface TripService {
     List<TripDTO> getTripsForHubTodayStart(UUID hubId);
 
     List<TripDTO> getTripsForHubTodayThrough(UUID hubId);
+
+    TripHistoryResponseDto getTripHistoryWithDetails(UUID tripId);
 }

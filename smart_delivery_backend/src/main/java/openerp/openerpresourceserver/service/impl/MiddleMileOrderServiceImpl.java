@@ -9,15 +9,13 @@ import openerp.openerpresourceserver.dto.OrderResponseDto;
 import openerp.openerpresourceserver.dto.OrderSummaryMiddleMileDto;
 import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
-import openerp.openerpresourceserver.entity.enumentity.VehicleStatus;
 import openerp.openerpresourceserver.repository.*;
 import openerp.openerpresourceserver.service.MiddleMileOrderService;
 import openerp.openerpresourceserver.service.OrderService;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
+import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,7 +38,7 @@ public class MiddleMileOrderServiceImpl implements MiddleMileOrderService {
      */
     @Transactional
     @Override
-    public void assignOrdersToTrip(UUID routeVehicleId, List<UUID> orderIds) {
+    public void assignOrdersToTrip(UUID tripId, List<UUID> orderIds) {
 //        RouteVehicle routeVehicle = routeVehicleRepository.findById(routeVehicleId)
 //                .orElseThrow(() -> new NotFoundException("Route vehicle assignment not found"));
 //        Vehicle vehicle = vehicleRepo.findById(routeVehicle.getVehicleId()).orElseThrow(()-> new NotFoundException("not found vehicle"));
@@ -162,7 +160,7 @@ public class MiddleMileOrderServiceImpl implements MiddleMileOrderService {
 
     }
     @Transactional
-    public void assignAndConfirmOrdersOut(UUID tripId, List<UUID> orderIds) {
+    public void assignAndConfirmOrdersOut(Principal principal, UUID tripId, List<UUID> orderIds) {
         log.info("Assigning and confirming {} orders for trip {}", orderIds.size(), tripId);
 
         // 1. Validate capacity
@@ -183,6 +181,7 @@ public class MiddleMileOrderServiceImpl implements MiddleMileOrderService {
             }
 
             order.setStatus(OrderStatus.CONFIRMED_OUT);
+            order.setChangedBy(principal.getName());
             orders.add(order);
 
             log.debug("Updated order {} status to CONFIRMED_OUT", orderId);

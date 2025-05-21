@@ -58,7 +58,11 @@ public class DriverController {
         TripDetailsDTO tripDetails = tripService.getTripDetailsForDriver(tripId, username);
         return ResponseEntity.ok(tripDetails);
     }
-
+    @GetMapping("/trips/{tripId}/history")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
+    public ResponseEntity<TripHistoryResponseDto> getTripHistory(@PathVariable UUID tripId) {
+        return ResponseEntity.ok(tripService.getTripHistoryWithDetails(tripId));
+    }
     /**
      * Start a scheduled trip
      */
@@ -78,11 +82,25 @@ public class DriverController {
     @PreAuthorize("hasRole('DRIVER')")
     @PostMapping("/trips/{tripId}/advance")
     public ResponseEntity<TripDetailsDTO> advanceToNextStop(
-            @PathVariable UUID tripId,
+            @PathVariable UUID tripId, @RequestParam UUID hubId,
             Principal principal) {
         String username = principal.getName();
-        TripDetailsDTO updatedTrip = tripService.advanceToNextStop(tripId, username);
+        TripDetailsDTO updatedTrip = tripService.arrivedInNextStop(tripId, hubId, username);
         return ResponseEntity.ok(updatedTrip);
+    }
+    /**
+     * Mark a trip as completed
+     */
+    @PreAuthorize("hasRole('DRIVER')")
+    @PostMapping("/trips/{tripId}/doneStop")
+    public ResponseEntity<TripDetailsDTO> doneStop(
+            @PathVariable UUID tripId,
+            @RequestBody(required = false) Map<String, String> notes,
+            Principal principal) {
+        String username = principal.getName();
+        String completionNotes = notes != null ? notes.getOrDefault("notes", "") : "";
+        TripDetailsDTO summary = tripService.doneStop(tripId, username);
+        return ResponseEntity.ok(summary);
     }
 
     /**

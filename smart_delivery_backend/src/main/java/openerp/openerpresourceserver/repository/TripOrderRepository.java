@@ -61,5 +61,8 @@ public interface TripOrderRepository extends JpaRepository<TripOrder, UUID> {
 
     TripOrder findTopByOrderIdOrderByCreatedAtDesc(UUID orderId);
 
-    TripOrder findByOrderIdAndStatus(UUID id, TripStatus tripStatus);
+    TripOrder findByOrderIdAndStatus(UUID orderId, String status);
+
+    @Query("select to from TripOrder to join Order o on to.orderId = o.id where to.tripId = :id and  to.orderId = o.id and to.status = :delivering and o.finalHubId = :hubId")
+    List<TripOrder> findByTripIdAndStatusOrderByCreatedAtDescAndHubId(UUID id, UUID hubId, String delivering);
 }

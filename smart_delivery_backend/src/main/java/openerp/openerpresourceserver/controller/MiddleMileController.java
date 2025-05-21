@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -45,11 +46,11 @@ public class MiddleMileController {
 
     // Hub staff assigns selected orders to trip
     @PostMapping("/trip/{tripId}/assign-orders")
-    public ResponseEntity<Void> assignOrdersToTrip(
+    public ResponseEntity<Void> assignOrdersToTrip(Principal principal,
             @PathVariable UUID tripId,
             @RequestBody AssignOrdersRequest request) {
 
-        middleMileOrderService.assignAndConfirmOrdersOut(tripId, request.getOrderIds());
+        middleMileOrderService.assignAndConfirmOrdersOut( principal, tripId, request.getOrderIds());
         return ResponseEntity.ok().build();
     }
     // ===== Route Endpoints =====

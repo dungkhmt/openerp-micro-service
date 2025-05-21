@@ -533,15 +533,17 @@ const DriverHubOperations = () => {
                                     </Typography>
                                 </Grid>
                             </Grid>
+                            { isLastStop &&
+                                <Button
+                                    variant="contained"
+                                    color={isLastStop ? "success" : "secondary"}
+                                    sx={{ mt: 2 }}
+                                    onClick={handleCompleteTrip }
+                                >
+                                    'Complete Trip'
+                                </Button>
+                            }
 
-                            <Button
-                                variant="contained"
-                                color={isLastStop ? "success" : "secondary"}
-                                sx={{ mt: 2 }}
-                                onClick={isLastStop ? handleCompleteTrip : handleAdvanceToNextStop}
-                            >
-                                {isLastStop ? 'Complete Trip' : 'Advance to Next Stop'}
-                            </Button>
                         </CardContent>
                     </Card>
 
