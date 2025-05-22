@@ -8,6 +8,7 @@ import { VerticalDotsIcon } from "../../../components/icon/VerticalDotsIcon";
 import { SearchIcon } from "../../../components/icon/SearchIcon";
 import { columns, statusOptions } from "../../../config/distance";
 import { request } from "../../../api";
+import { toast, Toaster } from "react-hot-toast";
 
 export default function Distance() {
     const [page, setPage] = useState(1);
@@ -98,7 +99,7 @@ export default function Distance() {
     const handleAutoUpdate = () => {
         request("post", "/address-distances/update-all", (res) => {
             if (res.status === 200) {
-                alert("Distances updated successfully!");
+                toast.success("Distances updated successfully!");
                 // Reload data
                 request(
                     "get",
@@ -111,7 +112,7 @@ export default function Distance() {
                     }
                 );
             } else {
-                alert("Failed to update distances!");
+                toast.error("Failed to update distances!");
             }
         });
     };
@@ -255,6 +256,7 @@ export default function Distance() {
 
     return (
         <>
+        <Toaster/>
             <Table
                 isCompact
                 removeWrapper

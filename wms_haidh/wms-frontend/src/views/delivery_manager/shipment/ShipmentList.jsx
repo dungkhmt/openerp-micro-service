@@ -23,6 +23,8 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../../api";
 import { formatDate } from '../../../utils/utils';
+import { toast, Toaster } from "react-hot-toast";
+
 const buttonText = "Create shipment";
 export default function Shipment() {
 
@@ -104,7 +106,19 @@ export default function Shipment() {
   };
 
   const handleConfirm = () => {
-    if (!selectedDateTime) return;
+    if (!selectedDateTime) {
+      toast.error("Please select a delivery time");
+      return;
+    }
+
+    const selected = new Date(selectedDateTime);
+    const now = new Date();
+
+    if (selected < now) {
+      toast.error("Delivery time must be in the future");
+      return;
+    }
+
     const formattedDateTime = `${selectedDateTime}:00`;
 
     const payload = {
@@ -115,13 +129,15 @@ export default function Shipment() {
 
     request("post", requestUrl, (res) => {
       if (res.status === 200) {
+        setPage(1);
         request("get", `/shipments?page=${page - 1}&size=${rowsPerPage}&search=${debouncedSearchTerm}`, (res) => {
           setItems(res.data.content);
           setTotalItems(res.data.totalElements);
           setPages(res.data.totalPages);
         }).then();
+        toast.success("Shipment created successfully!");
       } else {
-        alert("Error occured !");
+        toast.error("Something went wrong!");
       }
     }, {}, payload);
 
@@ -213,6 +229,7 @@ export default function Shipment() {
 
   return (
     <>
+      <Toaster />
       <Table
         isCompact
         removeWrapper

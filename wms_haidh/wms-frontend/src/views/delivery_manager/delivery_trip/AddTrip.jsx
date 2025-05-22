@@ -153,10 +153,41 @@ const AddTrip = () => {
 
   const handleSubmit = async () => {
 
+    if (!warehouseId) {
+      toast.error("Please select a departure warehouse");
+      return;
+    }
+
+    if (!shipmentId) {
+      toast.error("Please select a shipment");
+      return;
+    }
+
+    if (!deliveryPersonId) {
+      toast.error("Please select a delivery person");
+      return;
+    }
+
+    if (!vehicleId) {
+      toast.error("Please select a vehicle");
+      return;
+    }
+
+    if (totalWeight === 0) {
+      toast.error("Please select at least one item");
+      return;
+    }
+
     if (totalWeight > maxWeight) {
       toast.error("Total weight exceeds vehicle load capacity ! ");
       return;
     }
+
+    if (distance === 0) {
+      toast.error("Please wait until the route distance is loaded. ");
+      return;
+    }
+
 
     const orderSequenceMap = deliverySequence.reduce((acc, item, index) => {
       acc[item.orderId] = index + 1;
@@ -188,7 +219,10 @@ const AddTrip = () => {
 
     request("post", requestUrl, (res) => {
       if (res.status === 200) {
+        alert("Trip created successfully!");
         navigate(`/delivery-manager/delivery-trip`);
+      } else {
+        alert("Failed to create trip");
       }
     }, {}, payload);
   };

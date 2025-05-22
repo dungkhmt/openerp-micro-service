@@ -19,6 +19,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { request } from "../../../api";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import { toast, Toaster } from "react-hot-toast";
 
 const RoutingRecommendation = () => {
   const navigate = useNavigate();
@@ -37,8 +38,18 @@ const RoutingRecommendation = () => {
   }, []);
 
   const handleAddTrip = () => {
+    const isAllValid = deliveryTrips.every(
+      trip => trip.warehouseId && trip.vehicleId
+    );
+
+    if (!isAllValid) {
+      toast.error("Please complete all existing trips before adding a new one.");
+      return;
+    }
+
     setDeliveryTrips([...deliveryTrips, { warehouseId: '', vehicleId: '' }]);
   };
+
 
   const handleDeleteTrip = (index) => {
     const updatedTrips = deliveryTrips.filter((_, i) => i !== index);
@@ -81,6 +92,7 @@ const RoutingRecommendation = () => {
 
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
+      <Toaster />
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         <IconButton onClick={() => navigate('/delivery-manager/shipments')} sx={{ color: 'grey.700', mr: 1 }}>
@@ -90,6 +102,7 @@ const RoutingRecommendation = () => {
           Routing Recommendation
         </Typography>
         <Button
+          disabled={deliveryTrips.some(trip => !trip.warehouseId || !trip.vehicleId)}
           variant="contained"
           startIcon={<PlayArrowIcon />}
           sx={{

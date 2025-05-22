@@ -23,6 +23,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../../api";
 import { formatDate } from '../../../utils/utils';
 import { Badge } from "../../../components/button/badge";
+import { toast, Toaster } from "react-hot-toast";
 
 const statusColorMap = {
   BUSY: "warning",
@@ -141,7 +142,39 @@ export default function DeliveryPerson() {
     });
   };
 
+  const validateForm = () => {
+
+    if (!staffInfo.userLoginId) {
+      if (!staffInfo.email.trim()) {
+        toast.error("Email is required");
+        return false;
+      }
+      if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(staffInfo.email)) {
+        toast.error("Invalid email format");
+        return false;
+      }
+    }
+
+    if (!staffInfo.fullName.trim()) {
+      toast.error("Full name is required");
+      return false;
+    }
+
+    if (!staffInfo.phoneNumber.trim()) {
+      toast.error("Phone number is required");
+      return false;
+    }
+    if (!/^[0-9]{8,15}$/.test(staffInfo.phoneNumber)) {
+      toast.error("Phone number must be 8–15 digits");
+      return false;
+    }
+    return true;
+  };
+
   const handleConfirm = () => {
+
+    if (!validateForm()) return;
+
     const requestUrl = staffInfo.userLoginId
       ? "/delivery-persons/update"
       : "/delivery-persons";
@@ -156,8 +189,9 @@ export default function DeliveryPerson() {
           setTotalItems(res.data.totalElements);
           setPages(res.data.totalPages);
         });
+        toast.success("Delivery staff saved successfully!");
       } else {
-        alert("Error occurred!");
+        toast.error("Something went wrong!");
       }
     }, {}, payload);
 
@@ -276,6 +310,7 @@ export default function DeliveryPerson() {
 
   return (
     <>
+      <Toaster />
       <Table
         isCompact
         removeWrapper

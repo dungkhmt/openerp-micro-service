@@ -7,6 +7,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { Table, TableHead, TableRow, TableCell, TableBody, TableContainer } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
+import { toast, Toaster } from "react-hot-toast";
 
 const RoutingResult = () => {
     const { id } = useParams();
@@ -121,7 +122,6 @@ const RoutingResult = () => {
     };
 
 
-
     const handleInputChange = (tripId, field, value) => {
         setInputData(prev => ({
             ...prev,
@@ -133,6 +133,14 @@ const RoutingResult = () => {
     };
 
     const handleSubmit = async () => {
+        const missingDelivery = trips.filter(
+            trip => !inputData[trip.vehicleId]?.deliveryPerson
+        );
+
+        if (missingDelivery.length > 0) {
+            toast.error("Please assign a delivery person for all trips before saving.");
+            return;
+        }
         const payload = trips.map(trip => {
             return {
                 warehouseId: trip.warehouse,
@@ -160,7 +168,10 @@ const RoutingResult = () => {
         const requestUrl = "/delivery-trips/batch";
         request("post", requestUrl, (res) => {
             if (res.status === 200) {
+                alert("Trips created successfully!");
                 navigate(`/delivery-manager/shipments/${id}`);
+            } else {
+                alert("Failed to create trips!");
             }
         }, {}, payload);
     };
@@ -168,6 +179,7 @@ const RoutingResult = () => {
 
     return (
         <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
+            <Toaster />
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <IconButton color="primary" onClick={() => navigate(`/delivery-manager/shipments/${id}/auto-routing`)} sx={{ color: 'grey.700', mr: 1 }}>
                     <ArrowBackIcon />
@@ -339,21 +351,29 @@ const RoutingResult = () => {
 
 
                                 <Box sx={{ mt: 3 }}>
-                                    <FormControl fullWidth margin="normal">
-                                        <InputLabel id={`delivery-person-label-${trip.vehicleId}`}>Delivery Person</InputLabel>
+                                    <FormControl fullWidth sx={{ mt: 2 }}>
+                                        <InputLabel>Delivery Person</InputLabel>
                                         <Select
-                                            labelId={`delivery-person-label-${trip.vehicleId}`}
                                             value={inputData[trip.vehicleId]?.deliveryPerson || ''}
                                             label="Delivery Person"
                                             onChange={(e) => handleInputChange(trip.vehicleId, 'deliveryPerson', e.target.value)}
                                         >
-                                            {deliveryPersonOptions.map((person) => (
-                                                <MenuItem key={person.userLoginId} value={person.userLoginId}>
-                                                    {person.fullName}
-                                                </MenuItem>
-                                            ))}
+                                            {deliveryPersonOptions
+                                                .filter(person => {
+                                                    // Kiểm tra xem person.id đã được chọn ở trip khác chưa
+                                                    return !Object.entries(inputData).some(([vid, data]) =>
+                                                        vid !== trip.vehicleId && data.deliveryPerson === person.userLoginId
+                                                    );
+                                                })
+                                                .map(person => (
+                                                    <MenuItem key={person.userLoginId} value={person.userLoginId}>
+                                                        {person.fullName}
+                                                    </MenuItem>
+                                                ))
+                                            }
                                         </Select>
                                     </FormControl>
+
 
                                     <TextField
                                         label="Description"
