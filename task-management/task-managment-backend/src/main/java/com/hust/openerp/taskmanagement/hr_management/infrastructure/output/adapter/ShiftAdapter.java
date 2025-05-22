@@ -35,7 +35,9 @@ public class ShiftAdapter implements IShiftPort {
     public ShiftModel updateShift(ShiftModel shiftModel) {
         var shiftEntity = getShiftEntity(shiftModel.getId());
         shiftEntity.setUserId(shiftModel.getUserId());
-        shiftEntity.setSlots(shiftModel.getSlots());
+        if(shiftModel.getSlots() != null || shiftModel.getUserId() != null){
+            shiftEntity.setSlots(shiftModel.getSlots());
+        }
 
         if(shiftModel.getDate() != null){
             shiftEntity.setDate(shiftModel.getDate());

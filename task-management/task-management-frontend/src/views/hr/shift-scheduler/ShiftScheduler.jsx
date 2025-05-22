@@ -305,6 +305,7 @@ export default function ShiftScheduler() {
     return filteredUsers.map(user => ({ ...user, workHoursSummary: calculateUserWorkHours(user.id, shifts) }));
   }, [rawUsers, shifts, appliedNameFilter, appliedDepartmentFilter, appliedJobPositionFilter]);
 
+
   const groupedUsersForGrid = useMemo(() => {
     if (allUsers.length === 0 && !isLoadingUsers) return []; // Return empty if no users after filtering and not loading
     if (isLoadingUsers) return []; // Still loading users, don't compute yet
@@ -788,11 +789,15 @@ export default function ShiftScheduler() {
           </Box>
 
           <ShiftModal
-            isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleSaveShift} users={rawUsers}
-            isSaving={isPerformingApiAction}
-            initialFormState={modalInitialFormState} isEditing={!!currentEditingShift && currentEditingShift.type !== 'time_off'}
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
+            onSave={handleSaveShift}
+            users={allUsers}
+            initialFormState={modalInitialFormState}
+            isEditing={!!currentEditingShift && currentEditingShift.type !== 'time_off'}
             isUnassignedContext={modalOpeningContext === 'newUnassigned' || modalOpeningContext === 'editUnassigned'}
             unassignedShiftBeingEdited={currentEditingShift && currentEditingShift.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID ? currentEditingShift : null}
+            isSaving={isPerformingApiAction}
           />
           <CopyShiftsModal
             isOpen={isCopyModalOpen} onClose={handleCloseCopyModal} onConfirmCopy={handleConfirmCopyToWeeks}
