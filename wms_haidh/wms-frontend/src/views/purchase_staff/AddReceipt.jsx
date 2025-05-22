@@ -23,6 +23,7 @@ import { useNavigate } from 'react-router-dom';
 import { request } from "../../api";
 import { debounce } from '../../utils/utils';
 import SaveIcon from '@mui/icons-material/Save';
+import { toast, Toaster } from "react-hot-toast";
 
 const AddReceipt = () => {
   const navigate = useNavigate();
@@ -74,15 +75,19 @@ const AddReceipt = () => {
     setRequestDetails(updatedDetails);
 
     setProductNames((prev) => ({ ...prev, [index]: product.name }));
-    setProductUOMs((prev) => ({ ...prev, [index]: product.uom })); 
+    setProductUOMs((prev) => ({ ...prev, [index]: product.uom }));
     setProductSuggestions([]);
     setActiveSuggestionIndex(null);
   };
 
 
   const handleAddRequestDetail = () => {
+    const allValid = requestDetails.every((detail, i) => isDetailValid(detail, i));
+    if (!allValid) return;
+
     setRequestDetails([...requestDetails, { productId: '', quantity: '' }]);
   };
+
 
   const handleDeleteRequestDetail = (index) => {
     const updatedDetails = requestDetails.filter((_, i) => i !== index);
@@ -103,8 +108,30 @@ const AddReceipt = () => {
     setRequestDetails(updatedDetails);
   };
 
+  const isDetailValid = (detail, index) => {
+    const productName = productNames[index];
+    if (!detail.productId || !productName) {
+      toast.error(`Product at row ${index + 1} is missing or invalid.`);
+      return false;
+    }
+    if (!detail.quantity || Number(detail.quantity) <= 0) {
+      toast.error(`Quantity at row ${index + 1} must be greater than 0.`);
+      return false;
+    }
+    return true;
+  };
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!name || !warehouseId || !supplierId || !expectedReceiptDate) {
+      toast.error("Please fill all required general fields.");
+      return;
+    }
+
+    const allValid = requestDetails.every((detail, i) => isDetailValid(detail, i));
+    if (!allValid) return;
 
     const updatedRequestDetails = requestDetails.map(item => ({
       ...item,
@@ -125,9 +152,10 @@ const AddReceipt = () => {
       "/receipts",
       (res) => {
         if (res.status === 200) {
+          alert("Receipt saved successfully!");
           navigate(`/purchase-staff/receipts`);
         } else {
-          alert("Error occurred!");
+          alert("Error occurred while saving.");
         }
       },
       {},
@@ -136,8 +164,10 @@ const AddReceipt = () => {
   };
 
 
+
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
+      <Toaster />
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         <IconButton

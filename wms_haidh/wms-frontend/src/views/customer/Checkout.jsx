@@ -63,6 +63,11 @@ const Checkout = () => {
             return;
         }
 
+        if (!/^[0-9]{8,15}$/.test(phone)) {
+            toast.error("Phone number must be 8–15 digits");
+            return false;
+        }
+
         if (address === "new") {
             toast.error("Please select a saved address or add a new one.");
             return;
@@ -136,7 +141,7 @@ const Checkout = () => {
                                 <TableRow>
                                     <TableCell>Product</TableCell>
                                     <TableCell align="center">Quantity</TableCell>
-                                    <TableCell align="center">Uom</TableCell>
+                                    <TableCell align="center">Unit</TableCell>
                                     <TableCell align="center">Unit Price</TableCell>
                                     <TableCell align="center">Total</TableCell>
                                 </TableRow>

@@ -38,6 +38,7 @@ const ReceiptDetail = () => {
       `/receipts/${receiptId}/approve`,
       (res) => {
         if (res.status === 200) {
+          alert('Receipt approved successfully!')
           navigate(`/purchase-manager/process-receipts`);
         } else {
           alert("Error approving receipt!");
@@ -52,6 +53,7 @@ const ReceiptDetail = () => {
       `/receipts/${receiptId}/cancel`,
       (res) => {
         if (res.status === 200) {
+          alert("The receipt has been cancelled!");
           navigate(`/purchase-manager/process-receipts`);
         } else {
           alert("Error rejecting receipt!");

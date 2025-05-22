@@ -83,9 +83,9 @@ const PriceConfig = () => {
         request("post", `/product-prices`, (res) => {
             if (res.status === 200) {
                 fetchPriceList();
-                alert("Add new price successfully!")
+                toast.success("Add new price successfully!")
             } else {
-                alert("Error occcured while add new price!");
+                toast.error("Error occcured while add new price!");
             }
         }, {}, payload);
 

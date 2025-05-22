@@ -17,6 +17,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router-dom';
 import { request } from "../../../api";
 import SaveIcon from '@mui/icons-material/Save';
+import { toast, Toaster } from "react-hot-toast";
 
 const ProductForm = () => {
 
@@ -68,14 +69,43 @@ const ProductForm = () => {
   };
 
 
+  const validateForm = () => {
+    if (!name.trim()) {
+      toast.error("Product name is required");
+      return false;
+    }
+    if (!category) {
+      toast.error("Product category is required");
+      return false;
+    }
+    if (!code.trim()) {
+      toast.error("Product code is required");
+      return false;
+    }
+    if (!weight || parseFloat(weight) <= 0) {
+      toast.error("Weight must be a positive number");
+      return false;
+    }
+    if (!height || parseFloat(height) <= 0) {
+      toast.error("Height must be a positive number");
+      return false;
+    }
+    if (!uom.trim()) {
+      toast.error("Unit of measure is required");
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!validateForm()) return;
+
     const formData = new FormData();
 
-    // Serialize product data as a JSON string and append it to the form data
     const productData = JSON.stringify({
-      productId: id, // Only include the id for update, omit it for create
+      productId: id,
       name,
       categoryId: category,
       code,
@@ -86,23 +116,26 @@ const ProductForm = () => {
     });
     formData.append("productData", productData);
 
-    // If an image is selected, append it to the FormData
     if (image instanceof File) {
-      formData.append("image", image); // This sends the binary data of the image
+      formData.append("image", image);
     }
 
     const requestUrl = id ? "/products/update" : "/products";
 
-    // Make the request
     request("post", requestUrl, (res) => {
       if (res.status === 200) {
-        navigate(`/admin/product`); // Redirect after success
+        alert("Product saved successfully!");
+        navigate(`/admin/product`);
+      } else {
+        alert("Something went wrong!");
       }
     }, {}, formData);
   };
 
+
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
+      <Toaster />
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         <IconButton
           onClick={() => navigate('/admin/product')}
@@ -305,7 +338,7 @@ const ProductForm = () => {
                   onChange={(e) => setDescription(e.target.value)}
                 />
               </Grid>
-              
+
             </Grid>
           </Paper>
 

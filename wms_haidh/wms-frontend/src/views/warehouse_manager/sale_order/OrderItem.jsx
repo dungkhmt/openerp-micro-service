@@ -121,9 +121,9 @@ const OrderItem = () => {
         request("get", `/assigned-order-items?saleOrderItemId=${id2}`, (res) => {
           setDetails(res.data);
         });
-        alert("Assign successfully!")
+        toast.success("Assign successfully!")
       } else {
-        alert("Error occcured while assigning order item!");
+        toast.error("Error occcured while assigning order item!");
       }
     }, {}, payload);
   };

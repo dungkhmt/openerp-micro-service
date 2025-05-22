@@ -18,6 +18,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import MapIcon from '@mui/icons-material/Map';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { toast, Toaster } from "react-hot-toast";
 
 const DeliveryTripDetail = () => {
   const navigate = useNavigate();
@@ -44,9 +45,9 @@ const DeliveryTripDetail = () => {
         request('get', `/delivery-trips/${id}/general-info`, (res) => {
           setGeneralInfo(res.data);
         });
-        alert("Your delivery trip has started. Good luck!");
+        toast.success("Your delivery trip has started. Good luck!");
       } else {
-        alert("Error occurred while starting trip!");
+        toast.error("Error occurred while starting trip!");
       }
     }, {});
   };
@@ -55,8 +56,8 @@ const DeliveryTripDetail = () => {
     setIsMapOpen((prev) => !prev);
   };
 
-  const handleMarkDelivered = (orderId) => {
-    request('post', `/delivery-trips/${id}/mark-delivered?orderId=${orderId}`, (res) => {
+  const handleMarkDelivered = (item) => {
+    request('post', `/delivery-trips/${id}/mark-delivered?orderId=${item.orderId}`, (res) => {
       if (res.status === 200) {
         request('get', `/delivery-trips/${id}/general-info`, (res) => {
           setGeneralInfo(res.data);
@@ -65,9 +66,14 @@ const DeliveryTripDetail = () => {
         request("get", `/delivery-trip-items/customers?deliveryTripId=${id}`, (res) => {
           setDeliverySequence(res.data);
         });
+
+        toast.success(`Delivery to ${item.customerName} completed.`);
+      } else {
+        toast.error("Failed to mark as delivered.");
       }
     });
   };
+
 
   useEffect(() => {
     if (isMapOpen && id && route.length === 0) {
@@ -85,6 +91,7 @@ const DeliveryTripDetail = () => {
 
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
+      <Toaster />
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         <IconButton color="primary" onClick={() => navigate('/delivery-staff/delivery-trip')} sx={{ color: 'grey.700', mr: 1 }}>
@@ -193,7 +200,7 @@ const DeliveryTripDetail = () => {
                     <Button
                       variant="contained"
                       startIcon={<CheckCircleIcon />}
-                      onClick={() => handleMarkDelivered(item.orderId)}
+                      onClick={() => handleMarkDelivered(item)}
                       sx={{
                         backgroundColor: '#019160',
                         color: '#fff',

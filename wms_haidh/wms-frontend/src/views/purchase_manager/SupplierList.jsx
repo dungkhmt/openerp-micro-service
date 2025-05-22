@@ -21,6 +21,7 @@ import { SearchIcon } from "../../components/icon/SearchIcon";
 import { columns } from "../../config/supplier";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { request } from "../../api";
+import { toast, Toaster } from "react-hot-toast";
 
 const buttonText = "Add supplier";
 export default function SupplierList() {
@@ -126,7 +127,39 @@ export default function SupplierList() {
     });
   };
 
+  const validateForm = () => {
+    if (!staffInfo.name.trim()) {
+      toast.error("Supplier name is required");
+      return false;
+    }
+    if (!staffInfo.address.trim()) {
+      toast.error("Address is required");
+      return false;
+    }
+    if (!staffInfo.email.trim()) {
+      toast.error("Email is required");
+      return false;
+    }
+    if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(staffInfo.email)) {
+      toast.error("Invalid email format");
+      return false;
+    }
+    if (!staffInfo.phone.trim()) {
+      toast.error("Phone number is required");
+      return false;
+    }
+    if (!/^[0-9]{8,15}$/.test(staffInfo.phone)) {
+      toast.error("Phone number must be 8–15 digits");
+      return false;
+    }
+    return true;
+  };
+
+
   const handleConfirm = () => {
+
+    if (!validateForm()) return;
+
     const requestUrl = staffInfo.supplierId
       ? "/suppliers/update"
       : "/suppliers";
@@ -137,8 +170,14 @@ export default function SupplierList() {
     request("post", requestUrl, (res) => {
       if (res.status === 200) {
         setPage(1);
+        request("get", `/suppliers/paged?page=${page - 1}&size=${rowsPerPage}&search=${debouncedSearchTerm}`, (res) => {
+          setItems(res.data.content);
+          setTotalItems(res.data.totalElements);
+          setPages(res.data.totalPages);
+        }).then();
+        toast.success("Suppier saved successfully!");
       } else {
-        alert("Error occurred!");
+        toast.error("Something went wrong!");
       }
     }, {}, payload);
 
@@ -232,6 +271,7 @@ export default function SupplierList() {
 
   return (
     <>
+      <Toaster />
       <Table
         isCompact
         removeWrapper

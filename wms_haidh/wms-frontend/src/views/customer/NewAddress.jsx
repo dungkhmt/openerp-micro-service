@@ -4,6 +4,7 @@ import Map from "../../components/Map";
 import { useNavigate } from "react-router-dom";
 import BreadcrumbsCustom from "../../components/BreadcrumbsCustom";
 import { request } from '../../api';
+import { toast, Toaster } from "react-hot-toast";
 
 const NewAddress = () => {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ const NewAddress = () => {
 
   const handleSubmit = () => {
     if (!coordinates) {
-      alert("Please select a location.");
+      toast.error("Please select a location.");
       return;
     }
 
@@ -46,6 +47,7 @@ const NewAddress = () => {
     request("post", `/customer-addresses`, (res) => {
       if (res.status === 201) {
         // Quay lại trang checkout
+        alert("Add new address successfully!");
         navigate("/customer/cart/checkout");
       } else {
         alert("Error occcured !");
@@ -57,6 +59,7 @@ const NewAddress = () => {
 
   return (
     <div className="flex justify-start p-6">
+      <Toaster/>
       <div className="w-full space-y-6">
         <BreadcrumbsCustom paths={breadcrumbPaths} />
         <Card className="p-6 space-y-4">

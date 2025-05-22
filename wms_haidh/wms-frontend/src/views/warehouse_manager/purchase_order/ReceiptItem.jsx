@@ -56,11 +56,6 @@ const ReceiptItem = () => {
   }, [id2]);
 
   const handleSubmit = () => {
-    // Kiểm tra số lượng
-    if (!quantity || quantity > remainingQuantity || quantity <= 0) {
-      toast.error("Invalid quantity!");
-      return;
-    }
 
     // Kiểm tra các trường bắt buộc
     if (!bayCode) {
@@ -71,8 +66,14 @@ const ReceiptItem = () => {
       toast.error("Lot ID is required!");
       return;
     }
+
     if (!importPrice || importPrice <= 0) {
       toast.error("Invalid import price!");
+      return;
+    }
+
+    if (!quantity || quantity > remainingQuantity || quantity <= 0) {
+      toast.error("Invalid quantity!");
       return;
     }
 
@@ -94,9 +95,9 @@ const ReceiptItem = () => {
         request("get", `/receipt-items?requestId=${id2}`, (res) => {
           setDetails(res.data);
         });
-        alert("Create new purchase order successfully!");
+        toast.success("Create new purchase order successfully!");
       } else {
-        alert("Error occurred while creating receipt item!");
+        toast.error("Error occurred while creating receipt item!");
       }
     }, {}, payload);
   };
