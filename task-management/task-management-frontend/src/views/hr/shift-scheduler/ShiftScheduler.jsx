@@ -789,6 +789,7 @@ export default function ShiftScheduler() {
 
           <ShiftModal
             isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleSaveShift} users={rawUsers}
+            isSaving={isPerformingApiAction}
             initialFormState={modalInitialFormState} isEditing={!!currentEditingShift && currentEditingShift.type !== 'time_off'}
             isUnassignedContext={modalOpeningContext === 'newUnassigned' || modalOpeningContext === 'editUnassigned'}
             unassignedShiftBeingEdited={currentEditingShift && currentEditingShift.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID ? currentEditingShift : null}
