@@ -839,9 +839,6 @@ export default function ShiftScheduler() {
               </Box>
             </Paper>
           </Box>
-          <Paper elevation={3} sx={{ position: 'fixed', bottom: 16, right: 16, p: 1.5, display: 'flex', alignItems: 'center', borderRadius: 2 }}>
-            <AccessTimeFilledIcon color="primary" sx={{mr:1}}/> <Typography variant="caption">Bật đồng hồ chấm công</Typography> <Checkbox size="small" sx={{ml:0.5, p:0.2}}/>
-          </Paper>
 
           <ShiftModal
             isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleSaveShift}

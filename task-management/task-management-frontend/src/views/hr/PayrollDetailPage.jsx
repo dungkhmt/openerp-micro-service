@@ -290,7 +290,6 @@ const PayrollDetailPage = () => {
         }}
       >
         <Grid container spacing={2} alignItems="center">
-          {/* Payroll Info Grid Items ... (no changes here) */}
           <Grid item xs={12} sm={4}>
             <Typography variant="subtitle2" color="text.secondary" component="span" sx={{ whiteSpace: "nowrap" }}>
               Tổng số ngày làm việc:
@@ -368,7 +367,7 @@ const PayrollDetailPage = () => {
         onClear={handleClearFilters}
       />
 
-      <TableContainer component={Paper} sx={{ overflowX: "auto", maxHeight: 500, border: '1px solid #e0e0e0', borderRadius:1 }}>
+      <TableContainer component={Paper} sx={{ overflowX: "auto", maxHeight: 460, border: '1px solid #e0e0e0', borderRadius:1 }}>
         <Table stickyHeader size="small" sx={{borderCollapse: 'collapse'}}>
           <TableHead>
             <TableRow>
@@ -413,7 +412,7 @@ const PayrollDetailPage = () => {
                   ...stickyHeaderCellStyle,
                   zIndex: 4,
                   minWidth: 150,
-                  background: defaultHeaderBgColor, // Ensure non-date sticky headers have default bg
+                  background: defaultHeaderBgColor,
                 }}
               >
                 Chức vụ
@@ -424,7 +423,7 @@ const PayrollDetailPage = () => {
                   ...stickyHeaderCellStyle,
                   zIndex: 4,
                   minWidth: 60,
-                  background: defaultHeaderBgColor, // Ensure non-date sticky headers have default bg
+                  background: defaultHeaderBgColor,
                 }}
               >
                 Loại
@@ -434,12 +433,12 @@ const PayrollDetailPage = () => {
                   key={`d-${i}`}
                   align="center"
                   style={{
-                    ...headerCellStyle, // Base style
+                    ...headerCellStyle,
                     position: "sticky",
                     top: 0,
                     zIndex: 3,
                     minWidth: 55,
-                    backgroundColor: getBgColorForDayHeader(d), // Dynamic background color
+                    backgroundColor: getBgColorForDayHeader(d),
                   }}
                 >
                   <div>{d.format("DD/MM")}</div>
