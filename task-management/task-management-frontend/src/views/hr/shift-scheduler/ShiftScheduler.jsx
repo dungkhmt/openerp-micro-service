@@ -24,6 +24,7 @@ import SchedulingConflictModal from "./SchedulingConflictModal.jsx";
 import DeleteConfirmationModal from "../modals/DeleteConfirmationModal.jsx";
 import UserFilterDrawer from "./UserFilterDrawer.jsx";
 import {request} from "../../../api.js";
+import toast from "react-hot-toast";
 
 export const TOP_BAR_HEIGHT = 61;
 export const AVAILABLE_SHIFTS_BANNER_HEIGHT = 36;
@@ -590,11 +591,11 @@ export default function ShiftScheduler() {
       () => {
         setShifts(prevShifts => prevShifts.filter(shift => !selectedShiftIds.includes(shift.id)));
         setSelectedShiftIds([]);
-        // toast.success(`Đã xóa ${selectedShiftIds.length} ca thành công!`);
+        toast.success(`Đã xóa ${selectedShiftIds.length} ca thành công!`);
       },
       { onError: async (err) => {
           console.error("Error deleting selected shifts:", err.response?.data || err.message);
-          // toast.error("Lỗi khi xóa các ca đã chọn.");
+          toast.error("Lỗi khi xóa các ca đã chọn.");
           await refetchCurrentWeekShifts();
         }},
       null, { params: { ids: selectedShiftIds.join(',') } }
@@ -611,16 +612,69 @@ export default function ShiftScheduler() {
     const newDestDayString = `${destParts[3]}-${destParts[4]}-${destParts[5]}`;
 
     setIsPerformingApiAction(true);
-    let requiresRefetchDueToOtherCreate = false; // Đổi tên biến để rõ ràng hơn
-    let locallyUpdatedShiftDataForDrag = null; // Dữ liệu để cập nhật lạc quan cho ca bị kéo (nếu chỉ là update)
+    let requiresRefetchDueToCreate = false;
+    let locallyUpdatedShiftDataForDrag = null;
     let isAssignFromUnassignedByDrag = false;
+    // Biến mới cho kịch bản kéo thả lên hàng unassigned
+    let isDraggingToUnassignedAndFoundMatch = false;
+    let matchedUnassignedShiftToUpdate = null; // Ca unassigned sẽ được cập nhật slots
+    let newUnassignedShiftOptimisticData = null; // Ca unassigned mới nếu không tìm thấy match
 
     try {
       const operations = [];
-      if (draggedShiftOriginal.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID && newDestUserIdForFrontend !== FRONTEND_UNASSIGNED_SHIFT_USER_ID) {
-        // ** Đây là trường hợp "gán từ ca chờ" bằng kéo thả **
-        isAssignFromUnassignedByDrag = true;
-        // API calls vẫn thực hiện như cũ
+
+      if (draggedShiftOriginal.userId !== FRONTEND_UNASSIGNED_SHIFT_USER_ID && newDestUserIdForFrontend === FRONTEND_UNASSIGNED_SHIFT_USER_ID) {
+        // ** Kéo từ nhân viên lên hàng "Ca chờ gán" **
+        const existingUnassignedShiftsOnDay = shifts.filter(
+          s => s.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID &&
+            s.day === newDestDayString &&
+            s.startTime === draggedShiftOriginal.startTime &&
+            s.endTime === draggedShiftOriginal.endTime &&
+            (s.note || '') === (draggedShiftOriginal.note || '') // So sánh cả note
+        );
+
+        const match = existingUnassignedShiftsOnDay[0]; // Lấy ca đầu tiên tìm được (nếu có)
+
+        if (match) {
+          isDraggingToUnassignedAndFoundMatch = true;
+          matchedUnassignedShiftToUpdate = { ...match, slots: (match.slots || 0) + 1 };
+
+          // 1. Cập nhật (tăng slot) cho ca unassigned đã có
+          const updatePayload = transformFrontendShiftToApiUpdateShiftRequest(match.id, { slots: matchedUnassignedShiftToUpdate.slots });
+          operations.push(request("put", `/shifts/${match.id}`, null, {onError: (e) => {throw e}}, updatePayload));
+
+          // 2. Xóa ca đã gán gốc của nhân viên
+          operations.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, null, {params: {ids: draggedShiftOriginal.id}}));
+        } else {
+          // Không tìm thấy match -> Tạo ca unassigned mới và xóa ca cũ
+          requiresRefetchDueToCreate = true; // Vì tạo mới ca unassigned, cần ID từ server
+          // HOẶC chúng ta sẽ tạo ID tạm thời cho ca unassigned này
+          const createNewUnassignedShiftReq = transformFrontendShiftToApiShiftRequest({
+            ...draggedShiftOriginal,
+            userId: FRONTEND_UNASSIGNED_SHIFT_USER_ID, // Để API biết đây là unassigned
+            day: newDestDayString,
+            slots: 1, // Slot ban đầu là 1
+          });
+          newUnassignedShiftOptimisticData = { // Dữ liệu để thêm vào state lạc quan
+            id: `temp-unassigned-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+            userId: FRONTEND_UNASSIGNED_SHIFT_USER_ID,
+            day: newDestDayString,
+            startTime: draggedShiftOriginal.startTime,
+            endTime: draggedShiftOriginal.endTime,
+            note: draggedShiftOriginal.note,
+            slots: 1,
+            type: 'unassigned',
+            duration: calculateDuration(newDestDayString, draggedShiftOriginal.startTime, draggedShiftOriginal.endTime),
+            muiColor: 'grey.300', // Giữ style cho ca unassigned
+            muiTextColor: 'text.primary'
+          };
+          operations.push(request("post", "/shifts", null, {onError: (e) => {throw e}}, { shifts: [createNewUnassignedShiftReq] }));
+          operations.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, null, {params: {ids: draggedShiftOriginal.id}}));
+        }
+
+      } else if (draggedShiftOriginal.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID && newDestUserIdForFrontend !== FRONTEND_UNASSIGNED_SHIFT_USER_ID) {
+        // Kéo từ ca chờ gán xuống cho nhân viên
+        isAssignFromUnassignedByDrag = true; // Sẽ được xử lý lạc quan bên dưới
         const createNewAssignedShiftReq = transformFrontendShiftToApiShiftRequest({ ...draggedShiftOriginal, userId: newDestUserIdForFrontend, day: newDestDayString, slots: undefined });
         operations.push(request("post", "/shifts", null, {onError: (e) => {throw e}}, { shifts: [createNewAssignedShiftReq] }));
         if (draggedShiftOriginal.slots && draggedShiftOriginal.slots > 1) {
@@ -629,11 +683,6 @@ export default function ShiftScheduler() {
         } else {
           operations.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, null, {params: {ids:draggedShiftOriginal.id}}));
         }
-      } else if (draggedShiftOriginal.userId !== FRONTEND_UNASSIGNED_SHIFT_USER_ID && newDestUserIdForFrontend === FRONTEND_UNASSIGNED_SHIFT_USER_ID) {
-        requiresRefetchDueToOtherCreate = true; // Tạo ca chờ mới, xóa ca cũ -> cần ID mới
-        const createNewUnassignedShiftReq = transformFrontendShiftToApiShiftRequest({ ...draggedShiftOriginal, userId: FRONTEND_UNASSIGNED_SHIFT_USER_ID, day: newDestDayString, slots: 1 });
-        operations.push(request("post", "/shifts", null, {onError: (e) => {throw e}}, { shifts: [createNewUnassignedShiftReq] }));
-        operations.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, null, {params: {ids:draggedShiftOriginal.id}}));
       } else if (draggedShiftOriginal.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID && newDestUserIdForFrontend === FRONTEND_UNASSIGNED_SHIFT_USER_ID) {
         // Kéo ca chờ sang ngày khác trong dòng ca chờ -> chỉ update
         const updateUnassignedReq = transformFrontendShiftToApiUpdateShiftRequest(draggedShiftOriginal.id, { day: newDestDayString });
@@ -648,34 +697,49 @@ export default function ShiftScheduler() {
       await Promise.all(operations);
 
       if (isAssignFromUnassignedByDrag) {
-        // ** Cập nhật lạc quan cho kéo thả từ ca chờ **
         setShifts(prevShifts => {
           let newShiftsArray = [...prevShifts];
-          // 1. Cập nhật hoặc xóa ca chờ gốc
           if (draggedShiftOriginal.slots && draggedShiftOriginal.slots > 1) {
-            newShiftsArray = newShiftsArray.map(s => s.id === draggedShiftOriginal.id ? ({
-              ...s, slots: s.slots - 1
-            }) : s);
+            newShiftsArray = newShiftsArray.map(s => s.id === draggedShiftOriginal.id ? ({ ...s, slots: s.slots - 1 }) : s);
           } else {
             newShiftsArray = newShiftsArray.filter(s => s.id !== draggedShiftOriginal.id);
           }
-          // 2. Thêm ca mới được gán với ID tạm thời
           newShiftsArray.push({
             id: `temp-drag-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-            userId: newDestUserIdForFrontend,
-            day: newDestDayString,
-            startTime: draggedShiftOriginal.startTime,
-            endTime: draggedShiftOriginal.endTime,
-            note: draggedShiftOriginal.note,
-            type: 'regular',
+            userId: newDestUserIdForFrontend, day: newDestDayString,
+            startTime: draggedShiftOriginal.startTime, endTime: draggedShiftOriginal.endTime,
+            note: draggedShiftOriginal.note, type: 'regular',
             duration: calculateDuration(newDestDayString, draggedShiftOriginal.startTime, draggedShiftOriginal.endTime),
           });
           return newShiftsArray;
         });
-      } else if (requiresRefetchDueToOtherCreate) {
-        await refetchCurrentWeekShifts();
-      } else if (locallyUpdatedShiftDataForDrag) { // Chỉ là update, không tạo mới
+      } else if (isDraggingToUnassignedAndFoundMatch && matchedUnassignedShiftToUpdate) {
+        // Cập nhật lạc quan: xóa ca cũ, cập nhật ca unassigned đã có
+        setShifts(prevShifts => {
+          const withoutDragged = prevShifts.filter(s => s.id !== draggedShiftOriginal.id);
+          return withoutDragged.map(s => s.id === matchedUnassignedShiftToUpdate.id ? matchedUnassignedShiftToUpdate : s);
+        });
+      } else if (requiresRefetchDueToCreate && newUnassignedShiftOptimisticData) {
+        // Tạo ca unassigned mới không match -> xóa ca cũ, thêm ca mới lạc quan
+        // Tuy nhiên, để có ID thật, vẫn nên refetch sau đó nếu cần.
+        // Hoặc chấp nhận ID tạm thời cho ca unassigned mới này.
+        // Vì user yêu cầu không reload, chúng ta sẽ thêm lạc quan.
+        setShifts(prevShifts => {
+          const withoutDragged = prevShifts.filter(s => s.id !== draggedShiftOriginal.id);
+          return [...withoutDragged, newUnassignedShiftOptimisticData];
+        });
+        // Nếu muốn có ID thật ngay, bạn sẽ cần gọi refetch ở đây:
+        // await refetchCurrentWeekShifts();
+      } else if (locallyUpdatedShiftDataForDrag) {
         setShifts(prevShifts => prevShifts.map(s => s.id === locallyUpdatedShiftDataForDrag.id ? locallyUpdatedShiftDataForDrag : s));
+      } else if (requiresRefetchDueToCreate) {
+        // Các trường hợp tạo mới khác (ví dụ: kéo từ assigned lên unassigned mà không match)
+        // và chúng ta quyết định cần ID thật ngay lập tức.
+        // Hiện tại, nếu newUnassignedShiftOptimisticData có, nó đã được thêm lạc quan.
+        // Nếu không, tức là một kịch bản tạo mới khác mà chưa xử lý lạc quan, thì refetch.
+        if (!newUnassignedShiftOptimisticData) { // Chỉ refetch nếu chưa được xử lý lạc quan
+          await refetchCurrentWeekShifts();
+        }
       }
       // toast.success("Di chuyển ca thành công!");
     } catch (error) {
@@ -786,11 +850,11 @@ export default function ShiftScheduler() {
           await refetchCurrentWeekShifts(); // <<< Refetch needed
           setSelectedShiftIds([]);
           handleCloseCopyModal();
-          // toast.success("Sao chép ca thành công!");
+          toast.success("Sao chép ca thành công!");
         },
         { onError: async (err) => {
             console.error("Error copying shifts:", err.response?.data || err.message);
-            // toast.error("Lỗi khi sao chép ca.");
+            toast.error("Lỗi khi sao chép ca.");
             await refetchCurrentWeekShifts();
           }},
         { shifts: newShiftApiRequests }
