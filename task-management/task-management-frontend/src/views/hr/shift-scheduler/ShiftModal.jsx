@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close.js";
 import {DatePicker, TimePicker} from "@mui/x-date-pickers";
-import { UNASSIGNED_SHIFT_USER_ID } from "./ShiftScheduler.jsx";
+import { FRONTEND_UNASSIGNED_SHIFT_USER_ID } from "./ShiftScheduler.jsx";
 
 const modalStyle = {
   position: 'absolute',

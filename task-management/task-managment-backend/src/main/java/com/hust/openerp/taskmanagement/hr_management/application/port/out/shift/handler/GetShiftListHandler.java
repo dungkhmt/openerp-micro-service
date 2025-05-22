@@ -26,6 +26,8 @@ public class GetShiftListHandler extends ObservableUseCasePublisher
 
     @Override
     public Collection<ShiftModel> handle(GetShiftList useCase) {
-        return shiftPort.getShifts(useCase.getUserIds(), useCase.getStartDate(), useCase.getEndDate());
+        return shiftPort.getShifts(
+            useCase.getUserIds(), useCase.getStartDate(), useCase.getEndDate(), useCase.isHasUnassigned()
+        );
     }
 }

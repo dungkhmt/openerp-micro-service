@@ -7,7 +7,7 @@ import {Grid} from "@mui/material";
 import React from "react";
 import EmptyShiftSlot from "./EmptyShiftSlot.jsx";
 import ShiftCard from "./ShiftCard.jsx";
-import { UNASSIGNED_SHIFT_USER_ID } from "./ShiftScheduler.jsx"; // Import for logging
+import { FRONTEND_UNASSIGNED_SHIFT_USER_ID } from "./ShiftScheduler.jsx"; // Import for logging
 
 export default function DayCell({
                                   userId,
@@ -54,16 +54,16 @@ export default function DayCell({
                 {(providedDraggable, snapshotDraggable) => (
                   <ShiftCard
                     shift={shift}
-                    shiftType={shift.type || (shift.userId === UNASSIGNED_SHIFT_USER_ID ? 'unassigned' : 'regular')} // Pass shift type
+                    shiftType={shift.type || (shift.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID ? 'unassigned' : 'regular')} // Pass shift type
                     onEditShift={onEditShift} // Passed to ShiftCard
                     // onAddAnotherShift is for the "+" button on a user's REGULAR or TIME_OFF shift card
                     // It should trigger adding a NEW REGULAR shift for that user/day.
                     // `onAddShift` (from DayCell props) is (userId, day) => handleOpenModal(userId, day)
-                    onAddAnotherShift={userId !== UNASSIGNED_SHIFT_USER_ID ? () => onAddShift(userId, day) : undefined}
+                    onAddAnotherShift={userId !== FRONTEND_UNASSIGNED_SHIFT_USER_ID ? () => onAddShift(userId, day) : undefined}
                     // onAddShift (new name) is for the "+" button on an UNASSIGNED shift card
                     // It should trigger adding a NEW UNASSIGNED shift template for that day.
                     // `onAddShift` (from DayCell props) is (UNASSIGNED_ID, day) => handleOpenModal(UNASSIGNED_ID, day)
-                    onAddShiftToUnassignedDay={userId === UNASSIGNED_SHIFT_USER_ID ? () => onAddShift(UNASSIGNED_SHIFT_USER_ID, day) : undefined}
+                    onAddShiftToUnassignedDay={userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID ? () => onAddShift(FRONTEND_UNASSIGNED_SHIFT_USER_ID, day) : undefined}
                     provided={providedDraggable}
                     snapshot={snapshotDraggable}
                     isSelected={selectedShiftIds.includes(shift.id)}

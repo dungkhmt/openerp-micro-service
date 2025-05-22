@@ -170,11 +170,11 @@ const navigation = [
         path: "/hr/config/company",
         icon: "mdi:domain",
       },
-      {
+/*      {
         title: "Cơ chế tính lương",
         path: "/hr/config/salary",
         icon: "mdi:cash-multiple",
-      },
+      },*/
     ]
   },
   {

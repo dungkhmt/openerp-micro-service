@@ -8,7 +8,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime'; // For work hours i
 import DayCell from './DayCell.jsx';
 import {
   WEEK_STARTS_ON,
-  UNASSIGNED_SHIFT_USER_ID,
+  FRONTEND_UNASSIGNED_SHIFT_USER_ID,
   DEPARTMENT_HEADER_ROW_HEIGHT,
   USER_ROW_MIN_HEIGHT
 } from "./ShiftScheduler.jsx";
@@ -73,7 +73,7 @@ export default function ShiftsGrid({
 
           {/* User Rows for this Department */}
           {deptGroup.users.map(user => {
-            const userShifts = shifts.filter(s => s.userId === user.id && s.userId !== UNASSIGNED_SHIFT_USER_ID);
+            const userShifts = shifts.filter(s => s.userId === user.id && s.userId !== FRONTEND_UNASSIGNED_SHIFT_USER_ID);
             return (
               <Grid container key={user.id} sx={{ borderBottom: 1, borderColor: 'divider', minHeight: USER_ROW_MIN_HEIGHT, '&:last-child': { borderBottom: 0 } }}>
                 <Grid item sx={{

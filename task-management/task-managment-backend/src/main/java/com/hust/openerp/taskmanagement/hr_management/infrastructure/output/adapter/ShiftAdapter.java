@@ -60,8 +60,8 @@ public class ShiftAdapter implements IShiftPort {
     }
 
     @Override
-    public List<ShiftModel> getShifts(List<String> userIds, LocalDate startDate, LocalDate endDate) {
-        var shifts = shiftRepo.findShiftsWithDatesInRange(userIds, startDate, endDate);
+    public List<ShiftModel> getShifts(List<String> userIds, LocalDate startDate, LocalDate endDate, boolean hasUnassigned) {
+        var shifts = shiftRepo.findShiftsWithDatesInRange(userIds, startDate, endDate, hasUnassigned);
         return toModels(shifts);
     }
 

@@ -16,4 +16,5 @@ public class GetShiftList implements UseCase {
     private List<String> userIds;
     private LocalDate startDate;
     private LocalDate endDate;
+    private boolean hasUnassigned;
 }

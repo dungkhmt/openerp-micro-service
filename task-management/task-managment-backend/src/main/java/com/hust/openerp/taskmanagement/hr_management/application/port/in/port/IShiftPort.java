@@ -12,5 +12,5 @@ public interface IShiftPort {
     ShiftModel updateShift(ShiftModel shiftModel);
     void deleteShifts(List<UUID> ids);
     ShiftModel getShift(UUID id);
-    List<ShiftModel> getShifts(List<String> userIds, LocalDate startDate, LocalDate endDate);
+    List<ShiftModel> getShifts(List<String> userIds, LocalDate startDate, LocalDate endDate, boolean hasUnassigned);
 }

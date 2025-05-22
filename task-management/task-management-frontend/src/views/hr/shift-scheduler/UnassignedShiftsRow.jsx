@@ -9,7 +9,7 @@ import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 import DayCell from './DayCell.jsx';
 import {
   WEEK_STARTS_ON,
-  UNASSIGNED_SHIFT_USER_ID,
+  FRONTEND_UNASSIGNED_SHIFT_USER_ID,
   UNASSIGNED_ROW_HEIGHT, // Used for minHeight
   CALENDAR_HEADER_HEIGHT // Used for sticky top offset
 } from './ShiftScheduler.jsx';
@@ -84,8 +84,8 @@ export default function UnassignedShiftsRow({
           const shiftsInCell = shifts.filter(shift => shift.day === dayString);
           return (
             <DayCell
-              key={`${UNASSIGNED_SHIFT_USER_ID}-${day.toISOString()}`} // Ensure a unique key
-              userId={UNASSIGNED_SHIFT_USER_ID}
+              key={`${FRONTEND_UNASSIGNED_SHIFT_USER_ID}-${day.toISOString()}`} // Ensure a unique key
+              userId={FRONTEND_UNASSIGNED_SHIFT_USER_ID}
               day={day}
               shiftsInCell={shiftsInCell}
               onAddShift={onAddShift}

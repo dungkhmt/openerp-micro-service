@@ -8,7 +8,7 @@ import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank.j
 import CheckBoxIcon from "@mui/icons-material/CheckBox.js";
 import {parseISO} from "date-fns";
 import AddIcon from "@mui/icons-material/Add.js";
-import { UNASSIGNED_SHIFT_USER_ID } from "./ShiftScheduler.jsx";
+import { FRONTEND_UNASSIGNED_SHIFT_USER_ID } from "./ShiftScheduler.jsx";
 
 const EMPLOYEE_SHIFT_TEXT_COLOR = '#673ab7';
 const EMPLOYEE_SHIFT_BACKGROUND_COLOR_LIGHT = '#f3e5f5';
@@ -72,7 +72,7 @@ export default function ShiftCard({
   const handleAddNewUnassignedFromCard = (e) => { // For "+" on unassigned cards
     e.stopPropagation();
     if (onAddShiftToUnassignedDay) {
-      onAddShiftToUnassignedDay(UNASSIGNED_SHIFT_USER_ID, parseISO(shift.day));
+      onAddShiftToUnassignedDay(FRONTEND_UNASSIGNED_SHIFT_USER_ID, parseISO(shift.day));
     }
   };
 
@@ -83,7 +83,7 @@ export default function ShiftCard({
   // Visibility for the "+" button on employee shift cards or time_off cards
   const showAddButtonForUserOrTimeOff =
     (shiftType === 'regular' || isTimeOff) && // Only on regular or time_off cards
-    shift.userId && shift.userId !== UNASSIGNED_SHIFT_USER_ID && // Must have a valid user ID
+    shift.userId && shift.userId !== FRONTEND_UNASSIGNED_SHIFT_USER_ID && // Must have a valid user ID
     isHovered && !isAnyShiftSelected && !snapshot.isDragging;
 
   // Visibility for the new "+" button on unassigned shift cards

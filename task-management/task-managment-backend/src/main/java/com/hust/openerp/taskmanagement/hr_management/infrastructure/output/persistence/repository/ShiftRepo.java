@@ -15,13 +15,14 @@ public interface ShiftRepo extends IBaseRepository<ShiftEntity, UUID> {
     @Query(value = """
     SELECT * 
     FROM hr_shift 
-    WHERE user_id IN :userIds 
+    WHERE (user_id IN :userIds or (:hasUnassigned and user_id IS NULL))
     AND date BETWEEN :startDate AND :endDate
     """, nativeQuery = true)
     List<ShiftEntity> findShiftsWithDatesInRange(
         @Param("userIds") List<String> userIds,
         @Param("startDate") LocalDate startDate,
-        @Param("endDate") LocalDate endDate
+        @Param("endDate") LocalDate endDate,
+        @Param("hasUnassigned") boolean hasUnassigned
     );
 }
 

@@ -76,6 +76,7 @@ public class ShiftController extends BeanAwareUseCasePublisher {
             .userIds(userIds)
             .startDate(startDate)
             .endDate(endDate)
+            .hasUnassigned(true)
             .build();
         var shiftList = publishCollection(ShiftModel.class, useCase);
         return ResponseEntity.ok().body(
@@ -93,6 +94,7 @@ public class ShiftController extends BeanAwareUseCasePublisher {
             .userIds(List.of(principal.getName()))
             .startDate(startDate)
             .endDate(endDate)
+            .hasUnassigned(false)
             .build();
         var shiftList = publishCollection(ShiftModel.class, useCase);
         return ResponseEntity.ok().body(

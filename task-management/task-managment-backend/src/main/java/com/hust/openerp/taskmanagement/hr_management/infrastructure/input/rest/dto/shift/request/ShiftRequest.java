@@ -26,6 +26,8 @@ public class ShiftRequest {
             .userId(userId)
             .startTime(startTime)
             .endTime(endTime)
+            .note(note)
+            .slots(slots)
             .build();
     }
 }
