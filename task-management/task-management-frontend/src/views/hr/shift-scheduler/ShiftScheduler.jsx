@@ -38,6 +38,11 @@ export const API_UNASSIGNED_USER_ID = null;
 export const DEPARTMENT_HEADER_ROW_HEIGHT = 25;
 export const USER_ROW_MIN_HEIGHT = 60;
 
+const PAGE_BOTTOM_BUFFER = 24;
+const PADDING_AROUND_SCROLLABLE_PAPER_ELEMENT = 24;
+
+// Không cần generateTempId nữa
+// const generateTempId = (prefix = 'temp') => { ... };
 
 const calculateDuration = (day, startTime, endTime) => {
   if (!day || !startTime || !endTime) return '0h 0m';
@@ -120,13 +125,10 @@ const transformApiShiftToFrontend = (apiShift) => {
   const isActuallyUnassigned = apiShift.user_id === API_UNASSIGNED_USER_ID;
 
   return {
-    id: apiShift.id,
+    id: apiShift.id, // Sẽ luôn là ID thật từ server sau khi refetch
     userId: isActuallyUnassigned ? FRONTEND_UNASSIGNED_SHIFT_USER_ID : apiShift.user_id,
-    day: day,
-    startTime: startTime,
-    endTime: endTime,
-    note: apiShift.note || '',
-    slots: apiShift.slots,
+    day: day, startTime: startTime, endTime: endTime,
+    note: apiShift.note || '', slots: apiShift.slots,
     type: isActuallyUnassigned ? 'unassigned' : 'regular',
     duration: calculateDuration(day, startTime, endTime),
     ...(isActuallyUnassigned && { muiColor: 'grey.300', muiTextColor: 'text.primary' }),
@@ -160,10 +162,9 @@ export default function ShiftScheduler() {
   const [shifts, setShifts] = useState([]);
   const [rawUsers, setRawUsers] = useState([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
-  const [isLoadingShifts, setIsLoadingShifts] = useState(true); // For full data refetches
+  const [isLoadingShifts, setIsLoadingShifts] = useState(true);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
-  const [isPerformingApiAction, setIsPerformingApiAction] = useState(false); // For disabling buttons during any API call
-
+  const [isPerformingApiAction, setIsPerformingApiAction] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEditingShift, setCurrentEditingShift] = useState(null);
@@ -196,11 +197,15 @@ export default function ShiftScheduler() {
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [jobPositionOptions, setJobPositionOptions] = useState([]);
 
-
   const isAnyShiftSelected = selectedShiftIds.length > 0;
 
   const refetchCurrentWeekShifts = useCallback(async (isInitialGlobalLoad = false) => {
-    setIsLoadingShifts(true); // Use this for full refetch loading state
+    if (!isInitialGlobalLoad) { // Nếu không phải initial load, chỉ set isPerformingApiAction
+      setIsPerformingApiAction(true);
+    } else {
+      setIsLoadingShifts(true);
+    }
+
     const weekStart = format(startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }), 'yyyy-MM-dd');
     const weekEnd = format(endOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }), 'yyyy-MM-dd');
     const userIdsToFetch = rawUsers.map(u => u.id).filter(id => id !== FRONTEND_UNASSIGNED_SHIFT_USER_ID);
@@ -208,50 +213,40 @@ export default function ShiftScheduler() {
     try {
       const absencesData = await fetchAbsences(userIdsToFetch, weekStart, weekEnd);
       let regularAndUnassignedShiftsData = [];
-
       const shiftParams = { startDate: weekStart, endDate: weekEnd };
       if (userIdsToFetch.length > 0) {
         shiftParams.userIds = userIdsToFetch.join(',');
       }
-
-      await request(
-        "get", `/shifts`,
+      await request( "get", `/shifts`,
         (res) => { regularAndUnassignedShiftsData = res.data?.data || []; },
-        { onError: (err) => {
-            console.error("Failed to fetch shifts:", err.response?.data || err.message);
-            regularAndUnassignedShiftsData = [];
-          }},
+        { onError: (err) => { console.error("Failed to fetch shifts:", err.response?.data || err.message); regularAndUnassignedShiftsData = []; }},
         null, { params: shiftParams }
       );
-
       const timeOffShifts = absencesData.map(absence => ({
-        id: absence.id,
-        userId: absence.user_id,
+        id: absence.id, userId: absence.user_id,
         day: format(parseISO(absence.date), 'yyyy-MM-dd'),
-        startTime: absence.start_time.substring(0, 5),
-        endTime: absence.end_time.substring(0, 5),
-        note: absence.reason || 'Nghỉ phép',
-        type: 'time_off',
+        startTime: absence.start_time.substring(0, 5), endTime: absence.end_time.substring(0, 5),
+        note: absence.reason || 'Nghỉ phép', type: 'time_off',
         duration: calculateDuration(absence.date, absence.start_time.substring(0,5), absence.end_time.substring(0,5))
       }));
-
       const fetchedRegularShifts = regularAndUnassignedShiftsData.map(transformApiShiftToFrontend).filter(s => s);
       setShifts([...fetchedRegularShifts, ...timeOffShifts]);
-
     } catch (error) {
       console.error("Error fetching week data (absences or shifts):", error.response?.data || error.message);
     } finally {
-      setIsLoadingShifts(false); // End full refetch loading state
-      if (isInitialGlobalLoad) setInitialLoadComplete(true);
+      if (!isInitialGlobalLoad) {
+        setIsPerformingApiAction(false);
+      } else {
+        setIsLoadingShifts(false);
+        setInitialLoadComplete(true);
+      }
     }
-  }, [currentDate, rawUsers, isLoadingUsers]); // Removed isLoadingUsers to prevent potential loop if it changes during refetch
-
+  }, [currentDate, rawUsers]);
 
   useEffect(() => {
     const loadUsers = async () => {
       setIsLoadingUsers(true);
-      request(
-        "get", "/staffs/details",
+      request( "get", "/staffs/details",
         (res) => {
           const fetchedUsers = (res.data.data || []).map(staff => ({
             id: staff.user_login_id, name: staff.fullname,
@@ -269,29 +264,21 @@ export default function ShiftScheduler() {
   }, []);
 
   useEffect(() => {
-    // Only refetch if users are loaded OR if it's not the initial phase where users might still be loading
     if (!isLoadingUsers) {
-      if (!initialLoadComplete) {
-        refetchCurrentWeekShifts(true);
-      } else {
-        refetchCurrentWeekShifts(false);
-      }
+      if (!initialLoadComplete) { refetchCurrentWeekShifts(true); }
+      else { refetchCurrentWeekShifts(false); }
     }
-  }, [currentDate, isLoadingUsers, initialLoadComplete]); // refetchCurrentWeekShifts removed from deps here as it depends on isLoadingUsers
+  }, [currentDate, isLoadingUsers, initialLoadComplete, refetchCurrentWeekShifts]);
 
   useEffect(() => {
     if (rawUsers.length > 0) {
       const uniqueDepartments = rawUsers.reduce((acc, user) => {
-        if (user.departmentCode && user.departmentName && !acc.find(d => d.code === user.departmentCode)) {
-          acc.push({ code: user.departmentCode, name: user.departmentName });
-        }
+        if (user.departmentCode && user.departmentName && !acc.find(d => d.code === user.departmentCode)) acc.push({ code: user.departmentCode, name: user.departmentName });
         return acc;
       }, []);
       setDepartmentOptions(uniqueDepartments.sort((a, b) => a.name.localeCompare(b.name)));
       const uniqueJobPositions = rawUsers.reduce((acc, user) => {
-        if (user.jobPositionName && !acc.find(jp => jp.name === user.jobPositionName)) {
-          acc.push({ code: user.jobPositionName, name: user.jobPositionName });
-        }
+        if (user.jobPositionName && !acc.find(jp => jp.name === user.jobPositionName)) acc.push({ code: user.jobPositionName, name: user.jobPositionName });
         return acc;
       }, []);
       setJobPositionOptions(uniqueJobPositions.sort((a,b) => a.name.localeCompare(b.name)));
@@ -306,29 +293,22 @@ export default function ShiftScheduler() {
     return filteredUsers.map(user => ({ ...user, workHoursSummary: calculateUserWorkHours(user.id, shifts) }));
   }, [rawUsers, shifts, appliedNameFilter, appliedDepartmentFilter, appliedJobPositionFilter]);
 
-
   const groupedUsersForGrid = useMemo(() => {
-    if (allUsers.length === 0 && !isLoadingUsers) return []; // Return empty if no users after filtering and not loading
-    if (isLoadingUsers) return []; // Still loading users, don't compute yet
-
+    if (allUsers.length === 0 && !isLoadingUsers) return [];
+    if (isLoadingUsers) return [];
     const groups = {};
     allUsers.forEach(user => {
       const deptKey = user.departmentCode || 'UNKNOWN_DEPT';
-      if (!groups[deptKey]) {
-        groups[deptKey] = { departmentCode: user.departmentCode, departmentName: user.departmentName || 'Không có phòng ban', users: [] };
-      }
+      if (!groups[deptKey]) groups[deptKey] = { departmentCode: user.departmentCode, departmentName: user.departmentName || 'Không có phòng ban', users: [] };
       groups[deptKey].users.push(user);
     });
-    return Object.values(groups)
-      .sort((a, b) => a.departmentName.localeCompare(b.departmentName))
-      .map(group => { group.users.sort((a, b) => a.name.localeCompare(b.name)); return group; });
+    return Object.values(groups).sort((a, b) => a.departmentName.localeCompare(b.departmentName)).map(group => { group.users.sort((a, b) => a.name.localeCompare(b.name)); return group; });
   }, [allUsers, isLoadingUsers]);
 
   const fetchAbsences = async (userIds, start, end) => {
     if (!userIds || userIds.length === 0) return [];
     return new Promise((resolve) => {
-      request(
-        "get", `/absences`,
+      request( "get", `/absences`,
         (res) => resolve(res.data?.data || []),
         { onError: (err) => { console.error("Failed to fetch absences:", err.response?.data || err.message); resolve([]); }},
         null, { params: { userIds: userIds.join(','), startDate: start, endDate: end } }
@@ -343,6 +323,14 @@ export default function ShiftScheduler() {
   const handleOpenModal = (userIdForPreselection, day, shiftToEdit = null) => {
     let context = null;
     if (shiftToEdit) {
+      // Quan trọng: Không cho sửa ca có ID tạm thời trực tiếp bằng cách mở modal như ca thường.
+      // Nếu backend không hỗ trợ upsert dựa trên ID tạm thời, việc này sẽ gây lỗi.
+      // Tạm thời vẫn cho mở, nhưng proceedWithSaveShift sẽ phải xử lý đặc biệt.
+      // Một giải pháp tốt hơn có thể là vô hiệu hóa nút sửa cho ca có ID tạm thời.
+      if (shiftToEdit.id && shiftToEdit.id.toString().startsWith('temp-')) {
+        toast.error("Ca này đang chờ đồng bộ từ server. Vui lòng thử lại sau ít phút.", { duration: 4000});
+        return; // Không mở modal cho ca có ID tạm thời
+      }
       setCurrentEditingShift(shiftToEdit);
       context = shiftToEdit.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID ? 'editUnassigned' : 'editUser';
       setModalInitialFormState({
@@ -365,6 +353,7 @@ export default function ShiftScheduler() {
   const handleCloseModal = () => { setIsModalOpen(false); setCurrentEditingShift(null); setModalOpeningContext(null); };
 
   const proceedWithSaveShift = async (formDataToSave, editingShiftOriginalId) => {
+    // editingShiftOriginalId sẽ luôn là ID thật từ server nếu logic handleOpenModal được tuân thủ
     const { userIds: rawUserIdsForm, day, startTime, endTime, note, slots: formSlotsStr, _initiatedAsNewUnassignedContext } = formDataToSave;
     const formUserIds = rawUserIdsForm || [];
     const formSlots = formSlotsStr !== undefined && formSlotsStr !== null ? parseInt(formSlotsStr, 10) : undefined;
@@ -372,14 +361,15 @@ export default function ShiftScheduler() {
     let shiftsToCreateApiPayload = [];
     let shiftToUpdateApiPayload = null;
     let idToDeleteOnSuccess = null;
-    let performedCreateOperation = false; // Để theo dõi nếu có ca mới được tạo qua API POST
+    let involvesCreation = false; // Cờ để xác định có cần refetch hay không
 
     const commonShiftData = { day, startTime, endTime, note };
     setIsPerformingApiAction(true);
 
     try {
-      if (_initiatedAsNewUnassignedContext) { // Tạo ca mới (unassigned context)
-        performedCreateOperation = true;
+      if (_initiatedAsNewUnassignedContext) {
+        involvesCreation = true;
+        // ... (logic xây dựng shiftsToCreateApiPayload như cũ) ...
         const assignedUsers = formUserIds.filter(uid => uid !== FRONTEND_UNASSIGNED_SHIFT_USER_ID);
         let totalInitialSlots = formSlots !== undefined ? formSlots : 1;
         if (isNaN(totalInitialSlots) || totalInitialSlots < 0) totalInitialSlots = 1;
@@ -387,156 +377,90 @@ export default function ShiftScheduler() {
         const remainingSlots = totalInitialSlots - assignedUsers.length;
         if (remainingSlots > 0) shiftsToCreateApiPayload.push(transformFrontendShiftToApiShiftRequest({ ...commonShiftData, userId: FRONTEND_UNASSIGNED_SHIFT_USER_ID, slots: remainingSlots }));
 
-      } else if (editingShiftOriginalId && currentEditingShift) { // Đang sửa một ca hiện có
-        if (currentEditingShift.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID) { // Sửa một ca chờ gán
+      } else if (editingShiftOriginalId && currentEditingShift) {
+        if (currentEditingShift.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID) {
           const assignedUsers = formUserIds.filter(uid => uid !== FRONTEND_UNASSIGNED_SHIFT_USER_ID);
-          if (assignedUsers.length > 0) {
-            performedCreateOperation = true; // Vì sẽ tạo ca mới cho nhân viên được gán
-          }
+          if (assignedUsers.length > 0) involvesCreation = true;
+          // ... (logic xây dựng shiftsToCreateApiPayload và shiftToUpdateApiPayload/idToDeleteOnSuccess cho template như cũ) ...
           let currentTemplateActualSlots = currentEditingShift.slots || 0;
           let newTotalSlotsForTemplateDefinition = formSlots !== undefined ? formSlots : currentTemplateActualSlots;
           if (isNaN(newTotalSlotsForTemplateDefinition) || newTotalSlotsForTemplateDefinition < 0) newTotalSlotsForTemplateDefinition = currentTemplateActualSlots;
-
-          assignedUsers.forEach(uid => {
-            shiftsToCreateApiPayload.push(transformFrontendShiftToApiShiftRequest({ ...commonShiftData, userId: uid, slots: undefined }));
-          });
-
-          const finalTemplateSlots = formSlots !== undefined
-            ? newTotalSlotsForTemplateDefinition - assignedUsers.length
-            : currentTemplateActualSlots - assignedUsers.length;
-
-          if (finalTemplateSlots > 0) {
-            shiftToUpdateApiPayload = transformFrontendShiftToApiUpdateShiftRequest(editingShiftOriginalId, { ...commonShiftData, userId: FRONTEND_UNASSIGNED_SHIFT_USER_ID, slots: finalTemplateSlots });
-          } else {
-            idToDeleteOnSuccess = editingShiftOriginalId;
-          }
-        } else { // Sửa một ca đã gán cho nhân viên
-          if (formUserIds.length === 1 && formUserIds[0] === currentEditingShift.userId) { // Chỉ sửa chi tiết, không đổi người
+          assignedUsers.forEach(uid => shiftsToCreateApiPayload.push(transformFrontendShiftToApiShiftRequest({ ...commonShiftData, userId: uid, slots: undefined })));
+          const finalTemplateSlots = formSlots !== undefined ? newTotalSlotsForTemplateDefinition - assignedUsers.length : currentTemplateActualSlots - assignedUsers.length;
+          if (finalTemplateSlots > 0) shiftToUpdateApiPayload = transformFrontendShiftToApiUpdateShiftRequest(editingShiftOriginalId, { ...commonShiftData, userId: FRONTEND_UNASSIGNED_SHIFT_USER_ID, slots: finalTemplateSlots });
+          else idToDeleteOnSuccess = editingShiftOriginalId;
+        } else { // Editing a regular assigned shift
+          if (formUserIds.length === 1 && formUserIds[0] === currentEditingShift.userId) {
             shiftToUpdateApiPayload = transformFrontendShiftToApiUpdateShiftRequest(editingShiftOriginalId, { ...commonShiftData, userId: currentEditingShift.userId });
-          } else { // Có thay đổi về nhân viên -> coi như xóa ca cũ, tạo ca mới
-            performedCreateOperation = true;
+          } else { // User changed, or multiple users selected -> delete old, create new
+            involvesCreation = true;
             idToDeleteOnSuccess = editingShiftOriginalId;
-            formUserIds.filter(uid => uid !== FRONTEND_UNASSIGNED_SHIFT_USER_ID).forEach(uid => {
-              shiftsToCreateApiPayload.push(transformFrontendShiftToApiShiftRequest({ ...commonShiftData, userId: uid }));
-            });
-            if (formUserIds.some(uid => uid === FRONTEND_UNASSIGNED_SHIFT_USER_ID) && formSlots > 0 && !isNaN(formSlots)) {
-              shiftsToCreateApiPayload.push(transformFrontendShiftToApiShiftRequest({ ...commonShiftData, userId: FRONTEND_UNASSIGNED_SHIFT_USER_ID, slots: formSlots }));
-            }
+            // ... (logic xây dựng shiftsToCreateApiPayload như cũ) ...
+            formUserIds.filter(uid => uid !== FRONTEND_UNASSIGNED_SHIFT_USER_ID).forEach(uid => shiftsToCreateApiPayload.push(transformFrontendShiftToApiShiftRequest({ ...commonShiftData, userId: uid })));
+            if (formUserIds.some(uid => uid === FRONTEND_UNASSIGNED_SHIFT_USER_ID) && formSlots > 0 && !isNaN(formSlots)) shiftsToCreateApiPayload.push(transformFrontendShiftToApiShiftRequest({ ...commonShiftData, userId: FRONTEND_UNASSIGNED_SHIFT_USER_ID, slots: formSlots }));
           }
         }
-      } else { // Tạo ca mới hoàn toàn (không phải context unassigned, không phải edit)
-        performedCreateOperation = true;
-        if (formUserIds.length === 0 && (formSlots === undefined || formSlots <= 0 || isNaN(formSlots))) {
-          // toast.error("Vui lòng chọn nhân viên hoặc tạo ca chờ có slot.");
-          setIsPerformingApiAction(false); return;
-        }
-        formUserIds.filter(uid => uid !== FRONTEND_UNASSIGNED_SHIFT_USER_ID).forEach(uid => {
-          shiftsToCreateApiPayload.push(transformFrontendShiftToApiShiftRequest({ ...commonShiftData, userId: uid }));
-        });
-        if (formUserIds.some(uid => uid === FRONTEND_UNASSIGNED_SHIFT_USER_ID) && formSlots > 0 && !isNaN(formSlots)) {
-          shiftsToCreateApiPayload.push(transformFrontendShiftToApiShiftRequest({ ...commonShiftData, userId: FRONTEND_UNASSIGNED_SHIFT_USER_ID, slots: formSlots }));
-        }
+      } else { // Creating brand new shifts (not from unassigned context, not an edit)
+        involvesCreation = true;
+        // ... (logic xây dựng shiftsToCreateApiPayload như cũ) ...
+        if (formUserIds.length === 0 && (formSlots === undefined || formSlots <= 0 || isNaN(formSlots))) { setIsPerformingApiAction(false); return; }
+        formUserIds.filter(uid => uid !== FRONTEND_UNASSIGNED_SHIFT_USER_ID).forEach(uid => shiftsToCreateApiPayload.push(transformFrontendShiftToApiShiftRequest({ ...commonShiftData, userId: uid })));
+        if (formUserIds.some(uid => uid === FRONTEND_UNASSIGNED_SHIFT_USER_ID) && formSlots > 0 && !isNaN(formSlots)) shiftsToCreateApiPayload.push(transformFrontendShiftToApiShiftRequest({ ...commonShiftData, userId: FRONTEND_UNASSIGNED_SHIFT_USER_ID, slots: formSlots }));
       }
 
       const promises = [];
-      if (idToDeleteOnSuccess) {
-        promises.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, null, {params: {ids: idToDeleteOnSuccess}}));
-      }
-      if (shiftToUpdateApiPayload) {
-        promises.push(request("put", `/shifts/${shiftToUpdateApiPayload.id}`, null, {onError: (e) => {throw e}}, shiftToUpdateApiPayload));
-      }
-      if (shiftsToCreateApiPayload.length > 0) {
-        promises.push(request("post", "/shifts", null, {onError: (e) => {throw e}}, { shifts: shiftsToCreateApiPayload }));
-      }
+      if (idToDeleteOnSuccess) promises.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, null, {params: {ids: idToDeleteOnSuccess}}));
+      if (shiftToUpdateApiPayload) promises.push(request("put", `/shifts/${shiftToUpdateApiPayload.id}`, null, {onError: (e) => {throw e}}, shiftToUpdateApiPayload));
+      if (shiftsToCreateApiPayload.length > 0) promises.push(request("post", "/shifts", null, {onError: (e) => {throw e}}, { shifts: shiftsToCreateApiPayload }));
 
       await Promise.all(promises);
 
-      // Logic cập nhật UI sau khi API thành công
-      const isAssignFromUnassignedContext = editingShiftOriginalId && currentEditingShift &&
-        currentEditingShift.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID &&
-        shiftsToCreateApiPayload.some(p => p.user_id !== API_UNASSIGNED_USER_ID);
-
-      if (isAssignFromUnassignedContext) {
-        // ** Cập nhật "lạc quan" cho trường hợp gán từ ca chờ **
-        setShifts(prevShifts => {
-          let newShiftsArray = [...prevShifts];
-          // 1. Cập nhật hoặc xóa ca chờ (template)
-          if (shiftToUpdateApiPayload) { // Template được cập nhật (giảm slots)
-            newShiftsArray = newShiftsArray.map(s => s.id === editingShiftOriginalId ? ({
-              ...s, ...commonShiftData,
-              userId: FRONTEND_UNASSIGNED_SHIFT_USER_ID, // Giữ là unassigned
-              slots: shiftToUpdateApiPayload.slots, // slots mới từ payload API
-              type: 'unassigned',
+      if (involvesCreation || shiftsToCreateApiPayload.length > 0) { // Nếu có bất kỳ sự tạo mới nào
+        await refetchCurrentWeekShifts(); // Tải lại để lấy ID thật và cập nhật UI
+      } else { // Chỉ là update hoặc delete (không tạo mới) -> cập nhật cục bộ
+        let updated = false;
+        if (shiftToUpdateApiPayload) {
+          setShifts(prevShifts => prevShifts.map(s => s.id === shiftToUpdateApiPayload.id ?
+            { ...s, ...commonShiftData,
+              userId: shiftToUpdateApiPayload.user_id === API_UNASSIGNED_USER_ID ? FRONTEND_UNASSIGNED_SHIFT_USER_ID : shiftToUpdateApiPayload.user_id,
+              slots: shiftToUpdateApiPayload.slots,
+              type: shiftToUpdateApiPayload.user_id === API_UNASSIGNED_USER_ID ? 'unassigned' : (s.type === 'time_off' ? 'time_off' : 'regular'),
               duration: calculateDuration(commonShiftData.day, commonShiftData.startTime, commonShiftData.endTime)
-            }) : s);
-          } else if (idToDeleteOnSuccess) { // Template bị xóa (slots = 0)
-            newShiftsArray = newShiftsArray.filter(s => s.id !== idToDeleteOnSuccess);
-          }
-
-          // 2. Thêm các ca mới được gán cho nhân viên với ID tạm thời
-          shiftsToCreateApiPayload.forEach(apiReq => {
-            if (apiReq.user_id !== API_UNASSIGNED_USER_ID) { // Chỉ thêm các ca thực sự gán cho user
-              newShiftsArray.push({
-                id: `temp-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`, // ID tạm thời
-                userId: apiReq.user_id, // userId thật của nhân viên
-                day: apiReq.date,
-                startTime: apiReq.start_time,
-                endTime: apiReq.end_time,
-                note: apiReq.note,
-                type: 'regular',
-                duration: calculateDuration(apiReq.date, apiReq.start_time, apiReq.end_time),
-                // Các thuộc tính frontend mặc định khác nếu có
-              });
-            }
-          });
-          return newShiftsArray;
-        });
-      } else if (performedCreateOperation) { // Các trường hợp tạo mới khác, cần refetch để lấy ID thật
-        await refetchCurrentWeekShifts();
-      } else { // Chỉ là cập nhật hoặc xóa một ca hiện có (không tạo mới)
-        let updatedOrDeletedLocally = false;
-        if (shiftToUpdateApiPayload && editingShiftOriginalId) {
-          setShifts(prevShifts => prevShifts.map(s =>
-            s.id === editingShiftOriginalId
-              ? { ...s, ...commonShiftData,
-                userId: shiftToUpdateApiPayload.user_id === API_UNASSIGNED_USER_ID ? FRONTEND_UNASSIGNED_SHIFT_USER_ID : shiftToUpdateApiPayload.user_id,
-                slots: shiftToUpdateApiPayload.slots,
-                type: shiftToUpdateApiPayload.user_id === API_UNASSIGNED_USER_ID ? 'unassigned' : (s.type === 'time_off' ? 'time_off' : 'regular'),
-                duration: calculateDuration(commonShiftData.day, commonShiftData.startTime, commonShiftData.endTime)
-              }
-              : s ));
-          updatedOrDeletedLocally = true;
-        } else if (idToDeleteOnSuccess && !shiftToUpdateApiPayload) {
-          setShifts(prevShifts => prevShifts.filter(s => s.id !== idToDeleteOnSuccess));
-          updatedOrDeletedLocally = true;
+            } : s
+          ));
+          updated = true;
         }
-        // if (!updatedOrDeletedLocally && !performedCreateOperation) { // Fallback an toàn
-        //     await refetchCurrentWeekShifts();
-        // }
+        if (idToDeleteOnSuccess) {
+          setShifts(prevShifts => prevShifts.filter(s => s.id !== idToDeleteOnSuccess));
+          updated = true;
+        }
+        // if (!updated) await refetchCurrentWeekShifts(); // Fallback an toàn
       }
-      // toast.success("Lưu ca thành công!");
+      toast.success("Lưu ca thành công!");
       handleCloseModal();
-
     } catch (error) {
       console.error("Error saving shift(s):", error.response?.data || error.message);
-      // toast.error(`Lỗi khi lưu ca: ${error.response?.data?.message || 'Vui lòng thử lại.'}`);
-      await refetchCurrentWeekShifts(); // Luôn refetch khi có lỗi để đồng bộ
+      toast.error(`Lỗi khi lưu ca: ${error.response?.data?.message || 'Vui lòng thử lại.'}`);
+      await refetchCurrentWeekShifts();
     } finally {
       setIsPerformingApiAction(false);
     }
   };
+
   const handleSaveShift = (formData) => {
     const { userIds: rawUserIdsForm, day, startTime, endTime, _initiatedAsNewUnassignedContext } = formData;
     const formUserIds = rawUserIdsForm || [];
     const actualUserIdsToAssign = formUserIds.filter(uid => uid !== FRONTEND_UNASSIGNED_SHIFT_USER_ID && rawUsers.find(u => u.id === uid));
     let editingId = currentEditingShift ? currentEditingShift.id : null;
     let allDetectedConflicts = [];
+    // Chỉ kiểm tra xung đột nếu editingId là ID thật (không phải tạm thời)
+    const idToExcludeForConflict = editingId && !editingId.toString().startsWith('temp-') ? editingId : null;
 
     if (_initiatedAsNewUnassignedContext && actualUserIdsToAssign.length > 0) {
       actualUserIdsToAssign.forEach(userId => allDetectedConflicts.push(...detectConflicts({ day, startTime, endTime }, shifts, userId, rawUsers, null)));
-    } else if (currentEditingShift && currentEditingShift.userId !== FRONTEND_UNASSIGNED_SHIFT_USER_ID && currentEditingShift.type !== 'time_off') {
+    } else if (currentEditingShift && currentEditingShift.userId !== FRONTEND_UNASSIGNED_SHIFT_USER_ID ) {
       actualUserIdsToAssign.forEach(userId => {
-        const idToExclude = userId === currentEditingShift.userId ? editingId : null;
+        const idToExclude = userId === currentEditingShift.userId ? idToExcludeForConflict : null;
         allDetectedConflicts.push(...detectConflicts({ day, startTime, endTime }, shifts, userId, rawUsers, idToExclude));
       });
     } else if (currentEditingShift && currentEditingShift.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID && actualUserIdsToAssign.length > 0) {
@@ -555,49 +479,49 @@ export default function ShiftScheduler() {
     proceedWithSaveShift(formData, editingId);
   }
 
-  const handleDeleteSingleShift = (shiftId) => { setShiftIdToDelete(shiftId); setIsDeleteSingleModalOpen(true); };
+  const handleDeleteSingleShift = (shiftId) => {
+    if (shiftId && shiftId.toString().startsWith('temp-')) {
+      toast.error("Không thể xóa ca chưa đồng bộ."); return;
+    }
+    setShiftIdToDelete(shiftId); setIsDeleteSingleModalOpen(true);
+  };
 
   const confirmDeleteSingleShift = async () => {
     if (shiftIdToDelete) {
       setIsPerformingApiAction(true);
-      request(
-        "delete", `/shifts`,
+      request( "delete", `/shifts`,
         () => {
           setShifts(prevShifts => prevShifts.filter(shift => shift.id !== shiftIdToDelete));
           setSelectedShiftIds(prevSelected => prevSelected.filter(id => id !== shiftIdToDelete));
           setShiftIdToDelete(null);
-          // toast.success("Xóa ca thành công!");
+          toast.success("Xóa ca thành công!");
         },
-        { onError: async (err) => {
-            console.error("Error deleting single shift:", err.response?.data || err.message);
-            // toast.error("Lỗi khi xóa ca.");
-            await refetchCurrentWeekShifts();
-          }},
+        { onError: async (err) => { console.error("Error deleting single shift:", err.response?.data || err.message); toast.error("Lỗi khi xóa ca."); await refetchCurrentWeekShifts(); }},
         null, { params: { ids: shiftIdToDelete } }
       ).finally(() => { setIsPerformingApiAction(false); setIsDeleteSingleModalOpen(false); });
     }
   };
 
   const handleDeleteSelectedShifts = useCallback(() => {
-    if (!isAnyShiftSelected || selectedShiftIds.length === 0) return;
+    const realIds = selectedShiftIds.filter(id => !id.toString().startsWith('temp-'));
+    if (realIds.length !== selectedShiftIds.length) {
+      toast.error("Một số ca được chọn chưa được đồng bộ và không thể xóa hàng loạt. Vui lòng bỏ chọn hoặc đợi đồng bộ.");
+      return;
+    }
+    if (selectedShiftIds.length === 0) return;
     setIsDeleteSelectedModalOpen(true);
-  }, [selectedShiftIds, isAnyShiftSelected]);
+  }, [selectedShiftIds]);
 
   const confirmDeleteSelectedShifts = async () => {
-    if (selectedShiftIds.length === 0) return;
+    if (selectedShiftIds.length === 0) return; // Should be guarded by previous check too
     setIsPerformingApiAction(true);
-    request(
-      "delete", `/shifts`,
+    request( "delete", `/shifts`,
       () => {
         setShifts(prevShifts => prevShifts.filter(shift => !selectedShiftIds.includes(shift.id)));
         setSelectedShiftIds([]);
         toast.success(`Đã xóa ${selectedShiftIds.length} ca thành công!`);
       },
-      { onError: async (err) => {
-          console.error("Error deleting selected shifts:", err.response?.data || err.message);
-          toast.error("Lỗi khi xóa các ca đã chọn.");
-          await refetchCurrentWeekShifts();
-        }},
+      { onError: async (err) => { console.error("Error deleting selected shifts:", err.response?.data || err.message); toast.error("Lỗi khi xóa các ca đã chọn."); await refetchCurrentWeekShifts(); }},
       null, { params: { ids: selectedShiftIds.join(',') } }
     ).finally(() => { setIsPerformingApiAction(false); setIsDeleteSelectedModalOpen(false); });
   };
@@ -605,90 +529,49 @@ export default function ShiftScheduler() {
   const proceedWithDragEnd = async (dragResult) => {
     const { source, destination, draggableId } = dragResult;
     const draggedShiftOriginal = shifts.find(shift => shift.id === draggableId);
-    if (!draggedShiftOriginal || draggedShiftOriginal.type === 'time_off') return;
+    // Đã có check ID tạm thời ở onDragEnd
 
     const destParts = destination.droppableId.split('-');
     const newDestUserIdForFrontend = destParts[1];
     const newDestDayString = `${destParts[3]}-${destParts[4]}-${destParts[5]}`;
 
     setIsPerformingApiAction(true);
-    let requiresRefetchDueToCreate = false;
+    let involvesCreationForDrag = false;
     let locallyUpdatedShiftDataForDrag = null;
-    let isAssignFromUnassignedByDrag = false;
-    // Biến mới cho kịch bản kéo thả lên hàng unassigned
     let isDraggingToUnassignedAndFoundMatch = false;
-    let matchedUnassignedShiftToUpdate = null; // Ca unassigned sẽ được cập nhật slots
-    let newUnassignedShiftOptimisticData = null; // Ca unassigned mới nếu không tìm thấy match
+    let matchedUnassignedShiftToUpdate = null;
 
     try {
       const operations = [];
-
       if (draggedShiftOriginal.userId !== FRONTEND_UNASSIGNED_SHIFT_USER_ID && newDestUserIdForFrontend === FRONTEND_UNASSIGNED_SHIFT_USER_ID) {
-        // ** Kéo từ nhân viên lên hàng "Ca chờ gán" **
-        const existingUnassignedShiftsOnDay = shifts.filter(
-          s => s.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID &&
-            s.day === newDestDayString &&
-            s.startTime === draggedShiftOriginal.startTime &&
-            s.endTime === draggedShiftOriginal.endTime &&
-            (s.note || '') === (draggedShiftOriginal.note || '') // So sánh cả note
-        );
-
-        const match = existingUnassignedShiftsOnDay[0]; // Lấy ca đầu tiên tìm được (nếu có)
-
+        const existingUnassignedShiftsOnDay = shifts.filter(s => s.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID && s.day === newDestDayString && s.startTime === draggedShiftOriginal.startTime && s.endTime === draggedShiftOriginal.endTime && (s.note || '') === (draggedShiftOriginal.note || ''));
+        const match = existingUnassignedShiftsOnDay[0];
         if (match) {
           isDraggingToUnassignedAndFoundMatch = true;
           matchedUnassignedShiftToUpdate = { ...match, slots: (match.slots || 0) + 1 };
-
-          // 1. Cập nhật (tăng slot) cho ca unassigned đã có
           const updatePayload = transformFrontendShiftToApiUpdateShiftRequest(match.id, { slots: matchedUnassignedShiftToUpdate.slots });
           operations.push(request("put", `/shifts/${match.id}`, null, {onError: (e) => {throw e}}, updatePayload));
-
-          // 2. Xóa ca đã gán gốc của nhân viên
-          operations.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, null, {params: {ids: draggedShiftOriginal.id}}));
         } else {
-          // Không tìm thấy match -> Tạo ca unassigned mới và xóa ca cũ
-          requiresRefetchDueToCreate = true; // Vì tạo mới ca unassigned, cần ID từ server
-          // HOẶC chúng ta sẽ tạo ID tạm thời cho ca unassigned này
-          const createNewUnassignedShiftReq = transformFrontendShiftToApiShiftRequest({
-            ...draggedShiftOriginal,
-            userId: FRONTEND_UNASSIGNED_SHIFT_USER_ID, // Để API biết đây là unassigned
-            day: newDestDayString,
-            slots: 1, // Slot ban đầu là 1
-          });
-          newUnassignedShiftOptimisticData = { // Dữ liệu để thêm vào state lạc quan
-            id: `temp-unassigned-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-            userId: FRONTEND_UNASSIGNED_SHIFT_USER_ID,
-            day: newDestDayString,
-            startTime: draggedShiftOriginal.startTime,
-            endTime: draggedShiftOriginal.endTime,
-            note: draggedShiftOriginal.note,
-            slots: 1,
-            type: 'unassigned',
-            duration: calculateDuration(newDestDayString, draggedShiftOriginal.startTime, draggedShiftOriginal.endTime),
-            muiColor: 'grey.300', // Giữ style cho ca unassigned
-            muiTextColor: 'text.primary'
-          };
+          involvesCreationForDrag = true;
+          const createNewUnassignedShiftReq = transformFrontendShiftToApiShiftRequest({ ...draggedShiftOriginal, userId: FRONTEND_UNASSIGNED_SHIFT_USER_ID, day: newDestDayString, slots: 1 });
           operations.push(request("post", "/shifts", null, {onError: (e) => {throw e}}, { shifts: [createNewUnassignedShiftReq] }));
-          operations.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, null, {params: {ids: draggedShiftOriginal.id}}));
         }
-
+        operations.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, null, {params: {ids: draggedShiftOriginal.id}}));
       } else if (draggedShiftOriginal.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID && newDestUserIdForFrontend !== FRONTEND_UNASSIGNED_SHIFT_USER_ID) {
-        // Kéo từ ca chờ gán xuống cho nhân viên
-        isAssignFromUnassignedByDrag = true; // Sẽ được xử lý lạc quan bên dưới
+        involvesCreationForDrag = true;
         const createNewAssignedShiftReq = transformFrontendShiftToApiShiftRequest({ ...draggedShiftOriginal, userId: newDestUserIdForFrontend, day: newDestDayString, slots: undefined });
         operations.push(request("post", "/shifts", null, {onError: (e) => {throw e}}, { shifts: [createNewAssignedShiftReq] }));
         if (draggedShiftOriginal.slots && draggedShiftOriginal.slots > 1) {
-          const updateUnassignedReq = transformFrontendShiftToApiUpdateShiftRequest(draggedShiftOriginal.id, { slots: draggedShiftOriginal.slots - 1, });
+          const updateUnassignedReq = transformFrontendShiftToApiUpdateShiftRequest(draggedShiftOriginal.id, { slots: draggedShiftOriginal.slots - 1 });
           operations.push(request("put", `/shifts/${draggedShiftOriginal.id}`, null, {onError: (e) => {throw e}}, updateUnassignedReq));
         } else {
           operations.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, null, {params: {ids:draggedShiftOriginal.id}}));
         }
       } else if (draggedShiftOriginal.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID && newDestUserIdForFrontend === FRONTEND_UNASSIGNED_SHIFT_USER_ID) {
-        // Kéo ca chờ sang ngày khác trong dòng ca chờ -> chỉ update
         const updateUnassignedReq = transformFrontendShiftToApiUpdateShiftRequest(draggedShiftOriginal.id, { day: newDestDayString });
         operations.push(request("put", `/shifts/${draggedShiftOriginal.id}`, null, {onError: (e) => {throw e}}, updateUnassignedReq));
         locallyUpdatedShiftDataForDrag = { ...draggedShiftOriginal, day: newDestDayString, duration: calculateDuration(newDestDayString, draggedShiftOriginal.startTime, draggedShiftOriginal.endTime) };
-      } else { // Kéo ca đã gán sang nhân viên/ngày khác
+      } else {
         const updateAssignedReq = transformFrontendShiftToApiUpdateShiftRequest(draggedShiftOriginal.id, { userId: newDestUserIdForFrontend, day: newDestDayString });
         operations.push(request("put", `/shifts/${draggedShiftOriginal.id}`, null, {onError: (e) => {throw e}}, updateAssignedReq));
         locallyUpdatedShiftDataForDrag = { ...draggedShiftOriginal, userId: newDestUserIdForFrontend, day: newDestDayString, duration: calculateDuration(newDestDayString, draggedShiftOriginal.startTime, draggedShiftOriginal.endTime) };
@@ -696,55 +579,20 @@ export default function ShiftScheduler() {
 
       await Promise.all(operations);
 
-      if (isAssignFromUnassignedByDrag) {
-        setShifts(prevShifts => {
-          let newShiftsArray = [...prevShifts];
-          if (draggedShiftOriginal.slots && draggedShiftOriginal.slots > 1) {
-            newShiftsArray = newShiftsArray.map(s => s.id === draggedShiftOriginal.id ? ({ ...s, slots: s.slots - 1 }) : s);
-          } else {
-            newShiftsArray = newShiftsArray.filter(s => s.id !== draggedShiftOriginal.id);
-          }
-          newShiftsArray.push({
-            id: `temp-drag-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-            userId: newDestUserIdForFrontend, day: newDestDayString,
-            startTime: draggedShiftOriginal.startTime, endTime: draggedShiftOriginal.endTime,
-            note: draggedShiftOriginal.note, type: 'regular',
-            duration: calculateDuration(newDestDayString, draggedShiftOriginal.startTime, draggedShiftOriginal.endTime),
-          });
-          return newShiftsArray;
-        });
+      if (involvesCreationForDrag) {
+        await refetchCurrentWeekShifts();
       } else if (isDraggingToUnassignedAndFoundMatch && matchedUnassignedShiftToUpdate) {
-        // Cập nhật lạc quan: xóa ca cũ, cập nhật ca unassigned đã có
         setShifts(prevShifts => {
           const withoutDragged = prevShifts.filter(s => s.id !== draggedShiftOriginal.id);
           return withoutDragged.map(s => s.id === matchedUnassignedShiftToUpdate.id ? matchedUnassignedShiftToUpdate : s);
         });
-      } else if (requiresRefetchDueToCreate && newUnassignedShiftOptimisticData) {
-        // Tạo ca unassigned mới không match -> xóa ca cũ, thêm ca mới lạc quan
-        // Tuy nhiên, để có ID thật, vẫn nên refetch sau đó nếu cần.
-        // Hoặc chấp nhận ID tạm thời cho ca unassigned mới này.
-        // Vì user yêu cầu không reload, chúng ta sẽ thêm lạc quan.
-        setShifts(prevShifts => {
-          const withoutDragged = prevShifts.filter(s => s.id !== draggedShiftOriginal.id);
-          return [...withoutDragged, newUnassignedShiftOptimisticData];
-        });
-        // Nếu muốn có ID thật ngay, bạn sẽ cần gọi refetch ở đây:
-        // await refetchCurrentWeekShifts();
       } else if (locallyUpdatedShiftDataForDrag) {
         setShifts(prevShifts => prevShifts.map(s => s.id === locallyUpdatedShiftDataForDrag.id ? locallyUpdatedShiftDataForDrag : s));
-      } else if (requiresRefetchDueToCreate) {
-        // Các trường hợp tạo mới khác (ví dụ: kéo từ assigned lên unassigned mà không match)
-        // và chúng ta quyết định cần ID thật ngay lập tức.
-        // Hiện tại, nếu newUnassignedShiftOptimisticData có, nó đã được thêm lạc quan.
-        // Nếu không, tức là một kịch bản tạo mới khác mà chưa xử lý lạc quan, thì refetch.
-        if (!newUnassignedShiftOptimisticData) { // Chỉ refetch nếu chưa được xử lý lạc quan
-          await refetchCurrentWeekShifts();
-        }
       }
-      // toast.success("Di chuyển ca thành công!");
+      //toast.success("Di chuyển ca thành công!");
     } catch (error) {
       console.error("Error during drag and drop:", error.response?.data || error.message);
-      // toast.error("Lỗi khi di chuyển ca.");
+      toast.error("Lỗi khi di chuyển ca.");
       await refetchCurrentWeekShifts();
     } finally {
       setIsPerformingApiAction(false);
@@ -755,7 +603,14 @@ export default function ShiftScheduler() {
     const { source, destination, draggableId } = result;
     if (!destination || !destination.droppableId || (source.droppableId === destination.droppableId && source.index === destination.index)) return;
     const draggedShift = shifts.find(shift => shift.id === draggableId);
-    if (!draggedShift || draggedShift.type === 'time_off') return;
+
+    if (!draggedShift || draggedShift.type === 'time_off' || (draggedShift.id && draggedShift.id.toString().startsWith('temp-'))) {
+      if (draggedShift && draggedShift.id && draggedShift.id.toString().startsWith('temp-')) {
+        toast.error("Ca này đang chờ đồng bộ, không thể kéo thả.", { duration: 3000 });
+      }
+      return;
+    }
+    // ... (rest of onDragEnd logic remains the same)
     const destParts = destination.droppableId.split('-');
     if (destParts.length < 6 || destParts[0] !== 'user') return;
     const newDestUserId = destParts[1];
@@ -787,16 +642,23 @@ export default function ShiftScheduler() {
 
   const handleToggleSelectShift = useCallback((shiftId) => {
     const shiftToToggle = shifts.find(s => s.id === shiftId);
-    if (shiftToToggle && shiftToToggle.type === 'time_off') return;
+    if (shiftToToggle && (shiftToToggle.type === 'time_off' || (shiftToToggle.id && shiftToToggle.id.toString().startsWith('temp-')))) {
+      if (shiftToToggle.id && shiftToToggle.id.toString().startsWith('temp-')) {
+        toast.error("Ca này đang chờ đồng bộ, không thể chọn.", {duration: 3000});
+      }
+      return;
+    }
     setSelectedShiftIds(prev => prev.includes(shiftId) ? prev.filter(id => id !== shiftId) : [...prev, shiftId]);
   }, [shifts]);
+
   const handleDeselectAll = useCallback(() => { setSelectedShiftIds([]); }, []);
+
   const getAllShiftIdsInCurrentView = useCallback(() => {
     const weekStartFilter = startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON });
     const weekEndRange = addDays(weekStartFilter, 6);
     const ids = [];
     shifts.forEach(s => {
-      if (s.type === 'time_off') return;
+      if (s.type === 'time_off' || (s.id && s.id.toString().startsWith('temp-'))) return;
       if (isValid(parseISO(s.day))) {
         const d = parseISO(s.day);
         if (d >= weekStartFilter && d <= weekEndRange) {
@@ -820,12 +682,26 @@ export default function ShiftScheduler() {
     else setSelectedShiftIds(prev => [...new Set([...prev, ...idsInView])]);
   }, [getAllShiftIdsInCurrentView, isAllSelectedInView]);
 
-  const handleOpenCopyModal = () => { if (!isAnyShiftSelected) return; setIsCopyModalOpen(true); };
+
+  const handleOpenCopyModal = () => {
+    const realIdsSelected = selectedShiftIds.filter(id => !id.toString().startsWith('temp-'));
+    if(realIdsSelected.length !== selectedShiftIds.length){
+      toast.error("Một số ca được chọn chưa đồng bộ và không thể sao chép. Vui lòng bỏ chọn hoặc đợi đồng bộ.");
+      return;
+    }
+    if (!isAnyShiftSelected || realIdsSelected.length === 0) {
+      toast.error("Vui lòng chọn ít nhất một ca (đã đồng bộ) để sao chép.");
+      return;
+    }
+    setIsCopyModalOpen(true);
+  };
   const handleCloseCopyModal = () => { setIsCopyModalOpen(false); };
 
   const handleConfirmCopyToWeeks = useCallback(async (targetWeekStartDates) => {
-    if (!isAnyShiftSelected || targetWeekStartDates.length === 0) return;
-    const toCopy = shifts.filter(s => selectedShiftIds.includes(s.id) && s.type !== 'time_off');
+    const realSelectedShiftIds = selectedShiftIds.filter(id => !id.toString().startsWith('temp-'));
+    if (realSelectedShiftIds.length === 0 || targetWeekStartDates.length === 0) return;
+
+    const toCopy = shifts.filter(s => realSelectedShiftIds.includes(s.id) && s.type !== 'time_off');
     let newShiftApiRequests = [];
     targetWeekStartDates.forEach(weekStart => {
       toCopy.forEach(s => {
@@ -844,23 +720,18 @@ export default function ShiftScheduler() {
 
     if (newShiftApiRequests.length > 0) {
       setIsPerformingApiAction(true);
-      request(
-        "post", "/shifts",
+      request( "post", "/shifts",
         async () => {
-          await refetchCurrentWeekShifts(); // <<< Refetch needed
-          setSelectedShiftIds([]);
+          await refetchCurrentWeekShifts();
+          setSelectedShiftIds([]); // Clear selection after successful copy
           handleCloseCopyModal();
           toast.success("Sao chép ca thành công!");
         },
-        { onError: async (err) => {
-            console.error("Error copying shifts:", err.response?.data || err.message);
-            toast.error("Lỗi khi sao chép ca.");
-            await refetchCurrentWeekShifts();
-          }},
+        { onError: async (err) => { console.error("Error copying shifts:", err.response?.data || err.message); toast.error("Lỗi khi sao chép ca."); await refetchCurrentWeekShifts(); }},
         { shifts: newShiftApiRequests }
       ).finally(() => setIsPerformingApiAction(false));
     } else { handleCloseCopyModal(); }
-  }, [selectedShiftIds, shifts, isAnyShiftSelected, refetchCurrentWeekShifts]); // Added refetchCurrentWeekShifts to dep array
+  }, [selectedShiftIds, shifts, isAnyShiftSelected, refetchCurrentWeekShifts]);
 
   const handleOpenFilterDrawer = () => { setNameFilterInput(appliedNameFilter); setDepartmentFilterInput(appliedDepartmentFilter); setJobPositionFilterInput(appliedJobPositionFilter); setFilterDrawerOpen(true); };
   const handleCloseFilterDrawer = () => setFilterDrawerOpen(false);
@@ -868,104 +739,72 @@ export default function ShiftScheduler() {
   const handleClearFiltersFromDrawer = () => { setNameFilterInput(""); setDepartmentFilterInput(null); setJobPositionFilterInput(null); setAppliedNameFilter(""); setAppliedDepartmentFilter(null); setAppliedJobPositionFilter(null); };
 
   const dynamicStickyOffset = isAnyShiftSelected ? BULK_ACTIONS_BAR_HEIGHT : 0;
-  const PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER = 24;
-  const FIXED_FOOTER_RESERVED_SPACE = 40;
-  const paperContentMaxHeight = `calc(100vh - ${TOP_BAR_HEIGHT}px - ${dynamicStickyOffset}px - ${INFO_BANNERS_TOTAL_HEIGHT}px - ${PADDING_AND_MARGIN_AROUND_SCROLLABLE_PAPER}px - ${FIXED_FOOTER_RESERVED_SPACE}px)`;
-
-  // Adjusted mainContentLoading: do not consider isPerformingApiAction here
-  // as it would hide the grid during optimistic updates.
-  // isLoadingShifts will cover full refetches.
-  const mainContentLoading = isLoadingUsers || isLoadingShifts;
-
+  const FIXED_FOOTER_RESERVED_SPACE = 20;
+  const paperContentMaxHeight = `calc(100vh - ${TOP_BAR_HEIGHT}px - ${dynamicStickyOffset}px - ${INFO_BANNERS_TOTAL_HEIGHT}px - ${PADDING_AROUND_SCROLLABLE_PAPER_ELEMENT}px - ${PAGE_BOTTOM_BUFFER}px - ${FIXED_FOOTER_RESERVED_SPACE}px)`;
+  const mainContentLoading = (isLoadingUsers && !initialLoadComplete) || (isLoadingShifts && !initialLoadComplete);
+  const showClearFilterButton = (appliedNameFilter || appliedDepartmentFilter || appliedJobPositionFilter) && allUsers.length === 0 && rawUsers.length > 0 && !isLoadingUsers;
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
       <DragDropContext onDragEnd={onDragEnd}>
         <Container maxWidth={false} disableGutters sx={{ bgcolor: 'grey.200', minHeight: '100vh' }}>
-          <TopBar
-            currentDate={currentDate} onPrevWeek={handlePrevWeek} onNextWeek={handleNextWeek}
-            onToday={handleToday} onOpenFilterDrawer={handleOpenFilterDrawer}
-            isFilterApplied={!!(appliedNameFilter || appliedDepartmentFilter || appliedJobPositionFilter)}
-            isLoading={isPerformingApiAction} // Pass this to TopBar for its own loading indicator if needed
-          />
-          <BulkActionsBar
-            selectedCount={selectedShiftIds.length} onDeleteSelected={handleDeleteSelectedShifts}
-            onOpenCopyModal={handleOpenCopyModal} onDeselectAll={handleDeselectAll}
-          />
-          <UserFilterDrawer
-            open={isFilterDrawerOpen} onClose={handleCloseFilterDrawer}
-            nameFilterValue={nameFilterInput} onNameFilterChange={(e) => setNameFilterInput(e.target.value)}
-            departmentFilterValue={departmentFilterInput} onDepartmentFilterChange={(event, newValue) => setDepartmentFilterInput(newValue)}
-            jobPositionFilterValue={jobPositionFilterInput} onJobPositionFilterChange={(event, newValue) => setJobPositionFilterInput(newValue)}
-            departmentOptions={departmentOptions} jobPositionOptions={jobPositionOptions}
-            onApply={handleApplyFiltersFromDrawer} onClear={handleClearFiltersFromDrawer}
-          />
-
+          <TopBar currentDate={currentDate} onPrevWeek={handlePrevWeek} onNextWeek={handleNextWeek} onToday={handleToday} onOpenFilterDrawer={handleOpenFilterDrawer} isFilterApplied={!!(appliedNameFilter || appliedDepartmentFilter || appliedJobPositionFilter)} isLoading={isPerformingApiAction} />
+          <BulkActionsBar selectedCount={selectedShiftIds.filter(id => !id.toString().startsWith('temp-')).length} onDeleteSelected={handleDeleteSelectedShifts} onOpenCopyModal={handleOpenCopyModal} onDeselectAll={handleDeselectAll} />
+          <UserFilterDrawer open={isFilterDrawerOpen} onClose={handleCloseFilterDrawer} nameFilterValue={nameFilterInput} onNameFilterChange={(e) => setNameFilterInput(e.target.value)} departmentFilterValue={departmentFilterInput} onDepartmentFilterChange={(event, newValue) => setDepartmentFilterInput(newValue)} jobPositionFilterValue={jobPositionFilterInput} onJobPositionFilterChange={(event, newValue) => setJobPositionFilterInput(newValue)} departmentOptions={departmentOptions} jobPositionOptions={jobPositionOptions} onApply={handleApplyFiltersFromDrawer} onClear={handleClearFiltersFromDrawer} />
           <Box sx={{px: {xs: 0, sm:1, md:2}, py:1}}>
             <InfoBanners currentDate={currentDate} stickyTopOffset={dynamicStickyOffset} />
             <Paper elevation={2} sx={{ mt:1, overflowY: 'auto', maxHeight: paperContentMaxHeight }}>
               <CalendarHeader currentDate={currentDate} onToggleSelectAll={handleToggleSelectAllInView} isAllSelectedInView={isAllSelectedInView} isIndeterminateInView={isIndeterminateInView} stickyTopOffset={0} />
-
-              {(!isLoadingUsers && !initialLoadComplete && isLoadingShifts) ? null : (
-                !isLoadingUsers && !isLoadingShifts &&
-                <UnassignedShiftsRow
-                  currentDate={currentDate} shifts={shifts.filter(s => s.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID)}
-                  onAddShift={(userId, day) => handleOpenModal(FRONTEND_UNASSIGNED_SHIFT_USER_ID, day)}
-                  onEditShift={(shift) => handleOpenModal(null, null, shift)}
-                  onDeleteShift={handleDeleteSingleShift} selectedShiftIds={selectedShiftIds}
-                  onToggleSelectShift={handleToggleSelectShift} isAnyShiftSelected={isAnyShiftSelected}
-                  isSticky={unassignedRowSticky} onToggleSticky={() => setUnassignedRowSticky(prev => !prev)}
-                  stickyTopOffset={CALENDAR_HEADER_HEIGHT}
-                />
-              )}
-
+              {(!isLoadingUsers && !initialLoadComplete && isLoadingShifts && !isPerformingApiAction) ? null : ( !mainContentLoading && <UnassignedShiftsRow currentDate={currentDate} shifts={shifts.filter(s => s.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID)} onAddShift={(userId, day) => handleOpenModal(FRONTEND_UNASSIGNED_SHIFT_USER_ID, day)} onEditShift={(shift) => handleOpenModal(null, null, shift)} onDeleteShift={handleDeleteSingleShift} selectedShiftIds={selectedShiftIds} onToggleSelectShift={handleToggleSelectShift} isAnyShiftSelected={isAnyShiftSelected} isSticky={unassignedRowSticky} onToggleSticky={() => setUnassignedRowSticky(prev => !prev)} stickyTopOffset={CALENDAR_HEADER_HEIGHT} /> )}
               <Box sx={{ overflowX: 'auto' }}>
                 <Box sx={{ minWidth: 1100 }}>
                   {mainContentLoading ? (
                     <Box display="flex" justifyContent="center" alignItems="center" sx={{ height: 200, p: 2 }}>
                       <CircularProgress /> <Typography sx={{ml: 2}}>Đang tải dữ liệu...</Typography>
                     </Box>
-                  ) : groupedUsersForGrid.length > 0 || shifts.some(s => s.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID) ? (
-                    <ShiftsGrid
-                      currentDate={currentDate} shifts={shifts.filter(s => s.userId !== FRONTEND_UNASSIGNED_SHIFT_USER_ID)}
-                      groupedUsers={groupedUsersForGrid}
-                      onAddShift={(userId, day) => handleOpenModal(userId, day)}
-                      onEditShift={(shift) => { if (shift.type === 'time_off') return; handleOpenModal(shift.userId, parseISO(shift.day), shift); }}
-                      selectedShiftIds={selectedShiftIds} onToggleSelectShift={handleToggleSelectShift}
-                      isAnyShiftSelected={isAnyShiftSelected}
-                    />
                   ) : (
-                    <Box display="flex" justifyContent="center" alignItems="center" sx={{ height: 100, p:2, flexDirection: 'column' }}>
-                      <Typography color="text.secondary">
-                        { (rawUsers.length > 0 && allUsers.length === 0) ? "Không có nhân viên nào khớp với bộ lọc."
-                          : (rawUsers.length === 0 && !isLoadingUsers ? "Không có nhân viên nào trong hệ thống." : "") }
-                      </Typography>
-                      { (appliedNameFilter || appliedDepartmentFilter || appliedJobPositionFilter) && allUsers.length === 0 && rawUsers.length > 0 &&
-                        <Button variant="text" size="small" onClick={handleClearFiltersFromDrawer} sx={{mt:1, textTransform:'none'}}>Xóa bộ lọc?</Button> }
-                    </Box>
+                    <>
+                      {groupedUsersForGrid.length > 0 || shifts.some(s => s.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID) ? (
+                        <ShiftsGrid
+                          currentDate={currentDate}
+                          shifts={shifts.filter(s => s.userId !== FRONTEND_UNASSIGNED_SHIFT_USER_ID)}
+                          groupedUsers={groupedUsersForGrid}
+                          onAddShift={(userId, day) => handleOpenModal(userId, day)}
+                          onEditShift={(shift) => { if (shift.type === 'time_off') return; handleOpenModal(null, parseISO(shift.day), shift); }}
+                          selectedShiftIds={selectedShiftIds}
+                          onToggleSelectShift={handleToggleSelectShift}
+                          isAnyShiftSelected={isAnyShiftSelected}
+                        />
+                      ) : (
+                        // Hiển thị thông báo nếu không có user nào và không có ca unassigned
+                        !shifts.some(s => s.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID) && (
+                          <Box display="flex" justifyContent="center" alignItems="center" sx={{ height: 100, p:2, flexDirection: 'column' }}>
+                            <Typography color="text.secondary">
+                              { (rawUsers.length > 0 && allUsers.length === 0 && !isLoadingUsers) ? "Không có nhân viên nào khớp với bộ lọc."
+                                : (rawUsers.length === 0 && !isLoadingUsers ? "Không có nhân viên nào trong hệ thống."
+                                  : (isLoadingUsers && initialLoadComplete ? "" : "Không có dữ liệu ca làm việc."))
+                              }
+                            </Typography>
+                            {/* Nút xóa bộ lọc sẽ được hiển thị riêng biệt bên dưới nếu cần */}
+                          </Box>
+                        )
+                      )}
+                      {/* Luôn hiển thị nút "Xóa bộ lọc" nếu điều kiện showClearFilterButton là true, ngay cả khi có ca unassigned */}
+                      {showClearFilterButton && (
+                        <Box display="flex" justifyContent="center" alignItems="center" sx={{ height: showClearFilterButton ? 50 : 0, p: showClearFilterButton ? 1 : 0, transition: 'height 0.3s' }}>
+                          <Button variant="text" size="small" onClick={handleClearFiltersFromDrawer} sx={{textTransform:'none'}}>Xóa bộ lọc?</Button>
+                        </Box>
+                      )}
+                    </>
                   )}
                 </Box>
               </Box>
             </Paper>
           </Box>
-
-          <ShiftModal
-            isOpen={isModalOpen}
-            onClose={handleCloseModal}
-            onSave={handleSaveShift}
-            users={allUsers}
-            initialFormState={modalInitialFormState}
-            isEditing={!!currentEditingShift && currentEditingShift.type !== 'time_off'}
-            isUnassignedContext={modalOpeningContext === 'newUnassigned' || modalOpeningContext === 'editUnassigned'}
-            unassignedShiftBeingEdited={currentEditingShift && currentEditingShift.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID ? currentEditingShift : null}
-            isSaving={isPerformingApiAction}
-          />
-          <CopyShiftsModal
-            isOpen={isCopyModalOpen} onClose={handleCloseCopyModal} onConfirmCopy={handleConfirmCopyToWeeks}
-            currentDate={currentDate} numSelectedShifts={selectedShiftIds.length}
-          />
+          <ShiftModal isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleSaveShift} users={allUsers} initialFormState={modalInitialFormState} isEditing={!!currentEditingShift && currentEditingShift.type !== 'time_off'} isUnassignedContext={modalOpeningContext === 'newUnassigned' || modalOpeningContext === 'editUnassigned'} unassignedShiftBeingEdited={currentEditingShift && currentEditingShift.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID ? currentEditingShift : null} isSaving={isPerformingApiAction} />
+          <CopyShiftsModal isOpen={isCopyModalOpen} onClose={handleCloseCopyModal} onConfirmCopy={handleConfirmCopyToWeeks} currentDate={currentDate} numSelectedShifts={selectedShiftIds.filter(id => !id.toString().startsWith('temp-')).length} />
           <DeleteConfirmationModal open={isDeleteSingleModalOpen} onClose={() => { setIsDeleteSingleModalOpen(false); setShiftIdToDelete(null); }} onSubmit={confirmDeleteSingleShift} title="Xác nhận xóa ca" info="Bạn có chắc chắn muốn xóa ca làm việc này không?" cancelLabel="Hủy bỏ" confirmLabel="Xóa"/>
-          <DeleteConfirmationModal open={isDeleteSelectedModalOpen} onClose={() => setIsDeleteSelectedModalOpen(false)} onSubmit={confirmDeleteSelectedShifts} title="Xác nhận xóa các ca đã chọn" info={`Bạn có chắc chắn muốn xóa ${selectedShiftIds.length} ca đã chọn không?`} cancelLabel="Hủy bỏ" confirmLabel="Xóa tất cả"/>
+          <DeleteConfirmationModal open={isDeleteSelectedModalOpen} onClose={() => setIsDeleteSelectedModalOpen(false)} onSubmit={confirmDeleteSelectedShifts} title="Xác nhận xóa các ca đã chọn" info={`Bạn có chắc chắn muốn xóa ${selectedShiftIds.filter(id => !id.toString().startsWith('temp-')).length} ca hợp lệ đã chọn không?`} cancelLabel="Hủy bỏ" confirmLabel="Xóa tất cả"/>
           <SchedulingConflictModal open={isConflictModalOpen} onClose={handleConflictModalClose} onConfirm={handleConflictModalConfirm} conflicts={schedulingConflicts}/>
         </Container>
       </DragDropContext>
