@@ -220,7 +220,10 @@ const AddTrip = () => {
 
     request("post", requestUrl, (res) => {
       if (res.status === 200) {
+        alert("Trip created successfully!");
         navigate(`/delivery-manager/delivery-trip`);
+      } else {
+        alert("Failed to create trip!");
       }
     }, {}, payload);
   };
@@ -445,10 +448,10 @@ const AddTrip = () => {
                 <TableRow>
                   <TableCell>Select</TableCell>
                   <TableCell>Product</TableCell>
-                  <TableCell>Weight</TableCell>
-                  <TableCell>Quantity</TableCell>
-                  <TableCell>Bay Code</TableCell>
-                  <TableCell>Lot ID</TableCell>
+                  <TableCell align="center">Weight (kg)</TableCell>
+                  <TableCell align="center">Quantity</TableCell>
+                  <TableCell align="center">Bay Code</TableCell>
+                  <TableCell align="center">Lot ID</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -464,16 +467,16 @@ const AddTrip = () => {
                       <TableCell width={200}>
                         <Skeleton variant="text" />
                       </TableCell>
-                      <TableCell width={100}>
+                      <TableCell width={100} align="center">
                         <Skeleton variant="text" />
                       </TableCell>
-                      <TableCell width={100}>
+                      <TableCell width={100} align="center">
                         <Skeleton variant="text" />
                       </TableCell>
-                      <TableCell width={120}>
+                      <TableCell width={120} align="center">
                         <Skeleton variant="text" />
                       </TableCell>
-                      <TableCell width={120}>
+                      <TableCell width={120} align="center">
                         <Skeleton variant="text" />
                       </TableCell>
                     </TableRow>
@@ -488,10 +491,10 @@ const AddTrip = () => {
                         />
                       </TableCell>
                       <TableCell width={200}>{detail.productName}</TableCell>
-                      <TableCell width={100}>{detail.weight}</TableCell>
-                      <TableCell width={100}>{detail.originalQuantity}</TableCell>
-                      <TableCell width={120}>{detail.bayCode}</TableCell>
-                      <TableCell width={120}>{detail.lotId}</TableCell>
+                      <TableCell width={100} align="center">{detail.weight}</TableCell>
+                      <TableCell width={100} align="center">{detail.originalQuantity}</TableCell>
+                      <TableCell width={120} align="center">{detail.bayCode}</TableCell>
+                      <TableCell width={120} align="center">{detail.lotId}</TableCell>
                     </TableRow>
                   ))}
               </TableBody>

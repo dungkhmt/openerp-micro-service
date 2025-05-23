@@ -164,7 +164,7 @@ const RoutingResult = () => {
             };
         });
 
-        // console.log('Submit payload:', payload); 
+        console.log('Submit payload:', payload); 
         const requestUrl = "/delivery-trips/batch";
         request("post", requestUrl, (res) => {
             if (res.status === 200) {
@@ -282,7 +282,7 @@ const RoutingResult = () => {
                                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', backgroundColor: '#f5f5f5', padding: '10px', borderRadius: '4px' }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                         <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mr: 1 }}>
-                                            Total Customers:
+                                            Total Locations:
                                         </Typography>
                                         <Typography variant="body2">
                                             {trip.route.length > 2 ? trip.route.length - 2 : 0}
