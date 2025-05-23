@@ -71,7 +71,7 @@ public class DeliveryTripService {
 		deliveryPersonService.updateDeliveryPersonStatus(payload.getDeliveryPersonId(), "BUSY");
 
 		List<DeliveryTripItem> items = payload.getItems().stream()
-				.map(item -> DeliveryTripItem.builder().deliveryTripItemId(deliveryTripItemService.generateTripItemId())
+				.map(item -> DeliveryTripItem.builder()
 						.deliveryTripId(tripId).orderId(item.getOrderId())
 						.assignedOrderItemId(item.getAssignedOrderItemId()).sequence(item.getSequence())
 						.quantity(item.getQuantity()).status("CREATED")

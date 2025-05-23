@@ -19,13 +19,7 @@ import openerp.openerpresourceserver.repository.DeliveryTripItemRepository;
 @RequiredArgsConstructor
 public class DeliveryTripItemService {
 
-	private static final String TRIP_ITEM_PREFIX = "TRP_ITEM_";
 	private final DeliveryTripItemRepository deliveryTripItemRepository;
-
-	public String generateTripItemId() {
-		long count = deliveryTripItemRepository.count() + 1;
-		return String.format(TRIP_ITEM_PREFIX + "%05d", count);
-	}
 
 	public List<CustomerDeliveryProjection> getCustomersByDeliveryTripId(String deliveryTripId) {
 		return deliveryTripItemRepository.findCustomersByDeliveryTripId(deliveryTripId);

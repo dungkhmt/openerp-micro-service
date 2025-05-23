@@ -149,7 +149,7 @@ const DeliveryTripDetail = () => {
       <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
         <Typography variant="h6" gutterBottom>Delivery sequence</Typography>
         <Typography className="text-green-500" sx={{ mb: 2 }}>
-          Total locations: {deliverySequence.length}
+          Total orders: {deliverySequence.length}
         </Typography>
 
         <Stack spacing={2}>

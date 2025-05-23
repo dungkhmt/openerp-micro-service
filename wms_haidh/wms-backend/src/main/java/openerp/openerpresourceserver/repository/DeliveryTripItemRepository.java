@@ -16,7 +16,7 @@ import openerp.openerpresourceserver.projection.CustomerDeliveryProjection;
 import openerp.openerpresourceserver.projection.DeliveryItemDetailProjection;
 
 @Repository
-public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripItem, String> {
+public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripItem, UUID> {
 	@Query("""
 			    SELECT DISTINCT
 			        o.orderId AS orderId,

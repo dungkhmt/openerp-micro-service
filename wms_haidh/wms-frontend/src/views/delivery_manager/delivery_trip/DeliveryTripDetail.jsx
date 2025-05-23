@@ -120,7 +120,7 @@ const DeliveryTripDetail = () => {
           </Typography>
           <div className='mb-4'>
             <Typography variant="h7" gutterBottom className="text-green-500">
-              Total locations : {deliverySequence.length}
+              Total orders : {deliverySequence.length}
             </Typography>
           </div>
           <Stack spacing={2}>

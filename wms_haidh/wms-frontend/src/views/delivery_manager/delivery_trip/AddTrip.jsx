@@ -25,7 +25,7 @@ import {
   Checkbox
 } from '@mui/material';
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import Map from '../../../components/Map';
+import MyMap from '../../../components/Map';
 import fetchRoute from '../../../utils/fetchRoute';
 import { formatDate } from '../../../utils/utils';
 import SaveIcon from '@mui/icons-material/Save';
@@ -58,6 +58,35 @@ const AddTrip = () => {
   const [maxWeight, setMaxWeight] = useState(0);
   const prevWarehouseId = useRef(warehouseId);
 
+  const locationSequenceMap = useMemo(() => {
+    const seen = new Set();
+    let sequence = 1;
+    const map = {};
+    for (const item of deliverySequence) {
+      const addressId = customerInfo[item.orderId]?.customerAddressId;
+      if (addressId && !seen.has(addressId)) {
+        seen.add(addressId);
+        map[addressId] = sequence++;
+      }
+    }
+    return map;
+  }, [deliverySequence, customerInfo]);
+
+  const groupedSequence = useMemo(() => {
+    const groups = new Map();
+    for (const item of deliverySequence) {
+      const addressId = customerInfo[item.orderId]?.customerAddressId;
+      if (!addressId) continue;
+      if (!groups.has(addressId)) {
+        groups.set(addressId, []);
+      }
+      groups.get(addressId).push(item);
+    }
+    return Array.from(groups.entries()); // [ [addressId, [item, item]], ... ]
+  }, [deliverySequence, customerInfo]);
+
+  const totalLocations = groupedSequence.length;
+
   const selectedWarehouse = useMemo(() =>
     warehouseOptions.find(wh => wh.warehouseId === warehouseId),
     [warehouseId, warehouseOptions]
@@ -69,13 +98,13 @@ const AddTrip = () => {
   );
 
   const customerCoordinates = useMemo(() =>
-    deliverySequence
-      .map(({ orderId }) => customerInfo[orderId])
-      .filter(info => info)
-      .map(({ longitude, latitude }) => ({ lat: latitude, lng: longitude })),
-    [deliverySequence, customerInfo]
+    groupedSequence.map(([addressId, orders]) => {
+      const firstOrderId = orders[0]?.orderId;
+      const info = customerInfo[firstOrderId];
+      return info ? { lat: info.latitude, lng: info.longitude } : null;
+    }).filter(Boolean),
+    [groupedSequence, customerInfo]
   );
-
 
   const coordinates = useMemo(() =>
     warehouseCoordinates
@@ -153,46 +182,18 @@ const AddTrip = () => {
 
   const handleSubmit = async () => {
 
-    if (!warehouseId) {
-      toast.error("Please select a departure warehouse");
-      return;
-    }
-
-    if (!shipmentId) {
-      toast.error("Please select a shipment");
-      return;
-    }
-
-    if (!deliveryPersonId) {
-      toast.error("Please select a delivery person");
-      return;
-    }
-
-    if (!vehicleId) {
-      toast.error("Please select a vehicle");
-      return;
-    }
-
-    if (totalWeight === 0) {
-      toast.error("Please select at least one item");
-      return;
-    }
-
     if (totalWeight > maxWeight) {
       toast.error("Total weight exceeds vehicle load capacity ! ");
       return;
     }
 
-    if (distance === 0) {
-      toast.error("Please wait until the route distance is loaded. ");
-      return;
-    }
-
-
-    const orderSequenceMap = deliverySequence.reduce((acc, item, index) => {
-      acc[item.orderId] = index + 1;
+    const orderSequenceMap = groupedSequence.reduce((acc, [customerAddressId, orders], index) => {
+      orders.forEach(order => {
+        acc[order.orderId] = index + 1; // sequence của nhóm
+      });
       return acc;
     }, {});
+
 
     const submittedData = assignedItems.map(item => ({
       assignedOrderItemId: item.assignedOrderItemId,
@@ -208,7 +209,7 @@ const AddTrip = () => {
       description,
       shipmentId,
       totalWeight,
-      totalLocations: deliverySequence.length,
+      totalLocations,
       distance,
       items: submittedData,
       coordinates
@@ -219,10 +220,7 @@ const AddTrip = () => {
 
     request("post", requestUrl, (res) => {
       if (res.status === 200) {
-        alert("Trip created successfully!");
         navigate(`/delivery-manager/delivery-trip`);
-      } else {
-        alert("Failed to create trip");
       }
     }, {}, payload);
   };
@@ -289,13 +287,26 @@ const AddTrip = () => {
 
   const handleDragEnd = (result) => {
     if (!result.destination) return;
-    const reorderedItems = Array.from(deliverySequence);
-    const [movedItem] = reorderedItems.splice(result.source.index, 1);
-    reorderedItems.splice(result.destination.index, 0, movedItem);
-    setDeliverySequence(reorderedItems);
+
+    // nhóm lại như groupedSequence
+    const groupMap = new Map();
+    for (const item of deliverySequence) {
+      const addressId = customerInfo[item.orderId]?.customerAddressId;
+      if (!groupMap.has(addressId)) {
+        groupMap.set(addressId, []);
+      }
+      groupMap.get(addressId).push(item);
+    }
+    const grouped = Array.from(groupMap.values()); // list of groups
+
+    // Di chuyển nhóm
+    const [movedGroup] = grouped.splice(result.source.index, 1);
+    grouped.splice(result.destination.index, 0, movedGroup);
+
+    // Flatten lại
+    const newSequence = grouped.flat();
+    setDeliverySequence(newSequence);
   };
-
-
 
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
@@ -501,9 +512,12 @@ const AddTrip = () => {
           <Typography variant="h6" gutterBottom>
             Delivery sequence (Drag & Drop)
           </Typography>
+          <Typography variant="h7" gutterBottom className="text-green-500">
+            Total orders : {deliverySequence.length}
+          </Typography>
           <div className='mb-4'>
             <Typography variant="h7" gutterBottom className="text-green-500">
-              Total locations : {deliverySequence.length}
+              Total locations : {totalLocations}
             </Typography>
           </div>
           <DragDropContext onDragEnd={handleDragEnd}>
@@ -520,18 +534,30 @@ const AddTrip = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {deliverySequence && deliverySequence.map((item, index) => (
-                        <Draggable key={item.orderId} draggableId={item.orderId} index={index}>
+                      {groupedSequence.map(([addressId, orders], index) => (
+                        <Draggable key={addressId} draggableId={addressId} index={index}>
                           {(provided) => (
-                            <TableRow ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                              <TableCell>{index + 1}</TableCell>
-                              <TableCell sx={{ textAlign: 'center' }}>{customerInfo[item.orderId]?.customerName || 'Loading...'}</TableCell>
-                              <TableCell sx={{ textAlign: 'center' }}>{customerInfo[item.orderId]?.customerPhoneNumber || 'Loading...'}</TableCell>
-                              <TableCell>{customerInfo[item.orderId]?.addressName || 'Loading...'}</TableCell>
-                            </TableRow>
+                            <React.Fragment>
+                              {orders.map((item, i) => (
+                                <TableRow
+                                  key={item.orderId}
+                                  ref={i === 0 ? provided.innerRef : null}
+                                  {...(i === 0 ? provided.draggableProps : {})}
+                                  {...(i === 0 ? provided.dragHandleProps : {})}
+                                >
+                                  <TableCell>
+                                    {locationSequenceMap[customerInfo[item.orderId]?.customerAddressId] || '-'}
+                                  </TableCell>
+                                  <TableCell sx={{ textAlign: 'center' }}>{customerInfo[item.orderId]?.customerName || 'Loading...'}</TableCell>
+                                  <TableCell sx={{ textAlign: 'center' }}>{customerInfo[item.orderId]?.customerPhoneNumber || 'Loading...'}</TableCell>
+                                  <TableCell>{customerInfo[item.orderId]?.addressName || 'Loading...'}</TableCell>
+                                </TableRow>
+                              ))}
+                            </React.Fragment>
                           )}
                         </Draggable>
                       ))}
+
                       {provided.placeholder}
                     </TableBody>
                   </Table>
@@ -567,7 +593,7 @@ const AddTrip = () => {
                     Loading route...
                   </Typography>
                 ) : (
-                  <Map route={route} />
+                  <MyMap route={route} />
                 )}
               </Box>
             </Paper>

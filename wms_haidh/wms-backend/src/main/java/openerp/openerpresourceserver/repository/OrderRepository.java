@@ -51,6 +51,7 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 
 	@Query("""
 			    SELECT
+			        ca.customerAddressId AS customerAddressId,
 			        o.customerName AS customerName,
 			        o.customerPhoneNumber AS customerPhoneNumber,
 			        ca.addressName AS addressName,
@@ -98,11 +99,9 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 			    ORDER BY profit DESC
 			""")
 	List<CategoryProfitDatapoint> getMonthlyProfitByCategory(@Param("month") String month);
-	
+
 	@Modifying
 	@Query("UPDATE Order o SET o.status = 'DELIVERING', o.lastUpdatedStamp = CURRENT_TIMESTAMP WHERE o.id IN :orderIds")
 	int updateStatusToDelivering(@Param("orderIds") List<UUID> orderIds);
-
-
 
 }
