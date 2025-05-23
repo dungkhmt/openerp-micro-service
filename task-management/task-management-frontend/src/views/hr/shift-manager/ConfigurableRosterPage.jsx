@@ -300,8 +300,8 @@ export default function ConfigurableRosterPage() {
                   onApply={handleActualApplyAndRoster}
                   onCancel={handleCloseApplyModal}
                   configTemplate={templateToApply}
-                  departments={departments} // Sử dụng state departments
-                  jobPositions={jobPositions} // Sử dụng state jobPositions
+                  departments={departments}
+                  jobPositions={jobPositions} 
                   isSubmittingRoster={isSubmittingRoster}
                 />
               }
