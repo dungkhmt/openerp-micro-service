@@ -30,7 +30,7 @@ public class  StaffController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PutMapping("")
+    @PostMapping("")
     public ResponseEntity<?> addStaff(
             @Valid @RequestBody AddStaffRequest request
     ){
@@ -51,7 +51,7 @@ public class  StaffController extends BeanAwareUseCasePublisher {
         );
     }
 
-    @PostMapping("/{staffCode}")
+    @PutMapping("/{staffCode}")
     public ResponseEntity<?> editStaff(
         @PathVariable String staffCode,
             @Valid @RequestBody EditStaffRequest request

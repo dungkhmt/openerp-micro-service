@@ -13,6 +13,6 @@ import lombok.*;
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public abstract class BasePageableRequest implements IPageableRequest {
-    private Long page = 0L;
-    private Long pageSize = 10L;
+    private Long page;
+    private Long pageSize;
 }

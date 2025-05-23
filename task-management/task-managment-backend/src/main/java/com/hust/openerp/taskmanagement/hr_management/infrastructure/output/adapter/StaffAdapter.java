@@ -22,6 +22,7 @@ import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persi
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.utils.PageableUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -63,11 +64,13 @@ public class StaffAdapter implements IStaffPort {
         }
 
 
-        var staffEntity =  new StaffEntity();
+        var staffEntity = new StaffEntity();
         staffEntity.setStaffCode(staff.getStaffCode());
         staffEntity.setFullname(staff.getFullname());
         staffEntity.setUser(user);
         staffEntity.setStatus(staff.getStatus());
+        staffEntity.setLeaveHours(0f);
+        staffEntity.setCreatedStamp(LocalDateTime.now());
         return toModel(staffRepo.save(staffEntity));
     }
 

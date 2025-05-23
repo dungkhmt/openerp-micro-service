@@ -5,12 +5,17 @@ import com.google.ortools.sat.*; // Keep this for CpModel, CpSolver, etc.
 import com.google.ortools.sat.BoolVar; // Explicit import for clarity, though sat.* covers it
 import com.google.ortools.sat.IntVar; // Explicit import for clarity
 import com.google.ortools.sat.Literal; // Explicit import for clarity
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IShiftPort;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.AbsenceModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.ShiftModel;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffModel;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +24,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
+@RequiredArgsConstructor
 public class OrToolsSolverService {
+    private final IShiftPort shiftPort;
     static {
         try {
             Loader.loadNativeLibraries();
@@ -198,6 +205,14 @@ public class OrToolsSolverService {
                         if (solver.booleanValue(works[e][s][d])) {
                             StaffModel emp = employees.get(e);
                             ShiftDefinition shiftDef = shiftDefs.get(s);
+                            var shiftModel = ShiftModel.builder()
+                                .userId(emp.getUserLoginId())
+                                .note(shiftDef.getName())
+                                .date(currentDate)
+                                .startTime(convertStringToLocalTime(shiftDef.getStartTime()))
+                                .endTime(convertStringToLocalTime(shiftDef.getEndTime()))
+                                .build();
+                            shiftPort.createShift(shiftModel);
                             generatedSchedule.add(new ScheduledShift(
                                 emp.getUserLoginId(),
                                 emp.getFullname(),
@@ -215,5 +230,19 @@ public class OrToolsSolverService {
             System.out.println("No solution found or an error occurred. Status: " + status);
         }
         return generatedSchedule;
+    }
+
+    public static LocalTime convertStringToLocalTime(String timeString) {
+        if (timeString == null || timeString.isEmpty()) {
+            System.err.println("Chuỗi thời gian không được rỗng.");
+            return null;
+        }
+
+        try {
+            return LocalTime.parse(timeString);
+        } catch (DateTimeParseException e) {
+            System.err.println("Lỗi khi chuyển đổi chuỗi '" + timeString + "' sang LocalTime. Định dạng phải là HH:mm. Lỗi: " + e.getMessage());
+            return null;
+        }
     }
 }

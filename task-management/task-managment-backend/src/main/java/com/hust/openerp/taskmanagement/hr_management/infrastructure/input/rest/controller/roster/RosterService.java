@@ -34,17 +34,16 @@ public class RosterService extends BeanAwareUseCasePublisher {
         return feasibleSolutionFound;
     }
 
-    // Wrapper class cho API response (giống cấu trúc bạn cung cấp)
-    static class ApiResponse<T> {
-        public List<T> data;
-        public Meta meta;
-        static class Meta { public String code; public String message;}
-    }
-
-
-    private List<StaffModel> fetchAllEmployees() {
+    private List<StaffModel> fetchAllEmployees(List<String> departmentCodes, List<String> jobPositionCodes) {
         //todo filter
-        var staffPage = publishPageWrapper(StaffModel.class, FindStaff.builder().status(StaffStatus.ACTIVE).build());
+        var staffPage = publishPageWrapper(
+            StaffModel.class,
+            FindStaff.builder()
+                .departmentCodes(departmentCodes)
+                
+                .status(StaffStatus.ACTIVE)
+                .build()
+        );
         return staffPage.getPageContent();
     }
 
@@ -63,7 +62,7 @@ public class RosterService extends BeanAwareUseCasePublisher {
         this.feasibleSolutionFound = false; // Reset cờ
 
         // 1. Lấy tất cả nhân viên ACTIVE
-        var allActiveEmployees = fetchAllEmployees();
+        var allActiveEmployees = fetchAllEmployees(requestDto.getDepartmentCodes(), requestDto.getJobPositionCodes());
 
         /*// 2. Lọc nhân viên theo phòng ban và chức vụ từ requestDto (nếu có)
         List<EmployeeDto> filteredEmployees = allActiveEmployees.stream()

@@ -7,11 +7,11 @@ import {
   Button,
   TextField,
   CircularProgress,
-  Snackbar,
   Alert,
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { request } from "@/api";
+import toast from "react-hot-toast";
 
 const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
   const [formValues, setFormValues] = useState({
@@ -170,23 +170,14 @@ const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
 
                 if (meta && meta.code) {
                   console.warn("Validation error:", meta.message, data);
-                  setError({
-                    title: meta.message || "Validation Error",
-                    info: data || "Invalid input provided.",
-                  });
+                  toast.error("Invalid input provided.")
                 } else {
                   console.warn("API Error:", meta?.message || "Error occurred", data);
-                  setError({
-                    title: meta?.message || "Error",
-                    info: data || "An unexpected error occurred.",
-                  });
+                  toast.error("An unexpected error occurred.");
                 }
               } else {
                 console.error("Unexpected error response:", err);
-                setError({
-                  title: "Error",
-                  info: "Something went wrong. Please try again later.",
-                });
+                toast.error("Something went wrong. Please try again later.");
               }
             },
           },
@@ -324,21 +315,6 @@ const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
             </Button>
           </DialogActions>
         </Dialog>
-
-        <Snackbar
-            open={!!error}
-            autoHideDuration={6000}
-            onClose={() => setError(null)}
-            anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        >
-          <Alert onClose={() => setError(null)} severity="error" variant="filled">
-            <strong>{error?.title || "Error"}</strong>
-            <br />
-            {typeof error?.info === "string"
-                ? error?.info
-                : JSON.stringify(error?.info, null, 2)}
-          </Alert>
-        </Snackbar>
       </>
   );
 };
