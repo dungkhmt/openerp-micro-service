@@ -11,8 +11,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SingleTemplateDetails from './SingleTemplateDetails'; // Import component con
 import ArticleIcon from '@mui/icons-material/Article'; // Icon đã có ở phiên bản trước
 
-export default function TemplateListDisplay({ templates, onEdit, onDelete, onOpenApplyModal }) {
-  const [anchorEl, setAnchorEl] = useState(null);
+export default function TemplateListDisplay({ templates, onEdit, onDelete, onOpenApplyModal, isSubmittingRoster }) {  const [anchorEl, setAnchorEl] = useState(null);
   const [currentTemplateId, setCurrentTemplateId] = useState(null);
 
   const handleMenuOpen = (event, templateId) => { setAnchorEl(event.currentTarget); setCurrentTemplateId(templateId); };
@@ -46,6 +45,7 @@ export default function TemplateListDisplay({ templates, onEdit, onDelete, onOpe
                 startIcon={<PlaylistPlayIcon />}
                 onClick={() => onOpenApplyModal(template)}
                 sx={{mr:1}}
+                disabled={isSubmittingRoster}
               >
                 Áp dụng
               </Button>

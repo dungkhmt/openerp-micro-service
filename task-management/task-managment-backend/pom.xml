@@ -201,6 +201,11 @@
       <artifactId>hibernate-types-60</artifactId>
       <version>2.21.1</version>
     </dependency>
+    <dependency>
+      <groupId>com.google.ortools</groupId>
+      <artifactId>ortools-java</artifactId>
+      <version>9.12.4544</version>
+    </dependency>
   </dependencies>
 
   <build>

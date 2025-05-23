@@ -10,12 +10,12 @@ import SaveIcon from '@mui/icons-material/Save';
 import CloseIcon from '@mui/icons-material/Close';
 import ShiftManager from './ShiftManager';
 import ConstraintsManager from './ConstraintsManager';
-import EventBusyIcon from '@mui/icons-material/EventBusy';
-import WeekendIcon from '@mui/icons-material/Weekend';
+// Import các icon dùng trong initialHardConstraintsStructure nếu cần thiết (đã có trong ConstraintsManager)
+// import EventBusyIcon from '@mui/icons-material/EventBusy';
+// import WeekendIcon from '@mui/icons-material/Weekend';
 
 
 export default function TemplateConfigForm({ onSave, onCancel, initialTemplateData }) {
-  // ... (state templateName, shifts, initialHardConstraintsStructure, hardConstraints, formError giữ nguyên)
   const [templateName, setTemplateName] = useState(initialTemplateData?.templateName || '');
   const [shifts, setShifts] = useState(initialTemplateData?.definedShifts || [
     { id: 's1', name: 'Sáng Hành Chính', startTime: '08:00', endTime: '17:00', isNightShift: false, minEmployees: 2, maxEmployees: 5 },
@@ -66,7 +66,8 @@ export default function TemplateConfigForm({ onSave, onCancel, initialTemplateDa
     return baseStructure;
   });
   const [formError, setFormError] = useState('');
-  const handleSubmit = () => { /* ... như cũ ... */
+
+  const handleSubmit = () => {
     setFormError('');
     if (!templateName.trim()) { setFormError("Tên bộ cấu hình không được để trống."); return; }
     if (shifts.length === 0) { setFormError("Cần định nghĩa ít nhất một ca làm việc."); return; }
@@ -105,8 +106,15 @@ export default function TemplateConfigForm({ onSave, onCancel, initialTemplateDa
           <IconButton aria-label="close" onClick={onCancel} sx={{ color: 'white' }}><CloseIcon /></IconButton>
         </Stack>
       </DialogTitle>
-      {/* TĂNG PADDING VÀ MAXHEIGHT CHO DIALOGCONTENT */}
-      <DialogContent dividers sx={{ p: { xs: 2, sm: 3 }, backgroundColor: (th) => th.palette.background.paper, maxHeight: 'calc(95vh - 128px)', overflowY: 'auto' }}>
+      <DialogContent
+        dividers
+        sx={{
+          p: { xs: 1.5, sm: 2 },
+          backgroundColor: (th) => th.palette.background.paper,
+          // maxHeight: 'calc(95vh - 128px)', // 128px là chiều cao của Title + Actions
+          // Để DialogContent tự tính toán chiều cao bên trong Paper của Modal
+        }}
+      >
         {formError && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setFormError('')} variant="filled">{formError}</Alert>}
         <TextField
           fullWidth
@@ -114,7 +122,7 @@ export default function TemplateConfigForm({ onSave, onCancel, initialTemplateDa
           value={templateName}
           onChange={(e) => setTemplateName(e.target.value)}
           required
-          sx={{ mb: 2.5 }} // Tăng margin bottom
+          sx={{ mb: 2 }}
           InputLabelProps={{ shrink: true }}
         />
         <ShiftManager shifts={shifts} setShifts={setShifts} />
