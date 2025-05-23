@@ -18,8 +18,10 @@ import ConstraintsManager from './ConstraintsManager';
 export default function TemplateConfigForm({ onSave, onCancel, initialTemplateData }) {
   const [templateName, setTemplateName] = useState(initialTemplateData?.templateName || '');
   const [shifts, setShifts] = useState(initialTemplateData?.definedShifts || [
-    { id: 's1', name: 'Sáng Hành Chính', startTime: '08:00', endTime: '17:00', isNightShift: false, minEmployees: 2, maxEmployees: 5 },
-    { id: 's3', name: 'Đêm Kho', startTime: '22:00', endTime: '06:00', isNightShift: true, minEmployees: 1, maxEmployees: 2 },
+    { id: 's1', name: 'Sáng Hành Chính 1', startTime: '08:00', endTime: '11:00', isNightShift: false, minEmployees: 2, maxEmployees: 5 },
+    { id: 's2', name: 'Sáng Hành Chính 2', startTime: '13:00', endTime: '15:00', isNightShift: false, minEmployees: 3, maxEmployees: 5 },
+    { id: 's3', name: 'Sáng Hành Chính 3', startTime: '15:00', endTime: '18:00', isNightShift: false, minEmployees: 4, maxEmployees: 5 },
+    { id: 's4', name: 'Đêm Kho', startTime: '22:00', endTime: '06:00', isNightShift: true, minEmployees: 1, maxEmployees: 2 },
   ]);
 
   const initialHardConstraintsStructure = useCallback(() => ({
