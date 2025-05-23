@@ -1,6 +1,6 @@
 // src/features/rosterConfiguration/SingleTemplateDetails.jsx
 import React from 'react';
-import { /* ... imports như cũ ... */
+import {
   Box, Typography, Paper, List, ListItem, ListItemText, Chip,
   Grid
 } from '@mui/material';
@@ -11,7 +11,7 @@ import TodayIcon from '@mui/icons-material/Today';
 import NightsStayIcon from '@mui/icons-material/NightsStay';
 import WeekendIcon from '@mui/icons-material/Weekend';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
-
+import SyncAltIcon from '@mui/icons-material/SyncAlt'; // Icon ví dụ cho ràng buộc mới
 
 export default function SingleTemplateDetails({ template }) {
   const { definedShifts, activeHardConstraints } = template;
@@ -19,17 +19,23 @@ export default function SingleTemplateDetails({ template }) {
     MAX_CONSECUTIVE_WORK_DAYS: { label: "Ngày làm LT tối đa", icon: <TodayIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
     MIN_REST_BETWEEN_SHIFTS_HOURS: { label: "Nghỉ giữa ca (giờ)", icon: <BusinessHoursIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
     MAX_WEEKLY_WORK_HOURS: { label: "Giờ tối đa/tuần", icon: <BusinessHoursIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
-    NO_CLASHING_SHIFTS_FOR_EMPLOYEE: { label: "Không trùng ca", icon: <BlockIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
-    MAX_SHIFTS_PER_DAY_FOR_EMPLOYEE: { label: "Ca tối đa/ngày", icon: <EventAvailableIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
+    NO_CLASHING_SHIFTS_FOR_EMPLOYEE: { label: "Không trùng ca (lịch mới)", icon: <BlockIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
+    MAX_SHIFTS_PER_DAY_FOR_EMPLOYEE: { label: "Ca tối đa/ngày (lịch mới)", icon: <EventAvailableIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
     NO_WORK_NEXT_DAY_AFTER_NIGHT_SHIFT: { label: "Nghỉ sau ca đêm", icon: <NightsStayIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
     MIN_WEEKEND_DAYS_OFF_PER_PERIOD: { label: "Nghỉ cuối tuần TT", icon: <WeekendIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
-    ENSURE_EMPLOYEE_APPROVED_LEAVE: { // <<==== HIỂN THỊ RÀNG BUỘC MỚI
+    ENSURE_EMPLOYEE_APPROVED_LEAVE: {
       label: "Kiểm tra ngày nghỉ phép NV",
       icon: <EventBusyIcon sx={{mr:0.5, fontSize: '1.2rem'}} />
+    },
+    // --- HIỂN THỊ RÀNG BUỘC MỚI ---
+    AVOID_OVERLAPPING_EXISTING_SHIFTS: {
+      label: "Tránh trùng ca đã có",
+      icon: <SyncAltIcon sx={{mr:0.5, fontSize: '1.2rem'}} />
     }
+    // --- KẾT THÚC HIỂN THỊ RÀNG BUỘC MỚI ---
   };
 
-  return ( /* ... phần JSX của SingleTemplateDetails giữ nguyên như phiên bản trước ... */
+  return (
     <Paper elevation={0} sx={{ p: { xs: 1.5, sm: 2 }, mt: 1.5, backgroundColor: '#fafafa', borderRadius: 1.5, border: '1px solid #e0e0e0' }}>
       <Grid container spacing={2.5}>
         <Grid item xs={12} md={5}>
@@ -58,15 +64,28 @@ export default function SingleTemplateDetails({ template }) {
           </Typography>
           {Object.keys(activeHardConstraints).length > 0 ? (
             <List dense sx={{ maxHeight: 200, overflow: 'auto', p:0 }}>
-              {Object.entries(activeHardConstraints).map(([key, value]) => {
+              {Object.entries(activeHardConstraints).map(([key, constraintValue]) => {
                 const displayInfo = constraintDisplayInfo[key] || { label: key.replace(/_/g, ' ') };
                 let valueString = "";
-                if (typeof value === 'boolean' && value) valueString = "Đang áp dụng";
-                else if (typeof value === 'object' && value !== null) valueString = Object.entries(value).map(([pKey, pVal])=>`${pVal}`).join('; ');
+                // Nếu constraintValue là true (cho ràng buộc boolean không có params)
+                if (typeof constraintValue === 'boolean' && constraintValue) {
+                  valueString = "Đang áp dụng";
+                }
+                // Nếu constraintValue là object (cho ràng buộc có params)
+                else if (typeof constraintValue === 'object' && constraintValue !== null) {
+                  valueString = Object.entries(constraintValue)
+                    .map(([pKey, pVal]) => `${pVal}`) // Hiển thị giá trị của param
+                    .join('; ');
+                }
+                // Bỏ qua nếu constraintValue là false hoặc không xác định (ràng buộc không được kích hoạt)
+                else if (!constraintValue) {
+                  return null;
+                }
+
                 return (
                   <ListItem key={key} sx={{py: 0.25, pl:0, alignItems: 'center', borderBottom: '1px solid #f0f0f0', '&:last-child': {borderBottom: 'none'} }}>
                     <Box sx={{display: 'flex', alignItems: 'center', minWidth: {xs: '150px', sm:'200px'}, mr:1, color: 'text.secondary', flexShrink:0 }}>
-                      {displayInfo.icon}
+                      {displayInfo.icon || <BlockIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> /* Icon mặc định */}
                       <Typography variant="body1" component="span" fontWeight="500" sx={{ml:0.25}}>{displayInfo.label}:</Typography>
                     </Box>
                     <Typography variant="subtitle1" color="text.primary" sx={{flexGrow: 1, fontWeight: 'bold'}}>{valueString}</Typography>

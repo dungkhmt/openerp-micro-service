@@ -59,12 +59,12 @@ public class StaffInfoSpecification implements Specification<StaffEntity> {
         }
 
         // Join and filter by Department
-        if (filter.getDepartmentCode() != null || filter.getDepartmentCodes() != null) {
+        if (filter.getDepartmentCode() != null || (filter.getDepartmentCodes() != null && !filter.getDepartmentCodes().isEmpty())) {
             predicates.add(getDepartmentPredicate(root, query, cb));
         }
 
         // Join and filter by Job Position
-        if (filter.getJobPositionCode() != null || filter.getJobPositionCodes() != null) {
+        if (filter.getJobPositionCode() != null || (filter.getJobPositionCodes() != null && !filter.getJobPositionCodes().isEmpty())) {
             predicates.add(getJobPositionPredicate(root, query, cb));
         }
 

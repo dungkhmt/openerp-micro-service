@@ -2,11 +2,13 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.absence.usecase_data.GetAbsenceList;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.shift.usecase_data.GetShiftList;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.FindStaff;
 import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceStatus;
 import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.AbsenceModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.ShiftModel; // Giả sử đây là model cho ca đã có
 import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,14 +22,12 @@ import java.util.stream.Collectors;
 public class RosterService extends BeanAwareUseCasePublisher {
 
     private final OrToolsSolverService solverService;
-    private final ObjectMapper objectMapper; // Để parse JSON
     private boolean feasibleSolutionFound;
 
 
     @Autowired
-    public RosterService(OrToolsSolverService solverService, ObjectMapper objectMapper) {
+    public RosterService(OrToolsSolverService solverService) {
         this.solverService = solverService;
-        this.objectMapper = objectMapper;
     }
 
     public boolean wasFeasible() {
@@ -35,13 +35,12 @@ public class RosterService extends BeanAwareUseCasePublisher {
     }
 
     private List<StaffModel> fetchAllEmployees(List<String> departmentCodes, List<String> jobPositionCodes) {
-        //todo filter
         var staffPage = publishPageWrapper(
             StaffModel.class,
             FindStaff.builder()
                 .departmentCodes(departmentCodes)
-                
-                .status(StaffStatus.ACTIVE)
+                .jobPositionCodes(jobPositionCodes)
+                .status(StaffStatus.ACTIVE) // Chỉ lấy nhân viên đang hoạt động
                 .build()
         );
         return staffPage.getPageContent();
@@ -57,38 +56,41 @@ public class RosterService extends BeanAwareUseCasePublisher {
         return publishCollection(AbsenceModel.class, useCase).stream().toList();
     }
 
+    private List<ShiftModel> fetchExistingShiftsForUsers(List<String> userLoginIds, LocalDate apiStartDate, LocalDate apiEndDate) { //
+        var useCase = GetShiftList.builder()
+            .userIds(userLoginIds)
+            .startDate(apiStartDate)
+            .endDate(apiEndDate)
+            .build();
+        return publishCollection(ShiftModel.class, useCase).stream().toList();
+    }
+
 
     public List<ScheduledShift> generateSchedule(RosterRequest requestDto) {
-        this.feasibleSolutionFound = false; // Reset cờ
+        this.feasibleSolutionFound = false;
 
-        // 1. Lấy tất cả nhân viên ACTIVE
         var allActiveEmployees = fetchAllEmployees(requestDto.getDepartmentCodes(), requestDto.getJobPositionCodes());
-
-        /*// 2. Lọc nhân viên theo phòng ban và chức vụ từ requestDto (nếu có)
-        List<EmployeeDto> filteredEmployees = allActiveEmployees.stream()
-            .filter(emp -> (requestDto.getDepartmentCodes() == null || requestDto.getDepartmentCodes().isEmpty() ||
-                (emp.getDepartment() != null && requestDto.getDepartmentCodes().contains(emp.getDepartment().getDepartmentCode()))))
-            .filter(emp -> (requestDto.getJobPositionCodes() == null || requestDto.getJobPositionCodes().isEmpty() ||
-                (emp.getJobPosition() != null && requestDto.getJobPositionCodes().contains(emp.getJobPosition().getJobPositionCode()))))
-            .collect(Collectors.toList());*/
 
         if (allActiveEmployees.isEmpty()) {
             System.out.println("Không có nhân viên nào thỏa mãn tiêu chí phòng ban/chức vụ.");
+            this.feasibleSolutionFound = true; // Không có NV, coi như khả thi vì không có gì để lỗi
             return new ArrayList<>();
         }
         System.out.println("Filtered employees count: " + allActiveEmployees.size());
 
 
-        // 3. Lấy ngày nghỉ phép của các nhân viên đã lọc
         List<String> employeeUserLoginIds = allActiveEmployees.stream()
             .map(StaffModel::getUserLoginId)
             .distinct()
             .collect(Collectors.toList());
+
         var approvedLeaves = fetchLeaveRequestsForUsers(employeeUserLoginIds, requestDto.getStartDate(), requestDto.getEndDate());
         System.out.println("Fetched approved leaves count: " + approvedLeaves.size());
 
-        // 4. Gọi solver
-        List<ScheduledShift> schedule = solverService.solveRoster(requestDto, allActiveEmployees, approvedLeaves);
+        var existingAssignedShifts = fetchExistingShiftsForUsers(employeeUserLoginIds, requestDto.getStartDate(), requestDto.getEndDate()); //
+        System.out.println("Fetched existing assigned shifts count: " + existingAssignedShifts.size());
+
+        List<ScheduledShift> schedule = solverService.solveRoster(requestDto, allActiveEmployees, approvedLeaves, existingAssignedShifts);
         this.feasibleSolutionFound = solverService.wasLastSolveFeasible();
 
         return schedule;
