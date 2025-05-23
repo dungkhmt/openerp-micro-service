@@ -8,11 +8,14 @@ import {
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import CloseIcon from '@mui/icons-material/Close';
-import ShiftManager from './ShiftManager'; // Import component con
-import ConstraintsManager from './ConstraintsManager'; // Import component con
+import ShiftManager from './ShiftManager';
+import ConstraintsManager from './ConstraintsManager';
+import EventBusyIcon from '@mui/icons-material/EventBusy';
+import WeekendIcon from '@mui/icons-material/Weekend';
 
-// Component Form Cấu Hình Bộ Template (Nội dung Modal 1)
+
 export default function TemplateConfigForm({ onSave, onCancel, initialTemplateData }) {
+  // ... (state templateName, shifts, initialHardConstraintsStructure, hardConstraints, formError giữ nguyên)
   const [templateName, setTemplateName] = useState(initialTemplateData?.templateName || '');
   const [shifts, setShifts] = useState(initialTemplateData?.definedShifts || [
     { id: 's1', name: 'Sáng Hành Chính', startTime: '08:00', endTime: '17:00', isNightShift: false, minEmployees: 2, maxEmployees: 5 },
@@ -25,7 +28,22 @@ export default function TemplateConfigForm({ onSave, onCancel, initialTemplateDa
     MAX_WEEKLY_WORK_HOURS: { description: "Tổng giờ làm tối đa/tuần", enabled: true, params: { hours: { label: "Số giờ tối đa/tuần", value: 40, type: 'number', min: 1 } }, tooltip: "Tuân thủ luật." },
     NO_CLASHING_SHIFTS_FOR_EMPLOYEE: { description: "Không trùng ca cho 1 nhân viên", enabled: true, params: null, tooltip: "Một người không thể ở 2 nơi." },
     MAX_SHIFTS_PER_DAY_FOR_EMPLOYEE: { description: "Số ca tối đa/ngày/nhân viên", enabled: true, params: { count: { label: "Số ca tối đa/ngày", value: 1, type: 'number', min: 1 } }, tooltip: "Thường là 1." },
-    NO_WORK_NEXT_DAY_AFTER_NIGHT_SHIFT: { description: "Nghỉ ngày sau nếu làm bất kỳ ca đêm nào", enabled: true, params: null, tooltip: "Nếu bật, nhân viên sẽ được nghỉ ngày tiếp theo sau khi làm một ca được đánh dấu là 'Ca đêm'." },
+    NO_WORK_NEXT_DAY_AFTER_NIGHT_SHIFT: { description: "Nghỉ ngày sau nếu làm bất kỳ ca đêm nào", enabled: true, params: null, tooltip: "Nếu bật, NV sẽ nghỉ ngày sau khi làm ca được đánh dấu 'Ca đêm'." },
+    MIN_WEEKEND_DAYS_OFF_PER_PERIOD: {
+      description: "NV nghỉ cuối tuần tối thiểu trong khoảng thời gian",
+      enabled: true,
+      params: {
+        count: { label: "Số ngày T7/CN nghỉ", value: 2, type: 'number', min: 0 },
+        periodWeeks: { label: "Trong khoảng (tuần)", value: 4, type: 'number', min: 1 }
+      },
+      tooltip: "Đảm bảo mỗi nhân viên có ít nhất X ngày Thứ 7 hoặc Chủ Nhật nghỉ trong Y tuần."
+    },
+    ENSURE_EMPLOYEE_APPROVED_LEAVE: {
+      description: "Không xếp lịch vào ngày nghỉ đã duyệt của nhân viên",
+      enabled: true,
+      params: null,
+      tooltip: "Hệ thống sẽ kiểm tra ngày nghỉ phép đã được duyệt của nhân viên và không xếp lịch vào những ngày đó."
+    }
   }), []);
 
   const [hardConstraints, setHardConstraints] = useState(() => {
@@ -48,8 +66,7 @@ export default function TemplateConfigForm({ onSave, onCancel, initialTemplateDa
     return baseStructure;
   });
   const [formError, setFormError] = useState('');
-
-  const handleSubmit = () => {
+  const handleSubmit = () => { /* ... như cũ ... */
     setFormError('');
     if (!templateName.trim()) { setFormError("Tên bộ cấu hình không được để trống."); return; }
     if (shifts.length === 0) { setFormError("Cần định nghĩa ít nhất một ca làm việc."); return; }
@@ -88,7 +105,8 @@ export default function TemplateConfigForm({ onSave, onCancel, initialTemplateDa
           <IconButton aria-label="close" onClick={onCancel} sx={{ color: 'white' }}><CloseIcon /></IconButton>
         </Stack>
       </DialogTitle>
-      <DialogContent dividers sx={{ p: { xs: 1.5, sm: 2 }, backgroundColor: (th) => th.palette.background.paper }}>
+      {/* TĂNG PADDING VÀ MAXHEIGHT CHO DIALOGCONTENT */}
+      <DialogContent dividers sx={{ p: { xs: 2, sm: 3 }, backgroundColor: (th) => th.palette.background.paper, maxHeight: 'calc(95vh - 128px)', overflowY: 'auto' }}>
         {formError && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setFormError('')} variant="filled">{formError}</Alert>}
         <TextField
           fullWidth
@@ -96,7 +114,7 @@ export default function TemplateConfigForm({ onSave, onCancel, initialTemplateDa
           value={templateName}
           onChange={(e) => setTemplateName(e.target.value)}
           required
-          sx={{ mb: 2 }}
+          sx={{ mb: 2.5 }} // Tăng margin bottom
           InputLabelProps={{ shrink: true }}
         />
         <ShiftManager shifts={shifts} setShifts={setShifts} />

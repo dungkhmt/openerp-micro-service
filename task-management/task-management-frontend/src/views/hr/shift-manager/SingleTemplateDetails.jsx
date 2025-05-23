@@ -1,6 +1,6 @@
 // src/features/rosterConfiguration/SingleTemplateDetails.jsx
 import React from 'react';
-import {
+import { /* ... imports như cũ ... */
   Box, Typography, Paper, List, ListItem, ListItemText, Chip,
   Grid
 } from '@mui/material';
@@ -9,20 +9,27 @@ import BlockIcon from '@mui/icons-material/Block';
 import BusinessHoursIcon from '@mui/icons-material/MoreTime';
 import TodayIcon from '@mui/icons-material/Today';
 import NightsStayIcon from '@mui/icons-material/NightsStay';
+import WeekendIcon from '@mui/icons-material/Weekend';
+import EventBusyIcon from '@mui/icons-material/EventBusy';
 
-// Component con để hiển thị chi tiết một bộ cấu hình
+
 export default function SingleTemplateDetails({ template }) {
   const { definedShifts, activeHardConstraints } = template;
   const constraintDisplayInfo = {
-    MAX_CONSECUTIVE_WORK_DAYS: { label: "Ngày làm LT tối đa", icon: <TodayIcon sx={{mr:0.5, fontSize: '1.1rem'}}/> },
-    MIN_REST_BETWEEN_SHIFTS_HOURS: { label: "Nghỉ giữa ca (giờ)", icon: <BusinessHoursIcon sx={{mr:0.5, fontSize: '1.1rem'}}/> },
-    MAX_WEEKLY_WORK_HOURS: { label: "Giờ tối đa/tuần", icon: <BusinessHoursIcon sx={{mr:0.5, fontSize: '1.1rem'}}/> },
-    NO_CLASHING_SHIFTS_FOR_EMPLOYEE: { label: "Không trùng ca", icon: <BlockIcon sx={{mr:0.5, fontSize: '1.1rem'}}/> },
-    MAX_SHIFTS_PER_DAY_FOR_EMPLOYEE: { label: "Ca tối đa/ngày", icon: <EventAvailableIcon sx={{mr:0.5, fontSize: '1.1rem'}}/> },
-    NO_WORK_NEXT_DAY_AFTER_NIGHT_SHIFT: { label: "Nghỉ sau ca đêm", icon: <NightsStayIcon sx={{mr:0.5, fontSize: '1.1rem'}}/> },
+    MAX_CONSECUTIVE_WORK_DAYS: { label: "Ngày làm LT tối đa", icon: <TodayIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
+    MIN_REST_BETWEEN_SHIFTS_HOURS: { label: "Nghỉ giữa ca (giờ)", icon: <BusinessHoursIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
+    MAX_WEEKLY_WORK_HOURS: { label: "Giờ tối đa/tuần", icon: <BusinessHoursIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
+    NO_CLASHING_SHIFTS_FOR_EMPLOYEE: { label: "Không trùng ca", icon: <BlockIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
+    MAX_SHIFTS_PER_DAY_FOR_EMPLOYEE: { label: "Ca tối đa/ngày", icon: <EventAvailableIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
+    NO_WORK_NEXT_DAY_AFTER_NIGHT_SHIFT: { label: "Nghỉ sau ca đêm", icon: <NightsStayIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
+    MIN_WEEKEND_DAYS_OFF_PER_PERIOD: { label: "Nghỉ cuối tuần TT", icon: <WeekendIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
+    ENSURE_EMPLOYEE_APPROVED_LEAVE: { // <<==== HIỂN THỊ RÀNG BUỘC MỚI
+      label: "Kiểm tra ngày nghỉ phép NV",
+      icon: <EventBusyIcon sx={{mr:0.5, fontSize: '1.2rem'}} />
+    }
   };
 
-  return (
+  return ( /* ... phần JSX của SingleTemplateDetails giữ nguyên như phiên bản trước ... */
     <Paper elevation={0} sx={{ p: { xs: 1.5, sm: 2 }, mt: 1.5, backgroundColor: '#fafafa', borderRadius: 1.5, border: '1px solid #e0e0e0' }}>
       <Grid container spacing={2.5}>
         <Grid item xs={12} md={5}>
@@ -57,12 +64,12 @@ export default function SingleTemplateDetails({ template }) {
                 if (typeof value === 'boolean' && value) valueString = "Đang áp dụng";
                 else if (typeof value === 'object' && value !== null) valueString = Object.entries(value).map(([pKey, pVal])=>`${pVal}`).join('; ');
                 return (
-                  <ListItem key={key} sx={{py: 0.25, pl:0, alignItems: 'flex-start', borderBottom: '1px solid #f0f0f0', '&:last-child': {borderBottom: 'none'} }}>
-                    <Box sx={{display: 'flex', alignItems: 'center', minWidth: {xs: '140px', sm:'190px'}, mr:1, color: 'text.secondary' }}>
+                  <ListItem key={key} sx={{py: 0.25, pl:0, alignItems: 'center', borderBottom: '1px solid #f0f0f0', '&:last-child': {borderBottom: 'none'} }}>
+                    <Box sx={{display: 'flex', alignItems: 'center', minWidth: {xs: '150px', sm:'200px'}, mr:1, color: 'text.secondary', flexShrink:0 }}>
                       {displayInfo.icon}
-                      <Typography variant="body2" component="span" fontWeight="500" sx={{ml:0.25}}>{displayInfo.label}:</Typography>
+                      <Typography variant="body1" component="span" fontWeight="500" sx={{ml:0.25}}>{displayInfo.label}:</Typography>
                     </Box>
-                    <Typography variant="body1" color="text.primary" sx={{flexGrow: 1, fontWeight: 500}}>{valueString}</Typography>
+                    <Typography variant="subtitle1" color="text.primary" sx={{flexGrow: 1, fontWeight: 'bold'}}>{valueString}</Typography>
                   </ListItem>
                 );
               })}

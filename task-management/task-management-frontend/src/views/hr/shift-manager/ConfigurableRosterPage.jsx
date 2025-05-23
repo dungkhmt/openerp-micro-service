@@ -1,33 +1,32 @@
 // src/features/rosterConfiguration/ConfigurableRosterPage.jsx
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import {
+import { /* ... các import khác giữ nguyên ... */
   Container, Box, Typography, Button, Modal, Paper,
-  CssBaseline, ThemeProvider, CircularProgress, IconButton // Bỏ Toolbar, AppBar nếu không dùng trực tiếp ở đây
+  CssBaseline, ThemeProvider, CircularProgress, IconButton,
+  InputLabel // Đã có
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add'; // Icon cho nút Tạo Mới
-import ArticleIcon from '@mui/icons-material/Article'; // Icon cho tiêu đề danh sách
+import AddIcon from '@mui/icons-material/Add';
+import ArticleIcon from '@mui/icons-material/Article';
+// Icon WeekendIcon và EventBusyIcon đã được import trong SingleTemplateDetails và TemplateConfigForm
 
-import { theme } from './theme'; // Import theme
-import { mockApiRequest } from './api'; // Import mock API
+import { theme } from './theme';
+import { mockApiRequest } from './api';
 import TemplateConfigForm from './TemplateConfigForm';
-import ApplyConfigForm from './ApplyConfigForm.jsx';
+import ApplyConfigForm from './ApplyConfigForm';
 import TemplateListDisplay from './TemplateListDisplay';
 
-// Khai báo biến module cho departments và jobPositions
-// để TemplateListDisplay -> SingleTemplateDetails có thể truy cập
-// Lưu ý: Đây là cách đơn giản, với ứng dụng lớn nên dùng Context/Redux
 let moduleDepartmentsForDisplay = [];
 let moduleJobPositionsForDisplay = [];
 
 export default function ConfigurableRosterPage() {
+  // ... (state và logic của ConfigurableRosterPage giữ nguyên như phiên bản trước) ...
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
-
   const [editingTemplate, setEditingTemplate] = useState(null);
   const [templateToApply, setTemplateToApply] = useState(null);
 
   const [configTemplates, setConfigTemplates] = useState(() => {
-    try { const saved = localStorage.getItem('rosterTemplatesList_v7_styled_split'); return saved ? JSON.parse(saved) : []; } // Đổi key
+    try { const saved = localStorage.getItem('rosterTemplatesList_v9_leave_constraint'); return saved ? JSON.parse(saved) : []; } // Đổi key localStorage
     catch (e) { console.error("Failed to load templates from localStorage", e); return []; }
   });
 
@@ -57,7 +56,7 @@ export default function ConfigurableRosterPage() {
 
 
   useEffect(() => {
-    localStorage.setItem('rosterTemplatesList_v7_styled_split', JSON.stringify(configTemplates)); // Đổi key
+    localStorage.setItem('rosterTemplatesList_v9_leave_constraint', JSON.stringify(configTemplates)); // Đổi key localStorage
   }, [configTemplates]);
 
   const handleOpenTemplateModalForNew = () => { setEditingTemplate(null); setIsTemplateModalOpen(true); };
@@ -90,7 +89,7 @@ export default function ConfigurableRosterPage() {
   };
 
   const handleActualApplyAndRoster = (applicationDetails) => {
-    console.log("DỮ LIỆU GỬI ĐI ĐỂ XẾP LỊCH:", applicationDetails);
+    console.log("DỮ LIỆU GỬI ĐI ĐỂ XẾP LỊCH (có kiểm tra ngày nghỉ nếu được bật):", applicationDetails);
     alert(`Đã gửi yêu cầu xếp lịch cho: ${applicationDetails.templateName}\nTừ ${applicationDetails.startDate} đến ${applicationDetails.endDate}\nPhòng ban: ${applicationDetails.departmentCodes.map(code => moduleDepartmentsForDisplay.find(d=>d.departmentCode === code)?.departmentName || code).join(', ') || 'Tất cả'}\nChức vụ: ${applicationDetails.jobPositionCodes.map(code => moduleJobPositionsForDisplay.find(j=>j.code === code)?.name || code).join(', ') || 'Tất cả'}`);
     handleCloseApplyModal();
   };
@@ -110,24 +109,22 @@ export default function ConfigurableRosterPage() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-        {/* Container chứa nội dung chính, bao gồm cả header cố định và danh sách cuộn */}
         <Container component="main" maxWidth="lg" sx={{
-          pt: 0, // Bỏ padding top ở đây vì header cố định sẽ có padding riêng
+          pt: 0,
           pb: 2.5,
           flexGrow: 1,
           display: 'flex',
           flexDirection: 'column',
-          overflow: 'hidden' // Quan trọng: để Box con bên trong tự cuộn
+          overflow: 'hidden'
         }}>
-          <Box sx={{ // Header cố định
+          <Box sx={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            py: 2, // Padding y cho header
-            px: {xs:0, sm:1}, // Padding x nhỏ
-            backgroundColor: theme.palette.background.default, // Nền để không bị trong suốt
+            py: 2,
+            px: {xs:0, sm:1},
+            backgroundColor: theme.palette.background.default,
             zIndex: 10,
-            // Không cần sticky nếu Container cha có overflow hidden và Box con có overflow auto
           }}>
             <Typography variant="h5" sx={{ color: 'primary.dark', fontWeight: 700 }}>
               <ArticleIcon sx={{mr:1, verticalAlign: 'bottom', color: 'primary.main', fontSize: '1.7rem'}} />
@@ -142,8 +139,7 @@ export default function ConfigurableRosterPage() {
               Tạo Mới
             </Button>
           </Box>
-          {/* Box này sẽ chứa danh sách và có thể cuộn */}
-          <Box sx={{flexGrow: 1, overflowY: 'auto', pr:0.5, mr: -0.5 /* Bù lại pr để thanh cuộn không tạo khoảng trống thừa */}}>
+          <Box sx={{flexGrow: 1, overflowY: 'auto', pr:0.5, mr: -0.5 }}>
             <TemplateListDisplay
               templates={configTemplates}
               onEdit={handleOpenTemplateModalForEdit}
@@ -154,7 +150,7 @@ export default function ConfigurableRosterPage() {
         </Container>
 
         <Modal open={isTemplateModalOpen} onClose={(event, reason) => { if (reason !== 'backdropClick') handleCloseTemplateModal();}} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} closeAfterTransition >
-          <Paper sx={{ width: '95%', maxWidth: '900px', maxHeight: '95vh', display: 'flex', flexDirection: 'column', borderRadius: 2, boxShadow: 24, outline: 'none' }}>
+          <Paper sx={{ width: '95%', maxWidth: '900px', maxHeight: 'calc(95vh - 40px)', /* GIẢM MAXHEIGHT ĐỂ CÓ THÊM KHÔNG GIAN */ display: 'flex', flexDirection: 'column', borderRadius: 2, boxShadow: 24, outline: 'none' }}>
             {isTemplateModalOpen &&
               <TemplateConfigForm onSave={handleSaveTemplate} onCancel={handleCloseTemplateModal} initialTemplateData={editingTemplate} />
             }
@@ -176,7 +172,6 @@ export default function ConfigurableRosterPage() {
             </Paper>
           </Modal>
         )}
-        {/* Bỏ footer để có thêm không gian */}
       </Box>
     </ThemeProvider>
   );
