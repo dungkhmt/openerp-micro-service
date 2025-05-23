@@ -21,18 +21,21 @@ public class RosterController {
     }
 
     @PostMapping("/generate")
-    public ResponseEntity<List<ScheduledShift>> generateRoster(@RequestBody RosterRequest rosterRequest) {
+    public ResponseEntity<RosterSolution> generateRoster(@RequestBody RosterRequest rosterRequest) {
         try {
-            List<ScheduledShift> schedule = rosterService.generateSchedule(rosterRequest);
-            if (schedule.isEmpty() && !rosterService.wasFeasible()) { // Thêm một cờ để biết có tìm được giải pháp không
-                return ResponseEntity.status(422).body(null); // Unprocessable Entity - không tìm thấy lịch phù hợp
+            RosterSolution solution = rosterService.generateSchedule(rosterRequest);
+            if ((solution.getScheduledShifts() == null || solution.getScheduledShifts().isEmpty()) && !rosterService.wasFeasible()) {
+                return ResponseEntity.status(422).body(solution);
             }
-            return ResponseEntity.ok(schedule);
+            return ResponseEntity.ok(solution);
         } catch (Exception e) {
-            // Log lỗi chi tiết
             System.err.println("Error generating roster: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body(
+                RosterSolution.builder()
+                    .statistics(RosterStatistics.builder().detailedRosterLog(List.of("Server error: " + e.getMessage())).build())
+                    .build()
+            );
         }
     }
 }
