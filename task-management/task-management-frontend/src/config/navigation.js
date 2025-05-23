@@ -183,6 +183,11 @@ const navigation = [
     path: "/hr/shift-scheduler",
   },
   {
+    title: "Xếp lịch",
+    icon: "mdi:calendar",
+    path: "/hr/shift-manager",
+  },
+  {
     sectionTitle: "Meetings",
   },
   {
