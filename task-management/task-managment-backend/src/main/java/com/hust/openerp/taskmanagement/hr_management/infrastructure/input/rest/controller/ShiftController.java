@@ -44,7 +44,7 @@ public class ShiftController extends BeanAwareUseCasePublisher {
 
     @DeleteMapping("")
     public ResponseEntity<?> cancelShift(
-        @Valid @RequestParam List<UUID> ids
+        @Valid @RequestBody List<UUID> ids
     ){
         var useCase = new DeleteShifts(ids);
         publish(useCase);

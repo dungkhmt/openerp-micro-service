@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Map;
+import java.util.UUID; // Import UUID
 
 @Data
 @Builder
@@ -15,4 +15,5 @@ import java.util.Map;
 public class RosterSolution {
     private List<ScheduledShift> scheduledShifts;
     private RosterStatistics statistics;
+    private List<UUID> createdShiftIds;
 }

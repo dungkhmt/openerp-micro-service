@@ -79,7 +79,6 @@ public class RosterService extends BeanAwareUseCasePublisher {
                 .statistics(RosterStatistics.builder()
                     .employeeStats(new ArrayList<>())
                     .detailedRosterLog(List.of("Không có nhân viên nào thỏa mãn tiêu chí."))
-                    .fairness(RosterStatistics.FairnessStats.builder().build())
                     .build())
                 .build();
         }
