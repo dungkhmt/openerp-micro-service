@@ -1,437 +1,414 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState, useCallback} from "react";
 import {usePagination, useTable} from "react-table";
+import {useNavigate, useLocation} from "react-router-dom";
+import {request} from "@/api";
+
+// MUI Components
 import {
-  Alert,
-  Autocomplete,
+  ThemeProvider,
+  CssBaseline,
+  Box,
   Button,
   CircularProgress,
+  Grid,
   IconButton,
-  MenuItem,
-  Select,
-  Snackbar,
+  // Menu, // Không có menu Sửa/Xóa cho từng nhân viên ở đây
+  // MenuItem as MuiMenuItem,
+  Paper,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   TextField,
+  Tooltip,
+  Typography,
+  Avatar,
+  Autocomplete,
+  Snackbar,
+  Alert as MuiAlert, // Đổi tên để tránh xung đột
 } from "@mui/material";
+import { theme } from './theme'; // Đường dẫn tới file theme.js của bạn
+
+// Icons
+// import AddIcon from '@mui/icons-material/Add'; // Không có nút Add ở đây
+// import MoreVertIcon from "@mui/icons-material/MoreVert"; // Không có menu ở đây
+// import EditIcon from '@mui/icons-material/Edit';
+// import DeleteIcon from '@mui/icons-material/Delete';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import GradeIcon from "@mui/icons-material/BorderColor"; // Icon Đánh giá
+import AssessmentIcon from '@mui/icons-material/Assessment'; // Icon cho tiêu đề
+
+// Custom Components & Hooks
+import GradeModal from "./modals/GradeModal"; // Điều chỉnh đường dẫn nếu cần
+import Pagination from "@/components/item/Pagination";
+import { useDebounce } from "../../hooks/useDebounce"; // Điều chỉnh đường dẫn nếu cần
+
+// Libraries
 import {CSVLink} from "react-csv";
 import jsPDF from "jspdf";
-import GradeModal from "./modals/GradeModal";
 import "jspdf-autotable";
-import {request} from "@/api";
-import "@/assets/css/CheckpointEvaluation.css";
-import {useLocation, useNavigate} from "react-router-dom";
-import GradeIcon from "@mui/icons-material/BorderColor";
+// import toast from "react-hot-toast"; // Mặc dù không thấy dùng trong code gốc, nhưng có thể cần
+// import "@/assets/css/CheckpointEvaluation.css"; // Loại bỏ import CSS
 
-const CheckpointEvaluation = () => {
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+const CheckpointEvaluationScreenInternal = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const periodFromState = location.state?.period;
+
   const [staffData, setStaffData] = useState([]);
   const [periods, setPeriods] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [jobPositions, setJobPositions] = useState([]);
+
   const [selectedPeriod, setSelectedPeriod] = useState(null);
-  const [selectedDepartment, setSelectedDepartment] = useState(null);
-  const [selectedJobPosition, setSelectedJobPosition] = useState(null);
-  const [totalPoints, setTotalPoints] = useState({});
+  const [selectedDepartmentFilter, setSelectedDepartmentFilter] = useState(null);
+  const [selectedJobPositionFilter, setSelectedJobPositionFilter] = useState(null);
+  const [totalPointsMap, setTotalPointsMap] = useState({});
+
   const [loading, setLoading] = useState(true);
+  const [loadingPoints, setLoadingPoints] = useState(false);
+
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [tempPageInput, setTempPageInput] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedStaff, setSelectedStaff] = useState(null);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const location = useLocation();
-  const period = location.state?.period;
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
+  const [gradeModalOpen, setGradeModalOpen] = useState(false);
+  const [selectedStaffForGrading, setSelectedStaffForGrading] = useState(null);
+
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
+
+  // Effect để set selectedPeriod từ state của router (chỉ chạy khi periodFromState thay đổi)
   useEffect(() => {
-    if (period) {
-      setSelectedPeriod(period); 
+    // console.log("EFFECT (periodFromState): periodFromState is", periodFromState);
+    if (periodFromState) {
+      setSelectedPeriod(currentSelectedPeriod => {
+        // Chỉ cập nhật nếu chưa có hoặc ID khác để tránh set lại object giống hệt
+        if (!currentSelectedPeriod || currentSelectedPeriod.id !== periodFromState.id) {
+          // console.log("Setting selectedPeriod from periodFromState:", periodFromState);
+          return periodFromState; // periodFromState có thể là object đầy đủ hoặc chỉ chứa ID
+        }
+        return currentSelectedPeriod;
+      });
     }
-  }, [period]);
+  }, [periodFromState]);
 
-  const fetchStaffData = async (pageIndex, pageSize) => {
+
+  const fetchStaffList = useCallback(async (pageIndex, pageSize, searchValue, department, jobPosition, isInitialLoadOrFilterChange = false) => {
+    // console.log("fetchStaffList called with:", { pageIndex, pageSize, searchValue, department, jobPosition, isInitialLoadOrFilterChange });
     setLoading(true);
     const payload = {
-      fullname: searchTerm || null,
-      departmentCode: selectedDepartment?.department_code || null,
-      jobPositionCode: selectedJobPosition?.code || null,
+      fullname: searchValue || null,
+      departmentCode: department?.department_code || null,
+      jobPositionCode: jobPosition?.code || null,
       status: "ACTIVE",
       page: pageIndex,
       pageSize: pageSize,
     };
     try {
-      request(
-        "get",
-        "/staffs",
-        (res) => {
-          const { data, meta } = res.data;
-          setStaffData(data || []);
-          setPageCount(meta.page_info.total_page);
-          setCurrentPage(meta.page_info.page);
-          setTempPageInput(meta.page_info.page + 1);
-        },
-        { onError: (err) => console.error("Error fetching staff data:", err) },
-        null,
-        {params: payload}
-      );
+      await request("get", "/staffs", (res) => {
+        const { data: staffListFromApi, meta } = res.data;
+        const transformedStaff = (staffListFromApi || []).map((staff, index) => ({
+          ...staff,
+          id: String(staff.user_login_id || staff.staff_code || `__fallback_staff_id_${index}`),
+        }));
+        setStaffData(transformedStaff);
+        setPageCount(meta?.page_info?.total_page || 0);
+        if (!isInitialLoadOrFilterChange) {
+          setCurrentPage(meta?.page_info?.page || 0);
+        }
+        // console.log("fetchStaffList success, currentPage (from API if not initial):", meta?.page_info?.page);
+      }, {
+        onError: (err) => { console.error("Lỗi khi tải danh sách nhân viên:", err); setSnackbar({open: true, message: "Không thể tải danh sách nhân viên.", severity: "error"}); },
+      }, null, { params: payload });
     } catch (error) {
-      console.error("Error fetching staff data:", error);
+      console.error("Ngoại lệ khi tải danh sách nhân viên:", error);
+      setSnackbar({open: true, message: "Lỗi hệ thống khi tải danh sách nhân viên.", severity: "error"});
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // Dependencies rỗng vì các hàm set state không cần đưa vào
 
-  const fetchPeriods = async () => {
+  const fetchPeriodsForSelection = useCallback(async () => {
+    // console.log("fetchPeriodsForSelection called");
     try {
-      const payload = { name: null, status: "ACTIVE" };
-      request(
-        "get",
-        "/checkpoints/periods",
-        (res) => setPeriods(res.data.data || []),
-        { onError: (err) => console.error("Error fetching periods:", err) },
-        null,
-        payload
-      );
-    } catch (error) {
-      console.error("Error fetching periods:", error);
-    }
-  };
+      await request("get", "/checkpoints/periods?status=ACTIVE&pageSize=1000", (res) => {
+        const fetchedPeriods = res.data.data || [];
+        setPeriods(fetchedPeriods);
+        // console.log("Periods fetched:", fetchedPeriods.length);
+        // Sau khi fetch xong list periods, cập nhật selectedPeriod để đảm bảo nó là object đầy đủ
+        // nếu nó đã được set từ periodFromState (có thể chỉ là partial object)
+        setSelectedPeriod(currentSelectedPeriod => {
+          if (currentSelectedPeriod && fetchedPeriods.length > 0) {
+            const fullPeriodObjectFromList = fetchedPeriods.find(p => p.id === currentSelectedPeriod.id);
+            // Chỉ cập nhật nếu tìm thấy và nó thực sự là object khác (hoặc để đảm bảo là object từ list mới nhất)
+            if (fullPeriodObjectFromList && fullPeriodObjectFromList !== currentSelectedPeriod) {
+              // console.log("Updating selectedPeriod with full object from fetched list:", fullPeriodObjectFromList);
+              return fullPeriodObjectFromList;
+            }
+          }
+          return currentSelectedPeriod; // Không thay đổi nếu không tìm thấy hoặc đã là object đúng
+        });
+      }, { onError: (err) => console.error("Lỗi tải kỳ checkpoint:", err) });
+    } catch (error) { console.error("Lỗi tải kỳ checkpoint:", error); }
+  }, [setPeriods, setSelectedPeriod]); // setPeriods, setSelectedPeriod là stable
 
-  const fetchDepartments = async () => {
+
+  const fetchFilterData = useCallback(async () => {
+    // console.log("fetchFilterData called");
     try {
-      request(
-        "get",
-        "/departments",
-        (res) => setDepartments(res.data.data || []),
-        { onError: (err) => console.error("Error fetching departments:", err) },
-        {}
-      );
-    } catch (error) {
-      console.error("Error fetching departments:", error);
-    }
-  };
-
-  const fetchJobPositions = async () => {
-    try {
-      request(
-        "get",
-        "/jobs",
-        (res) => setJobPositions(res.data.data || []),
-        { onError: (err) => console.error("Error fetching job positions:", err) },
-        {}
-      );
-    } catch (error) {
-      console.error("Error fetching job positions:", error);
-    }
-  };
-
-  const fetchCheckpointData = async () => {
-    if (!selectedPeriod) return;
-    const payload = {
-      user_ids: staffData.map((staff) => staff.user_login_id)
-    };
-    try {
-      request(
-        "get",
-        `/checkpoints/${selectedPeriod.id}`,
-        (res) => {
-          const { data } = res.data;
-          const points = {};
-          data.forEach((item) => (points[item.user_id] = item.total_point || "Not Evaluated"));
-          setTotalPoints(points);
-        },
-        { onError: (err) => console.error("Error fetching checkpoint data:", err) },
-        payload
-      );
-    } catch (error) {
-      console.error("Error fetching checkpoint data:", error);
-    }
-  };
-
-  const exportPDF = () => {
-    const doc = new jsPDF();
-    doc.text("Checkpoint Evaluation", 20, 10);
-    doc.autoTable({
-      head: [["Emp Id", "Fullname", "Email", "Total Points"]],
-      body: staffData.map((row) => [
-        row.staff_code,
-        row.fullname,
-        row.email,
-        totalPoints[row.user_login_id] || "Not Evaluated",
-      ]),
-    });
-    doc.save("CheckpointEvaluation.pdf");
-  };
+      await request("get", "/departments?status=ACTIVE", (res) => setDepartments(res.data.data || []), { onError: (err) => console.error("Lỗi tải phòng ban:", err) });
+      await request("get", "/jobs?status=ACTIVE", (res) => setJobPositions(res.data.data || []), { onError: (err) => console.error("Lỗi tải vị trí:", err) });
+    } catch (error) { console.error("Lỗi tải dữ liệu filter:", error); }
+  }, [setDepartments, setJobPositions]); // setX là stable
 
   useEffect(() => {
-    fetchPeriods();
-    fetchDepartments();
-    fetchJobPositions();
-    fetchStaffData(0, itemsPerPage);
-  }, [itemsPerPage, searchTerm, selectedDepartment, selectedJobPosition]);
+    // console.log("EFFECT: Initial data fetch for dropdowns (periods, filters)");
+    fetchPeriodsForSelection();
+    fetchFilterData();
+  }, [fetchPeriodsForSelection, fetchFilterData]); // Callbacks này ổn định
 
-  const handleGradeClick = (staff) => {
-    if (!selectedPeriod) {
-      setError("Please select a period before grading.");
+  useEffect(() => {
+    // console.log("EFFECT (staff list): Filters changed. Resetting to page 0 and fetching.");
+    setCurrentPage(0);
+    fetchStaffList(0, itemsPerPage, debouncedSearchTerm, selectedDepartmentFilter, selectedJobPositionFilter, true);
+  }, [itemsPerPage, debouncedSearchTerm, selectedDepartmentFilter, selectedJobPositionFilter, fetchStaffList]);
+
+
+  const fetchCheckpointPoints = useCallback(async () => {
+    if (!selectedPeriod || !selectedPeriod.id || staffData.length === 0) {
+      setTotalPointsMap({});
       return;
     }
-    setSelectedStaff(staff);
-    setModalOpen(true);
-  };
+    // console.log("fetchCheckpointPoints called for period:", selectedPeriod?.id, "staffData length:", staffData.length);
+    setLoadingPoints(true);
+    const userLoginIds = staffData.map(staff => staff.user_login_id).filter(Boolean);
+    if (userLoginIds.length === 0) {
+      setTotalPointsMap({});
+      setLoadingPoints(false);
+      return;
+    }
 
-  useEffect(() => {
-    fetchStaffData();
-    fetchPeriods();
-  }, []);
-
-  useEffect(() => {
-    if (selectedPeriod) {
-      fetchCheckpointData();
+    const payload = { user_ids: userLoginIds.join(',') };
+    try {
+      await request("get", `/checkpoints/${selectedPeriod.id}`, (res) => {
+          const evaluations = res.data.data || [];
+          const points = {};
+          evaluations.forEach(item => {
+            points[item.user_id] = item.total_point !== null && item.total_point !== undefined ? item.total_point : "Chưa đánh giá";
+          });
+          setTotalPointsMap(points);
+        }, {
+          onError: (err) => { console.error("Lỗi tải điểm checkpoint:", err); setTotalPointsMap({}); }
+        }, null, { params: payload }
+      );
+    } catch (error) {
+      console.error("Ngoại lệ khi tải điểm checkpoint:", error);
+      setTotalPointsMap({});
+    } finally {
+      setLoadingPoints(false);
     }
   }, [selectedPeriod, staffData]);
 
+  useEffect(() => {
+    // console.log("EFFECT: fetchCheckpointPoints due to change in its definition (selectedPeriod or staffData)");
+    fetchCheckpointPoints();
+  }, [fetchCheckpointPoints]);
+
+
+  const handleGradeClick = useCallback((staff) => {
+    if (!selectedPeriod) {
+      setSnackbar({open: true, message: "Vui lòng chọn một kỳ checkpoint trước khi đánh giá.", severity: "warning"});
+      return;
+    }
+    setSelectedStaffForGrading(staff);
+    setGradeModalOpen(true);
+  }, [selectedPeriod]);
+
   const columns = useMemo(
     () => [
-      { Header: "#", accessor: "index", Cell: ({ row }) => currentPage * itemsPerPage + row.index + 1 },
-      { Header: "Emp Id", accessor: "staff_code" },
-      {
-        Header: "Fullname",
-        accessor: "fullname",
-        Cell: ({ row }) => (
-          <div
-            className="employee-name-cell"
-            onClick={() => navigate(`/hr/staff/${row.original.staff_code}`)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              cursor: "pointer",
-            }}
-          >
-            <img
-              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                row.original.fullname
-              )}&background=random&size=100`}
-              alt="Avatar"
-              className="employee-avatar"
-              style={{ width: "40px", borderRadius: "50%" }}
-            />
-            <span
-              style={{
-                marginLeft: "10px",
-              }}
-            >
-              {row.original.fullname}
+      { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1, width: 60, disableSortBy: true },
+      { Header: "Mã NV", accessor: "staff_code", minWidth: 90, Cell: ({value}) => <Typography variant="body2" sx={{fontSize: '0.8rem'}}>{value}</Typography> },
+      { Header: "Họ và Tên", accessor: "fullname", minWidth: 220, Cell: ({ row }) => (
+          <Box onClick={() => navigate(`/hr/staff/${row.original.staff_code}`)} sx={{ display: "flex", alignItems: "center", cursor: "pointer", '&:hover': {textDecoration: 'underline', color: 'primary.main'} }}>
+            <Avatar alt={row.original.fullname} src={`https://ui-avatars.com/api/?name=${encodeURIComponent(row.original.fullname || 'N V')}&background=random&size=100&font-size=0.5&bold=true`} sx={{ width: 36, height: 36, mr: 1.5 }} />
+            <Typography variant="body1" component="span" sx={{fontWeight: 500}}>{row.original.fullname}</Typography>
+          </Box>
+        )},
+      { Header: "Email", accessor: "email", minWidth: 200 },
+      { Header: "Tổng Điểm", id: "total_points", minWidth: 120,
+        Cell: ({ row }) => {
+          const point = totalPointsMap[row.original.user_login_id]; // Dùng user_login_id nếu đó là key trong map
+          return loadingPoints ? <CircularProgress size={20}/> : (point !== undefined ? String(point) : "Chưa có");
+        }
+      },
+      { Header: "Hành động", id: 'actions', Cell: ({ row }) => (
+          <Tooltip title="Đánh giá">
+            <span>
+                <IconButton onClick={() => handleGradeClick(row.original)} disabled={!selectedPeriod || loadingPoints} size="small">
+                    <GradeIcon fontSize="small" />
+                </IconButton>
             </span>
-          </div>
-        ),
-      },
-      { Header: "Email", accessor: "email" },
-      {
-        Header: "Total Points",
-        accessor: "total_point",
-        Cell: ({ row }) => totalPoints[row.original.user_login_id] || "Not Evaluated",
-      },
-      {
-        Header: "Actions",
-        Cell: ({ row }) => (
-          <IconButton
-            className="icon-button"
-            onClick={() => handleGradeClick(row.original)}
-            disabled={!selectedPeriod}
-          >
-            <GradeIcon />
-          </IconButton>
-        ),
+          </Tooltip>
+        ), width: 100, minWidth: 100, disableSortBy: true, textAlign: 'center'
       },
     ],
-    [currentPage, itemsPerPage, totalPoints]
+    [currentPage, itemsPerPage, navigate, totalPointsMap, handleGradeClick, selectedPeriod, loadingPoints]
   );
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-  } = useTable(
-    {
-      columns,
-      data: staffData,
-      manualPagination: true,
-      pageCount,
-    },
-    usePagination
-  );
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data: staffData, manualPagination: true, pageCount: pageCount, initialState: { pageIndex: currentPage }, }, usePagination );
+
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    const headerColor = theme?.palette?.primary?.main || [30, 136, 229];
+    doc.setFont("helvetica", "bold"); doc.text(`Đánh giá Checkpoint - Kỳ: ${selectedPeriod?.name || 'Chưa chọn kỳ'}`, 14, 20); doc.setFont("helvetica", "normal");
+    doc.autoTable({
+      startY: 30,
+      headStyles: { fillColor: headerColor, textColor: "#ffffff", fontStyle: 'bold' },
+      head: [["Mã NV", "Họ Tên", "Email", "Tổng Điểm"]],
+      body: staffData.map(row => [
+        row.staff_code,
+        row.fullname,
+        row.email,
+        totalPointsMap[row.user_login_id] !== undefined ? String(totalPointsMap[row.user_login_id]) : "Chưa đánh giá",
+      ]),
+      styles: { font: "helvetica", fontSize: 10 },
+    });
+    doc.save(`DanhSachDanhGiaCheckpoint_${selectedPeriod?.name || 'All'}.pdf`);
+  };
+
+  const handlePageChange = (newPage) => {
+    // setCurrentPage(newPage); // Không cần thiết nếu fetchStaffList cập nhật đúng
+    fetchStaffList(newPage, itemsPerPage, debouncedSearchTerm, selectedDepartmentFilter, selectedJobPositionFilter, false);
+  };
+
+  const handleItemsPerPageChange = (newValue) => {
+    setItemsPerPage(newValue);
+    // useEffect cho itemsPerPage sẽ tự động gọi fetchStaffList với trang 0
+  };
+
+  const csvData = useMemo(() => {
+    if (!staffData || staffData.length === 0) return [];
+    return staffData.map(row => ({
+      "Mã NV": row.staff_code,
+      "Họ Tên": row.fullname,
+      "Email": row.email,
+      "Tổng Điểm": totalPointsMap[row.user_login_id] !== undefined ? String(totalPointsMap[row.user_login_id]) : "Chưa đánh giá",
+    }));
+  }, [staffData, totalPointsMap]);
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') return;
+    setSnackbar({...snackbar, open: false});
+  };
+
 
   return (
-    <div className="checkpoint-evaluation">
-      <Snackbar
-        open={!!error}
-        autoHideDuration={6000}
-        onClose={() => setError("")}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert severity="error">{error}</Alert>
-      </Snackbar>
-      <Snackbar
-        open={!!success}
-        autoHideDuration={6000}
-        onClose={() => setSuccess("")}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert severity="success">{success}</Alert>
+    <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, bgcolor: 'background.default', minHeight: 'calc(100vh - 64px)' }}>
+      <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: "top", horizontal: "right" }}>
+        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
       </Snackbar>
 
-      <div className="header">
-        <h2>Checkpoint Evaluation</h2>
-      </div>
+      <Paper sx={{ p: 2, mb: 2 }}>
+        <Grid container spacing={2} alignItems="center" justifyContent="space-between" wrap="wrap">
+          <Grid item> <Typography variant="h4" component="h1"> <AssessmentIcon sx={{mr:1, verticalAlign: 'middle'}}/> Đánh giá Checkpoint </Typography> </Grid>
+          <Grid item xs={12} sm={6} md={4} lg={3}>
+            <Autocomplete
+              options={periods}
+              getOptionLabel={(option) => option.name || ""}
+              value={selectedPeriod}
+              isOptionEqualToValue={(option, value) => option && value && option.id === value.id} // Thêm kiểm tra null
+              onChange={(event, newValue) => {
+                // console.log("Autocomplete period changed:", newValue);
+                setSelectedPeriod(newValue);
+              }}
+              renderInput={(params) => <TextField {...params} label="Chọn Kỳ Checkpoint" variant="outlined" size="small" />}
+            />
+          </Grid>
+        </Grid>
+      </Paper>
 
-      <div className="period-selection">
-        <Autocomplete
-          options={periods}
-          getOptionLabel={(option) => option.name || ""}
-          value={selectedPeriod} 
-          onChange={(e, value) => setSelectedPeriod(value)}
-          renderInput={(params) => (
-            <TextField {...params} label="Select Period" size="small" />
-          )}
+      {selectedStaffForGrading && selectedPeriod && (
+        <GradeModal
+          open={gradeModalOpen}
+          onClose={() => {setGradeModalOpen(false); fetchCheckpointPoints(); /* Tải lại điểm sau khi đóng modal */}}
+          staff={selectedStaffForGrading}
+          period={selectedPeriod}
         />
-      </div>
-
-      <GradeModal
-        open={modalOpen}
-        onClose={() => {setModalOpen(false); fetchCheckpointData(); }}
-        staff={selectedStaff}
-        period={selectedPeriod}
-      />
-
-      <div className="export-search-container">
-        <div className="export-buttons">
-          <CSVLink
-            data={staffData}
-            filename="CheckpointEvaluation.csv"
-          >
-            <Button className="export-button csv-button">Export CSV</Button>
-          </CSVLink>
-          <Button className="export-button pdf-button" onClick={exportPDF}>
-            Export PDF
-          </Button>
-        </div>
-
-        <div className="search-filters">
-          <Autocomplete
-            options={departments}
-            getOptionLabel={(option) => option.department_name || ""}
-            onChange={(e, value) => setSelectedDepartment(value)}
-            renderInput={(params) => (
-              <TextField {...params} label="Filter by Department" size="small" />
-            )}
-            className="filter-item"
-          />
-          <Autocomplete
-            options={jobPositions}
-            getOptionLabel={(option) => option.name || ""}
-            onChange={(e, value) => setSelectedJobPosition(value)}
-            renderInput={(params) => (
-              <TextField {...params} label="Filter by Job Position" size="small" />
-            )}
-            className="filter-item"
-          />
-          <TextField
-            label="Search by Name"
-            variant="outlined"
-            size="small"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-      </div>
-
-      {loading ? (
-        <CircularProgress />
-      ) : (
-
-
-        <div style={{maxHeight: "400px", overflowY: "auto"}}>
-          <table {...getTableProps()} className="employee-table">
-            <thead style={{position: "sticky", top: 0, background: "#fff", zIndex: 2}}>
-              {headerGroups.map((headerGroup) => (
-                <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
-                  {headerGroup.headers.map((column) => (
-                    <th {...column.getHeaderProps()} key={column.id}>
-                      {column.render("Header")}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody {...getTableBodyProps()}>
-            {rows.map((row) => {
-                prepareRow(row);
-                return (
-                  <tr {...row.getRowProps()} key={row.id}>
-                    {row.cells.map((cell) => (
-                      <td {...cell.getCellProps()} key={cell.column.id}>
-                        {cell.render("Cell")}
-                      </td>
-                    ))}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
       )}
 
-      <div className="pagination">
-        <div className="page-controls">
-          <input
-            type="number"
-            value={tempPageInput}
-            onChange={(e) => setTempPageInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                const enteredPage = parseInt(tempPageInput, 10) - 1;
-                if (enteredPage >= 0 && enteredPage < pageCount) {
-                  fetchStaffData(enteredPage, itemsPerPage);
-                }
-              }
-            }}
-            className="page-input"
-          />
-          <span>of {pageCount} pages</span>
-          <button
-            onClick={() => fetchStaffData(currentPage - 1, itemsPerPage)}
-            disabled={currentPage === 0}
-            className="page-button"
-          >
-            {"<"}
-          </button>
-          <button
-            onClick={() => fetchStaffData(currentPage + 1, itemsPerPage)}
-            disabled={currentPage === pageCount - 1}
-            className="page-button"
-          >
-            {">"}
-          </button>
-        </div>
-        <div className="items-per-page">
-          <Select
-            value={itemsPerPage}
-            onChange={(e) => setItemsPerPage(e.target.value)}
-            size="small"
-          >
-            {[5, 10, 15, 20].map((size) => (
-              <MenuItem key={size} value={size}>
-                {size}
-              </MenuItem>
-            ))}
-          </Select>
-          <span>items per page</span>
-        </div>
-      </div>
-    </div>
+      <Paper sx={{ p: 2, mb: 2 }}>
+        <Grid container spacing={2} alignItems="flex-end" wrap="wrap">
+          <Grid item xs={12} md="auto">
+            <Stack direction={{xs: "column", sm: "row"}} spacing={1.5} useFlexGap>
+              {(csvData && csvData.length > 0) ? (
+                <Button variant="outlined" size="small" startIcon={<CloudDownloadIcon />}>
+                  <CSVLink data={csvData} filename={`DanhSachDanhGiaCheckpoint_${selectedPeriod?.name || 'TatCa'}.csv`} style={{ textDecoration: 'none', color: 'inherit' }}> Xuất CSV </CSVLink>
+                </Button>
+              ) : ( <Button variant="outlined" size="small" startIcon={<CloudDownloadIcon />} disabled> Xuất CSV </Button> )}
+              <Button variant="outlined" size="small" startIcon={<PictureAsPdfIcon />} onClick={exportPDF} disabled={!staffData || staffData.length === 0}> Xuất PDF </Button>
+            </Stack>
+          </Grid>
+          <Grid item xs={12} sm={6} md>
+            <TextField fullWidth label="Tìm kiếm theo tên NV" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} variant="outlined" size="small"/>
+          </Grid>
+          <Grid item xs={12} sm={6} md>
+            <Autocomplete options={departments} getOptionLabel={(option) => option.department_name || ""} isOptionEqualToValue={(option, value) => option && value && option.department_code === value.department_code} onChange={(event, newValue) => setSelectedDepartmentFilter(newValue)} value={selectedDepartmentFilter} renderInput={(params) => <TextField {...params} label="Lọc theo Phòng Ban" variant="outlined" size="small" />} sx={{minWidth: 180}}/>
+          </Grid>
+          <Grid item xs={12} sm={6} md>
+            <Autocomplete options={jobPositions} getOptionLabel={(option) => option.name || ""} isOptionEqualToValue={(option, value) => option && value && option.code === value.code} onChange={(event, newValue) => setSelectedJobPositionFilter(newValue)} value={selectedJobPositionFilter} renderInput={(params) => <TextField {...params} label="Lọc theo Vị Trí" variant="outlined" size="small" />} sx={{minWidth: 180}}/>
+          </Grid>
+        </Grid>
+      </Paper>
+
+      <Paper sx={{ overflow: 'hidden' }}>
+        <TableContainer sx={{ maxHeight: "calc(100vh - 350px)" }}> {/* Điều chỉnh chiều cao nếu cần */}
+          <Table {...getTableProps()} stickyHeader size="medium">
+            <TableHead>
+              {headerGroups.map((headerGroup) => (
+                <TableRow {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map((column) => (
+                    <TableCell {...column.getHeaderProps()} align={column.textAlign || (column.id === 'actions' ? 'center' : 'left')}
+                               sx={{ bgcolor: (t) => t.palette.mode === 'light' ? t.palette.grey[200] : t.palette.grey[700], color: (t) => t.palette.getContrastText(t.palette.mode === 'light' ? t.palette.grey[200] : t.palette.grey[700]), fontWeight: 'bold', whiteSpace: 'nowrap', width: column.width, minWidth: column.minWidth || (column.id === '#' ? 60 : 120), py: 1.5, borderBottom: (t) => `1px solid ${t.palette.divider}`, '&:not(:last-child)': { borderRight: (t) => `1px solid ${t.palette.divider}` } }}
+                    > {column.render("Header")} </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHead>
+            <TableBody {...getTableBodyProps()}>
+              {loading && rows.length === 0 ? ( <TableRow><TableCell colSpan={columns.length} align="center" sx={{ py: 5 }}> <CircularProgress /> <Typography sx={{mt: 1.5}} variant="body1">Đang tải danh sách nhân viên...</Typography> </TableCell></TableRow>
+              ) : !loading && rows.length === 0 ? ( <TableRow><TableCell colSpan={columns.length} align="center" sx={{ py: 5 }}> <Typography variant="h6">Không tìm thấy nhân viên nào.</Typography> <Typography variant="body1" color="text.secondary" sx={{mt:1}}> Vui lòng thử lại với từ khóa khác hoặc điều chỉnh bộ lọc. </Typography> </TableCell></TableRow>
+              ) : (
+                rows.map((row) => { prepareRow(row); return ( <TableRow {...row.getRowProps()} hover sx={{ '&:nth-of-type(odd)': { backgroundColor: (t) => t.palette.action.hover } }} > {row.cells.map((cell) => ( <TableCell {...cell.getCellProps()} align={cell.column.textAlign || (cell.column.id === 'actions' ? 'center' : 'left')} sx={{ py: 1.2, '&:not(:last-child)': { borderRight: (t) => `1px solid ${t.palette.grey[200]}` } }}> {cell.render("Cell")} </TableCell> ))} </TableRow> ); })
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        {(pageCount > 0 && !loading) && ( <Pagination currentPage={currentPage} pageCount={pageCount} itemsPerPage={itemsPerPage} onPageChange={handlePageChange} onItemsPerPageChange={handleItemsPerPageChange} /> )}
+      </Paper>
+    </Box>
   );
 };
 
-export default CheckpointEvaluation;
+const CheckpointEvaluationScreen = () => {
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <CheckpointEvaluationScreenInternal />
+    </ThemeProvider>
+  );
+};
+
+export default CheckpointEvaluationScreen;

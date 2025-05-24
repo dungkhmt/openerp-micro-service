@@ -336,8 +336,6 @@ const StaffScreenInternal = () => {
           <Grid item xs={12} sm={6} md>
             <Autocomplete
               options={jobPositions}
-              // API của jobPositions trả về "name" cho tên, nhưng object nhân viên lại có job_position.job_position_name
-              // Cần đảm bảo getOptionLabel và isOptionEqualToValue sử dụng đúng trường của object jobPosition từ API /jobs
               getOptionLabel={(option) => option.name || ""} // Giả sử API /jobs trả về {code: ..., name: ...}
               isOptionEqualToValue={(option, value) => option.code === value.code}
               onChange={(event, newValue) => setSelectedJobPositionFilter(newValue)}
@@ -351,7 +349,7 @@ const StaffScreenInternal = () => {
 
       {viewMode === "table" ? (
         <Paper sx={{ overflow: 'hidden' }}>
-          <TableContainer sx={{ maxHeight: "calc(100vh - 380px)" }}>
+          <TableContainer sx={{ maxHeight: "calc(100vh - 350px)" }}>
             <Table {...getTableProps()} stickyHeader size="medium">
               <TableHead>
                 {headerGroups.map((headerGroup) => (

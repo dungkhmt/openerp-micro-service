@@ -232,7 +232,7 @@ const JobPositionScreenInternal = () => {
       </Paper>
 
       <Paper sx={{ overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: "calc(100vh - 360px)" }}> {/* Tăng chiều cao bảng */}
+        <TableContainer sx={{ maxHeight: "calc(100vh - 350px)" }}> {/* Tăng chiều cao bảng */}
           <Table {...getTableProps()} stickyHeader size="medium">
             <TableHead>
               {headerGroups.map((headerGroup) => (

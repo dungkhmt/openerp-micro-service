@@ -1,401 +1,335 @@
-import React, {useEffect, useMemo, useRef, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState, useCallback} from "react";
 import {usePagination, useTable} from "react-table";
-import {Button, CircularProgress, IconButton, MenuItem, Select, TextField,} from "@mui/material";
-import AddPeriodModal from "./modals/AddPeriodModal";
-import DeleteConfirmationModal from "./modals/DeleteConfirmationModal";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {useNavigate} from "react-router-dom";
+import {request} from "@/api";
+
+// MUI Components
+import {
+  ThemeProvider,
+  CssBaseline,
+  Box,
+  Button,
+  CircularProgress,
+  Grid,
+  IconButton,
+  Menu,
+  MenuItem as MuiMenuItem,
+  Paper,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Tooltip,
+  Typography
+} from "@mui/material";
+import { theme } from './theme'; // Đường dẫn tới file theme.js của bạn
+
+// Icons
+import AddIcon from '@mui/icons-material/Add';
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import EventNoteIcon from '@mui/icons-material/EventNote'; // Icon cho kỳ checkpoint
+
+// Custom Components & Hooks
+import AddPeriodModal from "./modals/AddPeriodModal"; // Điều chỉnh đường dẫn nếu cần
+import DeleteConfirmationModal from "./modals/DeleteConfirmationModal.jsx"; // Điều chỉnh đường dẫn nếu cần
+import Pagination from "@/components/item/Pagination";
+import { useDebounce } from "../../hooks/useDebounce"; // Điều chỉnh đường dẫn nếu cần
+
+// Libraries
 import {CSVLink} from "react-csv";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import "@/assets/css/CheckpointPeriodTable.css";
-import deleteIcon from "@/assets/icons/delete.svg";
-import editIcon from "@/assets/icons/edit.svg";
-import {request} from "@/api";
 import toast from "react-hot-toast";
+import dayjs from "dayjs"; // Để định dạng ngày tháng
 
-const CheckpointPeriodScreen = () => {
+// import "@/assets/css/CheckpointPeriodTable.css"; // Loại bỏ import CSS
+
+const CheckpointPeriodScreenInternal = () => {
+  const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [tempPageInput, setTempPageInput] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
   const [openModal, setOpenModal] = useState(false);
-  const [selectedPeriod, setSelectedPeriod] = useState(null);
+  const [selectedPeriod, setSelectedPeriod] = useState(null); // Dùng cho cả edit và delete
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [deletePeriod, setDeletePeriod] = useState(null);
-  const [dropdownVisible, setDropdownVisible] = useState(null);
-  const dropdownRefs = useRef([]);
-  const navigate = useNavigate();
-  
-  const handleRowClick = (period) => {
-    navigate(`/hr/checkpoint/evaluation`, { state: { period } });
-  };
+  // const [deletePeriod, setDeletePeriod] = useState(null); // Không cần state riêng cho delete nếu selectedPeriod đủ
 
-  useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (
-        dropdownVisible !== null &&
-        dropdownRefs.current[dropdownVisible] &&
-        !dropdownRefs.current[dropdownVisible].contains(event.target)
-      ) {
-        setDropdownVisible(null);
-      }
-    };
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const [currentMenuPeriodId, setCurrentMenuPeriodId] = useState(null);
 
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, [dropdownVisible]);
+  const handleRowClick = useCallback((period) => {
+    navigate(`/hr/checkpoint/evaluation`, { state: { period } }); // Điều chỉnh route nếu cần
+  }, [navigate]);
 
-  const fetchPeriods = async (pageIndex, pageSize, searchValue) => {
+  const fetchData = useCallback(async (pageIndex, pageSize, searchValue, isInitialLoadOrFilterChange = false) => {
+    setLoading(true);
     const payload = {
       name: searchValue || null,
       status: "ACTIVE",
       page: pageIndex,
       pageSize: pageSize,
     };
-
     try {
-      request(
-        "get",
-        "/checkpoints/periods",
-        (res) => {
-          const { data: periods, meta } = res.data;
-          setData(periods || []);
-          setPageCount(meta.page_info.total_page);
-          setCurrentPage(meta.page_info.page);
-          setTempPageInput(meta.page_info.page + 1);
-          setLoading(false);
-        },
-        {
-          onError: (err) => console.error("Error fetching periods:", err),
-        },
-        null,
-        {params: payload}
-      );
+      await request("get", "/checkpoints/periods", (res) => {
+        const { data: periodsFromApi, meta } = res.data;
+        const transformedPeriods = (periodsFromApi || []).map((period, index) => ({
+          ...period,
+          id: String(period.id || `__fallback_period_id_${index}`),
+          // Định dạng lại ngày tháng nếu cần
+          checkpoint_date_formatted: period.checkpoint_date ? dayjs(period.checkpoint_date).format("DD/MM/YYYY") : "Chưa có",
+        }));
+        setData(transformedPeriods);
+        setPageCount(meta?.page_info?.total_page || 0);
+        if (!isInitialLoadOrFilterChange) {
+          setCurrentPage(meta?.page_info?.page || 0);
+        }
+      }, {
+        onError: (err) => { console.error("Lỗi khi tải kỳ checkpoint:", err); toast.error("Không thể tải danh sách kỳ checkpoint."); },
+      }, null, { params: payload });
     } catch (error) {
-      console.error("Error fetching periods:", error);
+      console.error("Ngoại lệ khi tải kỳ checkpoint:", error);
+      toast.error("Lỗi hệ thống khi tải danh sách kỳ checkpoint.");
+    } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchPeriods(0, itemsPerPage, searchTerm);
-  }, [itemsPerPage, searchTerm]);
+    setCurrentPage(0);
+    fetchData(0, itemsPerPage, debouncedSearchTerm, true);
+  }, [itemsPerPage, debouncedSearchTerm, fetchData]);
 
-  const exportPDF = () => {
-    const doc = new jsPDF();
-    doc.text("Checkpoint Periods", 20, 10);
-    doc.autoTable({
-      head: [["Name", "Description", "Checkpoint Date"]],
-      body: data.map((row) => [
-        row.name,
-        row.description,
-        row.checkpoint_date,
-      ]),
-    });
-    doc.save("Checkpoint_Periods.pdf");
-  };
+  const handleMenuOpen = useCallback((event, periodId) => {
+    event.stopPropagation(); // Ngăn sự kiện click vào hàng
+    setMenuAnchorEl(event.currentTarget);
+    setCurrentMenuPeriodId(periodId);
+  }, []);
+
+  const handleMenuClose = useCallback(() => {
+    setMenuAnchorEl(null);
+    setCurrentMenuPeriodId(null);
+  }, []);
+
+  const handleEditFromMenu = useCallback(() => {
+    if (currentMenuPeriodId) {
+      const periodToEdit = data.find(p => p.id === currentMenuPeriodId);
+      if (periodToEdit) {
+        setSelectedPeriod(periodToEdit);
+        setOpenModal(true);
+      }
+    }
+    handleMenuClose();
+  }, [currentMenuPeriodId, data]);
+
+  const handleOpenDeleteModalFromMenu = useCallback(() => {
+    if (currentMenuPeriodId) {
+      const periodToDelete = data.find(p => p.id === currentMenuPeriodId);
+      if (periodToDelete) {
+        setSelectedPeriod(periodToDelete); // Dùng selectedPeriod cho modal xóa
+        setDeleteModalOpen(true);
+      }
+    }
+    handleMenuClose();
+  }, [currentMenuPeriodId, data]);
 
   const columns = useMemo(
     () => [
-      {
-        Header: "#",
-        accessor: "index",
-        Cell: ({ row }) => currentPage * itemsPerPage + row.index + 1,
+      { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1, width: 60, disableSortBy: true },
+      { Header: "Tên Kỳ Checkpoint", accessor: "name", minWidth: 250,
+        Cell: ({ row }) => (
+          <Typography
+            variant="body1"
+            sx={{ fontWeight: 500, cursor: 'pointer', '&:hover': { color: 'primary.main', textDecoration: 'underline' } }}
+            onClick={() => handleRowClick(row.original)}
+          >
+            {row.original.name}
+          </Typography>
+        )
       },
-      { Header: "Name", accessor: "name" },
-      { Header: "Description", accessor: "description" },
-      { Header: "Checkpoint Date", accessor: "checkpoint_date" },
+      { Header: "Mô tả", accessor: "description", Cell: ({ value }) => ( <Tooltip title={String(value || '')} placement="bottom-start"> <Typography variant="body1" noWrap sx={{ maxWidth: 350, overflow: 'hidden', textOverflow: 'ellipsis' }}> {value || '-'} </Typography> </Tooltip> ), minWidth: 300 },
+      { Header: "Ngày Checkpoint", accessor: "checkpoint_date_formatted", minWidth: 150 }, // Sử dụng trường đã định dạng
       {
-        Header: "Actions",
+        Header: "Hành động",
+        id: 'actions',
         Cell: ({ row }) => {
-          const rowIndex = row.index;
+          const periodId = row.original.id;
+          if (!periodId) return <Typography variant="caption" color="error">ID không hợp lệ</Typography>;
           return (
-            <div
-              style={{ position: "relative" }}
-              ref={(ref) => (dropdownRefs.current[rowIndex] = ref)}
-            >
-              <IconButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDropdownVisible(
-                    dropdownVisible === rowIndex ? null : rowIndex
-                  );
-                }}
-                style={{ width: "40px", height: "40px" }}
-              >
-                <MoreVertIcon />
-              </IconButton>
-              {dropdownVisible === rowIndex && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "100%",
-                    right: "0",
-                    backgroundColor: "#fff",
-                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                    borderRadius: "4px",
-                    zIndex: 1000,
-                    width: "150px",
-                    padding: "8px 0",
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div
-                    onClick={() => handleEdit(row.original)}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      padding: "8px 16px",
-                      cursor: "pointer",
-                      borderBottom: "1px solid #f0f0f0",
-                    }}
-                  >
-                    <img
-                      src={editIcon}
-                      alt="Edit"
-                      style={{ marginRight: "8px", width: "16px" }}
-                    />
-                    Edit
-                  </div>
-                  <div
-                    onClick={() => handleOpenDeleteModal(row.original)}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      padding: "8px 16px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <img
-                      src={deleteIcon}
-                      alt="Delete"
-                      style={{ marginRight: "8px", width: "16px" }}
-                    />
-                    Delete
-                  </div>
-                </div>
-              )}
-            </div>
+            <Box sx={{ textAlign: 'center' }}>
+              <Tooltip title="Tùy chọn">
+                <IconButton aria-label="menu-hanh-dong" onClick={(event) => handleMenuOpen(event, periodId)}>
+                  <MoreVertIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
           );
         },
+        width: 100, minWidth: 100, disableSortBy: true,
       },
     ],
-    [currentPage, itemsPerPage, dropdownVisible]
+    [currentPage, itemsPerPage, handleMenuOpen, handleRowClick]
   );
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-  } = useTable(
-    {
-      columns,
-      data,
-      manualPagination: true,
-      pageCount,
-    },
-    usePagination
-  );
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data, manualPagination: true, pageCount: pageCount, initialState: { pageIndex: currentPage }, }, usePagination );
 
-  const handleEdit = (period) => {
-    setSelectedPeriod(period);
-    setOpenModal(true);
-    setDropdownVisible(null);
+  const handleDelete = () => {
+    if (!selectedPeriod || !selectedPeriod.id) { toast.error("Không tìm thấy ID kỳ checkpoint để xóa."); return; }
+    const periodIdToDelete = selectedPeriod.id;
+    request("delete", `/checkpoints/periods/${periodIdToDelete}`, () => {
+        toast.success("Kỳ Checkpoint đã được xóa thành công.");
+        const newCurrentPage = (data.filter(d => d.id !== periodIdToDelete).length % itemsPerPage === 0 && currentPage > 0 && Math.floor((data.length -1) / itemsPerPage) < currentPage) ? currentPage - 1 : currentPage;
+        if (newCurrentPage !== currentPage) setCurrentPage(newCurrentPage);
+        fetchData(newCurrentPage, itemsPerPage, debouncedSearchTerm);
+        setDeleteModalOpen(false); setSelectedPeriod(null); // Reset selectedPeriod
+      }, { onError: (err) => { console.error("Lỗi khi xóa kỳ checkpoint:", err); toast.error(err.response?.data?.message || "Không thể xóa kỳ checkpoint."); } }
+    );
   };
 
-  const handleOpenDeleteModal = (period) => {
-    setDeletePeriod(period);
-    setDeleteModalOpen(true);
-    setDropdownVisible(null);
-  };
-
-  const handleDelete = async () => {
-    if (!deletePeriod) return;
-
-    try {
-      await request(
-        "delete",
-        `/checkpoints/periods/${deletePeriod.id}`,
-        () => {
-          fetchPeriods(currentPage, itemsPerPage, searchTerm);
-          setDeleteModalOpen(false);
-          setDeletePeriod(null);
-          toast.success("Xoá thành công")
-        },
-        {
-          onError: (err) => {
-            console.error("Error deleting period:", err);
-          },
-        }
-      );
-    } catch (error) {
-      console.error("Error deleting period:", error);
-    }
-  };
-
-  const handlePageInputKeyDown = (e) => {
-    if (e.key === "Enter") {
-      const enteredPage = parseInt(tempPageInput, 10) - 1;
-      if (enteredPage >= 0 && enteredPage < pageCount) {
-        fetchPeriods(enteredPage, itemsPerPage, searchTerm);
-      }
-    }
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    const headerColor = theme?.palette?.primary?.main || [30, 136, 229];
+    doc.setFont("helvetica", "bold"); doc.text("Danh sách Kỳ Checkpoint", 14, 20); doc.setFont("helvetica", "normal");
+    doc.autoTable({
+      startY: 30,
+      headStyles: { fillColor: headerColor, textColor: "#ffffff", fontStyle: 'bold' },
+      head: [["Tên Kỳ", "Mô tả", "Ngày Checkpoint"]],
+      body: data.map(row => [
+        row.name,
+        row.description,
+        row.checkpoint_date_formatted, // Sử dụng trường đã định dạng
+      ]),
+      styles: { font: "helvetica", fontSize: 10 },
+    });
+    doc.save("DanhSachKyCheckpoint.pdf");
   };
 
   const handlePageChange = (newPage) => {
-    fetchPeriods(newPage, itemsPerPage, searchTerm);
+    setCurrentPage(newPage);
+    fetchData(newPage, itemsPerPage, debouncedSearchTerm, false);
   };
 
-  if (loading) return <CircularProgress />;
+  const handleItemsPerPageChange = (newValue) => {
+    setItemsPerPage(newValue);
+  };
+
+  const csvData = useMemo(() => {
+    if (loading || !data || data.length === 0) return [];
+    return data.map(row => ({
+      "Tên Kỳ Checkpoint": row.name,
+      "Mô tả": row.description,
+      "Ngày Checkpoint": row.checkpoint_date_formatted, // Sử dụng trường đã định dạng
+    }));
+  }, [data, loading]);
 
   return (
-    <div className="checkpoint-management">
-      <div className="header">
-        <h2>Checkpoint Periods</h2>
-        <Button
-          variant="contained"
-          color="success"
-          onClick={() => setOpenModal(true)}
-        >
-          + Add Period
-        </Button>
-      </div>
+    <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, bgcolor: 'background.default', minHeight: 'calc(100vh - 64px)' }}>
+      <Paper sx={{ p: 2, mb: 2 }}>
+        <Grid container spacing={2} alignItems="center" justifyContent="space-between" wrap="wrap">
+          <Grid item> <Typography variant="h4" component="h1"> <EventNoteIcon sx={{mr:1, verticalAlign: 'middle'}}/> Kỳ Checkpoint </Typography> </Grid>
+          <Grid item> <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => { setSelectedPeriod(null); setOpenModal(true); }}> Thêm mới </Button> </Grid>
+        </Grid>
+      </Paper>
 
-      <div className="export-search-container">
-        <div className="export-buttons">
-          <CSVLink data={data} filename="Checkpoint_Periods.csv">
-            <Button
-              variant="contained"
-              className="export-button csv-button"
-            >
-              Export CSV
-            </Button>
-          </CSVLink>
-          <Button
-            variant="contained"
-            className="export-button pdf-button"
-            onClick={exportPDF}
-          >
-            Export PDF
-          </Button>
-        </div>
-        <div className="search-bar">
-          <TextField
-            label="Search by Name"
-            variant="outlined"
-            size="small"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-      </div>
-      <div style={{maxHeight: "460px", overflowY: "auto"}}>
-        <table {...getTableProps()} className="checkpoint-table">
-          <thead style={{position: "sticky", top: 0, background: "#fff", zIndex: 2}}>
-            {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
-                {headerGroup.headers.map((column) => (
-                  <th {...column.getHeaderProps()} key={column.id}>
-                    {column.render("Header")}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-              return (
-                <tr
-                  {...row.getRowProps()}
-                  key={row.id}
-                  onClick={() => handleRowClick(row.original)}
-                  style={{ cursor: "pointer" }}
-                >
-                  {row.cells.map((cell) => (
-                    <td {...cell.getCellProps()} key={cell.column.id}>
-                      {cell.render("Cell")}
-                    </td>
+      <AddPeriodModal open={openModal} onClose={() => { setOpenModal(false); setSelectedPeriod(null); }} onSubmit={() => { const targetPage = selectedPeriod ? currentPage : 0; if (!selectedPeriod) setCurrentPage(0); fetchData(targetPage, itemsPerPage, debouncedSearchTerm, !selectedPeriod); }} initialValues={selectedPeriod} />
+      {selectedPeriod && (<DeleteConfirmationModal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} onSubmit={handleDelete} title="Xác nhận xóa Kỳ Checkpoint" info={`Bạn có chắc chắn muốn xóa kỳ checkpoint "${selectedPeriod?.name}" không?`} cancelLabel="Hủy" confirmLabel="Xóa" /> )}
+
+      <Paper sx={{ p: 2, mb: 2 }}>
+        <Grid container spacing={2} alignItems="flex-end" wrap="wrap">
+          <Grid item xs={12} md="auto">
+            <Stack direction={{xs: "column", sm: "row"}} spacing={1.5} useFlexGap>
+              {(csvData && csvData.length > 0) ? (
+                <Button variant="outlined" size="small" startIcon={<CloudDownloadIcon />}>
+                  <CSVLink data={csvData} filename={`DanhSachKyCheckpoint.csv`} style={{ textDecoration: 'none', color: 'inherit' }}> Xuất CSV </CSVLink>
+                </Button>
+              ) : ( <Button variant="outlined" size="small" startIcon={<CloudDownloadIcon />} disabled> Xuất CSV </Button> )}
+              <Button variant="outlined" size="small" startIcon={<PictureAsPdfIcon />} onClick={exportPDF}> Xuất PDF </Button>
+            </Stack>
+          </Grid>
+          <Grid item xs={12} sm>
+            <TextField fullWidth label="Tìm kiếm theo tên kỳ" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} variant="outlined" size="small"/>
+          </Grid>
+        </Grid>
+      </Paper>
+
+      <Paper sx={{ overflow: 'hidden' }}>
+        <TableContainer sx={{ maxHeight: "calc(100vh - 350px)" }}>
+          <Table {...getTableProps()} stickyHeader size="medium">
+            <TableHead>
+              {headerGroups.map((headerGroup) => (
+                <TableRow {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map((column) => (
+                    <TableCell {...column.getHeaderProps()} align={column.textAlign || (column.id === 'actions' ? 'center' : 'left')}
+                               sx={{ bgcolor: (t) => t.palette.mode === 'light' ? t.palette.grey[200] : t.palette.grey[700], color: (t) => t.palette.getContrastText(t.palette.mode === 'light' ? t.palette.grey[200] : t.palette.grey[700]), fontWeight: 'bold', whiteSpace: 'nowrap', width: column.width, minWidth: column.minWidth || (column.id === '#' ? 60 : 120), py: 1.5, borderBottom: (t) => `1px solid ${t.palette.divider}`, '&:not(:last-child)': { borderRight: (t) => `1px solid ${t.palette.divider}` } }}
+                    > {column.render("Header")} </TableCell>
                   ))}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                </TableRow>
+              ))}
+            </TableHead>
+            <TableBody {...getTableBodyProps()}>
+              {loading && rows.length === 0 ? ( <TableRow><TableCell colSpan={columns.length} align="center" sx={{ py: 5 }}> <CircularProgress /> <Typography sx={{mt: 1.5}} variant="body1">Đang tải dữ liệu...</Typography> </TableCell></TableRow>
+              ) : !loading && rows.length === 0 ? ( <TableRow><TableCell colSpan={columns.length} align="center" sx={{ py: 5 }}> <Typography variant="h6">Không tìm thấy kỳ checkpoint nào.</Typography> <Typography variant="body1" color="text.secondary" sx={{mt:1}}> Vui lòng thử lại với từ khóa khác hoặc thêm kỳ mới. </Typography> </TableCell></TableRow>
+              ) : (
+                rows.map((row) => { prepareRow(row); return (
+                  <TableRow
+                    {...row.getRowProps()}
+                    hover
+                    // onClick={() => handleRowClick(row.original)} // Bỏ onClick ở đây nếu không muốn cả hàng click được
+                    // sx={{ cursor: 'pointer' }} // Bỏ cursor pointer nếu không muốn cả hàng click được
+                    sx={{ '&:nth-of-type(odd)': { backgroundColor: (t) => t.palette.action.hover } }}
+                  >
+                    {row.cells.map((cell) => (
+                      <TableCell
+                        {...cell.getCellProps()}
+                        align={cell.column.textAlign || (cell.column.id === 'actions' ? 'center' : 'left')}
+                        sx={{ py: 1.2, '&:not(:last-child)': { borderRight: (t) => `1px solid ${t.palette.grey[200]}` } }}
+                      >
+                        {cell.render("Cell")}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ); })
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        {(pageCount > 0 && !loading) && ( <Pagination currentPage={currentPage} pageCount={pageCount} itemsPerPage={itemsPerPage} onPageChange={handlePageChange} onItemsPerPageChange={handleItemsPerPageChange} /> )}
+      </Paper>
 
-      <div className="pagination">
-        <div className="page-controls">
-          <input
-            type="number"
-            value={tempPageInput}
-            onChange={(e) => setTempPageInput(e.target.value)}
-            onKeyDown={handlePageInputKeyDown}
-            className="page-input"
-          />
-          <span>of {pageCount} pages</span>
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 0}
-            className="page-button"
-          >
-            {"<"}
-          </button>
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === pageCount - 1}
-            className="page-button"
-          >
-            {">"}
-          </button>
-        </div>
-        <div className="items-per-page">
-          <Select
-            value={itemsPerPage}
-            onChange={(e) => {
-              setItemsPerPage(e.target.value);
-              fetchPeriods(0, e.target.value, searchTerm);
-            }}
-            displayEmpty
-            className="items-per-page-select"
-          >
-            <MenuItem value={5}>5</MenuItem>
-            <MenuItem value={10}>10</MenuItem>
-            <MenuItem value={15}>15</MenuItem>
-            <MenuItem value={20}>20</MenuItem>
-          </Select>
-          <span>items per page</span>
-        </div>
-      </div>
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleMenuClose}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        PaperProps={{ elevation: 0, sx: { overflow: 'visible', filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))', mt: 1.5, '& .MuiAvatar-root': { width: 32, height: 32, ml: -0.5, mr: 1, }, '&::before': { content: '""', display: 'block', position: 'absolute', top: 0, right: 14, width: 10, height: 10, bgcolor: 'background.paper', transform: 'translateY(-50%) rotate(45deg)', zIndex: 0, }, }, }}
+      >
+        <MuiMenuItem onClick={handleEditFromMenu} sx={{ gap: 1 }}> <EditIcon fontSize="small" /> Sửa </MuiMenuItem>
+        <MuiMenuItem onClick={handleOpenDeleteModalFromMenu} sx={{ gap: 1, color: 'error.main' }}> <DeleteIcon fontSize="small" /> Xóa </MuiMenuItem>
+      </Menu>
+    </Box>
+  );
+};
 
-      <AddPeriodModal
-        open={openModal}
-        onClose={() => {
-          setOpenModal(false);
-          setSelectedPeriod(null);
-        }}
-        onSubmit={() => fetchPeriods(0, itemsPerPage, searchTerm)}
-        initialValues={selectedPeriod}
-      />
-
-      <DeleteConfirmationModal
-        open={deleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onSubmit={handleDelete}
-        title="Delete Period"
-        info={`Are you sure you want to delete the period "${deletePeriod?.name}"?`}
-        cancelLabel="Cancel"
-        confirmLabel="Delete"
-      />
-    </div>
+const CheckpointPeriodScreen = () => {
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <CheckpointPeriodScreenInternal />
+    </ThemeProvider>
   );
 };
 
