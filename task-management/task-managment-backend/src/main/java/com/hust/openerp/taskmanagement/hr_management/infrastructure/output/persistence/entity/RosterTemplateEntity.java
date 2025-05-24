@@ -3,12 +3,15 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.pers
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller.roster.ShiftDefinition;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.utils.JpaMapConverter;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.utils.JpaShiftDefinitionListConverter;
+import com.vladmihalcea.hibernate.type.array.ListArrayType;
+import com.vladmihalcea.hibernate.type.array.StringArrayType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 
 import java.util.List;
@@ -39,4 +42,13 @@ public class RosterTemplateEntity extends AuditEntity {
     @Column(name = "active_hard_constraints")
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> activeHardConstraints;
+
+    @Column(name = "departments", columnDefinition = "text[]")
+    @Type(ListArrayType.class)
+    private List<String> departments;
+
+    @Column(name = "job_positions", columnDefinition = "text[]")
+    @Type(ListArrayType.class)
+    private List<String> jobPositions;
+
 }

@@ -13,7 +13,7 @@ export const theme = createTheme({
   typography: {
     fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
     h4: { fontWeight: 700, fontSize: '1.65rem', letterSpacing: '0.01em' },
-    h5: { fontWeight: 600, fontSize: '1.2rem' }, // Giảm chút nữa cho header danh sách
+    h5: { fontWeight: 600, fontSize: '1.2rem' },
     h6: { fontWeight: 600, fontSize: '1rem' },
     subtitle1: { fontWeight: 500, fontSize: '0.9rem'},
     body1: { fontSize: '0.875rem'},

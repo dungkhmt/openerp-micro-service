@@ -25,6 +25,6 @@ public class UpdateRosterTemplateHandler extends ObservableUseCasePublisher
     @Override
     @Transactional
     public void handle(UpdateRosterTemplate useCase) {
-        rosterTemplatePort.createRosterTemplate(useCase.getRosterTemplateModel());
+        rosterTemplatePort.updateRosterTemplate(useCase.getRosterTemplateModel());
     }
 }

@@ -5,6 +5,7 @@ import com.hust.openerp.taskmanagement.hr_management.domain.exception.Applicatio
 import com.hust.openerp.taskmanagement.hr_management.domain.model.RosterTemplateModel;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.RosterTemplateEntity;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository.RosterTemplateRepo;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.UUID;
 public class RosterTemplateAdapter implements IRosterTemplatePort {
     private final RosterTemplateRepo rosterTemplateRepo;
 
+    @Transactional
     @Override
     public RosterTemplateModel createRosterTemplate(RosterTemplateModel model) {
         var rosterTemplateEntity = new RosterTemplateEntity();
@@ -42,6 +44,7 @@ public class RosterTemplateAdapter implements IRosterTemplatePort {
         return toModels(rosterTemplateRepo.findAll());
     }
 
+    @Transactional
     @Override
     public RosterTemplateModel updateRosterTemplate(RosterTemplateModel model) {
         var rosterTemplateEntity = getRosterTemplateEntity(model.getId());
@@ -55,14 +58,11 @@ public class RosterTemplateAdapter implements IRosterTemplatePort {
             rosterTemplateEntity.setActiveHardConstraints(model.getActiveHardConstraints());
         }
         if(model.getDepartmentFilter() != null){
-            //rosterTemplateEntity.setDepartmentFilter(model.getDepartmentFilter());
+            rosterTemplateEntity.setDepartments(model.getDepartmentFilter());
         }
         if(model.getJobPositionFilter() != null){
-            //rosterTemplateEntity.setJobPositionFilter(model.getJobPositionFilter());
+            rosterTemplateEntity.setJobPositions(model.getJobPositionFilter());
         }
-        rosterTemplateEntity.setTemplateName(model.getTemplateName());
-        rosterTemplateEntity.setDefinedShifts(model.getDefinedShifts());
-        rosterTemplateEntity.setActiveHardConstraints(model.getActiveHardConstraints());
         return toModel(rosterTemplateRepo.save(rosterTemplateEntity));
     }
 
@@ -79,6 +79,8 @@ public class RosterTemplateAdapter implements IRosterTemplatePort {
             .templateName(rosterTemplateEntity.getTemplateName())
             .definedShifts(rosterTemplateEntity.getDefinedShifts())
             .activeHardConstraints(rosterTemplateEntity.getActiveHardConstraints())
+            .departmentFilter(rosterTemplateEntity.getDepartments())
+            .jobPositionFilter(rosterTemplateEntity.getJobPositions())
             .build();
     }
 
