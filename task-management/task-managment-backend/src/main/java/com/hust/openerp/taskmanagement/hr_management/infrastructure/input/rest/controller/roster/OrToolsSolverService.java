@@ -438,6 +438,43 @@ public class OrToolsSolverService {
                 }
             }
         }
+        if (hardConstraints.containsKey("MAX_DAILY_WORK_HOURS")) {
+            Object param = hardConstraints.get("MAX_DAILY_WORK_HOURS");
+            if (param instanceof Map) {
+                Object hoursObj = ((Map<?, ?>) param).get("hours");
+                if (hoursObj instanceof Number) {
+                    long maxDailyWorkMillis = ((Number) hoursObj).longValue() * 3600000L; // hours to milliseconds
+                    if (maxDailyWorkMillis > 0) {
+                        System.out.println("INFO: Applying constraint: MAX_DAILY_WORK_HOURS = " + ((Number) hoursObj).longValue() + " hours");
+                        for (int e = 0; e < numEmployees; e++) {
+                            for (int d = 0; d < numDays; d++) {
+                                List<LinearExpr> dailyWorkExpressions = new ArrayList<>();
+                                for (int s = 0; s < numShifts; s++) {
+                                    ShiftDefinition shiftDef = shiftDefs.get(s);
+                                    LocalTime st = convertStringToLocalTime(shiftDef.getStartTime());
+                                    LocalTime et = convertStringToLocalTime(shiftDef.getEndTime());
+                                    if (st == null || et == null) continue;
+
+                                    long durationMillis;
+                                    // Calculate duration of the shift PART that falls on day 'd'
+                                    // This is important for shifts crossing midnight.
+                                    if (et.isAfter(st) || et.equals(st)) { // Shift does not cross midnight
+                                        durationMillis = Duration.between(st, et).toMillis();
+                                    } else { // Shift crosses midnight
+                                        // For day 'd', it's from start time to end of day
+                                        durationMillis = Duration.between(st, LocalTime.MAX).toMillis() + 1; // +1 to include the last ms
+                                    }
+                                    dailyWorkExpressions.add(LinearExpr.term(works[e][s][d], durationMillis));
+                                }
+                                if (!dailyWorkExpressions.isEmpty()) {
+                                    model.addLessOrEqual(LinearExpr.sum(dailyWorkExpressions.toArray(new LinearExpr[0])), maxDailyWorkMillis);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         // --- OBJECTIVE: FAIRNESS (Minimize range of total work hours) ---
         IntVar[] employeeTotalWorkMillis = new IntVar[numEmployees];
@@ -708,7 +745,7 @@ public class OrToolsSolverService {
         return RosterSolution.builder()
             .scheduledShifts(generatedScheduleResult)
             .statistics(statsBuilder.build())
-            .createdShiftIds(createdShiftIds) // Add the list of created shift IDs
+            .createdShiftIds(createdShiftIds)
             .build();
     }
 
@@ -719,8 +756,7 @@ public class OrToolsSolverService {
         try {
             return LocalTime.parse(timeString);
         } catch (DateTimeParseException e) {
-            // System.err.println("Error converting string '" + timeString + "' to LocalTime. Expected format HH:mm. Error: " + e.getMessage());
-            return null; // Reduced verbosity for cleaner logs, error is usually evident from context
+            return null;
         }
     }
 }

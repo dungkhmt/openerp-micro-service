@@ -109,7 +109,6 @@ const downloadCSV = (statistics, fileName = "roster_statistics.csv") => {
 };
 
 export default function ConfigurableRosterPage() {
-  // ... (các state như cũ)
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState(null);
@@ -121,14 +120,11 @@ export default function ConfigurableRosterPage() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('info');
-
   const [isSubmittingRoster, setIsSubmittingRoster] = useState(false);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
   const [rosterStatistics, setRosterStatistics] = useState(null);
   const [lastGeneratedShiftIds, setLastGeneratedShiftIds] = useState([]);
   const [isUndoingShifts, setIsUndoingShifts] = useState(false);
-
-  // State mới cho modal xác nhận hoàn tác
   const [isUndoConfirmModalOpen, setIsUndoConfirmModalOpen] = useState(false);
 
 
@@ -162,7 +158,7 @@ export default function ConfigurableRosterPage() {
       defined_shifts: applicationDetails.shiftsAndConstraints.definedShifts,
       active_hard_constraints: applicationDetails.shiftsAndConstraints.activeHardConstraints
     };
-    const API_ENDPOINT = "/api/roster/generate";
+    const API_ENDPOINT = "/roster/generate";
 
     try {
       request(
@@ -375,14 +371,13 @@ export default function ConfigurableRosterPage() {
 
               {rosterStatistics.detailedRosterLog && rosterStatistics.detailedRosterLog.length > 0 && (
                 <>
-                  <Typography variant="h6" gutterBottom>Log Chi Tiết Lịch (Mẫu)</Typography>
-                  <Paper variant="outlined" sx={{maxHeight: 250, overflowY: 'auto', p:1.5, backgroundColor: 'grey.50'}}>
-                    {rosterStatistics.detailedRosterLog.slice(0, 100).map((line, idx) => (
+                  <Typography variant="h6" gutterBottom>Log Chi Tiết Lịch</Typography>
+                  <Paper variant="outlined" sx={{maxHeight: 300, overflowY: 'auto', p:1.5, backgroundColor: 'grey.50'}}> {/* Increased maxHeight slightly */}
+                    {rosterStatistics.detailedRosterLog.map((line, idx) => ( // REMOVED .slice(0, 100)
                       <Typography key={idx} component="div" variant="caption" sx={{whiteSpace: 'pre-wrap', fontFamily:'monospace', fontSize: '0.75rem', lineHeight: 1.3}}>
                         {line.replace(/📅|🕒|👤|🎉|📊|❌|▶|✅|➡|=========================================================|\n/g, '').trim()}
                       </Typography>
                     ))}
-                    {rosterStatistics.detailedRosterLog.length > 100 && <Typography variant="caption" fontStyle="italic">... và nhiều dòng log khác.</Typography>}
                   </Paper>
                 </>
               )}

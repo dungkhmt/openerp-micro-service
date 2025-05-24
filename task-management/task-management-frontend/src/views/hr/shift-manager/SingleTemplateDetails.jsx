@@ -11,13 +11,18 @@ import TodayIcon from '@mui/icons-material/Today';
 import NightsStayIcon from '@mui/icons-material/NightsStay';
 import WeekendIcon from '@mui/icons-material/Weekend';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
-import SyncAltIcon from '@mui/icons-material/SyncAlt'; // Icon ví dụ cho ràng buộc mới
+import SyncAltIcon from '@mui/icons-material/SyncAlt';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 export default function SingleTemplateDetails({ template }) {
   const { definedShifts, activeHardConstraints } = template;
   const constraintDisplayInfo = {
     MAX_CONSECUTIVE_WORK_DAYS: { label: "Ngày làm LT tối đa", icon: <TodayIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
     MIN_REST_BETWEEN_SHIFTS_HOURS: { label: "Nghỉ giữa ca (giờ)", icon: <BusinessHoursIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
+    MAX_DAILY_WORK_HOURS: {
+      label: "Giờ làm tối đa/ngày",
+      icon: <AccessTimeIcon sx={{mr:0.5, fontSize: '1.2rem'}} />
+    },
     MAX_WEEKLY_WORK_HOURS: { label: "Giờ tối đa/tuần", icon: <BusinessHoursIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
     NO_CLASHING_SHIFTS_FOR_EMPLOYEE: { label: "Không trùng ca (lịch mới)", icon: <BlockIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
     MAX_SHIFTS_PER_DAY_FOR_EMPLOYEE: { label: "Ca tối đa/ngày (lịch mới)", icon: <EventAvailableIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
@@ -27,12 +32,11 @@ export default function SingleTemplateDetails({ template }) {
       label: "Kiểm tra ngày nghỉ phép NV",
       icon: <EventBusyIcon sx={{mr:0.5, fontSize: '1.2rem'}} />
     },
-    // --- HIỂN THỊ RÀNG BUỘC MỚI ---
     AVOID_OVERLAPPING_EXISTING_SHIFTS: {
       label: "Tránh trùng ca đã có",
       icon: <SyncAltIcon sx={{mr:0.5, fontSize: '1.2rem'}} />
-    }
-    // --- KẾT THÚC HIỂN THỊ RÀNG BUỘC MỚI ---
+    },
+    //todo add new constraint
   };
 
   return (

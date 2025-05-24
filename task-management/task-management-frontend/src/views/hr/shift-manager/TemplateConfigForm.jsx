@@ -10,8 +10,6 @@ import SaveIcon from '@mui/icons-material/Save';
 import CloseIcon from '@mui/icons-material/Close';
 import ShiftManager from './ShiftManager';
 import ConstraintsManager from './ConstraintsManager';
-// Import các icon dùng trong initialHardConstraintsStructure nếu cần thiết
-// (đã có trong ConstraintsManager và SingleTemplateDetails)
 
 export default function TemplateConfigForm({ onSave, onCancel, initialTemplateData }) {
   const [templateName, setTemplateName] = useState(initialTemplateData?.templateName || '');
@@ -26,6 +24,12 @@ export default function TemplateConfigForm({ onSave, onCancel, initialTemplateDa
     MAX_CONSECUTIVE_WORK_DAYS: { description: "Số ngày làm liên tiếp tối đa", enabled: true, params: { days: { label: "Số ngày tối đa", value: 5, type: 'number', min: 1 } }, tooltip: "Không làm quá X ngày liên tục." },
     MIN_REST_BETWEEN_SHIFTS_HOURS: { description: "Nghỉ tối thiểu (giờ) giữa 2 ca", enabled: true, params: { hours: { label: "Số giờ nghỉ tối thiểu", value: 10, type: 'number', min: 1 } }, tooltip: "Đảm bảo phục hồi." },
     MAX_WEEKLY_WORK_HOURS: { description: "Tổng giờ làm tối đa/tuần", enabled: true, params: { hours: { label: "Số giờ tối đa/tuần", value: 40, type: 'number', min: 1 } }, tooltip: "Tuân thủ luật." },
+    MAX_DAILY_WORK_HOURS: {
+      description: "Số giờ làm việc tối đa trong một ngày",
+      enabled: true,
+      params: { hours: { label: "Số giờ tối đa/ngày", value: 8, type: 'number', min: 1, max: 24 } },
+      tooltip: "Giới hạn tổng số giờ làm việc của một nhân viên trong một ngày (00:00 - 23:59)."
+    },
     NO_CLASHING_SHIFTS_FOR_EMPLOYEE: { description: "Không trùng ca cho 1 nhân viên (trong lịch mới)", enabled: true, params: null, tooltip: "Một người không thể ở 2 nơi trong cùng lịch mới tạo." },
     MAX_SHIFTS_PER_DAY_FOR_EMPLOYEE: { description: "Số ca tối đa/ngày/nhân viên (trong lịch mới)", enabled: true, params: { count: { label: "Số ca tối đa/ngày", value: 1, type: 'number', min: 1 } }, tooltip: "Thường là 1." },
     NO_WORK_NEXT_DAY_AFTER_NIGHT_SHIFT: { description: "Nghỉ ngày sau nếu làm bất kỳ ca đêm nào", enabled: true, params: null, tooltip: "Nếu bật, NV sẽ nghỉ ngày sau khi làm ca được đánh dấu 'Ca đêm'." },
@@ -44,14 +48,12 @@ export default function TemplateConfigForm({ onSave, onCancel, initialTemplateDa
       params: null,
       tooltip: "Hệ thống sẽ kiểm tra ngày nghỉ phép đã được duyệt của nhân viên và không xếp lịch vào những ngày đó."
     },
-    // --- RÀNG BUỘC MỚI THÊM VÀO ĐÂY ---
     AVOID_OVERLAPPING_EXISTING_SHIFTS: {
       description: "Không xếp lịch trùng với các ca ĐÃ CÓ SẴN của nhân viên",
       enabled: true, // Mặc định là bật
       params: null, // Đây là một toggle boolean, không có tham số con
       tooltip: "Nếu bật, hệ thống sẽ kiểm tra lịch làm việc hiện tại của nhân viên và tránh xếp ca mới nếu có sự trùng lặp thời gian."
-    }
-    // --- KẾT THÚC RÀNG BUỘC MỚI ---
+    },
   }), []);
 
   const [hardConstraints, setHardConstraints] = useState(() => {
@@ -77,8 +79,7 @@ export default function TemplateConfigForm({ onSave, onCancel, initialTemplateDa
             }
           }
         } else {
-          // Nếu có ràng buộc trong initialTemplateData.activeHardConstraints không còn trong baseStructure nữa thì bỏ qua
-          // Hoặc bạn có thể log một cảnh báo ở đây
+          //todo log
         }
         return acc;
       }, {});
