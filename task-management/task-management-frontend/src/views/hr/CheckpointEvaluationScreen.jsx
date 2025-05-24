@@ -238,7 +238,7 @@ const CheckpointEvaluationScreenInternal = () => {
   const columns = useMemo(
     () => [
       { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1, width: 60, disableSortBy: true },
-      { Header: "Mã NV", accessor: "staff_code", minWidth: 90, Cell: ({value}) => <Typography variant="body2" sx={{fontSize: '0.8rem'}}>{value}</Typography> },
+      { Header: "Mã NV", accessor: "staff_code", minWidth: 90, Cell: ({value}) => <Typography variant="body2">{value}</Typography> },
       { Header: "Họ và Tên", accessor: "fullname", minWidth: 220, Cell: ({ row }) => (
           <Box onClick={() => navigate(`/hr/staff/${row.original.staff_code}`)} sx={{ display: "flex", alignItems: "center", cursor: "pointer", '&:hover': {textDecoration: 'underline', color: 'primary.main'} }}>
             <Avatar alt={row.original.fullname} src={`https://ui-avatars.com/api/?name=${encodeURIComponent(row.original.fullname || 'N V')}&background=random&size=100&font-size=0.5&bold=true`} sx={{ width: 36, height: 36, mr: 1.5 }} />

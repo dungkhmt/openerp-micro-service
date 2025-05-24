@@ -256,7 +256,7 @@ const StaffScreenInternal = () => {
         row.fullname,
         row.email,
         row.department?.department_name || "Chưa có",
-        row.job_position?.job_position_name || "Chưa có", // Sử dụng job_position_name
+        row.job_position?.job_position_name || "Chưa có",
       ]),
       styles: { font: "helvetica", fontSize: 10 },
     });
@@ -307,7 +307,6 @@ const StaffScreenInternal = () => {
 
       <Paper sx={{ p: 2, mb: 2 }}>
         <Grid container spacing={2} alignItems="flex-end" wrap="wrap">
-          {/* Export Buttons - Đưa ra bên trái */}
           <Grid item xs={12} md="auto">
             <Stack direction={{xs: "column", sm: "row"}} spacing={1.5} useFlexGap>
               {(csvData && csvData.length > 0) ? (
@@ -318,8 +317,7 @@ const StaffScreenInternal = () => {
               <Button variant="outlined" size="small" startIcon={<PictureAsPdfIcon />} onClick={exportPDF}> Xuất PDF </Button>
             </Stack>
           </Grid>
-          {/* Search and Filters - Nằm sau export buttons */}
-          <Grid item xs={12} sm={6} md> {/* md không có giá trị cụ thể sẽ cho phép nó co giãn */}
+          <Grid item xs={12} sm={6} md>
             <TextField fullWidth label="Tìm kiếm theo tên" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} variant="outlined" size="small"/>
           </Grid>
           <Grid item xs={12} sm={6} md>
@@ -336,7 +334,7 @@ const StaffScreenInternal = () => {
           <Grid item xs={12} sm={6} md>
             <Autocomplete
               options={jobPositions}
-              getOptionLabel={(option) => option.name || ""} // Giả sử API /jobs trả về {code: ..., name: ...}
+              getOptionLabel={(option) => option.name || ""}
               isOptionEqualToValue={(option, value) => option.code === value.code}
               onChange={(event, newValue) => setSelectedJobPositionFilter(newValue)}
               value={selectedJobPositionFilter}
@@ -373,20 +371,19 @@ const StaffScreenInternal = () => {
           </TableContainer>
           {(pageCount > 0 && !loading) && ( <Pagination currentPage={currentPage} pageCount={pageCount} itemsPerPage={itemsPerPage} onPageChange={handlePageChange} onItemsPerPageChange={handleItemsPerPageChange} /> )}
         </Paper>
-      ) : ( // Card View
-        // Bọc Card View và Pagination trong Paper để nhất quán
+      ) : (
         <Paper sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-          <Box sx={{ flexGrow: 1, maxHeight: "calc(100vh - 320px)", /* Điều chỉnh giá trị này */ overflowY: 'auto', p: 2 }}>
+          <Box sx={{ flexGrow: 1, maxHeight: "calc(100vh - 320px)",overflowY: 'auto', p: 2 }}>
             {loading && data.length === 0 ? (
               <Box sx={{display: 'flex', justifyContent: 'center', py: 5}}> <CircularProgress /> <Typography sx={{ml: 2}}>Đang tải...</Typography> </Box>
-            ) : !loading && data.length === 0 ? ( // data thay vì rows vì rows là của useTable
+            ) : !loading && data.length === 0 ? (
               <Box sx={{p:3, textAlign: 'center', mt: 0}}>
                 <Typography variant="h6">Không tìm thấy nhân viên nào.</Typography>
                 <Typography variant="body1" color="text.secondary" sx={{mt:1}}> Vui lòng thử lại với từ khóa khác hoặc điều chỉnh bộ lọc. </Typography>
               </Box>
             ) : (
               <Grid container spacing={2.5}>
-                {data.map((employee) => { // Dùng data trực tiếp thay vì rows
+                {data.map((employee) => {
                   return (
                     <Grid item xs={12} sm={6} md={4} lg={3} key={employee.id}>
                       <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%', transition: 'box-shadow .3s', '&:hover': {boxShadow: 6} }}>

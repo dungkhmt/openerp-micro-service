@@ -224,15 +224,15 @@ const JobPositionScreenInternal = () => {
             <TextField
               fullWidth
               label="Tìm kiếm theo tên"
-              value={searchTerm} // Vẫn dùng searchTerm cho input
-              onChange={(e) => setSearchTerm(e.target.value)} // Cập nhật searchTerm ngay
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </Grid>
         </Grid>
       </Paper>
 
       <Paper sx={{ overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: "calc(100vh - 350px)" }}> {/* Tăng chiều cao bảng */}
+        <TableContainer sx={{ maxHeight: "calc(100vh - 350px)" }}>
           <Table {...getTableProps()} stickyHeader size="medium">
             <TableHead>
               {headerGroups.map((headerGroup) => (
