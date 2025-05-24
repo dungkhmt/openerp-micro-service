@@ -1,405 +1,321 @@
-import React, {useEffect, useMemo, useRef, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState, useCallback} from "react";
 import {usePagination, useTable} from "react-table";
-import {request} from "@/api";
-import {Button, IconButton, MenuItem, Select, TextField,} from "@mui/material";
-import AddDepartmentModal from "./modals/AddDepartmentModal";
-import DeleteConfirmationModal from "./modals/DeleteConfirmationModal";
+import {request} from "@/api"; // API client của bạn
+
+// MUI Components
+import {
+  ThemeProvider,
+  CssBaseline,
+  Box,
+  Button,
+  CircularProgress,
+  Grid,
+  IconButton,
+  Menu,
+  MenuItem as MuiMenuItem,
+  Paper,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Tooltip,
+  Typography
+} from "@mui/material";
+import { theme } from './theme'; // Đường dẫn tới file theme.js của bạn
+
+// Icons
+import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+
+// Custom Components
+import AddDepartmentModal from "./modals/AddDepartmentModal";
+import DeleteConfirmationModal from "./modals/DeleteConfirmationModal.jsx";
+import Pagination from "@/components/item/Pagination"; // Component Pagination
+import { useDebounce } from "../../hooks/useDebounce"; // Import useDebounce
+
+// Libraries
 import {CSVLink} from "react-csv";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import "@/assets/css/DepartmentTable.css";
-import deleteIcon from "@/assets/icons/delete.svg";
-import editIcon from "@/assets/icons/edit.svg";
 import toast from "react-hot-toast";
 
-const DepartmentTable = () => {
+const DepartmentScreenInternal = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pageCount, setPageCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [tempPageInput, setTempPageInput] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0); // 0-indexed
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500); // Debounce giá trị tìm kiếm
+
   const [openModal, setOpenModal] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteDepartment, setDeleteDepartment] = useState(null);
-  const [dropdownVisible, setDropdownVisible] = useState(null);
-  const dropdownRefs = useRef([]);
 
-  const fetchData = async (pageIndex, pageSize, searchValue) => {
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const [currentMenuDepartmentId, setCurrentMenuDepartmentId] = useState(null);
+
+  const fetchData = useCallback(async (pageIndex, pageSize, searchValue, isInitialLoadOrFilterChange = false) => {
+    setLoading(true);
     const payload = {
-      departmentCode: null,
-      departmentName: searchValue || null,
+      departmentName: searchValue || null, // Sử dụng searchValue (debounced)
       status: "ACTIVE",
       page: pageIndex,
       pageSize: pageSize,
     };
-
     try {
-      request(
-        "get",
-        "/departments",
-        (res) => {
-          const { data: departments, meta } = res.data;
-          const transformedDepartments = departments.map((dept) => ({
-            departmentCode: dept.department_code,
-            departmentName: dept.department_name,
-            description: dept.description,
-            status: dept.status,
-          }));
-
-          setData(transformedDepartments);
-          setPageCount(meta.page_info.total_page);
-          setCurrentPage(meta.page_info.page);
-          setTempPageInput(meta.page_info.page + 1);
-          setLoading(false);
-        },
-        {
-          onError: (err) => console.error("Error fetching data:", err),
-        },
-        null,
-        {
-          params: payload
+      await request("get", "/departments", (res) => {
+        const { data: departmentsFromApi, meta } = res.data;
+        const transformedDepartments = (departmentsFromApi || []).map((dept, index) => ({
+          id: String(dept.department_code || `__fallback_dept_id_${index}`),
+          departmentCode: dept.department_code,
+          departmentName: dept.department_name,
+          description: dept.description,
+          status: dept.status,
+        }));
+        setData(transformedDepartments);
+        setPageCount(meta?.page_info?.total_page || 0);
+        if (!isInitialLoadOrFilterChange) {
+          setCurrentPage(meta?.page_info?.page || 0);
         }
-      );
+      }, {
+        onError: (err) => { console.error("Lỗi khi tải dữ liệu phòng ban:", err); toast.error("Không thể tải danh sách phòng ban."); },
+      }, null, { params: payload });
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Ngoại lệ khi tải dữ liệu phòng ban:", error);
+      toast.error("Lỗi hệ thống khi tải danh sách phòng ban.");
+    } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchData(0, itemsPerPage, searchTerm);
-  }, [itemsPerPage, searchTerm]);
+    // Fetch dữ liệu khi debouncedSearchTerm hoặc itemsPerPage thay đổi
+    setCurrentPage(0); // Đặt lại trang về 0 trước khi fetch
+    fetchData(0, itemsPerPage, debouncedSearchTerm, true); // Sử dụng debouncedSearchTerm
+  }, [itemsPerPage, debouncedSearchTerm, fetchData]);
 
-  useEffect(() => {
-   
-    const handleOutsideClick = (event) => {
-      if (
-        dropdownVisible !== null &&
-        (!dropdownRefs.current[dropdownVisible] ||
-          !dropdownRefs.current[dropdownVisible].contains(event.target))
-      ) {
-        setDropdownVisible(null);
+
+  const handleMenuOpen = useCallback((event, departmentId) => {
+    setMenuAnchorEl(event.currentTarget);
+    setCurrentMenuDepartmentId(departmentId);
+  }, []);
+
+  const handleMenuClose = useCallback(() => {
+    setMenuAnchorEl(null);
+    setCurrentMenuDepartmentId(null);
+  }, []);
+
+  const handleEditFromMenu = useCallback(() => {
+    if (currentMenuDepartmentId) {
+      const departmentToEdit = data.find(dept => dept.id === currentMenuDepartmentId);
+      if (departmentToEdit) {
+        setSelectedDepartment(departmentToEdit);
+        setOpenModal(true);
       }
-    };
+    }
+    handleMenuClose();
+  }, [currentMenuDepartmentId, data]);
 
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, [dropdownVisible]);
+  const handleOpenDeleteModalFromMenu = useCallback(() => {
+    if (currentMenuDepartmentId) {
+      const departmentToDelete = data.find(dept => dept.id === currentMenuDepartmentId);
+      if (departmentToDelete) {
+        setDeleteDepartment(departmentToDelete);
+        setDeleteModalOpen(true);
+      }
+    }
+    handleMenuClose();
+  }, [currentMenuDepartmentId, data]);
 
   const columns = useMemo(
     () => [
+      { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1, width: 60, disableSortBy: true },
+      { Header: "Tên phòng ban", accessor: "departmentName", minWidth: 200 },
+      { Header: "Mô tả", accessor: "description", Cell: ({ value }) => ( <Tooltip title={String(value || '')} placement="bottom-start"> <Typography variant="body1" noWrap sx={{ maxWidth: {xs: 150, sm: 200, md: 300}, overflow: 'hidden', textOverflow: 'ellipsis' }}> {value || '-'} </Typography> </Tooltip> ), minWidth: 250 },
       {
-        Header: "#",
-        accessor: "index",
-        Cell: ({ row }) => currentPage * itemsPerPage + row.index + 1,
-      },
-      {
-        Header: "Name",
-        accessor: "departmentName",
-      },
-      {
-        Header: "Description",
-        accessor: "description",
-      },
-      {
-        Header: "Actions",
+        Header: "Hành động",
+        id: 'actions',
         Cell: ({ row }) => {
-          const rowIndex = row.index;
-
+          const departmentId = row.original.id;
+          if (!departmentId) return <Typography variant="caption" color="error">ID không hợp lệ</Typography>;
           return (
-            <div
-              style={{ position: "relative" }}
-              ref={(ref) => (dropdownRefs.current[rowIndex] = ref)}
-            >
-              <IconButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDropdownVisible(
-                    dropdownVisible === rowIndex ? null : rowIndex
-                  );
-                }}
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <MoreVertIcon />
-              </IconButton>
-              {dropdownVisible === rowIndex && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "100%",
-                    right: "0",
-                    backgroundColor: "#fff",
-                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                    borderRadius: "4px",
-                    zIndex: 1000,
-                    width: "150px",
-                    padding: "8px 0",
-                  }}
-                >
-                  <div
-                    onClick={() => handleEdit(row.original)}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      padding: "8px 16px",
-                      cursor: "pointer",
-                      borderBottom: "1px solid #f0f0f0",
-                    }}
-                  >
-                    <img
-                      src={editIcon}
-                      alt="Edit"
-                      style={{ marginRight: "8px", width: "16px" }}
-                    />
-                    Edit
-                  </div>
-                  <div
-                    onClick={() => handleOpenDeleteModal(row.original)}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      padding: "8px 16px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <img
-                      src={deleteIcon}
-                      alt="Delete"
-                      style={{ marginRight: "8px", width: "16px" }}
-                    />
-                    Delete
-                  </div>
-                </div>
-              )}
-            </div>
+            <Box sx={{ textAlign: 'center' }}>
+              <Tooltip title="Tùy chọn">
+                <IconButton aria-label="menu-hanh-dong" onClick={(event) => handleMenuOpen(event, departmentId)} >
+                  <MoreVertIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
           );
         },
+        width: 100, minWidth: 100, disableSortBy: true,
       },
     ],
-    [currentPage, itemsPerPage, dropdownVisible]
+    [currentPage, itemsPerPage, handleMenuOpen]
   );
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-  } = useTable(
-    {
-      columns,
-      data,
-      manualPagination: true,
-      pageCount,
-    },
-    usePagination
-  );
-
-  const handleEdit = (department) => {
-    setSelectedDepartment(department);
-    setOpenModal(true);
-    setDropdownVisible(null); 
-  };
-
-  const handleOpenDeleteModal = (department) => {
-    setDeleteDepartment(department);
-    setDeleteModalOpen(true);
-    setDropdownVisible(null); 
-  };
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable( { columns, data, manualPagination: true, pageCount: pageCount, initialState: { pageIndex: currentPage }, }, usePagination );
 
   const handleDelete = () => {
-    if (!deleteDepartment) return;
-
-    request(
-      "delete",
-      `/departments/${deleteDepartment.departmentCode}`,
-      () => {
-        fetchData(currentPage, itemsPerPage, searchTerm);
-        setDeleteModalOpen(false);
-        setDeleteDepartment(null);
-        toast.success("Xoá thành công")
-      },
-      {
-        onError: (err) => {
-          console.error("Error deleting department:", err);
-        },
-      }
+    if (!deleteDepartment || !deleteDepartment.departmentCode) { toast.error("Không tìm thấy mã phòng ban để xóa."); return; }
+    const departmentCodeToDelete = deleteDepartment.departmentCode;
+    request( "delete", `/departments/${departmentCodeToDelete}`, () => {
+        toast.success("Phòng ban đã được xóa thành công.");
+        const newCurrentPage = (data.filter(d => d.departmentCode !== departmentCodeToDelete).length % itemsPerPage === 0 && currentPage > 0 && Math.floor((data.length -1) / itemsPerPage) < currentPage) ? currentPage - 1 : currentPage;
+        if (newCurrentPage !== currentPage) {
+          setCurrentPage(newCurrentPage);
+        }
+        fetchData(newCurrentPage, itemsPerPage, debouncedSearchTerm); // Sử dụng debouncedSearchTerm
+        setDeleteModalOpen(false); setDeleteDepartment(null);
+      }, { onError: (err) => { console.error("Lỗi khi xóa phòng ban:", err); toast.error(err.response?.data?.message || "Không thể xóa phòng ban."); } }
     );
   };
 
   const exportPDF = () => {
     const doc = new jsPDF();
-    doc.text("Departments", 20, 10);
-    doc.autoTable({
-      head: [["#", "Name", "Description"]],
-      body: data.map((row, index) => [
-        currentPage * itemsPerPage + index + 1,
-        row.departmentName,
-        row.description,
-      ]),
-    });
-    doc.save("Departments.pdf");
-  };
-
-  const handlePageInputChange = (e) => {
-    setTempPageInput(e.target.value);
-  };
-
-  const handlePageInputKeyDown = (e) => {
-    if (e.key === "Enter") {
-      const enteredPage = parseInt(tempPageInput, 10) - 1;
-
-      if (enteredPage >= 0 && enteredPage < pageCount) {
-        fetchData(enteredPage, itemsPerPage, searchTerm);
-      } else if (enteredPage < 0) {
-        fetchData(0, itemsPerPage, searchTerm);
-      } else {
-        fetchData(pageCount - 1, itemsPerPage, searchTerm);
-      }
-    }
+    const headerColor = theme?.palette?.primary?.main || [22, 160, 133];
+    doc.setFont("helvetica", "bold"); doc.text("Danh sách Phòng ban", 14, 20); doc.setFont("helvetica", "normal");
+    doc.autoTable({ startY: 30, headStyles: { fillColor: headerColor, textColor: "#ffffff", fontStyle: 'bold' }, head: [["#", "Tên phòng ban", "Mô tả"]], body: data.map((row, index) => [ currentPage * itemsPerPage + index + 1, row.departmentName, row.description, ]), styles: { font: "helvetica", fontSize: 10 }, });
+    doc.save("DanhSachPhongBan.pdf");
   };
 
   const handlePageChange = (newPage) => {
-    fetchData(newPage, itemsPerPage, searchTerm);
+    setCurrentPage(newPage);
+    fetchData(newPage, itemsPerPage, debouncedSearchTerm, false); // Sử dụng debouncedSearchTerm
   };
 
-  const handleItemsPerPageChange = (event) => {
-    setItemsPerPage(event.target.value);
-    fetchData(0, event.target.value, searchTerm);
+  const handleItemsPerPageChange = (newValue) => {
+    setItemsPerPage(newValue);
+    // useEffect cho itemsPerPage sẽ kích hoạt fetchData với trang 0 và debouncedSearchTerm hiện tại
   };
 
-  if (loading) return <p>Loading...</p>;
+  const csvData = useMemo(() => {
+    if (loading || !data || data.length === 0) return [];
+    return data.map((row, index) => ({
+      "#": currentPage * itemsPerPage + index + 1,
+      "Tên phòng ban": row.departmentName,
+      "Mô tả": row.description,
+    }));
+  }, [data, currentPage, itemsPerPage, loading]);
 
   return (
-    <div className="department-container">
-      <div className="header">
-        <h2>Departments</h2>
-        <Button
-          variant="contained"
-          color="success"
-          onClick={() => setOpenModal(true)}
-        >
-          + Add Department
-        </Button>
-      </div>
-      <AddDepartmentModal
-        open={openModal}
-        onClose={() => {
-          setOpenModal(false);
-          setSelectedDepartment(null);
-        }}
-        onSubmit={() => fetchData(0, itemsPerPage, searchTerm)} // Refresh table
-        initialValues={selectedDepartment}
-      />
-      <DeleteConfirmationModal
-        open={deleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onSubmit={handleDelete}
-        title="Delete Department"
-        info={`Are you sure you want to delete the department "${deleteDepartment?.departmentName}"?`}
-        cancelLabel="Cancel"
-        confirmLabel="Delete"
-      />
-      <div className="export-search-container">
-        <div className="export-buttons">
-          <CSVLink data={data} filename={`Departments.csv`}>
-            <Button variant="contained" color="primary">
-              Export CSV
-            </Button>
-          </CSVLink>
-          <Button variant="contained" color="secondary" onClick={exportPDF}>
-            Export PDF
-          </Button>
-        </div>
-        <div className="search-bar">
-          <TextField
-            label="Search by Name"
-            variant="outlined"
-            size="small"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-      </div>
-      <div style={{ maxHeight: "450px", overflowY: "auto" }}>
-        <table {...getTableProps()} className="department-table">
-          <thead style={{position: "sticky", top: 0, background: "#fff", zIndex: 2}}>
-            {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column) => (
-                  <th {...column.getHeaderProps()}>{column.render("Header")}</th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-              return (
-                <tr {...row.getRowProps()}>
-                  {row.cells.map((cell) => (
-                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+    <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, bgcolor: 'background.default', minHeight: 'calc(100vh - 64px)' }}>
+      <Paper sx={{ p: 2, mb: 2 }}>
+        <Grid container spacing={2} alignItems="center" justifyContent="space-between" wrap="wrap">
+          <Grid item> <Typography variant="h4" component="h1"> Quản lý Phòng Ban </Typography> </Grid>
+          <Grid item> <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => { setSelectedDepartment(null); setOpenModal(true); }}> Thêm mới </Button> </Grid>
+        </Grid>
+      </Paper>
+
+      <AddDepartmentModal open={openModal} onClose={() => { setOpenModal(false); setSelectedDepartment(null); }} onSubmit={() => { const targetPage = selectedDepartment ? currentPage : 0; if (!selectedDepartment) setCurrentPage(0); fetchData(targetPage, itemsPerPage, debouncedSearchTerm, !selectedDepartment); }} initialValues={selectedDepartment} />
+      {deleteDepartment && (<DeleteConfirmationModal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} onSubmit={handleDelete} title="Xác nhận xóa Phòng Ban" info={`Bạn có chắc chắn muốn xóa phòng ban "${deleteDepartment?.departmentName}" không?`} cancelLabel="Hủy" confirmLabel="Xóa" /> )}
+
+      <Paper sx={{ p: 2, mb: 2 }}>
+        <Grid container spacing={2} alignItems="center" justifyContent="space-between" wrap="wrap">
+          <Grid item xs={12} md="auto">
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} useFlexGap>
+              {(csvData && csvData.length > 0) ? (
+                <Button variant="outlined" size="small" startIcon={<CloudDownloadIcon />} >
+                  <CSVLink data={csvData} filename={`DanhSachPhongBan.csv`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    Xuất CSV
+                  </CSVLink>
+                </Button>
+              ) : (
+                <Button variant="outlined" size="small" startIcon={<CloudDownloadIcon />} disabled>
+                  Xuất CSV
+                </Button>
+              )}
+              <Button variant="outlined" size="small" startIcon={<PictureAsPdfIcon />} onClick={exportPDF}> Xuất PDF </Button>
+            </Stack>
+          </Grid>
+          <Grid item xs={12} sm>
+            <TextField
+              fullWidth
+              label="Tìm kiếm theo tên"
+              value={searchTerm} // Vẫn dùng searchTerm cho input
+              onChange={(e) => setSearchTerm(e.target.value)} // Cập nhật searchTerm ngay lập tức
+            />
+          </Grid>
+        </Grid>
+      </Paper>
+
+      <Paper sx={{ overflow: 'hidden' }}>
+        <TableContainer sx={{ maxHeight: "calc(100vh - 360px)" }}> {/* Tăng chiều cao bảng */}
+          <Table {...getTableProps()} stickyHeader size="medium">
+            <TableHead>
+              {headerGroups.map((headerGroup) => (
+                <TableRow {...headerGroup.getHeaderGroupProps()} sx={{
+                  // Thêm style cho TableRow của header nếu muốn, ví dụ border bottom
+                  // borderBottom: (t) => `2px solid ${t.palette.divider}`,
+                }}>
+                  {headerGroup.headers.map((column) => (
+                    <TableCell
+                      {...column.getHeaderProps()}
+                      align={column.textAlign || (column.id === 'actions' ? 'center' : 'left')}
+                      sx={{
+                        bgcolor: (t) => t.palette.mode === 'light' ? t.palette.grey[200] : t.palette.grey[700], // Màu nền đậm hơn một chút
+                        color: (t) => t.palette.getContrastText(t.palette.mode === 'light' ? t.palette.grey[200] : t.palette.grey[700]), // Đảm bảo độ tương phản chữ
+                        fontWeight: 'bold', // Chữ đậm hơn
+                        whiteSpace: 'nowrap',
+                        width: column.width,
+                        minWidth: column.minWidth || (column.id === '#' ? 60 : 150),
+                        py: 1.5, // Padding dọc
+                        borderBottom: (t) => `1px solid ${t.palette.divider}`, // Đường viền dưới cho mỗi cell header
+                        // Thêm borderRight cho các cell trừ cell cuối cùng để có đường kẻ dọc
+                        '&:not(:last-child)': {
+                          borderRight: (t) => `1px solid ${t.palette.divider}`,
+                        }
+                      }}
+                    >
+                      {column.render("Header")}
+                    </TableCell>
                   ))}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-      <div className="pagination">
-        <div className="page-controls">
-          <input
-            type="number"
-            value={tempPageInput}
-            onChange={handlePageInputChange}
-            onKeyDown={handlePageInputKeyDown}
-            className="page-input"
-          />
-          <span>of {pageCount} pages</span>
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 0}
-            className="page-button"
-          >
-            {"<"}
-          </button>
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === pageCount - 1}
-            className="page-button"
-          >
-            {">"}
-          </button>
-        </div>
-        <div className="items-per-page">
-          <Select
-            value={itemsPerPage}
-            onChange={handleItemsPerPageChange}
-            displayEmpty
-            className="items-per-page-select"
-          >
-            <MenuItem value={5}>5</MenuItem>
-            <MenuItem value={10}>10</MenuItem>
-            <MenuItem value={15}>15</MenuItem>
-            <MenuItem value={20}>20</MenuItem>
-          </Select>
-          <span>items per page</span>
-        </div>
-      </div>
-    </div>
+                </TableRow>
+              ))}
+            </TableHead>
+            <TableBody {...getTableBodyProps()}>
+              {loading ? ( <TableRow><TableCell colSpan={columns.length} align="center" sx={{ py: 5 }}> <CircularProgress /> <Typography sx={{mt: 1.5}} variant="body1">Đang tải dữ liệu...</Typography> </TableCell></TableRow>
+              ) : rows.length > 0 ? (
+                rows.map((row) => { prepareRow(row); return ( <TableRow {...row.getRowProps()} hover sx={{ '&:nth-of-type(odd)': { backgroundColor: (t) => t.palette.action.hover } }} > {row.cells.map((cell) => ( <TableCell {...cell.getCellProps()} align={cell.column.textAlign || (cell.column.id === 'actions' ? 'center' : 'left')} sx={{ py: 1.2, '&:not(:last-child)': { borderRight: (t) => `1px solid ${t.palette.grey[200]}` } /* Đường kẻ dọc mờ hơn cho body */ }}> {cell.render("Cell")} </TableCell> ))} </TableRow> ); })
+              ) : ( <TableRow><TableCell colSpan={columns.length} align="center" sx={{ py: 5 }}> <Typography variant="h6">Không tìm thấy phòng ban nào.</Typography> <Typography variant="body1" color="text.secondary" sx={{mt:1}}> Vui lòng thử lại với từ khóa khác hoặc thêm phòng ban mới. </Typography> </TableCell></TableRow> )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        {(pageCount > 0 && !loading) && ( <Pagination currentPage={currentPage} pageCount={pageCount} itemsPerPage={itemsPerPage} onPageChange={handlePageChange} onItemsPerPageChange={handleItemsPerPageChange} /> )}
+      </Paper>
+
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleMenuClose}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        PaperProps={{ elevation: 0, sx: { overflow: 'visible', filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))', mt: 1.5, '& .MuiAvatar-root': { width: 32, height: 32, ml: -0.5, mr: 1, }, '&::before': { content: '""', display: 'block', position: 'absolute', top: 0, right: 14, width: 10, height: 10, bgcolor: 'background.paper', transform: 'translateY(-50%) rotate(45deg)', zIndex: 0, }, }, }}
+      >
+        <MuiMenuItem onClick={handleEditFromMenu} sx={{ gap: 1 }}> <EditIcon fontSize="small" /> Sửa </MuiMenuItem>
+        <MuiMenuItem onClick={handleOpenDeleteModalFromMenu} sx={{ gap: 1, color: 'error.main' }}> <DeleteIcon fontSize="small" /> Xóa </MuiMenuItem>
+      </Menu>
+    </Box>
   );
 };
 
-export default DepartmentTable;
+const DepartmentScreen = () => {
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <DepartmentScreenInternal />
+    </ThemeProvider>
+  );
+};
+
+export default DepartmentScreen;
