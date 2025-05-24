@@ -167,13 +167,13 @@ const StaffScreenInternal = () => {
 
   const columns = useMemo(
     () => [
-      { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1, width: 60, disableSortBy: true },
+      { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1, width: 40, disableSortBy: true },
       {
         Header: "Mã NV",
         accessor: "staff_code",
-        minWidth: 90, // Điều chỉnh minWidth nếu cần
+        minWidth: 30,
         Cell: ({ value }) => (
-          <Typography variant="body2" sx={{ fontSize: '0.8rem' }}> {/* Cỡ chữ nhỏ hơn */}
+          <Typography variant="body2" >
             {value}
           </Typography>
         )
