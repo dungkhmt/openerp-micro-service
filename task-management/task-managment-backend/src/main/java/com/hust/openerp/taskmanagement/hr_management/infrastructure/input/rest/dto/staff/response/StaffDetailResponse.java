@@ -2,16 +2,14 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.DepartmentModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.JobPositionModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffDetailModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.DepartmentModel;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.JobPositionModel;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffDetailModel;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffModel;
 
 @AllArgsConstructor
 @Getter

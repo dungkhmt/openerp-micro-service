@@ -2,13 +2,14 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
 import com.hust.openerp.taskmanagement.hr_management.constant.CheckpointPeriodStatus;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodConfigureDetailsModel;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodModel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
-import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor

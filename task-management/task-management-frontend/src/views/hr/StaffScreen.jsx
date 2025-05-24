@@ -1,26 +1,20 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
-import { useTable, usePagination } from "react-table";
-import {
-  Button,
-  Select,
-  MenuItem,
-  TextField,
-  IconButton,
-} from "@mui/material";
+import React, {useEffect, useMemo, useRef, useState} from "react";
+import {usePagination, useTable} from "react-table";
+import {Button, IconButton, TextField,} from "@mui/material";
 import AddStaffModal from "./modals/AddStaffModal";
 import DeleteConfirmationModal from "./modals/DeleteConfirmationModal";
 import GridViewIcon from "@mui/icons-material/GridView";
 import TableRowsIcon from "@mui/icons-material/TableRows";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Autocomplete from "@mui/material/Autocomplete";
-import { CSVLink } from "react-csv";
+import {CSVLink} from "react-csv";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import "@/assets/css/EmployeeTable.css";
 import deleteIcon from "@/assets/icons/delete.svg";
 import editIcon from "@/assets/icons/edit.svg";
-import { request } from "@/api";
-import { useNavigate  } from "react-router-dom";
+import {request} from "@/api";
+import {useNavigate} from "react-router-dom";
 import Pagination from "@/components/item/Pagination";
 import toast from "react-hot-toast";
 

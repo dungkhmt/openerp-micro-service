@@ -1,23 +1,10 @@
-import {
-  Box,
-  Button,
-  Grid,
-  IconButton,
-  MenuItem,
-  Select,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import {
-  TimePicker,
-  LocalizationProvider,
-} from "@mui/x-date-pickers";
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { request } from "@/api";
+import {Box, Button, Grid, MenuItem, Select, TextField, Typography,} from "@mui/material";
+import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
+import {LocalizationProvider, TimePicker,} from "@mui/x-date-pickers";
+import {useEffect, useState} from "react";
+import {useNavigate, useParams} from "react-router-dom";
+import {request} from "@/api";
 import toast from "react-hot-toast";
-import CloseIcon from "@mui/icons-material/Close";
 
 const UpdateAbsenceForm = () => {
   const { id } = useParams(); // Lấy ID từ URL

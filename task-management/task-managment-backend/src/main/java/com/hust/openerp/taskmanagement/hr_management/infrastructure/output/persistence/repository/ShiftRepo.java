@@ -1,6 +1,5 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository;
 
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.AbsenceEntity;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.ShiftEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

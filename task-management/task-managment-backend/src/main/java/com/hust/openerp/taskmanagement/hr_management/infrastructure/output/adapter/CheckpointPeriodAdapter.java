@@ -1,6 +1,5 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.adapter;
 
-import lombok.RequiredArgsConstructor;
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.ICheckpointPeriodPort;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_period.filter.ICheckpointPeriodFilter;
 import com.hust.openerp.taskmanagement.hr_management.domain.exception.ApplicationException;
@@ -12,6 +11,7 @@ import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persi
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository.CheckpointPeriodRepo;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.specification.CheckpointPeriodSpecification;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.utils.PageableUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;

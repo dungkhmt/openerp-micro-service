@@ -1,24 +1,17 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
-import { useTable, usePagination } from "react-table";
-import {
-  Button,
-  IconButton,
-  TextField,
-  Select,
-  MenuItem,
-  CircularProgress,
-} from "@mui/material";
+import React, {useEffect, useMemo, useRef, useState} from "react";
+import {usePagination, useTable} from "react-table";
+import {Button, CircularProgress, IconButton, MenuItem, Select, TextField,} from "@mui/material";
 import AddPeriodModal from "./modals/AddPeriodModal";
 import DeleteConfirmationModal from "./modals/DeleteConfirmationModal";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useNavigate } from "react-router-dom";
-import { CSVLink } from "react-csv";
+import {useNavigate} from "react-router-dom";
+import {CSVLink} from "react-csv";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import "@/assets/css/CheckpointPeriodTable.css";
 import deleteIcon from "@/assets/icons/delete.svg";
 import editIcon from "@/assets/icons/edit.svg";
-import { request } from "@/api";
+import {request} from "@/api";
 import toast from "react-hot-toast";
 
 const CheckpointPeriodScreen = () => {

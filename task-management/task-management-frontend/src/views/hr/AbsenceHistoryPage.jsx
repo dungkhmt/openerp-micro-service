@@ -1,27 +1,14 @@
-import {
-  Box,
-  Typography,
-  Grid,
-  TextField,
-  IconButton,
-  List,
-  Card,
-  CardContent,
-  CardActions,
-  Divider,
-  Chip,
-  CardHeader,
-} from "@mui/material";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { format, startOfWeek, endOfWeek, isMonday } from "date-fns"; // Import thêm isMonday
-import { useEffect, useState } from "react";
-import { request } from "@/api";
+import {Box, Card, CardContent, CardHeader, Chip, Grid, IconButton, List, TextField, Typography,} from "@mui/material";
+import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
+import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
+import {endOfWeek, format, isMonday, startOfWeek} from "date-fns"; // Import thêm isMonday
+import {useEffect, useState} from "react";
+import {request} from "@/api";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteConfirmationModal from "./modals/DeleteConfirmationModal";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 const AbsenceHistoryPage = () => {
   const [selectedDate, setSelectedDate] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));

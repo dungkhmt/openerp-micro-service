@@ -2,10 +2,10 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.department.usecase_data.CreateDepartment;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import com.hust.openerp.taskmanagement.hr_management.application.port.out.department.usecase_data.CreateDepartment;
 
 @Getter
 @Setter

@@ -1,9 +1,6 @@
 // src/features/rosterConfiguration/SingleTemplateDetails.jsx
 import React from 'react';
-import {
-  Box, Typography, Paper, List, ListItem, ListItemText, Chip,
-  Grid
-} from '@mui/material';
+import {Box, Chip, Grid, List, ListItem, ListItemText, Paper, Typography} from '@mui/material';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import BlockIcon from '@mui/icons-material/Block';
 import BusinessHoursIcon from '@mui/icons-material/MoreTime';

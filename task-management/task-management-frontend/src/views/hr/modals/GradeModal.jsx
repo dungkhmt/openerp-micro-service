@@ -1,20 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, {useEffect, useState} from "react";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Box,
   Button,
   CircularProgress,
-  TextField,
-  Grid,
-  Typography,
-  Box,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
-  Snackbar,
-  Alert,
+  Grid,
+  TextField,
+  Typography,
 } from "@mui/material";
-import { request } from "@/api";
+import {request} from "@/api";
 import toast from "react-hot-toast";
 
 const MAX_POINT = 10; // Maximum point per configure

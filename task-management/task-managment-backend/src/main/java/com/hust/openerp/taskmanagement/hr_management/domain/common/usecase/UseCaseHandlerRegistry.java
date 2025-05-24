@@ -1,9 +1,8 @@
 package com.hust.openerp.taskmanagement.hr_management.domain.common.usecase;
 
+import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
 
 import java.util.HashMap;
 import java.util.Map;

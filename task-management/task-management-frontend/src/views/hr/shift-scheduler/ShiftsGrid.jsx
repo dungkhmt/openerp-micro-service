@@ -3,14 +3,14 @@
 // ==============
 import React from 'react';
 import {addDays, format, startOfWeek} from 'date-fns';
-import {Grid, Typography, Box, Avatar as MuiAvatar} from '@mui/material';
+import {Avatar as MuiAvatar, Box, Grid, Typography} from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime'; // For work hours icon
 import DayCell from './DayCell.jsx';
 import {
-  WEEK_STARTS_ON,
-  FRONTEND_UNASSIGNED_SHIFT_USER_ID,
   DEPARTMENT_HEADER_ROW_HEIGHT,
-  USER_ROW_MIN_HEIGHT
+  FRONTEND_UNASSIGNED_SHIFT_USER_ID,
+  USER_ROW_MIN_HEIGHT,
+  WEEK_STARTS_ON
 } from "./ShiftScheduler.jsx";
 
 export default function ShiftsGrid({

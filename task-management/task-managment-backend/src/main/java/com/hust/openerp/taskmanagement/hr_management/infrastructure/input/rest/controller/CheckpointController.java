@@ -1,14 +1,13 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_staff.usecase_data.GetCheckpoint;
-import jakarta.validation.Valid;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointModel;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_staff.request.CheckpointStaffRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_staff.request.GetAllCheckpointRequest;
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_staff.request.GetCheckpointRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_staff.response.CheckpointResponse;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

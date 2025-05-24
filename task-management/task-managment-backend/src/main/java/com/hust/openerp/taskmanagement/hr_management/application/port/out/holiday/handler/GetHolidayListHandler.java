@@ -3,15 +3,11 @@ package com.hust.openerp.taskmanagement.hr_management.application.port.out.holid
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IHolidayPort;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.holiday.usecase_data.GetHolidayList;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
-import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.CollectionUseCaseHandler;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.UseCaseHandler;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.HolidayListModel;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.HolidayModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Collection;
 
 @DomainComponent
 @Slf4j

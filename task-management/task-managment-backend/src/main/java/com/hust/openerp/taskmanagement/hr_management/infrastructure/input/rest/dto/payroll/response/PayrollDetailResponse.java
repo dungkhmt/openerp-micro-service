@@ -2,16 +2,13 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.hust.openerp.taskmanagement.hr_management.constant.PayrollStatus;
 import com.hust.openerp.taskmanagement.hr_management.constant.SalaryType;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.PayrollDetailModel;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.PayrollModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 

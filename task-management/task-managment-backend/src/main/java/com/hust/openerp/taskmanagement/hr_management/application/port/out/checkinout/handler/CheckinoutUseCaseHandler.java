@@ -1,15 +1,12 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.checkinout.handler;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.ICheckinoutPort;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkinout.usecase_data.Checkinout;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.VoidUseCaseHandler;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckinoutModel;
-
-import java.time.LocalDateTime;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @DomainComponent
 @Slf4j

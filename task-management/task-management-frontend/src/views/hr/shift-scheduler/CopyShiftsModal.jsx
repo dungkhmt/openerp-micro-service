@@ -1,13 +1,16 @@
 import React, {useEffect, useState} from "react";
 import {addDays, addWeeks, format, parseISO, startOfWeek} from "date-fns";
 import {
-  Box, Button,
-  Checkbox, CircularProgress,
+  Box,
+  Button,
+  Checkbox,
+  CircularProgress,
   IconButton,
   List,
   ListItem,
   ListItemButton,
-  ListItemIcon, ListItemText,
+  ListItemIcon,
+  ListItemText,
   Modal,
   Typography
 } from "@mui/material";

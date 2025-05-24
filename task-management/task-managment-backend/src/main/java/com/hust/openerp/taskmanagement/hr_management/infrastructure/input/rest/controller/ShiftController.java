@@ -5,10 +5,10 @@ import com.hust.openerp.taskmanagement.hr_management.application.port.out.shift.
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.shift.usecase_data.GetShiftList;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.ShiftModel;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.shift.request.CreateShiftsRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.shift.request.UpdateShiftRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.shift.response.ShiftResponse;
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 public class PayrollDetailSpecification implements Specification<PayrollDetailEntity> {

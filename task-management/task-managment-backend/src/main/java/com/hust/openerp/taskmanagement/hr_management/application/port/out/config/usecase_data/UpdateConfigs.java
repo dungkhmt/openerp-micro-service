@@ -1,9 +1,7 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.config.usecase_data;
 
 import com.hust.openerp.taskmanagement.hr_management.constant.ConfigKey;
-import com.hust.openerp.taskmanagement.hr_management.constant.DepartmentStatus;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.DepartmentModel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;

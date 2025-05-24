@@ -1,17 +1,11 @@
-import React, { useMemo, useState, useEffect, useRef } from "react";
-import { useTable, usePagination } from "react-table";
-import { request } from "@/api";
-import {
-  Button,
-  Select,
-  MenuItem,
-  TextField,
-  IconButton,
-} from "@mui/material";
+import React, {useEffect, useMemo, useRef, useState} from "react";
+import {usePagination, useTable} from "react-table";
+import {request} from "@/api";
+import {Button, IconButton, MenuItem, Select, TextField,} from "@mui/material";
 import AddDepartmentModal from "./modals/AddDepartmentModal";
 import DeleteConfirmationModal from "./modals/DeleteConfirmationModal";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { CSVLink } from "react-csv";
+import {CSVLink} from "react-csv";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import "@/assets/css/DepartmentTable.css";

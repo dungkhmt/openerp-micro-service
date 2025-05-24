@@ -1,17 +1,17 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.adapter;
 
-import lombok.RequiredArgsConstructor;
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IJobPositionPort;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.job_position.filter.IJobPositionFilter;
 import com.hust.openerp.taskmanagement.hr_management.domain.exception.ApplicationException;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.JobPositionModel;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.IPageableRequest;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.JobPositionModel;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.JobPositionEntity;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository.JobPositionRepo;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.specification.JobPositionSpecification;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.utils.PageableUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;

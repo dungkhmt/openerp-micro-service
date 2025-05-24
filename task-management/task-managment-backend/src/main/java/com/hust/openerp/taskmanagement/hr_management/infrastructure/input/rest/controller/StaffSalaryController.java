@@ -1,20 +1,13 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff_salary.usecase_data.GetCurrentStaffSalary;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.DepartmentModel;
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.department.request.GetDepartmentRequest;
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.department.response.DepartmentResponse;
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.salary.request.GetSalaryListRequest;
-import jakarta.validation.Valid;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffDepartmentModel;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffSalaryModel;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.salary.request.GetSalaryRequest;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.salary.request.GetSalaryListRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.salary.request.UpdateSalaryRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.salary.response.StaffSalaryResponse;
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.staff_department.request.GetDepartmentHistoryRequest;
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.staff_department.response.StaffDepartmentResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

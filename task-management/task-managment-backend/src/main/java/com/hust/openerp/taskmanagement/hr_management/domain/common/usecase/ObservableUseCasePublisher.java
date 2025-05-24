@@ -1,7 +1,7 @@
 package com.hust.openerp.taskmanagement.hr_management.domain.common.usecase;
 
-import jakarta.annotation.PostConstruct;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
+import jakarta.annotation.PostConstruct;
 
 public abstract class ObservableUseCasePublisher extends BeanAwareUseCasePublisher {
 

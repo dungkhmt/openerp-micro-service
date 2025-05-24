@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, {useEffect, useState} from "react";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Alert,
   Button,
-  TextField,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   IconButton,
   Snackbar,
-  Alert,
-  CircularProgress,
+  TextField,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { request } from "@/api";
+import {request} from "@/api";
 
 const AddCheckpointConfigureModal = ({ open, onClose, onSubmit, initialValues }) => {
   const [formValues, setFormValues] = useState({

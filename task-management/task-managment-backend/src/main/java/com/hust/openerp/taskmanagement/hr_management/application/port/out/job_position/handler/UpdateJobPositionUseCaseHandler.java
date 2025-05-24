@@ -1,13 +1,13 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.job_position.handler;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IJobPositionPort;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.job_position.service.JobPositionValidator;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.job_position.usecase_data.UpdateJobPosition;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.VoidUseCaseHandler;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @DomainComponent
 @Slf4j

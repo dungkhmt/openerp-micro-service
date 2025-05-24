@@ -1,15 +1,11 @@
 // src/features/rosterConfiguration/TemplateListDisplay.jsx
-import React, { useState } from 'react';
-import {
-  Box, Typography, Paper, Grid, IconButton,
-  Button, Menu, MenuItem, Divider, Chip
-} from '@mui/material';
+import React, {useState} from 'react';
+import {Box, Button, Divider, IconButton, Menu, MenuItem, Paper, Typography} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SingleTemplateDetails from './SingleTemplateDetails'; // Import component con
-import ArticleIcon from '@mui/icons-material/Article'; // Icon đã có ở phiên bản trước
 
 export default function TemplateListDisplay({ templates, onEdit, onDelete, onOpenApplyModal, isSubmittingRoster }) {  const [anchorEl, setAnchorEl] = useState(null);
   const [currentTemplateId, setCurrentTemplateId] = useState(null);

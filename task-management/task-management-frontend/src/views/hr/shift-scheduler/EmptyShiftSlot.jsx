@@ -1,8 +1,6 @@
 import React, {useState} from "react";
-import {Grid, Paper} from "@mui/material";
+import {Paper} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add.js";
-import {format} from "date-fns";
-import {Draggable, Droppable} from "react-beautiful-dnd";
 
 export default function EmptyShiftSlot({ onAdd }) {
   const [isHovered, setIsHovered] = useState(false);

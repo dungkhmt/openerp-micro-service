@@ -2,9 +2,9 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.hust.openerp.taskmanagement.hr_management.constant.*;
+import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceStatus;
+import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceType;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.AbsenceModel;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.ConfigModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

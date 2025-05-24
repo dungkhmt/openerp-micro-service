@@ -2,7 +2,6 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.EditStaff;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.GetStaffInfo;
-import jakarta.validation.Valid;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffDetailModel;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffModel;
@@ -10,6 +9,7 @@ import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.d
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.staff.request.*;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.staff.response.StaffDetailResponse;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.staff.response.StaffResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

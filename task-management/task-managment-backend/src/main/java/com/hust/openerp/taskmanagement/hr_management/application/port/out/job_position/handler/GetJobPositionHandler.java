@@ -1,7 +1,5 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.job_position.handler;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IJobPositionPort;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.job_position.usecase_data.GetJobPosition;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
@@ -9,6 +7,8 @@ import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.Obser
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.PageWrapperUseCaseHandler;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.JobPositionModel;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @DomainComponent
 @Slf4j

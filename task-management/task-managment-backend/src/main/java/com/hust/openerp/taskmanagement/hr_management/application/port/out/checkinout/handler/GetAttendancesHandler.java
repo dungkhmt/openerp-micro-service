@@ -2,7 +2,6 @@ package com.hust.openerp.taskmanagement.hr_management.application.port.out.check
 
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.ICheckinoutPort;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkinout.usecase_data.GetAttendances;
-import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkinout.usecase_data.MonthAttendance;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.CollectionUseCaseHandler;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;

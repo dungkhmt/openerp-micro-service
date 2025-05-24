@@ -1,25 +1,16 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.handler;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IStaffPort;
-import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.GetAllStaffInfo;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.GetStaffInfo;
-import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff_department.usecase_data.GetAllCurrentStaffDepartment;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff_department.usecase_data.GetCurrentDepartment;
-import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff_job_position.usecase_data.GetAllCurrentStaffJobPosition;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff_job_position.usecase_data.GetCurrentJobPosition;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;
-import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.PageWrapperUseCaseHandler;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.UseCaseHandler;
-import com.hust.openerp.taskmanagement.hr_management.domain.exception.ApplicationException;
 import com.hust.openerp.taskmanagement.hr_management.domain.exception.InvalidParameterException;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.*;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @DomainComponent
 @Slf4j

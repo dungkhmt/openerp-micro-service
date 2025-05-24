@@ -1,7 +1,5 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.department.handler;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IDepartmentPort;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.code_generator.ICodeGeneratorService;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.department.service.DepartmentValidator;
@@ -9,6 +7,7 @@ import com.hust.openerp.taskmanagement.hr_management.application.port.out.depart
 import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.VoidUseCaseHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 @DomainComponent

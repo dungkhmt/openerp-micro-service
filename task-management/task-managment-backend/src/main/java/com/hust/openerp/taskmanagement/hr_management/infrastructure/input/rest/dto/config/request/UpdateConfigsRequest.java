@@ -3,7 +3,6 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.config.usecase_data.UpdateConfigs;
-import com.hust.openerp.taskmanagement.hr_management.application.port.out.holiday.usecase_data.UpdateHoliday;
 import com.hust.openerp.taskmanagement.hr_management.constant.ConfigKey;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

@@ -1,8 +1,8 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.checkinout.filter.impl;
 
-import lombok.*;
-import com.hust.openerp.taskmanagement.hr_management.constant.CheckinoutType;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkinout.filter.ICheckinoutFilter;
+import com.hust.openerp.taskmanagement.hr_management.constant.CheckinoutType;
+import lombok.*;
 
 import java.time.LocalDate;
 

@@ -1,12 +1,12 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data;
 
+import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffModel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
-import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffModel;
 
 @Data
 @Builder

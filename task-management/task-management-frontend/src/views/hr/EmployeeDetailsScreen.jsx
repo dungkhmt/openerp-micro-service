@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { request } from "@/api";
+import React, {useEffect, useState} from "react";
+import {useParams} from "react-router-dom";
+import {request} from "@/api";
 import AddStaffModal from "./modals/AddStaffModal";
 import EditIcon from "@mui/icons-material/Edit";
-import { Divider, Tab, Tabs } from "@mui/material";
+import {Divider, Tab, Tabs} from "@mui/material";
 import Timeline from "@/components/item/TimelineItem";
 import SalaryTab from "@/components/tab/SalaryTab";
 import toast from "react-hot-toast";

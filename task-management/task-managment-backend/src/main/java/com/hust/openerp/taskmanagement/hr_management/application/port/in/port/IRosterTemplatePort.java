@@ -1,9 +1,5 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.in.port;
 
-import com.hust.openerp.taskmanagement.hr_management.application.port.out.payroll.filter.IPayrollFilter;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.IPageableRequest;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.PayrollModel;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.RosterTemplateModel;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.RosterTemplateEntity;
 

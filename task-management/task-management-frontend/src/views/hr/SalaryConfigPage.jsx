@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import {
   Box,
-  Typography,
-  Grid,
-  TextField,
   Button,
-  Paper,
-  CircularProgress,
-  Divider,
   Card,
   CardContent,
+  CircularProgress,
+  Grid,
   InputAdornment,
+  Paper,
+  TextField,
+  Typography,
 } from "@mui/material";
-import { LocalizationProvider, TimePicker } from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { request } from "@/api";
+import {LocalizationProvider, TimePicker} from "@mui/x-date-pickers";
+import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
+import {request} from "@/api";
 import toast from "react-hot-toast";
 
 const SalaryConfigPage = () => {

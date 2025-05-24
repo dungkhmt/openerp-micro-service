@@ -1,6 +1,5 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
-import jakarta.validation.Valid;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkinout.usecase_data.Checkinout;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.AttendanceModel;
@@ -10,6 +9,7 @@ import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.d
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkinout.response.GetCheckinoutResponse;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkinout.response.MonthAttendanceResponse;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

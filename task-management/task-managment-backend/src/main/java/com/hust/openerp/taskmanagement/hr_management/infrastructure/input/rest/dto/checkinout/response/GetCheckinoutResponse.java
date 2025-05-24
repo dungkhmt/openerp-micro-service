@@ -2,9 +2,9 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.*;
 import com.hust.openerp.taskmanagement.hr_management.constant.CheckinoutType;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckinoutModel;
+import lombok.*;
 
 import java.time.LocalDateTime;
 

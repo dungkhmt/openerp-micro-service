@@ -1,20 +1,19 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.adapter;
 
-import com.hust.openerp.taskmanagement.hr_management.constant.JobPositionType;
-import lombok.RequiredArgsConstructor;
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IStaffJobPositionPort;
 import com.hust.openerp.taskmanagement.hr_management.constant.JobPositionStatus;
+import com.hust.openerp.taskmanagement.hr_management.constant.JobPositionType;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.JobPositionModel;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffJobPositionModel;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.StaffJobPositionEntity;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.StaffJobPositionId;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.projection.StaffJobPositionProjection;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository.StaffJobPositionRepo;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 

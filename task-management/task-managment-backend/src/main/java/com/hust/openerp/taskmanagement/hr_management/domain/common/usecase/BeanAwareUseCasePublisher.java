@@ -1,10 +1,10 @@
 package com.hust.openerp.taskmanagement.hr_management.domain.common.usecase;
 
-import lombok.extern.slf4j.Slf4j;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
 import com.hust.openerp.taskmanagement.hr_management.domain.exception.ApiHandlerException;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
 import java.util.Objects;

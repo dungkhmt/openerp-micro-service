@@ -1,6 +1,5 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.adapter;
 
-import lombok.RequiredArgsConstructor;
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IDepartmentPort;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.department.filter.IDepartmentFilter;
 import com.hust.openerp.taskmanagement.hr_management.constant.DepartmentStatus;
@@ -13,6 +12,7 @@ import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persi
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository.DepartmentRepo;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.specification.DepartmentSpecification;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.utils.PageableUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;

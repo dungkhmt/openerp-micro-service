@@ -1,7 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity;
 
 import com.hust.openerp.taskmanagement.hr_management.constant.ConfigGroup;
-import com.hust.openerp.taskmanagement.hr_management.constant.ConfigKey;
 import com.hust.openerp.taskmanagement.hr_management.constant.ConfigType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

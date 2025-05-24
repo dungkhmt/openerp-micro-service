@@ -1,13 +1,12 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_configure.usecase_data;
 
+import com.hust.openerp.taskmanagement.hr_management.constant.CheckpointConfigureStatus;
+import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointConfigureModel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import com.hust.openerp.taskmanagement.hr_management.constant.CheckpointConfigureStatus;
-import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointConfigureModel;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.JobPositionModel;
 
 @Data
 @Builder

@@ -1,7 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity;
 
 import com.hust.openerp.taskmanagement.hr_management.constant.SalaryType;
-import com.vladmihalcea.hibernate.type.array.DoubleArrayType;
 import com.vladmihalcea.hibernate.type.array.ListArrayType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -10,7 +9,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 

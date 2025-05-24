@@ -1,6 +1,5 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity;
 
-import com.hust.openerp.taskmanagement.entity.User;
 import com.hust.openerp.taskmanagement.hr_management.constant.PayrollStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

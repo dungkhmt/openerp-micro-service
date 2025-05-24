@@ -1,11 +1,11 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.adapter;
 
-import lombok.RequiredArgsConstructor;
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IStaffSalaryPort;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffSalaryModel;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.StaffSalaryEntity;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.StaffSalaryId;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository.StaffSalaryRepo;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

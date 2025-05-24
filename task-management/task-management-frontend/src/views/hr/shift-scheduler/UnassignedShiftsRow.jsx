@@ -2,16 +2,16 @@
 // UnassignedShiftsRow.jsx
 // ==============
 import React from 'react';
-import { Grid, Typography, IconButton, Paper } from '@mui/material';
-import { addDays, format, startOfWeek } from 'date-fns';
+import {Grid, IconButton, Paper, Typography} from '@mui/material';
+import {addDays, format, startOfWeek} from 'date-fns';
 import PushPinIcon from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 import DayCell from './DayCell.jsx';
 import {
-  WEEK_STARTS_ON,
+  CALENDAR_HEADER_HEIGHT,
   FRONTEND_UNASSIGNED_SHIFT_USER_ID,
-  UNASSIGNED_ROW_HEIGHT, // Used for minHeight
-  CALENDAR_HEADER_HEIGHT // Used for sticky top offset
+  UNASSIGNED_ROW_HEIGHT,
+  WEEK_STARTS_ON
 } from './ShiftScheduler.jsx';
 
 export default function UnassignedShiftsRow({

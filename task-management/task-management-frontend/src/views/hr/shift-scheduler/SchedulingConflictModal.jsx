@@ -1,11 +1,20 @@
 // ==============
 // SchedulingConflictModal.jsx
 // ==============
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
-  Dialog, DialogTitle, DialogContent, DialogActions,
-  Button, Typography, Box, List, ListItem, ListItemText,
-  ListItemIcon, Avatar, Link, Collapse, IconButton
+  Avatar,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Typography
 } from '@mui/material';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';

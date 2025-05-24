@@ -1,10 +1,9 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository;
 
-import jakarta.transaction.Transactional;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.CheckpointPeriodConfigureEntity;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.CheckpointPeriodConfigureId;
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.CheckpointPeriodEntity;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.projection.CheckpointPeriodConfigureProjection;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

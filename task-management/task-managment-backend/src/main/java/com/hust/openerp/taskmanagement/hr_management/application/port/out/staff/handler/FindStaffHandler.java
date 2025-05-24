@@ -1,7 +1,5 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.handler;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IStaffPort;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.FindStaff;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
@@ -9,8 +7,8 @@ import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.Obser
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.PageWrapperUseCaseHandler;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffModel;
-
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @DomainComponent
 @Slf4j

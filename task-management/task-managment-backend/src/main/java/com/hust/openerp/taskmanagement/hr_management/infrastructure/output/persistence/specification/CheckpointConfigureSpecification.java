@@ -1,12 +1,12 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.specification;
 
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_configure.filter.ICheckpointConfigureFilter;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.CheckpointConfigureEntity;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
-import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_configure.filter.ICheckpointConfigureFilter;
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.CheckpointConfigureEntity;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;

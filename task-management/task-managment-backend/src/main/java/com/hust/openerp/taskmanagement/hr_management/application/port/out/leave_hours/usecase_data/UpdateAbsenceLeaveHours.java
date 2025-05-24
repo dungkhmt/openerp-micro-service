@@ -6,7 +6,6 @@ import com.hust.openerp.taskmanagement.hr_management.constant.LeaveHoursUpdateTy
 import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.Setter;
 
 @Data

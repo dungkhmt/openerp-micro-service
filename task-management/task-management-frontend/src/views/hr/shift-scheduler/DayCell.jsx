@@ -7,7 +7,7 @@ import {Grid} from "@mui/material";
 import React from "react";
 import EmptyShiftSlot from "./EmptyShiftSlot.jsx";
 import ShiftCard from "./ShiftCard.jsx";
-import { FRONTEND_UNASSIGNED_SHIFT_USER_ID } from "./ShiftScheduler.jsx"; // Import for logging
+import {FRONTEND_UNASSIGNED_SHIFT_USER_ID} from "./ShiftScheduler.jsx"; // Import for logging
 
 export default function DayCell({
                                   userId,

@@ -1,10 +1,10 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity;
 
 import com.hust.openerp.taskmanagement.entity.User;
+import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
 
 @Getter
 @Setter

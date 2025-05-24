@@ -1,19 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  Box,
-  Typography,
-  Grid,
-  TextField,
-  Button,
-  Chip,
-  Paper,
-} from "@mui/material";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { startOfWeek, addDays, format, isMonday } from "date-fns";
+import React, {useEffect, useMemo, useState} from "react";
+import {Box, Button, Chip, Grid, Paper, TextField, Typography,} from "@mui/material";
+import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
+import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
+import {addDays, format, isMonday, startOfWeek} from "date-fns";
 import SearchSelect from "@/components/item/SearchSelect";
-import { request } from "@/api";
-import toast from "react-hot-toast";
+import {request} from "@/api";
 
 const WeeklyAbsencePage = () => {
   const [selectedDate, setSelectedDate] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));

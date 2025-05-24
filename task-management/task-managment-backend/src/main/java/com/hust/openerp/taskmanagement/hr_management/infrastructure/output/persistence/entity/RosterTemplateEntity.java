@@ -4,7 +4,6 @@ import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.c
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.utils.JpaMapConverter;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.utils.JpaShiftDefinitionListConverter;
 import com.vladmihalcea.hibernate.type.array.ListArrayType;
-import com.vladmihalcea.hibernate.type.array.StringArrayType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

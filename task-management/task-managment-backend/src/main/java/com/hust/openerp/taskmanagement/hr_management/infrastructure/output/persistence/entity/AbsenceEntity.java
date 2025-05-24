@@ -4,7 +4,6 @@ import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceStatus;
 import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;

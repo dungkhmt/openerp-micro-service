@@ -1,13 +1,14 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_configure.usecase_data.UpdateCheckpointConfigure;
-import jakarta.validation.Valid;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointConfigureModel;
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_configure.request.CreateCheckpointConfigureRequest;import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_configure.request.GetAllCheckpointConfigureRequest;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_configure.request.CreateCheckpointConfigureRequest;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_configure.request.GetAllCheckpointConfigureRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_configure.request.UpdateCheckpointConfigureRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.checkpoint_configure.response.CheckpointConfigureResponse;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

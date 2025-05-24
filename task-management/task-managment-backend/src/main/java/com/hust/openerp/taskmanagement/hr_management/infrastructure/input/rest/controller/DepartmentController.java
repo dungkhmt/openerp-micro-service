@@ -1,15 +1,14 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller;
 
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.department.usecase_data.UpdateDepartment;
-import jakarta.validation.Valid;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.DepartmentModel;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.Resource;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.department.request.CreateDepartmentRequest;
-import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.department.request.DeleteDepartmentRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.department.request.GetDepartmentRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.department.request.UpdateDepartmentRequest;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.department.response.DepartmentResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

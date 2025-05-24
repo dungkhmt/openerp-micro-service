@@ -1,7 +1,5 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_period.handler;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.ICheckpointPeriodPort;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_period.usecase_data.CreateCheckpointPeriod;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_period_configure.usecase_data.UpdateCheckpointPeriodConfigure;
@@ -9,6 +7,8 @@ import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainCompone
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.VoidUseCaseHandler;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodConfigureModel;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.UUID;

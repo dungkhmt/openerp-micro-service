@@ -4,12 +4,9 @@ import com.hust.openerp.taskmanagement.hr_management.application.port.out.payrol
 import com.hust.openerp.taskmanagement.hr_management.constant.PayrollStatus;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.IPageableRequest;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.PayrollDetailModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 @AllArgsConstructor

@@ -2,7 +2,6 @@ package com.hust.openerp.taskmanagement.hr_management.application.port.out.payro
 
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IPayrollDetailPort;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.payroll.usecase_data.CreatePayrollDetails;
-import com.hust.openerp.taskmanagement.hr_management.application.port.out.payroll.usecase_data.GetPayrollDetails;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.CollectionUseCaseHandler;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;

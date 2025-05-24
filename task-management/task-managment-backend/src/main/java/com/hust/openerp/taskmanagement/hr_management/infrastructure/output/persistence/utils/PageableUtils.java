@@ -1,8 +1,8 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.utils;
 
 import com.hust.openerp.taskmanagement.hr_management.constant.SortDirection;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.PageInfo;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.IPageableRequest;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.PageInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

@@ -2,12 +2,12 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.AddStaff;
+import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.AddStaff;
-import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
 
 @Getter
 @Setter

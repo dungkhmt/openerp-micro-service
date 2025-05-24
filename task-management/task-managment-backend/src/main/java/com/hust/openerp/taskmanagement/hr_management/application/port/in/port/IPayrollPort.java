@@ -5,9 +5,6 @@ import com.hust.openerp.taskmanagement.hr_management.domain.model.IPageableReque
 import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.PayrollModel;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public interface IPayrollPort {

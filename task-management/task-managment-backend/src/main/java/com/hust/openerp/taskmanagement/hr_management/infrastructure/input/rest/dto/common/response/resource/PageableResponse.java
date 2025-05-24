@@ -1,14 +1,13 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.PageInfo;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.PageInfo;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.PageWrapper;
 
 import java.util.List;
 

@@ -1,13 +1,13 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_period.usecase_data;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import com.hust.openerp.taskmanagement.hr_management.constant.CheckpointPeriodStatus;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.model.UseCase;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodConfigureModel;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointPeriodModel;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.UUID;

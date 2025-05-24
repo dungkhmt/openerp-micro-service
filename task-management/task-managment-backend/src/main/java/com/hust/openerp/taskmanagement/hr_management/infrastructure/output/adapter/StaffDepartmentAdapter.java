@@ -1,6 +1,5 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.adapter;
 
-import lombok.RequiredArgsConstructor;
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IStaffDepartmentPort;
 import com.hust.openerp.taskmanagement.hr_management.constant.DepartmentStatus;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.DepartmentModel;
@@ -9,6 +8,7 @@ import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persi
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.StaffDepartmentId;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.projection.StaffDepartmentProjection;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.repository.StaffDepartmentRepo;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

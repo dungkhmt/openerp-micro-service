@@ -1,23 +1,20 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_staff.handler;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.ICheckpointStaffPort;
-import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_period.usecase_data.GetCheckpointPeriodDetails;
-import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_period_configure.usecase_data.GetCheckpointPeriodConfigure;
-import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_period_configure.usecase_data.GetCheckpointPeriodConfigureDetails;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_staff.service.CheckpointCalculator;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_staff.usecase_data.GetAllCheckpoint;
-import com.hust.openerp.taskmanagement.hr_management.application.port.out.checkpoint_staff.usecase_data.GetCheckpointStaff;
-import com.hust.openerp.taskmanagement.hr_management.constant.CheckpointPeriodConfigureStatus;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.CollectionUseCaseHandler;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.*;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.CheckpointStaffModel;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 
 @DomainComponent
 @Slf4j

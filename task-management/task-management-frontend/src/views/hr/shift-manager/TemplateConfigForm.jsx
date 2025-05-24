@@ -1,11 +1,6 @@
 // src/features/rosterConfiguration/TemplateConfigForm.jsx
-import React, { useState, useCallback } from 'react';
-import {
-  Typography, TextField, Button, Paper,
-  Grid, IconButton,
-  Stack, DialogActions, DialogContent, DialogTitle,
-  Alert
-} from '@mui/material';
+import React, {useCallback, useState} from 'react';
+import {Alert, Button, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField} from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import CloseIcon from '@mui/icons-material/Close';
 import ShiftManager from './ShiftManager';

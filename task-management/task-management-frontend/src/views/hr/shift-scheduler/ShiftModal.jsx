@@ -1,21 +1,24 @@
 // ==============
 // ShiftModal.jsx
 // ==============
-import React, {useEffect, useState, useMemo} from "react"; // Added useMemo
+import React, {useEffect, useMemo, useState} from "react"; // Added useMemo
 import {format, isValid, parseISO} from "date-fns";
 import {
-  Box, Button,
+  Box,
+  Button,
   Checkbox,
   Chip,
   FormControl,
   Grid,
   IconButton,
-  InputAdornment, // Added
-  InputLabel, ListItemText,
-  ListSubheader, // Added
+  InputAdornment,
+  InputLabel,
+  ListItemText,
+  ListSubheader,
   MenuItem,
   Modal,
-  Select, TextField,
+  Select,
+  TextField,
   Typography
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close.js";

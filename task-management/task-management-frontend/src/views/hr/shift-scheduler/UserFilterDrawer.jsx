@@ -2,15 +2,7 @@
 // UserFilterDrawer.jsx
 // ==============
 import React from "react";
-import {
-  Box,
-  Drawer,
-  Typography,
-  TextField,
-  Button,
-  IconButton,
-  Autocomplete,
-} from "@mui/material";
+import {Autocomplete, Box, Button, Drawer, IconButton, TextField, Typography,} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close.js";
 
 export default function UserFilterDrawer({

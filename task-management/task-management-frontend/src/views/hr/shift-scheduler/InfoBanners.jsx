@@ -1,15 +1,11 @@
 // ==============
 // InfoBanners.jsx
 // ==============
-import {addDays, startOfWeek} from "date-fns";
-import {Box, Grid, Paper, Typography} from "@mui/material";
+import {startOfWeek} from "date-fns";
+import {Box, Paper, Typography} from "@mui/material";
 import StarRateIcon from "@mui/icons-material/StarRate.js";
 import React from "react";
-import {
-  AVAILABLE_SHIFTS_BANNER_HEIGHT,
-  TOP_BAR_HEIGHT,
-  WEEK_STARTS_ON
-} from "./ShiftScheduler.jsx";
+import {AVAILABLE_SHIFTS_BANNER_HEIGHT, TOP_BAR_HEIGHT, WEEK_STARTS_ON} from "./ShiftScheduler.jsx";
 
 export default function InfoBanners({ currentDate, stickyTopOffset = 0 }) {
   const startDate = startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON });

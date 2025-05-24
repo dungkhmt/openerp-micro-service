@@ -1,8 +1,8 @@
 package com.hust.openerp.taskmanagement.hr_management.application.service;
 
-import lombok.RequiredArgsConstructor;
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IExamplePort;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.IExampleUseCase;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service

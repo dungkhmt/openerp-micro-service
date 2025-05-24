@@ -1,6 +1,7 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller.roster;
 
 // ... (imports remain the same)
+
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.absence.usecase_data.GetAbsenceList;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.shift.usecase_data.GetShiftList;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.FindStaff;
@@ -8,10 +9,11 @@ import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceStatus;
 import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.AbsenceModel;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.ShiftModel; // Make sure this is the correct import
+import com.hust.openerp.taskmanagement.hr_management.domain.model.ShiftModel;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffModel;
-import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;

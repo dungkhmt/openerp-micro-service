@@ -2,12 +2,11 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff_salary.usecase_data.UpdateStaffSalary;
 import com.hust.openerp.taskmanagement.hr_management.constant.SalaryType;
+import jakarta.validation.constraints.Min;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter

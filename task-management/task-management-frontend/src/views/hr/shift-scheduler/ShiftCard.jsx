@@ -2,13 +2,13 @@
 // ShiftCard.jsx
 // ==============
 import React, {useState} from "react";
-import {Box, Checkbox, IconButton, Paper, Typography, Chip} from "@mui/material";
+import {Box, Checkbox, Chip, IconButton, Paper, Typography} from "@mui/material";
 import {alpha} from "@mui/material/styles";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank.js";
 import CheckBoxIcon from "@mui/icons-material/CheckBox.js";
 import {parseISO} from "date-fns";
 import AddIcon from "@mui/icons-material/Add.js";
-import { FRONTEND_UNASSIGNED_SHIFT_USER_ID } from "./ShiftScheduler.jsx";
+import {FRONTEND_UNASSIGNED_SHIFT_USER_ID} from "./ShiftScheduler.jsx";
 
 const EMPLOYEE_SHIFT_TEXT_COLOR = '#673ab7';
 const EMPLOYEE_SHIFT_BACKGROUND_COLOR_LIGHT = '#f3e5f5';

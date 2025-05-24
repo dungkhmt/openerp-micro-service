@@ -1,7 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.roster_template.handler;
 
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IRosterTemplatePort;
-import com.hust.openerp.taskmanagement.hr_management.application.port.out.roster_template.usecase_data.CreateRosterTemplate;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.roster_template.usecase_data.UpdateRosterTemplate;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;

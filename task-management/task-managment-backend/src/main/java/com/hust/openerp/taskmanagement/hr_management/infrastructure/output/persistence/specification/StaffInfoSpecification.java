@@ -1,11 +1,11 @@
 package com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.specification;
 
-import jakarta.persistence.criteria.*;
-import lombok.RequiredArgsConstructor;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.filter.IStaffFilter;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.StaffDepartmentEntity;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.StaffEntity;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persistence.entity.StaffJobPositionEntity;
+import jakarta.persistence.criteria.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;

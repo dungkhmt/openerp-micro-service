@@ -1,9 +1,9 @@
 package com.hust.openerp.taskmanagement.hr_management.domain.model;
 
+import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
 
 import java.time.LocalDate;
 

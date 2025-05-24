@@ -1,14 +1,6 @@
-import React, { useState } from "react";
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  MenuItem,
-  Paper,
-  CircularProgress,
-} from "@mui/material";
-import { request } from "@/api";
+import React, {useState} from "react";
+import {Box, Button, CircularProgress, MenuItem, Paper, TextField, Typography,} from "@mui/material";
+import {request} from "@/api";
 import toast from "react-hot-toast";
 
 const LeavePolicyPage = () => {
