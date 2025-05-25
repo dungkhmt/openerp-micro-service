@@ -175,13 +175,13 @@ const ProductPreview = ({ item }) => {
                 disabled={item.quantity === 0}
                 sx={{
                     marginLeft: 'auto',
-                    backgroundColor: '#019160',
+                    backgroundColor: '#6fd649',
                     color: '#fff',
                     '&:hover': {
-                        backgroundColor: '#2fbe8e', // màu hover
+                        backgroundColor: '#4caf50', // màu hover
                     },
                     '&:active': {
-                        backgroundColor: '#01b075', // màu khi nhấn
+                        backgroundColor: '#3e8e41', // màu khi nhấn
                     },
                 }}
                 fullWidth

@@ -171,14 +171,14 @@ const Cart = () => {
                                 sx={{
                                     width: "100%",
                                     height: "40px",
-                                    backgroundColor: '#019160',
+                                    backgroundColor: '#6fd649',
                                     color: '#fff',
                                     fontSize: "16px",
                                     '&:hover': {
-                                        backgroundColor: '#2fbe8e', // hover hiệu ứng
+                                        backgroundColor: '#4caf50', // hover hiệu ứng
                                     },
                                     '&:active': {
-                                        backgroundColor: '#01b075', // nhấn
+                                        backgroundColor: '#3e8e41', // nhấn
                                     },
                                 }}
                             >

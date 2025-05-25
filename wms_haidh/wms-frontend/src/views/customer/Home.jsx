@@ -120,14 +120,14 @@ export default function Home() {
                     onClick={() => setSorting("asc")}
                     sx={{
                         height: "48px",
-                        backgroundColor: sorting === "asc" ? "#019160" : "transparent",
-                        color: sorting === "asc" ? "#fff" : "#019160",
-                        border: "1px solid #019160",
+                        backgroundColor: sorting === "asc" ? "#6fd649" : "transparent",
+                        color: sorting === "asc" ? "#fff" : "#6fd649",
+                        border: "1px solid #6fd649",
                         '&:hover': {
-                            backgroundColor: sorting === "asc" ? "#019160" : "transparent",
+                            backgroundColor: sorting === "asc" ? "#6fd649" : "transparent",
                         },
                         '&:active': {
-                            backgroundColor: sorting === "asc" ? "#01b075" : "transparent",
+                            backgroundColor: sorting === "asc" ? "#3e8e41" : "transparent",
                         },
                     }}
                 >
@@ -141,14 +141,14 @@ export default function Home() {
                     onClick={() => setSorting("desc")}
                     sx={{
                         height: "48px",
-                        backgroundColor: sorting === "desc" ? "#019160" : "transparent",
-                        color: sorting === "desc" ? "#fff" : "#019160",
-                        border: "1px solid #019160",
+                        backgroundColor: sorting === "desc" ? "#6fd649" : "transparent",
+                        color: sorting === "desc" ? "#fff" : "#6fd649",
+                        border: "1px solid #6fd649",
                         '&:hover': {
-                            backgroundColor: sorting === "desc" ? "#019160" : "transparent",
+                            backgroundColor: sorting === "desc" ? "#6fd649" : "transparent",
                         },
                         '&:active': {
-                            backgroundColor: sorting === "desc" ? "#01b075" : "transparent",
+                            backgroundColor: sorting === "desc" ? "#3e8e41" : "transparent",
                         },
                     }}
                 >

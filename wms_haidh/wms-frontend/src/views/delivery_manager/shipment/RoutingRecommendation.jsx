@@ -99,7 +99,7 @@ const RoutingRecommendation = () => {
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 1 }}>
-          Routing Recommendation
+          Smart Planning
         </Typography>
         <Button
           disabled={deliveryTrips.some(trip => !trip.warehouseId || !trip.vehicleId)}

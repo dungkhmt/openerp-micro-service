@@ -182,13 +182,13 @@ const ProductDetail = () => {
                             sx={{
                                 mt: 3,
                                 width: '33%',
-                                backgroundColor: '#019160',
+                                backgroundColor: '#6fd649',
                                 color: '#fff',
                                 '&:hover': {
-                                    backgroundColor: '#2fbe8e', // hover
+                                    backgroundColor: '#4caf50', // hover
                                 },
                                 '&:active': {
-                                    backgroundColor: '#01b075', // nhấn
+                                    backgroundColor: '#3e8e41', // nhấn
                                 }
                             }}
                         >

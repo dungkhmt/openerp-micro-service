@@ -76,13 +76,13 @@ const NewAddress = () => {
           <Button variant="contained" color="primary" sx={{
             width: '40%',
             margin: 'auto',
-            backgroundColor: '#019160',
+            backgroundColor: '#6fd649',
             color: '#fff',
             '&:hover': {
-              backgroundColor: '#2fbe8e',
+              backgroundColor: '#4caf50',
             },
             '&:active': {
-              backgroundColor: '#01b075',
+              backgroundColor: '#3e8e41',
             },
           }} onClick={handleSubmit}>
             Save Address

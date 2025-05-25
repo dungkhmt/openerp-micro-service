@@ -14,10 +14,10 @@ import {
     TableContainer,
     TablePagination,
     TableHead,
-    TableRow
+    TableRow,
+    Button
 } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Button } from '@nextui-org/react';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
 const ShipmentDetail = () => {
@@ -66,22 +66,27 @@ const ShipmentDetail = () => {
                 <Typography variant="h6" gutterBottom sx={{ ml: 1 }}>
                     Shipment Detail
                 </Typography>
-            </Box>
-
-            {hasFetched && !loading && deliveryTrips.length === 0 && (
-                <Box>
+                {hasFetched && !loading && deliveryTrips.length === 0 && (
                     <Button
-                        size="md"
-                        className="bg-[#019160] text-white hover:bg-[#2fbe8e] active:bg-[#01b075]"
-                        onPress={() => navigate('auto-routing')}
-                        startContent={<AutoAwesomeIcon className="w-4 h-4" />}
+                        variant="contained"
+                        startIcon={<AutoAwesomeIcon/>}
+                        sx={{
+                            marginLeft: 'auto',
+                            backgroundColor: '#019160',
+                            color: '#fff',
+                            '&:hover': {
+                                backgroundColor: '#2fbe8e',
+                            },
+                            '&:active': {
+                                backgroundColor: '#01b075',
+                            },
+                        }}
+                        onClick={() => navigate('auto-routing')}
                     >
-                        Use routing recommendation
+                        Smart planning
                     </Button>
-                </Box>
             )}
-
-
+            </Box>           
 
             <Box sx={{ mt: 1 }}>
                 <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
