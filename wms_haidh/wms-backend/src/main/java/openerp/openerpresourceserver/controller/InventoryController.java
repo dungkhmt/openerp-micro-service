@@ -79,10 +79,10 @@ public class InventoryController {
 	}
 
 	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
-	@GetMapping("/quantity-on-hand")
-	public ResponseEntity<Integer> getQuantityOnHandBySaleOrderItemIdBayIdAndLotId(@RequestParam UUID saleOrderItemId,
+	@GetMapping("/available-quantity")
+	public ResponseEntity<Integer> getAvailableQuantityBySaleOrderItemIdBayIdAndLotId(@RequestParam UUID saleOrderItemId,
 			@RequestParam UUID bayId, @RequestParam String lotId) {
-		return inventoryService.getQuantityOnHandBySaleOrderItemIdBayIdAndLotId(saleOrderItemId, bayId, lotId)
+		return inventoryService.getAvailableQuantityBySaleOrderItemIdBayIdAndLotId(saleOrderItemId, bayId, lotId)
 				.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
 	}
 

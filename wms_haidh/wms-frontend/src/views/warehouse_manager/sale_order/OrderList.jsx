@@ -23,8 +23,7 @@ import { request } from "../../../api";
 import { formatDate, formatPrice } from '../../../utils/utils';
 const statusColorMap = {
   APPROVED: "secondary",
-  IN_PROGRESS: "warning",
-  ASSIGNED: "success",
+  IN_PROGRESS: "warning"
 };
 
 const INITIAL_VISIBLE_COLUMNS = ["orderDate", "customerName", "totalOrderCost", "status", "approvedBy", "actions"];
@@ -61,8 +60,25 @@ export default function SaleOrderList() {
 
     switch (columnKey) {
       case "status":
+        const status = item.status;
+        if (status === "ASSIGNED") {
+          return (
+            <Badge className="bg-green-100 text-green-800" variant="flat">
+              {cellValue.replace(/_/g, ' ')}
+            </Badge>
+          );
+        } else if (status === "PICK_COMPLETE") {
+          return (
+            <Badge className="bg-green-600 text-white" variant="flat">
+              {cellValue.replace(/_/g, ' ')}
+            </Badge>
+          );
+        }
+
         return (
-          <Badge variant={statusColorMap[item.status]}>{cellValue.replace(/_/g, ' ')}</Badge>
+          <Badge color={statusColorMap[status]}>
+            {cellValue.replace(/_/g, ' ')}
+          </Badge>
         );
       case "actions":
         return (
@@ -93,7 +109,7 @@ export default function SaleOrderList() {
   const navigate = useNavigate();
 
   const handleUpdate = (id) => {
-    navigate(`/admin/orders/${id}`);
+    navigate(`/warehouse-manager/orders/${id}`);
   };
 
   const topContent = useMemo(() => {

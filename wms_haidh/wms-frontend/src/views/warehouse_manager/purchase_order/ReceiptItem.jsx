@@ -107,11 +107,11 @@ const ReceiptItem = () => {
     <Box sx={{ p: 3 }}>
       <Toaster />
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <IconButton color="primary" onClick={() => navigate(`/admin/receipts/${id1}`)} sx={{ color: 'grey.700', mr: 1 }}>
+        <IconButton color="primary" onClick={() => navigate(`/warehouse-manager/receipts/${id1}`)} sx={{ color: 'grey.700', mr: 1 }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>
-          Putaway
+          Putaway assignment
         </Typography>
       </Box>
 

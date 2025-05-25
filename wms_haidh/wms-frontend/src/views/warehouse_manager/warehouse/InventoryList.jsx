@@ -85,7 +85,7 @@ const InventoryList = () => {
     return (
         <Box sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <IconButton color="primary" onClick={() => navigate(`/admin/warehouse/${id1}`)} sx={{ color: 'grey.700', mr: 1 }}>
+                <IconButton color="primary" onClick={() => navigate(`/warehouse-manager/warehouse/${id1}`)} sx={{ color: 'grey.700', mr: 1 }}>
                     <ArrowBackIcon />
                 </IconButton>
                 <Typography variant="h6" sx={{ ml: 2 }}>
@@ -174,7 +174,8 @@ const InventoryList = () => {
                             <TableRow>
                                 <TableCell>Product</TableCell>
                                 <TableCell>Lot ID</TableCell>
-                                <TableCell>Quantity</TableCell>
+                                <TableCell>Available quantity</TableCell>
+                                <TableCell>Total Quantity</TableCell>
                                 <TableCell>Last Updated</TableCell>
                             </TableRow>
                         </TableHead>
@@ -183,6 +184,9 @@ const InventoryList = () => {
                                 ? Array.from({ length: rowsPerPage }).map((_, index) => (
                                     <TableRow key={`skeleton-${index}`}>
                                         <TableCell width={300}>
+                                            <Skeleton variant="text" />
+                                        </TableCell>
+                                        <TableCell width={100}>
                                             <Skeleton variant="text" />
                                         </TableCell>
                                         <TableCell width={100}>
@@ -200,6 +204,7 @@ const InventoryList = () => {
                                     <TableRow key={item.inventoryItemId}>
                                         <TableCell width={300}>{item.productName}</TableCell>
                                         <TableCell width={100}>{item.lotId}</TableCell>
+                                        <TableCell width={100}>{item.availableQuantity}</TableCell>
                                         <TableCell width={100}>{item.quantityOnHandTotal}</TableCell>
                                         <TableCell width={150}>{formatDate(item.lastUpdatedStamp)}</TableCell>
                                     </TableRow>

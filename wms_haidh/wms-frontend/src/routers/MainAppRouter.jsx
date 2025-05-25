@@ -7,6 +7,7 @@ import { useNotificationState } from "../state/NotificationState";
 import NotFound from "../views/errors/NotFound";
 import { useKeycloak } from "@react-keycloak/web";
 import WarehouseManagerRouter from "./WarehouseManagerRouter";
+import WarehouseStaffRouter from "./WarehouseStaffRouter";
 import SaleManagerRouter from "./SaleManagerRouter";
 import CustomerRouter from "./CustomerRouter";
 import DeliveryManagerRouter from "./DeliveryManagerRouter";
@@ -52,7 +53,8 @@ function MainAppRouter() {
           <Routes>
             <Route path="/" element={<div>Welcome back !</div>} />
             <Route path="/director/*" element={renderPrivateRoute(DirectorRouter)} />
-            <Route path="/admin/*" element={renderPrivateRoute(WarehouseManagerRouter)} />
+            <Route path="/warehouse-manager/*" element={renderPrivateRoute(WarehouseManagerRouter)} />
+            <Route path="/warehouse-staff/*" element={renderPrivateRoute(WarehouseStaffRouter)} />
             <Route path="/sale-manager/*" element={renderPrivateRoute(SaleManagerRouter)} />
             <Route path="/customer/*" element={renderPrivateRoute(CustomerRouter)} />
             <Route path="/delivery-manager/*" element={renderPrivateRoute(DeliveryManagerRouter)} />

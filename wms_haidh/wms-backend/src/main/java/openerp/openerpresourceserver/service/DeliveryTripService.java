@@ -99,7 +99,7 @@ public class DeliveryTripService {
 
 				List<UUID> assignedOrderItemIds = deliveryTripItemService.findIdsByDeliveryTripId(deliveryTripId);
 
-				assignedOrderItemService.updateAssignedOrderItemsStatus(assignedOrderItemIds, "CREATED");
+				assignedOrderItemService.updateAssignedOrderItemsStatus(assignedOrderItemIds, "PICKED");
 
 				vehicleService.updateVehicleStatus(trip.getVehicleId(), "AVAILABLE");
 				deliveryPersonService.updateDeliveryPersonStatus(trip.getDeliveryPersonId(), "AVAILABLE");

@@ -28,7 +28,7 @@ const RoutingRecommendation = () => {
   const [vehicleList, setVehicleList] = useState([]);
 
   useEffect(() => {
-    request("get", "/warehouses/with-created-assigned-items", (res) => {
+    request("get", "/warehouses/with-picked-assigned-items", (res) => {
       setWarehouseList(res.data);
     }).then();
 

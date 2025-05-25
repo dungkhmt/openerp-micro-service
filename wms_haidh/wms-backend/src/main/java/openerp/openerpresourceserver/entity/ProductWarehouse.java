@@ -21,5 +21,5 @@ public class ProductWarehouse {
     private UUID productWarehouseId;
     private UUID productId;
     private UUID warehouseId;
-    private double quantityOnHand;
+    private double quantityOnHand; // số lượng khả dụng
 }

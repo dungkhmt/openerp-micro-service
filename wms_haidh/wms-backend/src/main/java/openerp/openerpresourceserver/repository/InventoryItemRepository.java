@@ -26,6 +26,7 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, UU
 			    i.inventoryItemId AS inventoryItemId,
 			    p.name AS productName,
 			    i.lotId AS lotId,
+			    i.availableQuantity AS availableQuantity,
 			    i.quantityOnHandTotal AS quantityOnHandTotal,
 			    i.lastUpdatedStamp AS lastUpdatedStamp
 			FROM InventoryItem i
@@ -42,6 +43,7 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, UU
 			    i.inventoryItemId AS inventoryItemId,
 			    p.name AS productName,
 			    i.lotId AS lotId,
+			    i.availableQuantity AS availableQuantity,
 			    i.quantityOnHandTotal AS quantityOnHandTotal,
 			    i.lastUpdatedStamp AS lastUpdatedStamp
 			FROM InventoryItem i
@@ -87,16 +89,15 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, UU
 			@Param("bayId") UUID bayId);
 
 	@Query("""
-			    SELECT i.quantityOnHandTotal
+			    SELECT i.availableQuantity
 			    FROM InventoryItem i
 			    WHERE i.productId = (
 			        SELECT soi.productId FROM SaleOrderItem soi WHERE soi.saleOrderItemId = :saleOrderItemId
 			    )
 			    AND i.bayId = :bayId
 			    AND i.lotId = :lotId
-			    AND i.quantityOnHandTotal > 0
 			""")
-	Optional<Integer> findQuantityOnHandBySaleOrderItemIdBayIdAndLotId(@Param("saleOrderItemId") UUID saleOrderItemId,
+	Optional<Integer> findAvailableQuantityBySaleOrderItemIdBayIdAndLotId(@Param("saleOrderItemId") UUID saleOrderItemId,
 			@Param("bayId") UUID bayId, @Param("lotId") String lotId);
 
 	@Query("""

@@ -30,7 +30,8 @@ public class InventoryItem {
     private String lotId;
     private UUID warehouseId;
     private UUID bayId;
-    private int quantityOnHandTotal;
+    private int availableQuantity; // ready for order assignment
+    private int quantityOnHandTotal;  // real quantity 
     private double importPrice;
     private String currencyUomId; 
     private LocalDateTime expireDate;

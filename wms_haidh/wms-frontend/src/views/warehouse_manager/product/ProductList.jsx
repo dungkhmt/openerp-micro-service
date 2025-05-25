@@ -94,11 +94,11 @@ export default function ProductList() {
   const navigate = useNavigate();
 
   const handleAddProduct = () => {
-    navigate('/admin/product/add-product');
+    navigate('/warehouse-manager/product/add-product');
   };
 
   const handleUpdate = (id) => {
-    navigate(`/admin/product/${id}`);
+    navigate(`/warehouse-manager/product/${id}`);
   };
 
   const handleDelete = (id) => {

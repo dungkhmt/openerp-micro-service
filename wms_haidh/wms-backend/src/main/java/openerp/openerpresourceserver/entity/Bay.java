@@ -37,5 +37,8 @@ public class Bay {
     private int xLong; // in meters
 
     private int yLong; // in meters
+    
+    private int shelf;
+
 }
 

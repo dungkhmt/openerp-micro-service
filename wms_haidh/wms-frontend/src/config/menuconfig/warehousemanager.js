@@ -5,7 +5,7 @@ export const warehousemanagerWarehouse = {
   child: [
     {
       id: "MENU_WMSv2_ADMIN.WAREHOUSE",
-      path: "/admin/warehouse",
+      path: "/warehouse-manager/warehouse",
       isPublic: false,
       text: "Warehouses",
       child: [],
@@ -19,7 +19,7 @@ export const warehousemanagerProduct = {
   child: [
     {
       id: "MENU_WMSv2_ADMIN.PRODUCT",
-      path: "/admin/product",
+      path: "/warehouse-manager/product",
       isPublic: false,
       text: "Products",
       child: [],
@@ -33,7 +33,7 @@ export const warehousemanagerProcessReceipt = {
   child: [
     {
       id: "MENU_WMSv2_ADMIN.PROCESS_RECEIPT",
-      path: "/admin/receipts",
+      path: "/warehouse-manager/receipts",
       isPublic: false,
       text: "Purchase Orders",
       child: [],
@@ -47,7 +47,7 @@ export const warehousemanagerOrder = {
   child: [
     {
       id: "MENU_WMSv2_ADMIN.ORDER",
-      path: "/admin/orders",
+      path: "/warehouse-manager/orders",
       isPublic: false,
       text: "Sale Orders",
       child: [],

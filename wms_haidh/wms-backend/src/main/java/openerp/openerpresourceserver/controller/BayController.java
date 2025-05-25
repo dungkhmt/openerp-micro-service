@@ -32,18 +32,18 @@ public class BayController {
 		List<BayProjection> warehouses = bayService.getBaysProjectionByWarehouseId(warehouseId);
 		return ResponseEntity.ok(warehouses);
 	}
-	
-	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
+
+	@Secured({"ROLE_WMS_WAREHOUSE_MANAGER","ROLE_WMS_WAREHOUSE_STAFF"})
 	@GetMapping("/full")
-    public ResponseEntity<List<Bay>> getBaysByWarehouseId(@RequestParam UUID warehouseId) {
-        List<Bay> bays = bayService.getBaysByWarehouseId(warehouseId);
-        return ResponseEntity.ok(bays);
-    }
-	
+	public ResponseEntity<List<Bay>> getBaysByWarehouseId(@RequestParam UUID warehouseId, @RequestParam(defaultValue = "0") int shelf) {
+		List<Bay> bays = bayService.getBaysByWarehouseIdAndShelf(warehouseId, shelf);
+		return ResponseEntity.ok(bays);
+	}
+
 	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping("/{id}")
-    public ResponseEntity<Bay> getBayById(@PathVariable("id") UUID bayId) {
-        Bay bay = bayService.getBayById(bayId);
-        return ResponseEntity.ok(bay);
-    }
+	public ResponseEntity<Bay> getBayById(@PathVariable("id") UUID bayId) {
+		Bay bay = bayService.getBayById(bayId);
+		return ResponseEntity.ok(bay);
+	}
 }

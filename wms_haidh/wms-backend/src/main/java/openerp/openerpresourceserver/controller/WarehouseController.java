@@ -35,14 +35,14 @@ public class WarehouseController {
 		return ResponseEntity.ok(warehouses);
 	}
 	
-	@Secured({"ROLE_WMS_WAREHOUSE_MANAGER","ROLE_WMS_DELIVERY_MANAGER"})
+	@Secured({"ROLE_WMS_WAREHOUSE_MANAGER","ROLE_WMS_DELIVERY_MANAGER","ROLE_WMS_WAREHOUSE_STAFF"})
 	@GetMapping("/{id}")
     public ResponseEntity<Warehouse> getWarehouseById(@PathVariable("id") UUID warehouseId) {
         Warehouse warehouse = warehouseService.getWarehouseById(warehouseId);
         return ResponseEntity.ok(warehouse);
     }
 
-	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
+	@Secured({"ROLE_WMS_WAREHOUSE_MANAGER","ROLE_WMS_WAREHOUSE_STAFF"})
 	@GetMapping("/paged")
 	public ResponseEntity<Page<Warehouse>> getWarehouses(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size, @RequestParam(required = false) String search) {
@@ -52,9 +52,9 @@ public class WarehouseController {
 	}
 	
 	@Secured("ROLE_WMS_DELIVERY_MANAGER")
-	@GetMapping("/with-created-assigned-items")
+	@GetMapping("/with-picked-assigned-items")
     public ResponseEntity<List<Warehouse>> getRelevantWarehouses() {
-        List<Warehouse> warehouses = warehouseService.getWarehousesWithCreatedAssignedItemsAndAssignedOrders();
+        List<Warehouse> warehouses = warehouseService.getWarehousesWithPickedOrders();
         return ResponseEntity.ok(warehouses);
     }
 

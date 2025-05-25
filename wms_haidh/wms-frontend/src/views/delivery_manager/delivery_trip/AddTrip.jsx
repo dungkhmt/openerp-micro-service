@@ -166,7 +166,7 @@ const AddTrip = () => {
       setLoading(true);
       request(
         "get",
-        `/assigned-order-items/by-warehouse?warehouseId=${warehouseId}&page=${page}&size=${rowsPerPage}`,
+        `/assigned-order-items/picked?warehouseId=${warehouseId}&page=${page}&size=${rowsPerPage}`,
         (res) => {
           const newDetails = res.data.content;
           setTimeout(() => {

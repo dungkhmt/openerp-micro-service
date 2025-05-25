@@ -21,8 +21,8 @@ public class BayService {
 		return bayRepository.findByWarehouseIdWithProjection(warehouseId);
 	}
 
-	public List<Bay> getBaysByWarehouseId(UUID warehouseId) {
-		return bayRepository.findByWarehouseId(warehouseId);
+	public List<Bay> getBaysByWarehouseIdAndShelf(UUID warehouseId, int shelf) {
+	        return bayRepository.findByWarehouseIdAndShelf(warehouseId, shelf);
 	}
 
 	public UUID getWarehouseIdByBayId(UUID bayId) {

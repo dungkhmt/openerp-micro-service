@@ -125,7 +125,7 @@ const ProductForm = () => {
     request("post", requestUrl, (res) => {
       if (res.status === 200) {
         alert("Product saved successfully!");
-        navigate(`/admin/product`);
+        navigate(`/warehouse-manager/product`);
       } else {
         alert("Something went wrong!");
       }
@@ -138,7 +138,7 @@ const ProductForm = () => {
       <Toaster />
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         <IconButton
-          onClick={() => navigate('/admin/product')}
+          onClick={() => navigate('/warehouse-manager/product')}
           sx={{ color: 'grey.700', mr: 1 }}
         >
           <ArrowBackIcon />

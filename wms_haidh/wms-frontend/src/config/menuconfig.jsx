@@ -24,6 +24,7 @@ import { warehousemanagerWarehouse } from "./menuconfig/warehousemanager";
 import { warehousemanagerProduct } from "./menuconfig/warehousemanager";
 import { warehousemanagerProcessReceipt } from "./menuconfig/warehousemanager";
 import { warehousemanagerOrder } from "./menuconfig/warehousemanager";
+import { warehousestaffTask } from "./menuconfig/warehousestaff";
 import { purchasestaffProduct } from "./menuconfig/purchasestaff";
 import { purchasestaffReceipt } from "./menuconfig/purchasestaff";
 import { purchasemanagerSuppliers } from "./menuconfig/purchasemanager";
@@ -50,6 +51,8 @@ MENUS.push(warehousemanagerWarehouse);
 MENUS.push(warehousemanagerProduct);
 MENUS.push(warehousemanagerProcessReceipt);
 MENUS.push(warehousemanagerOrder);
+
+MENUS.push(warehousestaffTask);
 
 MENUS.push(purchasestaffProduct);
 MENUS.push(purchasestaffReceipt);

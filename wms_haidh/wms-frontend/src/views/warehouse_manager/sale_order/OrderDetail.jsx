@@ -43,7 +43,7 @@ const OrderDetail = () => {
     <Box sx={{ p: 3 }}>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <IconButton color="primary" onClick={() => navigate('/admin/orders')} sx={{ color: 'grey.700', mr: 1 }}>
+        <IconButton color="primary" onClick={() => navigate('/warehouse-manager/orders')} sx={{ color: 'grey.700', mr: 1 }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>
@@ -118,7 +118,7 @@ const OrderDetail = () => {
                     <TableCell sx={{ textAlign: 'center' }}>
                       <IconButton
                         color="primary"
-                        onClick={() => navigate(`/admin/orders/${id1}/${detail.saleOrderItemId}`)}
+                        onClick={() => navigate(`/warehouse-manager/orders/${id1}/${detail.saleOrderItemId}`)}
                       >
                         <VisibilityIcon />
                       </IconButton>

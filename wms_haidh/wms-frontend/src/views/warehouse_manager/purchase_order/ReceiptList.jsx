@@ -23,8 +23,7 @@ import { request } from "../../../api";
 import { formatDate } from '../../../utils/utils';
 const statusColorMap = {
   APPROVED: "secondary",
-  IN_PROGRESS: "warning",
-  COMPLETED: "success",
+  IN_PROGRESS: "warning"
 };
 
 const INITIAL_VISIBLE_COLUMNS = ["receiptName", "warehouseName", "expectedReceiptDate", "status", "approvedBy", "actions"];
@@ -61,8 +60,24 @@ export default function ReceiptList() {
 
     switch (columnKey) {
       case "status":
+        const status = item.status;
+        if (status === "ASSIGNED") {
+          return (
+            <Badge className="bg-green-100 text-green-800" variant="flat">
+              {cellValue.replace(/_/g, ' ')}
+            </Badge>
+          );
+        } else if (status === "PUTAWAY_COMPLETE") {
+          return (
+            <Badge className="bg-green-600 text-white" variant="flat">
+              {cellValue.replace(/_/g, ' ')}
+            </Badge>
+          );
+        }
         return (
-          <Badge variant={statusColorMap[item.status]}>{cellValue.replace(/_/g, ' ')}</Badge>
+          <Badge variant={statusColorMap[status]} >
+            {cellValue.replace(/_/g, ' ')}
+          </Badge>
         );
       case "actions":
         return (
@@ -101,7 +116,7 @@ export default function ReceiptList() {
   const navigate = useNavigate();
 
   const handleUpdate = (id) => {
-    navigate(`/admin/receipts/${id}`);
+    navigate(`/warehouse-manager/receipts/${id}`);
   };
 
   const topContent = useMemo(() => {

@@ -37,7 +37,7 @@ const ReceiptDetail = () => {
     <Box sx={{ p: 3 }}>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <IconButton color="primary" onClick={() => navigate('/admin/receipts')} sx={{ color: 'grey.700', mr: 1 }}>
+        <IconButton color="primary" onClick={() => navigate('/warehouse-manager/receipts')} sx={{ color: 'grey.700', mr: 1 }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>
@@ -113,7 +113,7 @@ const ReceiptDetail = () => {
                     <TableCell sx={{ textAlign: 'center' }}>
                       <IconButton
                         color="primary"
-                        onClick={() => navigate(`/admin/receipts/${id1}/${detail.receiptItemRequestId}`)}
+                        onClick={() => navigate(`/warehouse-manager/receipts/${id1}/${detail.receiptItemRequestId}`)}
                       >
                         <VisibilityIcon />
                       </IconButton>

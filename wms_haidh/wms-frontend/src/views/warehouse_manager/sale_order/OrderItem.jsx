@@ -73,7 +73,7 @@ const OrderItem = () => {
 
   useEffect(() => {
     if (lotId) {
-      request("get", `/inventory/quantity-on-hand?saleOrderItemId=${id2}&bayId=${bayId}&lotId=${lotId}`, (res) => {
+      request("get", `/inventory/available-quantity?saleOrderItemId=${id2}&bayId=${bayId}&lotId=${lotId}`, (res) => {
         setQuantityOnHand(res.data);
       }).then();
     }
@@ -132,7 +132,7 @@ const OrderItem = () => {
     <Box sx={{ p: 3 }}>
       <Toaster />
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <IconButton color="primary" onClick={() => navigate(`/admin/orders/${id1}`)} sx={{ color: 'grey.700', mr: 1 }}>
+        <IconButton color="primary" onClick={() => navigate(`/warehouse-manager/orders/${id1}`)} sx={{ color: 'grey.700', mr: 1 }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>
@@ -241,7 +241,7 @@ const OrderItem = () => {
             </Typography>
             <div className='mb-4'>
               <Typography variant="h7" gutterBottom className="text-green-500">
-                Quantity on hand : {quantityOnHand}
+                Available quantity: {quantityOnHand}
               </Typography>
             </div>
 

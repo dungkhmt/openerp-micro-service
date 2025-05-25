@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +25,7 @@ import openerp.openerpresourceserver.dto.request.AssignedOrderItemCreateRequest;
 import openerp.openerpresourceserver.entity.AssignedOrderItem;
 import openerp.openerpresourceserver.projection.AssignedOrderItemProjection;
 import openerp.openerpresourceserver.projection.DeliveryOrderItemProjection;
+import openerp.openerpresourceserver.projection.PickedOrderItemProjection;
 import openerp.openerpresourceserver.service.AssignedOrderItemService;
 
 @RestController
@@ -41,11 +43,21 @@ public class AssignedOrderItemController {
 		return assignedOrderItemService.getAssignedOrderItemsBySaleOrderItemId(saleOrderItemId);
 	}
 
-	@Secured("ROLE_WMS_DELIVERY_MANAGER")
-	@GetMapping("/by-warehouse")
-	public ResponseEntity<Page<DeliveryOrderItemProjection>> getAssignedOrderItemsByWarehouseId(
-			@RequestParam UUID warehouseId, @RequestParam(defaultValue = "0") int page,
+	@Secured("ROLE_WMS_WAREHOUSE_STAFF")
+	@GetMapping("/assigned")
+	public ResponseEntity<Page<PickedOrderItemProjection>> getAssignedOrderItems(@RequestParam UUID bayId,
+			@RequestParam(defaultValue = "CREATED") String status, @RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<PickedOrderItemProjection> orderItems = assignedOrderItemService.getAllPickedOrderItems(bayId, status,
+				pageable);
+		return ResponseEntity.ok(orderItems);
+	}
+
+	@Secured("ROLE_WMS_DELIVERY_MANAGER")
+	@GetMapping("/picked")
+	public ResponseEntity<Page<DeliveryOrderItemProjection>> getPickedAssignedOrderItems(@RequestParam UUID warehouseId,
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
 		Pageable pageable = PageRequest.of(page, size);
 		Page<DeliveryOrderItemProjection> orderItems = assignedOrderItemService.getAllDeliveryOrderItems(warehouseId,
 				pageable);
@@ -72,6 +84,13 @@ public class AssignedOrderItemController {
 			@RequestBody List<UUID> assignedOrderItemIds) {
 		List<DeliveryOrderItemProjection> items = assignedOrderItemService.getDeliveryOrderItems(assignedOrderItemIds);
 		return ResponseEntity.ok(items);
+	}
+
+	@Secured("ROLE_WMS_WAREHOUSE_STAFF")
+	@PostMapping("/{id}/mark-as-picked")
+	public ResponseEntity<String> markAsPicked(@PathVariable("id") UUID assignedOrderItemId) {
+		assignedOrderItemService.markAsPicked(assignedOrderItemId);
+		return ResponseEntity.ok("Marked as PICKED");
 	}
 
 }

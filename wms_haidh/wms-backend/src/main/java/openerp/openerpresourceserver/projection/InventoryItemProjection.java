@@ -6,7 +6,8 @@ public interface InventoryItemProjection {
 	String getInventoryItemId();
     String getProductName();          // Tên sản phẩm
     String getLotId();                // Lot ID
-    int getQuantityOnHandTotal();     // Số lượng tồn kho
+    int getAvailableQuantity(); // Số lượng tồn kho khả dụng
+    int getQuantityOnHandTotal();     // Số lượng tồn kho thật sự
     LocalDateTime getLastUpdatedStamp(); // Thời gian cập nhật cuối
 }
 

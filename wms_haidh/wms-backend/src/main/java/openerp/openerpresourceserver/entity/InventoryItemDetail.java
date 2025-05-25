@@ -27,7 +27,7 @@ public class InventoryItemDetail {
     private UUID inventoryItemDetailId;
 
     private UUID inventoryItemId;
-    private int quantityOnHandDiff;
+    private int quantityOnHandDiff; // change in quantity on hand total 
     private LocalDateTime effectiveDate;
 }
 

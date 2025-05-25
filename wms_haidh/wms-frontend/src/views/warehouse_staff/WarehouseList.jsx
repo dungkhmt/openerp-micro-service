@@ -15,12 +15,12 @@ import {
     Pagination,
 } from "@nextui-org/react";
 
-import { VerticalDotsIcon } from "../../../components/icon/VerticalDotsIcon";
-import { SearchIcon } from "../../../components/icon/SearchIcon";
-import { columns } from "../../../config/warehouse";
+import { VerticalDotsIcon } from "../../components/icon/VerticalDotsIcon";
+import { SearchIcon } from "../../components/icon/SearchIcon";
+import { columns } from "../../config/warehouse";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { request } from "../../../api";
+import { request } from "../../api";
 
 export default function WarehouseList() {
 
@@ -70,7 +70,8 @@ export default function WarehouseList() {
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu>
-                                <DropdownItem onPress={() => handleUpdate(item.warehouseId)}>View</DropdownItem>
+                                <DropdownItem onPress={() => handlePutaway(item.warehouseId)}>Putway</DropdownItem>
+                                <DropdownItem onPress={() => handlePicking(item.warehouseId)}>Order picking</DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
                     </div>
@@ -96,8 +97,11 @@ export default function WarehouseList() {
 
     const navigate = useNavigate();
 
-    const handleUpdate = (id) => {
-        navigate(`/warehouse-manager/warehouse/${id}`);
+    const handlePutaway = (id) => {
+        navigate(`putaway/${id}`);
+    };
+    const handlePicking = (id) => {
+        navigate(`order-picking/${id}`);
     };
 
     const topContent = useMemo(() => {

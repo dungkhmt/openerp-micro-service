@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import jakarta.persistence.EntityNotFoundException;
+import openerp.openerpresourceserver.entity.AssignedOrderItem;
 import openerp.openerpresourceserver.entity.InventoryItem;
 import openerp.openerpresourceserver.entity.InventoryItemDetail;
 import openerp.openerpresourceserver.entity.Warehouse;
@@ -31,7 +33,7 @@ public class InventoryService {
 	@Autowired
 	private BayService bayService;
 
-	public void updateInventory(UUID productId, int quantity, UUID bayId, String lotId, double importPrice,
+	public void increaseInventory(UUID productId, int quantity, UUID bayId, String lotId, double importPrice,
 			LocalDateTime expiredDate) {
 		// Tìm InventoryItem dựa trên productId, lotId, bayId
 		Optional<InventoryItem> existingItem = inventoryItemRepository.findByProductIdAndLotIdAndBayId(productId, lotId,
@@ -42,14 +44,15 @@ public class InventoryService {
 		if (existingItem.isPresent()) {
 			// Cập nhật số lượng tồn kho nếu đã tồn tại
 			inventoryItem = existingItem.get();
+			inventoryItem.setAvailableQuantity(inventoryItem.getAvailableQuantity() + quantity);
 			inventoryItem.setQuantityOnHandTotal(inventoryItem.getQuantityOnHandTotal() + quantity);
 			inventoryItem.setLastUpdatedStamp(LocalDateTime.now());
 		} else {
 			// Tạo mới InventoryItem
 			UUID warehouseId = bayService.getWarehouseIdByBayId(bayId);
 			inventoryItem = InventoryItem.builder().productId(productId).bayId(bayId).warehouseId(warehouseId)
-					.lotId(lotId).quantityOnHandTotal(quantity).importPrice(importPrice).currencyUomId("VND")
-					.expireDate(expiredDate).createdStamp(now).lastUpdatedStamp(now).build();
+					.lotId(lotId).availableQuantity(quantity).quantityOnHandTotal(quantity).importPrice(importPrice)
+					.currencyUomId("VND").expireDate(expiredDate).createdStamp(now).lastUpdatedStamp(now).build();
 		}
 
 		// Lưu InventoryItem
@@ -58,6 +61,25 @@ public class InventoryService {
 		// Tạo và lưu InventoryItemDetail
 		InventoryItemDetail inventoryItemDetail = InventoryItemDetail.builder()
 				.inventoryItemId(inventoryItem.getInventoryItemId()).quantityOnHandDiff(quantity).effectiveDate(now)
+				.build();
+
+		inventoryItemDetailRepository.save(inventoryItemDetail);
+	}
+	
+	public void decreaseInventory(AssignedOrderItem item) {
+
+		InventoryItem inventoryItem = inventoryItemRepository.findById(item.getInventoryItemId()).orElseThrow(
+				() -> new EntityNotFoundException("InventoryItem not found: " + item.getInventoryItemId()));
+
+		// Update inventory total quantity 
+		LocalDateTime now = LocalDateTime.now();
+		inventoryItem.setQuantityOnHandTotal(inventoryItem.getQuantityOnHandTotal() - item.getQuantity());
+		inventoryItem.setLastUpdatedStamp(now);
+		inventoryItemRepository.save(inventoryItem);
+		
+		// Tạo và lưu InventoryItemDetail
+		InventoryItemDetail inventoryItemDetail = InventoryItemDetail.builder()
+				.inventoryItemId(inventoryItem.getInventoryItemId()).quantityOnHandDiff(-item.getQuantity()).effectiveDate(now)
 				.build();
 
 		inventoryItemDetailRepository.save(inventoryItemDetail);
@@ -84,9 +106,10 @@ public class InventoryService {
 		return inventoryItemRepository.findLotIdsBySaleOrderItemIdAndBayId(saleOrderItemId, bayId);
 	}
 
-	public Optional<Integer> getQuantityOnHandBySaleOrderItemIdBayIdAndLotId(UUID saleOrderItemId, UUID bayId,
+	public Optional<Integer> getAvailableQuantityBySaleOrderItemIdBayIdAndLotId(UUID saleOrderItemId, UUID bayId,
 			String lotId) {
-		return inventoryItemRepository.findQuantityOnHandBySaleOrderItemIdBayIdAndLotId(saleOrderItemId, bayId, lotId);
+		return inventoryItemRepository.findAvailableQuantityBySaleOrderItemIdBayIdAndLotId(saleOrderItemId, bayId,
+				lotId);
 	}
 
 	public List<String> getDistinctLotIdsByBayId(UUID bayId) {

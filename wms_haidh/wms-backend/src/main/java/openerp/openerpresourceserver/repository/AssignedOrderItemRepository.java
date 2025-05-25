@@ -16,6 +16,7 @@ import openerp.openerpresourceserver.dto.request.Item;
 import openerp.openerpresourceserver.entity.AssignedOrderItem;
 import openerp.openerpresourceserver.projection.AssignedOrderItemProjection;
 import openerp.openerpresourceserver.projection.DeliveryOrderItemProjection;
+import openerp.openerpresourceserver.projection.PickedOrderItemProjection;
 
 @Repository
 public interface AssignedOrderItemRepository extends JpaRepository<AssignedOrderItem, UUID> {
@@ -52,10 +53,26 @@ public interface AssignedOrderItemRepository extends JpaRepository<AssignedOrder
 			    JOIN Bay b ON aoi.bayId = b.bayId
 			    JOIN Order o ON aoi.orderId = o.orderId
 			    WHERE aoi.warehouseId = :warehouseId
-			    AND aoi.status = 'CREATED'
-			    AND o.status = 'ASSIGNED'
+			    AND aoi.status='PICKED' AND (o.status = 'PICK_COMPLETE' OR o.status='DELIVERING')
 			""")
 	Page<DeliveryOrderItemProjection> findAllDeliveryOrderItemsByWarehouse(@Param("warehouseId") UUID warehouseId,
+			Pageable pageable);
+
+	@Query("""
+			    SELECT
+			        aoi.assignedOrderItemId AS assignedOrderItemId,
+			        p.name AS productName,
+			        aoi.quantity AS originalQuantity,
+			        b.code AS bayCode,
+			        aoi.lotId AS lotId,
+			        aoi.status AS status
+			    FROM AssignedOrderItem aoi
+			    JOIN Product p ON aoi.productId = p.productId
+			    JOIN Bay b ON aoi.bayId = b.bayId
+			    AND aoi.bayId = :bayId
+			    AND aoi.status = :status
+			""")
+	Page<PickedOrderItemProjection> findAllPickedOrderItemsByBay(@Param("bayId") UUID bayId, String status,
 			Pageable pageable);
 
 	@Modifying
@@ -68,7 +85,7 @@ public interface AssignedOrderItemRepository extends JpaRepository<AssignedOrder
 			FROM AssignedOrderItem a
 			JOIN Order o ON a.orderId = o.orderId
 			JOIN Product p ON a.productId = p.productId
-			WHERE a.status = 'CREATED' AND o.status = 'ASSIGNED'
+			WHERE a.status = 'PICKED' AND (o.status = 'PICK_COMPLETE' OR o.status = 'DELIVERING')
 			""")
 	List<Item> getAllItems();
 
@@ -89,6 +106,10 @@ public interface AssignedOrderItemRepository extends JpaRepository<AssignedOrder
 	List<DeliveryOrderItemProjection> findDeliveryOrderItemsByIds(List<UUID> assignedOrderItemIds);
 
 	@Query("SELECT COUNT(a) FROM AssignedOrderItem a WHERE a.orderId = :orderId")
-    long countAssignedItems(@Param("orderId") UUID orderId);
+	long countAssignedItems(@Param("orderId") UUID orderId);
+
+	List<AssignedOrderItem> findByOrderId(UUID orderId);
+
+	long countByOrderIdAndStatusNot(UUID orderId, String status);
 
 }

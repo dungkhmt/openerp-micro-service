@@ -25,7 +25,7 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, UUID> {
 			    FROM Warehouse w
 			    JOIN AssignedOrderItem aoi ON aoi.warehouseId = w.warehouseId
 			    JOIN Order o ON o.orderId = aoi.orderId
-			    WHERE aoi.status = 'CREATED' AND o.status = 'ASSIGNED'
+			    WHERE aoi.status='PICKED' AND (o.status = 'PICK_COMPLETE' OR o.status='DELIVERING')
 			""")
-	List<Warehouse> findWarehousesWithCreatedAssignedItemsAndAssignedOrders();
+	List<Warehouse> findWarehousesWithPickedOrders();
 }
