@@ -315,7 +315,7 @@ const WeeklyAbsencePageInternal = () => {
             <Paper sx={{p:3, textAlign: 'center', mt:2}}><Typography variant="subtitle1">Không có nhân viên nào phù hợp.</Typography></Paper>
           ) : (
             <Paper sx={{ overflow: 'hidden' }}>
-              <TableContainer sx={{ maxHeight: "calc(100vh - 230px)" }}>
+              <TableContainer sx={{ maxHeight: "calc(100vh - 230px)" }} className="custom-scrollbar">
                 <Table stickyHeader size="small">
                   <TableHead>
                     <TableRow>
@@ -366,12 +366,7 @@ const WeeklyAbsencePageInternal = () => {
           Object.values(absencesGroupedByDay).every(arr => arr.length === 0) && !loading ? (
             <Paper sx={{p:3, textAlign: 'center', mt:2}}><Typography variant="h6" color="text.secondary">Không có ai nghỉ trong tuần này theo bộ lọc đã chọn.</Typography></Paper>
           ) : (
-            <Box sx={{ maxHeight: "calc(100vh - 230px)", overflowY: 'auto', pr: 1,
-              '&::-webkit-scrollbar': { width: '6px' },
-              '&::-webkit-scrollbar-track': { background: theme.palette.grey[200], borderRadius: '3px' },
-              '&::-webkit-scrollbar-thumb': { background: theme.palette.grey[400], borderRadius: '3px' },
-              '&::-webkit-scrollbar-thumb:hover': { background: theme.palette.grey[500] }
-            }}>
+            <Box sx={{ maxHeight: "calc(100vh - 230px)", overflowY: 'auto', pr: 1}} className="custom-scrollbar">
               <Grid container spacing={2}>
                 {weekDays.map(day => {
                   const absencesThisDay = absencesGroupedByDay[day.dateStr] || [];

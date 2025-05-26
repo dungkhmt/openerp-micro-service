@@ -347,7 +347,7 @@ const StaffScreenInternal = () => {
 
       {viewMode === "table" ? (
         <Paper sx={{ overflow: 'hidden' }}>
-          <TableContainer sx={{ maxHeight: "calc(100vh - 320px)" }}>
+          <TableContainer sx={{ maxHeight: "calc(100vh - 320px)" }} className="custom-scrollbar">
             <Table {...getTableProps()} stickyHeader size="medium">
               <TableHead>
                 {headerGroups.map((headerGroup) => (
@@ -373,7 +373,7 @@ const StaffScreenInternal = () => {
         </Paper>
       ) : (
         <Paper sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-          <Box sx={{ flexGrow: 1, maxHeight: "calc(100vh - 320px)",overflowY: 'auto', p: 2 }}>
+          <Box sx={{ flexGrow: 1, maxHeight: "calc(100vh - 320px)",overflowY: 'auto', p: 2 }} className="custom-scrollbar">
             {loading && data.length === 0 ? (
               <Box sx={{display: 'flex', justifyContent: 'center', py: 5}}> <CircularProgress /> <Typography sx={{ml: 2}}>Đang tải...</Typography> </Box>
             ) : !loading && data.length === 0 ? (

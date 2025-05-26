@@ -245,12 +245,7 @@ const AbsenceHistoryPageInternal = () => {
             <Typography variant="h6" color="text.secondary">Không có lịch sử nghỉ phép nào trong tuần đã chọn.</Typography>
           </Paper>
         ) : (
-          <Box sx={{ maxHeight: "calc(100vh - 280px)", overflowY: 'auto', pr:1, pb:4,
-            '&::-webkit-scrollbar': { width: '6px' },
-            '&::-webkit-scrollbar-track': { background: theme.palette.grey[200], borderRadius: '3px' },
-            '&::-webkit-scrollbar-thumb': { background: theme.palette.grey[400], borderRadius: '3px' },
-            '&::-webkit-scrollbar-thumb:hover': { background: theme.palette.grey[500] }
-          }}>
+          <Box sx={{ maxHeight: "calc(100vh - 280px)", overflowY: 'auto', pr:1, pb:4}} className="custom-scrollbar">
             <Grid container spacing={2.5}>
               {currentCardData.map((item) => {
                 const statusProps = getStatusProps(item.status);

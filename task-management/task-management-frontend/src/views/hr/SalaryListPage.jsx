@@ -268,7 +268,7 @@ const SalaryListPageInternal = () => {
         </Paper>
 
         <Paper sx={{ overflow: 'hidden' }}>
-          <TableContainer sx={{ maxHeight: "calc(100vh - 280px)" }}>
+          <TableContainer sx={{ maxHeight: "calc(100vh - 280px)" }} className="custom-scrollbar">
             <Table stickyHeader size="medium">
               <TableHead>
                 <TableRow>

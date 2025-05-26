@@ -93,15 +93,14 @@ export default function ShiftManager({ shifts, setShifts }) {
         <EventAvailableIcon sx={{ mr: 1, color: 'primary.main', fontSize: '1.3rem' }} /> Định Nghĩa Ca Làm Việc
       </Typography>
       {error && <Alert severity="error" sx={{ mb: 1.5 }} onClose={() => setError('')} variant="outlined">{error}</Alert>}
-      {/* Form thêm ca - căn chỉnh giống ảnh */}
       <Box component="form" noValidate autoComplete="off" sx={{ mb: 1.5 }}>
-        <Grid container spacing={1.5} alignItems="center"> {/* Sử dụng alignItems="center" cho căn giữa dọc tốt hơn */}
+        <Grid container spacing={1.5} alignItems="center">
           <Grid item xs={12} sm={6} md={2.5}><TextField fullWidth label="Tên ca (*)" value={newShiftName} onChange={(e) => setNewShiftName(e.target.value)} InputLabelProps={{ shrink: true }} /></Grid>
-          <Grid item xs={6} sm={3} md={1.5}><TextField fullWidth label="Bắt đầu (*)" type="time" value={newShiftStart} onChange={(e) => setNewShiftStart(e.target.value)} InputLabelProps={{ shrink: true }} /></Grid>
-          <Grid item xs={6} sm={3} md={1.5}><TextField fullWidth label="Kết thúc (*)" type="time" value={newShiftEnd} onChange={(e) => setNewShiftEnd(e.target.value)} InputLabelProps={{ shrink: true }} /></Grid>
-          <Grid item xs={6} sm={3} md={1.5}><TextField fullWidth label="NV Min" type="number" value={newMinEmployees} onChange={(e) => setNewMinEmployees(e.target.value)} inputProps={{ min: 0 }} InputLabelProps={{ shrink: true }}/></Grid>
-          <Grid item xs={6} sm={3} md={1.5}><TextField fullWidth label="NV Max" type="number" value={newMaxEmployees} onChange={(e) => setNewMaxEmployees(e.target.value)} inputProps={{ min: 0 }} InputLabelProps={{ shrink: true }} placeholder="Trống/0 = KGH"/></Grid>
-          <Grid item xs={12} sm={6} md={2} sx={{display: 'flex', alignItems: 'center', height: '53px' /* Căn với TextField khi có placeholder/helper */}}>
+          <Grid item xs={6} sm={3} md={2}><TextField fullWidth label="Bắt đầu (*)" type="time" value={newShiftStart} onChange={(e) => setNewShiftStart(e.target.value)} InputLabelProps={{ shrink: true }} /></Grid>
+          <Grid item xs={6} sm={3} md={2}><TextField fullWidth label="Kết thúc (*)" type="time" value={newShiftEnd} onChange={(e) => setNewShiftEnd(e.target.value)} InputLabelProps={{ shrink: true }} /></Grid>
+          <Grid item xs={6} sm={3} md={1}><TextField fullWidth label="NV Min" type="number" value={newMinEmployees} onChange={(e) => setNewMinEmployees(e.target.value)} inputProps={{ min: 0 }} InputLabelProps={{ shrink: true }}/></Grid>
+          <Grid item xs={6} sm={3} md={1}><TextField fullWidth label="NV Max" type="number" value={newMaxEmployees} onChange={(e) => setNewMaxEmployees(e.target.value)} inputProps={{ min: 0 }} InputLabelProps={{ shrink: true }} placeholder="Trống/0 = KGH"/></Grid>
+          <Grid item xs={12} sm={6} md={2} sx={{display: 'flex', alignItems: 'center', height: '53px'}}>
             <FormControlLabel control={<Switch checked={isNewShiftNightShift} onChange={(e) => setIsNewShiftNightShift(e.target.checked)} />} label="Ca đêm?" sx={{whiteSpace: 'nowrap', m:0}} />
           </Grid>
           <Grid item xs={12} sm={6} md={1.5}>
@@ -110,7 +109,7 @@ export default function ShiftManager({ shifts, setShifts }) {
         </Grid>
       </Box>
       <Typography variant="caption" sx={{ mb: 0.5, color: 'text.secondary', display:'block' }}>Danh sách ca đã định nghĩa ({shifts.length}):</Typography>
-      <Box sx={{ maxHeight: '250px', overflowY: 'auto', pr: 0.5 }}>
+      <Box sx={{ maxHeight: '250px', overflowY: 'auto', pr: 0.5 }}  className="custom-scrollbar">
         {shifts.length === 0 && <Typography sx={{ textAlign: 'center', color: 'text.secondary', p: 2, fontStyle: 'italic' }}>Chưa có ca làm việc nào.</Typography>}
         {shifts.map(shift => (
           <Paper key={shift.id} variant="outlined" sx={{ p: 1.5, mb: 1, borderColor: 'rgba(0,0,0,0.1)'}}>
@@ -118,20 +117,20 @@ export default function ShiftManager({ shifts, setShifts }) {
               <Grid item xs={12} sm={12} md={2.5}>
                 <TextField InputLabelProps={{ shrink: true }} InputProps={{disableUnderline: false}} fullWidth variant="standard" label="Tên ca" value={shift.name} onChange={(e) => handleShiftChange(shift.id, 'name', e.target.value)} />
               </Grid>
-              <Grid item xs={6} sm={3} md={1.5}>
+              <Grid item xs={6} sm={3} md={2}>
                 <TextField InputLabelProps={{ shrink: true }} InputProps={{disableUnderline: false}} fullWidth variant="standard" label="BĐ" type="time" value={shift.startTime} onChange={(e) => handleShiftChange(shift.id, 'startTime', e.target.value)} />
               </Grid>
-              <Grid item xs={6} sm={3} md={1.5}>
+              <Grid item xs={6} sm={3} md={2}>
                 <TextField InputLabelProps={{ shrink: true }} InputProps={{disableUnderline: false}} fullWidth variant="standard" label="KT" type="time" value={shift.endTime} onChange={(e) => handleShiftChange(shift.id, 'endTime', e.target.value)} />
               </Grid>
-              <Grid item xs={6} sm={2.5} md={1.25}>
+              <Grid item xs={6} sm={2} md={1.25}>
                 <TextField InputLabelProps={{ shrink: true }} InputProps={{disableUnderline: false}} fullWidth variant="standard" label="Min" type="number" value={shift.minEmployees === '' ? '' : shift.minEmployees} onChange={(e) => handleShiftChange(shift.id, 'minEmployees', e.target.value)} inputProps={{ min: 0 }} />
               </Grid>
-              <Grid item xs={6} sm={2.5} md={1.25}>
+              <Grid item xs={6} sm={2} md={1.25}>
                 <TextField InputLabelProps={{ shrink: true }} InputProps={{disableUnderline: false}} fullWidth variant="standard" label="Max" type="number" value={shift.maxEmployees === null ? '' : shift.maxEmployees} onChange={(e) => handleShiftChange(shift.id, 'maxEmployees', e.target.value)} inputProps={{ min: 0 }} placeholder="KGH"/>
               </Grid>
-              <Grid item xs={9} sm={2} md={2.5} sx={{display: 'flex', alignItems:'center'}}>
-                <FormControlLabel control={<Switch size="small" checked={shift.isNightShift} onChange={(e) => handleShiftChange(shift.id, 'isNightShift', e.target.checked)} />} label="Đêm" sx={{fontSize: '0.8rem'}} />
+              <Grid item xs={9} sm={3} md={2} sx={{display: 'flex', alignItems:'center'}}>
+                <FormControlLabel control={<Switch size="small" checked={shift.isNightShift} onChange={(e) => handleShiftChange(shift.id, 'isNightShift', e.target.checked)} />} label="Ca đêm" sx={{fontSize: '0.8rem', pl: 2}} />
               </Grid>
               <Grid item xs={3} sm={1} md={1} sx={{textAlign: 'right'}}>
                 <Tooltip title="Xóa ca"><IconButton onClick={() => removeShift(shift.id)} color="error" size="small"><DeleteIcon /></IconButton></Tooltip>

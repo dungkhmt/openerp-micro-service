@@ -266,7 +266,7 @@ const CheckpointPeriodScreenInternal = () => {
       </Paper>
 
       <Paper sx={{ overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: "calc(100vh - 320px)" }}>
+        <TableContainer sx={{ maxHeight: "calc(100vh - 320px)" }} className="custom-scrollbar">
           <Table {...getTableProps()} stickyHeader size="medium">
             <TableHead>
               {headerGroups.map((headerGroup) => (

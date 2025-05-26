@@ -58,6 +58,7 @@ export default function UserFilterDrawer({
           value={departmentFilterValue}
           onChange={onDepartmentFilterChange}
           isOptionEqualToValue={(option, value) => option.code === value.code}
+          className="custom-scrollbar"
           renderInput={(params) => (
             <TextField
               {...params}
@@ -75,7 +76,8 @@ export default function UserFilterDrawer({
           getOptionLabel={(option) => option.name}
           value={jobPositionFilterValue}
           onChange={onJobPositionFilterChange}
-          isOptionEqualToValue={(option, value) => option.name === value.name}
+          isOptionEqualToValue={(option, value) => option.code === value.code}
+          className="custom-scrollbar"
           renderInput={(params) => (
             <TextField
               {...params}

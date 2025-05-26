@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.hr_management.application.port.out.roster_template.handler;
 
+import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IRosterTemplatePort;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.roster_template.usecase_data.CreateRosterTemplate;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;
@@ -14,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 public class CreateRosterTemplateHandler extends ObservableUseCasePublisher
         implements VoidUseCaseHandler<CreateRosterTemplate> {
 
+    private final IRosterTemplatePort rosterTemplatePort;
+
     @Override
     public void init() {
         register(CreateRosterTemplate.class, this);
@@ -22,6 +25,6 @@ public class CreateRosterTemplateHandler extends ObservableUseCasePublisher
     @Override
     @Transactional
     public void handle(CreateRosterTemplate useCase) {
-
+        rosterTemplatePort.createRosterTemplate(useCase.getRosterTemplateModel());
     }
 }

@@ -26,7 +26,6 @@ export default function TemplateListDisplay({ templates, onEdit, onDelete, onOpe
 
   return (
     <Box sx={{ mt: 0 }}>
-      {/* Tiêu đề và nút Tạo mới đã được chuyển ra ConfigurableRosterPage */}
       {templates.map(template => (
         <Paper key={template.id} elevation={3} sx={{ p: 2.5, mb: 2.5, transition: 'box-shadow .3s', '&:hover': {boxShadow: 6} }}>
           <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5}}>

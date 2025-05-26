@@ -24,5 +24,46 @@ export const theme = createTheme({
     MuiButton: { styleOverrides: { root: { borderRadius: 6, textTransform: 'none', fontWeight: 600 } } },
     MuiTextField: { defaultProps: { variant: 'outlined', size: 'small' } },
     MuiChip: { styleOverrides: { root: { fontWeight: 500, borderRadius: 16 }}},
+    MuiCssBaseline: {
+      styleOverrides: (themeParam) => ({
+        body: {
+          '&::-webkit-scrollbar': {
+            width: '8px',
+            height: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: themeParam.palette.grey[100],
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: themeParam.palette.grey[300],
+            borderRadius: '4px',
+            '&:hover': {
+              background: themeParam.palette.grey[400],
+            },
+          },
+        },
+        '.custom-scrollbar': {
+          '&::-webkit-scrollbar': {
+            width: '6px',
+            height: '6px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: themeParam.palette.grey[200],
+            borderRadius: '3px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: themeParam.palette.grey[400],
+            borderRadius: '3px',
+            '&:hover': {
+              background: themeParam.palette.grey[500],
+            },
+          },
+        },
+      })
+    },
+    MuiBox: {
+      styleOverrides: {}
+    }
   }
 });

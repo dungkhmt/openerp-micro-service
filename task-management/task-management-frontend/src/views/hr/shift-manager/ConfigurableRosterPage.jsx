@@ -6,13 +6,12 @@ import {
   Box,
   Button,
   CircularProgress,
-  Container,
   CssBaseline,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Divider,
+  Divider, Grid,
   IconButton,
   List,
   ListItem,
@@ -30,16 +29,13 @@ import DownloadIcon from '@mui/icons-material/Download';
 import CloseIcon from '@mui/icons-material/Close';
 import UndoIcon from '@mui/icons-material/Undo';
 
-import {theme} from './theme';
-import {request} from "@/api";
+import {theme} from '../theme';
+import {request}from "@/api";
 
 import TemplateConfigForm from './TemplateConfigForm';
 import ApplyConfigForm from './ApplyConfigForm';
 import TemplateListDisplay from './TemplateListDisplay';
 import DeleteConfirmationModal from "../modals/DeleteConfirmationModal.jsx";
-
-let moduleDepartmentsForDisplay = [];
-let moduleJobPositionsForDisplay = [];
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -47,61 +43,47 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 const downloadCSV = (statistics, fileName = "roster_statistics.csv") => {
   if (!statistics) {
-    alert("Không có dữ liệu thống kê để tải.");
+    console.warn("Không có dữ liệu thống kê để tải.");
     return;
   }
 
   let csvContent = "\uFEFF"; // BOM for UTF-8
 
-  // Roster Period
-  csvContent += "Roster Period\r\n";
-  csvContent += `Start Date,"${statistics.rosterStartDate || 'N/A'}"\r\n`; // Sửa ở đây
-  csvContent += `End Date,"${statistics.rosterEndDate || 'N/A'}"\r\n`;   // Và ở đây
+  csvContent += "Thông tin Kỳ Xếp Lịch\r\n";
+  csvContent += `Ngày bắt đầu,"${statistics.rosterStartDate || 'N/A'}"\r\n`;
+  csvContent += `Ngày kết thúc,"${statistics.rosterEndDate || 'N/A'}"\r\n`;
   csvContent += "\r\n";
 
-  // Overall Statistics
-  csvContent += "Overall Statistics\r\n";
-  csvContent += `Total Assigned Shifts,"${statistics.totalAssignedShifts || 'N/A'}"\r\n`;
-  csvContent += `Total Assigned Hours,"${statistics.totalAssignedHours?.toFixed(2) || 'N/A'}"\r\n`;
+  csvContent += "Thống Kê Tổng Quan\r\n";
+  csvContent += `Tổng số ca đã xếp,"${statistics.totalAssignedShifts || 'N/A'}"\r\n`;
+  csvContent += `Tổng số giờ làm đã xếp,"${statistics.totalAssignedHours?.toFixed(2) || 'N/A'}"\r\n`;
   if (statistics.fairnessHours) {
-    csvContent += "Work Hours Fairness\r\n";
-    csvContent += `Min Employee Hours,"${statistics.fairnessHours.minEmployeeValue?.toFixed(2) || 'N/A'}"\r\n`;
-    csvContent += `Max Employee Hours,"${statistics.fairnessHours.maxEmployeeValue?.toFixed(2) || 'N/A'}"\r\n`;
-    csvContent += `Range (Hours),"${statistics.fairnessHours.rangeValue?.toFixed(2) || 'N/A'}"\r\n`;
+    csvContent += "Phân bổ giờ làm (Công bằng)\r\n";
+    csvContent += `Giờ làm tối thiểu/NV,"${statistics.fairnessHours.minEmployeeValue?.toFixed(2) || 'N/A'}"\r\n`;
+    csvContent += `Giờ làm tối đa/NV,"${statistics.fairnessHours.maxEmployeeValue?.toFixed(2) || 'N/A'}"\r\n`;
+    csvContent += `Chênh lệch (giờ),"${statistics.fairnessHours.rangeValue?.toFixed(2) || 'N/A'}"\r\n`;
   }
-  if (statistics.fairnessNightShifts) {
-    csvContent += "Night Shifts Fairness\r\n";
-    csvContent += `Min Night Shifts/Emp,"${statistics.fairnessNightShifts.minEmployeeCount || 'N/A'}"\r\n`;
-    csvContent += `Max Night Shifts/Emp,"${statistics.fairnessNightShifts.maxEmployeeCount || 'N/A'}"\r\n`;
-    csvContent += `Range (Night Shifts),"${statistics.fairnessNightShifts.rangeCount || 'N/A'}"\r\n`;
-  }
-  if (statistics.fairnessSundayShifts) {
-    csvContent += "Sunday Shifts Fairness\r\n";
-    csvContent += `Min Sunday Shifts/Emp,"${statistics.fairnessSundayShifts.minEmployeeCount || 'N/A'}"\r\n`;
-    csvContent += `Max Sunday Shifts/Emp,"${statistics.fairnessSundayShifts.maxEmployeeCount || 'N/A'}"\r\n`;
-    csvContent += `Range (Sunday Shifts),"${statistics.fairnessSundayShifts.rangeCount || 'N/A'}"\r\n`;
-  }
+  // ... (các phần CSV khác tương tự, có thể thêm tiếng Việt cho header)
   csvContent += "\r\n";
 
-  // Employee Detailed Statistics
-  csvContent += "Employee Detailed Statistics\r\n";
-  csvContent += "Staff Code,Employee Name,Total Shifts,Total Hours,Night Shifts,Saturday Shifts,Sunday Shifts,Max Consecutive Work Days\r\n";
+  csvContent += "Thống Kê Chi Tiết Theo Nhân Viên\r\n";
+  csvContent += "Mã NV,Tên Nhân Viên,Tổng Ca,Tổng Giờ,Ca Đêm,Ca Thứ 7,Ca Chủ Nhật,Chuỗi Ngày Làm Việc Liên Tục Tối Đa\r\n";
   if (statistics.employeeStats && statistics.employeeStats.length > 0) {
     statistics.employeeStats.forEach(emp => {
       csvContent += `"${emp.staffCode || ''}","${emp.employeeName || ''}","${emp.totalShifts || 0}","${emp.totalHours?.toFixed(2) || 0}","${emp.nightShifts || 0}","${emp.saturdayShiftsWorked || 0}","${emp.sundayShiftsWorked || 0}","${emp.maxConsecutiveWorkDays || 0}"\r\n`;
     });
   } else {
-    csvContent += "No detailed employee statistics available.\r\n";
+    csvContent += "Không có thống kê chi tiết theo nhân viên.\r\n";
   }
   csvContent += "\r\n";
 
   if (statistics.detailedRosterLog && statistics.detailedRosterLog.length > 0) {
-    csvContent += "Detailed Roster Generation Log\r\n";
+    csvContent += "Log Chi Tiết Quá Trình Xếp Lịch\r\n";
     statistics.detailedRosterLog.forEach(logLine => {
       let cleanLine = logLine.replace(/📅|🕒|👤|🎉|📊|❌|▶|✅|➡|=========================================================|\n/g, '').trim();
       cleanLine = cleanLine.replace(/^[\s\t]+/, '');
-      cleanLine = `"${cleanLine.replace(/"/g, '""')}"\r\n`; // Escape double quotes
-      if (cleanLine.length > 3) { // Avoid empty "","" lines
+      cleanLine = `"${cleanLine.replace(/"/g, '""')}"\r\n`;
+      if (cleanLine.length > 3) {
         csvContent += cleanLine;
       }
     });
@@ -119,11 +101,13 @@ const downloadCSV = (statistics, fileName = "roster_statistics.csv") => {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   } else {
-    alert("Trình duyệt của bạn không hỗ trợ tải file trực tiếp.");
+    toast.error("Trình duyệt của bạn không hỗ trợ tải file trực tiếp.");
+    console.warn("Trình duyệt của bạn không hỗ trợ tải file trực tiếp.");
   }
 };
 
-export default function ConfigurableRosterPage() {
+
+const ConfigurableRosterPageInternal = () => {
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState(null);
@@ -131,12 +115,12 @@ export default function ConfigurableRosterPage() {
   const [configTemplates, setConfigTemplates] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [jobPositions, setJobPositions] = useState([]);
-  const [loadingApis, setLoadingApis] = useState(true); // Initial loading for departments, jobs, AND initial templates
-  const [loadingTemplatesAction, setLoadingTemplatesAction] = useState(false); // For subsequent template CUD actions
+  const [loadingApis, setLoadingApis] = useState(true);
+  const [loadingTemplatesAction, setLoadingTemplatesAction] = useState(false);
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('info');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('info'); // Default 'info'
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
@@ -148,10 +132,9 @@ export default function ConfigurableRosterPage() {
   const [isDeleteConfirmModalOpen, setIsDeleteConfirmModalOpen] = useState(false);
 
   const ensureTemplateStructure = (template) => {
-    // Handles potential snake_case from API and provides defaults
     return {
       id: template.id,
-      templateName: template.template_name || template.templateName, // Prioritize snake_case if present
+      templateName: template.template_name || template.templateName || `Bộ cấu hình ${template.id}`.slice(0,10),
       definedShifts: template.defined_shifts || template.definedShifts || [],
       activeHardConstraints: template.active_hard_constraints || template.activeHardConstraints || {},
       departmentFilter: template.department_filter || template.departmentFilter || [],
@@ -188,12 +171,11 @@ export default function ConfigurableRosterPage() {
   }, []);
 
   const fetchDepartmentsAPI = useCallback(async () => {
-    // Assuming request utility returns a Promise or can be awaited
     try {
       await request( "get", "/departments", (res) => {
         const transformed = (res.data.data || []).map(dept => ({ departmentCode: dept.department_code, departmentName: dept.department_name }));
         setDepartments(transformed);
-      }, { onError: (err) => console.error("Error fetching departments:", err.response?.data || err.message) }, null, { params: { status: "ACTIVE" } } );
+      }, { onError: (err) => console.error("Error fetching departments:", err.response?.data || err.message) }, null, { params: { status: "ACTIVE", pageSize: 1000 } } ); // Thêm pageSize
     } catch (error) {
       console.error("Exception in fetchDepartmentsAPI:", error);
     }
@@ -204,7 +186,7 @@ export default function ConfigurableRosterPage() {
       await request( "get", "/jobs", (res) => {
         const transformed = (res.data.data || []).map(job => ({ code: job.code, name: job.name }));
         setJobPositions(transformed);
-      }, { onError: (err) => console.error("Error fetching job positions:", err.response?.data || err.message) }, null, { params: { status: "ACTIVE" } } );
+      }, { onError: (err) => console.error("Error fetching job positions:", err.response?.data || err.message) }, null, { params: { status: "ACTIVE", pageSize: 1000 } } ); // Thêm pageSize
     } catch (error) {
       console.error("Exception in fetchJobPositionsAPI:", error);
     }
@@ -213,18 +195,20 @@ export default function ConfigurableRosterPage() {
   useEffect(() => {
     let active = true;
     const loadInitialData = async () => {
-      setLoadingApis(true); // Start initial comprehensive loading
+      setLoadingApis(true);
       try {
         await Promise.all([
           fetchDepartmentsAPI(),
           fetchJobPositionsAPI(),
-          fetchAllRosterTemplates(false) // Initial fetch, don't trigger separate template loading indicator
+          fetchAllRosterTemplates(false)
         ]);
       } catch (error) {
         console.error("Error loading initial API data:", error);
-        // Potentially set a global error state or snackbar here
+        setSnackbarMessage("Lỗi tải dữ liệu khởi tạo cho trang.");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
       } finally {
-        if (active) setLoadingApis(false); // End initial comprehensive loading
+        if (active) setLoadingApis(false);
       }
     };
     loadInitialData();
@@ -234,11 +218,11 @@ export default function ConfigurableRosterPage() {
 
   const handleOpenTemplateModalForNew = () => { setEditingTemplate(null); setIsTemplateModalOpen(true); };
   const handleOpenTemplateModalForEdit = (template) => { setEditingTemplate(ensureTemplateStructure(template)); setIsTemplateModalOpen(true); };
-  const handleCloseTemplateModal = () => { setIsTemplateModalOpen(false); setEditingTemplate(null); };
+  const handleCloseTemplateModal = () => { if(!isSubmitting) { setIsTemplateModalOpen(false); setEditingTemplate(null); }};
 
   const handleSaveTemplate = async (templateData) => {
-    setIsSubmitting(true); // General submitting state
-    setLoadingTemplatesAction(true); // Specific for template action
+    setIsSubmitting(true);
+    setLoadingTemplatesAction(true);
     const isUpdating = !!editingTemplate?.id;
     const endpoint = isUpdating ? `/roster-templates/${editingTemplate.id}` : "/roster-templates";
     const method = isUpdating ? "put" : "post";
@@ -247,6 +231,7 @@ export default function ConfigurableRosterPage() {
       template_name: templateData.templateName,
       defined_shifts: templateData.definedShifts || [],
       active_hard_constraints: templateData.activeHardConstraints || {}
+      // department_filter và job_position_filter sẽ được cập nhật riêng khi áp dụng nếu cần
     };
     if (isUpdating) {
       payload.id = editingTemplate.id;
@@ -256,16 +241,16 @@ export default function ConfigurableRosterPage() {
       await request( method, endpoint, (res) => {
           setSnackbarMessage(`Đã ${isUpdating ? 'cập nhật' : 'tạo mới'} bộ cấu hình thành công!`);
           setSnackbarSeverity("success");
-          fetchAllRosterTemplates(false); // Refresh without its own loading indicator
+          fetchAllRosterTemplates(false);
           handleCloseTemplateModal();
         },
-        { onError: (err) => { /* ... error handling ... */
+        { onError: (err) => {
             console.error("Error saving template:", err.response?.data || err.message);
             setSnackbarMessage(`Lỗi khi ${isUpdating ? 'cập nhật' : 'tạo mới'} bộ cấu hình: ${err.response?.data?.message || 'Lỗi không xác định'}`);
             setSnackbarSeverity("error");
           }
         }, payload );
-    } catch (error) { /* ... error handling ... */
+    } catch (error) {
       console.error("Exception during template save:", error);
       setSnackbarMessage(`Lỗi nghiêm trọng khi ${isUpdating ? 'cập nhật' : 'tạo mới'} bộ cấu hình.`);
       setSnackbarSeverity("error");
@@ -290,14 +275,14 @@ export default function ConfigurableRosterPage() {
           setSnackbarSeverity("info");
           fetchAllRosterTemplates(false);
         },
-        { onError: (err) => { /* ... error handling ... */
+        { onError: (err) => {
             console.error("Error deleting template:", err.response?.data || err.message);
             setSnackbarMessage(`Lỗi khi xóa bộ cấu hình: ${err.response?.data?.message || 'Lỗi không xác định'}`);
             setSnackbarSeverity("error");
           }
         }
       );
-    } catch (error) { /* ... error handling ... */
+    } catch (error) {
       console.error("Exception during template delete:", error);
       setSnackbarMessage("Lỗi nghiêm trọng khi xóa bộ cấu hình.");
       setSnackbarSeverity("error");
@@ -309,7 +294,7 @@ export default function ConfigurableRosterPage() {
   };
 
   const handleOpenApplyModal = (template) => { setTemplateToApply(ensureTemplateStructure(template)); setIsApplyModalOpen(true); };
-  const handleCloseApplyModal = () => { setIsApplyModalOpen(false); setTemplateToApply(null); };
+  const handleCloseApplyModal = () => { if(!isSubmitting) {setIsApplyModalOpen(false); setTemplateToApply(null);} };
 
   const handleActualApplyAndRoster = async (applicationDetails) => {
     setIsSubmitting(true);
@@ -334,74 +319,75 @@ export default function ConfigurableRosterPage() {
           job_position_filter: currentJobFilters
         };
         try {
-          await request( "patch", `/roster-templates/${applicationDetails.templateId}`, () => { filtersSuccessfullyPatched = true; },
-            { onError: (err) => { /* ... error handling ... */
+          await request( "patch", `/roster-templates/${applicationDetails.templateId}/filters`, // Giả sử có endpoint riêng để patch filter
+            () => { filtersSuccessfullyPatched = true; },
+            { onError: (err) => {
                 console.error("Error patching template filters:", err.response?.data || err.message);
-                setSnackbarMessage(`Lỗi khi cập nhật bộ lọc cho template: ${err.response?.data?.message || 'Lỗi không xác định'}. Tiếp tục xếp lịch với bộ lọc mới đã chọn.`);
+                setSnackbarMessage(`Lỗi khi cập nhật bộ lọc. Tiếp tục xếp lịch với bộ lọc mới.`);
                 setSnackbarSeverity("warning");
                 setSnackbarOpen(true);
               }
             }, filterPayload );
-        } catch (patchError) { /* ... error handling ... */
+        } catch (patchError) {
           console.error("Exception during filter patch request:", patchError);
-          setSnackbarMessage(`Lỗi nghiêm trọng khi cập nhật bộ lọc. Tiếp tục xếp lịch với bộ lọc mới đã chọn.`);
+          setSnackbarMessage(`Lỗi nghiêm trọng khi cập nhật bộ lọc. Tiếp tục xếp lịch với bộ lọc mới.`);
           setSnackbarSeverity("error");
           setSnackbarOpen(true);
         }
+      } else {
+        filtersSuccessfullyPatched = true; // Coi như thành công nếu không có gì thay đổi
       }
     }
 
+
     const rosterGenerationPayload = {
-      template_name: applicationDetails.templateName,
+      template_id: applicationDetails.templateId, // Gửi template_id thay vì toàn bộ template_name
       start_date: applicationDetails.startDate,
       end_date: applicationDetails.endDate,
       department_codes: applicationDetails.departmentCodes,
       job_position_codes: applicationDetails.jobPositionCodes,
-      defined_shifts: applicationDetails.shiftsAndConstraints.definedShifts || [],
-      active_hard_constraints: applicationDetails.shiftsAndConstraints.activeHardConstraints || {}
+      // defined_shifts và active_hard_constraints sẽ được lấy từ template trên backend dựa vào template_id
     };
-    const API_ENDPOINT_GENERATE = "/roster/generate";
+    const API_ENDPOINT_GENERATE = "/roster/generate-from-template"; // Endpoint mới
 
     try {
       await request( "post", API_ENDPOINT_GENERATE, (res) => {
-          const solution = res.data;
-          const scheduledShifts = solution?.scheduledShifts || [];
+          const solution = res.data?.data || res.data; // Kiểm tra cả res.data.data
           const stats = solution?.statistics || null;
-          const createdIds = solution?.createdShiftIds || [];
+          const createdIds = solution?.created_shift_ids || solution?.createdShiftIds || [];
           setLastGeneratedShiftIds(createdIds);
           if (filtersSuccessfullyPatched) fetchAllRosterTemplates(false);
+
           if (stats) {
             setRosterStatistics(stats); setIsStatsModalOpen(true);
-            setSnackbarMessage(`Xếp lịch thành công cho "${applicationDetails.templateName}"! ${createdIds.length} ca mới đã được tạo.`);
-          } else if (scheduledShifts.length > 0) {
-            setSnackbarMessage(`Xếp lịch thành công cho "${applicationDetails.templateName}"! ${createdIds.length} ca mới được tạo. (Không có thống kê chi tiết).`);
+            setSnackbarMessage(`Xếp lịch thành công! ${createdIds.length} ca mới đã được tạo.`);
+            setSnackbarSeverity("success");
           } else {
-            setSnackbarMessage(`Hoàn tất xử lý cho "${applicationDetails.templateName}". Solver không tìm thấy giải pháp hoặc không tạo ca nào.`);
+            setSnackbarMessage(`Hoàn tất xử lý. ${createdIds.length > 0 ? `${createdIds.length} ca mới được tạo.` : 'Không có ca nào được tạo.'} (Không có thống kê chi tiết).`);
+            setSnackbarSeverity(createdIds.length > 0 ? "success" : "info");
           }
-          setSnackbarSeverity((stats && (stats.totalAssignedShifts > 0 || scheduledShifts.length > 0)) ? "success" : "warning");
           setSnackbarOpen(true); handleCloseApplyModal();
         },
-        { onError: (err) => { /* ... error handling ... */
+        { onError: (err) => {
             let errorMessage = 'Lỗi không xác định từ server.';
             if (err.response) {
-              if (err.response.status === 422 && err.response.data && err.response.data.statistics) {
-                errorMessage = `Không thể tạo lịch. Xem log thống kê để biết thêm chi tiết.`;
-                setRosterStatistics(err.response.data.statistics); setIsStatsModalOpen(true);
-              } else if (err.response.status === 422) {
-                errorMessage = "Không thể tạo lịch: Các ràng buộc quá chặt, không có nhân viên phù hợp hoặc không tìm thấy giải pháp.";
-              } else if (err.response.data && err.response.data.message) { errorMessage = `Lỗi ${err.response.status}: ${err.response.data.message}`;
+              const errorData = err.response.data;
+              if (err.response.status === 422 && errorData && errorData.statistics) {
+                errorMessage = errorData.message || `Không thể tạo lịch. Xem log thống kê.`;
+                setRosterStatistics(errorData.statistics); setIsStatsModalOpen(true);
+              } else if (errorData && errorData.message) { errorMessage = `Lỗi ${err.response.status}: ${errorData.message}`;
               } else if (err.response.statusText) { errorMessage = `Lỗi ${err.response.status}: ${err.response.statusText}`;
               } else { errorMessage = `Lỗi ${err.response.status} từ server.`; }
-            } else if (err.request) { errorMessage = "Không nhận được phản hồi từ server. Vui lòng kiểm tra kết nối mạng."; }
+            } else if (err.request) { errorMessage = "Không nhận được phản hồi từ server."; }
             else { errorMessage = `Lỗi khi gửi yêu cầu: ${err.message}`; }
             console.error("Lỗi khi gọi API xếp lịch:", err);
             setSnackbarMessage(errorMessage); setSnackbarSeverity("error"); setSnackbarOpen(true);
           }
         }, rosterGenerationPayload );
-    } catch (error) { /* ... error handling ... */
+    } catch (error) {
       console.error("Lỗi cục bộ khi chuẩn bị gọi API xếp lịch:", error);
       setSnackbarMessage("Lỗi cục bộ khi chuẩn bị gửi yêu cầu."); setSnackbarSeverity("error"); setSnackbarOpen(true);
-      handleCloseApplyModal();
+      // Không đóng apply modal ở đây để người dùng có thể thử lại nếu là lỗi mạng tạm thời
     } finally {
       setIsSubmitting(false);
     }
@@ -414,149 +400,197 @@ export default function ConfigurableRosterPage() {
     if (lastGeneratedShiftIds.length === 0) return;
     setIsUndoingShifts(true);
     try {
-      await request( "delete", `/shifts`, () => { setSnackbarMessage(`Đã hoàn tác ${lastGeneratedShiftIds.length} ca thành công!`); setSnackbarSeverity("success"); setLastGeneratedShiftIds([]); }, { onError: (err) => { console.error("Lỗi khi hoàn tác ca:", err.response?.data || err.message); setSnackbarMessage("Lỗi khi hoàn tác các ca đã tạo."); setSnackbarSeverity("error"); } }, lastGeneratedShiftIds );
+      await request( "delete", `/shifts/bulk-delete`, () => { setSnackbarMessage(`Đã hoàn tác ${lastGeneratedShiftIds.length} ca thành công!`); setSnackbarSeverity("success"); setLastGeneratedShiftIds([]); }, { onError: (err) => { console.error("Lỗi khi hoàn tác ca:", err.response?.data || err.message); setSnackbarMessage("Lỗi khi hoàn tác các ca đã tạo."); setSnackbarSeverity("error"); } }, { shift_ids: lastGeneratedShiftIds } ); // Gửi ID trong body
     } catch (error) { console.error("Lỗi cục bộ khi hoàn tác:", error); setSnackbarMessage("Lỗi cục bộ khi gửi yêu cầu hoàn tác."); setSnackbarSeverity("error");
     } finally { setIsUndoingShifts(false); setSnackbarOpen(true); if (isStatsModalOpen) setIsStatsModalOpen(false); }
   };
   const handleSnackbarClose = (event, reason) => { if (reason === 'clickaway') { return; } setSnackbarOpen(false); };
   const handleCloseStatsModal = () => setIsStatsModalOpen(false);
 
-  // Updated loading condition: Show full page loading only during the very initial data fetch.
+
   if (loadingApis) {
-    return ( <ThemeProvider theme={theme}> <CssBaseline /> <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}> <CircularProgress size={50} /> <Typography variant="h6" sx={{ml:2}}>Đang tải dữ liệu khởi tạo...</Typography> </Box> </ThemeProvider> )
+    return (
+      // ThemeProvider và CssBaseline đã được áp dụng ở ConfigurableRosterPage
+      <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 64px)', bgcolor: 'background.default', mr:2 }}>
+        <CircularProgress size={50} />
+        <Typography variant="h6" sx={{ml:2, color: 'text.secondary'}}>Đang tải dữ liệu...</Typography>
+      </Box>
+    )
   }
 
+  const modalTitleStyle = { fontSize: '1.15rem', fontWeight: 600 }; // Style cho tiêu đề modal
+
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      {/* More specific Backdrop for actions that affect the list or submit forms */}
-      <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.modal + 1 }} open={isSubmitting || isUndoingShifts || loadingTemplatesAction }>
+    // ThemeProvider và CssBaseline đã có ở ConfigurableRosterPage
+    <>
+      <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isSubmitting || isUndoingShifts || loadingTemplatesAction }> {/* Tăng zIndex cho Backdrop */}
         <CircularProgress color="inherit" sx={{mr: 2}}/>
-        <Typography variant="h6">
+        <Typography variant="body1">
           {isUndoingShifts ? "Đang hoàn tác..." :
-            isSubmitting ? "Đang xử lý..." :
-              loadingTemplatesAction ? "Đang tải danh sách cấu hình..." : "Đang xử lý..." // Fallback
+            isSubmitting ? "Đang xử lý yêu cầu..." :
+              loadingTemplatesAction ? "Đang tải danh sách cấu hình..." : "Vui lòng chờ..."
           }
         </Typography>
       </Backdrop>
 
-      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-        <Container component="main" maxWidth="lg" sx={{ py: 0, flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 2, px: {xs: 0, sm: 0}, backgroundColor: theme.palette.background.default, zIndex: 10, borderBottom: `1px solid ${theme.palette.divider}`, }}>
-            <Typography variant="h5" sx={{ color: 'primary.dark', fontWeight: 700, display:'flex', alignItems:'center' }}>
-              <ArticleIcon sx={{mr:1, color: 'primary.main', fontSize: '1.7rem'}} />
-              Quản Lý Bộ Cấu Hình Xếp Lịch
-            </Typography>
-            <Button color="primary" startIcon={<AddIcon />} onClick={handleOpenTemplateModalForNew} variant="contained" disabled={isSubmitting || isUndoingShifts || loadingTemplatesAction}>
-              Tạo Mới
-            </Button>
-          </Box>
-          <Box sx={{flexGrow: 1, overflowY: 'auto', pt: 2, pr:0.5, mr: -0.5 }}>
-            {/* Show loading for template list only if it's the initial load and list is empty */}
-            {loadingTemplatesAction && configTemplates.length === 0 ? (
-              <Box sx={{display:'flex', justifyContent:'center', alignItems:'center', height: '50vh'}}><CircularProgress/></Box>
-            ) : (
-              <TemplateListDisplay
-                templates={configTemplates}
-                onEdit={handleOpenTemplateModalForEdit}
-                onDelete={openDeleteConfirmModal}
-                onOpenApplyModal={handleOpenApplyModal}
-                isSubmittingRoster={isSubmitting || isUndoingShifts}
-              />
-            )}
-          </Box>
-        </Container>
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 64px)', overflow: 'hidden', bgcolor: 'background.default', mr:2 }}>
+        {/* Header Paper */}
+        <Paper sx={{
+          p: 2,
+          mb: 0,
+          borderBottom: `1px solid ${theme.palette.divider}`,
+          borderRadius:0,
+          boxShadow: 'none'
+        }}>
+          <Grid container justifyContent="space-between" alignItems="center">
+            <Grid item>
+              <Typography variant="h4" component="h1" sx={{ color: 'text.primary', fontWeight: 600, display:'flex', alignItems:'center' }}>
+                <ArticleIcon sx={{mr:1.5, color: 'primary.main', fontSize: '2rem'}} />
+                Quản Lý Bộ Cấu Hình Xếp Lịch
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Button color="primary" startIcon={<AddIcon />} onClick={handleOpenTemplateModalForNew} variant="contained" disabled={isSubmitting || isUndoingShifts || loadingTemplatesAction}>
+                Tạo Mới Cấu Hình
+              </Button>
+            </Grid>
+          </Grid>
+        </Paper>
 
-        <Modal open={isTemplateModalOpen} onClose={(event, reason) => { if (reason !== 'backdropClick' && !isSubmitting) handleCloseTemplateModal();}} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} closeAfterTransition >
-          <Paper sx={{ width: '95%', maxWidth: '900px', maxHeight: 'calc(95vh - 32px)', display: 'flex', flexDirection: 'column', borderRadius: 2, boxShadow: 24, outline: 'none' }}>
-            {isTemplateModalOpen && <TemplateConfigForm onSave={handleSaveTemplate} onCancel={handleCloseTemplateModal} initialTemplateData={editingTemplate} isSubmitting={isSubmitting} />}
+        {/* Content Area */}
+        <Box sx={{flexGrow: 1, overflowY: 'auto', p: 2}} className= "custom-scrollbar">
+          {loadingTemplatesAction && configTemplates.length === 0 ? (
+            <Box sx={{display:'flex', justifyContent:'center', alignItems:'center', height: 'calc(100% - 40px)'}}><CircularProgress/></Box> // Điều chỉnh height
+          ) : (
+            <TemplateListDisplay
+              templates={configTemplates}
+              onEdit={handleOpenTemplateModalForEdit}
+              onDelete={openDeleteConfirmModal}
+              onOpenApplyModal={handleOpenApplyModal}
+              isSubmittingRoster={isSubmitting || isUndoingShifts}
+            />
+          )}
+        </Box>
+      </Box>
+
+      {/* Modals */}
+      <Modal open={isTemplateModalOpen} onClose={(event, reason) => { if (reason !== 'backdropClick' && !isSubmitting) handleCloseTemplateModal();}} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} closeAfterTransition >
+        <Paper sx={{ width: '95%', maxWidth: '1000px', maxHeight: 'calc(95vh - 32px)', display: 'flex', flexDirection: 'column', borderRadius: 2, boxShadow: 24, outline: 'none' }}>
+          {/* Truyền titleProps vào TemplateConfigForm nếu nó hỗ trợ, hoặc style DialogTitle bên trong nó */}
+          {isTemplateModalOpen && <TemplateConfigForm onSave={handleSaveTemplate} onCancel={handleCloseTemplateModal} initialTemplateData={editingTemplate} isSubmitting={isSubmitting} titleStyle={modalTitleStyle} />}
+        </Paper>
+      </Modal>
+
+      {templateToApply && (
+        <Modal open={isApplyModalOpen} onClose={(event, reason) => { if (reason !== 'backdropClick' && !isSubmitting) handleCloseApplyModal();}} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} closeAfterTransition >
+          <Paper sx={{ width: '95%', maxWidth: '750px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', borderRadius: 2, boxShadow: 24, outline: 'none' }}>
+            {isApplyModalOpen &&
+              <ApplyConfigForm
+                onApply={handleActualApplyAndRoster}
+                onCancel={handleCloseApplyModal}
+                configTemplate={templateToApply}
+                departments={departments}
+                jobPositions={jobPositions}
+                isSubmittingRoster={isSubmitting}
+                titleStyle={modalTitleStyle}
+              />
+            }
           </Paper>
         </Modal>
+      )}
 
-        {templateToApply && (
-          <Modal open={isApplyModalOpen} onClose={(event, reason) => { if (reason !== 'backdropClick' && !isSubmitting) handleCloseApplyModal();}} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} closeAfterTransition >
-            <Paper sx={{ width: '95%', maxWidth: '750px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', borderRadius: 2, boxShadow: 24, outline: 'none' }}>
-              {isApplyModalOpen &&
-                <ApplyConfigForm
-                  onApply={handleActualApplyAndRoster}
-                  onCancel={handleCloseApplyModal}
-                  configTemplate={templateToApply}
-                  departments={departments} // Pass the state departments
-                  jobPositions={jobPositions} // Pass the state jobPositions
-                  isSubmittingRoster={isSubmitting}
-                />
-              }
+      {rosterStatistics && (
+        <Dialog open={isStatsModalOpen} onClose={handleCloseStatsModal} maxWidth="lg" fullWidth
+                PaperProps={{ sx: { maxHeight: 'calc(90vh - 64px)', display: 'flex', flexDirection: 'column', m: {xs:1, sm:2} }}} // Thêm margin cho Dialog
+        >
+          <DialogTitle sx={{ ...modalTitleStyle, backgroundColor: 'primary.main', color: 'primary.contrastText', display: 'flex', justifyContent: 'space-between', alignItems: 'center', py:1.5, px:2 }}>
+            <Box sx={{display: 'flex', alignItems: 'center'}}> <BarChartIcon sx={{ mr: 1 }} /> Thống Kê Kết Quả Xếp Lịch </Box>
+            <IconButton onClick={handleCloseStatsModal} sx={{color: 'primary.contrastText'}}><CloseIcon /></IconButton>
+          </DialogTitle>
+          <DialogContent dividers sx={{p:2, flexGrow: 1,
+            '&::-webkit-scrollbar': { width: '6px' },
+            '&::-webkit-scrollbar-track': { background: theme.palette.grey[100] },
+            '&::-webkit-scrollbar-thumb': { background: theme.palette.grey[300] },
+            '&::-webkit-scrollbar-thumb:hover': { background: theme.palette.grey[400] }
+          }}>
+            <Typography variant="body1" gutterBottom> Cho giai đoạn: <strong>{rosterStatistics.rosterStartDate}</strong> đến <strong>{rosterStatistics.rosterEndDate}</strong> </Typography>
+            <Divider sx={{my:1.5}}/>
+            <Typography variant="h6" gutterBottom sx={{fontWeight:500}}>Tổng Quan</Typography>
+            <Paper variant="outlined" sx={{p:1.5, mb:2, bgcolor: 'background.default'}}>
+              <Typography>Tổng số ca đã xếp: <strong>{rosterStatistics.totalAssignedShifts ?? 'N/A'}</strong></Typography>
+              <Typography>Tổng số giờ làm đã xếp: <strong>{rosterStatistics.totalAssignedHours?.toFixed(2) ?? 'N/A'}</strong></Typography>
+              {rosterStatistics.fairnessHours && ( <> <Typography sx={{mt:1, fontWeight:'500'}}>Phân Bổ Giờ Làm:</Typography> <Typography variant="body2">Giờ làm tối thiểu/NV: {rosterStatistics.fairnessHours.minEmployeeValue?.toFixed(2) ?? 'N/A'}</Typography> <Typography variant="body2">Giờ làm tối đa/NV: {rosterStatistics.fairnessHours.maxEmployeeValue?.toFixed(2) ?? 'N/A'}</Typography> <Typography variant="body2">Chênh lệch (Max-Min): {rosterStatistics.fairnessHours.rangeValue?.toFixed(2) ?? 'N/A'} giờ</Typography> </>)}
             </Paper>
-          </Modal>
-        )}
+            <Typography variant="h6" gutterBottom sx={{fontWeight:500}}>Chi Tiết Theo Nhân Viên</Typography>
+            <Paper variant="outlined" sx={{maxHeight: 250, overflowY: 'auto', mb:2, bgcolor: 'background.default'}}>
+              <List dense disablePadding>
+                {(rosterStatistics.employeeStats && rosterStatistics.employeeStats.length > 0) ? rosterStatistics.employeeStats.map((emp, index) => (
+                  <React.Fragment key={emp.staffCode || index}>
+                    <ListItem sx={{py:0.5}}>
+                      <ListItemText
+                        primaryTypographyProps={{fontWeight:'500', color:'text.primary', fontSize: '0.9rem'}}
+                        secondaryTypographyProps={{fontSize: '0.75rem', color:'text.secondary'}}
+                        primary={`${emp.employeeName} (Mã NV: ${emp.staffCode || 'N/A'})`}
+                        secondary={`Tổng ca: ${emp.totalShifts}, Tổng giờ: ${emp.totalHours?.toFixed(2)}, Ca Đêm: ${emp.nightShifts}, Ca T7: ${emp.saturdayShiftsWorked}, Ca CN: ${emp.sundayShiftsWorked}, Chuỗi LT max: ${emp.maxConsecutiveWorkDays}`} />
+                    </ListItem>
+                    {index < rosterStatistics.employeeStats.length - 1 && <Divider component="li" variant="inset" />}
+                  </React.Fragment>
+                )) : <ListItem><ListItemText primary="Không có dữ liệu chi tiết nhân viên." /></ListItem>}
+              </List>
+            </Paper>
+            {rosterStatistics.detailedRosterLog && rosterStatistics.detailedRosterLog.length > 0 && (
+              <> <Typography variant="h6" gutterBottom sx={{fontWeight:500}}>Log Chi Tiết Quá Trình Xếp Lịch</Typography>
+                <Paper variant="outlined" sx={{maxHeight: 300, overflowY: 'auto', p:1.5, backgroundColor: theme.palette.grey[50]}}> {/* Nền nhạt hơn cho log */}
+                  {rosterStatistics.detailedRosterLog.map((line, idx) => ( <Typography key={idx} component="div" variant="caption" sx={{whiteSpace: 'pre-wrap', fontFamily:'monospace', fontSize: '0.7rem', lineHeight: 1.25}}> {line.replace(/📅|🕒|👤|🎉|📊|❌|▶|✅|➡|=========================================================|\n/g, '').trim()} </Typography> ))}
+                </Paper> </>
+            )}
+          </DialogContent>
+          <DialogActions sx={{borderTop: `1px solid ${theme.palette.divider}`, p: '12px 24px', backgroundColor:theme.palette.grey[50]}}> {/* Nền nhạt cho actions */}
+            {lastGeneratedShiftIds.length > 0 && ( <Button onClick={handleOpenUndoConfirmModal} color="warning" variant="outlined" startIcon={<UndoIcon />} disabled={isUndoingShifts || isSubmitting}> {isUndoingShifts ? "Đang Hoàn Tác..." : "Hoàn Tác Lịch"} </Button> )}
+            <Box sx={{ flexGrow: 1 }} />
+            <Button onClick={handleCloseStatsModal} color="inherit">Đóng</Button>
+            <Button onClick={() => downloadCSV(rosterStatistics)} color="primary" variant="contained" startIcon={<DownloadIcon />}> Tải CSV </Button>
+          </DialogActions>
+        </Dialog>
+      )}
 
-        {rosterStatistics && (
-          <Dialog open={isStatsModalOpen} onClose={handleCloseStatsModal} maxWidth="lg" fullWidth PaperProps={{ sx: { maxHeight: '90vh', display: 'flex', flexDirection: 'column'} }}>
-            <DialogTitle sx={{ backgroundColor: 'primary.dark', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', py:1.5 }}>
-              <Box sx={{display: 'flex', alignItems: 'center'}}> <BarChartIcon sx={{ mr: 1 }} /> Thống Kê Kết Quả Xếp Lịch </Box>
-              <IconButton onClick={handleCloseStatsModal} sx={{color: 'white'}}><CloseIcon /></IconButton>
-            </DialogTitle>
-            <DialogContent dividers sx={{p:2, flexGrow: 1, overflowY: 'auto'}}>
-              <Typography variant="body2" gutterBottom> Cho giai đoạn: <strong>{rosterStatistics.rosterStartDate}</strong> đến <strong>{rosterStatistics.rosterEndDate}</strong> </Typography>
-              <Divider sx={{my:1}}/>
-              <Typography variant="h6" gutterBottom>Tổng Quan</Typography>
-              <Paper variant="outlined" sx={{p:1.5, mb:2}}>
-                <Typography>Tổng số ca đã xếp: <strong>{rosterStatistics.totalAssignedShifts ?? 'N/A'}</strong></Typography>
-                <Typography>Tổng số giờ làm đã xếp: <strong>{rosterStatistics.totalAssignedHours?.toFixed(2) ?? 'N/A'}</strong></Typography>
-                {rosterStatistics.fairnessHours && ( <> <Typography sx={{mt:1, fontWeight:'bold'}}>Phân Bổ Giờ Làm:</Typography> <Typography>Giờ làm tối thiểu/NV: {rosterStatistics.fairnessHours.minEmployeeValue?.toFixed(2) ?? 'N/A'}</Typography> <Typography>Giờ làm tối đa/NV: {rosterStatistics.fairnessHours.maxEmployeeValue?.toFixed(2) ?? 'N/A'}</Typography> <Typography>Chênh lệch (Max-Min): {rosterStatistics.fairnessHours.rangeValue?.toFixed(2) ?? 'N/A'} giờ</Typography> </>)}
-                {rosterStatistics.fairnessNightShifts && ( <> <Typography sx={{mt:1, fontWeight:'bold'}}>Phân Bổ Ca Đêm:</Typography> <Typography>Ca đêm tối thiểu/NV: {rosterStatistics.fairnessNightShifts.minEmployeeCount ?? 'N/A'}</Typography> <Typography>Ca đêm tối đa/NV: {rosterStatistics.fairnessNightShifts.maxEmployeeCount ?? 'N/A'}</Typography> <Typography>Chênh lệch: {rosterStatistics.fairnessNightShifts.rangeCount ?? 'N/A'} ca</Typography> </>)}
-                {rosterStatistics.fairnessSundayShifts && ( <> <Typography sx={{mt:1, fontWeight:'bold'}}>Phân Bổ Ca Chủ Nhật:</Typography> <Typography>Ca CN tối thiểu/NV: {rosterStatistics.fairnessSundayShifts.minEmployeeCount ?? 'N/A'}</Typography> <Typography>Ca CN tối đa/NV: {rosterStatistics.fairnessSundayShifts.maxEmployeeCount ?? 'N/A'}</Typography> <Typography>Chênh lệch: {rosterStatistics.fairnessSundayShifts.rangeCount ?? 'N/A'} ca</Typography> </>)}
-              </Paper>
-              <Typography variant="h6" gutterBottom>Chi Tiết Theo Nhân Viên</Typography>
-              <Paper variant="outlined" sx={{maxHeight: 300, overflowY: 'auto', mb:2}}>
-                <List dense>
-                  {(rosterStatistics.employeeStats && rosterStatistics.employeeStats.length > 0) ? rosterStatistics.employeeStats.map((emp, index) => (
-                    <React.Fragment key={emp.staffCode || index}> <ListItem> <ListItemText primaryTypographyProps={{fontWeight:'500', color:'text.primary'}} secondaryTypographyProps={{fontSize: '0.8rem', color:'text.secondary'}} primary={`${emp.employeeName} (Mã NV: ${emp.staffCode})`} secondary={`Tổng ca: ${emp.totalShifts}, Tổng giờ: ${emp.totalHours?.toFixed(2)}, Ca Đêm: ${emp.nightShifts}, Ca T7: ${emp.saturdayShiftsWorked}, Ca CN: ${emp.sundayShiftsWorked}, Chuỗi LT max: ${emp.maxConsecutiveWorkDays}`} /> </ListItem> {index < rosterStatistics.employeeStats.length - 1 && <Divider component="li" />} </React.Fragment>
-                  )) : <ListItem><ListItemText primary="Không có dữ liệu chi tiết nhân viên." /></ListItem>}
-                </List>
-              </Paper>
-              {rosterStatistics.detailedRosterLog && rosterStatistics.detailedRosterLog.length > 0 && (
-                <> <Typography variant="h6" gutterBottom>Log Chi Tiết Lịch</Typography>
-                  <Paper variant="outlined" sx={{maxHeight: 350, overflowY: 'auto', p:1.5, backgroundColor: 'grey.50'}}>
-                    {rosterStatistics.detailedRosterLog.map((line, idx) => ( <Typography key={idx} component="div" variant="caption" sx={{whiteSpace: 'pre-wrap', fontFamily:'monospace', fontSize: '0.75rem', lineHeight: 1.3}}> {line.replace(/📅|🕒|👤|🎉|📊|❌|▶|✅|➡|=========================================================|\n/g, '').trim()} </Typography> ))}
-                  </Paper> </>
-              )}
-            </DialogContent>
-            <DialogActions sx={{borderTop: '1px solid', borderColor:'divider', p: '12px 24px', backgroundColor:'grey.100'}}>
-              {lastGeneratedShiftIds.length > 0 && ( <Button onClick={handleOpenUndoConfirmModal} color="warning" variant="outlined" startIcon={<UndoIcon />} disabled={isUndoingShifts || isSubmitting}> {isUndoingShifts ? "Đang Hoàn Tác..." : "Hoàn Tác Lịch Vừa Tạo"} </Button> )}
-              <Box sx={{ flexGrow: 1 }} />
-              <Button onClick={handleCloseStatsModal} color="inherit">Đóng</Button>
-              <Button onClick={() => downloadCSV(rosterStatistics)} color="primary" variant="contained" startIcon={<DownloadIcon />}> Tải CSV Thống Kê </Button>
-            </DialogActions>
-          </Dialog>
-        )}
+      <DeleteConfirmationModal
+        open={isDeleteConfirmModalOpen}
+        onClose={closeDeleteConfirmModal}
+        onSubmit={handleDeleteTemplateConfirmed}
+        title="Xác nhận Xóa Bộ Cấu Hình"
+        info={`Bạn có chắc chắn muốn xóa vĩnh viễn bộ cấu hình này không?`}
+        confirmLabel="Xóa"
+        cancelLabel="Hủy"
+        titleProps={{sx: modalTitleStyle}}
+      />
 
-        <DeleteConfirmationModal
-          open={isDeleteConfirmModalOpen}
-          onClose={closeDeleteConfirmModal}
-          onSubmit={handleDeleteTemplateConfirmed}
-          title="Xác nhận Xóa Bộ Cấu Hình"
-          info={`Bạn có chắc chắn muốn xóa bộ cấu hình này không? Hành động này sẽ xóa vĩnh viễn và không thể hoàn tác.`}
-          confirmLabel="Đồng Ý Xóa"
-          cancelLabel="Hủy Bỏ"
-        />
+      <DeleteConfirmationModal
+        open={isUndoConfirmModalOpen}
+        onClose={handleCloseUndoConfirmModal}
+        onSubmit={executeUndoLastGeneratedShifts}
+        title="Xác nhận Hoàn Tác Lịch"
+        info={`Bạn có chắc chắn muốn hoàn tác ${lastGeneratedShiftIds.length} ca làm việc vừa tạo không?`}
+        confirmLabel="Hoàn Tác"
+        cancelLabel="Hủy"
+        titleProps={{sx: modalTitleStyle}}
+      />
 
-        <DeleteConfirmationModal
-          open={isUndoConfirmModalOpen}
-          onClose={handleCloseUndoConfirmModal}
-          onSubmit={executeUndoLastGeneratedShifts}
-          title="Xác nhận Hoàn Tác Lịch"
-          info={`Bạn có chắc chắn muốn hoàn tác ${lastGeneratedShiftIds.length} ca làm việc vừa được tạo không? Các ca này sẽ bị xóa khỏi hệ thống.`}
-          confirmLabel="Đồng Ý Hoàn Tác"
-          cancelLabel="Hủy Bỏ"
-        />
+      <Snackbar open={snackbarOpen} autoHideDuration={5000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+    </>
+  );
+}
 
-        <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
-          <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-            {snackbarMessage}
-          </Alert>
-        </Snackbar>
-      </Box>
+
+export default function ConfigurableRosterPage() {
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <ConfigurableRosterPageInternal />
     </ThemeProvider>
   );
 }

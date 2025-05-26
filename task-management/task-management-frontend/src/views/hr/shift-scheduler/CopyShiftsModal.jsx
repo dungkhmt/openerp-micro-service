@@ -90,7 +90,7 @@ export default function CopyShiftsModal({ isOpen, onClose, onConfirmCopy, curren
 
         <Typography variant="body2" sx={{mb:1}}>Chọn (các) tuần muốn sao chép đến:</Typography>
 
-        <Box sx={{ overflowY: 'auto', mb: 2, flexGrow: 1 }}>
+        <Box sx={{ overflowY: 'auto', mb: 2, flexGrow: 1 }} className={"custom-scrollbar"}>
           <List dense>
             {weekOptions.map((option) => (
               <ListItem key={option.value} disablePadding>

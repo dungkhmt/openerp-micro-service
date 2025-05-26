@@ -16,7 +16,7 @@ export default function ConstraintsManager({ constraints, setConstraints }) {
       <Typography variant="h6" gutterBottom sx={{ color: 'primary.dark', fontSize: '1.05rem', display: 'flex', alignItems: 'center', mb: 1.5 }}>
         <BlockIcon sx={{ mr: 1, color: 'primary.main', fontSize: '1.3rem' }} /> Các Ràng Buộc Công Việc
       </Typography>
-      <Box sx={{ maxHeight: '220px', overflowY: 'auto', pr: 0.5 }}>
+      <Box sx={{ maxHeight: '400px', overflowY: 'auto', pr: 0.5 }} className="custom-scrollbar">
         {Object.entries(constraints).map(([key, constraint]) => (
           <Paper key={key} variant="outlined" sx={{ p: 1.5, mb: 1.5, borderColor: 'rgba(0,0,0,0.1)' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

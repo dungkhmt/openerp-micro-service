@@ -528,6 +528,7 @@ const AutocompleteComponent = ({ hidden }) => {
                 groupBy={(option) =>
                   searchValue.length ? categoryTitle[option.category] : ""
                 }
+                className="custom-scrollbar"
                 sx={{
                   "& + .MuiAutocomplete-popper": {
                     ...(searchValue.length

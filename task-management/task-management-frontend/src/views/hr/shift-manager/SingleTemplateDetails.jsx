@@ -39,10 +39,10 @@ export default function SingleTemplateDetails({ template }) {
       <Grid container spacing={2.5}>
         <Grid item xs={12} md={5}>
           <Typography variant="subtitle1" gutterBottom sx={{ color: 'secondary.dark', fontWeight: 'bold', fontSize:'1rem', borderBottom: '1px solid', borderColor:'divider', pb: 0.5, mb:1 }}>
-            Ca Làm Việc ({definedShifts.length}) {/* Safe access to length */}
+            Ca Làm Việc ({definedShifts.length})
           </Typography>
           {definedShifts.length > 0 ? (
-            <List dense sx={{ maxHeight: 200, overflow: 'auto', p:0 }}>
+            <List dense sx={{ maxHeight: 200, overflow: 'auto', p:0 }} className="custom-scrollbar">
               {definedShifts.map(shift => (
                 <ListItem key={shift.id} sx={{py: 0.5, pl:0, borderBottom: '1px solid #f0f0f0', '&:last-child': {borderBottom: 'none'} }}>
                   <ListItemText
@@ -59,10 +59,10 @@ export default function SingleTemplateDetails({ template }) {
         </Grid>
         <Grid item xs={12} md={7}>
           <Typography variant="subtitle1" gutterBottom sx={{ color: 'secondary.dark', fontWeight: 'bold', fontSize:'1rem', borderBottom: '1px solid', borderColor:'divider', pb: 0.5, mb:1 }}>
-            Ràng Buộc Áp Dụng ({activeConstraintKeys.length}) {/* Safe access to length */}
+            Ràng Buộc Áp Dụng ({activeConstraintKeys.length})
           </Typography>
           {activeConstraintKeys.length > 0 ? (
-            <List dense sx={{ maxHeight: 200, overflow: 'auto', p:0 }}>
+            <List dense sx={{ maxHeight: 200, overflow: 'auto', p:0 }} className="custom-scrollbar">
               {activeConstraintKeys.map((key) => {
                 const constraintValue = activeHardConstraints[key];
                 const displayInfo = constraintDisplayInfo[key] || { label: key.replace(/_/g, ' ') };
@@ -75,8 +75,6 @@ export default function SingleTemplateDetails({ template }) {
                     .map(([pKey, pVal]) => `${pVal}`)
                     .join('; ');
                 }
-                // This check is now implicitly handled by filtering activeConstraintKeys
-
                 return (
                   <ListItem key={key} sx={{py: 0.25, pl:0, alignItems: 'center', borderBottom: '1px solid #f0f0f0', '&:last-child': {borderBottom: 'none'} }}>
                     <Box sx={{display: 'flex', alignItems: 'center', minWidth: {xs: '150px', sm:'200px'}, mr:1, color: 'text.secondary', flexShrink:0 }}>

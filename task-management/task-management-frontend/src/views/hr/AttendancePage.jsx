@@ -262,7 +262,7 @@ const AttendancePageInternal = () => {
         </Grid>
       </Paper>
 
-      <TableContainer component={Paper} sx={{ maxHeight: "calc(100vh - 270px)" }}>
+      <TableContainer component={Paper} sx={{ maxHeight: "calc(100vh - 270px)" }} className="custom-scrollbar">
         <Table stickyHeader sx={{ borderCollapse: "separate", borderSpacing: 0}}>
           <TableHead>
             <TableRow>
@@ -342,7 +342,7 @@ const AttendancePageInternal = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      <Box sx={{mt: 2}}>
+      <Box>
         <Pagination
           currentPage={currentPage}
           pageCount={pageCount}

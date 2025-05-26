@@ -2,6 +2,7 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.roster_template.usecase_data.CreateRosterTemplate;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.roster_template.usecase_data.UpdateRosterTemplate;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.RosterTemplateModel;
 import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.controller.roster.ShiftDefinition;
@@ -25,8 +26,8 @@ public class CreateRosterTemplatesRequest {
     @NotNull
     private Map<String, Object> activeHardConstraints;
 
-    public UpdateRosterTemplate toUseCase(){
-        return new UpdateRosterTemplate(
+    public CreateRosterTemplate toUseCase(){
+        return new CreateRosterTemplate(
             RosterTemplateModel.builder()
                 .templateName(templateName)
                 .definedShifts(definedShifts)

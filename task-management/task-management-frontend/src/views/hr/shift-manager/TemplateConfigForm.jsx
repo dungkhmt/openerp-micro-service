@@ -101,29 +101,21 @@ export default function TemplateConfigForm({ onSave, onCancel, initialTemplateDa
 
             if (paramDetail.type === 'number') {
               if (valueToSave === '' || valueToSave === null || isNaN(Number(valueToSave))) {
-                // Nếu giá trị số không hợp lệ, và có giá trị min được định nghĩa, dùng min. Nếu không, báo lỗi.
-                // Hoặc có thể set một default hợp lý nếu min không có.
-                // Hiện tại, nếu trống hoặc NaN, sẽ dùng giá trị min (hoặc 0 nếu min không có)
                 valueToSave = paramDetail.min === undefined ? 0 : paramDetail.min;
-                // Hoặc bạn có thể muốn báo lỗi:
-                // setFormError(`Tham số '${paramDetail.label}' của ràng buộc '${constraint.description}' không hợp lệ.`);
-                // paramsAreValid = false;
-                // break;
+
               } else {
                 valueToSave = Number(valueToSave);
               }
             }
             activeParams[paramKey] = valueToSave;
           }
-          // if (!paramsAreValid) break; // Thoát nếu có tham số lỗi
           activeConstraints[key] = activeParams;
-        } else { // Ràng buộc không có tham số (boolean toggle)
+        } else {
           activeConstraints[key] = true;
         }
       }
     }
 
-    // if (formError) return; // Nếu có lỗi từ việc validate params thì dừng
 
     const finalTemplateData = {
       id: initialTemplateData?.id || `template_${Date.now()}`,
@@ -136,19 +128,19 @@ export default function TemplateConfigForm({ onSave, onCancel, initialTemplateDa
 
   return (
     <>
-      <DialogTitle sx={{ m: 0, p: 2, backgroundColor: 'primary.main', color: 'white' }}>
+      <DialogTitle sx={{ m: 0, p: 2, backgroundColor: 'primary.main', color: 'white' }} >
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           {initialTemplateData?.id ? "Chỉnh Sửa Bộ Cấu Hình" : "Tạo Mới Bộ Cấu Hình"}
           <IconButton aria-label="close" onClick={onCancel} sx={{ color: 'white' }}><CloseIcon /></IconButton>
         </Stack>
       </DialogTitle>
-      <DialogContent dividers sx={{ p: { xs: 1.5, sm: 2 } }}>
+      <DialogContent dividers sx={{ p: { xs: 1.5, sm: 2 } }} className="custom-scrollbar">
         {formError && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setFormError('')} variant="filled">{formError}</Alert>}
         <TextField
           fullWidth label="Tên bộ cấu hình (*)" value={templateName} onChange={(e) => setTemplateName(e.target.value)}
           required sx={{ mb: 2 }} InputLabelProps={{ shrink: true }}
         />
-        <ShiftManager shifts={shifts} setShifts={setShifts} />
+        <ShiftManager shifts={shifts} setShifts={setShifts}  />
         <ConstraintsManager constraints={hardConstraints} setConstraints={setHardConstraints} />
       </DialogContent>
       <DialogActions sx={{ p: '16px 24px', borderTop: '1px solid', borderColor: 'divider', backgroundColor: 'grey.50' }}>

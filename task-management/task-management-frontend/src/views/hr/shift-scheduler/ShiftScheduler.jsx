@@ -735,7 +735,7 @@ function InnerShiftScheduler() {
 
   const dynamicStickyOffset = isAnyShiftSelected ? BULK_ACTIONS_BAR_HEIGHT : 0;
   const FIXED_FOOTER_RESERVED_SPACE = 20;
-  const paperContentMaxHeight = `calc(100vh - ${TOP_BAR_HEIGHT}px - ${dynamicStickyOffset}px - ${INFO_BANNERS_TOTAL_HEIGHT}px - ${PADDING_AROUND_SCROLLABLE_PAPER_ELEMENT}px - ${PAGE_BOTTOM_BUFFER}px - ${FIXED_FOOTER_RESERVED_SPACE}px)`;
+  const paperContentMaxHeight = `calc(100vh - 10px - ${TOP_BAR_HEIGHT}px - ${dynamicStickyOffset}px - ${INFO_BANNERS_TOTAL_HEIGHT}px - ${PADDING_AROUND_SCROLLABLE_PAPER_ELEMENT}px - ${PAGE_BOTTOM_BUFFER}px - ${FIXED_FOOTER_RESERVED_SPACE}px)`;
   const mainContentLoading = (isLoadingUsers && !initialLoadComplete) || (isLoadingShifts && !initialLoadComplete);
   const showClearFilterButton = (appliedNameFilter || appliedDepartmentFilter || appliedJobPositionFilter) && allUsers.length === 0 && rawUsers.length > 0 && !isLoadingUsers;
 
@@ -746,9 +746,9 @@ function InnerShiftScheduler() {
           <TopBar currentDate={currentDate} onPrevWeek={handlePrevWeek} onNextWeek={handleNextWeek} onToday={handleToday} onOpenFilterDrawer={handleOpenFilterDrawer} isFilterApplied={!!(appliedNameFilter || appliedDepartmentFilter || appliedJobPositionFilter)} isLoading={isPerformingApiAction} />
           <BulkActionsBar selectedCount={selectedShiftIds.filter(id => !id.toString().startsWith('temp-')).length} onDeleteSelected={handleDeleteSelectedShifts} onOpenCopyModal={handleOpenCopyModal} onDeselectAll={handleDeselectAll} />
           <UserFilterDrawer open={isFilterDrawerOpen} onClose={handleCloseFilterDrawer} nameFilterValue={nameFilterInput} onNameFilterChange={(e) => setNameFilterInput(e.target.value)} departmentFilterValue={departmentFilterInput} onDepartmentFilterChange={(event, newValue) => setDepartmentFilterInput(newValue)} jobPositionFilterValue={jobPositionFilterInput} onJobPositionFilterChange={(event, newValue) => setJobPositionFilterInput(newValue)} departmentOptions={departmentOptions} jobPositionOptions={jobPositionOptions} onApply={handleApplyFiltersFromDrawer} onClear={handleClearFiltersFromDrawer} />
-          <Box sx={{px: {xs: 0, sm:1, md:2}, py:1}}>
+          <Box sx={{py:1}} >
             <InfoBanners currentDate={currentDate} stickyTopOffset={dynamicStickyOffset} />
-            <Paper elevation={2} sx={{ mt:1, overflowY: 'auto', maxHeight: paperContentMaxHeight }}>
+            <Paper elevation={2} sx={{ mt:1, overflowY: 'auto', maxHeight: paperContentMaxHeight }} className={"custom-scrollbar"}>
               <CalendarHeader currentDate={currentDate} onToggleSelectAll={handleToggleSelectAllInView} isAllSelectedInView={isAllSelectedInView} isIndeterminateInView={isIndeterminateInView} stickyTopOffset={0} />
               {(!isLoadingUsers && !initialLoadComplete && isLoadingShifts && !isPerformingApiAction) ? null : ( !mainContentLoading && <UnassignedShiftsRow currentDate={currentDate} shifts={shifts.filter(s => s.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID)} onAddShift={(userId, day) => handleOpenModal(FRONTEND_UNASSIGNED_SHIFT_USER_ID, day)} onEditShift={(shift) => handleOpenModal(null, null, shift)} onDeleteShift={handleDeleteSingleShift} selectedShiftIds={selectedShiftIds} onToggleSelectShift={handleToggleSelectShift} isAnyShiftSelected={isAnyShiftSelected} isSticky={unassignedRowSticky} onToggleSticky={() => setUnassignedRowSticky(prev => !prev)} stickyTopOffset={CALENDAR_HEADER_HEIGHT} /> )}
               <Box sx={{ overflowX: 'auto' }}>
@@ -771,7 +771,6 @@ function InnerShiftScheduler() {
                           isAnyShiftSelected={isAnyShiftSelected}
                         />
                       ) : (
-                        // Hiển thị thông báo nếu không có user nào và không có ca unassigned
                         !shifts.some(s => s.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID) && (
                           <Box display="flex" justifyContent="center" alignItems="center" sx={{ height: 100, p:2, flexDirection: 'column' }}>
                             <Typography color="text.secondary">
@@ -780,7 +779,6 @@ function InnerShiftScheduler() {
                                   : (isLoadingUsers && initialLoadComplete ? "" : "Không có dữ liệu ca làm việc."))
                               }
                             </Typography>
-                            {/* Nút xóa bộ lọc sẽ được hiển thị riêng biệt bên dưới nếu cần */}
                           </Box>
                         )
                       )}

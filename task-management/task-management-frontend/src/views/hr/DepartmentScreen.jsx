@@ -25,9 +25,8 @@ import {
   Tooltip,
   Typography
 } from "@mui/material";
-import { theme } from './theme'; // Đường dẫn tới file theme.js của bạn
+import { theme } from './theme';
 
-// Icons
 import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditIcon from '@mui/icons-material/Edit';
@@ -35,11 +34,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 
-// Custom Components
 import AddDepartmentModal from "./modals/AddDepartmentModal";
 import DeleteConfirmationModal from "./modals/DeleteConfirmationModal.jsx";
-import Pagination from "@/components/item/Pagination"; // Component Pagination
-import { useDebounce } from "../../hooks/useDebounce"; // Import useDebounce
+import Pagination from "@/components/item/Pagination";
+import { useDebounce } from "../../hooks/useDebounce";
 
 // Libraries
 import {CSVLink} from "react-csv";
@@ -67,7 +65,7 @@ const DepartmentScreenInternal = () => {
   const fetchData = useCallback(async (pageIndex, pageSize, searchValue, isInitialLoadOrFilterChange = false) => {
     setLoading(true);
     const payload = {
-      departmentName: searchValue || null, // Sử dụng searchValue (debounced)
+      departmentName: searchValue || null,
       status: "ACTIVE",
       page: pageIndex,
       pageSize: pageSize,
@@ -242,21 +240,19 @@ const DepartmentScreenInternal = () => {
             <TextField
               fullWidth
               label="Tìm kiếm theo tên"
-              value={searchTerm} // Vẫn dùng searchTerm cho input
-              onChange={(e) => setSearchTerm(e.target.value)} // Cập nhật searchTerm ngay lập tức
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}lập tức
             />
           </Grid>
         </Grid>
       </Paper>
 
       <Paper sx={{ overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: "calc(100vh - 320px)" }}>
+        <TableContainer sx={{ maxHeight: "calc(100vh - 320px)" }} className="custom-scrollbar">
           <Table {...getTableProps()} stickyHeader size="medium">
             <TableHead>
               {headerGroups.map((headerGroup) => (
                 <TableRow {...headerGroup.getHeaderGroupProps()} sx={{
-                  // Thêm style cho TableRow của header nếu muốn, ví dụ border bottom
-                  // borderBottom: (t) => `2px solid ${t.palette.divider}`,
                 }}>
                   {headerGroup.headers.map((column) => (
                     <TableCell

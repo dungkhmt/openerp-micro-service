@@ -132,10 +132,11 @@ const InnerPayrollDetailPage = () => {
   }, [payroll?.from_date, payroll?.thru_date]);
 
   useEffect(() => {
-    request("get", "/departments?pageSize=1000&status=ACTIVE", (res) => { // Added params
-      setDepartmentOptions(res.data.data || []);
+    request("get", "/departments?status=ACTIVE", (res) => {
+      const data = res.data.data || []
+      setDepartmentOptions(data.map((d) => {return {code: d.department_code, name: d.department_name}}));
     });
-    request("get", "/jobs?pageSize=1000&status=ACTIVE", (res) => { // Added params
+    request("get", "/jobs?status=ACTIVE", (res) => {
       setJobPositionOptions(res.data.data || []);
     });
   }, []);
@@ -234,7 +235,7 @@ const InnerPayrollDetailPage = () => {
       {
         params: {
           fullname: tempSearchName || null,
-          departmentCode: tempDepartmentFilter?.department_code || null,
+          departmentCode: tempDepartmentFilter?.code || null,
           jobPositionCode: tempJobPositionFilter?.code || null,
           pageSize: 10000, // Assuming we need all matching staff_ids
           page:0,
@@ -293,7 +294,7 @@ const InnerPayrollDetailPage = () => {
   };
 
   const handleApplyFiltersFromDrawer = () => {
-    applyStaffFilters(); // This will set actual filters and trigger re-fetch
+    applyStaffFilters();
     setUserFilterDrawerOpen(false);
   };
 
@@ -324,7 +325,7 @@ const InnerPayrollDetailPage = () => {
     return <Typography sx={{p:3}}>Không tìm thấy thông tin kỳ lương.</Typography>;
   }
 
-  const tableMaxHeight = `calc(100vh - 280px)`;
+  const tableMaxHeight = `calc(100vh - 260px)`;
 
 
   return (
@@ -350,8 +351,8 @@ const InnerPayrollDetailPage = () => {
           width: "100%",
           p: 2,
           borderRadius: 2,
-          mb: 2, // Consistent margin bottom
-          bgcolor: theme.palette.mode === 'light' ? "#f7f9fc" : theme.palette.grey[900], // Adjusted bgcolor for theme
+          mb: 2,
+          bgcolor: theme.palette.mode === 'light' ? "#f7f9fc" : theme.palette.grey[900]
         }}
       >
         <Grid container spacing={2} alignItems="center">
@@ -429,11 +430,15 @@ const InnerPayrollDetailPage = () => {
         }}
         departmentOptions={departmentOptions}
         jobPositionOptions={jobPositionOptions}
-        onApply={handleApplyFiltersFromDrawer} // Changed handler
-        onClear={handleClearFiltersInDrawer}   // Changed handler
+        onApply={handleApplyFiltersFromDrawer}
+        onClear={handleClearFiltersInDrawer}
       />
 
-      <TableContainer component={Paper} sx={{ overflowX: "auto", maxHeight: tableMaxHeight, border: `1px solid ${theme.palette.divider}`, borderRadius:1 }}>
+      <TableContainer
+        component={Paper}
+        sx={{ overflowX: "auto", maxHeight: tableMaxHeight, border: `1px solid ${theme.palette.divider}`, borderRadius:1 }}
+        className="custom-scrollbar"
+      >
         <Table stickyHeader size="small" sx={{borderCollapse: 'collapse'}}>
           <TableHead>
             <TableRow>
