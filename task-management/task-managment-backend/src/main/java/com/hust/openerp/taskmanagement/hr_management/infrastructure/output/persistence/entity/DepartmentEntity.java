@@ -17,8 +17,7 @@ public class DepartmentEntity extends AuditEntity{
     @Column(name = "department_name", length = 200)
     private String departmentName;
 
-    @Lob
-    @Column(name = "description")
+    @Column(name = "description", length = Integer.MAX_VALUE)
     private String description;
 
     @Column(name = "status", length = 100)

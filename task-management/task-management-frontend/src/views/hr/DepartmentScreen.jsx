@@ -1,8 +1,7 @@
-import React, {useEffect, useMemo, useRef, useState, useCallback} from "react";
+import React, {useEffect, useMemo, useState, useCallback} from "react";
 import {usePagination, useTable} from "react-table";
-import {request} from "@/api"; // API client của bạn
+import {request}from "@/api";
 
-// MUI Components
 import {
   ThemeProvider,
   CssBaseline,
@@ -38,21 +37,19 @@ import AddDepartmentModal from "./modals/AddDepartmentModal";
 import DeleteConfirmationModal from "./modals/DeleteConfirmationModal.jsx";
 import Pagination from "@/components/item/Pagination";
 import { useDebounce } from "../../hooks/useDebounce";
-
-// Libraries
-import {CSVLink} from "react-csv";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
+import { exportToPDF, prepareCSVData } from "./fileExportUtils"; // Import hàm mới
+import dayjs from 'dayjs';
+import {CSVLink}from "react-csv";
 import toast from "react-hot-toast";
 
 const DepartmentScreenInternal = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pageCount, setPageCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(0); // 0-indexed
+  const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearchTerm = useDebounce(searchTerm, 500); // Debounce giá trị tìm kiếm
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   const [openModal, setOpenModal] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
@@ -84,6 +81,8 @@ const DepartmentScreenInternal = () => {
         setPageCount(meta?.page_info?.total_page || 0);
         if (!isInitialLoadOrFilterChange) {
           setCurrentPage(meta?.page_info?.page || 0);
+        } else {
+          setCurrentPage(0);
         }
       }, {
         onError: (err) => { console.error("Lỗi khi tải dữ liệu phòng ban:", err); toast.error("Không thể tải danh sách phòng ban."); },
@@ -97,9 +96,7 @@ const DepartmentScreenInternal = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch dữ liệu khi debouncedSearchTerm hoặc itemsPerPage thay đổi
-    setCurrentPage(0); // Đặt lại trang về 0 trước khi fetch
-    fetchData(0, itemsPerPage, debouncedSearchTerm, true); // Sử dụng debouncedSearchTerm
+    fetchData(0, itemsPerPage, debouncedSearchTerm, true);
   }, [itemsPerPage, debouncedSearchTerm, fetchData]);
 
 
@@ -122,7 +119,7 @@ const DepartmentScreenInternal = () => {
       }
     }
     handleMenuClose();
-  }, [currentMenuDepartmentId, data]);
+  }, [currentMenuDepartmentId, data, handleMenuClose]);
 
   const handleOpenDeleteModalFromMenu = useCallback(() => {
     if (currentMenuDepartmentId) {
@@ -133,13 +130,29 @@ const DepartmentScreenInternal = () => {
       }
     }
     handleMenuClose();
-  }, [currentMenuDepartmentId, data]);
+  }, [currentMenuDepartmentId, data, handleMenuClose]);
 
   const columns = useMemo(
     () => [
-      { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1, width: 60, disableSortBy: true },
-      { Header: "Tên phòng ban", accessor: "departmentName", minWidth: 200 },
-      { Header: "Mô tả", accessor: "description", Cell: ({ value }) => ( <Tooltip title={String(value || '')} placement="bottom-start"> <Typography variant="body1" noWrap sx={{ maxWidth: {xs: 150, sm: 200, md: 300}, overflow: 'hidden', textOverflow: 'ellipsis' }}> {value || '-'} </Typography> </Tooltip> ), minWidth: 250 },
+      { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1, width: 60, disableSortBy: true, id: 'stt' },
+      { Header: "Tên phòng ban", accessor: "departmentName", minWidth: 200, id: 'name' },
+      {
+        Header: "Mô tả",
+        accessor: "description",
+        Cell: ({ value }) => (
+          <Typography
+            variant="body1"
+            sx={{
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+            }}
+          >
+            {value || '-'}
+          </Typography>
+        ),
+        minWidth: 250,
+        id: 'description'
+      },
       {
         Header: "Hành động",
         id: 'actions',
@@ -170,41 +183,56 @@ const DepartmentScreenInternal = () => {
     request( "delete", `/departments/${departmentCodeToDelete}`, () => {
         toast.success("Phòng ban đã được xóa thành công.");
         const newCurrentPage = (data.filter(d => d.departmentCode !== departmentCodeToDelete).length % itemsPerPage === 0 && currentPage > 0 && Math.floor((data.length -1) / itemsPerPage) < currentPage) ? currentPage - 1 : currentPage;
-        if (newCurrentPage !== currentPage) {
-          setCurrentPage(newCurrentPage);
-        }
-        fetchData(newCurrentPage, itemsPerPage, debouncedSearchTerm); // Sử dụng debouncedSearchTerm
+
+        fetchData(newCurrentPage, itemsPerPage, debouncedSearchTerm, newCurrentPage === 0 && data.length -1 === 0);
         setDeleteModalOpen(false); setDeleteDepartment(null);
       }, { onError: (err) => { console.error("Lỗi khi xóa phòng ban:", err); toast.error(err.response?.data?.message || "Không thể xóa phòng ban."); } }
     );
   };
 
-  const exportPDF = () => {
-    const doc = new jsPDF();
-    const headerColor = theme?.palette?.primary?.main || [22, 160, 133];
-    doc.setFont("helvetica", "bold"); doc.text("Danh sách Phòng ban", 14, 20); doc.setFont("helvetica", "normal");
-    doc.autoTable({ startY: 30, headStyles: { fillColor: headerColor, textColor: "#ffffff", fontStyle: 'bold' }, head: [["#", "Tên phòng ban", "Mô tả"]], body: data.map((row, index) => [ currentPage * itemsPerPage + index + 1, row.departmentName, row.description, ]), styles: { font: "helvetica", fontSize: 10 }, });
-    doc.save("DanhSachPhongBan.pdf");
+  const handleExportPDF = () => {
+    // Chỉ lấy các cột cần xuất, bỏ cột "Hành động"
+    const pdfColumns = columns.filter(col => col.id !== 'actions');
+    exportToPDF({
+      data: data,
+      columns: pdfColumns,
+      title: "Danh sách Phòng Ban",
+      fileName: "DanhSachPhongBan.pdf",
+      themePalette: theme.palette,
+      customColumnWidths: {
+        0: { cellWidth: 30 },    // STT
+        1: { cellWidth: 120 },   // Tên phòng ban
+        2: { cellWidth: 'auto'} // Mô tả
+      }
+    });
   };
 
+  const csvHeaders = [
+    { label: "#", key: "stt" },
+    { label: "Tên phòng ban", key: "departmentName" },
+    { label: "Mô tả", key: "description" }
+  ];
+
+  const csvPreparedData = useMemo(() => {
+    if (loading || !data || data.length === 0) return [];
+    return data.map((row, index) => ({
+      stt: currentPage * itemsPerPage + index + 1,
+      departmentName: row.departmentName,
+      description: row.description,
+    }));
+  }, [data, currentPage, itemsPerPage, loading]);
+
+
   const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-    fetchData(newPage, itemsPerPage, debouncedSearchTerm, false); // Sử dụng debouncedSearchTerm
+    fetchData(newPage, itemsPerPage, debouncedSearchTerm, false);
   };
 
   const handleItemsPerPageChange = (newValue) => {
     setItemsPerPage(newValue);
-    // useEffect cho itemsPerPage sẽ kích hoạt fetchData với trang 0 và debouncedSearchTerm hiện tại
   };
 
-  const csvData = useMemo(() => {
-    if (loading || !data || data.length === 0) return [];
-    return data.map((row, index) => ({
-      "#": currentPage * itemsPerPage + index + 1,
-      "Tên phòng ban": row.departmentName,
-      "Mô tả": row.description,
-    }));
-  }, [data, currentPage, itemsPerPage, loading]);
+  const modalTitleStyle = { fontSize: '1.15rem', fontWeight: 600 };
+
 
   return (
     <Box sx={{ mr: 2, bgcolor: 'background.default', minHeight: 'calc(100vh - 64px)' }}>
@@ -215,16 +243,34 @@ const DepartmentScreenInternal = () => {
         </Grid>
       </Paper>
 
-      <AddDepartmentModal open={openModal} onClose={() => { setOpenModal(false); setSelectedDepartment(null); }} onSubmit={() => { const targetPage = selectedDepartment ? currentPage : 0; if (!selectedDepartment) setCurrentPage(0); fetchData(targetPage, itemsPerPage, debouncedSearchTerm, !selectedDepartment); }} initialValues={selectedDepartment} />
-      {deleteDepartment && (<DeleteConfirmationModal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} onSubmit={handleDelete} title="Xác nhận xóa Phòng Ban" info={`Bạn có chắc chắn muốn xóa phòng ban "${deleteDepartment?.departmentName}" không?`} cancelLabel="Hủy" confirmLabel="Xóa" /> )}
+      <AddDepartmentModal
+        open={openModal}
+        onClose={() => { setOpenModal(false); setSelectedDepartment(null); }}
+        onSubmit={() => {
+          const targetPage = selectedDepartment ? currentPage : 0;
+          fetchData(targetPage, itemsPerPage, debouncedSearchTerm, !selectedDepartment);
+        }}
+        initialData={selectedDepartment}  // Đổi tên prop cho nhất quán
+        titleProps={{sx: modalTitleStyle}}
+      />
+      {deleteDepartment && (<DeleteConfirmationModal
+        open={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onSubmit={handleDelete}
+        title="Xác nhận xóa Phòng Ban"
+        info={`Bạn có chắc chắn muốn xóa phòng ban "${deleteDepartment?.departmentName}" không?`}
+        cancelLabel="Hủy"
+        confirmLabel="Xóa"
+        titleProps={{sx: modalTitleStyle}}
+      /> )}
 
       <Paper sx={{ p: 2, mb: 2 }}>
         <Grid container spacing={2} alignItems="center" justifyContent="space-between" wrap="wrap">
           <Grid item xs={12} md="auto">
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} useFlexGap>
-              {(csvData && csvData.length > 0) ? (
+              {(csvPreparedData && csvPreparedData.length > 0 && !loading) ? (
                 <Button variant="outlined" size="small" startIcon={<CloudDownloadIcon />} >
-                  <CSVLink data={csvData} filename={`DanhSachPhongBan.csv`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <CSVLink data={csvPreparedData} headers={csvHeaders} filename={`DanhSachPhongBan_${dayjs().format("YYYYMMDD")}.csv`} style={{ textDecoration: 'none', color: 'inherit' }}>
                     Xuất CSV
                   </CSVLink>
                 </Button>
@@ -233,41 +279,40 @@ const DepartmentScreenInternal = () => {
                   Xuất CSV
                 </Button>
               )}
-              <Button variant="outlined" size="small" startIcon={<PictureAsPdfIcon />} onClick={exportPDF}> Xuất PDF </Button>
+              <Button variant="outlined" size="small" startIcon={<PictureAsPdfIcon />} onClick={handleExportPDF} disabled={loading || data.length === 0}> Xuất PDF </Button>
             </Stack>
           </Grid>
           <Grid item xs={12} sm>
             <TextField
               fullWidth
-              label="Tìm kiếm theo tên"
+              label="Tìm kiếm theo tên phòng ban"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}lập tức
+              onChange={(e) => setSearchTerm(e.target.value)}
+              size="small"
             />
           </Grid>
         </Grid>
       </Paper>
 
       <Paper sx={{ overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: "calc(100vh - 320px)" }} className="custom-scrollbar">
+        <TableContainer sx={{ maxHeight: "calc(100vh - 330px)" }} className="custom-scrollbar">
           <Table {...getTableProps()} stickyHeader size="medium">
             <TableHead>
               {headerGroups.map((headerGroup) => (
-                <TableRow {...headerGroup.getHeaderGroupProps()} sx={{
-                }}>
+                <TableRow {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map((column) => (
                     <TableCell
                       {...column.getHeaderProps()}
-                      align={column.textAlign || (column.id === 'actions' ? 'center' : 'left')}
+                      align={column.id === 'actions' || column.id === 'stt' ? 'center' : 'left'}
                       sx={{
-                        bgcolor: (t) => t.palette.mode === 'light' ? t.palette.grey[200] : t.palette.grey[700], // Màu nền đậm hơn một chút
-                        color: (t) => t.palette.getContrastText(t.palette.mode === 'light' ? t.palette.grey[200] : t.palette.grey[700]), // Đảm bảo độ tương phản chữ
-                        fontWeight: 'bold', // Chữ đậm hơn
+                        bgcolor: (t) => t.palette.mode === 'light' ? t.palette.grey[100] : t.palette.grey[700],
+                        color: (t) => t.palette.getContrastText(t.palette.mode === 'light' ? t.palette.grey[100] : t.palette.grey[700]),
+                        fontWeight: '600',
                         whiteSpace: 'nowrap',
                         width: column.width,
-                        minWidth: column.minWidth || (column.id === '#' ? 60 : 150),
-                        py: 1.5, // Padding dọc
-                        borderBottom: (t) => `1px solid ${t.palette.divider}`, // Đường viền dưới cho mỗi cell header
-                        // Thêm borderRight cho các cell trừ cell cuối cùng để có đường kẻ dọc
+                        minWidth: column.minWidth || (column.id === 'stt' ? 60 : 150),
+                        py: 1.25,
+                        borderBottom: (t) => `1px solid ${t.palette.divider}`,
                         '&:not(:last-child)': {
                           borderRight: (t) => `1px solid ${t.palette.divider}`,
                         }
@@ -282,7 +327,7 @@ const DepartmentScreenInternal = () => {
             <TableBody {...getTableBodyProps()}>
               {loading ? ( <TableRow><TableCell colSpan={columns.length} align="center" sx={{ py: 5 }}> <CircularProgress /> <Typography sx={{mt: 1.5}} variant="body1">Đang tải dữ liệu...</Typography> </TableCell></TableRow>
               ) : rows.length > 0 ? (
-                rows.map((row) => { prepareRow(row); return ( <TableRow {...row.getRowProps()} hover sx={{ '&:nth-of-type(odd)': { backgroundColor: (t) => t.palette.action.hover } }} > {row.cells.map((cell) => ( <TableCell {...cell.getCellProps()} align={cell.column.textAlign || (cell.column.id === 'actions' ? 'center' : 'left')} sx={{ py: 1.2, '&:not(:last-child)': { borderRight: (t) => `1px solid ${t.palette.grey[200]}` } /* Đường kẻ dọc mờ hơn cho body */ }}> {cell.render("Cell")} </TableCell> ))} </TableRow> ); })
+                rows.map((row) => { prepareRow(row); return ( <TableRow {...row.getRowProps()} hover sx={{ '&:nth-of-type(odd)': { backgroundColor: (t) => t.palette.action.hover } }} > {row.cells.map((cell) => ( <TableCell {...cell.getCellProps()} align={cell.column.id === 'actions' || cell.column.id === 'stt' ? 'center' : 'left'} sx={{ py: 1, '&:not(:last-child)': { borderRight: (t) => `1px solid ${t.palette.grey[200]}` } }}> {cell.render("Cell")} </TableCell> ))} </TableRow> ); })
               ) : ( <TableRow><TableCell colSpan={columns.length} align="center" sx={{ py: 5 }}> <Typography variant="h6">Không tìm thấy phòng ban nào.</Typography> <Typography variant="body1" color="text.secondary" sx={{mt:1}}> Vui lòng thử lại với từ khóa khác hoặc thêm phòng ban mới. </Typography> </TableCell></TableRow> )}
             </TableBody>
           </Table>
@@ -296,10 +341,10 @@ const DepartmentScreenInternal = () => {
         onClose={handleMenuClose}
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-        PaperProps={{ elevation: 0, sx: { overflow: 'visible', filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))', mt: 1.5, '& .MuiAvatar-root': { width: 32, height: 32, ml: -0.5, mr: 1, }, '&::before': { content: '""', display: 'block', position: 'absolute', top: 0, right: 14, width: 10, height: 10, bgcolor: 'background.paper', transform: 'translateY(-50%) rotate(45deg)', zIndex: 0, }, }, }}
+        PaperProps={{ elevation: 2, sx: { overflow: 'visible', filter: 'drop-shadow(0px 1px 4px rgba(0,0,0,0.2))', mt: 1.5, '& .MuiAvatar-root': { width: 32, height: 32, ml: -0.5, mr: 1, }, '&::before': { content: '""', display: 'block', position: 'absolute', top: 0, right: 14, width: 10, height: 10, bgcolor: 'background.paper', transform: 'translateY(-50%) rotate(45deg)', zIndex: 0, borderLeft: `1px solid ${theme.palette.divider}`, borderTop: `1px solid ${theme.palette.divider}` }, }, }}
       >
-        <MuiMenuItem onClick={handleEditFromMenu} sx={{ gap: 1 }}> <EditIcon fontSize="small" /> Sửa </MuiMenuItem>
-        <MuiMenuItem onClick={handleOpenDeleteModalFromMenu} sx={{ gap: 1, color: 'error.main' }}> <DeleteIcon fontSize="small" /> Xóa </MuiMenuItem>
+        <MuiMenuItem onClick={handleEditFromMenu} sx={{ gap: 1, fontSize:'0.9rem', color: 'text.secondary' }}> <EditIcon fontSize="small" /> Sửa </MuiMenuItem>
+        <MuiMenuItem onClick={handleOpenDeleteModalFromMenu} sx={{ gap: 1, color: 'error.main', fontSize:'0.9rem' }}> <DeleteIcon fontSize="small" /> Xóa </MuiMenuItem>
       </Menu>
     </Box>
   );

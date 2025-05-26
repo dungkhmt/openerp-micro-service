@@ -9,11 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 public class DepartmentValidator {
 
     public void validateDepartmentName(String name) {
-        if (!name.matches("^[a-zA-Z0-9]+(\\s[a-zA-Z0-9]+)*$")) {
+        if (!name.matches("^[\\p{L}\\p{N}]+(\\s[\\p{L}\\p{N}]+)*$")) {
             log.error("Department name contains invalid characters or invalid spacing");
             throw new InvalidParameterException("Department name contains invalid characters or invalid spacing." +
-                    " Only letters, numbers, and single spaces between words are allowed.");
+                " Only Unicode letters (including Vietnamese), numbers, and single spaces between words are allowed.");
         }
-
     }
 }

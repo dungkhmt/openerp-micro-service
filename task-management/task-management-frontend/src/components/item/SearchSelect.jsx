@@ -11,7 +11,7 @@ const  SearchSelect = ({
                         onChange,
                         getOptionLabel = (option) => option?.name || "",
                         disabled = false,
-                        size = 20,
+                        pageSize = 30,
                         multiple = false,
                         textFieldProps = {},
                         sx ={}
@@ -37,7 +37,7 @@ const  SearchSelect = ({
         params: {
           departmentName: search || null,
           page: 0,
-          pageSize: size,
+          pageSize: pageSize,
           sortBy: "id",
           order: "asc",
         },
