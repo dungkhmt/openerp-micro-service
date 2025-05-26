@@ -236,10 +236,10 @@ const CheckpointPeriodScreenInternal = () => {
   }, [data, loading]);
 
   return (
-    <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, bgcolor: 'background.default', minHeight: 'calc(100vh - 64px)' }}>
+    <Box sx={{ mr: 2, bgcolor: 'background.default', minHeight: 'calc(100vh - 64px)' }}>
       <Paper sx={{ p: 2, mb: 2 }}>
         <Grid container spacing={2} alignItems="center" justifyContent="space-between" wrap="wrap">
-          <Grid item> <Typography variant="h4" component="h1"> <EventNoteIcon sx={{mr:1, verticalAlign: 'middle'}}/> Kỳ Checkpoint </Typography> </Grid>
+          <Grid item> <Typography variant="h4" component="h1">  Kỳ Checkpoint </Typography> </Grid>
           <Grid item> <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => { setSelectedPeriod(null); setOpenModal(true); }}> Thêm mới </Button> </Grid>
         </Grid>
       </Paper>
@@ -266,7 +266,7 @@ const CheckpointPeriodScreenInternal = () => {
       </Paper>
 
       <Paper sx={{ overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: "calc(100vh - 350px)" }}>
+        <TableContainer sx={{ maxHeight: "calc(100vh - 320px)" }}>
           <Table {...getTableProps()} stickyHeader size="medium">
             <TableHead>
               {headerGroups.map((headerGroup) => (

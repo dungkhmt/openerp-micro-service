@@ -32,7 +32,7 @@ const AddHolidayModal = ({ open, onClose, onSubmit, initialData = null }) => {
   const [toDate, setToDate] = useState(null);
 
   useEffect(() => {
-    if (initialData) {
+    if (initialData?.id) {
       const dates = initialData.dates || [];
       setForm({
         name: initialData.name || "",
@@ -68,8 +68,8 @@ const AddHolidayModal = ({ open, onClose, onSubmit, initialData = null }) => {
 
     const dateArray = generateDateRange(fromDate, toDate);
 
-    const method = initialData ? "put" : "post";
-    const url = initialData ? `/holidays/${initialData.id}` : "/holidays";
+    const method = initialData?.id ? "put" : "post";
+    const url = initialData?.id ? `/holidays/${initialData.id}` : "/holidays";
 
     request(
       method,
@@ -91,7 +91,7 @@ const AddHolidayModal = ({ open, onClose, onSubmit, initialData = null }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>{initialData ? "Cập nhật ngày nghỉ" : "Thêm ngày nghỉ lễ"}</DialogTitle>
+      <DialogTitle>{initialData?.id ? "Cập nhật ngày nghỉ" : "Thêm ngày nghỉ lễ"}</DialogTitle>
       <DialogContent>
         <Stack spacing={3} mt={2}>
           <TextField

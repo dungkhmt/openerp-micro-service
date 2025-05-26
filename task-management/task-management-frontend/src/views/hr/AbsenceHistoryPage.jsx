@@ -218,7 +218,7 @@ const AbsenceHistoryPageInternal = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-      <Box sx={{ p: { xs: 2, md: 3 } }}>
+      <Box sx={{ p: { xs: 2 } }}>
         <Paper sx={{ p: { xs: 2, md: 3 }, mb: 3 }}>
           <Grid container spacing={2} alignItems="center" justifyContent="space-between">
             <Grid item xs={12} sm={7} md={8} lg={9}>

@@ -248,7 +248,7 @@ const WeeklyAbsencePageInternal = () => {
           WebkitBoxOrient: forCardView ? 'vertical' : 'inherit',
           color: theme.palette.text.secondary
         }}>
-          Lý do: {absence.reason || "-"}
+          {absence.reason || "-"}
         </Typography>
       </Tooltip>
     </Box>
@@ -257,7 +257,7 @@ const WeeklyAbsencePageInternal = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-      <Box sx={{ p: { xs: 2, md: 3 } }}>
+      <Box sx={{ mr: 2 }}>
         <Paper sx={{ p: { xs: 2, md: 3 }, mb: 2 }}> {/* Giảm mb một chút */}
           <Grid container justifyContent="space-between" alignItems="center" sx={{mb: 2.5}}> {/* Tăng mb một chút */}
             <Grid item>
@@ -296,10 +296,10 @@ const WeeklyAbsencePageInternal = () => {
                 value={selectedWeekStart}
                 onChange={(date) => date && setSelectedWeekStart(startOfWeek(date, { weekStartsOn: 1 }))}
                 shouldDisableDate={(date) => !isMonday(date)}
-                slotProps={{ textField: { size: 'small', fullWidth: true } }} // Đảm bảo DatePicker cũng size small và fullWidth
+                slotProps={{ textField: { size: 'small', fullWidth: true } }}
               />
             </Grid>
-            <Grid item xs={12} sm="auto" md="auto"> {/* Cho nút tìm kiếm co giãn */}
+            <Grid item xs={12} sm="auto" md="auto">
               <Button variant="contained" onClick={handleSearch} disabled={loading} fullWidth sx={{height: '40px'}}> Tìm kiếm </Button> {/* Set height bằng TextField size small */}
             </Grid>
           </Grid>
@@ -315,7 +315,7 @@ const WeeklyAbsencePageInternal = () => {
             <Paper sx={{p:3, textAlign: 'center', mt:2}}><Typography variant="subtitle1">Không có nhân viên nào phù hợp.</Typography></Paper>
           ) : (
             <Paper sx={{ overflow: 'hidden' }}>
-              <TableContainer sx={{ maxHeight: "calc(100vh - 260px)" }}> {/* Điều chỉnh lại maxHeight */}
+              <TableContainer sx={{ maxHeight: "calc(100vh - 230px)" }}>
                 <Table stickyHeader size="small">
                   <TableHead>
                     <TableRow>
@@ -366,7 +366,7 @@ const WeeklyAbsencePageInternal = () => {
           Object.values(absencesGroupedByDay).every(arr => arr.length === 0) && !loading ? (
             <Paper sx={{p:3, textAlign: 'center', mt:2}}><Typography variant="h6" color="text.secondary">Không có ai nghỉ trong tuần này theo bộ lọc đã chọn.</Typography></Paper>
           ) : (
-            <Box sx={{ maxHeight: "calc(100vh - 260px)", overflowY: 'auto', pr: 1,
+            <Box sx={{ maxHeight: "calc(100vh - 230px)", overflowY: 'auto', pr: 1,
               '&::-webkit-scrollbar': { width: '6px' },
               '&::-webkit-scrollbar-track': { background: theme.palette.grey[200], borderRadius: '3px' },
               '&::-webkit-scrollbar-thumb': { background: theme.palette.grey[400], borderRadius: '3px' },

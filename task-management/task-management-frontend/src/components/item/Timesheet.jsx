@@ -1,41 +1,51 @@
-import React, { useEffect, useState } from "react";
-import Button from "@mui/material/Button";
+// Timesheet.jsx
+import React, { useEffect, useState, useCallback } from "react";
+import {
+  Box,
+  Button,
+  Paper,
+  Typography,
+  Grid,
+  CircularProgress,
+  Divider
+} from "@mui/material";
 import { request } from "@/api";
 import toast from "react-hot-toast";
+import dayjs from "dayjs";
+import "dayjs/locale/vi";
+import { useTheme } from '@mui/material/styles';
+
+dayjs.locale('vi');
+
+const capitalizeFirstLetter = (str) => {
+  if (!str) return "";
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
 
 const Timesheet = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [checkData, setCheckData] = useState([]);
-  const [checkInTime, setCheckInTime] = useState(null);
-  const [checkOutTime, setCheckOutTime] = useState(null);
-  const [hoursWorked, setHoursWorked] = useState("0");
-  const [isLoading, setIsLoading] = useState(false);
+  const theme = useTheme();
+  const [currentTime, setCurrentTime] = useState(dayjs());
+  const [firstCheckInTime, setFirstCheckInTime] = useState(null);
+  const [lastCheckOutTime, setLastCheckOutTime] = useState(null);
+  const [allTodayRecords, setAllTodayRecords] = useState([]); // Lưu tất cả checkin/out trong ngày
+
+  const [hoursWorkedDisplay, setHoursWorkedDisplay] = useState("0.00"); // Giờ làm hiển thị (từ checkin đầu đến checkout cuối, hoặc đến hiện tại)
+
+  const [isLoading, setIsLoading] = useState(false); // Loading cho nút bấm
+  const [isFetchingInitialData, setIsFetchingInitialData] = useState(true);
+
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentTime(new Date());
+      setCurrentTime(dayjs());
     }, 1000);
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const fetchData = useCallback(async () => {
+    if (!isFetchingInitialData) setIsLoading(true);
 
-  useEffect(() => {
-    if (checkInTime) {
-      const interval = setInterval(() => {
-        const now = new Date();
-        const diff = now - new Date(checkInTime);
-        const hours = (diff / (1000 * 60 * 60)).toFixed(2);
-        setHoursWorked(hours);
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [checkInTime]);
-
-  const fetchData = async () => {
-    const today = currentTime.toLocaleDateString("en-CA").split("T")[0];
+    const today = dayjs().format("YYYY-MM-DD");
     const payload = { date: today };
 
     try {
@@ -44,38 +54,84 @@ const Timesheet = () => {
         "/checkinout/me",
         (res) => {
           const data = res.data?.data || [];
-          setCheckData(data);
+          setAllTodayRecords(data); // Lưu trữ tất cả bản ghi
 
-          if (data.length > 0) {
-            const checkin = data[0];
-            if (checkin?.type === "CHECKIN") {
-              setCheckInTime(checkin.point_time);
-            }
-          }
+          const checkInsToday = data.filter(d => d.type === "CHECKIN").sort((a, b) => dayjs(a.point_time).valueOf() - dayjs(b.point_time).valueOf());
+          const checkOutsToday = data.filter(d => d.type === "CHECKOUT").sort((a, b) => dayjs(a.point_time).valueOf() - dayjs(b.point_time).valueOf());
 
-          if (data.length > 1) {
-            const last = data[data.length - 1];
-            if (last?.type === "CHECKOUT") {
-              setCheckOutTime(last.point_time);
-            } else {
-              setCheckOutTime(null);
-            }
-          } else {
-            setCheckOutTime(null);
-          }
+          const firstCI = checkInsToday.length > 0 ? checkInsToday[0].point_time : null;
+          // Lần checkout cuối cùng phải sau lần checkin đầu tiên
+          const lastCO = checkOutsToday.length > 0 && firstCI ?
+            checkOutsToday.filter(co => dayjs(co.point_time).isAfter(dayjs(firstCI))).pop()?.point_time
+            : null;
+
+          setFirstCheckInTime(firstCI);
+          setLastCheckOutTime(lastCO);
         },
         {
           onError: (err) => {
             console.error(err);
+            toast.error("Không thể tải dữ liệu chấm công.");
+            setAllTodayRecords([]);
+            setFirstCheckInTime(null);
+            setLastCheckOutTime(null);
           },
         },
         null,
-        {params: payload}
+        { params: payload }
       );
     } catch (err) {
       console.error(err);
+      toast.error("Lỗi khi tải dữ liệu chấm công.");
+      setAllTodayRecords([]);
+      setFirstCheckInTime(null);
+      setLastCheckOutTime(null);
+    } finally {
+      if (!isFetchingInitialData) setIsLoading(false);
+      setIsFetchingInitialData(false);
     }
-  };
+  }, [isFetchingInitialData]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    // Tính toán giờ làm việc để hiển thị
+    if (firstCheckInTime) {
+      const start = dayjs(firstCheckInTime);
+      // Nếu có lastCheckOutTime và nó sau firstCheckInTime, tính đến lastCheckOutTime
+      // Nếu không, tính đến thời điểm hiện tại
+      const end = lastCheckOutTime && dayjs(lastCheckOutTime).isAfter(start) ? dayjs(lastCheckOutTime) : dayjs();
+
+      // Chỉ tính giờ nếu 'end' thực sự sau 'start' (tránh trường hợp lastCheckout là của ngày hôm trước hoặc lỗi dữ liệu)
+      if (end.isAfter(start)) {
+        const diff = end.diff(start);
+        const hours = (diff / (1000 * 60 * 60)).toFixed(2);
+        setHoursWorkedDisplay(hours);
+      } else if (!lastCheckOutTime) { // Nếu chỉ mới checkin, chưa checkout lần nào trong ngày
+        const diffToNow = dayjs().diff(start);
+        const hoursToNow = (diffToNow / (1000 * 60 * 60)).toFixed(2);
+        setHoursWorkedDisplay(hoursToNow);
+      } else {
+        setHoursWorkedDisplay("0.00"); // Trường hợp lastCheckout không hợp lệ so với firstCheckIn
+      }
+    } else {
+      setHoursWorkedDisplay("0.00"); // Chưa check-in
+    }
+
+    // Cập nhật giờ làm liên tục nếu đang trong phiên làm việc (đã check-in, chưa có check-out cuối cùng hợp lệ)
+    let interval;
+    if (firstCheckInTime && (!lastCheckOutTime || !dayjs(lastCheckOutTime).isAfter(dayjs(firstCheckInTime)) ) ) {
+      interval = setInterval(() => {
+        const now = dayjs();
+        const diff = now.diff(dayjs(firstCheckInTime));
+        setHoursWorkedDisplay((diff / (1000 * 60 * 60)).toFixed(2));
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [firstCheckInTime, lastCheckOutTime, currentTime]); // Thêm currentTime để cập nhật khi nó thay đổi (mặc dù đã có interval)
+
 
   const handleButtonClick = () => {
     setIsLoading(true);
@@ -84,147 +140,157 @@ const Timesheet = () => {
         "post",
         "/checkinout",
         (res) => {
-          setIsLoading(false);
           fetchData();
-          toast.success("Chấm công thành công");
+          toast.success(res.data?.message || "Thao tác thành công!");
         },
         {
           onError: (err) => {
             setIsLoading(false);
             console.error(err);
+            toast.error(err.response?.data?.message || "Thao tác thất bại.");
           },
         }
       );
     } catch (err) {
       setIsLoading(false);
       console.error(err);
+      toast.error("Lỗi khi thực hiện thao tác chấm công.");
     }
   };
 
-  const formatTime = (timeString) => {
-    const date = new Date(timeString);
-    return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
+  const formatTimeDisplay = (timeString) => {
+    if (!timeString) return "--:--";
+    return dayjs(timeString).format("HH:mm");
   };
 
-  const formattedDate = currentTime.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+  const formattedDate = capitalizeFirstLetter(currentTime.format("dddd, DD/MM/YYYY"));
+  const formattedClock = currentTime.format("HH:mm:ss");
 
-  const formattedClock = currentTime.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  });
+  if (isFetchingInitialData) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', p: 3, minHeight: 350 }}>
+        <CircularProgress />
+        <Typography sx={{ml: 2}} color="text.secondary">Đang tải dữ liệu chấm công...</Typography>
+      </Box>
+    );
+  }
+
+  // Nút luôn là "Check Out" nếu đã có firstCheckInTime, ngược lại là "Check In"
+  const buttonText = firstCheckInTime ? "Check Out" : "Check In";
+  // Nút có màu error (đỏ) khi là "Check Out", primary khi là "Check In"
+  const buttonColor = firstCheckInTime ? "error" : "primary";
+  // Nút không bị vô hiệu hóa sau khi đã checkout, cho phép checkout nhiều lần
+  const isButtonDisabled = isLoading;
+
 
   return (
-    <div style={styles.page}>
-      <div style={styles.container}>
-        <div style={styles.header}>
-          <div><strong>Timesheet</strong> {formattedDate}</div>
-          <div style={styles.clock}>{formattedClock}</div>
-        </div>
+    <Paper
+      elevation={2}
+      sx={{
+        p: {xs: 2, sm: 3},
+        maxWidth: 480,
+        width: '100%',
+        margin: '24px auto',
+        textAlign: 'center',
+        borderRadius: 3,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: theme.spacing(2.5)
+      }}
+    >
+      <Grid container justifyContent="space-between" alignItems="flex-start" sx={{ width: '100%', mb: 0.5 }}>
+        <Grid item>
+          <Typography variant="h5" component="div" sx={{fontWeight: '600', textAlign: 'left', color: theme.palette.text.primary}}>
+            Bảng chấm công
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary" sx={{display: 'block', textAlign: 'left', fontWeight: '500'}}>
+            {formattedDate}
+          </Typography>
+        </Grid>
+        <Grid item>
+          <Typography variant="h4" component="div" sx={{fontWeight: 'bold', color: theme.palette.primary.main}}>
+            {formattedClock}
+          </Typography>
+        </Grid>
+      </Grid>
 
-        <div style={styles.circle}>
-          <div>{checkInTime ? `${hoursWorked} Hours` : "0 Hours"}</div>
-        </div>
+      <Divider sx={{width: '100%', my: 1.5 }}/>
 
-        <Button
-          variant="contained"
-          onClick={handleButtonClick}
-          disabled={isLoading}
-          sx={{ backgroundColor: "#006cb3", mt: 2 }}
-        >
-          {isLoading ? "Loading..." : checkInTime ? "Clock Out" : "Check In"}
-        </Button>
+      <Box
+        sx={{
+          width: {xs: 160, sm: 180},
+          height: {xs: 160, sm: 180},
+          borderRadius: "50%",
+          border: `5px solid ${theme.palette.grey[300]}`,
+          display: "flex",
+          flexDirection: 'column',
+          justifyContent: "center",
+          alignItems: "center",
+          my: 2,
+          bgcolor: theme.palette.background.default,
+          boxShadow: 'inset 0px 3px 6px rgba(0,0,0,0.08)'
+        }}
+      >
+        <Typography variant="h2" component="div" sx={{ fontWeight: 'bold', color: theme.palette.primary.dark, lineHeight: 1.1 }}>
+          {hoursWorkedDisplay}
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{lineHeight: 1.2, mt: 0.5}}>
+          Giờ làm
+        </Typography>
+      </Box>
 
-        {checkInTime && (
-          checkOutTime ? (
-            <div style={styles.dualTimeBox}>
-              <div style={styles.timeBox}>
-                Checkin At<br />
-                <strong>{formatTime(checkInTime)}</strong>
-              </div>
-              <div style={styles.timeBox}>
-                Checkout At<br />
-                <strong>{formatTime(checkOutTime)}</strong>
-              </div>
-            </div>
-          ) : (
-            <div style={styles.startTime}>
-              Started At<br />
-              <strong>{formatTime(checkInTime)}</strong>
-            </div>
-          )
-        )}
-      </div>
-    </div>
+      <Button
+        variant="contained"
+        color={buttonColor}
+        onClick={handleButtonClick}
+        disabled={isButtonDisabled}
+        size="large"
+        sx={{
+          minWidth: 220,
+          py: 1.3,
+          fontSize: '1.05rem',
+          fontWeight: '600',
+          transition: 'background-color 0.3s ease, transform 0.2s ease',
+          '&:hover': {
+            transform: isButtonDisabled ? 'none' : 'scale(1.03)',
+          },
+          boxShadow: theme.shadows[2]
+        }}
+      >
+        {isLoading && !isFetchingInitialData ? <CircularProgress size={24} color="inherit"/> : buttonText}
+      </Button>
+
+      { (firstCheckInTime || lastCheckOutTime) && (
+        <Grid container spacing={2} justifyContent="center" sx={{ mt: 0, width: '100%' }}>
+          {firstCheckInTime && (
+            <Grid item xs={12} sm={lastCheckOutTime ? 6 : 8} md={lastCheckOutTime ? 6 : 'auto'}>
+              <Paper variant="outlined" sx={{ p: 1.5, bgcolor: theme.palette.grey[100], textAlign:'center' }}>
+                <Typography variant="body1" color="text.secondary" sx={{mb:0.5, fontWeight:'500'}}>
+                  Check In
+                </Typography>
+                <Typography variant="h5" sx={{ fontWeight: '600', color: theme.palette.secondary.dark }}>
+                  {formatTimeDisplay(firstCheckInTime)}
+                </Typography>
+              </Paper>
+            </Grid>
+          )}
+          {lastCheckOutTime && (
+            <Grid item xs={12} sm={6}>
+              <Paper variant="outlined" sx={{ p: 1.5, bgcolor: theme.palette.grey[100], textAlign:'center' }}>
+                <Typography variant="body1" color="text.secondary" sx={{mb:0.5, fontWeight:'500'}}>
+                  Check Out
+                </Typography>
+                <Typography variant="h5" sx={{ fontWeight: '600', color: theme.palette.secondary.dark }}>
+                  {formatTimeDisplay(lastCheckOutTime)}
+                </Typography>
+              </Paper>
+            </Grid>
+          )}
+        </Grid>
+      )}
+    </Paper>
   );
-};
-
-const styles = {
-  page: {
-    height: "85vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f2f3f8",
-  },
-  container: {
-    width: 500,
-    padding: 20,
-    border: "2px solid #eee",
-    borderRadius: 12,
-    textAlign: "center",
-    backgroundColor: "white",
-  },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  clock: {
-    fontWeight: "bold",
-  },
-  circle: {
-    width: 120,
-    height: 120,
-    borderRadius: "50%",
-    border: "4px solid #eee",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    margin: "0 auto 20px",
-    fontSize: 16,
-  },
-  startTime: {
-    marginTop: 20,
-    backgroundColor: "#f9f9f9",
-    padding: 10,
-    borderRadius: 4,
-    textAlign: "center",
-  },
-  dualTimeBox: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 20,
-    marginTop: 20,
-  },
-  timeBox: {
-    backgroundColor: "#f9f9f9",
-    padding: 10,
-    borderRadius: 4,
-    minWidth: 180,
-    textAlign: "center",
-  },
 };
 
 export default Timesheet;

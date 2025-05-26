@@ -1,103 +1,119 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   TextField,
   Button,
   CircularProgress,
-  Snackbar,
-  Alert,
+  // Snackbar, // Sẽ dùng react-hot-toast
+  // Alert, // Sẽ dùng react-hot-toast
   Divider,
+  Paper,
+  Typography,
+  Box,
+  Grid,
+  MenuItem,
+  InputAdornment // Để hiển thị đơn vị tiền tệ
 } from "@mui/material";
 import { request } from "@/api";
+import toast from "react-hot-toast"; // Sử dụng react-hot-toast
 
 const SalaryTab = ({ userLoginId }) => {
   const [salaryData, setSalaryData] = useState({
     salary_type: "MONTHLY",
     salary: "",
   });
-  const [loading, setLoading] = useState(false); // Loading state for fetching data
-  const [saving, setSaving] = useState(false); // Loading state for saving data
-  const [notification, setNotification] = useState(null); // Success or error notification
+  const [initialSalaryData, setInitialSalaryData] = useState(null);
+  const [loading, setLoading] = useState(true); // Đổi thành true để thể hiện đang fetch lần đầu
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (userLoginId) {
-      fetchSalary();
+  const fetchSalary = useCallback(async () => {
+    if (!userLoginId) {
+      setLoading(false); // Không có userLoginId, không fetch
+      return;
     }
-  }, [userLoginId]);
-
-  const showNotification = (type, message) => {
-    setNotification({ type, message });
-  };
-
-  const fetchSalary = async () => {
     setLoading(true);
-    const payload = { user_login_id: userLoginId };
-
     try {
-      request(
-        "post",
-        "/salaries",
+      await request(
+        "get",
+        `/salaries/${userLoginId}`, // Endpoint GET lương của nhân viên
         (res) => {
           if (res.data?.data) {
-            setSalaryData({
+            const fetchedData = {
               salary_type: res.data.data.salary_type || "MONTHLY",
               salary: res.data.data.salary || "",
-            });
+            };
+            setSalaryData(fetchedData);
+            setInitialSalaryData(fetchedData);
+          } else {
+            // Nếu không có dữ liệu, thiết lập giá trị mặc định
+            const defaultData = { salary_type: "MONTHLY", salary: "" };
+            setSalaryData(defaultData);
+            setInitialSalaryData(defaultData);
+            // Có thể thông báo cho người dùng biết là chưa có thông tin lương
+            // toast.info("Nhân viên này hiện chưa có thông tin lương.");
           }
         },
         {
           onError: (err) => {
             console.error("Error fetching salary:", err);
-            showNotification("error", "Failed to fetch salary data.");
+            const defaultDataOnError = { salary_type: "MONTHLY", salary: "" };
+            setSalaryData(defaultDataOnError);
+            setInitialSalaryData(defaultDataOnError);
+            toast.error(err.response?.data?.message || "Không thể tải thông tin lương của nhân viên.");
           },
-        },
-        payload
+        }
       );
     } catch (err) {
       console.error("Failed to fetch salary data:", err);
-      showNotification("error", "An unexpected error occurred while fetching salary.");
+      const defaultDataOnErrorCatch = { salary_type: "MONTHLY", salary: "" };
+      setSalaryData(defaultDataOnErrorCatch);
+      setInitialSalaryData(defaultDataOnErrorCatch);
+      toast.error("Lỗi không mong muốn khi tải thông tin lương.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [userLoginId]);
+
+  useEffect(() => {
+    fetchSalary();
+  }, [fetchSalary]);
+
 
   const handleSave = async () => {
     setSaving(true);
+    const salaryAmount = parseFloat(String(salaryData.salary).replace(/[^\d.-]/g, '')); // Chấp nhận số thập phân
+
+    if (isNaN(salaryAmount) || salaryAmount < 0) {
+      toast.error("Số tiền lương không hợp lệ. Vui lòng nhập số dương.");
+      setSaving(false);
+      return;
+    }
+
     const payload = {
       salary_type: salaryData.salary_type,
-      salary: salaryData.salary,
+      salary: salaryAmount,
     };
 
     try {
-      request(
+      await request(
         "put",
         `/salaries/${userLoginId}`,
-        () => {
-          fetchSalary(); 
-          showNotification("success", "Salary saved successfully.");
+        (res) => {
+          toast.success(res.data?.message || "Lưu thông tin lương thành công.");
+          // Cập nhật initialSalaryData sau khi lưu thành công để isFormDirty hoạt động đúng
+          setInitialSalaryData({...payload, salary: String(payload.salary) });
+          setSalaryData({...payload, salary: String(payload.salary) });
+
         },
         {
           onError: (err) => {
-            if (err.response && err.response.data) {
-              const { meta } = err.response.data;
-
-              if (meta?.code) {
-                console.error("Validation error:", meta.message);
-                showNotification("error", meta.message || "Validation error occurred.");
-              } else {
-                console.error("API Error:", meta?.message || "Error occurred");
-                showNotification("error", "An error occurred while saving salary data.");
-              }
-            } else {
-              console.error("Unexpected error response:", err);
-              showNotification("error", "Unexpected error occurred while saving salary.");
-            }
+            toast.error(err.response?.data?.message || "Lỗi khi lưu thông tin lương.");
           },
         },
         payload
       );
     } catch (err) {
       console.error("Error while saving salary:", err);
-      showNotification("error", "An unexpected error occurred while saving salary.");
+      toast.error("Lỗi không mong muốn khi lưu thông tin lương.");
     } finally {
       setSaving(false);
     }
@@ -108,66 +124,74 @@ const SalaryTab = ({ userLoginId }) => {
     setSalaryData((prev) => ({ ...prev, [name]: value }));
   };
 
-  if (loading) return <CircularProgress />;
+  // Kiểm tra xem form có thay đổi so với dữ liệu ban đầu không
+  const isFormDirty = JSON.stringify(salaryData) !== JSON.stringify(initialSalaryData);
+
+  if (loading) {
+    return (
+      <Paper sx={{ p: {xs: 2, md:3}, mt: {xs:2, md:0}, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 150 }} variant="outlined">
+        <CircularProgress size={24} />
+        <Typography sx={{ml:1.5}} color="text.secondary">Đang tải thông tin lương...</Typography>
+      </Paper>
+    );
+  }
 
   return (
-    <div style={{ padding: "20px", border: "1px solid #ddd", borderRadius: "8px" }}>
-      <h3 style={{ marginBottom: "15px" }}>Basic Salary Information</h3>
-      <Divider style={{ marginBottom: "15px" }} />
-      <div style={{ marginBottom: "20px" }}>
-        <TextField
-          fullWidth
-          select
-          SelectProps={{
-            native: true,
-          }}
-          label="Salary Basis"
-          name="salary_type"
-          value={salaryData.salary_type}
-          onChange={handleChange}
-          variant="outlined"
-          margin="normal"
+    <Paper sx={{ p: {xs: 2, md:3}, mt: {xs:2, md:0} }} variant="outlined">
+      <Typography variant="h6" gutterBottom sx={{fontWeight: 600}}>
+        Thông tin Lương Cơ bản
+      </Typography>
+      <Divider sx={{ mb: 2.5 }} />
+      <Grid container spacing={2.5}>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            select
+            label="Loại lương"
+            name="salary_type"
+            value={salaryData.salary_type}
+            onChange={handleChange}
+            variant="outlined"
+            size="small"
+            helperText="Chọn loại hình nhận lương (theo tháng, tuần, giờ)."
+          >
+            <MenuItem value="MONTHLY">Theo Tháng</MenuItem>
+            <MenuItem value="WEEKLY">Theo Tuần</MenuItem>
+            <MenuItem value="HOURLY">Theo Giờ</MenuItem>
+          </TextField>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            type="text" // Để cho phép nhập dấu phẩy, xử lý bằng parseFloat khi submit
+            label="Số tiền lương"
+            name="salary"
+            value={salaryData.salary === "" ? "" : Number(String(salaryData.salary).replace(/[^\d]/g, "")).toLocaleString("vi-VN")}
+            onChange={(e) => {
+              const rawValue = e.target.value.replace(/[^\d]/g, "");
+              handleChange({ target: { name: "salary", value: rawValue } });
+            }}
+            variant="outlined"
+            size="small"
+            InputProps={{
+              endAdornment: <InputAdornment position="end">VNĐ</InputAdornment>,
+              inputProps: { min: 0 }
+            }}
+            helperText="Nhập mức lương cơ bản của nhân viên."
+          />
+        </Grid>
+      </Grid>
+      <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSave}
+          disabled={saving || !isFormDirty || loading}
         >
-          <option value="MONTHLY">Monthly</option>
-          <option value="WEEKLY">Weekly</option>
-          <option value="HOURLY">Hourly</option>
-        </TextField>
-        <TextField
-          fullWidth
-          type="number"
-          label="Salary Amount (₫)"
-          name="salary"
-          value={salaryData.salary}
-          onChange={handleChange}
-          variant="outlined"
-          margin="normal"
-        />
-      </div>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleSave}
-        disabled={saving}
-      >
-        {saving ? "Saving..." : "Save"}
-      </Button>
-
-      {/* Notification Snackbar */}
-      <Snackbar
-        open={!!notification}
-        autoHideDuration={6000}
-        onClose={() => setNotification(null)}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
-          severity={notification?.type || "error"}
-          onClose={() => setNotification(null)}
-          variant="filled"
-        >
-          {notification?.message}
-        </Alert>
-      </Snackbar>
-    </div>
+          {saving ? <CircularProgress size={24} color="inherit"/> : "Lưu Thay Đổi"}
+        </Button>
+      </Box>
+    </Paper>
   );
 };
 

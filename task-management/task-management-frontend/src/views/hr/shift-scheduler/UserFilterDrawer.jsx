@@ -1,6 +1,3 @@
-// ==============
-// UserFilterDrawer.jsx
-// ==============
 import React from "react";
 import {Autocomplete, Box, Button, Drawer, IconButton, TextField, Typography,} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close.js";
@@ -28,7 +25,7 @@ export default function UserFilterDrawer({
           display: "flex",
           flexDirection: "column",
           height: "100%",
-          paddingTop: 12
+          paddingTop: 6
         }}
       >
         <Box

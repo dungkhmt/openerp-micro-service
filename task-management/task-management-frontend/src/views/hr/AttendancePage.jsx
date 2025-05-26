@@ -232,7 +232,7 @@ const AttendancePageInternal = () => {
   };
 
   return (
-    <Box sx={{ p: { xs: 1, sm: 2 } }}>
+    <Box sx={{ mr: 2 }}>
       <Paper sx={{ p: 2, mb: 2 }}>
         <Typography variant="h5" gutterBottom component="h1">Bảng Chấm Công Tháng</Typography>
         <Grid container spacing={2} alignItems="flex-end" wrap="wrap" marginBottom={2}>
@@ -262,7 +262,7 @@ const AttendancePageInternal = () => {
         </Grid>
       </Paper>
 
-      <TableContainer component={Paper} sx={{ maxHeight: "calc(100vh - 320px)" }}>
+      <TableContainer component={Paper} sx={{ maxHeight: "calc(100vh - 270px)" }}>
         <Table stickyHeader sx={{ borderCollapse: "separate", borderSpacing: 0}}>
           <TableHead>
             <TableRow>

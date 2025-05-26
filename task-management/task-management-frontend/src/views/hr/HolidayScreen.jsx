@@ -1,242 +1,351 @@
 // HolidayScreen.jsx
-import React, {useEffect, useMemo, useState} from "react";
-import {Box, Button, Grid, Paper, Stack, Typography,} from "@mui/material";
+import React, {useEffect, useMemo, useState, useCallback} from "react";
+import {
+  Box,
+  Button,
+  Grid,
+  Paper,
+  Typography,
+  ThemeProvider,
+  CssBaseline,
+  IconButton,
+  Tooltip,
+  CircularProgress
+} from "@mui/material";
 import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import {request} from "@/api";
+import "dayjs/locale/vi";
+import {request}from "@/api";
 import AddHolidayModal from "./modals/AddHolidayModal";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 import DeleteConfirmationModal from "./modals/DeleteConfirmationModal";
 import toast from "react-hot-toast";
 import lunar from "lunar-calendar";
+import {theme} from "./theme";
+
+dayjs.locale('vi');
 
 const WEEKDAYS = [
-  "Thứ Hai",
-  "Thứ Ba",
-  "Thứ Tư",
-  "Thứ Năm",
-  "Thứ Sáu",
-  "Thứ Bảy",
-  "Chủ Nhật",
+  "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy", "Chủ Nhật",
 ];
 
-const generateCalendarGrid = (month) => {
+const holidayCellBgColor = "#fff0f0";
+const todayCellBorderColor = theme.palette.primary.main;
+
+const generateCalendarWeeks = (month) => {
   const startOfMonth = month.startOf("month");
   const endOfMonth = month.endOf("month");
-  const currentMonthDays = endOfMonth.date();
-  const startWeekday = (startOfMonth.day() + 6) % 7;
+  const firstDayOfMonthWeekday = (startOfMonth.day() === 0 ? 6 : startOfMonth.day() - 1);
   const days = [];
 
-  for (let i = 0; i < startWeekday; i++) {
-    days.push(startOfMonth.subtract(startWeekday - i, "day"));
+  for (let i = 0; i < firstDayOfMonthWeekday; i++) {
+    days.push(startOfMonth.subtract(firstDayOfMonthWeekday - i, "day"));
   }
-
-  for (let i = 0; i < currentMonthDays; i++) {
+  for (let i = 0; i < endOfMonth.date(); i++) {
     days.push(startOfMonth.add(i, "day"));
   }
+  const totalDaysInGrid = days.length <= 35 ? 35 : 42;
+  const daysFromNextMonth = totalDaysInGrid - days.length;
 
-  const totalDays = days.length;
-  const remainder = totalDays % 7;
-  const trailingDays = remainder === 0 ? 0 : 7 - remainder;
-
-  for (let i = 1; i <= trailingDays; i++) {
+  for (let i = 1; i <= daysFromNextMonth; i++) {
     days.push(endOfMonth.add(i, "day"));
   }
-
-  return days;
+  const weeks = [];
+  for (let i = 0; i < days.length; i += 7) {
+    weeks.push(days.slice(i, i + 7));
+  }
+  return weeks;
 };
 
 const convertToLunarMock = (date) => {
-  const lunarDate = lunar.solarToLunar(date.year(), date.month() + 1, date.date());
-  return `${lunarDate.lunarDay}/${lunarDate.lunarMonth}`;
+  try {
+    if (!date || !date.isValid()) return "";
+    const lunarDate = lunar.solarToLunar(date.year(), date.month() + 1, date.date());
+    return `${lunarDate.lunarDay}/${lunarDate.lunarMonth}`;
+  } catch (e) {
+    return "";
+  }
 };
 
-const HolidayScreen = () => {
+const HolidayScreenInternal = () => {
+  const defaultCellBgColor = theme.palette.background.paper;
   const [selectedMonth, setSelectedMonth] = useState(dayjs());
   const [holidays, setHolidays] = useState({});
   const [openModal, setOpenModal] = useState(false);
   const [editingHoliday, setEditingHoliday] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [loadingHolidays, setLoadingHolidays] = useState(false);
 
-  const fetchHolidays = async (month) => {
-    const yearMonthStr = month.format("YYYY-MM");
-    request(
-      "get",
-      `/holidays?month=${yearMonthStr}`,
-      (res) => {
-        setHolidays(res.data.holidays || {});
-      },
-      {
-        onError: (err) => {
-          console.error("Failed to load holidays", err);
+  const fetchHolidays = useCallback(async (monthToFetch) => {
+    setLoadingHolidays(true);
+    const yearMonthStr = monthToFetch.format("YYYY-MM");
+    try {
+      await request(
+        "get",
+        `/holidays?month=${yearMonthStr}`,
+        (res) => {
+          const apiData = res.data.data || res.data.holidays;
+          if (typeof apiData === 'object' && apiData !== null && !Array.isArray(apiData)) {
+            setHolidays(apiData);
+          } else if (Array.isArray(apiData)) {
+            const holidaysMap = {};
+            apiData.forEach(holiday => {
+              holidaysMap[dayjs(holiday.date).format("YYYY-MM-DD")] = holiday;
+            });
+            setHolidays(holidaysMap);
+          } else {
+            console.warn("Received unexpected holiday data format:", apiData);
+            setHolidays({});
+          }
         },
-      }
-    );
-  };
+        {
+          onError: (err) => {
+            console.error("Failed to load holidays for month " + yearMonthStr, err);
+            toast.error(`Không thể tải danh sách ngày nghỉ cho tháng ${monthToFetch.format("MM/YYYY")}.`);
+            setHolidays({});
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Exception while fetching holidays", error);
+      toast.error("Lỗi hệ thống khi tải ngày nghỉ.");
+      setHolidays({});
+    } finally {
+      setLoadingHolidays(false);
+    }
+  }, []);
 
   useEffect(() => {
     fetchHolidays(selectedMonth);
-  }, [selectedMonth]);
+  }, [selectedMonth, fetchHolidays]);
 
-  const calendarDates = useMemo(
-    () => generateCalendarGrid(selectedMonth),
+  const calendarWeeks = useMemo(
+    () => generateCalendarWeeks(selectedMonth),
     [selectedMonth]
   );
 
-  const currentMonth = selectedMonth.month();
+  const currentMonthValue = selectedMonth.month();
+  const todayStr = dayjs().format("YYYY-MM-DD");
+
 
   const handleDelete = () => {
     if (!deleteTarget) return;
-
     request(
       "delete",
       `/holidays/${deleteTarget.id}`,
       () => {
-        toast.success("Xoá thành công");
+        toast.success("Xoá ngày nghỉ thành công!");
         setDeleteTarget(null);
         setConfirmOpen(false);
         fetchHolidays(selectedMonth);
       },
       {
-        onError: (err) => console.error("Xóa thất bại", err),
+        onError: (err) => {
+          console.error("Xóa thất bại", err);
+          toast.error(err.response?.data?.message || "Xóa ngày nghỉ thất bại.");
+        },
       }
     );
   };
 
+  const calendarMaxHeight = `calc(100vh - 240px)`;
+
   return (
-    <Box p={3}>
-      <Stack direction="row" justifyContent="space-between" mb={3}>
-        <Typography variant="h5">Lịch nghỉ lễ</Typography>
-        <Button variant="contained" onClick={() => setOpenModal(true)}>
-          + Thêm ngày nghỉ
-        </Button>
-      </Stack>
-
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DatePicker
-          views={["month", "year"]}
-          label="Chọn tháng"
-          value={selectedMonth}
-          onChange={(newVal) => setSelectedMonth(dayjs(newVal))}
-          sx={{ mb: 3, width: 250 }}
-        />
-      </LocalizationProvider>
-
-      <Grid container spacing={1} mb={1}>
-        {WEEKDAYS.map((day, idx) => (
-          <Grid item xs={12 / 7} key={idx}>
-            <Box
-              textAlign="center"
-              fontWeight="bold"
-              bgcolor="#9a1c1c"
-              color="white"
-              py={1}
-              borderRadius={1}
-            >
-              {day}
-            </Box>
+    <Box sx={{ mr: 2, bgcolor: 'background.default', minHeight: 'calc(100vh - 64px)' }}>
+      <Paper sx={{ p: 2, mb: 2 }}>
+        <Grid container spacing={2} justifyContent="space-between" alignItems="center" wrap="wrap">
+          <Grid item xs={12} md="auto">
+            <Typography variant="h4" component="h1">Lịch nghỉ lễ</Typography>
           </Grid>
-        ))}
-      </Grid>
-      <Box sx={{ overflowX: "auto", overflowY: "auto", maxHeight: "calc(100vh - 220px)" }}>
-        <Grid container spacing={1} minWidth={800}>
-          {calendarDates.map((day, idx) => {
-            const dateStr = day.format("YYYY-MM-DD");
-            const holiday = holidays[dateStr];
-            const isCurrentMonth = day.month() === currentMonth;
+          <Grid item xs={12} md="auto" sx={{display: 'flex', flexDirection: {xs: 'column', md:'row'}, gap: 2, alignItems: 'center', width: {xs: '100%', md: 'auto'}}}>
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="vi">
+              <DatePicker
+                views={["month", "year"]}
+                label="Chọn tháng & năm"
+                value={selectedMonth}
+                onChange={(newVal) => newVal && newVal.isValid() && setSelectedMonth(newVal)}
+                slotProps={{ textField: { size: 'small', fullWidth: {xs:true, md:false} } }}
+                sx={{ width: {xs: '100%', md: 200} }}
+              />
+            </LocalizationProvider>
+            <Button
+              variant="contained"
+              onClick={() => {setEditingHoliday(null); setOpenModal(true);}}
+              startIcon={<AddIcon />}
+              sx={{ width: {xs: '100%', md: 'auto'} }}
+            >
+              Thêm ngày nghỉ
+            </Button>
+          </Grid>
+        </Grid>
+      </Paper>
 
-            return (
-              <Grid item xs={12 / 7} key={idx}>
-                <Paper
-                  elevation={1}
-                  sx={{
-                    position: "relative",
-                    height: 95,
-                    borderRadius: 1,
-                    px: 1,
-                    py: 0.5,
-                    bgcolor: holiday ? "#ffe6e6" : "#fff",
-                    border: holiday ? "1px solid red" : "1px solid #ddd",
-                    opacity: isCurrentMonth ? 1 : 0.4,
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    "&:hover .edit-btn": { display: "flex" },
-                  }}
-                >
-                  <Box>
-                    <Typography fontWeight="bold" fontSize="1.3rem">
-                      {day.date()}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {convertToLunarMock(day)}
-                    </Typography>
-                  </Box>
+      <Paper sx={{p:1, overflow: 'hidden'}}>
+        <Grid container spacing={{xs: 0.25, sm:0.5}} sx={{mb: {xs: 0.25, sm:0.5}}}>
+          {WEEKDAYS.map((day, idx) => (
+            <Grid item xs key={idx} sx={{ flexBasis: 'calc(100%/7)', flexGrow: 1, maxWidth: 'calc(100%/7)'}}>
+              <Box
+                textAlign="center"
+                fontWeight="bold"
+                bgcolor={theme.palette.primary.dark}
+                color={theme.palette.primary.contrastText}
+                py={1}
+                borderRadius={1}
+                fontSize={{xs: '0.7rem', sm: '0.8rem', md: '0.9rem'}}
+              >
+                {day}
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
+        <Box sx={{ overflowY: "auto", maxHeight: calendarMaxHeight,
+          '&::-webkit-scrollbar': { width: '6px' },
+          '&::-webkit-scrollbar-track': { background: theme.palette.grey[200], borderRadius: '3px' },
+          '&::-webkit-scrollbar-thumb': { background: theme.palette.grey[400], borderRadius: '3px' },
+          '&::-webkit-scrollbar-thumb:hover': { background: theme.palette.grey[500] }
+        }}>
+          {loadingHolidays ? (
+            <Box sx={{display: 'flex', justifyContent:'center', alignItems:'center', height: 150}}>
+              <CircularProgress size={30}/>
+              <Typography sx={{ml:1.5}} color="text.secondary">Đang tải lịch...</Typography>
+            </Box>
+          ) : calendarWeeks.map((week, weekIdx) => (
+            <Grid container spacing={{xs: 0.25, sm:0.5}} key={weekIdx} sx={{width: '100%', display:'flex', flexWrap:'nowrap'}}>
+              {week.map((day, dayIdx) => {
+                const dateStr = day.format("YYYY-MM-DD");
+                const holiday = holidays[dateStr];
+                const isCurrentMonthDay = day.month() === currentMonthValue;
+                const isToday = dateStr === todayStr;
 
-                  {holiday && (
-                    <>
-                      <Typography
-                        variant="caption"
-                        fontWeight="bold"
-                        color="red"
-                        textAlign="center"
-                        sx={{
-                          fontSize: "clamp(10px, 1.2vw, 14px)",
-                          lineHeight: "1.2em",
-                          height: "1.4em",
-                          overflow: "hidden",
-                          whiteSpace: "nowrap",
-                          marginBottom: "0.4em"
-                        }}
-                      >
-                        {holiday.name}
-                      </Typography>
+                return (
+                  <Grid item xs key={`${weekIdx}-${dayIdx}`} sx={{
+                    flexBasis: 'calc(100%/7)',
+                    flexGrow: 1,
+                    maxWidth: 'calc(100%/7)',
+                    aspectRatio: '1/0.6',
+                    minHeight: {xs: 55, sm: 70, md:80},
+                    mb: 0.5
+                  }}>
+                    <Paper
+                      variant="outlined"
+                      sx={{
+                        position: "relative",
+                        height: "100%",
+                        borderRadius: 1,
+                        p: {xs: 0.5, sm: 0.75},
+                        bgcolor: holiday && isCurrentMonthDay ? holidayCellBgColor : defaultCellBgColor,
+                        borderColor: isToday ? todayCellBorderColor : (holiday && isCurrentMonthDay ? theme.palette.error.light : theme.palette.divider),
+                        borderWidth: isToday ? '2px' : '1px',
+                        opacity: isCurrentMonthDay ? 1 : 0.45,
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "flex-start",
+                        "&:hover .action-buttons-cell": { opacity: 1, visibility: 'visible' },
+                        overflow: 'hidden',
+                        boxSizing: 'border-box',
+                      }}
+                    >
+                      <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', mb: 0.25}}>
+                        <Typography
+                          fontWeight="bold"
+                          fontSize={{xs: '1rem', sm: '1.1rem', md: '1.3rem'}}
+                          color={isToday ? theme.palette.primary.main : 'text.primary'}
+                        >
+                          {day.date()}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{fontSize: {xs: '0.7rem', sm: '0.8rem'}}}>
+                          {isCurrentMonthDay ? convertToLunarMock(day) : ""}
+                        </Typography>
+                      </Box>
 
-                      <Box
-                        className="edit-btn"
-                        sx={{
-                          position: "absolute",
-                          top: 0,
-                          right: 0,
-                          display: "none",
-                          flexDirection: "row",
-                          gap: 0.5,
-                          marginTop: "0.3em"
-                        }}
-                      >
-                        <Button
-                          size="small"
-                          variant="text"
-                          sx={{ minWidth: "auto", p: 0.5 }}
-                          onClick={() => {
-                            setDeleteTarget(holiday);
-                            setConfirmOpen(true);
+                      <Box sx={{flexGrow: 1, display: 'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', overflow:'hidden', width: '100%'}}>
+                        {holiday && isCurrentMonthDay && (
+                          <Tooltip title={holiday.name} placement="bottom" arrow>
+                            <Typography
+                              variant="body2"
+                              fontWeight="600"
+                              color={theme.palette.error.dark}
+                              textAlign="center"
+                              sx={{
+                                fontSize: {xs: "0.7rem", sm:"0.8rem", md: "0.9rem"},
+                                lineHeight: 1.35,
+                                maxHeight: {xs: "2.7em", sm: "4.05em"},
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                display: '-webkit-box',
+                                WebkitLineClamp: {xs:2, sm:3},
+                                WebkitBoxOrient: 'vertical',
+                                wordBreak: 'break-word',
+                                width: 'calc(100% - 4px)',
+                                p: '0 2px'
+                              }}
+                            >
+                              {holiday.name}
+                            </Typography>
+                          </Tooltip>
+                        )}
+                      </Box>
+
+                      {isCurrentMonthDay && (
+                        <Box
+                          className="action-buttons-cell"
+                          sx={{
+                            display: 'flex',
+                            flexDirection: "row",
+                            justifyContent: 'flex-end',
+                            alignItems: 'center',
+                            gap: 0.1,
+                            opacity: 0,
+                            visibility: 'hidden',
+                            transition: 'opacity 0.2s ease-in-out, visibility 0.2s ease-in-out',
+                            height: '28px',
+                            position: 'absolute',
+                            bottom: 2,
+                            right: 2,
                           }}
                         >
-                          <DeleteIcon fontSize="small" sx={{ color: "red" }} />
-                        </Button>
-                        <Button
-                          size="small"
-                          variant="text"
-                          sx={{ minWidth: "auto", p: 0.5 }}
-                          onClick={() => setEditingHoliday(holiday)}
-                        >
-                          <EditIcon fontSize="small" />
-                        </Button>
-                      </Box>
-                    </>
-                  )}
-                </Paper>
-              </Grid>
-            );
-          })}
-        </Grid>
-      </Box>
-
-
+                          {holiday ? (
+                            <>
+                              <Tooltip title="Xóa ngày nghỉ">
+                                <IconButton size="small" sx={{p:0.15}} onClick={(e) => { e.stopPropagation(); setDeleteTarget(holiday); setConfirmOpen(true); }}>
+                                  <DeleteIcon sx={{fontSize: {xs: '1rem', sm: '1.1rem'}}} color="error" />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="Sửa ngày nghỉ">
+                                <IconButton size="small" sx={{p:0.15}} onClick={(e) => { e.stopPropagation(); setEditingHoliday(holiday); setOpenModal(true);}}>
+                                  <EditIcon sx={{fontSize: {xs: '1rem', sm: '1.1rem'}}} />
+                                </IconButton>
+                              </Tooltip>
+                            </>
+                          ) : (
+                            <Tooltip title="Thêm ngày nghỉ">
+                              <IconButton
+                                size="small"
+                                sx={{p:0.15}}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingHoliday({ date: dateStr, name: '', type: 'PAID_LEAVE' });
+                                  setOpenModal(true);
+                                }}
+                              >
+                                <AddIcon sx={{fontSize: {xs: '1rem', sm: '1.1rem'}}} color="primary"/>
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                        </Box>
+                      )}
+                    </Paper>
+                  </Grid>
+                );
+              })}
+            </Grid>
+          ))}
+        </Box>
+      </Paper>
 
       <AddHolidayModal
         open={openModal || editingHoliday !== null}
@@ -250,6 +359,7 @@ const HolidayScreen = () => {
           setEditingHoliday(null);
         }}
         initialData={editingHoliday}
+        titleProps={{ sx: { fontSize: '1.15rem' } }}
       />
 
       <DeleteConfirmationModal
@@ -257,10 +367,20 @@ const HolidayScreen = () => {
         onClose={() => setConfirmOpen(false)}
         onSubmit={handleDelete}
         title="Xoá ngày nghỉ"
-        info={`Bạn có chắc chắn muốn xoá ngày nghỉ "${deleteTarget?.name}"?`}
+        info={`Bạn có chắc chắn muốn xoá ngày nghỉ "${deleteTarget?.name || ''}"?`}
+        titleProps={{ sx: { fontSize: '1.15rem' } }}
       />
     </Box>
   );
 };
+
+const HolidayScreen = () => {
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <HolidayScreenInternal />
+    </ThemeProvider>
+  )
+}
 
 export default HolidayScreen;

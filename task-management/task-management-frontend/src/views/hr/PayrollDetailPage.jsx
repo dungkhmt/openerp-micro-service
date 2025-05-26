@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useCallback} from "react"; // Added useCallback
 import {
   Box,
-  Chip,
+  Chip, CssBaseline,
   Grid,
   IconButton,
   Paper,
@@ -10,16 +10,18 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow,
+  TableRow, ThemeProvider,
   Typography,
+  CircularProgress, Tooltip, // Added CircularProgress for loading state
 } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import {request} from "@/api";
+import {request}from "@/api";
 import {useParams} from "react-router-dom";
 import Pagination from "@/components/item/Pagination";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
-import UserFilterDrawer from "./shift-scheduler/UserFilterDrawer.jsx";
+import UserFilterDrawer from "./shift-scheduler/UserFilterDrawer.jsx"; // Assuming this path is correct relative to this file
+import {theme} from "./theme.js"; // Assuming this path is correct
 
 dayjs.extend(isSameOrBefore);
 
@@ -28,11 +30,11 @@ const holidayHeaderBgColor = "#d2efd3";
 const holidayCellBgColor = "#f1f8f1";
 const weekendHeaderBgColor = "#ffebee";
 const weekendCellBgColor = "#fff8f8";
-const defaultHeaderBgColor = "#f2f2f2";
-const defaultCellBgColor = "white";
+const defaultHeaderBgColor = theme.palette.mode === 'light' ? theme.palette.grey[200] : theme.palette.grey[700]; // Using theme color
+const defaultCellBgColor = theme.palette.background.paper;
 
 
-const PayrollDetailPage = () => {
+const InnerPayrollDetailPage = () => {
   const { payrollId } = useParams();
   const [payroll, setPayroll] = useState(null);
   const [details, setDetails] = useState([]);
@@ -47,18 +49,20 @@ const PayrollDetailPage = () => {
   const [tempJobPositionFilter, setTempJobPositionFilter] = useState(null);
 
   const [userFilterDrawerOpen, setUserFilterDrawerOpen] = useState(false);
-  const [userFilter, setUserFilter] = useState(null);
+  const [userFilter, setUserFilter] = useState(null); // This will store array of user_login_ids
 
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [jobPositionOptions, setJobPositionOptions] = useState([]);
   const [holidaysMap, setHolidaysMap] = useState({});
 
   const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [itemsPerPage, setItemsPerPage] = useState(20); // Default to 20, consistent
   const [pageCount, setPageCount] = useState(1);
+  const [loadingPayroll, setLoadingPayroll] = useState(true);
+  const [loadingDetails, setLoadingDetails] = useState(false); // Separate loading for details
 
   const cellBorderStyle = {
-    border: '1px solid #e0e0e0',
+    border: `1px solid ${theme.palette.divider}`,
   };
 
   const headerCellStyle = {
@@ -67,27 +71,36 @@ const PayrollDetailPage = () => {
     padding: '8px 10px',
     textAlign: 'center',
     verticalAlign: 'middle',
+    backgroundColor: defaultHeaderBgColor, // Moved common background here
+    color: theme.palette.getContrastText(defaultHeaderBgColor),
   };
 
-  const stickyHeaderCellStyle = {
+  const stickyHeaderCellStyle = (isDateHeader = false, dayObject = null) => ({
     ...headerCellStyle,
     position: "sticky",
     top: 0,
-    background: defaultHeaderBgColor,
-    zIndex: 5,
-  };
+    zIndex: 5, // Kept user's zIndex for now
+    backgroundColor: isDateHeader && dayObject ? getBgColorForDayHeader(dayObject) : defaultHeaderBgColor,
+    color: isDateHeader && dayObject ? theme.palette.getContrastText(getBgColorForDayHeader(dayObject)) : theme.palette.getContrastText(defaultHeaderBgColor),
+  });
 
-  const stickyBodyCellStyle = {
+  const stickyBodyCellStyle = (leftPosition) => ({
     ...cellBorderStyle,
     position: "sticky",
-    background: "white",
-    zIndex: 3,
+    left: leftPosition,
+    background: defaultCellBgColor, // Use theme paper for sticky body cells
+    zIndex: 3, // Kept user's zIndex
     padding: '6px 10px',
-  };
+  });
+
 
   useEffect(() => {
     if (!payrollId) return;
-    request("get", `/payrolls/${payrollId}`, (res) => setPayroll(res.data.data));
+    setLoadingPayroll(true);
+    request("get", `/payrolls/${payrollId}`, (res) => {
+      setPayroll(res.data.data);
+      setLoadingPayroll(false);
+    }, {onError: () => setLoadingPayroll(false)});
   }, [payrollId]);
 
   useEffect(() => {
@@ -119,48 +132,56 @@ const PayrollDetailPage = () => {
   }, [payroll?.from_date, payroll?.thru_date]);
 
   useEffect(() => {
-    request("get", "/departments", (res) => {
+    request("get", "/departments?pageSize=1000&status=ACTIVE", (res) => { // Added params
       setDepartmentOptions(res.data.data || []);
     });
-  }, []);
-
-  useEffect(() => {
-    request("get", "/jobs", (res) => {
+    request("get", "/jobs?pageSize=1000&status=ACTIVE", (res) => { // Added params
       setJobPositionOptions(res.data.data || []);
     });
   }, []);
 
-  useEffect(() => {
+  const fetchPayrollDetails = useCallback(() => {
     if (!payrollId) return;
+    setLoadingDetails(true);
     const params = {
-      userIds: userFilter == null ? null : userFilter.join(","),
+      userIds: userFilter === null || userFilter.length === 0 && (searchName || department || jobPosition) ? undefined : (userFilter && userFilter.length > 0 ? userFilter.join(",") : undefined),
       page: currentPage,
       pageSize: itemsPerPage,
     };
+    // If filters are active but userFilter is empty due to no matching staff, send empty userIds to get no results for details
+    if((searchName || department || jobPosition) && userFilter && userFilter.length === 0){
+      params.userIds = "EMPTY_FILTER_NO_MATCH"; // Ensure backend handles this or simply expect empty data
+    }
+
 
     request(
       "get",
       `/payrolls/${payrollId}/details`,
       (res) => {
         const list = res.data.data || [];
-        const meta = res.data.meta.page_info || {};
+        const meta = res.data.meta?.page_info || {};
         setDetails(list);
         setCurrentPage(meta.page || 0);
         setPageCount(meta.total_page || 1);
-        fetchUsers(list);
+        if (list.length > 0) fetchUsers(list); else setUserMap({});
+        setLoadingDetails(false);
       },
-      {},
+      {onError: () => setLoadingDetails(false)},
       null,
       { params }
     );
-  }, [payrollId, currentPage, itemsPerPage, userFilter]);
+  }, [payrollId, currentPage, itemsPerPage, userFilter, searchName, department, jobPosition]); // Added searchName, department, jobPosition
 
-  const fetchUsers = (list) => {
+  const fetchUsers = useCallback((list) => { // Made fetchUsers a useCallback
     if (list.length === 0) {
       setUserMap({});
       return;
     }
-    const userIds = [...new Set(list.map((item) => item.user_id))];
+    const userIds = [...new Set(list.map((item) => item.user_id))].filter(Boolean);
+    if(userIds.length === 0) {
+      setUserMap({});
+      return;
+    }
     request(
       "get",
       "/staffs/details",
@@ -171,42 +192,64 @@ const PayrollDetailPage = () => {
         }
         setUserMap(map);
       },
-      {},
-      null,
+      {}, // onError
+      null, // onFinal
       { params: { userIds: userIds.join(",") } }
     );
-  };
+  }, []);
+
 
   useEffect(() => {
+    fetchPayrollDetails();
+  }, [fetchPayrollDetails]); // Call fetchPayrollDetails when it changes (which includes its dependencies)
+
+
+  const applyStaffFilters = useCallback(() => {
     if (!payrollId) return;
-    if (searchName === "" && department == null && jobPosition == null) {
+    if (tempSearchName === "" && tempDepartmentFilter == null && tempJobPositionFilter == null) {
       setUserFilter(null);
+      setSearchName("");
+      setDepartment(null);
+      setJobPosition(null);
+      setCurrentPage(0); // Reset page when filters are cleared
+      // fetchPayrollDetails will be called by its own useEffect trigger due to userFilter change
       return;
     }
+    // Fetch staff IDs based on temporary filters first
     request(
       "get",
       "/staffs/details",
       (res) => {
-        setUserFilter(res.data.data.map((staff) => staff.user_login_id));
+        const staff_ids = (res.data.data || []).map((staff) => staff.user_login_id);
+        setUserFilter(staff_ids);
+        // Persist temp filters to actual filters
+        setSearchName(tempSearchName);
+        setDepartment(tempDepartmentFilter);
+        setJobPosition(tempJobPositionFilter);
+        setCurrentPage(0); // Reset page
+        // fetchPayrollDetails will be called by its own useEffect trigger
       },
-      {},
+      { onError: () => { setUserFilter([]); setCurrentPage(0); /* Handle error, maybe clear details */ }},
       null,
       {
         params: {
-          fullname: searchName || null,
-          departmentCode: department?.department_code || null,
-          jobPositionCode: jobPosition?.code || null,
+          fullname: tempSearchName || null,
+          departmentCode: tempDepartmentFilter?.department_code || null,
+          jobPositionCode: tempJobPositionFilter?.code || null,
+          pageSize: 10000, // Assuming we need all matching staff_ids
+          page:0,
         },
       }
     );
-  }, [payrollId, searchName, department, jobPosition]);
+  }, [payrollId, tempSearchName, tempDepartmentFilter, tempJobPositionFilter ]);
+
 
   const getVietnameseWeekday = (dayIndex) => {
     const weekdays = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
     return weekdays[dayIndex];
   };
 
-  const getDateArray = () => {
+  const getDateArray = useCallback(() => { // Memoize with useCallback
     if (!payroll?.from_date || !payroll?.thru_date) return [];
     const from = dayjs(payroll.from_date);
     const to = dayjs(payroll.thru_date);
@@ -217,16 +260,16 @@ const PayrollDetailPage = () => {
       current = current.add(1, "day");
     }
     return result;
-  };
+  }, [payroll?.from_date, payroll?.thru_date]);
 
   const dateArray = getDateArray();
 
   const getBgColorForDayHeader = (dayObject) => {
     const dateStr = dayObject.format("YYYY-MM-DD");
     if (holidaysMap[dateStr]) {
-      return holidayHeaderBgColor; // Green for holiday headers
+      return holidayHeaderBgColor;
     }
-    if (dayObject.day() === 0 || dayObject.day() === 6) { // Sunday or Saturday
+    if (dayObject.day() === 0 || dayObject.day() === 6) {
       return weekendHeaderBgColor;
     }
     return defaultHeaderBgColor;
@@ -235,25 +278,22 @@ const PayrollDetailPage = () => {
   const getBgColorForDayCell = (dayObject) => {
     const dateStr = dayObject.format("YYYY-MM-DD");
     if (holidaysMap[dateStr]) {
-      return holidayCellBgColor; // Lighter green for holiday cells
+      return holidayCellBgColor;
     }
-    if (dayObject.day() === 0 || dayObject.day() === 6) { // Sunday or Saturday
+    if (dayObject.day() === 0 || dayObject.day() === 6) {
       return weekendCellBgColor;
     }
     return defaultCellBgColor;
   }
 
-  const handleClearFilters = () => {
+  const handleClearFiltersInDrawer = () => {
     setTempSearchName("");
     setTempDepartmentFilter(null);
     setTempJobPositionFilter(null);
   };
 
-  const handleApplyFilters = () => {
-    setCurrentPage(0);
-    setSearchName(tempSearchName);
-    setDepartment(tempDepartmentFilter);
-    setJobPosition(tempJobPositionFilter);
+  const handleApplyFiltersFromDrawer = () => {
+    applyStaffFilters(); // This will set actual filters and trigger re-fetch
     setUserFilterDrawerOpen(false);
   };
 
@@ -265,19 +305,44 @@ const PayrollDetailPage = () => {
   };
 
   const renderStatusChip = (status) => {
-    if (!status) return null;
-    const color = status === "ACTIVE" ? "success" : "default";
-    return <Chip label={status} color={color} size="small" />;
+    if (!status) return <Chip label="-" size="small" />;
+    const color = status === "ACTIVE" ? "success" : (status === "PENDING" ? "warning" : "default");
+    const label = status === "ACTIVE" ? "Hoạt động" : (status === "PENDING" ? "Chờ duyệt" : (status === "COMPLETED" ? "Hoàn thành" : status));
+    return <Chip label={label} color={color} size="small" />;
   };
 
+  if (loadingPayroll) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 128px)' }}>
+        <CircularProgress />
+        <Typography sx={{ ml: 2 }}>Đang tải thông tin kỳ lương...</Typography>
+      </Box>
+    );
+  }
+
+  if (!payroll) {
+    return <Typography sx={{p:3}}>Không tìm thấy thông tin kỳ lương.</Typography>;
+  }
+
+  const tableMaxHeight = `calc(100vh - 280px)`;
+
+
   return (
-    <Box sx={{ p: 3 }}>
-      <Grid container justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h5" fontWeight="bold">{payroll?.name || "Chi tiết kỳ lương"}</Typography>
-        <IconButton onClick={openFilterDrawer}>
-          <FilterListIcon />
-        </IconButton>
-      </Grid>
+    <Box sx={{ mr: 2, bgcolor: 'background.default', minHeight: 'calc(100vh - 64px)', p:0 }}> {/* Adjusted main Box padding */}
+      <Paper sx={{p:2, mb:2}}>
+        <Grid container justifyContent="space-between" alignItems="center">
+          <Grid item>
+            <Typography variant="h4" component="h1" fontWeight="bold">{payroll?.name || "Chi tiết kỳ lương"}</Typography>
+          </Grid>
+          <Grid item>
+            <Tooltip title="Lọc nhân viên">
+              <IconButton onClick={openFilterDrawer} color="primary">
+                <FilterListIcon />
+              </IconButton>
+            </Tooltip>
+          </Grid>
+        </Grid>
+      </Paper>
 
       <Paper
         elevation={2}
@@ -285,22 +350,23 @@ const PayrollDetailPage = () => {
           width: "100%",
           p: 2,
           borderRadius: 2,
-          mb: 3,
-          bgcolor: "#f7f9fc",
+          mb: 2, // Consistent margin bottom
+          bgcolor: theme.palette.mode === 'light' ? "#f7f9fc" : theme.palette.grey[900], // Adjusted bgcolor for theme
         }}
       >
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} sm={4}>
-            <Typography variant="subtitle2" color="text.secondary" component="span" sx={{ whiteSpace: "nowrap" }}>
-              Tổng số ngày làm việc:
+          <Grid item xs={12} sm={6} md={4}>
+            <Typography variant="body2" color="text.secondary" component="span" sx={{ whiteSpace: "nowrap" }}>
+              Tổng ngày công:
             </Typography>{" "}
             <Typography variant="body1" fontWeight={600} component="span">
               {payroll?.total_work_days ?? "-"} ngày
               {payroll?.total_work_days && payroll?.work_hours_per_day && (
                 <Typography
                   component="span"
-                  fontWeight={600}
-                  sx={{ ml: 0.8 }}
+                  fontWeight={500}
+                  variant="body2"
+                  sx={{ ml: 0.5, color: 'text.secondary' }}
                 >
                   ({(payroll.total_work_days * payroll.work_hours_per_day).toFixed(1)} giờ)
                 </Typography>
@@ -308,26 +374,26 @@ const PayrollDetailPage = () => {
             </Typography>
           </Grid>
 
-          <Grid item xs={12} sm={4}>
-            <Typography variant="subtitle2" color="text.secondary" component="span" sx={{ whiteSpace: "nowrap" }}>
-              Giờ làm việc mỗi ngày:
+          <Grid item xs={12} sm={6} md={4}>
+            <Typography variant="body2" color="text.secondary" component="span" sx={{ whiteSpace: "nowrap" }}>
+              Giờ làm mỗi ngày:
             </Typography>{" "}
             <Typography variant="body1" fontWeight={600} component="span">
               {payroll?.work_hours_per_day ?? "-"} giờ
             </Typography>
           </Grid>
 
-          <Grid item xs={12} sm={4}>
-            <Typography variant="subtitle2" color="text.secondary" component="span" sx={{ whiteSpace: "nowrap" }}>
-              Tổng số ngày nghỉ lễ:
+          <Grid item xs={12} sm={6} md={4}>
+            <Typography variant="body2" color="text.secondary" component="span" sx={{ whiteSpace: "nowrap" }}>
+              Ngày nghỉ lễ:
             </Typography>{" "}
             <Typography variant="body1" fontWeight={600} component="span">
               {payroll?.total_holiday_days ?? "-"} ngày
             </Typography>
           </Grid>
 
-          <Grid item xs={12} sm={4}>
-            <Typography variant="subtitle2" color="text.secondary" component="span" sx={{ whiteSpace: "nowrap" }}>
+          <Grid item xs={12} sm={6} md={4}>
+            <Typography variant="body2" color="text.secondary" component="span" sx={{ whiteSpace: "nowrap" }}>
               Thời gian:
             </Typography>{" "}
             <Typography variant="body1" fontWeight={600} component="span">
@@ -336,15 +402,15 @@ const PayrollDetailPage = () => {
             </Typography>
           </Grid>
 
-          <Grid item xs={12} sm={4}>
-            <Box display="inline-flex" alignItems="center" gap={1}>
-              <Typography variant="subtitle2" color="text.secondary" sx={{ whiteSpace: "nowrap" }}>
+          <Grid item xs={12} sm={6} md={4}>
+            <Box display="flex" alignItems="center" gap={0.5}> {/* Changed to flex for better alignment */}
+              <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: "nowrap" }}>
                 Trạng thái:
               </Typography>
               {renderStatusChip(payroll?.status)}
             </Box>
           </Grid>
-          <Grid item xs={12} sm={4} />
+          {/* <Grid item xs={12} sm={4} /> */}
         </Grid>
       </Paper>
 
@@ -363,210 +429,84 @@ const PayrollDetailPage = () => {
         }}
         departmentOptions={departmentOptions}
         jobPositionOptions={jobPositionOptions}
-        onApply={handleApplyFilters}
-        onClear={handleClearFilters}
+        onApply={handleApplyFiltersFromDrawer} // Changed handler
+        onClear={handleClearFiltersInDrawer}   // Changed handler
       />
 
-      <TableContainer component={Paper} sx={{ overflowX: "auto", maxHeight: 460, border: '1px solid #e0e0e0', borderRadius:1 }}>
+      <TableContainer component={Paper} sx={{ overflowX: "auto", maxHeight: tableMaxHeight, border: `1px solid ${theme.palette.divider}`, borderRadius:1 }}>
         <Table stickyHeader size="small" sx={{borderCollapse: 'collapse'}}>
           <TableHead>
             <TableRow>
-              <TableCell
-                rowSpan={2}
-                style={{
-                  ...stickyHeaderCellStyle,
-                  left: 0,
-                  minWidth: 100,
-                  maxWidth: 100,
-                  background: defaultHeaderBgColor, // Ensure non-date sticky headers have default bg
-                }}
-              >
-                Mã NV
-              </TableCell>
-              <TableCell
-                rowSpan={2}
-                style={{
-                  ...stickyHeaderCellStyle,
-                  left: 100,
-                  minWidth: 180,
-                  maxWidth: 180,
-                  background: defaultHeaderBgColor, // Ensure non-date sticky headers have default bg
-                }}
-              >
-                Họ và tên
-              </TableCell>
-              <TableCell
-                rowSpan={2}
-                style={{
-                  ...stickyHeaderCellStyle,
-                  zIndex: 4,
-                  minWidth: 150,
-                  background: defaultHeaderBgColor, // Ensure non-date sticky headers have default bg
-                }}
-              >
-                Phòng ban
-              </TableCell>
-              <TableCell
-                rowSpan={2}
-                style={{
-                  ...stickyHeaderCellStyle,
-                  zIndex: 4,
-                  minWidth: 150,
-                  background: defaultHeaderBgColor,
-                }}
-              >
-                Chức vụ
-              </TableCell>
-              <TableCell
-                rowSpan={2}
-                style={{
-                  ...stickyHeaderCellStyle,
-                  zIndex: 4,
-                  minWidth: 60,
-                  background: defaultHeaderBgColor,
-                }}
-              >
-                Loại
-              </TableCell>
+              <TableCell rowSpan={2} sx={{...stickyHeaderCellStyle(), left: 0, minWidth: 100, maxWidth: 100, zIndex: 6 }}>Mã NV</TableCell>
+              <TableCell rowSpan={2} sx={{...stickyHeaderCellStyle(), left: 100, minWidth: 180, maxWidth: 180, zIndex: 6 }}>Họ và tên</TableCell>
+              <TableCell rowSpan={2} sx={{...stickyHeaderCellStyle(), minWidth: 150, zIndex: 4 }}>Phòng ban</TableCell>
+              <TableCell rowSpan={2} sx={{...stickyHeaderCellStyle(), minWidth: 150, zIndex: 4 }}>Chức vụ</TableCell>
+              <TableCell rowSpan={2} sx={{...stickyHeaderCellStyle(), minWidth: 60, zIndex: 4 }}>Loại</TableCell>
               {dateArray.map((d, i) => (
-                <TableCell
-                  key={`d-${i}`}
-                  align="center"
-                  style={{
-                    ...headerCellStyle,
-                    position: "sticky",
-                    top: 0,
-                    zIndex: 3,
-                    minWidth: 55,
-                    backgroundColor: getBgColorForDayHeader(d),
-                  }}
-                >
+                <TableCell key={`d-${i}`} align="center" sx={{...stickyHeaderCellStyle(true, d), minWidth: 55, top:0 }}> {/* Removed zIndex here as parent has it */}
                   <div>{d.format("DD/MM")}</div>
-                  <div style={{ fontSize: '0.75rem', color: "#555" }}>{getVietnameseWeekday(d.day())}</div>
+                  <div style={{ fontSize: '0.75rem' }}>{getVietnameseWeekday(d.day())}</div>
                 </TableCell>
               ))}
-              <TableCell
-                rowSpan={2}
-                style={{ ...stickyHeaderCellStyle, zIndex:3, minWidth: 90, background: defaultHeaderBgColor }}
-              >
-                Tổng giờ làm
-              </TableCell>
-              <TableCell
-                rowSpan={2}
-                style={{ ...stickyHeaderCellStyle, zIndex:3, minWidth: 90, background: defaultHeaderBgColor }}
-              >
-                Nghỉ có lương
-              </TableCell>
-              <TableCell
-                rowSpan={2}
-                style={{ ...stickyHeaderCellStyle, zIndex:3, minWidth: 90, background: defaultHeaderBgColor }}
-              >
-                Nghỉ không lương
-              </TableCell>
-              <TableCell
-                rowSpan={2}
-                style={{ ...stickyHeaderCellStyle, zIndex:3, minWidth: 120, background: defaultHeaderBgColor }}
-              >
-                Tổng lương (₫)
-              </TableCell>
+              <TableCell rowSpan={2} sx={{ ...stickyHeaderCellStyle(), minWidth: 90, zIndex:4 }}>Tổng giờ làm</TableCell>
+              <TableCell rowSpan={2} sx={{ ...stickyHeaderCellStyle(), minWidth: 90, zIndex:4 }}>Nghỉ có lương</TableCell>
+              <TableCell rowSpan={2} sx={{ ...stickyHeaderCellStyle(), minWidth: 90, zIndex:4 }}>Nghỉ không lương</TableCell>
+              <TableCell rowSpan={2} sx={{ ...stickyHeaderCellStyle(), minWidth: 120, zIndex:4 }}>Tổng lương (₫)</TableCell>
             </TableRow>
           </TableHead>
 
           <TableBody>
-            {details.map((d_row) => {
-              const user = userMap[d_row.user_id] || {};
-              return (
-                <React.Fragment key={d_row.id}>
-                  <TableRow hover>
-                    <TableCell
-                      rowSpan={2}
-                      align="center"
-                      style={{
-                        ...stickyBodyCellStyle,
-                        left: 0,
-                        minWidth: 100,
-                        maxWidth: 100,
-                        fontWeight: 'normal',
-                      }}
-                    >
-                      {user.staff_code || d_row.user_id}
-                    </TableCell>
-                    <TableCell
-                      rowSpan={2}
-                      style={{
-                        ...stickyBodyCellStyle,
-                        left: 100,
-                        minWidth: 180,
-                        maxWidth: 180,
-                        textAlign: 'left',
-                        verticalAlign: 'middle',
-                      }}
-                    >
-                      {user.fullname || d_row.user_id}
-                    </TableCell>
-                    <TableCell rowSpan={2} align="left" style={{ ...cellBorderStyle, verticalAlign: 'middle', padding: '6px 10px', minWidth: 150, }}>
-                      {user.department?.department_name || "-"}
-                    </TableCell>
-                    <TableCell rowSpan={2} align="left" style={{ ...cellBorderStyle, verticalAlign: 'middle', padding: '6px 10px', minWidth: 150, }}>
-                      {user.job_position?.job_position_name || "-"}
-                    </TableCell>
-                    <TableCell align="center" style={{ ...cellBorderStyle, fontWeight: "bold", padding: '6px 10px', backgroundColor: '#fcfcfc' }}>
-                      WRK
-                    </TableCell>
-                    {dateArray.map((dateVal, i) => (
-                      <TableCell
-                        key={`wh-${d_row.id}-${i}`}
-                        align="center"
-                        style={{
-                          ...cellBorderStyle,
-                          padding: '6px 10px',
-                          minWidth: 55,
-                          backgroundColor: getBgColorForDayCell(dateVal) // Dynamic background for cells
-                        }}
-                      >
-                        {d_row.work_hours[i] !== 0 ? d_row.work_hours[i] : "-"}
-                      </TableCell>
-                    ))}
-                    <TableCell rowSpan={2} align="center" style={{ ...cellBorderStyle, fontWeight: "bold", padding: '6px 10px', backgroundColor: '#f5f5f5' }}>
-                      {d_row.total_work_hours}
-                    </TableCell>
-                    <TableCell rowSpan={2} align="center" style={{ ...cellBorderStyle, fontWeight: "bold", padding: '6px 10px', backgroundColor: '#f5f5f5' }}>
-                      {d_row.pair_leave_hours}
-                    </TableCell>
-                    <TableCell rowSpan={2} align="center" style={{ ...cellBorderStyle, fontWeight: "bold", padding: '6px 10px', backgroundColor: '#f5f5f5' }}>
-                      {d_row.unpair_leave_hours}
-                    </TableCell>
-                    <TableCell rowSpan={2} align="right" style={{ ...cellBorderStyle, fontWeight: "bold", padding: '6px 10px', backgroundColor: '#f0f0f0' }}>
-                      {d_row.payroll_amount != null ? d_row.payroll_amount.toLocaleString() : "-"}
-                    </TableCell>
-                  </TableRow>
-
-                  <TableRow hover>
-                    <TableCell align="center" style={{ ...cellBorderStyle, fontWeight: "bold", padding: '6px 10px', backgroundColor: '#fcfcfc'}}>
-                      ABS
-                    </TableCell>
-                    {dateArray.map((dateVal, i) => (
-                      <TableCell
-                        key={`ah-${d_row.id}-${i}`}
-                        align="center"
-                        style={{
-                          ...cellBorderStyle,
-                          padding: '6px 10px',
-                          minWidth: 55,
-                          backgroundColor: getBgColorForDayCell(dateVal) // Dynamic background for cells
-                        }}
-                      >
-                        {d_row.absence_hours[i] !== 0 ? d_row.absence_hours[i] : "-"}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </React.Fragment>
-              );
-            })}
-            {details.length === 0 && (
+            {loadingDetails ? (
               <TableRow>
-                <TableCell colSpan={dateArray.length + 9} align="center" style={{padding: '20px', ...cellBorderStyle}}>
-                  Không có dữ liệu để hiển thị.
+                <TableCell colSpan={dateArray.length + 9} align="center" sx={{p:3, ...cellBorderStyle}}>
+                  <CircularProgress size={24} /> <Typography variant="body2" sx={{ml:1, display:'inline'}}>Đang tải chi tiết...</Typography>
+                </TableCell>
+              </TableRow>
+            ) : details.length > 0 ? (
+              details.map((d_row) => {
+                const user = userMap[d_row.user_id] || {};
+                return (
+                  <React.Fragment key={d_row.user_id + '_payroll_detail'}> {/* Changed key for stability */}
+                    <TableRow hover>
+                      <TableCell rowSpan={2} align="center" sx={{...stickyBodyCellStyle(0), fontWeight: 'normal' }}>{user.staff_code || d_row.user_id}</TableCell>
+                      <TableCell rowSpan={2} sx={{...stickyBodyCellStyle(100), textAlign: 'left', verticalAlign: 'middle' }}>{user.fullname || d_row.user_id}</TableCell>
+                      <TableCell rowSpan={2} align="left" sx={{ ...cellBorderStyle, verticalAlign: 'middle', padding: '6px 10px', minWidth: 150, }}>{user.department?.department_name || "-"}</TableCell>
+                      <TableCell rowSpan={2} align="left" sx={{ ...cellBorderStyle, verticalAlign: 'middle', padding: '6px 10px', minWidth: 150, }}>{user.job_position?.job_position_name || "-"}</TableCell>
+                      <TableCell align="center" sx={{ ...cellBorderStyle, fontWeight: "bold", padding: '6px 10px', backgroundColor: theme.palette.grey[50] }}>WRK</TableCell>
+                      {dateArray.map((dateVal, i) => (
+                        <TableCell
+                          key={`wh-${d_row.user_id}-${i}`}
+                          align="center"
+                          sx={{ ...cellBorderStyle, padding: '6px 10px', minWidth: 55, backgroundColor: getBgColorForDayCell(dateVal) }}
+                        >
+                          {d_row.work_hours[i] !== 0 ? d_row.work_hours[i] : "-"}
+                        </TableCell>
+                      ))}
+                      <TableCell rowSpan={2} align="center" sx={{ ...cellBorderStyle, fontWeight: "bold", padding: '6px 10px', backgroundColor: theme.palette.grey[100] }}>{d_row.total_work_hours}</TableCell>
+                      <TableCell rowSpan={2} align="center" sx={{ ...cellBorderStyle, fontWeight: "bold", padding: '6px 10px', backgroundColor: theme.palette.grey[100] }}>{d_row.pair_leave_hours}</TableCell>
+                      <TableCell rowSpan={2} align="center" sx={{ ...cellBorderStyle, fontWeight: "bold", padding: '6px 10px', backgroundColor: theme.palette.grey[100] }}>{d_row.unpair_leave_hours}</TableCell>
+                      <TableCell rowSpan={2} align="right" sx={{ ...cellBorderStyle, fontWeight: "bold", padding: '6px 10px', backgroundColor: theme.palette.grey[200] }}>{d_row.payroll_amount != null ? d_row.payroll_amount.toLocaleString() : "-"}</TableCell>
+                    </TableRow>
+
+                    <TableRow hover>
+                      <TableCell align="center" sx={{ ...cellBorderStyle, fontWeight: "bold", padding: '6px 10px', backgroundColor: theme.palette.grey[50]}}>ABS</TableCell>
+                      {dateArray.map((dateVal, i) => (
+                        <TableCell
+                          key={`ah-${d_row.user_id}-${i}`}
+                          align="center"
+                          sx={{ ...cellBorderStyle, padding: '6px 10px', minWidth: 55, backgroundColor: getBgColorForDayCell(dateVal) }}
+                        >
+                          {d_row.absence_hours[i] !== 0 ? d_row.absence_hours[i] : "-"}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </React.Fragment>
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell colSpan={dateArray.length + 9} align="center" sx={{padding: '20px', ...cellBorderStyle}}>
+                  Không có dữ liệu chi tiết để hiển thị cho bộ lọc hiện tại.
                 </TableCell>
               </TableRow>
             )}
@@ -574,18 +514,30 @@ const PayrollDetailPage = () => {
         </Table>
       </TableContainer>
 
-      <Pagination
-        currentPage={currentPage}
-        pageCount={pageCount}
-        itemsPerPage={itemsPerPage}
-        onPageChange={(page) => setCurrentPage(page)}
-        onItemsPerPageChange={(size) => {
-          setItemsPerPage(size);
-          setCurrentPage(0);
-        }}
-      />
+      { details.length > 0 && pageCount > 1 &&
+        <Pagination
+          currentPage={currentPage}
+          pageCount={pageCount}
+          itemsPerPage={itemsPerPage}
+          onPageChange={(page) => setCurrentPage(page)}
+          onItemsPerPageChange={(size) => {
+            setItemsPerPage(size);
+            setCurrentPage(0);
+          }}
+        />
+      }
     </Box>
   );
 };
 
+const PayrollDetailPage = () => {
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <InnerPayrollDetailPage />
+    </ThemeProvider>
+  );
+};
+
 export default PayrollDetailPage;
+

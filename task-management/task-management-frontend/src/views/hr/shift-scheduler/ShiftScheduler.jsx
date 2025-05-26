@@ -1,11 +1,8 @@
-// ==============
-// ShiftScheduler.jsx
-// ==============
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {addDays, endOfWeek, format, getDay, isValid, parseISO, startOfWeek, subDays} from 'date-fns';
 import vi from 'date-fns/locale/vi';
 import {DragDropContext} from 'react-beautiful-dnd';
-import {Box, Button, CircularProgress, Container, Paper, Typography} from '@mui/material';
+import {Box, Button, CircularProgress, Container, CssBaseline, Paper, ThemeProvider, Typography} from '@mui/material';
 import {LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
 
@@ -22,6 +19,7 @@ import DeleteConfirmationModal from "../modals/DeleteConfirmationModal.jsx";
 import UserFilterDrawer from "./UserFilterDrawer.jsx";
 import {request} from "../../../api.js";
 import toast from "react-hot-toast";
+import {theme} from "../theme.js";
 
 export const TOP_BAR_HEIGHT = 61;
 export const AVAILABLE_SHIFTS_BANNER_HEIGHT = 36;
@@ -154,7 +152,7 @@ const transformFrontendShiftToApiUpdateShiftRequest = (frontendShiftId, newValue
   return payload;
 };
 
-export default function ShiftScheduler() {
+function InnerShiftScheduler() {
   const [currentDate, setCurrentDate] = useState(new Date(new Date('2025-05-19').setHours(0,0,0,0)));
   const [shifts, setShifts] = useState([]);
   const [rawUsers, setRawUsers] = useState([]);
@@ -406,7 +404,7 @@ export default function ShiftScheduler() {
       }
 
       const promises = [];
-      if (idToDeleteOnSuccess) promises.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, null, {params: {ids: idToDeleteOnSuccess}}));
+      if (idToDeleteOnSuccess) promises.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, null, {idToDeleteOnSuccess}));
       if (shiftToUpdateApiPayload) promises.push(request("put", `/shifts/${shiftToUpdateApiPayload.id}`, null, {onError: (e) => {throw e}}, shiftToUpdateApiPayload));
       if (shiftsToCreateApiPayload.length > 0) promises.push(request("post", "/shifts", null, {onError: (e) => {throw e}}, { shifts: shiftsToCreateApiPayload }));
 
@@ -553,7 +551,7 @@ export default function ShiftScheduler() {
           const createNewUnassignedShiftReq = transformFrontendShiftToApiShiftRequest({ ...draggedShiftOriginal, userId: FRONTEND_UNASSIGNED_SHIFT_USER_ID, day: newDestDayString, slots: 1 });
           operations.push(request("post", "/shifts", null, {onError: (e) => {throw e}}, { shifts: [createNewUnassignedShiftReq] }));
         }
-        operations.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, draggedShiftOriginal.id));
+        operations.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, [draggedShiftOriginal.id]));
       } else if (draggedShiftOriginal.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID && newDestUserIdForFrontend !== FRONTEND_UNASSIGNED_SHIFT_USER_ID) {
         involvesCreationForDrag = true;
         const createNewAssignedShiftReq = transformFrontendShiftToApiShiftRequest({ ...draggedShiftOriginal, userId: newDestUserIdForFrontend, day: newDestDayString, slots: undefined });
@@ -562,7 +560,7 @@ export default function ShiftScheduler() {
           const updateUnassignedReq = transformFrontendShiftToApiUpdateShiftRequest(draggedShiftOriginal.id, { slots: draggedShiftOriginal.slots - 1 });
           operations.push(request("put", `/shifts/${draggedShiftOriginal.id}`, null, {onError: (e) => {throw e}}, updateUnassignedReq));
         } else {
-          operations.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, draggedShiftOriginal.id));
+          operations.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, [draggedShiftOriginal.id]));
         }
       } else if (draggedShiftOriginal.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID && newDestUserIdForFrontend === FRONTEND_UNASSIGNED_SHIFT_USER_ID) {
         const updateUnassignedReq = transformFrontendShiftToApiUpdateShiftRequest(draggedShiftOriginal.id, { day: newDestDayString });
@@ -808,3 +806,14 @@ export default function ShiftScheduler() {
     </LocalizationProvider>
   );
 }
+
+const ShiftScheduler = () => {
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <InnerShiftScheduler />
+    </ThemeProvider>
+  );
+};
+
+export default ShiftScheduler;
