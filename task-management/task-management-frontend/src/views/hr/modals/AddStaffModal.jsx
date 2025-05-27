@@ -1,312 +1,209 @@
-import React, {useEffect, useState} from "react";
-import {Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, TextField,} from "@mui/material";
+import React, {useEffect, useState, useCallback} from "react"; // Added useCallback
+import {
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  Grid, // Added Grid
+  IconButton, // Added IconButton
+  Stack // Added Stack
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close"; // Added CloseIcon
 import Autocomplete from "@mui/material/Autocomplete";
-import {request} from "@/api";
+import {request}from "@/api";
 import toast from "react-hot-toast";
 
-const AddStaffModal = ({ open, onClose, onSubmit, initialValues }) => {
-  const [formValues, setFormValues] = useState({
-    fullname: "",
-    email: "",
-    department_code: null,
-    job_position_code: null,
-  });
+const AddStaffModal = ({ open, onClose, onSubmitSuccess, initialData, isEditMode, departments = [], jobPositions = [], titleProps }) => {
+  const defaultFormState = { fullname: "", email: "", department_code: null, job_position_code: null };
+  const [formValues, setFormValues] = useState(defaultFormState);
 
-  const [departments, setDepartments] = useState([]);
-  const [jobPositions, setJobPositions] = useState([]);
-
-  const [loadingDepartments, setLoadingDepartments] = useState(false);
-  const [loadingJobPositions, setLoadingJobPositions] = useState(false);
-
-  const [searchDepartment, setSearchDepartment] = useState("");
-  const [searchJob, setSearchJob] = useState("");
+  const [currentDepartments, setCurrentDepartments] = useState([]);
+  const [currentJobPositions, setCurrentJobPositions] = useState([]);
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null); 
+
+  // Không dùng searchDepartment và searchJob nữa, Autocomplete tự xử lý
+  // const [searchDepartment, setSearchDepartment] = useState("");
+  // const [searchJob, setSearchJob] = useState("");
+
+  // Không fetch lặp lại nếu prop departments, jobPositions đã có
+  useEffect(() => {
+    if (departments) setCurrentDepartments(departments);
+  }, [departments]);
+
+  useEffect(() => {
+    if (jobPositions) setCurrentJobPositions(jobPositions);
+  }, [jobPositions]);
+
 
   useEffect(() => {
     if (open) {
-      setFormValues({
-        fullname: initialValues?.fullname || "",
-        email: initialValues?.email || "",
-        department_code: initialValues?.department?.department_code || null,
-        job_position_code: initialValues?.job_position?.job_position_code || null,
-      });
+      if (isEditMode && initialData) {
+        setFormValues({
+          fullname: initialData.fullname || "",
+          email: initialData.email || "",
+          department_code: initialData.department?.department_code || null,
+          job_position_code: initialData.job_position?.code || null, // Giả sử job_position có 'code'
+        });
+        // Set giá trị ban đầu cho Autocomplete nếu đang edit
+        if (initialData.department && departments.length > 0) {
+          const defaultDept = departments.find(d => d.department_code === initialData.department.department_code);
+          // setSelectedDepartmentValue(defaultDept || null); // Không cần state riêng nữa
+        }
+        if (initialData.job_position && jobPositions.length > 0) {
+          const defaultJob = jobPositions.find(j => j.code === initialData.job_position.code);
+          // setSelectedJobPositionValue(defaultJob || null); // Không cần state riêng nữa
+        }
 
-      fetchDepartments("", initialValues?.department?.department_code);
-      fetchJobPositions("", initialValues?.job_position?.job_position_code);
+      } else {
+        setFormValues(defaultFormState);
+        // setSelectedDepartmentValue(null);
+        // setSelectedJobPositionValue(null);
+      }
     }
-  }, [open, initialValues]);
+  }, [open, initialData, isEditMode, departments, jobPositions]);
 
-
-  const fetchDepartments = async (searchValue, defaultCode = null) => {
-    setLoadingDepartments(true);
-    try {
-      const payload = {
-        department_code: null,
-        department_name: searchValue || null,
-        status: "ACTIVE",
-        pageable_request: null,
-      };
-
-      request(
-          "get",
-          "/departments",
-          (res) => {
-            const data = res.data.data || [];
-            setDepartments(data);
-
-
-            if (defaultCode) {
-              const defaultDepartment = data.find(
-                  (dept) => dept.department_code === defaultCode
-              );
-              if (defaultDepartment) {
-                setFormValues((prev) => ({
-                  ...prev,
-                  department_code: defaultDepartment.department_code,
-                }));
-              }
-            }
-          },
-          { onError: (err) => console.error("Error fetching departments:", err) },
-        null,
-          payload
-      );
-    } catch (error) {
-      console.error("Error fetching departments:", error);
-    } finally {
-      setLoadingDepartments(false);
-    }
-  };
-
-
-  const fetchJobPositions = async (searchValue, defaultCode = null) => {
-    setLoadingJobPositions(true);
-    try {
-      const payload = {
-        code: null,
-        name: searchValue || null,
-        status: "ACTIVE",
-        pageable_request: null,
-      };
-
-      request(
-          "get",
-          "/jobs",
-          (res) => {
-            const data = res.data.data || [];
-            setJobPositions(data);
-
-            if (defaultCode) {
-              const defaultJob = data.find((job) => job.code === defaultCode);
-              if (defaultJob) {
-                setFormValues((prev) => ({
-                  ...prev,
-                  job_position_code: defaultJob.code,
-                }));
-              }
-            }
-          },
-          { onError: (err) => console.error("Error fetching job positions:", err) },
-          payload
-      );
-    } catch (error) {
-      console.error("Error fetching job positions:", error);
-    } finally {
-      setLoadingJobPositions(false);
-    }
-  };
 
   const handleSubmit = async () => {
     setLoading(true);
+    if (!formValues.fullname.trim()) {
+      toast.error("Họ và tên không được để trống."); setLoading(false); return;
+    }
+    if (!isEditMode && !formValues.email.trim()) { // Chỉ bắt buộc email khi thêm mới
+      toast.error("Email không được để trống."); setLoading(false); return;
+    }
+    // Thêm validation email nếu cần
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formValues.email.trim() && !emailRegex.test(formValues.email.trim())) {
+      toast.error("Định dạng email không hợp lệ."); setLoading(false); return;
+    }
+
 
     const payload = {
-      fullname: formValues.fullname,
-      email: formValues.email,
-      department_code:
-          formValues.department_code === initialValues?.department?.department_code
-              ? null
-              : formValues.department_code,
-      job_position_code:
-          formValues.job_position_code === initialValues?.job_position?.job_position_code
-              ? null
-              : formValues.job_position_code,
+      fullname: formValues.fullname.trim(),
+      email: formValues.email.trim(),
+      department_code: formValues.department_code, // Autocomplete trả về code trực tiếp
+      job_position_code: formValues.job_position_code, // Autocomplete trả về code trực tiếp
     };
 
+    // Nếu là edit mode và giá trị không thay đổi so với initial, không gửi field đó
+    if (isEditMode) {
+      if (payload.department_code === initialData?.department?.department_code) {
+        delete payload.department_code;
+      }
+      if (payload.job_position_code === initialData?.job_position?.code) {
+        delete payload.job_position_code;
+      }
+      // Email không cho sửa, không cần kiểm tra
+    }
+
+
     try {
-      const apiEndpoint = initialValues
-          ? `/staffs/${initialValues?.staff_code}`
-          : "/staffs";
-      const methodURL = initialValues
-        ? `put`
-        : "post";
+      const apiEndpoint = isEditMode
+        ? `/staffs/${initialData?.staff_code}`
+        : "/staffs";
+      const methodURL = isEditMode ? "put" : "post";
+
       await request(
         methodURL,
-          apiEndpoint,
-          () => {
-            onSubmit();
-            onClose();
-            setFormValues({
-              fullname: "",
-              email: "",
-              department_code: null,
-              job_position_code: null,
-            });
+        apiEndpoint,
+        () => {
+          toast.success(isEditMode ? "Cập nhật nhân viên thành công!" : "Thêm nhân viên thành công!");
+          onSubmitSuccess(); // Gọi lại hàm từ parent
+          onClose();
+        },
+        {
+          onError: (err) => {
+            console.error("API Error:", err.response?.data || err.message);
+            const errorMsg = err.response?.data?.meta?.message || err.response?.data?.message || "Thao tác thất bại.";
+            toast.error(errorMsg);
           },
-          {
-            onError: (err) => {
-              if (err.response && err.response.data) {
-                const { meta, data } = err.response.data;
-
-                if (meta && meta.code) {
-                  console.warn("Validation error:", meta.message, data);
-                  toast.error("Invalid input provided.")
-                } else {
-                  console.warn("API Error:", meta?.message || "Error occurred", data);
-                  toast.error("An unexpected error occurred.");
-                }
-              } else {
-                console.error("Unexpected error response:", err);
-                toast.error("Something went wrong. Please try again later.");
-              }
-            },
-          },
-          payload
+        },
+        payload
       );
     } catch (error) {
       console.error("API request failed:", error);
-      setError({
-        title: "Error",
-        info: `Something went wrong. ${error.message || "Please try again."}`,
-      });
+      toast.error(`Đã xảy ra lỗi: ${error.message || "Vui lòng thử lại."}`);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-      <>
-        <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-          <DialogTitle>{initialValues ? "Edit Employee" : "Add Employee"}</DialogTitle>
-          <DialogContent>
-            <TextField
-                fullWidth
-                label="Full Name"
-                name="fullname"
-                value={formValues.fullname}
-                onChange={(e) =>
-                    setFormValues((prev) => ({ ...prev, fullname: e.target.value }))
-                }
-                margin="normal"
-            />
-            <TextField
-                fullWidth
-                label="Email"
-                name="email"
-                value={formValues.email}
-                onChange={(e) =>
-                    setFormValues((prev) => ({ ...prev, email: e.target.value }))
-                }
-                margin="normal"
-                disabled={!!initialValues}
-                InputProps={{
-                  style: !!initialValues ? { color: "#8c8c8c", backgroundColor: "#f5f5f5" } : {}, // Add grayed-out style
-                }}
-            />
-            <Autocomplete
-                fullWidth
-                options={departments}
-                getOptionLabel={(option) => option.department_name || ""}
-                isOptionEqualToValue={(option, value) =>
-                    option.department_code === value.department_code
-                }
-                inputValue={searchDepartment}
-                onInputChange={(e, value) => {
-                  setSearchDepartment(value);
-                  fetchDepartments(value);
-                }}
-                onChange={(e, value) =>
-                    setFormValues((prev) => ({
-                      ...prev,
-                      department_code: value?.department_code || null,
-                    }))
-                }
-                value={
-                    departments.find(
-                        (dept) => dept.department_code === formValues.department_code
-                    ) || null
-                }
-                loading={loadingDepartments}
-                renderInput={(params) => (
-                    <TextField
-                        {...params}
-                        label="Select Department"
-                        margin="normal"
-                        InputProps={{
-                          ...params.InputProps,
-                          endAdornment: (
-                              <>
-                                {loadingDepartments ? <CircularProgress size={20} /> : null}
-                                {params.InputProps.endAdornment}
-                              </>
-                          ),
-                        }}
-                    />
-                )}
-            />
-            <Autocomplete
-                fullWidth
-                options={jobPositions}
-                getOptionLabel={(option) => option.name || ""}
-                isOptionEqualToValue={(option, value) => option.code === value.code}
-                inputValue={searchJob}
-                onInputChange={(e, value) => {
-                  setSearchJob(value);
-                  fetchJobPositions(value);
-                }}
-                onChange={(e, value) =>
-                    setFormValues((prev) => ({
-                      ...prev,
-                      job_position_code: value?.code || null,
-                    }))
-                }
-                value={
-                    jobPositions.find(
-                        (job) => job.code === formValues.job_position_code
-                    ) || null
-                }
-                loading={loadingJobPositions}
-                renderInput={(params) => (
-                    <TextField
-                        {...params}
-                        label="Select Job Position"
-                        margin="normal"
-                        InputProps={{
-                          ...params.InputProps,
-                          endAdornment: (
-                              <>
-                                {loadingJobPositions ? (
-                                    <CircularProgress size={20} />
-                                ) : null}
-                                {params.InputProps.endAdornment}
-                              </>
-                          ),
-                        }}
-                    />
-                )}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={onClose} color="secondary" disabled={loading}>
-              Cancel
-            </Button>
-            <Button onClick={handleSubmit} color="primary" variant="contained" disabled={loading}>
-              {loading ? "Submitting..." : initialValues ? "Save Changes" : "Submit"}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle sx={{...titleProps, display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1.5 }}>
+        {isEditMode ? "Chỉnh sửa Thông tin Nhân viên" : "Thêm Nhân viên Mới"}
+        <IconButton aria-label="đóng" onClick={onClose} sx={{p:0.5}}>
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent dividers sx={{pt: '12px !important'}}>
+        <Stack spacing={2.5} sx={{mt:1}}>
+          <TextField
+            autoFocus
+            fullWidth
+            label="Họ và tên (*)"
+            name="fullname"
+            value={formValues.fullname}
+            onChange={(e) => setFormValues((prev) => ({ ...prev, fullname: e.target.value })) }
+            size="small"
+          />
+          <TextField
+            fullWidth
+            label="Email (*)"
+            name="email"
+            value={formValues.email}
+            onChange={(e) => setFormValues((prev) => ({ ...prev, email: e.target.value }))}
+            size="small"
+            disabled={isEditMode} // Email không cho sửa khi edit
+            InputProps={{
+              sx: isEditMode ? { color: "text.disabled", backgroundColor: "action.disabledBackground" } : {},
+            }}
+          />
+          <Autocomplete
+            fullWidth
+            options={currentDepartments}
+            getOptionLabel={(option) => option.department_name || ""}
+            isOptionEqualToValue={(option, value) => option.department_code === value.department_code}
+            value={currentDepartments.find(dept => dept.department_code === formValues.department_code) || null}
+            onChange={(event, newValue) => {
+              setFormValues((prev) => ({ ...prev, department_code: newValue?.department_code || null}));
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Phòng ban" size="small" />
+            )}
+            noOptionsText="Không tìm thấy phòng ban"
+            size="small"
+          />
+          <Autocomplete
+            fullWidth
+            options={currentJobPositions}
+            getOptionLabel={(option) => option.name || ""}
+            isOptionEqualToValue={(option, value) => option.code === value.code }
+            value={currentJobPositions.find(job => job.code === formValues.job_position_code) || null}
+            onChange={(event, newValue) => {
+              setFormValues((prev) => ({ ...prev, job_position_code: newValue?.code || null}));
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Vị trí công việc" size="small" />
+            )}
+            noOptionsText="Không tìm thấy vị trí"
+            size="small"
+          />
+        </Stack>
+      </DialogContent>
+      <DialogActions sx={{p:2}}>
+        <Button onClick={onClose} color="inherit" variant="outlined" disabled={loading}>
+          Hủy
+        </Button>
+        <Button onClick={handleSubmit} color="primary" variant="contained" disabled={loading}>
+          {loading ? <CircularProgress size={24} color="inherit"/> : (isEditMode ? "Lưu thay đổi" : "Thêm mới")}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

@@ -153,7 +153,7 @@ const transformFrontendShiftToApiUpdateShiftRequest = (frontendShiftId, newValue
 };
 
 function InnerShiftScheduler() {
-  const [currentDate, setCurrentDate] = useState(new Date(new Date('2025-05-19').setHours(0,0,0,0)));
+  const [currentDate, setCurrentDate] = useState(new Date(new Date().setHours(0,0,0,0)));
   const [shifts, setShifts] = useState([]);
   const [rawUsers, setRawUsers] = useState([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);

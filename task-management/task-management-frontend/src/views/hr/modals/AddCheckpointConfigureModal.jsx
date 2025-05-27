@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
 import {
-  Alert,
   Button,
   CircularProgress,
   Dialog,
@@ -8,21 +7,21 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
-  Snackbar,
   TextField,
+  Stack,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import {request} from "@/api";
+import {request}from "@/api";
+import toast from "react-hot-toast";
 
-const AddCheckpointConfigureModal = ({ open, onClose, onSubmit, initialValues }) => {
+const AddCheckpointConfigureModal = ({ open, onClose, onSubmit, initialValues, titleProps }) => {
   const [formValues, setFormValues] = useState({
     name: "",
     description: "",
   });
-  const [error, setError] = useState(null); 
-  const [loading, setLoading] = useState(false); 
+  // Bỏ error state cục bộ, dùng toast
+  const [loading, setLoading] = useState(false);
 
- 
   useEffect(() => {
     if (initialValues) {
       setFormValues({
@@ -32,7 +31,7 @@ const AddCheckpointConfigureModal = ({ open, onClose, onSubmit, initialValues })
     } else {
       setFormValues({ name: "", description: "" });
     }
-  }, [initialValues]);
+  }, [initialValues, open]); // Thêm open để reset form khi mở lại modal cho item mới
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -42,135 +41,92 @@ const AddCheckpointConfigureModal = ({ open, onClose, onSubmit, initialValues })
     });
   };
 
-
   const handleSubmit = async () => {
     setLoading(true);
+    if (!formValues.name.trim()) {
+      toast.error("Tên cấu hình không được để trống.");
+      setLoading(false);
+      return;
+    }
 
     const payload = {
-      name: formValues.name,
-      description: formValues.description,
+      name: formValues.name.trim(),
+      description: formValues.description.trim(),
+      // API có thể yêu cầu 'code' nếu là 'put' và 'id' nếu là 'post', cần điều chỉnh
+      ...(initialValues && initialValues.code && { code: initialValues.code })
     };
 
     try {
-      const endpoint = initialValues
-        ? `/checkpoints/configures/${initialValues.code}`
+      const endpoint = initialValues?.id // Hoặc initialValues?.code nếu dùng code làm id
+        ? `/checkpoints/configures/${initialValues.id}` // Giả sử API dùng id cho PUT
         : "/checkpoints/configures";
-      const methodURL = initialValues
-        ? "put"
-        : "post";
+      const methodURL = initialValues?.id ? "put" : "post";
 
-      request(
+      await request(
         methodURL,
         endpoint,
         (response) => {
-          onSubmit(); 
-          onClose(); 
-          setFormValues({ name: "", description: "" }); 
+          toast.success(initialValues?.id ? "Cập nhật cấu hình thành công!" : "Thêm cấu hình thành công!");
+          onSubmit();
+          onClose();
         },
         {
           onError: (err) => {
-            if (err.response && err.response.data) {
-              const { meta, data } = err.response.data;
-
-              if (meta && meta.code) {
-             
-                console.error("Validation error:", meta.message, data);
-                setError({
-                  title: meta.message || "Validation Error",
-                  info: data || "Invalid input provided.",
-                });
-              } else {
-                console.error("API Error:", meta?.message || "Error occurred", data);
-                setError({
-                  title: meta?.message || "Error",
-                  info: data || "An unexpected error occurred.",
-                });
-              }
-            } else {
-              console.error("Unexpected error response:", err);
-              setError({
-                title: "Error",
-                info: "Something went wrong. Please try again later.",
-              });
-            }
-          },
-          500: (err) => {
-            console.error("Server error:", err);
-            setError({
-              title: "Server Error",
-              info: "The server is currently unavailable.",
-            });
-          },
+            console.error("API Error:", err.response?.data || err.message);
+            const errorMsg = err.response?.data?.meta?.message || err.response?.data?.message || "Thao tác thất bại. Vui lòng thử lại.";
+            toast.error(errorMsg);
+          }
         },
         payload
       );
     } catch (error) {
       console.error("API request failed:", error);
-      setError({
-        title: "Error",
-        info: `Something went wrong. ${error.message || "Please try again."}`,
-      });
+      toast.error(`Đã xảy ra lỗi. ${error.message || "Vui lòng thử lại."}`);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <>
-      <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" className="custom-modal">
-        <DialogTitle>
-          {initialValues ? "Edit Configure" : "Add Configure"}
-          <IconButton
-            aria-label="close"
-            onClick={onClose}
-            style={{ position: "absolute", right: 8, top: 8 }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle sx={{ ...titleProps, display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb:1.5 }}>
+        {initialValues?.id ? "Chỉnh sửa Cấu hình Checkpoint" : "Thêm Cấu hình Checkpoint Mới"}
+        <IconButton aria-label="đóng" onClick={onClose} sx={{p:0.5}}>
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent dividers sx={{pt: '12px !important'}}> {/* Thêm dividers và padding top */}
+        <Stack spacing={2.5} sx={{mt:1}}> {/* Sử dụng Stack */}
           <TextField
+            autoFocus // Thêm autoFocus
             fullWidth
-            label="Name"
+            label="Tên cấu hình (*)"
             name="name"
             value={formValues.name}
             onChange={handleChange}
-            margin="normal"
+            size="small"
           />
           <TextField
             fullWidth
-            label="Description"
+            label="Mô tả"
             name="description"
             value={formValues.description}
             onChange={handleChange}
-            margin="normal"
+            size="small"
             multiline
-            rows={3}
+            rows={4}
           />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose} color="secondary" disabled={loading}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} color="primary" variant="contained" disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : "Submit"}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Snackbar
-        open={!!error}
-        autoHideDuration={6000}
-        onClose={() => setError(null)}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert onClose={() => setError(null)} severity="error" variant="filled">
-          <strong>{error?.title}</strong>
-          <br />
-          {error?.info}
-        </Alert>
-      </Snackbar>
-    </>
+        </Stack>
+      </DialogContent>
+      <DialogActions sx={{p:2}}>
+        <Button onClick={onClose} color="inherit" variant="outlined" disabled={loading}>
+          Hủy
+        </Button>
+        <Button onClick={handleSubmit} color="primary" variant="contained" disabled={loading}>
+          {loading ? <CircularProgress size={24} color="inherit" /> : (initialValues?.id ? "Lưu thay đổi" : "Thêm mới")}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

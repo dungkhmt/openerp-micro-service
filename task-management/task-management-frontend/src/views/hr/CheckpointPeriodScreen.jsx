@@ -1,9 +1,8 @@
-import React, {useEffect, useMemo, useRef, useState, useCallback} from "react";
-import {usePagination, useTable} from "react-table";
-import {useNavigate} from "react-router-dom";
-import {request} from "@/api";
+import React, {useEffect, useMemo, useState, useCallback} from "react";
+import {usePagination, useTable}from "react-table";
+import {useNavigate}from "react-router-dom";
+import {request}from "@/api";
 
-// MUI Components
 import {
   ThemeProvider,
   CssBaseline,
@@ -26,31 +25,25 @@ import {
   Tooltip,
   Typography
 } from "@mui/material";
-import { theme } from './theme'; // Đường dẫn tới file theme.js của bạn
+import { theme } from './theme';
 
-// Icons
 import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
-import EventNoteIcon from '@mui/icons-material/EventNote'; // Icon cho kỳ checkpoint
+import EventNoteIcon from '@mui/icons-material/EventNote';
 
-// Custom Components & Hooks
-import AddPeriodModal from "./modals/AddPeriodModal"; // Điều chỉnh đường dẫn nếu cần
-import DeleteConfirmationModal from "./modals/DeleteConfirmationModal.jsx"; // Điều chỉnh đường dẫn nếu cần
+import AddPeriodModal from "./modals/AddPeriodModal";
+import DeleteConfirmationModal from "./modals/DeleteConfirmationModal.jsx";
 import Pagination from "@/components/item/Pagination";
-import { useDebounce } from "../../hooks/useDebounce"; // Điều chỉnh đường dẫn nếu cần
+import { useDebounce } from "../../hooks/useDebounce";
+import { exportToPDF, prepareCSVData } from "./fileExportUtils";
 
-// Libraries
-import {CSVLink} from "react-csv";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
+import {CSVLink}from "react-csv";
 import toast from "react-hot-toast";
-import dayjs from "dayjs"; // Để định dạng ngày tháng
-
-// import "@/assets/css/CheckpointPeriodTable.css"; // Loại bỏ import CSS
+import dayjs from "dayjs";
 
 const CheckpointPeriodScreenInternal = () => {
   const navigate = useNavigate();
@@ -64,15 +57,14 @@ const CheckpointPeriodScreenInternal = () => {
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   const [openModal, setOpenModal] = useState(false);
-  const [selectedPeriod, setSelectedPeriod] = useState(null); // Dùng cho cả edit và delete
+  const [selectedPeriod, setSelectedPeriod] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  // const [deletePeriod, setDeletePeriod] = useState(null); // Không cần state riêng cho delete nếu selectedPeriod đủ
 
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const [currentMenuPeriodId, setCurrentMenuPeriodId] = useState(null);
 
   const handleRowClick = useCallback((period) => {
-    navigate(`/hr/checkpoint/evaluation`, { state: { period } }); // Điều chỉnh route nếu cần
+    navigate(`/hr/checkpoint/evaluation`, { state: { period } });
   }, [navigate]);
 
   const fetchData = useCallback(async (pageIndex, pageSize, searchValue, isInitialLoadOrFilterChange = false) => {
@@ -89,13 +81,14 @@ const CheckpointPeriodScreenInternal = () => {
         const transformedPeriods = (periodsFromApi || []).map((period, index) => ({
           ...period,
           id: String(period.id || `__fallback_period_id_${index}`),
-          // Định dạng lại ngày tháng nếu cần
-          checkpoint_date_formatted: period.checkpoint_date ? dayjs(period.checkpoint_date).format("DD/MM/YYYY") : "Chưa có",
+          checkpoint_date_formatted: period.checkpoint_date ? dayjs(period.checkpoint_date).format("DD/MM/YYYY") : "N/A",
         }));
         setData(transformedPeriods);
         setPageCount(meta?.page_info?.total_page || 0);
         if (!isInitialLoadOrFilterChange) {
           setCurrentPage(meta?.page_info?.page || 0);
+        } else {
+          setCurrentPage(0);
         }
       }, {
         onError: (err) => { console.error("Lỗi khi tải kỳ checkpoint:", err); toast.error("Không thể tải danh sách kỳ checkpoint."); },
@@ -109,12 +102,11 @@ const CheckpointPeriodScreenInternal = () => {
   }, []);
 
   useEffect(() => {
-    setCurrentPage(0);
     fetchData(0, itemsPerPage, debouncedSearchTerm, true);
   }, [itemsPerPage, debouncedSearchTerm, fetchData]);
 
   const handleMenuOpen = useCallback((event, periodId) => {
-    event.stopPropagation(); // Ngăn sự kiện click vào hàng
+    event.stopPropagation();
     setMenuAnchorEl(event.currentTarget);
     setCurrentMenuPeriodId(periodId);
   }, []);
@@ -133,23 +125,23 @@ const CheckpointPeriodScreenInternal = () => {
       }
     }
     handleMenuClose();
-  }, [currentMenuPeriodId, data]);
+  }, [currentMenuPeriodId, data, handleMenuClose]);
 
   const handleOpenDeleteModalFromMenu = useCallback(() => {
     if (currentMenuPeriodId) {
       const periodToDelete = data.find(p => p.id === currentMenuPeriodId);
       if (periodToDelete) {
-        setSelectedPeriod(periodToDelete); // Dùng selectedPeriod cho modal xóa
+        setSelectedPeriod(periodToDelete);
         setDeleteModalOpen(true);
       }
     }
     handleMenuClose();
-  }, [currentMenuPeriodId, data]);
+  }, [currentMenuPeriodId, data, handleMenuClose]);
 
   const columns = useMemo(
     () => [
-      { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1, width: 60, disableSortBy: true },
-      { Header: "Tên Kỳ Checkpoint", accessor: "name", minWidth: 250,
+      { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1, width: 60, disableSortBy: true, id:'stt' },
+      { Header: "Tên Kỳ Checkpoint", accessor: "name", minWidth: 250, id:'name',
         Cell: ({ row }) => (
           <Typography
             variant="body1"
@@ -160,8 +152,18 @@ const CheckpointPeriodScreenInternal = () => {
           </Typography>
         )
       },
-      { Header: "Mô tả", accessor: "description", Cell: ({ value }) => ( <Tooltip title={String(value || '')} placement="bottom-start"> <Typography variant="body1" noWrap sx={{ maxWidth: 350, overflow: 'hidden', textOverflow: 'ellipsis' }}> {value || '-'} </Typography> </Tooltip> ), minWidth: 300 },
-      { Header: "Ngày Checkpoint", accessor: "checkpoint_date_formatted", minWidth: 150 }, // Sử dụng trường đã định dạng
+      {
+        Header: "Mô tả",
+        accessor: "description",
+        Cell: ({ value }) => (
+          <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            {value || '-'}
+          </Typography>
+        ),
+        minWidth: 300,
+        id: 'description'
+      },
+      { Header: "Ngày Checkpoint", accessor: "checkpoint_date_formatted", minWidth: 150, id:'checkpoint_date' },
       {
         Header: "Hành động",
         id: 'actions',
@@ -192,33 +194,31 @@ const CheckpointPeriodScreenInternal = () => {
     request("delete", `/checkpoints/periods/${periodIdToDelete}`, () => {
         toast.success("Kỳ Checkpoint đã được xóa thành công.");
         const newCurrentPage = (data.filter(d => d.id !== periodIdToDelete).length % itemsPerPage === 0 && currentPage > 0 && Math.floor((data.length -1) / itemsPerPage) < currentPage) ? currentPage - 1 : currentPage;
-        if (newCurrentPage !== currentPage) setCurrentPage(newCurrentPage);
-        fetchData(newCurrentPage, itemsPerPage, debouncedSearchTerm);
-        setDeleteModalOpen(false); setSelectedPeriod(null); // Reset selectedPeriod
+        fetchData(newCurrentPage, itemsPerPage, debouncedSearchTerm, newCurrentPage === 0 && data.length-1 === 0);
+        setDeleteModalOpen(false); setSelectedPeriod(null);
       }, { onError: (err) => { console.error("Lỗi khi xóa kỳ checkpoint:", err); toast.error(err.response?.data?.message || "Không thể xóa kỳ checkpoint."); } }
     );
   };
 
-  const exportPDF = () => {
-    const doc = new jsPDF();
-    const headerColor = theme?.palette?.primary?.main || [30, 136, 229];
-    doc.setFont("helvetica", "bold"); doc.text("Danh sách Kỳ Checkpoint", 14, 20); doc.setFont("helvetica", "normal");
-    doc.autoTable({
-      startY: 30,
-      headStyles: { fillColor: headerColor, textColor: "#ffffff", fontStyle: 'bold' },
-      head: [["Tên Kỳ", "Mô tả", "Ngày Checkpoint"]],
-      body: data.map(row => [
-        row.name,
-        row.description,
-        row.checkpoint_date_formatted, // Sử dụng trường đã định dạng
-      ]),
-      styles: { font: "helvetica", fontSize: 10 },
+  const pdfExportColumns = useMemo(() => columns.filter(col => col.id !== 'actions'), [columns]);
+
+  const handleExportPDF = () => {
+    exportToPDF({
+      data: data,
+      columns: pdfExportColumns,
+      title: "Danh sách Kỳ Checkpoint",
+      fileName: `DSKyCheckpoint_${dayjs().format("YYYYMMDD")}.pdf`,
+      themePalette: theme.palette,
+      customColumnWidths: {
+        0: {cellWidth: 30}, // STT
+        1: {cellWidth: 150}, // Tên Kỳ
+        2: {cellWidth: 'auto'}, // Mô tả
+        3: {cellWidth: 100} // Ngày Checkpoint
+      }
     });
-    doc.save("DanhSachKyCheckpoint.pdf");
   };
 
   const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
     fetchData(newPage, itemsPerPage, debouncedSearchTerm, false);
   };
 
@@ -226,37 +226,65 @@ const CheckpointPeriodScreenInternal = () => {
     setItemsPerPage(newValue);
   };
 
-  const csvData = useMemo(() => {
+  const csvHeaders = useMemo(() => pdfExportColumns.map(col => ({label: col.Header, key: col.id === 'stt' ? 'stt_export' : col.accessor})), [pdfExportColumns]);
+
+  const csvPreparedData = useMemo(() => {
     if (loading || !data || data.length === 0) return [];
-    return data.map(row => ({
-      "Tên Kỳ Checkpoint": row.name,
-      "Mô tả": row.description,
-      "Ngày Checkpoint": row.checkpoint_date_formatted, // Sử dụng trường đã định dạng
-    }));
-  }, [data, loading]);
+    return data.map((row, index) => {
+      const csvRow = {};
+      pdfExportColumns.forEach(col => {
+        if (col.id === 'stt') {
+          csvRow['stt_export'] = currentPage * itemsPerPage + index + 1;
+        } else if (typeof col.accessor === 'string') {
+          csvRow[col.accessor] = row[col.accessor];
+        }
+      });
+      return csvRow;
+    });
+  }, [data, loading, currentPage, itemsPerPage, pdfExportColumns]);
+
+  const modalTitleStyle = { fontSize: '1.15rem', fontWeight: 600 };
 
   return (
     <Box sx={{ mr: 2, bgcolor: 'background.default', minHeight: 'calc(100vh - 64px)' }}>
       <Paper sx={{ p: 2, mb: 2 }}>
         <Grid container spacing={2} alignItems="center" justifyContent="space-between" wrap="wrap">
-          <Grid item> <Typography variant="h4" component="h1">  Kỳ Checkpoint </Typography> </Grid>
+          <Grid item> <Typography variant="h4" component="h1" sx={{display:'flex', alignItems:'center'}}> Kỳ Checkpoint </Typography> </Grid>
           <Grid item> <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => { setSelectedPeriod(null); setOpenModal(true); }}> Thêm mới </Button> </Grid>
         </Grid>
       </Paper>
 
-      <AddPeriodModal open={openModal} onClose={() => { setOpenModal(false); setSelectedPeriod(null); }} onSubmit={() => { const targetPage = selectedPeriod ? currentPage : 0; if (!selectedPeriod) setCurrentPage(0); fetchData(targetPage, itemsPerPage, debouncedSearchTerm, !selectedPeriod); }} initialValues={selectedPeriod} />
-      {selectedPeriod && (<DeleteConfirmationModal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} onSubmit={handleDelete} title="Xác nhận xóa Kỳ Checkpoint" info={`Bạn có chắc chắn muốn xóa kỳ checkpoint "${selectedPeriod?.name}" không?`} cancelLabel="Hủy" confirmLabel="Xóa" /> )}
+      <AddPeriodModal
+        open={openModal}
+        onClose={() => { setOpenModal(false); setSelectedPeriod(null); }}
+        onSubmit={() => {
+          const targetPage = selectedPeriod ? currentPage : 0;
+          fetchData(targetPage, itemsPerPage, debouncedSearchTerm, !selectedPeriod);
+        }}
+        initialValues={selectedPeriod}
+        titleProps={{sx: modalTitleStyle}}
+      />
+      {selectedPeriod && (<DeleteConfirmationModal
+        open={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onSubmit={handleDelete}
+        title="Xác nhận xóa Kỳ Checkpoint"
+        info={`Bạn có chắc chắn muốn xóa kỳ checkpoint "${selectedPeriod?.name}" không?`}
+        cancelLabel="Hủy"
+        confirmLabel="Xóa"
+        titleProps={{sx: modalTitleStyle}}
+      /> )}
 
       <Paper sx={{ p: 2, mb: 2 }}>
         <Grid container spacing={2} alignItems="flex-end" wrap="wrap">
           <Grid item xs={12} md="auto">
             <Stack direction={{xs: "column", sm: "row"}} spacing={1.5} useFlexGap>
-              {(csvData && csvData.length > 0) ? (
+              {(csvPreparedData && csvPreparedData.length > 0 && !loading) ? (
                 <Button variant="outlined" size="small" startIcon={<CloudDownloadIcon />}>
-                  <CSVLink data={csvData} filename={`DanhSachKyCheckpoint.csv`} style={{ textDecoration: 'none', color: 'inherit' }}> Xuất CSV </CSVLink>
+                  <CSVLink data={csvPreparedData} headers={csvHeaders} filename={`DSKyCheckpoint_${dayjs().format("YYYYMMDD")}.csv`} style={{ textDecoration: 'none', color: 'inherit' }}> Xuất CSV </CSVLink>
                 </Button>
               ) : ( <Button variant="outlined" size="small" startIcon={<CloudDownloadIcon />} disabled> Xuất CSV </Button> )}
-              <Button variant="outlined" size="small" startIcon={<PictureAsPdfIcon />} onClick={exportPDF}> Xuất PDF </Button>
+              <Button variant="outlined" size="small" startIcon={<PictureAsPdfIcon />} onClick={handleExportPDF} disabled={loading || data.length === 0}> Xuất PDF </Button>
             </Stack>
           </Grid>
           <Grid item xs={12} sm>
@@ -272,8 +300,8 @@ const CheckpointPeriodScreenInternal = () => {
               {headerGroups.map((headerGroup) => (
                 <TableRow {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map((column) => (
-                    <TableCell {...column.getHeaderProps()} align={column.textAlign || (column.id === 'actions' ? 'center' : 'left')}
-                               sx={{ bgcolor: (t) => t.palette.mode === 'light' ? t.palette.grey[200] : t.palette.grey[700], color: (t) => t.palette.getContrastText(t.palette.mode === 'light' ? t.palette.grey[200] : t.palette.grey[700]), fontWeight: 'bold', whiteSpace: 'nowrap', width: column.width, minWidth: column.minWidth || (column.id === '#' ? 60 : 120), py: 1.5, borderBottom: (t) => `1px solid ${t.palette.divider}`, '&:not(:last-child)': { borderRight: (t) => `1px solid ${t.palette.divider}` } }}
+                    <TableCell {...column.getHeaderProps()} align={column.id === 'actions' || column.id === 'stt' ? 'center' : 'left'}
+                               sx={{ bgcolor: (t) => t.palette.mode === 'light' ? t.palette.grey[100] : t.palette.grey[700], color: (t) => t.palette.getContrastText(t.palette.mode === 'light' ? t.palette.grey[100] : t.palette.grey[700]), fontWeight: '600', whiteSpace: 'nowrap', width: column.width, minWidth: column.minWidth || (column.id === 'stt' ? 60 : 120), py: 1.25, borderBottom: (t) => `1px solid ${t.palette.divider}`, '&:not(:last-child)': { borderRight: (t) => `1px solid ${t.palette.divider}` } }}
                     > {column.render("Header")} </TableCell>
                   ))}
                 </TableRow>
@@ -287,15 +315,15 @@ const CheckpointPeriodScreenInternal = () => {
                   <TableRow
                     {...row.getRowProps()}
                     hover
-                    // onClick={() => handleRowClick(row.original)} // Bỏ onClick ở đây nếu không muốn cả hàng click được
-                    // sx={{ cursor: 'pointer' }} // Bỏ cursor pointer nếu không muốn cả hàng click được
                     sx={{ '&:nth-of-type(odd)': { backgroundColor: (t) => t.palette.action.hover } }}
                   >
                     {row.cells.map((cell) => (
                       <TableCell
                         {...cell.getCellProps()}
-                        align={cell.column.textAlign || (cell.column.id === 'actions' ? 'center' : 'left')}
-                        sx={{ py: 1.2, '&:not(:last-child)': { borderRight: (t) => `1px solid ${t.palette.grey[200]}` } }}
+                        align={cell.column.id === 'actions' || cell.column.id === 'stt' ? 'center' : 'left'}
+                        sx={{ py: 1, '&:not(:last-child)': { borderRight: (t) => `1px solid ${t.palette.grey[200]}` } }}
+                        onClick={cell.column.id !== 'actions' ? () => handleRowClick(row.original) : undefined} // Cho phép click vào cell trừ cột action
+                        style={cell.column.id !== 'actions' ? {cursor: 'pointer'} : {}}
                       >
                         {cell.render("Cell")}
                       </TableCell>
@@ -306,7 +334,7 @@ const CheckpointPeriodScreenInternal = () => {
             </TableBody>
           </Table>
         </TableContainer>
-        {(pageCount > 0 && !loading) && ( <Pagination currentPage={currentPage} pageCount={pageCount} itemsPerPage={itemsPerPage} onPageChange={handlePageChange} onItemsPerPageChange={handleItemsPerPageChange} /> )}
+        {(pageCount > 0 && !loading && data.length > 0) && ( <Pagination currentPage={currentPage} pageCount={pageCount} itemsPerPage={itemsPerPage} onPageChange={handlePageChange} onItemsPerPageChange={handleItemsPerPageChange} /> )}
       </Paper>
 
       <Menu
@@ -315,10 +343,10 @@ const CheckpointPeriodScreenInternal = () => {
         onClose={handleMenuClose}
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-        PaperProps={{ elevation: 0, sx: { overflow: 'visible', filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))', mt: 1.5, '& .MuiAvatar-root': { width: 32, height: 32, ml: -0.5, mr: 1, }, '&::before': { content: '""', display: 'block', position: 'absolute', top: 0, right: 14, width: 10, height: 10, bgcolor: 'background.paper', transform: 'translateY(-50%) rotate(45deg)', zIndex: 0, }, }, }}
+        PaperProps={{ elevation: 2, sx: { overflow: 'visible', filter: 'drop-shadow(0px 1px 4px rgba(0,0,0,0.2))', mt: 1.5, '& .MuiAvatar-root': { width: 32, height: 32, ml: -0.5, mr: 1, }, '&::before': { content: '""', display: 'block', position: 'absolute', top: 0, right: 14, width: 10, height: 10, bgcolor: 'background.paper', transform: 'translateY(-50%) rotate(45deg)', zIndex: 0, borderLeft: `1px solid ${theme.palette.divider}`, borderTop: `1px solid ${theme.palette.divider}` }, }, }}
       >
-        <MuiMenuItem onClick={handleEditFromMenu} sx={{ gap: 1 }}> <EditIcon fontSize="small" /> Sửa </MuiMenuItem>
-        <MuiMenuItem onClick={handleOpenDeleteModalFromMenu} sx={{ gap: 1, color: 'error.main' }}> <DeleteIcon fontSize="small" /> Xóa </MuiMenuItem>
+        <MuiMenuItem onClick={handleEditFromMenu} sx={{ gap: 1, fontSize:'0.9rem', color: 'text.secondary' }}> <EditIcon fontSize="small" /> Sửa </MuiMenuItem>
+        <MuiMenuItem onClick={handleOpenDeleteModalFromMenu} sx={{ gap: 1, color: 'error.main', fontSize:'0.9rem' }}> <DeleteIcon fontSize="small" /> Xóa </MuiMenuItem>
       </Menu>
     </Box>
   );

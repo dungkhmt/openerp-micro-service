@@ -178,12 +178,12 @@ const navigation = [
     ]
   },
   {
-    title: "Xếp lịch",
+    title: "Lịch làm việc",
     icon: "mdi:calendar-account",
     path: "/hr/shift-scheduler",
   },
   {
-    title: "Xếp lịch",
+    title: "Xếp lịch tự động",
     icon: "mdi:calendar",
     path: "/hr/shift-manager",
   },
