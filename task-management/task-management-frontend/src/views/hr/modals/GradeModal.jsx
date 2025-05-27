@@ -7,21 +7,18 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Divider,
   Grid,
   TextField,
   Typography,
   IconButton,
-  Stack,
   Paper,
-  Avatar, Tooltip // Thêm Avatar
+  Avatar, Tooltip
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import {request}from "@/api";
 import toast from "react-hot-toast";
 import { useTheme } from '@mui/material/styles';
-import PersonIcon from '@mui/icons-material/Person'; // Icon cho nhân viên
-import EventNoteIcon from '@mui/icons-material/EventNote'; // Icon cho kỳ checkpoint
+import EventNoteIcon from '@mui/icons-material/EventNote';
 
 const MAX_POINT = 10;
 
@@ -64,7 +61,7 @@ const GradeModal = ({ open, onClose, staff, period, titleProps }) => {
       setConfigures(configsWithPoints);
 
       if (checkpointData && checkpointData.total_point !== null && checkpointData.total_point !== undefined) {
-        setTotalPointDisplay(Number(checkpointData.total_point).toFixed(1));
+        setTotalPointDisplay(Number(checkpointData.total_point).toFixed(2));
       } else {
         calculateTotalPoints(configsWithPoints);
       }
@@ -94,7 +91,7 @@ const GradeModal = ({ open, onClose, staff, period, titleProps }) => {
       return sum + parseFloat(config.coefficient || 0);
     }, 0);
 
-    const result = totalCoefficientSum > 0 ? (totalPointsSum / totalCoefficientSum).toFixed(1) : "N/A";
+    const result = totalCoefficientSum > 0 ? (totalPointsSum / totalCoefficientSum).toFixed(2) : "N/A";
     setTotalPointDisplay(result);
   }, []);
 
@@ -129,14 +126,13 @@ const GradeModal = ({ open, onClose, staff, period, titleProps }) => {
       const payload = {
         period_id: period.id,
         user_id: staff.user_login_id,
-        // API cũ của bạn là checkpoint_configures, trong khi API mới có thể là configure_points
-        // Đồng nhất lại với API của bạn
-        configure_points: configures.map((config) => ({ // Đổi thành configure_points nếu API yêu cầu
+
+        checkpoint_configures: configures.map((config) => ({
           configure_id: config.configure_id,
           point: parseFloat(config.point),
         })),
       };
-      await request("post", "/checkpoints/evaluations", // Hoặc endpoint phù hợp để tạo/cập nhật đánh giá
+      await request("post", "/checkpoints",
         (res) => {
           toast.success(res.data?.message || "Lưu đánh giá thành công!");
           onClose();
@@ -290,7 +286,7 @@ const GradeModal = ({ open, onClose, staff, period, titleProps }) => {
             </Box>
 
             <Box sx={{p:2, pt:1.5, borderTop: `1px solid ${theme.palette.divider}`, backgroundColor: theme.palette.background.paper}}>
-              <Typography variant="h5" align="right" sx={{fontWeight: 'bold', color: 'primary.dark'}}> {/* Tăng size tổng điểm */}
+              <Typography variant="h5" align="right" sx={{fontWeight: 'bold', color: 'primary.dark'}}>
                 Tổng Điểm: {totalPointDisplay}
               </Typography>
             </Box>

@@ -25,11 +25,6 @@ const AddStaffModal = ({ open, onClose, onSubmitSuccess, initialData, isEditMode
 
   const [loading, setLoading] = useState(false);
 
-  // Không dùng searchDepartment và searchJob nữa, Autocomplete tự xử lý
-  // const [searchDepartment, setSearchDepartment] = useState("");
-  // const [searchJob, setSearchJob] = useState("");
-
-  // Không fetch lặp lại nếu prop departments, jobPositions đã có
   useEffect(() => {
     if (departments) setCurrentDepartments(departments);
   }, [departments]);
@@ -46,16 +41,13 @@ const AddStaffModal = ({ open, onClose, onSubmitSuccess, initialData, isEditMode
           fullname: initialData.fullname || "",
           email: initialData.email || "",
           department_code: initialData.department?.department_code || null,
-          job_position_code: initialData.job_position?.code || null, // Giả sử job_position có 'code'
+          job_position_code: initialData.job_position?.code || null,
         });
-        // Set giá trị ban đầu cho Autocomplete nếu đang edit
         if (initialData.department && departments.length > 0) {
           const defaultDept = departments.find(d => d.department_code === initialData.department.department_code);
-          // setSelectedDepartmentValue(defaultDept || null); // Không cần state riêng nữa
         }
         if (initialData.job_position && jobPositions.length > 0) {
           const defaultJob = jobPositions.find(j => j.code === initialData.job_position.code);
-          // setSelectedJobPositionValue(defaultJob || null); // Không cần state riêng nữa
         }
 
       } else {
@@ -85,8 +77,8 @@ const AddStaffModal = ({ open, onClose, onSubmitSuccess, initialData, isEditMode
     const payload = {
       fullname: formValues.fullname.trim(),
       email: formValues.email.trim(),
-      department_code: formValues.department_code, // Autocomplete trả về code trực tiếp
-      job_position_code: formValues.job_position_code, // Autocomplete trả về code trực tiếp
+      department_code: formValues.department_code,
+      job_position_code: formValues.job_position_code,
     };
 
     // Nếu là edit mode và giá trị không thay đổi so với initial, không gửi field đó
@@ -97,7 +89,6 @@ const AddStaffModal = ({ open, onClose, onSubmitSuccess, initialData, isEditMode
       if (payload.job_position_code === initialData?.job_position?.code) {
         delete payload.job_position_code;
       }
-      // Email không cho sửa, không cần kiểm tra
     }
 
 
