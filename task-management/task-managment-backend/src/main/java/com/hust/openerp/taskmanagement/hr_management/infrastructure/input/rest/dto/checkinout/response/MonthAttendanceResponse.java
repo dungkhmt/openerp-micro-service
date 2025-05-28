@@ -44,8 +44,8 @@ public class MonthAttendanceResponse {
                         .pointTimes(attendanceDayOfModel.getPointTimes())
                         .startTime(attendanceDayOfModel.getStartTime())
                         .endTime(attendanceDayOfModel.getEndTime())
-                        .attendanceType(attendanceDayOfModel.getAttendanceType(attendanceDayOfModel.totalTimeByHours()))
-                        .totalTimeByHours(attendanceDayOfModel.totalTimeByHours())
+                        .attendanceType(attendanceDayOfModel.getAttendanceType(attendanceDayOfModel.getTotalTimeByHours()))
+                        .totalTimeByHours(attendanceDayOfModel.getTotalTimeByHours())
                         .build();
                 dayAttendanceMap.put(date, dayAttendance);
             }

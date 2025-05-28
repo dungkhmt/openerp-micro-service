@@ -2,11 +2,11 @@ package com.hust.openerp.taskmanagement.hr_management.domain.model;
 
 import com.hust.openerp.taskmanagement.hr_management.constant.AttendanceConfig;
 import com.hust.openerp.taskmanagement.hr_management.constant.AttendanceType;
+import com.hust.openerp.taskmanagement.util.WorkTimeCalculator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,6 +25,7 @@ public class AttendanceModel {
     @Setter
     public static class DayAttendance{
         private List<LocalDateTime> pointTimes = new ArrayList<>();
+        private float totalTimeByHours;
 
         public LocalDateTime getStartTime(){
             return pointTimes.get(0);
@@ -37,28 +38,9 @@ public class AttendanceModel {
             return null;
         }
 
-        /**
-         * Calculates the total time between the first and last points in hours.
-         *
-         * @return the total time in hours as a float. Returns 0 if the list is empty or has only one point.
-         */
-        public float totalTimeByHours() {
-            // Ensure the list has at least two points
-            if (pointTimes.size() < 2) {
-                return 0.0f;
-            }
-
-            // Get the first and last points
-            LocalDateTime startTime = getStartTime();
-            LocalDateTime endTime = getEndTime();
-
-            // Calculate the duration in hours
-            long durationInSeconds = Duration.between(startTime, endTime).getSeconds();
-            return durationInSeconds / 3600.0f; // Convert seconds to hours
-        }
 
         public AttendanceType getAttendanceType() {
-            return getAttendanceType(totalTimeByHours());
+            return getAttendanceType(totalTimeByHours);
         }
 
         public AttendanceType getAttendanceType(float totalTimeByHours) {
@@ -71,16 +53,16 @@ public class AttendanceModel {
             if(totalTimeByHours < AttendanceConfig.LIMIT_TIME_BY_HOURS) {
                 return AttendanceType.INCOMPLETE;
             }
-            return AttendanceType.ABSENT;
+            return AttendanceType.PRESENT;
         }
     }
 
     /**
-     *
-     * @param sortedModel group by userid -> sort acs time
+     * @param sortedModel   group by userid -> sort acs time
+     * @param companyConfig
      * @return attendance
      */
-    public static List<AttendanceModel> populateFrom(List<CheckinoutModel> sortedModel){
+    public static List<AttendanceModel> populateFrom(List<CheckinoutModel> sortedModel, CompanyConfigModel companyConfig){
         String id = null;
         int count = -1;
         var list = new ArrayList<AttendanceModel>();
@@ -96,6 +78,18 @@ public class AttendanceModel {
                 attendances.put(date, new DayAttendance());
             }
             attendances.get(date).pointTimes.add(model.getPointTime());
+        }
+        for(var attendance: list){
+            for(var dayAttendance: attendance.attendances.values()){
+                var startTime = dayAttendance.getStartTime() != null ? dayAttendance.getStartTime().toLocalTime() : null;
+                var endTime = dayAttendance.getEndTime() != null ? dayAttendance.getEndTime().toLocalTime() : null;
+                dayAttendance.setTotalTimeByHours(
+                    WorkTimeCalculator.calculateWorkTimeByHours(
+                        startTime,
+                        endTime,
+                        companyConfig)
+                );
+            }
         }
         return list;
     }

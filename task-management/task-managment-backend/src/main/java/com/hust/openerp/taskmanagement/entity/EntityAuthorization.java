@@ -20,8 +20,6 @@ public class EntityAuthorization {
     @Column(name = "created")
     private Instant created;
 
-    @Lob
     @Column(name = "description")
     private String description;
-
 }
