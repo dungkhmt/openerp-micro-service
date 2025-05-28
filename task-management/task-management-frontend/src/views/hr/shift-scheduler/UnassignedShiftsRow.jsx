@@ -1,6 +1,3 @@
-// ==============
-// UnassignedShiftsRow.jsx
-// ==============
 import React from 'react';
 import {Grid, IconButton, Paper, Typography} from '@mui/material';
 import {addDays, format, startOfWeek} from 'date-fns';
@@ -16,7 +13,7 @@ import {
 
 export default function UnassignedShiftsRow({
                                               currentDate,
-                                              shifts, // These are pre-filtered unassigned shifts
+                                              shifts,
                                               onAddShift,
                                               onDeleteShift,
                                               onEditShift,
@@ -25,6 +22,7 @@ export default function UnassignedShiftsRow({
                                               isAnyShiftSelected,
                                               isSticky,
                                               onToggleSticky,
+                                              canAdmin
                                             }) {
   const startDate = startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON });
   const daysOfWeek = Array.from({ length: 7 }).map((_, i) => addDays(startDate, i));
@@ -35,29 +33,29 @@ export default function UnassignedShiftsRow({
       square
       sx={{
         position: isSticky ? 'sticky' : 'relative',
-        top: isSticky ? CALENDAR_HEADER_HEIGHT : undefined, // Sticks below CalendarHeader
-        zIndex: isSticky ? 12 : 1, // Ensure it's above user rows if sticky, below calendar header
-        bgcolor: 'grey.50', // A slightly different background for the unassigned row
+        top: isSticky ? CALENDAR_HEADER_HEIGHT : undefined,
+        zIndex: isSticky ? 12 : 1,
+        bgcolor: 'grey.50',
         borderBottom: 1,
         borderColor: 'divider',
-        minHeight: UNASSIGNED_ROW_HEIGHT, // Maintain a minimum height
-        height: 'auto', // Allow height to grow based on content (tallest DayCell)
+        minHeight: UNASSIGNED_ROW_HEIGHT,
+        height: 'auto',
         boxSizing: 'border-box',
       }}
     >
-      <Grid container sx={{ height: '100%' /* Grid container tries to fill Paper's height */ }}>
+      <Grid container sx={{ height: '100%' }}>
         <Grid
           item
           sx={{
-            width: 160, // Matches CalendarHeader user/title column width
+            width: 160,
             p: 1,
             borderRight: 1,
             borderColor: 'divider',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            bgcolor: 'grey.100', // Distinct background for the title cell of this row
-            alignSelf: 'stretch', // Ensures this title cell stretches vertically with the row
+            bgcolor: 'grey.100',
+            alignSelf: 'stretch',
           }}
         >
           <Typography
@@ -80,11 +78,10 @@ export default function UnassignedShiftsRow({
         </Grid>
         {daysOfWeek.map(day => {
           const dayString = format(day, 'yyyy-MM-dd');
-          // Filter shifts for the current day within this row's already filtered unassigned shifts
           const shiftsInCell = shifts.filter(shift => shift.day === dayString);
           return (
             <DayCell
-              key={`${FRONTEND_UNASSIGNED_SHIFT_USER_ID}-${day.toISOString()}`} // Ensure a unique key
+              key={`${FRONTEND_UNASSIGNED_SHIFT_USER_ID}-${day.toISOString()}`}
               userId={FRONTEND_UNASSIGNED_SHIFT_USER_ID}
               day={day}
               shiftsInCell={shiftsInCell}
@@ -94,6 +91,7 @@ export default function UnassignedShiftsRow({
               selectedShiftIds={selectedShiftIds}
               onToggleSelectShift={onToggleSelectShift}
               isAnyShiftSelected={isAnyShiftSelected}
+              canAdmin={canAdmin}
             />
           );
         })}

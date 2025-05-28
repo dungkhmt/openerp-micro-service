@@ -14,7 +14,7 @@ const getInitials = (name) => {
   return name.substring(0,2).toUpperCase();
 };
 
-export default function UserRow({ user, currentDate, shifts, onAddShift, onDeleteShift, onEditShift, selectedShiftIds, onToggleSelectShift, isAnyShiftSelected }) {
+export default function UserRow({ user, currentDate, shifts, onAddShift, onDeleteShift, onEditShift, selectedShiftIds, onToggleSelectShift, isAnyShiftSelected, canAdmin }) {
   const startDate = startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON });
   const daysOfWeek = Array.from({ length: 7 }).map((_, i) => addDays(startDate, i));
 
@@ -47,6 +47,7 @@ export default function UserRow({ user, currentDate, shifts, onAddShift, onDelet
             selectedShiftIds={selectedShiftIds}
             onToggleSelectShift={onToggleSelectShift}
             isAnyShiftSelected={isAnyShiftSelected}
+            canAdmin={canAdmin}
           />
         );
       })}

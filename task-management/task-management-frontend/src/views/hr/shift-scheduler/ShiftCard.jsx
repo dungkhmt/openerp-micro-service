@@ -1,6 +1,3 @@
-// ==============
-// ShiftCard.jsx
-// ==============
 import React, {useState} from "react";
 import {Box, Checkbox, Chip, IconButton, Paper, Typography} from "@mui/material";
 import {alpha} from "@mui/material/styles";
@@ -21,83 +18,75 @@ const TIME_OFF_CARD_NOTE_TEXT_COLOR = 'rgba(0, 0, 0, 0.8)';
 
 export default function ShiftCard({
                                     shift,
-                                    shiftType, // 'regular', 'unassigned', 'time_off'
+                                    shiftType,
                                     onEditShift,
-                                    onAddAnotherShift, // For "+" on regular user shifts AND time_off shifts
-                                    onAddShiftToUnassignedDay, // For "+" on unassigned shifts
+                                    onAddAnotherShift,
+                                    onAddShiftToUnassignedDay,
                                     provided,
                                     snapshot,
                                     isSelected,
                                     onToggleSelect,
-                                    isAnyShiftSelected
+                                    isAnyShiftSelected,
+                                    canAdmin
                                   }) {
   const [isHovered, setIsHovered] = useState(false);
 
   const isUnassigned = shiftType === 'unassigned';
-  const isTimeOff = shiftType === 'time_off'; //
+  const isTimeOff = shiftType === 'time_off';
 
   const handleCheckboxClick = (e) => {
     e.stopPropagation();
-    if (isTimeOff) return; // Time off cards are not selectable
+    if (!canAdmin || isTimeOff) return;
     onToggleSelect(shift.id);
   };
 
   const handleCardBodyClick = (e) => {
     if (e.defaultPrevented) return;
-    // Prevent action if clicking on interactive sub-elements
     if (e.target.closest('.selection-checkbox-area') ||
       e.target.closest('.add-action-button-area') ||
       e.target.closest('.add-unassigned-template-button-area')) return;
 
-    if (isTimeOff) { // Time_off cards: no edit, no selection via body click
+    if (!canAdmin || isTimeOff) {
       return;
     }
 
     if (!isAnyShiftSelected) {
-      onEditShift(shift); // Edit only if no other shifts are selected
+      onEditShift(shift);
     } else {
-      // If other shifts are selected, clicking this card's body should toggle its selection
-      // (unless it's a time_off card, which is handled above)
       onToggleSelect(shift.id);
     }
   };
 
-  const handleAddNewShiftFromCard = (e) => { // For "+" on regular user or time_off cards
+  const handleAddNewShiftFromCard = (e) => {
     e.stopPropagation();
-    if (onAddAnotherShift) {
-      onAddAnotherShift(shift.userId, parseISO(shift.day)); // Will open modal for a new REGULAR shift
-    }
+    if (!canAdmin || !onAddAnotherShift) return;
+    onAddAnotherShift(shift.userId, parseISO(shift.day));
   };
 
-  const handleAddNewUnassignedFromCard = (e) => { // For "+" on unassigned cards
+  const handleAddNewUnassignedFromCard = (e) => {
     e.stopPropagation();
-    if (onAddShiftToUnassignedDay) {
-      onAddShiftToUnassignedDay(FRONTEND_UNASSIGNED_SHIFT_USER_ID, parseISO(shift.day));
-    }
+    if (!canAdmin || !onAddShiftToUnassignedDay) return;
+    onAddShiftToUnassignedDay(FRONTEND_UNASSIGNED_SHIFT_USER_ID, parseISO(shift.day));
   };
 
+  const showCheckbox = canAdmin && !isTimeOff && (isHovered || isAnyShiftSelected) && !snapshot.isDragging;
 
-  // Checkbox visibility: not for time_off, not while dragging. Otherwise, on hover or if any shift is selected.
-  const showCheckbox = !isTimeOff && (isHovered || isAnyShiftSelected) && !snapshot.isDragging; //
-
-  // Visibility for the "+" button on employee shift cards or time_off cards
   const showAddButtonForUserOrTimeOff =
-    (shiftType === 'regular' || isTimeOff) && // Only on regular or time_off cards
-    shift.userId && shift.userId !== FRONTEND_UNASSIGNED_SHIFT_USER_ID && // Must have a valid user ID
+    canAdmin &&
+    (shiftType === 'regular' || isTimeOff) &&
+    shift.userId && shift.userId !== FRONTEND_UNASSIGNED_SHIFT_USER_ID &&
     isHovered && !isAnyShiftSelected && !snapshot.isDragging;
 
-  // Visibility for the new "+" button on unassigned shift cards
   const showAddButtonForUnassignedTemplate =
+    canAdmin &&
     isUnassigned && isHovered && !snapshot.isDragging;
 
-
-  // --- Determine Card Styling ---
   let cardSxProps = {
     my: 0.5, height: 50, minHeight: 50, boxSizing: 'border-box',
     position: 'relative', display: 'flex', alignItems: 'center',
     transition: 'background-color 0.2s ease, border 0.2s ease',
     width: '100%', maxWidth: '100%', overflow: 'hidden',
-    cursor: 'grab', // Default cursor
+    cursor: (!canAdmin || isTimeOff) ? 'default' : (snapshot.isDragging ? 'grabbing' : 'grab'),
   };
 
   let currentShiftTimeTextColor = isUnassigned ? (shift.muiTextColor || 'text.primary') : EMPLOYEE_SHIFT_TEXT_COLOR;
@@ -108,21 +97,23 @@ export default function ShiftCard({
   if (isTimeOff) {
     cardSxProps.bgcolor = TIME_OFF_CARD_BACKGROUND_COLOR;
     cardSxProps.border = `1px solid ${TIME_OFF_CARD_BORDER_COLOR}`;
-    cardSxProps.cursor = 'default'; // Not draggable, not interactive for edit/select
+    cardSxProps.cursor = 'default';
     currentShiftTimeTextColor = TIME_OFF_CARD_TEXT_COLOR;
     currentShiftNoteTextColor = TIME_OFF_CARD_NOTE_TEXT_COLOR;
+  } else if (!canAdmin) {
+    cardSxProps.bgcolor = isUnassigned ? 'grey.200' : EMPLOYEE_SHIFT_BACKGROUND_COLOR_LIGHT;
+    cardSxProps.border = `1px dashed ${alpha(isUnassigned ? '#e0e0e0' : EMPLOYEE_SHIFT_TEXT_COLOR, 0.3)}`;
+    cardSxProps.cursor = 'default';
   } else if (snapshot.isDragging) {
     cardSxProps.bgcolor = 'primary.lighter';
     cardSxProps.cursor = 'grabbing';
-  } else if (isSelected) { // isSelected is false for time_off due to logic in handleCheckboxClick and handleCardBodyClick
+  } else if (isSelected) {
     cardSxProps.bgcolor = (theme) => alpha(isUnassigned ? theme.palette.grey[400] : theme.palette.primary.main, 0.25);
     cardSxProps.border = (theme) => `2px solid ${isUnassigned ? theme.palette.grey[600] : theme.palette.primary.main}`;
   } else {
     cardSxProps.bgcolor = isUnassigned ? 'grey.200' : EMPLOYEE_SHIFT_BACKGROUND_COLOR_LIGHT;
     cardSxProps.border = `1px dashed ${alpha(isUnassigned ? '#bdbdbd' : EMPLOYEE_SHIFT_TEXT_COLOR, 0.5)}`;
   }
-  // --- End Card Styling ---
-
 
   const ACTION_BUTTON_SIZE = 28;
   const ACTION_BUTTON_RIGHT_MARGIN = '4px';
@@ -144,22 +135,22 @@ export default function ShiftCard({
   return (
     <Paper
       ref={provided.innerRef}
-      {...(isTimeOff ? {} : provided.draggableProps)} // Draggable props only if not time_off
+      {...((!canAdmin || isTimeOff) ? {} : provided.draggableProps)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      elevation={snapshot.isDragging ? 4 : (isSelected && !isTimeOff ? 3 : 1)}
+      elevation={snapshot.isDragging && canAdmin ? 4 : (isSelected && canAdmin && !isTimeOff ? 3 : 1)}
       sx={cardSxProps}
     >
-      <Box /* Checkbox Area */
+      <Box
         className="selection-checkbox-area"
         sx={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          width: showCheckbox ? 32 : 0, // Hidden if !showCheckbox (e.g. for time_off)
+          width: showCheckbox ? 32 : 0,
           flexShrink: 0, height: '100%',
           transition: 'width 0.15s ease-in-out', overflow: 'hidden', zIndex: 1
         }}
       >
-        {showCheckbox && ( // Conditionally render checkbox itself
+        {showCheckbox && (
           <Checkbox
             size="small"
             checked={isSelected}
@@ -168,23 +159,22 @@ export default function ShiftCard({
             icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
             checkedIcon={<CheckBoxIcon fontSize="small" />}
             sx={{
-              p: 0.5, opacity: 1, visibility: 'visible', // Simpler opacity/visibility
+              p: 0.5, opacity: 1, visibility: 'visible',
             }}
             tabIndex={0}
           />
         )}
       </Box>
 
-      <Box /* Main content area & Drag Handle */
-        {...(isTimeOff ? {} : provided.dragHandleProps)} // Drag handle props only if not time_off
+      <Box
+        {...((!canAdmin || isTimeOff) ? {} : provided.dragHandleProps)}
         onClick={handleCardBodyClick}
         sx={{
           flexGrow: 1, minWidth: 0, height: '100%',
           display: 'flex', flexDirection: 'column', justifyContent: 'center',
-          // Adjust left padding based on checkbox visibility
-          pl: showCheckbox ? 0.5 : ((isUnassigned || isTimeOff) ? 1.25 : 1.5),
+          pl: showCheckbox ? 0.5 : ((isUnassigned || isTimeOff || !canAdmin) ? 1.25 : 1.5),
           pr: contentPaddingRight,
-          cursor: isTimeOff ? 'default' : (snapshot.isDragging ? 'grabbing' : 'grab'), // Cursor based on type/state
+          cursor: (!canAdmin || isTimeOff) ? 'default' : (snapshot.isDragging ? 'grabbing' : 'grab'),
           overflow: 'hidden', userSelect: 'none',
           transition: 'padding-left 0.15s ease-in-out, padding-right 0.15s ease-in-out',
         }}
@@ -210,8 +200,7 @@ export default function ShiftCard({
         )}
       </Box>
 
-      {/* Slot Count Badge for Unassigned Shifts */}
-      {isUnassigned && typeof shift.slots === 'number' && ( // Only for unassigned
+      {isUnassigned && typeof shift.slots === 'number' && (
         <Chip
           label={shift.slots}
           size="small"
@@ -234,8 +223,7 @@ export default function ShiftCard({
         />
       )}
 
-      {/* "+" button for Unassigned Shift Cards */}
-      {showAddButtonForUnassignedTemplate && ( // Only for unassigned
+      {showAddButtonForUnassignedTemplate && (
         <Box
           className="add-unassigned-template-button-area"
           sx={{
@@ -261,8 +249,7 @@ export default function ShiftCard({
         </Box>
       )}
 
-      {/* "+" button for REGULAR user shifts OR TIME_OFF shifts */}
-      {showAddButtonForUserOrTimeOff && ( // For regular user or time_off shifts
+      {showAddButtonForUserOrTimeOff && (
         <Box
           className="add-action-button-area"
           sx={{ position: 'absolute', top: '50%', right: ACTION_BUTTON_RIGHT_MARGIN, transform: 'translateY(-50%)',
@@ -271,7 +258,7 @@ export default function ShiftCard({
           }}
         >
           <IconButton
-            size="small" onClick={handleAddNewShiftFromCard} // Updated handler
+            size="small" onClick={handleAddNewShiftFromCard}
             sx={{ p: 0.3, bgcolor: 'rgba(230,230,230,0.85)', '&:hover': { bgcolor: 'rgba(210,210,210,1)' }, borderRadius: '4px', width: '100%', height: '100%'}}
             title="Thêm ca làm việc khác vào ngày này"
           > <AddIcon sx={{ fontSize: '1rem' }} color="action" />

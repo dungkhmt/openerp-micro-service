@@ -5,11 +5,11 @@ import React from "react";
 import {BULK_ACTIONS_BAR_HEIGHT, TOP_BAR_HEIGHT} from "./ShiftScheduler.jsx";
 
 export default function BulkActionsBar({
-                          selectedCount,
-                          onDeleteSelected,
-                          onOpenCopyModal,
-                          onDeselectAll,
-                        }) {
+                                         selectedCount,
+                                         onDeleteSelected,
+                                         onOpenCopyModal,
+                                         onDeselectAll,
+                                       }) {
   if (selectedCount === 0) {
     return null;
   }

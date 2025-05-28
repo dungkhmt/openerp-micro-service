@@ -1,29 +1,27 @@
-// ==============
-// DayCell.jsx
-// ==============
 import {format} from "date-fns";
 import {Draggable, Droppable} from "react-beautiful-dnd";
 import {Grid} from "@mui/material";
 import React from "react";
 import EmptyShiftSlot from "./EmptyShiftSlot.jsx";
 import ShiftCard from "./ShiftCard.jsx";
-import {FRONTEND_UNASSIGNED_SHIFT_USER_ID} from "./ShiftScheduler.jsx"; // Import for logging
+import {FRONTEND_UNASSIGNED_SHIFT_USER_ID} from "./ShiftScheduler.jsx";
 
 export default function DayCell({
                                   userId,
                                   day,
                                   shiftsInCell,
-                                  onAddShift, // (userId, day) => handleOpenModal(userId, day) OR (UNASSIGNED_ID, day) => handleOpenModal(UNASSIGNED_ID, day)
+                                  onAddShift,
                                   onDeleteShift,
-                                  onEditShift, // (shift) => handleOpenModal(null, null, shift)
+                                  onEditShift,
                                   selectedShiftIds,
-                                  onToggleSelectShift, // (shiftId) => setSelectedShiftIds(...)
-                                  isAnyShiftSelected
+                                  onToggleSelectShift,
+                                  isAnyShiftSelected,
+                                  canAdmin
                                 }) {
   const droppableId = `user-${userId}-day-${format(day, 'yyyy-MM-dd')}`;
 
   return (
-    <Droppable droppableId={droppableId} type="SHIFT">
+    <Droppable droppableId={droppableId} type="SHIFT" isDropDisabled={!canAdmin}>
       {(provided, snapshot) => (
         <Grid
           item
@@ -38,7 +36,7 @@ export default function DayCell({
             minHeight: 60,
             display: 'flex',
             flexDirection: 'column',
-            bgcolor: snapshot.isDraggingOver ? 'action.focus' : 'transparent',
+            bgcolor: snapshot.isDraggingOver && canAdmin ? 'action.focus' : 'transparent',
             transition: 'background-color 0.2s ease',
             overflow: 'hidden',
           }}
@@ -49,32 +47,27 @@ export default function DayCell({
                 key={shift.id}
                 draggableId={shift.id}
                 index={index}
-                isDragDisabled={shift.type === 'time_off'} // Disable dragging for time_off shifts
+                isDragDisabled={!canAdmin || shift.type === 'time_off'}
               >
                 {(providedDraggable, snapshotDraggable) => (
                   <ShiftCard
                     shift={shift}
-                    shiftType={shift.type || (shift.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID ? 'unassigned' : 'regular')} // Pass shift type
-                    onEditShift={onEditShift} // Passed to ShiftCard
-                    // onAddAnotherShift is for the "+" button on a user's REGULAR or TIME_OFF shift card
-                    // It should trigger adding a NEW REGULAR shift for that user/day.
-                    // `onAddShift` (from DayCell props) is (userId, day) => handleOpenModal(userId, day)
+                    shiftType={shift.type || (shift.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID ? 'unassigned' : 'regular')}
+                    onEditShift={onEditShift}
                     onAddAnotherShift={userId !== FRONTEND_UNASSIGNED_SHIFT_USER_ID ? () => onAddShift(userId, day) : undefined}
-                    // onAddShift (new name) is for the "+" button on an UNASSIGNED shift card
-                    // It should trigger adding a NEW UNASSIGNED shift template for that day.
-                    // `onAddShift` (from DayCell props) is (UNASSIGNED_ID, day) => handleOpenModal(UNASSIGNED_ID, day)
                     onAddShiftToUnassignedDay={userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID ? () => onAddShift(FRONTEND_UNASSIGNED_SHIFT_USER_ID, day) : undefined}
                     provided={providedDraggable}
                     snapshot={snapshotDraggable}
                     isSelected={selectedShiftIds.includes(shift.id)}
-                    onToggleSelect={onToggleSelectShift} // Passed to ShiftCard
+                    onToggleSelect={onToggleSelectShift}
                     isAnyShiftSelected={isAnyShiftSelected}
+                    canAdmin={canAdmin}
                   />
                 )}
               </Draggable>
             ))
           ) : (
-            !snapshot.isDraggingOver && <EmptyShiftSlot onAdd={() => onAddShift(userId, day)} />
+            canAdmin && !snapshot.isDraggingOver && <EmptyShiftSlot onAdd={() => onAddShift(userId, day)} />
           )}
           {provided.placeholder}
         </Grid>

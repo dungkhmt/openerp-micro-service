@@ -23,6 +23,7 @@ export default function ShiftsGrid({
                                      selectedShiftIds,
                                      onToggleSelectShift,
                                      isAnyShiftSelected,
+                                     canAdmin
                                    }) {
   const startDate = startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON });
   const daysOfWeek = Array.from({ length: 7 }).map((_, i) => addDays(startDate, i));
@@ -122,6 +123,7 @@ export default function ShiftsGrid({
                       selectedShiftIds={selectedShiftIds}
                       onToggleSelectShift={onToggleSelectShift}
                       isAnyShiftSelected={isAnyShiftSelected}
+                      canAdmin={canAdmin}
                     />
                   );
                 })}
