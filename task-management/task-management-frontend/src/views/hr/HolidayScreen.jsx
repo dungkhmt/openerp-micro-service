@@ -26,6 +26,11 @@ import toast from "react-hot-toast";
 import lunar from "lunar-calendar";
 import {theme} from "./theme";
 
+// Import state quản lý quyền scope
+import { useScopePermissionState, fetchPermittedScopes } from "../../state/scopePermissionState"; // Điều chỉnh đường dẫn nếu cần
+
+const HOLIDAY_ADMIN_SCOPE = "SCOPE_HOLIDAY_ADMIN"; // Định nghĩa scope cho quản lý ngày nghỉ
+
 dayjs.locale('vi');
 
 const WEEKDAYS = [
@@ -80,6 +85,21 @@ const HolidayScreenInternal = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [loadingHolidays, setLoadingHolidays] = useState(false);
 
+  // State quyền scope
+  const scopeState = useScopePermissionState();
+  const { permittedScopeIds, isFetched: scopesFetched, isFetching: scopesFetching } = scopeState.get();
+
+  const canAdminHolidays = useMemo(() => {
+    return scopesFetched && permittedScopeIds.has(HOLIDAY_ADMIN_SCOPE);
+  }, [permittedScopeIds, scopesFetched]);
+
+  useEffect(() => {
+    // Fetch quyền scope khi component mount
+    if (!scopesFetched && !scopesFetching) {
+      fetchPermittedScopes();
+    }
+  }, [scopesFetched, scopesFetching]);
+
   const fetchHolidays = useCallback(async (monthToFetch) => {
     setLoadingHolidays(true);
     const yearMonthStr = monthToFetch.format("YYYY-MM");
@@ -88,30 +108,30 @@ const HolidayScreenInternal = () => {
         "get",
         `/holidays?month=${yearMonthStr}`,
         (res) => {
-          const apiData = res.data.data || res.data.holidays;
+          const apiData = res.data.data || res.data.holidays; // API có thể trả về data.data hoặc data.holidays
           if (typeof apiData === 'object' && apiData !== null && !Array.isArray(apiData)) {
             setHolidays(apiData);
-          } else if (Array.isArray(apiData)) {
+          } else if (Array.isArray(apiData)) { // Nếu API trả về mảng, chuyển đổi sang object map
             const holidaysMap = {};
             apiData.forEach(holiday => {
               holidaysMap[dayjs(holiday.date).format("YYYY-MM-DD")] = holiday;
             });
             setHolidays(holidaysMap);
           } else {
-            console.warn("Received unexpected holiday data format:", apiData);
+            console.warn("Định dạng dữ liệu ngày nghỉ không mong đợi:", apiData);
             setHolidays({});
           }
         },
         {
           onError: (err) => {
-            console.error("Failed to load holidays for month " + yearMonthStr, err);
+            console.error("Không thể tải ngày nghỉ cho tháng " + yearMonthStr, err);
             toast.error(`Không thể tải danh sách ngày nghỉ cho tháng ${monthToFetch.format("MM/YYYY")}.`);
             setHolidays({});
           },
         }
       );
     } catch (error) {
-      console.error("Exception while fetching holidays", error);
+      console.error("Ngoại lệ khi tải ngày nghỉ", error);
       toast.error("Lỗi hệ thống khi tải ngày nghỉ.");
       setHolidays({});
     } finally {
@@ -133,15 +153,18 @@ const HolidayScreenInternal = () => {
 
 
   const handleDelete = () => {
-    if (!deleteTarget) return;
+    if (!deleteTarget || !deleteTarget.id) { // Kiểm tra deleteTarget.id
+      toast.error("Không tìm thấy thông tin ngày nghỉ để xóa.");
+      return;
+    }
     request(
       "delete",
-      `/holidays/${deleteTarget.id}`,
+      `/holidays/${deleteTarget.id}`, // Sử dụng ID của ngày nghỉ để xóa
       () => {
         toast.success("Xoá ngày nghỉ thành công!");
         setDeleteTarget(null);
         setConfirmOpen(false);
-        fetchHolidays(selectedMonth);
+        fetchHolidays(selectedMonth); // Tải lại danh sách ngày nghỉ
       },
       {
         onError: (err) => {
@@ -152,7 +175,7 @@ const HolidayScreenInternal = () => {
     );
   };
 
-  const calendarMaxHeight = `calc(100vh - 240px)`;
+  const calendarMaxHeight = `calc(100vh - 240px)`; // Điều chỉnh nếu cần thiết
 
   return (
     <Box sx={{ mr: 2, bgcolor: 'background.default', minHeight: 'calc(100vh - 64px)' }}>
@@ -172,14 +195,16 @@ const HolidayScreenInternal = () => {
                 sx={{ width: {xs: '100%', md: 200} }}
               />
             </LocalizationProvider>
-            <Button
-              variant="contained"
-              onClick={() => {setEditingHoliday(null); setOpenModal(true);}}
-              startIcon={<AddIcon />}
-              sx={{ width: {xs: '100%', md: 'auto'} }}
-            >
-              Thêm ngày nghỉ
-            </Button>
+            {canAdminHolidays && (
+              <Button
+                variant="contained"
+                onClick={() => {setEditingHoliday(null); setOpenModal(true);}}
+                startIcon={<AddIcon />}
+                sx={{ width: {xs: '100%', md: 'auto'} }}
+              >
+                Thêm ngày nghỉ
+              </Button>
+            )}
           </Grid>
         </Grid>
       </Paper>
@@ -226,9 +251,9 @@ const HolidayScreenInternal = () => {
                     flexBasis: 'calc(100%/7)',
                     flexGrow: 1,
                     maxWidth: 'calc(100%/7)',
-                    aspectRatio: '1/0.6',
-                    minHeight: {xs: 55, sm: 70, md:80},
-                    mb: 0.5
+                    aspectRatio: '1/0.6', // Điều chỉnh tỷ lệ để ô vuông hơn nếu muốn
+                    minHeight: {xs: 55, sm: 70, md:80}, // Chiều cao tối thiểu cho ô
+                    mb: 0.5 // Khoảng cách giữa các ô
                   }}>
                     <Paper
                       variant="outlined"
@@ -240,11 +265,11 @@ const HolidayScreenInternal = () => {
                         bgcolor: holiday && isCurrentMonthDay ? holidayCellBgColor : defaultCellBgColor,
                         borderColor: isToday ? todayCellBorderColor : (holiday && isCurrentMonthDay ? theme.palette.error.light : theme.palette.divider),
                         borderWidth: isToday ? '2px' : '1px',
-                        opacity: isCurrentMonthDay ? 1 : 0.45,
+                        opacity: isCurrentMonthDay ? 1 : 0.45, // Làm mờ ngày của tháng trước/sau
                         display: "flex",
                         flexDirection: "column",
-                        justifyContent: "flex-start",
-                        "&:hover .action-buttons-cell": { opacity: 1, visibility: 'visible' },
+                        justifyContent: "flex-start", // Căn nội dung lên trên
+                        "&:hover .action-buttons-cell": { opacity: canAdminHolidays ? 1 : 0, visibility: canAdminHolidays ? 'visible' : 'hidden' }, // Chỉ hiển thị khi hover nếu có quyền
                         overflow: 'hidden',
                         boxSizing: 'border-box',
                       }}
@@ -273,14 +298,14 @@ const HolidayScreenInternal = () => {
                               sx={{
                                 fontSize: {xs: "0.7rem", sm:"0.8rem", md: "0.9rem"},
                                 lineHeight: 1.35,
-                                maxHeight: {xs: "2.7em", sm: "4.05em"},
+                                maxHeight: {xs: "2.7em", sm: "4.05em"}, // Giới hạn 2-3 dòng tùy kích thước
                                 overflow: "hidden",
                                 textOverflow: "ellipsis",
                                 display: '-webkit-box',
-                                WebkitLineClamp: {xs:2, sm:3},
+                                WebkitLineClamp: {xs:2, sm:3}, // Số dòng tối đa
                                 WebkitBoxOrient: 'vertical',
                                 wordBreak: 'break-word',
-                                width: 'calc(100% - 4px)',
+                                width: 'calc(100% - 4px)', // Để tránh tràn text nhỏ
                                 p: '0 2px'
                               }}
                             >
@@ -290,25 +315,25 @@ const HolidayScreenInternal = () => {
                         )}
                       </Box>
 
-                      {isCurrentMonthDay && (
+                      {canAdminHolidays && isCurrentMonthDay && ( // Các nút action chỉ hiển thị nếu có quyền VÀ là ngày trong tháng hiện tại
                         <Box
-                          className="action-buttons-cell"
+                          className="action-buttons-cell" // class này dùng cho CSS hover ở Paper cha
                           sx={{
                             display: 'flex',
                             flexDirection: "row",
                             justifyContent: 'flex-end',
                             alignItems: 'center',
                             gap: 0.1,
-                            opacity: 0,
-                            visibility: 'hidden',
+                            opacity: 0, // Mặc định ẩn
+                            visibility: 'hidden', // Mặc định ẩn
                             transition: 'opacity 0.2s ease-in-out, visibility 0.2s ease-in-out',
-                            height: '28px',
-                            position: 'absolute',
+                            height: '28px', // Chiều cao cố định cho box action
+                            position: 'absolute', // Định vị ở góc dưới
                             bottom: 2,
                             right: 2,
                           }}
                         >
-                          {holiday ? (
+                          {holiday ? ( // Nếu ô này đã là ngày nghỉ
                             <>
                               <Tooltip title="Xóa ngày nghỉ">
                                 <IconButton size="small" sx={{p:0.15}} onClick={(e) => { e.stopPropagation(); setDeleteTarget(holiday); setConfirmOpen(true); }}>
@@ -321,14 +346,14 @@ const HolidayScreenInternal = () => {
                                 </IconButton>
                               </Tooltip>
                             </>
-                          ) : (
+                          ) : ( // Nếu ô này là ngày thường, cho phép thêm mới
                             <Tooltip title="Thêm ngày nghỉ">
                               <IconButton
                                 size="small"
                                 sx={{p:0.15}}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  setEditingHoliday({ date: dateStr, name: '', type: 'PAID_LEAVE' });
+                                  setEditingHoliday({ date: dateStr, name: '', type: 'PAID_LEAVE' }); // Mặc định type khi thêm mới
                                   setOpenModal(true);
                                 }}
                               >
@@ -347,29 +372,35 @@ const HolidayScreenInternal = () => {
         </Box>
       </Paper>
 
-      <AddHolidayModal
-        open={openModal || editingHoliday !== null}
-        onClose={() => {
-          setOpenModal(false);
-          setEditingHoliday(null);
-        }}
-        onSubmit={() => {
-          fetchHolidays(selectedMonth);
-          setOpenModal(false);
-          setEditingHoliday(null);
-        }}
-        initialData={editingHoliday}
-        titleProps={{ sx: { fontSize: '1.15rem' } }}
-      />
+      {canAdminHolidays && (openModal || editingHoliday !== null) && ( // Modal chỉ mở nếu có quyền
+        <AddHolidayModal
+          open={openModal || editingHoliday !== null}
+          onClose={() => {
+            setOpenModal(false);
+            setEditingHoliday(null);
+          }}
+          onSubmit={() => {
+            fetchHolidays(selectedMonth); // Tải lại danh sách ngày nghỉ sau khi thêm/sửa
+            setOpenModal(false);
+            setEditingHoliday(null);
+          }}
+          initialData={editingHoliday}
+          titleProps={{ sx: { fontSize: '1.15rem' } }}
+        />
+      )}
 
-      <DeleteConfirmationModal
-        open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
-        onSubmit={handleDelete}
-        title="Xoá ngày nghỉ"
-        info={`Bạn có chắc chắn muốn xoá ngày nghỉ "${deleteTarget?.name || ''}"?`}
-        titleProps={{ sx: { fontSize: '1.15rem' } }}
-      />
+      {canAdminHolidays && confirmOpen && ( // Modal xác nhận xóa chỉ mở nếu có quyền
+        <DeleteConfirmationModal
+          open={confirmOpen}
+          onClose={() => setConfirmOpen(false)}
+          onSubmit={handleDelete}
+          title="Xoá ngày nghỉ"
+          info={`Bạn có chắc chắn muốn xoá ngày nghỉ "${deleteTarget?.name || ''}"?`}
+          titleProps={{ sx: { fontSize: '1.15rem' } }}
+          cancelLabel="Hủy" // Thêm nhãn cho nút hủy nếu cần
+          confirmLabel="Xóa" // Thêm nhãn cho nút xác nhận nếu cần
+        />
+      )}
     </Box>
   );
 };

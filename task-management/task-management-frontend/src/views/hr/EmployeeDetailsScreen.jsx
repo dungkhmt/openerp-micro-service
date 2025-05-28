@@ -1,8 +1,8 @@
 // EmployeeDetailsScreen.jsx
-import React, {useEffect, useState, useCallback} from "react";
-import {useParams} from "react-router-dom";
+import React, {useEffect, useState, useCallback, useMemo} from "react";
+import {useParams}from "react-router-dom";
 import {request}from "@/api";
-import AddStaffModal from "./modals/AddStaffModal"; // Giả sử đường dẫn đúng
+import AddStaffModal from "./modals/AddStaffModal";
 import EditIcon from "@mui/icons-material/Edit";
 import {
   Divider,
@@ -16,24 +16,28 @@ import {
   IconButton,
   Chip,
   CircularProgress,
-  Alert as MuiAlert, // Đổi tên để tránh xung đột nếu có Alert khác
+  Alert as MuiAlert,
   Tooltip
 } from "@mui/material";
-import TimelineComponent from "@/components/item/TimelineItem"; // Đổi tên import cho rõ ràng
-import SalaryTab from "@/components/tab/SalaryTab";           // Đổi tên import cho rõ ràng
+import TimelineComponent from "@/components/item/TimelineItem";
+import SalaryTab from "@/components/tab/SalaryTab";
 import toast from "react-hot-toast";
 import { ThemeProvider, CssBaseline } from "@mui/material";
-import { theme } from "./theme"; // Giả sử theme.js cùng cấp hoặc có đường dẫn đúng
+import { theme } from "./theme";
+
+// Import state quản lý quyền scope
+import { useScopePermissionState, fetchPermittedScopes } from "../../state/scopePermissionState"; // Điều chỉnh đường dẫn nếu cần
+
+const STAFF_ADMIN_SCOPE = "SCOPE_STAFF_ADMIN"; // Scope để sửa thông tin nhân viên chung
+const SALARY_ADMIN_SCOPE = "SCOPE_SALARY_ADMIN"; // Scope để xem và sửa lương của bất kỳ ai
 
 const formatDate = (dateString) => {
   if (!dateString) return "Hiện tại";
-  // Dùng dayjs nếu đã import, hoặc giữ nguyên new Date nếu muốn đơn giản
-  // Hoặc có thể dùng dayjs(dateString).format("DD/MM/YYYY") nếu dayjs được tích hợp
   const options = { year: "numeric", month: "short", day: "numeric" };
   try {
     return new Date(dateString).toLocaleDateString("vi-VN", options);
   } catch (e) {
-    return dateString; // Trả về chuỗi gốc nếu không parse được
+    return dateString;
   }
 };
 
@@ -43,9 +47,55 @@ const EmployeeDetailsInternal = () => {
   const [jobHistory, setJobHistory] = useState([]);
   const [departmentHistory, setDepartmentHistory] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); // Lưu trữ thông điệp lỗi
+  const [error, setError] = useState(null);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedTab, setSelectedTab] = useState("profile");
+  const [currentUserLoginId, setCurrentUserLoginId] = useState(null);
+
+  // State quyền scope
+  const scopeState = useScopePermissionState();
+  const { permittedScopeIds, isFetched: scopesFetched, isFetching: scopesFetching } = scopeState.get();
+
+  const canEditStaffGeneralInfo = useMemo(() => {
+    return scopesFetched && permittedScopeIds.has(STAFF_ADMIN_SCOPE);
+  }, [permittedScopeIds, scopesFetched]);
+
+  const canAdminSalary = useMemo(() => {
+    return scopesFetched && permittedScopeIds.has(SALARY_ADMIN_SCOPE);
+  }, [permittedScopeIds, scopesFetched]);
+
+  const isOwnProfile = useMemo(() => {
+    return currentUserLoginId && employeeDetails?.user_login_id && currentUserLoginId === employeeDetails.user_login_id;
+  }, [currentUserLoginId, employeeDetails]);
+
+  const canViewSalaryTab = useMemo(() => {
+    return canAdminSalary || isOwnProfile;
+  }, [canAdminSalary, isOwnProfile]);
+
+  const canEditSalaryData = useMemo(() => {
+    return canAdminSalary; // Chỉ admin lương mới được sửa
+  }, [canAdminSalary]);
+
+
+  useEffect(() => {
+    // Fetch quyền scope
+    if (!scopesFetched && !scopesFetching) {
+      fetchPermittedScopes();
+    }
+
+    // Fetch thông tin người dùng hiện tại
+    request(
+      "get",
+      `/users/me`, // API lấy thông tin người dùng đang đăng nhập
+      (res) => {
+        if (res.data?.id) {
+          setCurrentUserLoginId(res.data.id);
+        }
+      },
+      { onError: (err) => console.error("Lỗi khi lấy thông tin người dùng hiện tại:", err) }
+    );
+  }, [scopesFetched, scopesFetching]);
+
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -58,7 +108,6 @@ const EmployeeDetailsInternal = () => {
 
       if (empRes?.user_login_id) {
         const userLoginId = empRes.user_login_id;
-        // Fetch Job History
         request(
           "get",
           `/staffs/${userLoginId}/job-position`,
@@ -75,7 +124,6 @@ const EmployeeDetailsInternal = () => {
           { onError: (err) => toast.error("Không thể tải lịch sử chức vụ.") }
         );
 
-        // Fetch Department History
         request(
           "get",
           `/staffs/${userLoginId}/department`,
@@ -91,11 +139,16 @@ const EmployeeDetailsInternal = () => {
           },
           { onError: (err) => toast.error("Không thể tải lịch sử phòng ban.") }
         );
+      } else {
+        // Nếu không có user_login_id, reset lịch sử
+        setJobHistory([]);
+        setDepartmentHistory([]);
       }
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.message || err.message || "Không thể tải thông tin chi tiết nhân viên.");
-      toast.error(err.response?.data?.message || err.message || "Lỗi tải dữ liệu.");
+      const errorMessage = err.response?.data?.message || err.message || "Không thể tải thông tin chi tiết nhân viên.";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -105,15 +158,14 @@ const EmployeeDetailsInternal = () => {
     fetchData();
   }, [fetchData]);
 
-  const handleEditSuccess = (updatedData) => {
-    // setEmployeeDetails((prev) => ({ ...prev, ...updatedData }));
-    fetchData(); // Gọi lại fetchData để làm mới toàn bộ thông tin
+  const handleEditSuccess = () => {
+    fetchData();
     setOpenEditModal(false);
     toast.success("Cập nhật thông tin nhân viên thành công!");
   };
 
 
-  if (loading) {
+  if (loading && !employeeDetails) { // Chỉ hiển thị loading toàn màn hình khi chưa có dữ liệu lần đầu
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 128px)' }}>
         <CircularProgress />
@@ -122,15 +174,24 @@ const EmployeeDetailsInternal = () => {
     );
   }
 
-  if (error || !employeeDetails) {
+  if (error && !employeeDetails) { // Chỉ hiển thị lỗi toàn màn hình khi không load được lần đầu
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 128px)', p:3 }}>
         <MuiAlert severity="error" sx={{width: '100%', maxWidth: 600}}>
-          Lỗi: {error || "Không thể tải thông tin chi tiết nhân viên."}
+          Lỗi: {error}
         </MuiAlert>
       </Box>
     );
   }
+
+  if (!employeeDetails) { // Trường hợp không loading, không error nhưng không có employeeDetails
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 128px)', p:3 }}>
+        <Typography>Không tìm thấy thông tin nhân viên.</Typography>
+      </Box>
+    );
+  }
+
 
   const statusChip = employeeDetails.status === "ACTIVE"
     ? <Chip label="Đang hoạt động" color="success" size="small" />
@@ -139,31 +200,33 @@ const EmployeeDetailsInternal = () => {
   return (
     <Box sx={{ mr: 2, bgcolor: 'background.default', minHeight: 'calc(100vh - 64px)' }}>
       <Paper sx={{ p: {xs: 2, md: 3}, mb: 2, position: 'relative' }}>
-        <Tooltip title="Chỉnh sửa thông tin">
-          <IconButton
-            onClick={() => setOpenEditModal(true)}
-            sx={{
-              position: "absolute",
-              top: {xs: 8, md:16},
-              right: {xs: 8, md:16},
-              color: "primary.main"
-            }}
-          >
-            <EditIcon />
-          </IconButton>
-        </Tooltip>
+        {canEditStaffGeneralInfo && (
+          <Tooltip title="Chỉnh sửa thông tin">
+            <IconButton
+              onClick={() => setOpenEditModal(true)}
+              sx={{
+                position: "absolute",
+                top: {xs: 8, md:16},
+                right: {xs: 8, md:16},
+                color: "primary.main"
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+        )}
         <Grid container spacing={{xs: 2, md: 3}}>
           <Grid item xs={12} md="auto">
             <Avatar
               src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                employeeDetails.fullname || "N V" // Handle potential null fullname
+                employeeDetails.fullname || "N V"
               )}&background=random&size=128&font-size=0.33&bold=true&color=fff`}
               alt={employeeDetails.fullname}
               sx={{
                 width: {xs: 80, md: 120},
                 height: {xs: 80, md: 120},
                 border: `3px solid ${theme.palette.divider}`,
-                fontSize: '3rem' // Fallback for ui-avatars font size if needed
+                fontSize: '3rem'
               }}
             />
           </Grid>
@@ -213,14 +276,16 @@ const EmployeeDetailsInternal = () => {
           onChange={(e, value) => setSelectedTab(value)}
           indicatorColor="primary"
           textColor="primary"
-          variant="fullWidth" // hoặc "scrollable" nếu có nhiều tab
+          variant="fullWidth"
         >
           <Tab label="Hồ sơ & Lịch sử" value="profile" />
-          <Tab label="Thông tin lương" value="salary" />
+          {canViewSalaryTab && (
+            <Tab label="Thông tin lương" value="salary" />
+          )}
         </Tabs>
       </Paper>
 
-      <Box sx={{pt: 0}}> {/* Giảm padding top cho nội dung tab */}
+      <Box sx={{pt: 0}}>
         {selectedTab === "profile" && (
           <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
@@ -232,19 +297,25 @@ const EmployeeDetailsInternal = () => {
           </Grid>
         )}
 
-        {selectedTab === "salary" && employeeDetails.user_login_id && (
-          <SalaryTab userLoginId={employeeDetails.user_login_id} />
+        {selectedTab === "salary" && canViewSalaryTab && employeeDetails.user_login_id && (
+          <SalaryTab
+            userLoginId={employeeDetails.user_login_id}
+            canEdit={canEditSalaryData} // Truyền quyền sửa lương vào SalaryTab
+          />
         )}
       </Box>
 
-      {openEditModal && (
+      {canEditStaffGeneralInfo && openEditModal && (
         <AddStaffModal
           open={openEditModal}
           onClose={() => setOpenEditModal(false)}
-          onSubmitSuccess={handleEditSuccess} // Changed prop name for clarity
-          initialData={employeeDetails} // Changed prop name to initialData
-          isEditMode={true} // Indicate edit mode
-          titleProps={{sx: {fontSize: '1.15rem'}}} // Example for title styling
+          onSubmitSuccess={handleEditSuccess}
+          initialData={employeeDetails}
+          isEditMode={true}
+          // Giả sử AddStaffModal đã có props departments và jobPositions, nếu không thì cần thêm vào
+          // departments={departmentsListFromSomewhere}
+          // jobPositions={jobPositionsListFromSomewhere}
+          titleProps={{sx: {fontSize: '1.15rem'}}}
         />
       )}
     </Box>

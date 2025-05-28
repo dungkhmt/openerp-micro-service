@@ -46,11 +46,16 @@ import DeleteConfirmationModal from "./modals/DeleteConfirmationModal.jsx";
 import Pagination from "@/components/item/Pagination";
 import { useDebounce } from "../../hooks/useDebounce";
 import {request}from "@/api";
-import { exportToPDF } from "./fileExportUtils"; // Bỏ prepareCSVData nếu dùng cách mới
+import { exportToPDF } from "./fileExportUtils";
 
 import {CSVLink}from "react-csv";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
+
+// Import state quản lý quyền scope
+import { useScopePermissionState, fetchPermittedScopes } from "../../state/scopePermissionState"; // Điều chỉnh đường dẫn nếu cần
+
+const STAFF_ADMIN_SCOPE = "SCOPE_STAFF_ADMIN"; // Định nghĩa scope cho quản lý nhân viên
 
 const StaffScreenInternal = () => {
   const navigate = useNavigate();
@@ -77,22 +82,37 @@ const StaffScreenInternal = () => {
   const [currentMenuStaffId, setCurrentMenuStaffId] = useState(null);
   const [viewMode, setViewMode] = useState("table");
 
+  // State quyền scope
+  const scopeState = useScopePermissionState();
+  const { permittedScopeIds, isFetched: scopesFetched, isFetching: scopesFetching } = scopeState.get();
+
+  const canAdminStaff = useMemo(() => {
+    return scopesFetched && permittedScopeIds.has(STAFF_ADMIN_SCOPE);
+  }, [permittedScopeIds, scopesFetched]);
+
+  useEffect(() => {
+    // Fetch quyền scope khi component mount
+    if (!scopesFetched && !scopesFetching) {
+      fetchPermittedScopes();
+    }
+  }, [scopesFetched, scopesFetching]);
+
   const fetchStaffList = useCallback(async (pageIndex, pageSize, searchValue, department, jobPosition, isInitialLoadOrFilterChange = false) => {
     setLoading(true);
     const payload = {
       fullname: searchValue || null,
       departmentCode: department?.department_code || null,
       jobPositionCode: jobPosition?.code || null,
-      status: "ACTIVE",
+      status: "ACTIVE", // Giả sử bạn chỉ muốn lấy nhân viên đang hoạt động
       page: pageIndex,
       pageSize: pageSize,
     };
     try {
-      await request("get", "/staffs/details", (res) => {
+      await request("get", "/staffs/details", (res) => { // Endpoint có thể cần thay đổi nếu khác
         const { data: staffListFromApi, meta } = res.data;
         const transformedStaff = (staffListFromApi || []).map((staff, index) => ({
           ...staff,
-          id: String(staff.staff_code || staff.user_login_id || `__fallback_staff_id_${index}`),
+          id: String(staff.staff_code || staff.user_login_id || `__fallback_staff_id_${index}`), // Đảm bảo có id duy nhất
         }));
         setData(transformedStaff);
         setPageCount(meta?.page_info?.total_page || 0);
@@ -114,7 +134,9 @@ const StaffScreenInternal = () => {
 
   const fetchFilterData = useCallback(async () => {
     try {
+      // Lấy danh sách phòng ban đang hoạt động
       await request("get", "/departments?status=ACTIVE&pageSize=1000", (res) => setDepartments(res.data.data || []), { onError: (err) => console.error("Lỗi tải phòng ban:", err) }, {});
+      // Lấy danh sách vị trí công việc đang hoạt động
       await request("get", "/jobs?status=ACTIVE&pageSize=1000", (res) => setJobPositions(res.data.data || []), { onError: (err) => console.error("Lỗi tải vị trí công việc:", err) }, {});
     } catch (error) {
       console.error("Lỗi tải dữ liệu filter:", error);
@@ -162,65 +184,70 @@ const StaffScreenInternal = () => {
   }, [currentMenuStaffId, data, handleMenuClose]);
 
   const columns = useMemo(
-    () => [
-      { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1, width: 40, disableSortBy: true, id: 'stt' },
-      { Header: "Mã NV", accessor: "staff_code", minWidth: 80, id: 'staffCode' },
-      {
-        Header: "Họ và Tên",
-        accessor: "fullname",
-        minWidth: 220,
-        id: 'fullname',
-        Cell: ({ row }) => (
-          <Box
-            onClick={() => navigate(`/hr/staff/${row.original.staff_code}`)}
-            sx={{ display: "flex", alignItems: "center", cursor: "pointer", '&:hover': {textDecoration: 'underline', color: 'primary.main'} }}
-          >
-            <Avatar
-              alt={row.original.fullname}
-              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(row.original.fullname || 'N V')}&background=random&size=100&font-size=0.5&bold=true&color=fff`}
-              sx={{ width: 36, height: 36, mr: 1.5 }}
-            />
-            <Typography variant="body1" component="span" sx={{fontWeight: 500}}>
-              {row.original.fullname}
-            </Typography>
-          </Box>
-        ),
-      },
-      { Header: "Email", accessor: "email", minWidth: 200, id: 'email' },
-      {
-        Header: "Phòng Ban",
-        accessor: "department.department_name",
-        Cell: ({ row }) => row.original.department?.department_name || "Chưa có",
-        minWidth: 150,
-        id: 'department'
-      },
-      {
-        Header: "Vị Trí",
-        accessor: "job_position.job_position_name",
-        Cell: ({ row }) => row.original.job_position?.job_position_name || "Chưa có",
-        minWidth: 150,
-        id: 'jobPosition'
-      },
-      {
-        Header: "Hành động",
-        id: 'actions',
-        Cell: ({ row }) => {
-          const staffId = row.original.id;
-          if (!staffId) return <Typography variant="caption" color="error">ID không hợp lệ</Typography>;
-          return (
-            <Box sx={{ textAlign: 'center' }}>
-              <Tooltip title="Tùy chọn">
-                <IconButton aria-label="menu-hanh-dong" onClick={(event) => handleMenuOpen(event, staffId)}>
-                  <MoreVertIcon />
-                </IconButton>
-              </Tooltip>
+    () => {
+      const baseColumns = [
+        { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1, width: 40, disableSortBy: true, id: 'stt' },
+        { Header: "Mã NV", accessor: "staff_code", minWidth: 80, id: 'staffCode' },
+        {
+          Header: "Họ và Tên",
+          accessor: "fullname",
+          minWidth: 220,
+          id: 'fullname',
+          Cell: ({ row }) => (
+            <Box
+              onClick={() => navigate(`/hr/staff/${row.original.staff_code}`)}
+              sx={{ display: "flex", alignItems: "center", cursor: "pointer", '&:hover': {textDecoration: 'underline', color: 'primary.main'} }}
+            >
+              <Avatar
+                alt={row.original.fullname}
+                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(row.original.fullname || 'N V')}&background=random&size=100&font-size=0.5&bold=true&color=fff`}
+                sx={{ width: 36, height: 36, mr: 1.5 }}
+              />
+              <Typography variant="body1" component="span" sx={{fontWeight: 500}}>
+                {row.original.fullname}
+              </Typography>
             </Box>
-          );
+          ),
         },
-        width: 100, minWidth: 100, disableSortBy: true,
-      },
-    ],
-    [currentPage, itemsPerPage, handleMenuOpen, navigate]
+        { Header: "Email", accessor: "email", minWidth: 200, id: 'email' },
+        {
+          Header: "Phòng Ban",
+          accessor: "department.department_name", // Truy cập sâu hơn vào object
+          Cell: ({ row }) => row.original.department?.department_name || "Chưa có",
+          minWidth: 150,
+          id: 'department'
+        },
+        {
+          Header: "Vị Trí",
+          accessor: "job_position.job_position_name", // Truy cập sâu hơn vào object
+          Cell: ({ row }) => row.original.job_position?.job_position_name || "Chưa có",
+          minWidth: 150,
+          id: 'jobPosition'
+        },
+      ];
+      if(canAdminStaff) {
+        baseColumns.push({
+          Header: "Hành động",
+          id: 'actions',
+          Cell: ({ row }) => {
+            const staffId = row.original.id;
+            if (!staffId) return <Typography variant="caption" color="error">ID không hợp lệ</Typography>;
+            return (
+              <Box sx={{ textAlign: 'center' }}>
+                <Tooltip title="Tùy chọn">
+                  <IconButton aria-label="menu-hanh-dong" onClick={(event) => handleMenuOpen(event, staffId)}>
+                    <MoreVertIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            );
+          },
+          width: 100, minWidth: 100, disableSortBy: true,
+        });
+      }
+      return baseColumns;
+    },
+    [currentPage, itemsPerPage, handleMenuOpen, navigate, canAdminStaff] // Thêm canAdminStaff vào dependencies
   );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data, manualPagination: true, pageCount: pageCount, initialState: { pageIndex: currentPage }, }, usePagination );
@@ -228,7 +255,7 @@ const StaffScreenInternal = () => {
   const handleDelete = () => {
     if (!deleteEmployee || !deleteEmployee.staff_code) { toast.error("Không tìm thấy mã nhân viên để xóa."); return; }
     const staffCodeToDelete = deleteEmployee.staff_code;
-    request("delete", `/staffs/${staffCodeToDelete}`, () => {
+    request("delete", `/staffs/${staffCodeToDelete}`, () => { // Endpoint có thể cần thay đổi
         toast.success("Nhân viên đã được xóa thành công.");
         const newCurrentPage = (data.filter(d => d.staff_code !== staffCodeToDelete).length % itemsPerPage === 0 && currentPage > 0 && Math.floor((data.length -1) / itemsPerPage) < currentPage) ? currentPage - 1 : currentPage;
         fetchStaffList(newCurrentPage, itemsPerPage, debouncedSearchTerm, selectedDepartmentFilter, selectedJobPositionFilter, newCurrentPage === 0 && data.length - 1 === 0);
@@ -237,7 +264,6 @@ const StaffScreenInternal = () => {
     );
   };
 
-  // Định nghĩa cột riêng cho việc export PDF, với accessor là function để xử lý object
   const pdfExportColumnsDefinition = useMemo(
     () => [
       { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1 },
@@ -259,22 +285,21 @@ const StaffScreenInternal = () => {
   const handleExportPDF = () => {
     exportToPDF({
       data: data,
-      columns: pdfExportColumnsDefinition, // Sử dụng columns đã định nghĩa lại
+      columns: pdfExportColumnsDefinition,
       title: "Danh sách Nhân viên",
       fileName: `DSNhanVien_${dayjs().format("YYYYMMDD")}.pdf`,
       themePalette: theme.palette,
       customColumnWidths: {
-        0: { cellWidth: 30 },    // STT
-        1: { cellWidth: 70 },    // Mã NV
-        2: { cellWidth: 120 },   // Họ tên
-        3: { cellWidth: 130 },   // Email
-        4: { cellWidth: 100 },   // Phòng ban
-        5: { cellWidth: 100 }    // Vị trí
+        0: { cellWidth: 30 },
+        1: { cellWidth: 70 },
+        2: { cellWidth: 120 },
+        3: { cellWidth: 130 },
+        4: { cellWidth: 100 },
+        5: { cellWidth: 100 }
       }
     });
   };
 
-  // Định nghĩa header và chuẩn bị data cho CSV
   const csvExportHeaders = useMemo(() => [
     { label: "#", key: "stt_export" },
     { label: "Mã NV", key: "staff_code" },
@@ -321,35 +346,41 @@ const StaffScreenInternal = () => {
               <Tooltip title="Chế độ Thẻ">
                 <IconButton onClick={() => setViewMode("card")} color={viewMode === 'card' ? 'primary' : 'default'}> <GridViewIcon /> </IconButton>
               </Tooltip>
-              <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => { setSelectedEmployee(null); setOpenModal(true); }}> Thêm mới </Button>
+              {canAdminStaff && (
+                <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => { setSelectedEmployee(null); setOpenModal(true); }}> Thêm mới </Button>
+              )}
             </Stack>
           </Grid>
         </Grid>
       </Paper>
 
-      <AddStaffModal
-        open={openModal}
-        onClose={() => { setOpenModal(false); setSelectedEmployee(null); }}
-        onSubmitSuccess={() => {
-          const targetPage = selectedEmployee ? currentPage : 0;
-          fetchStaffList(targetPage, itemsPerPage, debouncedSearchTerm, selectedDepartmentFilter, selectedJobPositionFilter, !selectedEmployee);
-        }}
-        initialData={selectedEmployee}
-        isEditMode={!!selectedEmployee}
-        departments={departments}
-        jobPositions={jobPositions}
-        titleProps={{sx: modalTitleStyle}}
-      />
-      {deleteEmployee && (<DeleteConfirmationModal
-        open={deleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onSubmit={handleDelete}
-        title="Xác nhận xóa Nhân viên"
-        info={`Bạn có chắc chắn muốn xóa nhân viên "${deleteEmployee?.fullname}" không?`}
-        cancelLabel="Hủy"
-        confirmLabel="Xóa"
-        titleProps={{sx: modalTitleStyle}}
-      /> )}
+      {canAdminStaff && openModal && (
+        <AddStaffModal
+          open={openModal}
+          onClose={() => { setOpenModal(false); setSelectedEmployee(null); }}
+          onSubmitSuccess={() => {
+            const targetPage = selectedEmployee ? currentPage : 0; // Tải lại trang hiện tại nếu sửa, về trang đầu nếu thêm mới
+            fetchStaffList(targetPage, itemsPerPage, debouncedSearchTerm, selectedDepartmentFilter, selectedJobPositionFilter, !selectedEmployee);
+          }}
+          initialData={selectedEmployee}
+          isEditMode={!!selectedEmployee}
+          departments={departments} // Truyền danh sách phòng ban
+          jobPositions={jobPositions} // Truyền danh sách vị trí
+          titleProps={{sx: modalTitleStyle}}
+        />
+      )}
+      {canAdminStaff && deleteEmployee && deleteModalOpen && (
+        <DeleteConfirmationModal
+          open={deleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          onSubmit={handleDelete}
+          title="Xác nhận xóa Nhân viên"
+          info={`Bạn có chắc chắn muốn xóa nhân viên "${deleteEmployee?.fullname}" không?`}
+          cancelLabel="Hủy"
+          confirmLabel="Xóa"
+          titleProps={{sx: modalTitleStyle}}
+        />
+      )}
 
       <Paper sx={{ p: 2, mb: 2 }}>
         <Grid container spacing={2} alignItems="flex-end" wrap="wrap">
@@ -395,7 +426,7 @@ const StaffScreenInternal = () => {
 
       {viewMode === "table" ? (
         <Paper sx={{ overflow: 'hidden' }}>
-          <TableContainer sx={{ maxHeight: "calc(100vh - 320px)" }} className="custom-scrollbar">
+          <TableContainer sx={{ maxHeight: "calc(100vh - 320px)" }} className="custom-scrollbar"> {/* Điều chỉnh chiều cao nếu cần */}
             <Table {...getTableProps()} stickyHeader size="medium">
               <TableHead>
                 {headerGroups.map((headerGroup) => (
@@ -419,7 +450,7 @@ const StaffScreenInternal = () => {
           </TableContainer>
           {(pageCount > 0 && !loading && data.length > 0 )&& ( <Pagination currentPage={currentPage} pageCount={pageCount} itemsPerPage={itemsPerPage} onPageChange={handlePageChange} onItemsPerPageChange={handleItemsPerPageChange} /> )}
         </Paper>
-      ) : (
+      ) : ( // Chế độ xem Card
         <Paper sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', p:1, bgcolor:'transparent', boxShadow:'none' }}>
           <Box sx={{ flexGrow: 1, maxHeight: "calc(100vh - 320px)",overflowY: 'auto', p: 1 }} className="custom-scrollbar">
             {loading && data.length === 0 ? (
@@ -443,10 +474,11 @@ const StaffScreenInternal = () => {
                               sx={{ width: 48, height: 48 }}
                             />
                           }
-                          action={
-                            <IconButton aria-label="tùy chọn" onClick={(event) => handleMenuOpen(event, employee.id)}>
+                          action={ canAdminStaff && ( // Chỉ hiển thị nút action nếu có quyền
+                            <IconButton aria-label="tùy chọn thẻ" onClick={(event) => handleMenuOpen(event, employee.id)}>
                               <MoreVertIcon />
                             </IconButton>
+                          )
                           }
                           title={<Typography variant="subtitle1" component="div" noWrap title={employee.fullname} onClick={() => navigate(`/hr/staff/${employee.staff_code}`)} sx={{cursor: 'pointer', '&:hover': {textDecoration: 'underline', color: 'primary.main'}, fontWeight: 600}}>{employee.fullname}</Typography>}
                           subheader={<Typography variant="caption" color="text.secondary" noWrap title={employee.staff_code}>Mã NV: {employee.staff_code}</Typography>}
@@ -474,17 +506,19 @@ const StaffScreenInternal = () => {
         </Paper>
       )}
 
-      <Menu
-        anchorEl={menuAnchorEl}
-        open={Boolean(menuAnchorEl)}
-        onClose={handleMenuClose}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-        PaperProps={{ elevation: 2, sx: { overflow: 'visible', filter: 'drop-shadow(0px 1px 4px rgba(0,0,0,0.2))', mt: 1.5, '& .MuiAvatar-root': { width: 32, height: 32, ml: -0.5, mr: 1, }, '&::before': { content: '""', display: 'block', position: 'absolute', top: 0, right: 14, width: 10, height: 10, bgcolor: 'background.paper', transform: 'translateY(-50%) rotate(45deg)', zIndex: 0, borderLeft: `1px solid ${theme.palette.divider}`, borderTop: `1px solid ${theme.palette.divider}` }, }, }}
-      >
-        <MuiMenuItem onClick={handleEditFromMenu} sx={{ gap: 1, fontSize:'0.9rem', color: 'text.secondary' }}> <EditIcon fontSize="small" /> Sửa </MuiMenuItem>
-        <MuiMenuItem onClick={handleOpenDeleteModalFromMenu} sx={{ gap: 1, color: 'error.main', fontSize:'0.9rem' }}> <DeleteIcon fontSize="small" /> Xóa </MuiMenuItem>
-      </Menu>
+      {canAdminStaff && ( // Chỉ hiển thị Menu nếu có quyền
+        <Menu
+          anchorEl={menuAnchorEl}
+          open={Boolean(menuAnchorEl)}
+          onClose={handleMenuClose}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          PaperProps={{ elevation: 2, sx: { overflow: 'visible', filter: 'drop-shadow(0px 1px 4px rgba(0,0,0,0.2))', mt: 1.5, '& .MuiAvatar-root': { width: 32, height: 32, ml: -0.5, mr: 1, }, '&::before': { content: '""', display: 'block', position: 'absolute', top: 0, right: 14, width: 10, height: 10, bgcolor: 'background.paper', transform: 'translateY(-50%) rotate(45deg)', zIndex: 0, borderLeft: `1px solid ${theme.palette.divider}`, borderTop: `1px solid ${theme.palette.divider}` }, }, }}
+        >
+          <MuiMenuItem onClick={handleEditFromMenu} sx={{ gap: 1, fontSize:'0.9rem', color: 'text.secondary' }}> <EditIcon fontSize="small" /> Sửa </MuiMenuItem>
+          <MuiMenuItem onClick={handleOpenDeleteModalFromMenu} sx={{ gap: 1, color: 'error.main', fontSize:'0.9rem' }}> <DeleteIcon fontSize="small" /> Xóa </MuiMenuItem>
+        </Menu>
+      )}
     </Box>
   );
 };

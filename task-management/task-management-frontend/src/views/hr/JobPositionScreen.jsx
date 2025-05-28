@@ -43,6 +43,11 @@ import {CSVLink}from "react-csv";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
 
+// Import state quản lý quyền scope
+import { useScopePermissionState, fetchPermittedScopes } from "../../state/scopePermissionState"; // Điều chỉnh đường dẫn nếu cần
+
+const JOB_POSITION_ADMIN_SCOPE = "SCOPE_JOB_POSITION_ADMIN";
+
 const JobPositionScreenInternal = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -59,6 +64,21 @@ const JobPositionScreenInternal = () => {
 
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const [currentMenuJobId, setCurrentMenuJobId] = useState(null);
+
+  // State quyền scope
+  const scopeState = useScopePermissionState();
+  const { permittedScopeIds, isFetched: scopesFetched, isFetching: scopesFetching } = scopeState.get();
+
+  const canAdminJobPositions = useMemo(() => {
+    return scopesFetched && permittedScopeIds.has(JOB_POSITION_ADMIN_SCOPE);
+  }, [permittedScopeIds, scopesFetched]);
+
+  useEffect(() => {
+    // Fetch quyền scope khi component mount
+    if (!scopesFetched && !scopesFetching) {
+      fetchPermittedScopes();
+    }
+  }, [scopesFetched, scopesFetching]);
 
   const fetchData = useCallback(async (pageIndex, pageSize, searchValue, isInitialLoadOrFilterChange = false) => {
     setLoading(true);
@@ -127,43 +147,48 @@ const JobPositionScreenInternal = () => {
   }, [currentMenuJobId, data, handleMenuClose]);
 
   const columns = useMemo(
-    () => [
-      { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1, width: 60, disableSortBy: true, id: 'stt' },
-      { Header: "Tên vị trí", accessor: "name", minWidth: 200, id: 'name' },
-      {
-        Header: "Mô tả",
-        accessor: "description",
-        Cell: ({ value }) => (
-          <Typography
-            variant="body1"
-            sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
-          >
-            {value || '-'}
-          </Typography>
-        ),
-        minWidth: 250,
-        id: 'description'
-      },
-      {
-        Header: "Hành động",
-        id: 'actions',
-        Cell: ({ row }) => {
-          const jobId = row.original.id;
-          if (!jobId) return <Typography variant="caption" color="error">ID không hợp lệ</Typography>;
-          return (
-            <Box sx={{ textAlign: 'center' }}>
-              <Tooltip title="Tùy chọn">
-                <IconButton aria-label="menu-hanh-dong" onClick={(event) => handleMenuOpen(event, jobId)}>
-                  <MoreVertIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          );
+    () => {
+      const baseColumns = [
+        { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1, width: 60, disableSortBy: true, id: 'stt' },
+        { Header: "Tên vị trí", accessor: "name", minWidth: 200, id: 'name' },
+        {
+          Header: "Mô tả",
+          accessor: "description",
+          Cell: ({ value }) => (
+            <Typography
+              variant="body1"
+              sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+            >
+              {value || '-'}
+            </Typography>
+          ),
+          minWidth: 250,
+          id: 'description'
         },
-        width: 100, minWidth: 100, disableSortBy: true,
-      },
-    ],
-    [currentPage, itemsPerPage, handleMenuOpen]
+      ];
+      if (canAdminJobPositions) {
+        baseColumns.push({
+          Header: "Hành động",
+          id: 'actions',
+          Cell: ({ row }) => {
+            const jobId = row.original.id;
+            if (!jobId) return <Typography variant="caption" color="error">ID không hợp lệ</Typography>;
+            return (
+              <Box sx={{ textAlign: 'center' }}>
+                <Tooltip title="Tùy chọn">
+                  <IconButton aria-label="menu-hanh-dong" onClick={(event) => handleMenuOpen(event, jobId)}>
+                    <MoreVertIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            );
+          },
+          width: 100, minWidth: 100, disableSortBy: true,
+        });
+      }
+      return baseColumns;
+    },
+    [currentPage, itemsPerPage, handleMenuOpen, canAdminJobPositions]
   );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data, manualPagination: true, pageCount: pageCount, initialState: { pageIndex: currentPage }, }, usePagination );
@@ -180,11 +205,15 @@ const JobPositionScreenInternal = () => {
     );
   };
 
-  const pdfExportColumnsDefinition = useMemo(() => [
-    { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1 },
-    { Header: "Tên vị trí", accessor: "name" },
-    { Header: "Mô tả", accessor: "description" }
-  ], [currentPage, itemsPerPage]);
+  const pdfExportColumnsDefinition = useMemo(() => {
+      const exportCols = [
+        { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1 },
+        { Header: "Tên vị trí", accessor: "name" },
+        { Header: "Mô tả", accessor: "description" }
+      ];
+      return exportCols;
+    }, [currentPage, itemsPerPage]
+  );
 
   const handleExportPDF = () => {
     exportToPDF({
@@ -231,30 +260,36 @@ const JobPositionScreenInternal = () => {
       <Paper sx={{ p: 2, mb: 2 }}>
         <Grid container spacing={2} alignItems="center" justifyContent="space-between" wrap="wrap">
           <Grid item> <Typography variant="h4" component="h1"> Quản lý Vị trí Công việc </Typography> </Grid>
-          <Grid item> <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => { setSelectedJob(null); setOpenModal(true); }}> Thêm mới </Button> </Grid>
+          {canAdminJobPositions && (
+            <Grid item> <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => { setSelectedJob(null); setOpenModal(true); }}> Thêm mới </Button> </Grid>
+          )}
         </Grid>
       </Paper>
 
-      <AddJobPositionModal
-        open={openModal}
-        onClose={() => { setOpenModal(false); setSelectedJob(null); }}
-        onSubmit={() => {
-          const targetPage = selectedJob ? currentPage : 0;
-          fetchData(targetPage, itemsPerPage, debouncedSearchTerm, !selectedJob);
-        }}
-        initialData={selectedJob}
-        titleProps={{sx: modalTitleStyle}}
-      />
-      {deleteJob && ( <DeleteConfirmationModal
-        open={deleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onSubmit={handleDelete}
-        title="Xác nhận xóa Vị trí Công việc"
-        info={`Bạn có chắc chắn muốn xóa vị trí "${deleteJob?.name}" không?`}
-        cancelLabel="Hủy"
-        confirmLabel="Xóa"
-        titleProps={{sx: modalTitleStyle}}
-      /> )}
+      {canAdminJobPositions && openModal && (
+        <AddJobPositionModal
+          open={openModal}
+          onClose={() => { setOpenModal(false); setSelectedJob(null); }}
+          onSubmit={() => {
+            const targetPage = selectedJob ? currentPage : 0;
+            fetchData(targetPage, itemsPerPage, debouncedSearchTerm, !selectedJob);
+          }}
+          initialData={selectedJob}
+          titleProps={{sx: modalTitleStyle}}
+        />
+      )}
+      {canAdminJobPositions && deleteJob && (
+        <DeleteConfirmationModal
+          open={deleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          onSubmit={handleDelete}
+          title="Xác nhận xóa Vị trí Công việc"
+          info={`Bạn có chắc chắn muốn xóa vị trí "${deleteJob?.name}" không?`}
+          cancelLabel="Hủy"
+          confirmLabel="Xóa"
+          titleProps={{sx: modalTitleStyle}}
+        />
+      )}
 
       <Paper sx={{ p: 2, mb: 2 }}>
         <Grid container spacing={2} alignItems="center" justifyContent="space-between" wrap="wrap">
@@ -322,17 +357,19 @@ const JobPositionScreenInternal = () => {
         {(pageCount > 0 && !loading && data.length > 0 )&& ( <Pagination currentPage={currentPage} pageCount={pageCount} itemsPerPage={itemsPerPage} onPageChange={handlePageChange} onItemsPerPageChange={handleItemsPerPageChange} /> )}
       </Paper>
 
-      <Menu
-        anchorEl={menuAnchorEl}
-        open={Boolean(menuAnchorEl)}
-        onClose={handleMenuClose}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-        PaperProps={{ elevation: 2, sx: { overflow: 'visible', filter: 'drop-shadow(0px 1px 4px rgba(0,0,0,0.2))', mt: 1.5, '& .MuiAvatar-root': { width: 32, height: 32, ml: -0.5, mr: 1, }, '&::before': { content: '""', display: 'block', position: 'absolute', top: 0, right: 14, width: 10, height: 10, bgcolor: 'background.paper', transform: 'translateY(-50%) rotate(45deg)', zIndex: 0, borderLeft: `1px solid ${theme.palette.divider}`, borderTop: `1px solid ${theme.palette.divider}` }, }, }}
-      >
-        <MuiMenuItem onClick={handleEditFromMenu} sx={{ gap: 1, fontSize:'0.9rem', color: 'text.secondary' }}> <EditIcon fontSize="small" /> Sửa </MuiMenuItem>
-        <MuiMenuItem onClick={handleOpenDeleteModalFromMenu} sx={{ gap: 1, color: 'error.main', fontSize:'0.9rem' }}> <DeleteIcon fontSize="small" /> Xóa </MuiMenuItem>
-      </Menu>
+      {canAdminJobPositions && (
+        <Menu
+          anchorEl={menuAnchorEl}
+          open={Boolean(menuAnchorEl)}
+          onClose={handleMenuClose}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          PaperProps={{ elevation: 2, sx: { overflow: 'visible', filter: 'drop-shadow(0px 1px 4px rgba(0,0,0,0.2))', mt: 1.5, '& .MuiAvatar-root': { width: 32, height: 32, ml: -0.5, mr: 1, }, '&::before': { content: '""', display: 'block', position: 'absolute', top: 0, right: 14, width: 10, height: 10, bgcolor: 'background.paper', transform: 'translateY(-50%) rotate(45deg)', zIndex: 0, borderLeft: `1px solid ${theme.palette.divider}`, borderTop: `1px solid ${theme.palette.divider}` }, }, }}
+        >
+          <MuiMenuItem onClick={handleEditFromMenu} sx={{ gap: 1, fontSize:'0.9rem', color: 'text.secondary' }}> <EditIcon fontSize="small" /> Sửa </MuiMenuItem>
+          <MuiMenuItem onClick={handleOpenDeleteModalFromMenu} sx={{ gap: 1, color: 'error.main', fontSize:'0.9rem' }}> <DeleteIcon fontSize="small" /> Xóa </MuiMenuItem>
+        </Menu>
+      )}
     </Box>
   );
 };

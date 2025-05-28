@@ -37,10 +37,15 @@ import AddDepartmentModal from "./modals/AddDepartmentModal";
 import DeleteConfirmationModal from "./modals/DeleteConfirmationModal.jsx";
 import Pagination from "@/components/item/Pagination";
 import { useDebounce } from "../../hooks/useDebounce";
-import { exportToPDF, prepareCSVData } from "./fileExportUtils"; // Import hàm mới
+import { exportToPDF } from "./fileExportUtils";
 import dayjs from 'dayjs';
 import {CSVLink}from "react-csv";
 import toast from "react-hot-toast";
+
+// Import state quản lý quyền scope
+import { useScopePermissionState, fetchPermittedScopes } from "../../state/scopePermissionState"; // Điều chỉnh đường dẫn nếu cần
+
+const DEPARTMENT_ADMIN_SCOPE = "SCOPE_DEPARTMENT_ADMIN";
 
 const DepartmentScreenInternal = () => {
   const [data, setData] = useState([]);
@@ -58,6 +63,21 @@ const DepartmentScreenInternal = () => {
 
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const [currentMenuDepartmentId, setCurrentMenuDepartmentId] = useState(null);
+
+  // State quyền scope
+  const scopeState = useScopePermissionState();
+  const { permittedScopeIds, isFetched: scopesFetched, isFetching: scopesFetching } = scopeState.get();
+
+  const canAdminDepartments = useMemo(() => {
+    return scopesFetched && permittedScopeIds.has(DEPARTMENT_ADMIN_SCOPE);
+  }, [permittedScopeIds, scopesFetched]);
+
+  useEffect(() => {
+    // Fetch quyền scope khi component mount
+    if (!scopesFetched && !scopesFetching) {
+      fetchPermittedScopes();
+    }
+  }, [scopesFetched, scopesFetching]);
 
   const fetchData = useCallback(async (pageIndex, pageSize, searchValue, isInitialLoadOrFilterChange = false) => {
     setLoading(true);
@@ -133,46 +153,52 @@ const DepartmentScreenInternal = () => {
   }, [currentMenuDepartmentId, data, handleMenuClose]);
 
   const columns = useMemo(
-    () => [
-      { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1, width: 60, disableSortBy: true, id: 'stt' },
-      { Header: "Tên phòng ban", accessor: "departmentName", minWidth: 200, id: 'name' },
-      {
-        Header: "Mô tả",
-        accessor: "description",
-        Cell: ({ value }) => (
-          <Typography
-            variant="body1"
-            sx={{
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-            }}
-          >
-            {value || '-'}
-          </Typography>
-        ),
-        minWidth: 250,
-        id: 'description'
-      },
-      {
-        Header: "Hành động",
-        id: 'actions',
-        Cell: ({ row }) => {
-          const departmentId = row.original.id;
-          if (!departmentId) return <Typography variant="caption" color="error">ID không hợp lệ</Typography>;
-          return (
-            <Box sx={{ textAlign: 'center' }}>
-              <Tooltip title="Tùy chọn">
-                <IconButton aria-label="menu-hanh-dong" onClick={(event) => handleMenuOpen(event, departmentId)} >
-                  <MoreVertIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          );
+    () => {
+      const baseColumns = [
+        { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1, width: 60, disableSortBy: true, id: 'stt' },
+        { Header: "Tên phòng ban", accessor: "departmentName", minWidth: 200, id: 'name' },
+        {
+          Header: "Mô tả",
+          accessor: "description",
+          Cell: ({ value }) => (
+            <Typography
+              variant="body1"
+              sx={{
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+              }}
+            >
+              {value || '-'}
+            </Typography>
+          ),
+          minWidth: 250,
+          id: 'description'
         },
-        width: 100, minWidth: 100, disableSortBy: true,
-      },
-    ],
-    [currentPage, itemsPerPage, handleMenuOpen]
+      ];
+
+      if (canAdminDepartments) {
+        baseColumns.push({
+          Header: "Hành động",
+          id: 'actions',
+          Cell: ({ row }) => {
+            const departmentId = row.original.id;
+            if (!departmentId) return <Typography variant="caption" color="error">ID không hợp lệ</Typography>;
+            return (
+              <Box sx={{ textAlign: 'center' }}>
+                <Tooltip title="Tùy chọn">
+                  <IconButton aria-label="menu-hanh-dong" onClick={(event) => handleMenuOpen(event, departmentId)} >
+                    <MoreVertIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            );
+          },
+          width: 100, minWidth: 100, disableSortBy: true,
+        });
+      }
+      return baseColumns;
+    },
+    [currentPage, itemsPerPage, handleMenuOpen, canAdminDepartments]
   );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable( { columns, data, manualPagination: true, pageCount: pageCount, initialState: { pageIndex: currentPage }, }, usePagination );
@@ -191,18 +217,25 @@ const DepartmentScreenInternal = () => {
   };
 
   const handleExportPDF = () => {
-    // Chỉ lấy các cột cần xuất, bỏ cột "Hành động"
-    const pdfColumns = columns.filter(col => col.id !== 'actions');
+    const pdfColumnsToExport = columns.filter(col => col.id !== 'actions' && col.id !== 'stt').map(col => ({ Header: col.Header, accessor: col.accessor }));
+    const dataToExport = data.map((row, index) => ({
+      ...row,
+      stt_export: currentPage * itemsPerPage + index + 1,
+    }));
+
     exportToPDF({
-      data: data,
-      columns: pdfColumns,
+      data: dataToExport,
+      columns: [
+        { Header: "#", accessor: "stt_export"},
+        ...pdfColumnsToExport
+      ],
       title: "Danh sách Phòng Ban",
-      fileName: "DanhSachPhongBan.pdf",
+      fileName: `DanhSachPhongBan_${dayjs().format("YYYYMMDD")}.pdf`,
       themePalette: theme.palette,
       customColumnWidths: {
-        0: { cellWidth: 30 },    // STT
-        1: { cellWidth: 120 },   // Tên phòng ban
-        2: { cellWidth: 'auto'} // Mô tả
+        0: { cellWidth: 30 },
+        1: { cellWidth: 120 },
+        2: { cellWidth: 'auto'}
       }
     });
   };
@@ -239,30 +272,36 @@ const DepartmentScreenInternal = () => {
       <Paper sx={{ p: 2, mb: 2 }}>
         <Grid container spacing={2} alignItems="center" justifyContent="space-between" wrap="wrap">
           <Grid item> <Typography variant="h4" component="h1"> Quản lý Phòng Ban </Typography> </Grid>
-          <Grid item> <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => { setSelectedDepartment(null); setOpenModal(true); }}> Thêm mới </Button> </Grid>
+          {canAdminDepartments && (
+            <Grid item> <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => { setSelectedDepartment(null); setOpenModal(true); }}> Thêm mới </Button> </Grid>
+          )}
         </Grid>
       </Paper>
 
-      <AddDepartmentModal
-        open={openModal}
-        onClose={() => { setOpenModal(false); setSelectedDepartment(null); }}
-        onSubmit={() => {
-          const targetPage = selectedDepartment ? currentPage : 0;
-          fetchData(targetPage, itemsPerPage, debouncedSearchTerm, !selectedDepartment);
-        }}
-        initialData={selectedDepartment}  // Đổi tên prop cho nhất quán
-        titleProps={{sx: modalTitleStyle}}
-      />
-      {deleteDepartment && (<DeleteConfirmationModal
-        open={deleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onSubmit={handleDelete}
-        title="Xác nhận xóa Phòng Ban"
-        info={`Bạn có chắc chắn muốn xóa phòng ban "${deleteDepartment?.departmentName}" không?`}
-        cancelLabel="Hủy"
-        confirmLabel="Xóa"
-        titleProps={{sx: modalTitleStyle}}
-      /> )}
+      {canAdminDepartments && openModal && (
+        <AddDepartmentModal
+          open={openModal}
+          onClose={() => { setOpenModal(false); setSelectedDepartment(null); }}
+          onSubmit={() => {
+            const targetPage = selectedDepartment ? currentPage : 0;
+            fetchData(targetPage, itemsPerPage, debouncedSearchTerm, !selectedDepartment);
+          }}
+          initialData={selectedDepartment}
+          titleProps={{sx: modalTitleStyle}}
+        />
+      )}
+      {canAdminDepartments && deleteDepartment && (
+        <DeleteConfirmationModal
+          open={deleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          onSubmit={handleDelete}
+          title="Xác nhận xóa Phòng Ban"
+          info={`Bạn có chắc chắn muốn xóa phòng ban "${deleteDepartment?.departmentName}" không?`}
+          cancelLabel="Hủy"
+          confirmLabel="Xóa"
+          titleProps={{sx: modalTitleStyle}}
+        />
+      )}
 
       <Paper sx={{ p: 2, mb: 2 }}>
         <Grid container spacing={2} alignItems="center" justifyContent="space-between" wrap="wrap">
@@ -332,20 +371,22 @@ const DepartmentScreenInternal = () => {
             </TableBody>
           </Table>
         </TableContainer>
-        {(pageCount > 0 && !loading) && ( <Pagination currentPage={currentPage} pageCount={pageCount} itemsPerPage={itemsPerPage} onPageChange={handlePageChange} onItemsPerPageChange={handleItemsPerPageChange} /> )}
+        {(pageCount > 0 && !loading && data.length > 0) && ( <Pagination currentPage={currentPage} pageCount={pageCount} itemsPerPage={itemsPerPage} onPageChange={handlePageChange} onItemsPerPageChange={handleItemsPerPageChange} /> )}
       </Paper>
 
-      <Menu
-        anchorEl={menuAnchorEl}
-        open={Boolean(menuAnchorEl)}
-        onClose={handleMenuClose}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-        PaperProps={{ elevation: 2, sx: { overflow: 'visible', filter: 'drop-shadow(0px 1px 4px rgba(0,0,0,0.2))', mt: 1.5, '& .MuiAvatar-root': { width: 32, height: 32, ml: -0.5, mr: 1, }, '&::before': { content: '""', display: 'block', position: 'absolute', top: 0, right: 14, width: 10, height: 10, bgcolor: 'background.paper', transform: 'translateY(-50%) rotate(45deg)', zIndex: 0, borderLeft: `1px solid ${theme.palette.divider}`, borderTop: `1px solid ${theme.palette.divider}` }, }, }}
-      >
-        <MuiMenuItem onClick={handleEditFromMenu} sx={{ gap: 1, fontSize:'0.9rem', color: 'text.secondary' }}> <EditIcon fontSize="small" /> Sửa </MuiMenuItem>
-        <MuiMenuItem onClick={handleOpenDeleteModalFromMenu} sx={{ gap: 1, color: 'error.main', fontSize:'0.9rem' }}> <DeleteIcon fontSize="small" /> Xóa </MuiMenuItem>
-      </Menu>
+      {canAdminDepartments && (
+        <Menu
+          anchorEl={menuAnchorEl}
+          open={Boolean(menuAnchorEl)}
+          onClose={handleMenuClose}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          PaperProps={{ elevation: 2, sx: { overflow: 'visible', filter: 'drop-shadow(0px 1px 4px rgba(0,0,0,0.2))', mt: 1.5, '& .MuiAvatar-root': { width: 32, height: 32, ml: -0.5, mr: 1, }, '&::before': { content: '""', display: 'block', position: 'absolute', top: 0, right: 14, width: 10, height: 10, bgcolor: 'background.paper', transform: 'translateY(-50%) rotate(45deg)', zIndex: 0, borderLeft: `1px solid ${theme.palette.divider}`, borderTop: `1px solid ${theme.palette.divider}` }, }, }}
+        >
+          <MuiMenuItem onClick={handleEditFromMenu} sx={{ gap: 1, fontSize:'0.9rem', color: 'text.secondary' }}> <EditIcon fontSize="small" /> Sửa </MuiMenuItem>
+          <MuiMenuItem onClick={handleOpenDeleteModalFromMenu} sx={{ gap: 1, color: 'error.main', fontSize:'0.9rem' }}> <DeleteIcon fontSize="small" /> Xóa </MuiMenuItem>
+        </Menu>
+      )}
     </Box>
   );
 };
