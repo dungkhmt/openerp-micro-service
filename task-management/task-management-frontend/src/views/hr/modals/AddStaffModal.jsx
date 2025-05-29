@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback} from "react"; // Added useCallback
+import React, {useEffect, useState, useCallback} from "react";
 import {
   Button,
   CircularProgress,
@@ -7,17 +7,29 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
-  Grid, // Added Grid
-  IconButton, // Added IconButton
-  Stack // Added Stack
+  Grid,
+  IconButton,
+  Stack,
+  MenuItem, // Thêm MenuItem
+  FormControl, // Thêm FormControl
+  InputLabel, // Thêm InputLabel
+  Select, // Thêm Select
+  InputAdornment // Thêm InputAdornment
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close"; // Added CloseIcon
+import CloseIcon from "@mui/icons-material/Close";
 import Autocomplete from "@mui/material/Autocomplete";
 import {request}from "@/api";
 import toast from "react-hot-toast";
 
 const AddStaffModal = ({ open, onClose, onSubmitSuccess, initialData, isEditMode, departments = [], jobPositions = [], titleProps }) => {
-  const defaultFormState = { fullname: "", email: "", department_code: null, job_position_code: null };
+  const defaultFormState = {
+    fullname: "",
+    email: "",
+    department_code: null,
+    job_position_code: null,
+    salary: "", // Thêm trường lương
+    salary_type: "MONTHLY" // Thêm trường loại lương, mặc định là Theo Tháng
+  };
   const [formValues, setFormValues] = useState(defaultFormState);
 
   const [currentDepartments, setCurrentDepartments] = useState([]);
@@ -42,18 +54,11 @@ const AddStaffModal = ({ open, onClose, onSubmitSuccess, initialData, isEditMode
           email: initialData.email || "",
           department_code: initialData.department?.department_code || null,
           job_position_code: initialData.job_position?.code || null,
+          salary: "",
+          salary_type: "MONTHLY"
         });
-        if (initialData.department && departments.length > 0) {
-          const defaultDept = departments.find(d => d.department_code === initialData.department.department_code);
-        }
-        if (initialData.job_position && jobPositions.length > 0) {
-          const defaultJob = jobPositions.find(j => j.code === initialData.job_position.code);
-        }
-
       } else {
         setFormValues(defaultFormState);
-        // setSelectedDepartmentValue(null);
-        // setSelectedJobPositionValue(null);
       }
     }
   }, [open, initialData, isEditMode, departments, jobPositions]);
@@ -64,15 +69,14 @@ const AddStaffModal = ({ open, onClose, onSubmitSuccess, initialData, isEditMode
     if (!formValues.fullname.trim()) {
       toast.error("Họ và tên không được để trống."); setLoading(false); return;
     }
-    if (!isEditMode && !formValues.email.trim()) { // Chỉ bắt buộc email khi thêm mới
+    if (!isEditMode && !formValues.email.trim()) {
       toast.error("Email không được để trống."); setLoading(false); return;
     }
-    // Thêm validation email nếu cần
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (formValues.email.trim() && !emailRegex.test(formValues.email.trim())) {
       toast.error("Định dạng email không hợp lệ."); setLoading(false); return;
     }
-
 
     const payload = {
       fullname: formValues.fullname.trim(),
@@ -81,7 +85,24 @@ const AddStaffModal = ({ open, onClose, onSubmitSuccess, initialData, isEditMode
       job_position_code: formValues.job_position_code,
     };
 
-    // Nếu là edit mode và giá trị không thay đổi so với initial, không gửi field đó
+    if (!isEditMode) {
+      const salaryValue = String(formValues.salary).replace(/[^\d]/g, "");
+      if (salaryValue !== "" && (isNaN(parseFloat(salaryValue)) || parseFloat(salaryValue) < 0)) {
+        toast.error("Mức lương không hợp lệ. Vui lòng nhập số dương hoặc để trống.");
+        setLoading(false);
+        return;
+      }
+      if (salaryValue !== "") {
+        payload.salary = parseFloat(salaryValue);
+        payload.salary_type = formValues.salary_type;
+      } else {
+        // Nếu lương để trống, có thể không gửi hoặc gửi null/undefined tùy theo yêu cầu API
+        payload.salary = null; // Ví dụ: gửi null nếu lương trống
+        payload.salary_type = formValues.salary_type; // Vẫn gửi loại lương
+      }
+    }
+
+
     if (isEditMode) {
       if (payload.department_code === initialData?.department?.department_code) {
         delete payload.department_code;
@@ -89,6 +110,9 @@ const AddStaffModal = ({ open, onClose, onSubmitSuccess, initialData, isEditMode
       if (payload.job_position_code === initialData?.job_position?.code) {
         delete payload.job_position_code;
       }
+      // Đảm bảo không gửi salary và salary_type khi edit
+      delete payload.salary;
+      delete payload.salary_type;
     }
 
 
@@ -103,7 +127,7 @@ const AddStaffModal = ({ open, onClose, onSubmitSuccess, initialData, isEditMode
         apiEndpoint,
         () => {
           toast.success(isEditMode ? "Cập nhật nhân viên thành công!" : "Thêm nhân viên thành công!");
-          onSubmitSuccess(); // Gọi lại hàm từ parent
+          onSubmitSuccess();
           onClose();
         },
         {
@@ -144,12 +168,12 @@ const AddStaffModal = ({ open, onClose, onSubmitSuccess, initialData, isEditMode
           />
           <TextField
             fullWidth
-            label="Email (*)"
+            label={isEditMode ? "Email" : "Email (*)"}
             name="email"
             value={formValues.email}
             onChange={(e) => setFormValues((prev) => ({ ...prev, email: e.target.value }))}
             size="small"
-            disabled={isEditMode} // Email không cho sửa khi edit
+            disabled={isEditMode} // Email không được sửa khi edit mode
             InputProps={{
               sx: isEditMode ? { color: "text.disabled", backgroundColor: "action.disabledBackground" } : {},
             }}
@@ -184,6 +208,41 @@ const AddStaffModal = ({ open, onClose, onSubmitSuccess, initialData, isEditMode
             noOptionsText="Không tìm thấy vị trí"
             size="small"
           />
+
+          {!isEditMode && ( // Chỉ hiển thị khi thêm mới
+            <>
+              <FormControl fullWidth size="small">
+                <InputLabel id="add-staff-salary-type-label">Loại lương</InputLabel>
+                <Select
+                  labelId="add-staff-salary-type-label"
+                  label="Loại lương"
+                  name="salary_type"
+                  value={formValues.salary_type}
+                  onChange={(e) => setFormValues((prev) => ({ ...prev, salary_type: e.target.value }))}
+                >
+                  <MenuItem value="MONTHLY">Theo Tháng</MenuItem>
+                  <MenuItem value="WEEKLY">Theo Tuần</MenuItem>
+                  <MenuItem value="HOURLY">Theo Giờ</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                fullWidth
+                name="salary"
+                label="Mức lương"
+                type="text" // Để có thể format và chỉ cho nhập số
+                value={formValues.salary === '' ? '' : Number(String(formValues.salary).replace(/[^\d]/g, "")).toLocaleString("vi-VN")}
+                onChange={(e) => {
+                  const rawValue = e.target.value.replace(/[^\d]/g, "");
+                  setFormValues((prev) => ({ ...prev, salary: rawValue }));
+                }}
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">VNĐ</InputAdornment>,
+                }}
+                size="small"
+                placeholder="Để trống nếu chưa có thông tin"
+              />
+            </>
+          )}
         </Stack>
       </DialogContent>
       <DialogActions sx={{p:2}}>

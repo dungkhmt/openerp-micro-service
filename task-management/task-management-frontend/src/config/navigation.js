@@ -3,14 +3,13 @@ const navigation = [
     sectionTitle: "Dashboard",
   },
   {
-    id: "MENU_DASHBOARD_GROUP",
+    id: "MENU_DASHBOARD_ADMIN",
     title: "Dashboard",
     icon: "mdi:home-outline",
     badgeContent: "Mới",
     badgeColor: "info",
     children: [
       {
-        id: "DASHBOARD_VIEW",
         title: "Dashboard",
         path: "/dashboard",
       },
@@ -139,7 +138,7 @@ const navigation = [
         icon: "mdi:calendar-alert-outline",
       },
       {
-        id: "MENU_HR_ATTENDANCE",
+        id: "MENU_HR_ATTENDANCE.ABSENCE_ME",
         title: "Nghỉ phép cá nhân",
         path: "/hr/absence/me",
         icon: "mdi:calendar-account-outline",

@@ -132,7 +132,7 @@ const WeeklyAbsencePageInternal = () => {
       fullname: debouncedSearchName || null,
       departmentCode: selectedDept?.department_code || null,
       jobPositionCode: selectedPos?.code || null,
-      status: "ACTIVE", pageSize: 500, page: 0
+      status: "ACTIVE"
     };
     try {
       const empRes = await new Promise((resolve, reject) => {

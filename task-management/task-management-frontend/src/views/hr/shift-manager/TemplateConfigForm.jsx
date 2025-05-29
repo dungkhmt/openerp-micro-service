@@ -26,7 +26,7 @@ export default function TemplateConfigForm({ onSave, onCancel, initialTemplateDa
       tooltip: "Giới hạn tổng số giờ làm việc của một nhân viên trong một ngày (00:00 - 23:59)."
     },
     NO_CLASHING_SHIFTS_FOR_EMPLOYEE: { description: "Không trùng ca cho 1 nhân viên (trong lịch mới)", enabled: true, params: null, tooltip: "Một người không thể ở 2 nơi trong cùng lịch mới tạo." },
-    MAX_SHIFTS_PER_DAY_FOR_EMPLOYEE: { description: "Số ca tối đa/ngày/nhân viên (trong lịch mới)", enabled: true, params: { count: { label: "Số ca tối đa/ngày", value: 1, type: 'number', min: 1 } }, tooltip: "Thường là 1." },
+    MAX_SHIFTS_PER_DAY_FOR_EMPLOYEE: { description: "Số ca tối đa/ngày/nhân viên (trong lịch mới)", enabled: true, params: { count: { label: "Số ca tối đa/ngày", value: 1, type: 'number', min: 1 } }, tooltip: "Số ca tối đa/ngày" },
     NO_WORK_NEXT_DAY_AFTER_NIGHT_SHIFT: { description: "Nghỉ ngày sau nếu làm bất kỳ ca đêm nào", enabled: true, params: null, tooltip: "Nếu bật, NV sẽ nghỉ ngày sau khi làm ca được đánh dấu 'Ca đêm'." },
     MIN_WEEKEND_DAYS_OFF_PER_PERIOD: {
       description: "NV nghỉ cuối tuần tối thiểu trong khoảng thời gian",
@@ -45,8 +45,8 @@ export default function TemplateConfigForm({ onSave, onCancel, initialTemplateDa
     },
     AVOID_OVERLAPPING_EXISTING_SHIFTS: {
       description: "Không xếp lịch trùng với các ca ĐÃ CÓ SẴN của nhân viên",
-      enabled: true, // Mặc định là bật
-      params: null, // Đây là một toggle boolean, không có tham số con
+      enabled: true,
+      params: null,
       tooltip: "Nếu bật, hệ thống sẽ kiểm tra lịch làm việc hiện tại của nhân viên và tránh xếp ca mới nếu có sự trùng lặp thời gian."
     },
   }), []);

@@ -6,6 +6,8 @@ import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.AddStaff;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff_department.usecase_data.AssignDepartment;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff_job_position.usecase_data.AssignJobPosition;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff_salary.usecase_data.UpdateStaffSalary;
+import com.hust.openerp.taskmanagement.hr_management.constant.SalaryType;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.VoidUseCaseHandler;
@@ -42,12 +44,9 @@ public class AddStaffHandler extends ObservableUseCasePublisher implements VoidU
         var code = codeGeneratorService.generateCode(staffPort);
         model.setStaffCode(code);
         var savedModel = staffPort.addStaff(model);
-        if(useCase.getDepartmentCode() != null){
-            addStaffDepartment(useCase.getDepartmentCode(), savedModel.getUserLoginId());
-        }
-        if(useCase.getJobPositionCode() != null){
-            addStaffJobPosition(useCase.getJobPositionCode(), savedModel.getUserLoginId());
-        }
+        addStaffDepartment(useCase.getDepartmentCode(), savedModel.getUserLoginId());
+        addStaffJobPosition(useCase.getJobPositionCode(), savedModel.getUserLoginId());
+        addStaffSalary(useCase.getSalaryType(), useCase.getSalary(), useCase.getUserLoginId());
     }
 
     private void addStaffDepartment(String departmentCode, String userLoginId){
@@ -63,6 +62,15 @@ public class AddStaffHandler extends ObservableUseCasePublisher implements VoidU
                 .jobPositionCode(jobPositionCode)
                 .userLoginId(userLoginId)
                 .build();
+        publish(assignJobPosition);
+    }
+
+    private void addStaffSalary(SalaryType salaryType, Integer salary, String userLoginId){
+        var assignJobPosition = UpdateStaffSalary.builder()
+            .salary(salary)
+            .salaryType(salaryType)
+            .userLoginId(userLoginId)
+            .build();
         publish(assignJobPosition);
     }
 }

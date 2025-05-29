@@ -195,7 +195,6 @@ function InnerShiftScheduler() {
   const { permittedScopeIds, isFetched: scopesFetched, isFetching: scopesFetching } = scopeState.get();
 
   const canAdminShifts = useMemo(() => {
-    return true;
     return scopesFetched && permittedScopeIds.has(SHIFT_ADMIN_SCOPE);
   }, [permittedScopeIds, scopesFetched]);
 
@@ -524,7 +523,7 @@ function InnerShiftScheduler() {
         toast.success(`Đã xóa ${realIdsToDelete.length} ca thành công!`);
       },
       { onError: async (err) => { console.error("Error deleting selected shifts:", err.response?.data || err.message); toast.error("Lỗi khi xóa các ca đã chọn."); await refetchCurrentWeekShifts(); }},
-      null, { params: { ids: realIdsToDelete.join(',') } }
+      realIdsToDelete
     ).finally(() => { setIsPerformingApiAction(false); setIsDeleteSelectedModalOpen(false); });
   };
 
@@ -557,7 +556,7 @@ function InnerShiftScheduler() {
           const createNewUnassignedShiftReq = transformFrontendShiftToApiShiftRequest({ ...draggedShiftOriginal, userId: FRONTEND_UNASSIGNED_SHIFT_USER_ID, day: newDestDayString, slots: 1 });
           operations.push(request("post", "/shifts", null, {onError: (e) => {throw e}}, { shifts: [createNewUnassignedShiftReq] }));
         }
-        operations.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, null, {params: {ids: draggedShiftOriginal.id}}));
+        operations.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, [draggedShiftOriginal.id]));
       } else if (draggedShiftOriginal.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID && newDestUserIdForFrontend !== FRONTEND_UNASSIGNED_SHIFT_USER_ID) {
         involvesCreationForDrag = true;
         const createNewAssignedShiftReq = transformFrontendShiftToApiShiftRequest({ ...draggedShiftOriginal, userId: newDestUserIdForFrontend, day: newDestDayString, slots: undefined });
@@ -566,7 +565,7 @@ function InnerShiftScheduler() {
           const updateUnassignedReq = transformFrontendShiftToApiUpdateShiftRequest(draggedShiftOriginal.id, { slots: draggedShiftOriginal.slots - 1 });
           operations.push(request("put", `/shifts/${draggedShiftOriginal.id}`, null, {onError: (e) => {throw e}}, updateUnassignedReq));
         } else {
-          operations.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, null, {params: {ids: draggedShiftOriginal.id}}));
+          operations.push(request("delete", `/shifts`, null, {onError: (e) => {throw e}}, [draggedShiftOriginal.id]));
         }
       } else if (draggedShiftOriginal.userId === FRONTEND_UNASSIGNED_SHIFT_USER_ID && newDestUserIdForFrontend === FRONTEND_UNASSIGNED_SHIFT_USER_ID) {
         const updateUnassignedReq = transformFrontendShiftToApiUpdateShiftRequest(draggedShiftOriginal.id, { day: newDestDayString });

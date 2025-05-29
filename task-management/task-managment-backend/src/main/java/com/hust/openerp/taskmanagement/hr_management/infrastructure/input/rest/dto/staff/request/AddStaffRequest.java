@@ -3,6 +3,7 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.AddStaff;
+import com.hust.openerp.taskmanagement.hr_management.constant.SalaryType;
 import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -18,20 +19,29 @@ public class AddStaffRequest {
     private String fullname;
 
     private String userLoginId;
+    @NotNull
     private String email;
 
     private StaffStatus staffStatus;
+    @NotNull
     private String departmentCode;
+    @NotNull
     private String jobPositionCode;
+    @NotNull
+    private Integer salary;
+    @NotNull
+    private SalaryType salaryType;
 
     public AddStaff toUseCase(){
         return AddStaff.builder()
-                .fullName(fullname)
-                .userLoginId(userLoginId)
-                .email(email)
-                .staffStatus(staffStatus)
-                .departmentCode(departmentCode)
-                .jobPositionCode(jobPositionCode)
-                .build();
+            .fullName(fullname)
+            .userLoginId(userLoginId)
+            .email(email)
+            .staffStatus(staffStatus)
+            .departmentCode(departmentCode)
+            .jobPositionCode(jobPositionCode)
+            .salary(salary)
+            .salaryType(salaryType)
+            .build();
     }
 }
