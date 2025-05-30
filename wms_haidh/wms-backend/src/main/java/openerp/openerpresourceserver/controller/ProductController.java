@@ -1,7 +1,6 @@
 package openerp.openerpresourceserver.controller;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -176,23 +174,6 @@ public class ProductController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating product");
-		}
-	}
-
-	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
-	@PostMapping("/delete")
-	public ResponseEntity<String> deleteProduct(@RequestBody Map<String, Object> requestBody) {
-		try {
-			String id = (String) requestBody.get("id");
-			UUID uuid = UUID.fromString(id); // Convert the string to UUID
-			boolean isDeleted = productService.deleteProductById(uuid);
-			if (isDeleted) {
-				return ResponseEntity.ok("Product deleted successfully");
-			} else {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
-			}
-		} catch (IllegalArgumentException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid UUID format");
 		}
 	}
 

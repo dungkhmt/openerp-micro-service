@@ -47,7 +47,7 @@ const OrderDetail = () => {
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>
-          Sale Order Detail
+          Sales Order Detail
         </Typography>
       </Box>
 

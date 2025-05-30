@@ -43,13 +43,13 @@ export const warehousemanagerProcessReceipt = {
 export const warehousemanagerOrder = {
   id: "MENU_WMSv2_ADMIN.ORDER",
   icon: "SaleOrderIcon",
-  text: "Sale Orders",
+  text: "Sales Orders",
   child: [
     {
       id: "MENU_WMSv2_ADMIN.ORDER",
       path: "/warehouse-manager/orders",
       isPublic: false,
-      text: "Sale Orders",
+      text: "Sales Orders",
       child: [],
     }
   ],

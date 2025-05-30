@@ -82,6 +82,7 @@ menuIconMap.set("ProductIcon",<WidgetsIcon/>);
 menuIconMap.set("WarehouseIcon",<WarehouseIcon />);
 menuIconMap.set("RevenueIcon",<StackedLineChartIcon/>);
 menuIconMap.set("CategoryIcon",<PieChartIcon/>);
+menuIconMap.set("ProductInventoryIcon",<Inventory2Icon/>);
 menuIconMap.set("ReceiptIcon",<ReceiptLong />);
 menuIconMap.set("SupplierIcon",<HandshakeIcon />);
 menuIconMap.set("MoneyIcon",<MonetizationOnIcon/>);

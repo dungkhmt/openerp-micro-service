@@ -67,7 +67,6 @@ export default function ProductList() {
               </DropdownTrigger>
               <DropdownMenu>
                 <DropdownItem onPress={() => handleUpdate(item.id)}>Update</DropdownItem>
-                <DropdownItem onPress={() => handleDelete(item.id)}>Delete</DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
@@ -99,28 +98,6 @@ export default function ProductList() {
 
   const handleUpdate = (id) => {
     navigate(`/warehouse-manager/product/${id}`);
-  };
-
-  const handleDelete = (id) => {
-    request(
-      "post", // HTTP method
-      "/products/delete", // Endpoint for deleting product
-      (res) => {
-        if (res.status === 200) {
-          if (items.length === 1 && page > 1) setPage(page - 1);
-          request("get", `/products?page=${page - 1}&size=${rowsPerPage}&search=${debouncedSearchTerm}`, (res) => {
-            setItems(res.data.content);
-            setTotalItems(res.data.totalElements);
-            setPages(res.data.totalPages);
-          }).then();
-
-        }
-      },
-      {
-        onError: (e) => console.error("Error deleting product:", e),
-      },
-      { id }
-    );
   };
 
   const topContent = useMemo(() => {

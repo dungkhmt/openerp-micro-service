@@ -68,7 +68,7 @@ const SaleOrderDetail = () => {
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 2 }}>
-          Sale Order Details
+          Sales Order Details
         </Typography>
       </Box>
 
@@ -104,7 +104,7 @@ const SaleOrderDetail = () => {
       <Box sx={{ mt: 4 }}>
         <Paper elevation={3} sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
-            Sale order items
+            Sales order items
           </Typography>
           <TableContainer>
             <Table>

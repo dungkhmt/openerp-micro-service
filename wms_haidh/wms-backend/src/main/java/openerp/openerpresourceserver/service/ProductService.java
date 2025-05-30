@@ -22,8 +22,6 @@ public interface ProductService {
     Page<ProductInventoryProjection> getAllProductInventory(String searchTerm,Pageable pageable);
     
     Page<ProductGeneralProjection> getAllProductGeneral(String searchTerm,Pageable pageable);
-	
-	boolean deleteProductById(UUID id);
 
 	Product getProductById(UUID productId);
 

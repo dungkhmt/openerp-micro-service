@@ -200,7 +200,7 @@ const OrderItem = () => {
                 marginBottom: 2, // Khoảng cách bên dưới
               }}
             >
-              Sale order item
+              Sales order item
             </Typography>
             <Typography>
               <b>Product:</b>

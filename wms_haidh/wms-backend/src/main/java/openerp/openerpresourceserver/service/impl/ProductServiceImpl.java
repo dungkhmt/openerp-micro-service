@@ -44,15 +44,6 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public boolean deleteProductById(UUID id) {
-		if (productRepository.existsById(id)) {
-			productRepository.deleteById(id);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
 	public Product getProductById(UUID productId) {
 		Product product = productRepository.findById(productId).orElse(null);
 		if (product != null) {

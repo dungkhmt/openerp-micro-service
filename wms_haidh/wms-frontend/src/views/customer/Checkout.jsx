@@ -241,17 +241,17 @@ const Checkout = () => {
                 <DialogActions sx={{ justifyContent: "center" }}>
                     <Button
                         variant="contained"
-                        sx={{
-                            margin: 'auto',
-                            backgroundColor: '#019160',
-                            color: '#fff',
-                            '&:hover': {
-                                backgroundColor: '#2fbe8e',
-                            },
-                            '&:active': {
-                                backgroundColor: '#01b075',
-                            },
-                        }}
+                         sx={{
+                                margin: 'auto',
+                                backgroundColor: '#6fd649',
+                                color: '#fff',
+                                '&:hover': {
+                                    backgroundColor: '#4caf50',
+                                },
+                                '&:active': {
+                                    backgroundColor: '#3e8e41',
+                                },
+                            }}
                         onClick={() => navigate("/customer/order-history")}
                     >
                         View my orders

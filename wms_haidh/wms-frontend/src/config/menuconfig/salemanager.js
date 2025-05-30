@@ -15,13 +15,13 @@ export const salemanagerPriceConfig = {
 export const salemanagerOrders = {
   id: "MENU_WMSv2_SALE_MANAGER.ORDERS",
   icon: "SaleOrderIcon",
-  text: "Process Sale Orders",
+  text: "Process Sales Orders",
   child: [
     {
       id: "MENU_WMSv2_SALE_MANAGER.ORDERS",
       path: "/sale-manager/sale-order",
       isPublic: false,
-      text: "Sale Orders",
+      text: "Sales Orders",
       child: []
     },
   ],
