@@ -10,4 +10,5 @@ import java.util.UUID;
 
 public interface DistributeStrategy {
     Map<UUID, List<Order>> assignOrderToEmployees(Hub hub, List<Order> orders, List<Employee> employees);
+    String getName();
 }

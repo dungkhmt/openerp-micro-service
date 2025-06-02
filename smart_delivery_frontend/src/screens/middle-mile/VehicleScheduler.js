@@ -168,8 +168,14 @@ const VehicleScheduler = () => {
             },
             {
                 400: () => errorNoti("Dữ liệu không hợp lệ"),
-                500: () => errorNoti("Có lỗi xảy ra, vui lòng thử lại sau")
-            },
+                500: () => errorNoti("Có lỗi xảy ra, vui lòng thử lại sau"),
+                409: (e) => {
+                    const errorMessage = e.response?.data?.message ||
+                        e.response?.data?.error ||
+                        e.response?.data ||
+                        e.message;
+                    errorNoti(errorMessage);
+                }            },
             {
                 scheduleId: selectedRouteSchedule.id,
                 vehicleId: selectedVehicle.vehicleId,

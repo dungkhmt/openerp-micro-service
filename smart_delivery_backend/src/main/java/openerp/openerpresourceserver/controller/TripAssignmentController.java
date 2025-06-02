@@ -1,9 +1,11 @@
 package openerp.openerpresourceserver.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import openerp.openerpresourceserver.dto.OrderSummaryDTO;
 import openerp.openerpresourceserver.dto.TripDTO;
 import openerp.openerpresourceserver.dto.TripDetailsDTO;
+import openerp.openerpresourceserver.dto.TripUpdateDto;
 import openerp.openerpresourceserver.entity.Order;
 import openerp.openerpresourceserver.entity.Trip;
 import openerp.openerpresourceserver.entity.TripOrder;
@@ -33,6 +35,39 @@ public class TripAssignmentController {
     private final TripAssignmentService tripAssignmentService;
     private final TripService tripService;
 
+    @PreAuthorize("hasAnyRole('ADMIN','ROUTE_MANAGER','HUB_MANAGER')")
+    @GetMapping("/all")
+    public ResponseEntity<List<TripDTO>> getAllTrips() {
+        List<TripDTO> trips = tripService.getAllTrips();
+        return ResponseEntity.ok(trips);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TripDetailsDTO> getTripById(@PathVariable UUID id) {
+        TripDetailsDTO trip = tripService.getTripById(id);
+        return ResponseEntity.ok(trip);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','ROUTE_MANAGER')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTrip(@PathVariable UUID id) {
+        tripService.deleteTrip(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','ROUTE_MANAGER','DRIVER')")
+    @PutMapping("/{id}")
+    public ResponseEntity<Trip> updateTrip(
+            @PathVariable UUID id,
+            @RequestBody @Valid TripUpdateDto tripUpdateDTO,
+            Principal principal) {
+
+        // Set changedBy từ principal
+        String changedBy = principal.getName();
+
+        Trip updatedTrip = tripService.updateTrip(id, tripUpdateDTO, changedBy);
+        return ResponseEntity.ok(updatedTrip);
+    }
     @PreAuthorize("hasAnyRole('ROUTE_MANAGER')")
     @PostMapping("/weekly/create")
     public ResponseEntity<List<Trip>> createTripThisWeek(){
@@ -61,7 +96,7 @@ public class TripAssignmentController {
         return ResponseEntity.ok(trips);
     }
 
-
+    @PreAuthorize("hasAnyRole('ADMIN','ROUTE_MANAGER')")
     @PostMapping("/create-from-to")
     public ResponseEntity<List<Trip>> createTripsFromTo(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,

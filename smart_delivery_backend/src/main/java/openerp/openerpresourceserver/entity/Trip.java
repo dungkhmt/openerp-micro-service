@@ -9,6 +9,7 @@ import java.sql.Date;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
@@ -48,6 +49,7 @@ public class Trip {
     @Column(name = "start_time", nullable = true)
     private Instant startTime;
 
+    private LocalTime plannedStartTime;
     /**
      * When the trip was completed
      */

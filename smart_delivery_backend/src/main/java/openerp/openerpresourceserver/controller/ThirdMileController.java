@@ -26,7 +26,6 @@ public class ThirdMileController {
     private final ShipperAssignmentService shipperAssignmentService;
     private final DeliveryTrackingService deliveryTrackingService;
     private final RouteOptimizationService routeOptimizationService;
-    private final DeliveryAnalyticsService deliveryAnalyticsService;
     private final DeliveryConfirmationService deliveryConfirmationService;
 
     /**
@@ -122,45 +121,6 @@ public class ThirdMileController {
     @GetMapping("/order/{orderId}/estimated-delivery")
     public ResponseEntity<String> getEstimatedDeliveryTime(@PathVariable UUID orderId) {
         return ResponseEntity.ok(routeOptimizationService.calculateEstimatedDeliveryTime(orderId));
-    }
-
-    /**
-     * Get delivery analytics by hub
-     */
-    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER')")
-    @GetMapping("/analytics/hub/{hubId}")
-    public ResponseEntity<DeliveryAnalyticsDTO> getDeliveryAnalytics(@PathVariable UUID hubId) {
-        return ResponseEntity.ok(deliveryAnalyticsService.getDeliveryAnalytics(hubId));
-    }
-
-    /**
-     * Get shipper performance metrics
-     */
-    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER')")
-    @GetMapping("/analytics/shipper/{shipperId}")
-    public ResponseEntity<DeliveryAnalyticsDTO.ShipperPerformanceDTO> getShipperPerformance(@PathVariable UUID shipperId) {
-        return ResponseEntity.ok(deliveryAnalyticsService.getShipperPerformance(shipperId));
-    }
-
-    /**
-     * Get analytics by date range
-     */
-    @PreAuthorize("hasAnyRole('ADMIN', 'HUB_MANAGER')")
-    @GetMapping("/analytics/hub/{hubId}/range")
-    public ResponseEntity<DeliveryAnalyticsDTO> getAnalyticsByDateRange(
-            @PathVariable UUID hubId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return ResponseEntity.ok(deliveryAnalyticsService.getDeliveryAnalyticsByDateRange(hubId, startDate, endDate));
-    }
-
-    /**
-     * Get aggregated performance metrics
-     */
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    @GetMapping("/analytics/global")
-    public ResponseEntity<DeliveryAnalyticsDTO> getGlobalAnalytics() {
-        return ResponseEntity.ok(deliveryAnalyticsService.getAggregatedPerformanceMetrics());
     }
 
     /**

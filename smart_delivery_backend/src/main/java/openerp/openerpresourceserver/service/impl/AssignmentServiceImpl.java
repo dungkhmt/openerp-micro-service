@@ -7,6 +7,7 @@ import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.entity.enumentity.*;
 import openerp.openerpresourceserver.repository.*;
 import openerp.openerpresourceserver.service.AssignmentService;
+import openerp.openerpresourceserver.service.NotificationsService;
 import openerp.openerpresourceserver.utils.DistanceCalculator.HaversineDistanceCalculator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     @Autowired private DriverRepo driverRepo;
     @Autowired private TripRepository tripRepository;
     @Autowired private TripOrderRepository tripOrderRepository;
+    @Autowired private NotificationsService notificationsService;
 
     @Autowired private RouteScheduleRepository routeScheduleRepository;
     @Autowired private RouteStopRepository routeStopRepository;
@@ -105,15 +107,50 @@ public class AssignmentServiceImpl implements AssignmentService {
                 .orElseThrow(() -> new NotFoundException("Assignment not found"));
 
         assignment.setStatus(status);
-
+        Order order = orderRepo.findById(assignment.getOrderId())
+                .orElseThrow(() -> new NotFoundException("Order not found"));
         // If assignment is completed, update the order status accordingly
         if (status == CollectorAssignmentStatus.COMPLETED) {
-            Order order = orderRepo.findById(assignment.getOrderId())
-                    .orElseThrow(() -> new NotFoundException("Order not found"));
+
             order.setStatus(OrderStatus.COLLECTED_COLLECTOR);
+            order.setChangedBy(principal.getName());
+        }
+        else if (status == CollectorAssignmentStatus.FAILED_ONCE) {
+            order.setCollectAttemptCount(order.getCollectAttemptCount() + 1);
+            if(order.getCollectAttemptCount() >= 2) {
+                order.setStatus(OrderStatus.CANCELLED);
+                sendCancelledNotification(order, "Đơn hàng đã bị hủy do không thể thu gom sau 2 lần thử. ");
+            }
+            else{
+            order.setStatus(OrderStatus.COLLECT_FAILED);
+            }
+            order.setChangedBy(principal.getName());
         }
 
+        orderRepo.save(order);
         assignOrderCollectorRepository.save(assignment);
+    }
+    private void sendCancelledNotification(Order order, String reason) {
+        try {
+
+            String senderUsername = order.getCreatedBy();
+            String message = "Rất tiếc, đơn hàng của bạn đã bị hủy. " + reason +
+                    "Hãy liên lạc với chúng tôi để biết thêm chi tiết.";
+            String url = "/order/view/" + order.getId();
+
+            notificationsService.create(
+                    "SYSTEM", // fromUser
+                    senderUsername, // toUser
+                    message,
+                    url
+            );
+
+            log.info("Sent delivery cancellation notification for order {} to sender {}",
+                    order.getId(), order.getSenderId());
+        } catch (Exception e) {
+            log.error("Failed to send cancellation notification for order {}: {}",
+                    order.getId(), e.getMessage(), e);
+        }
     }
 
     @Override

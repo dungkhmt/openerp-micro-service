@@ -26,6 +26,7 @@ public class OrderItem {
     @GeneratedValue
     private UUID orderItemId;
     private UUID orderId;
+    private String code;
     @Column(nullable = false)
     private String name;
     private Integer quantity;

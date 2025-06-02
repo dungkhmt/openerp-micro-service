@@ -96,4 +96,23 @@ public interface OrderService {
     // New methods for order history
     List<CollectorOrderHistoryDto> getCollectorOrderHistory(UUID collectorId, LocalDate startDate, LocalDate endDate);
     List<ShipperOrderHistoryDto> getShipperOrderHistory(UUID shipperId, LocalDate startDate, LocalDate endDate);
+    /**
+     * Tạo đề xuất phân công mà không lưu vào database
+     */
+    List<OrderResponseCollectorShipperDto> suggestOrderToCollectorAssignment(
+            UUID hubId,
+            List<OrderRequestDto> orders,
+            List<EmployeeDTO> collectors
+    );
+
+    /**
+     * Xác nhận và lưu phân công vào database
+     */
+    List<OrderResponseCollectorShipperDto> confirmOrderToCollectorAssignment(
+            Principal principal,
+            UUID hubId,
+            List<ConfirmAssignmentDto.AssignmentDetailDto> assignments
+    );
+
+    List<OrderSummaryDTO> getFailedShippedOrders(UUID hubId);
 }

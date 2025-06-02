@@ -24,6 +24,7 @@ public class GAOrderAssignmentStrategy implements DistributeStrategy {
     private static final int POPULATION_SIZE = 50;
     private static final double CROSSOVER_RATE = 0.8;
     private static final double MUTATION_RATE = 0.1;
+    private String name = "GAStrategy";
     @Autowired
     private SenderRepo senderRepo;
     @Autowired
@@ -52,6 +53,12 @@ public class GAOrderAssignmentStrategy implements DistributeStrategy {
         this.senderMap = senderMap;
         this.recipientMap = recipientMap;
     }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
     private void initializeDistanceMatrix(List<Order> orderList, List<Employee> employees) {
         int size = orderList.size();
         distanceMatrix = new double[size][size]; // Khởi tạo mảng 2 chiều

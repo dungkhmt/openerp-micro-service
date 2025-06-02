@@ -1,5 +1,6 @@
 package openerp.openerpresourceserver.service;
 
+import jakarta.validation.Valid;
 import openerp.openerpresourceserver.dto.*;
 import openerp.openerpresourceserver.entity.RouteStop;
 import openerp.openerpresourceserver.entity.Trip;
@@ -60,4 +61,12 @@ public interface TripService {
     List<TripDTO> getTripsForHubTodayThrough(UUID hubId);
 
     TripHistoryResponseDto getTripHistoryWithDetails(UUID tripId);
+
+    List<TripDTO> getAllTrips();
+
+    TripDetailsDTO getTripById(UUID id);
+
+    void deleteTrip(UUID id);
+
+    Trip updateTrip(UUID id, TripUpdateDto tripUpdateDTO, String changedBy);
 }

@@ -69,6 +69,32 @@ const DriverSchedule = () => {
         }
     };
 
+    // Helper function to translate status to Vietnamese
+    const getStatusText = (status) => {
+        switch (status) {
+            case 'PLANNED': return 'PLANNED';
+            case 'IN_PROGRESS': return 'Đang thực hiện';
+            case 'CONFIRMED_IN': return 'Đã xác nhận';
+            case 'CAME_FIRST_STOP': return 'Đã đến điểm đầu';
+            case 'READY_FOR_PICKUP': return 'Sẵn sàng lấy hàng';
+            case 'COMPLETED': return 'Hoàn thành';
+            case 'CANCELLED': return 'Đã hủy';
+            default: return status;
+        }
+    };
+
+    // Helper function to format time display
+    const formatTime = (timeString) => {
+        if (!timeString) return '';
+        // Handle both full datetime and time-only strings
+        if (timeString.includes('T')) {
+            return new Date(timeString).toLocaleTimeString();
+        } else {
+            // For time-only strings like "12:32:00"
+            return timeString.substring(0, 5); // Remove seconds, show HH:MM
+        }
+    };
+
     // Fetch all trips and vehicle data on component mount
     useEffect(() => {
         fetchDriverData();
@@ -112,10 +138,11 @@ const DriverSchedule = () => {
             await request('get', '/smdeli/driver/vehicle', (res) => {
                 setVehicle(res.data);
             });
+
             setLoading(false);
         } catch (error) {
             console.error("Error fetching driver data:", error);
-            errorNoti("Failed to load driver data");
+            errorNoti("Không thể tải dữ liệu tài xế");
             setLoading(false);
         }
     };
@@ -127,7 +154,7 @@ const DriverSchedule = () => {
             });
         } catch (error) {
             console.error("Error fetching trip details:", error);
-            errorNoti("Failed to load trip details");
+            errorNoti("Không thể tải chi tiết chuyến đi");
         }
     };
 
@@ -137,7 +164,7 @@ const DriverSchedule = () => {
                 'post',
                 `/smdeli/driver/trips/${tripId}/start`,
                 (res) => {
-                    successNoti("Trip started successfully");
+                    successNoti("Bắt đầu chuyến đi thành công");
                     setTripDetails(res.data);
                     // Refresh all trips data
                     fetchDriverData();
@@ -145,15 +172,23 @@ const DriverSchedule = () => {
             );
         } catch (error) {
             console.error("Error starting trip:", error);
-            errorNoti("Failed to start trip");
+            errorNoti("Không thể bắt đầu chuyến đi");
         }
     };
 
     // Helper to get formatted day of week
     const formatDayOfWeek = (dayOfWeek) => {
         if (!dayOfWeek) return '';
-        // Convert MONDAY to Monday
-        return dayOfWeek.charAt(0) + dayOfWeek.slice(1).toLowerCase();
+        const days = {
+            'MONDAY': 'Thứ Hai',
+            'TUESDAY': 'Thứ Ba',
+            'WEDNESDAY': 'Thứ Tư',
+            'THURSDAY': 'Thứ Năm',
+            'FRIDAY': 'Thứ Sáu',
+            'SATURDAY': 'Thứ Bảy',
+            'SUNDAY': 'Chủ Nhật'
+        };
+        return days[dayOfWeek] || dayOfWeek;
     };
 
     const handleAdvanceTrip = async (tripId) => {
@@ -162,7 +197,7 @@ const DriverSchedule = () => {
                 'post',
                 `/smdeli/driver/trips/${tripId}/advance`,
                 (res) => {
-                    successNoti("Advanced to next stop");
+                    successNoti("Đã chuyển đến điểm dừng tiếp theo");
                     setTripDetails(res.data);
                     // Refresh all trips data
                     fetchDriverData();
@@ -170,7 +205,7 @@ const DriverSchedule = () => {
             );
         } catch (error) {
             console.error("Error advancing trip:", error);
-            errorNoti("Failed to advance trip");
+            errorNoti("Không thể chuyển đến điểm dừng tiếp theo");
         }
     };
 
@@ -180,7 +215,7 @@ const DriverSchedule = () => {
                 'post',
                 `/smdeli/driver/trips/${tripId}/complete`,
                 (res) => {
-                    successNoti("Trip completed successfully");
+                    successNoti("Hoàn thành chuyến đi thành công");
                     setTripDetails(null);
                     setSelectedTrip(null);
                     setCompleteTripDialogOpen(false);
@@ -188,14 +223,14 @@ const DriverSchedule = () => {
                     fetchDriverData();
                 },
                 {
-                    400: () => errorNoti("Unable to complete trip"),
-                    401: () => errorNoti("Unauthorized action")
+                    400: () => errorNoti("Không thể hoàn thành chuyến đi"),
+                    401: () => errorNoti("Không có quyền thực hiện hành động này")
                 },
                 { notes: completionNotes }
             );
         } catch (error) {
             console.error("Error completing trip:", error);
-            errorNoti("Failed to complete trip");
+            errorNoti("Không thể hoàn thành chuyến đi");
         }
     };
 
@@ -207,7 +242,7 @@ const DriverSchedule = () => {
     // If user wants to create a trip for today
     const handleCreateTrip = (routeScheduleId) => {
         if (!routeScheduleId) {
-            errorNoti("No route schedule selected");
+            errorNoti("Không có lịch trình tuyến đường được chọn");
             return;
         }
         try {
@@ -215,21 +250,21 @@ const DriverSchedule = () => {
                 'post',
                 '/smdeli/driver/trip/start',
                 (res) => {
-                    successNoti("Trip created successfully");
+                    successNoti("Tạo chuyến đi thành công");
                     // Set the new trip as selected
                     setSelectedTrip(res.data.id);
                     // Refresh trips data
                     fetchDriverData();
                 },
                 {
-                    401: () => errorNoti("Unauthorized action"),
-                    400: () => errorNoti("Unable to create trip")
+                    401: () => errorNoti("Không có quyền thực hiện hành động này"),
+                    400: () => errorNoti("Không thể tạo chuyến đi")
                 },
                 { routeVehicleId: routeScheduleId }
             );
         } catch (error) {
             console.error("Error creating trip:", error);
-            errorNoti("Failed to create trip");
+            errorNoti("Không thể tạo chuyến đi");
         }
     };
 
@@ -252,7 +287,7 @@ const DriverSchedule = () => {
                     primary={
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Typography variant="subtitle1">
-                                {trip.routeName || `Trip #${trip.id.substring(0, 8)}`}
+                                {trip.routeName || `Chuyến #${trip.id.substring(0, 8)}`}
                                 {trip.routeCode && (
                                     <Typography component="span" variant="body2" color="text.secondary" sx={{ ml: 1 }}>
                                         ({trip.routeCode})
@@ -260,7 +295,7 @@ const DriverSchedule = () => {
                                 )}
                             </Typography>
                             <Chip
-                                label={trip.status}
+                                label={getStatusText(trip.status)}
                                 color={getStatusColor(trip.status)}
                                 size="small"
                             />
@@ -270,32 +305,37 @@ const DriverSchedule = () => {
                         <Box sx={{ mt: 1 }}>
                             {trip.dayOfWeek && (
                                 <Typography variant="body2" color="text.secondary">
-                                    Day: {formatDayOfWeek(trip.dayOfWeek)}
+                                    Ngày: {formatDayOfWeek(trip.dayOfWeek)}
                                 </Typography>
                             )}
                             <Typography variant="body2" color="text.secondary">
-                                Date: {trip.date}
+                                Ngày tháng: {trip.date}
                             </Typography>
+                            {trip.plannedStartTime && (
+                                <Typography variant="body2" color="text.secondary">
+                                    Thời gian bắt đầu dự kiến: {formatTime(trip.plannedStartTime)}
+                                </Typography>
+                            )}
                             {trip.status === 'IN_PROGRESS' || trip.status === 'CONFIRMED_IN' ? (
                                 <Typography variant="body2" color="text.secondary">
-                                    Stop {trip.currentStopIndex + 1} of {trip.totalStops}
+                                    Điểm dừng {trip.currentStopIndex + 1} / {trip.totalStops}
                                 </Typography>
                             ) : (
                                 <Typography variant="body2" color="text.secondary">
-                                    Stops: {trip.totalStops}
+                                    Điểm dừng: {trip.totalStops}
                                 </Typography>
                             )}
                             <Typography variant="body2" color="text.secondary">
-                                Orders: {trip.ordersDelivered || 0}/{trip.ordersCount || 0}
+                                Đơn hàng: {trip.ordersDelivered || 0}/{trip.ordersCount || 0}
                             </Typography>
                             {trip.startTime && (
                                 <Typography variant="body2" color="text.secondary">
-                                    Started: {new Date(trip.startTime).toLocaleTimeString()}
+                                    Bắt đầu: {formatTime(trip.startTime)}
                                 </Typography>
                             )}
                             {trip.endTime && (
                                 <Typography variant="body2" color="text.secondary">
-                                    Completed: {new Date(trip.endTime).toLocaleTimeString()}
+                                    Hoàn thành: {formatTime(trip.endTime)}
                                 </Typography>
                             )}
                         </Box>
@@ -317,7 +357,7 @@ const DriverSchedule = () => {
         <Box sx={{ p: 3 }}>
             <Typography variant="h4" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
                 <ScheduleIcon sx={{ mr: 2 }} />
-                Driver Schedule & Orders
+                Lịch trình các chuyến đi hôm nay
             </Typography>
 
             <Grid container spacing={3}>
@@ -328,7 +368,7 @@ const DriverSchedule = () => {
                             title={
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                     <EventIcon sx={{ mr: 1 }} />
-                                    <Typography variant="h6">Today's Trips</Typography>
+                                    <Typography variant="h6">Chuyến đi hôm nay</Typography>
                                 </Box>
                             }
                         />
@@ -338,7 +378,7 @@ const DriverSchedule = () => {
                             {trips.otherTrips.length > 0 && (
                                 <>
                                     <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, color: 'secondary.main' }}>
-                                        Other Trips ({trips.otherTrips.length})
+                                        Chuyến đi khác ({trips.otherTrips.length})
                                     </Typography>
                                     <List>
                                         {trips.otherTrips.map(renderTripItem)}
@@ -350,7 +390,7 @@ const DriverSchedule = () => {
                             {trips.scheduledTrips.length > 0 && (
                                 <>
                                     <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: trips.otherTrips.length > 0 ? 2 : 0, color: 'info.main' }}>
-                                        Scheduled ({trips.scheduledTrips.length})
+                                        Đã lên lịch ({trips.scheduledTrips.length})
                                     </Typography>
                                     <List>
                                         {trips.scheduledTrips.map(renderTripItem)}
@@ -362,7 +402,7 @@ const DriverSchedule = () => {
                             {trips.activeTrips.length > 0 && (
                                 <>
                                     <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: (trips.otherTrips.length > 0 || trips.scheduledTrips.length > 0) ? 2 : 0, color: 'warning.main' }}>
-                                        In Progress ({trips.activeTrips.length})
+                                        Đang thực hiện ({trips.activeTrips.length})
                                     </Typography>
                                     <List>
                                         {trips.activeTrips.map(renderTripItem)}
@@ -374,7 +414,7 @@ const DriverSchedule = () => {
                             {trips.completedTrips.length > 0 && (
                                 <>
                                     <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, mt: (trips.otherTrips.length > 0 || trips.scheduledTrips.length > 0 || trips.activeTrips.length > 0) ? 2 : 0, color: 'success.main' }}>
-                                        Completed Today ({trips.completedTrips.length})
+                                        Đã hoàn thành hôm nay ({trips.completedTrips.length})
                                     </Typography>
                                     <List>
                                         {trips.completedTrips.map(renderTripItem)}
@@ -387,9 +427,7 @@ const DriverSchedule = () => {
                                 trips.completedTrips.length === 0 && trips.otherTrips.length === 0 && (
                                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 4 }}>
                                         <ScheduleIcon sx={{ fontSize: 60, color: 'text.disabled', mb: 2 }} />
-                                        <Typography variant="h6" color="text.secondary">No trips scheduled for today</Typography>
-
-
+                                        <Typography variant="h6" color="text.secondary">Không có chuyến đi nào được lên lịch hôm nay</Typography>
                                     </Box>
                                 )}
                         </CardContent>
@@ -411,7 +449,7 @@ const DriverSchedule = () => {
                                                 <ArrowBackIcon />
                                             </IconButton>
                                             <Typography variant="h6">
-                                                Trip Details
+                                                Chi tiết chuyến đi
                                             </Typography>
                                         </Box>
                                         {/* Action buttons based on trip status */}
@@ -424,7 +462,7 @@ const DriverSchedule = () => {
                                                         startIcon={<PlayArrowIcon />}
                                                         onClick={() => handleStartTrip(tripDetails.id)}
                                                     >
-                                                        Start Trip
+                                                        Bắt đầu
                                                     </Button>
                                                 )}
                                                 {tripDetails.status !== 'PLANNED' && tripDetails.status !== 'COMPLETED' && (
@@ -434,7 +472,7 @@ const DriverSchedule = () => {
                                                         startIcon={<CheckIcon />}
                                                         onClick={() => history.push(`/middle-mile/driver/route/${tripDetails.routeScheduleId}?tripId=${tripDetails.id}`)}
                                                     >
-                                                        Details
+                                                        Chi tiết
                                                     </Button>
                                                 )}
                                             </Box>
@@ -455,22 +493,27 @@ const DriverSchedule = () => {
                                         {/* Trip Summary */}
                                         <Grid item xs={12}>
                                             <Typography variant="h6" gutterBottom>
-                                                Trip Summary
+                                                Tổng quan chuyến đi
                                             </Typography>
                                             <Box sx={{ mb: 2 }}>
                                                 <Typography variant="body2" color="text.secondary">
-                                                    <strong>Route:</strong> {tripDetails.routeName}
+                                                    <strong>Tuyến đường:</strong> {tripDetails.routeName}
                                                 </Typography>
                                                 <Typography variant="body2" color="text.secondary">
-                                                    <strong>Route Code:</strong> {tripDetails.routeCode}
+                                                    <strong>Mã tuyến:</strong> {tripDetails.routeCode}
                                                 </Typography>
                                                 <Typography variant="body2" color="text.secondary">
-                                                    <strong>Date:</strong> {tripDetails.date}
+                                                    <strong>Ngày:</strong> {tripDetails.date}
                                                 </Typography>
+                                                {tripDetails.plannedStartTime && (
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        <strong>Thời gian dự kiến:</strong> {formatTime(tripDetails.plannedStartTime)}
+                                                    </Typography>
+                                                )}
                                                 <Typography variant="body2" color="text.secondary">
-                                                    <strong>Status:</strong>
+                                                    <strong>Trạng thái:</strong>
                                                     <Chip
-                                                        label={tripDetails.status}
+                                                        label={getStatusText(tripDetails.status)}
                                                         color={getStatusColor(tripDetails.status)}
                                                         size="small"
                                                         sx={{ ml: 1 }}
@@ -483,7 +526,7 @@ const DriverSchedule = () => {
                                         <Grid item xs={12}>
                                             <Typography variant="h6" gutterBottom>
                                                 <DirectionsIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                                                Stops ({tripDetails.currentStopIndex + 1}/{tripDetails.totalStops})
+                                                Điểm dừng ({tripDetails.currentStopIndex + 1}/{tripDetails.totalStops})
                                             </Typography>
                                             <List sx={{ bgcolor: 'background.paper', borderRadius: 1 }}>
                                                 {tripDetails.stops && tripDetails.stops.map((stop, index) => (
@@ -498,7 +541,8 @@ const DriverSchedule = () => {
                                                         <ListItem
                                                             secondaryAction={
                                                                 <Chip
-                                                                    label={stop.status}
+                                                                    label={stop.status === 'CURRENT' ? 'Hiện tại' :
+                                                                        stop.status === 'COMPLETED' ? 'Hoàn thành' : stop.status}
                                                                     color={
                                                                         stop.status === 'CURRENT' ? 'warning' :
                                                                             stop.status === 'COMPLETED' ? 'success' : 'default'
@@ -519,11 +563,11 @@ const DriverSchedule = () => {
                                                                             {stop.address}
                                                                         </Typography>
                                                                         <Typography variant="body2" color="text.secondary">
-                                                                            Orders: {stop.orderCount || 0}
+                                                                            Đơn hàng: {stop.orderCount || 0}
                                                                         </Typography>
                                                                         {stop.estimatedArrivalTime && (
                                                                             <Typography variant="body2" color="text.secondary">
-                                                                                ETA: {stop.estimatedArrivalTime}
+                                                                                Thời gian dự kiến đến: {stop.estimatedArrivalTime}
                                                                             </Typography>
                                                                         )}
                                                                     </>
@@ -549,13 +593,13 @@ const DriverSchedule = () => {
                 maxWidth="sm"
                 fullWidth
             >
-                <DialogTitle>Complete Trip</DialogTitle>
+                <DialogTitle>Hoàn thành chuyến đi</DialogTitle>
                 <DialogContent>
                     <Typography gutterBottom>
-                        Are you sure you want to mark this trip as completed?
+                        Bạn có chắc chắn muốn đánh dấu chuyến đi này là đã hoàn thành?
                     </Typography>
                     <TextField
-                        label="Completion Notes (optional)"
+                        label="Ghi chú hoàn thành (tùy chọn)"
                         fullWidth
                         multiline
                         rows={4}
@@ -565,13 +609,13 @@ const DriverSchedule = () => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setCompleteTripDialogOpen(false)}>Cancel</Button>
+                    <Button onClick={() => setCompleteTripDialogOpen(false)}>Hủy</Button>
                     <Button
                         variant="contained"
                         color="primary"
                         onClick={() => handleCompleteTrip(selectedTrip)}
                     >
-                        Complete Trip
+                        Hoàn thành
                     </Button>
                 </DialogActions>
             </Dialog>

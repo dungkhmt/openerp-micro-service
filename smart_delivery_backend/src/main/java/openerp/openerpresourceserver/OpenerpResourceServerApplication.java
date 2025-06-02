@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 @SpringBootApplication
+@EnableJpaAuditing
 public class OpenerpResourceServerApplication {
 
     public static void main(String[] args) {

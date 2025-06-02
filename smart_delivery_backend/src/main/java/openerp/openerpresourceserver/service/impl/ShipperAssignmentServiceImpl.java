@@ -9,6 +9,7 @@ import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.entity.enumentity.OrderStatus;
 import openerp.openerpresourceserver.entity.enumentity.ShipperAssignmentStatus;
 import openerp.openerpresourceserver.repository.*;
+import openerp.openerpresourceserver.service.NotificationsService;
 import openerp.openerpresourceserver.service.ShipperAssignmentService;
 import openerp.openerpresourceserver.utils.GAAutoAssign.GAAutoAssign;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,118 @@ public class ShipperAssignmentServiceImpl implements ShipperAssignmentService {
     private final AssignOrderShipperRepository assignOrderShipperRepository;
     private final GAAutoAssign gaAutoAssign;
     private final RecipientRepo recipientRepo;
+    private final SenderRepo senderRepo;
+    private final NotificationsService notificationsService;
 
+    @Override
+    public List<OrderResponseCollectorShipperDto> suggestOrdersToShippers(
+            UUID hubId,
+            List<OrderRequestDto> orders,
+            List<EmployeeDTO> shippers) {
+
+        if (hubId == null || orders.isEmpty() || shippers.isEmpty()) {
+            throw new IllegalArgumentException("Missing required data for shipper assignment suggestion");
+        }
+
+        // Tìm hub
+        Hub hub = hubRepo.findById(hubId)
+                .orElseThrow(() -> new NotFoundException("Hub not found"));
+
+        // Chuẩn bị dữ liệu
+        List<Employee> shipperList = new ArrayList<>();
+        for (EmployeeDTO shipperDto : shippers) {
+            Shipper shipper = shipperRepo.findById(shipperDto.getId())
+                    .orElseThrow(() -> new NotFoundException("Shipper not found"));
+            shipperList.add(shipper);
+        }
+
+        List<Order> orderList = new ArrayList<>();
+        for (OrderRequestDto orderDto : orders) {
+            Order order = orderRepo.findById(orderDto.getId())
+                    .orElseThrow(() -> new NotFoundException("Order not found"));
+            orderList.add(order);
+        }
+
+        // Sử dụng thuật toán để tạo đề xuất (KHÔNG lưu vào DB)
+        Map<UUID, List<Order>> orderShipperMap = gaAutoAssign.autoAssignOrderToEmployee(
+                hub, orderList, shipperList);
+
+        // Tạo response với thông tin đề xuất
+        List<OrderResponseCollectorShipperDto> suggestions = new ArrayList<>();
+        for (Map.Entry<UUID, List<Order>> entry : orderShipperMap.entrySet()) {
+            UUID shipperId = entry.getKey();
+            String shipperName = shipperRepo.findById(shipperId).get().getName();
+            int sequenceNumber = 1;
+
+            for (Order order : entry.getValue()) {
+                OrderResponseCollectorShipperDto suggestion = OrderResponseCollectorShipperDto.builder()
+                        .id(order.getId())
+                        .shipperId(shipperId)
+                        .shipperName(shipperName)
+                        .sequenceNumber(sequenceNumber++)
+                        .senderName(order.getSenderName())
+                        .recipientName(order.getRecipientName())
+                        .status(OrderStatus.DELIVERED) // Trạng thái hiện tại của order
+                        .build();
+                suggestions.add(suggestion);
+            }
+        }
+
+        return suggestions;
+    }
+
+    @Override
+    @Transactional
+    public List<OrderResponseCollectorShipperDto> confirmOrdersToShippers(
+            Principal principal,
+            UUID hubId,
+            List<ConfirmAssignmentDto.AssignmentDetailDto> assignments) {
+
+        if (assignments.isEmpty()) {
+            throw new RuntimeException("No assignments to confirm");
+        }
+
+        List<AssignOrderShipper> assignOrderShippers = new ArrayList<>();
+        List<Order> ordersToUpdate = new ArrayList<>();
+        List<OrderResponseCollectorShipperDto> responses = new ArrayList<>();
+
+        for (ConfirmAssignmentDto.AssignmentDetailDto assignment : assignments) {
+            // Tìm order
+            Order order = orderRepo.findById(assignment.getOrderId())
+                    .orElseThrow(() -> new NotFoundException("Order not found"));
+
+            // Cập nhật trạng thái order
+            order.setStatus(OrderStatus.ASSIGNED_SHIPPER);
+            order.setChangedBy(principal.getName());
+            ordersToUpdate.add(order);
+
+            // Tạo AssignOrderShipper
+            AssignOrderShipper assignOrderShipper = new AssignOrderShipper();
+            assignOrderShipper.setOrderId(assignment.getOrderId());
+            assignOrderShipper.setShipperId(assignment.getEmployeeId());
+            assignOrderShipper.setShipperName(assignment.getEmployeeName());
+            assignOrderShipper.setSequenceNumber(assignment.getSequenceNumber());
+            assignOrderShipper.setStatus(ShipperAssignmentStatus.ASSIGNED);
+            assignOrderShipper.setDeliveryAttempts(0);
+            assignOrderShipper.setCreatedBy(principal.getName());
+            assignOrderShippers.add(assignOrderShipper);
+
+            // Tạo response
+            OrderResponseCollectorShipperDto response = OrderResponseCollectorShipperDto.builder()
+                    .id(order.getId())
+                    .shipperId(assignment.getEmployeeId())
+                    .shipperName(assignment.getEmployeeName())
+                    .status(OrderStatus.ASSIGNED_SHIPPER)
+                    .build();
+            responses.add(response);
+        }
+
+        // Lưu tất cả vào database
+        orderRepo.saveAll(ordersToUpdate);
+        assignOrderShipperRepository.saveAll(assignOrderShippers);
+
+        return responses;
+    }
     @Override
     public List<OrderSummaryDTO> getPendingDeliveryOrders(UUID hubId) {
         // Get orders that have arrived at the destination hub and are ready for delivery
@@ -187,19 +299,155 @@ public class ShipperAssignmentServiceImpl implements ShipperAssignmentService {
         if(status == ShipperAssignmentStatus.COMPLETED) {
            order.setChangedBy(principal.getName());
            order.setStatus(OrderStatus.COMPLETED);
+           sendDeliveryNotification(order);
         }
-        if(status == ShipperAssignmentStatus.FAILED_ATTEMPT) {
+        else if(status == ShipperAssignmentStatus.FAILED_ATTEMPT) {
             order.setChangedBy(principal.getName());
             order.setStatus(OrderStatus.SHIPPED_FAILED);
             order.setShipAttemptCount(order.getShipAttemptCount() + 1);
-            if(order.getShipAttemptCount() >= 2) {
-                order.setStatus(OrderStatus.CANCELLED_SHIP);
-            }
+
+            // Send notification to sender about failed delivery
+
+            // If this is the third attempt, mark as cancelled and notify
+//            if(order.getShipAttemptCount() >= 2) {
+//                order.setStatus(OrderStatus.CANCELLED_SHIP);
+//                sendDeliveryCancelledNotification(order);
+//            }
+//            else{
+//                sendFailedDeliveryNotification(order, order.getShipAttemptCount());
+//
+//            }
+        }
+        else if(status == ShipperAssignmentStatus.CANCELED) {
+            order.setChangedBy(principal.getName());
+            order.setStatus(OrderStatus.CANCELLED_SHIP);
+
+            // Send notification to sender about cancelled delivery
+            sendDeliveryCancelledNotification(order);
+        }
+
+        else if(status == ShipperAssignmentStatus.RETURNED_TO_HUB) {
+            order.setChangedBy(principal.getName());
+            order.setStatus(OrderStatus.RETURNED_HUB_AFTER_SHIP_FAIL);
+
+            // Send notification to sender about order being returned to hub
+            sendReturnedToHubNotification(order);
         }
         assignOrderShipperRepository.save(assignment);
         orderRepo.save(order);
     }
+    /**
+     * Sends a notification to the sender that their order has been successfully delivered
+     */
+    private void sendDeliveryNotification(Order order) {
+        try {
+            Sender sender = senderRepo.findById(order.getSenderId())
+                    .orElseThrow(() -> new NotFoundException("Sender not found with ID: " + order.getSenderId()));
 
+            String senderUsername = order.getCreatedBy();
+            String message = "Great news! Your order has been successfully delivered.";
+            String url = "/order/view/" + order.getId();
+
+            notificationsService.create(
+                    "SYSTEM", // fromUser
+                    senderUsername, // toUser (use email or ID)
+                    message,
+                    url
+            );
+
+            log.info("Sent delivery completion notification for order {} to sender {}",
+                    order.getId(), order.getSenderId());
+        } catch (Exception e) {
+            log.error("Failed to send delivery notification for order {}: {}",
+                    order.getId(), e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Sends a notification to the sender that their order delivery attempt has failed
+     */
+    private void sendFailedDeliveryNotification(Order order, int attemptNumber) {
+        try {
+            Sender sender = senderRepo.findById(order.getSenderId())
+                    .orElseThrow(() -> new NotFoundException("Sender not found with ID: " + order.getSenderId()));
+
+            String senderUsername = order.getCreatedBy();
+            String message = "Delivery attempt #" + attemptNumber + " was unsuccessful. ";
+
+            if (attemptNumber < 3) {
+                message += "Our shipper will try again soon.";
+            } else {
+                message += "We've reached the maximum number of attempts.";
+            }
+
+            String url = "/order/view/" + order.getId();
+
+            notificationsService.create(
+                    "SYSTEM", // fromUser
+                    senderUsername, // toUser
+                    message,
+                    url
+            );
+
+            log.info("Sent failed delivery notification (attempt #{}) for order {} to sender {}",
+                    attemptNumber, order.getId(), order.getSenderId());
+        } catch (Exception e) {
+            log.error("Failed to send failed delivery notification for order {}: {}",
+                    order.getId(), e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Sends a notification to the sender that their order delivery has been cancelled
+     */
+    private void sendDeliveryCancelledNotification(Order order) {
+        try {
+
+            String senderUsername = order.getCreatedBy();
+            String message = "We regret to inform you that your order delivery has been cancelled. " +
+                    "Please contact customer service for more information.";
+            String url = "/order/view/" + order.getId();
+
+            notificationsService.create(
+                    "SYSTEM", // fromUser
+                    senderUsername, // toUser
+                    message,
+                    url
+            );
+
+            log.info("Sent delivery cancellation notification for order {} to sender {}",
+                    order.getId(), order.getSenderId());
+        } catch (Exception e) {
+            log.error("Failed to send cancellation notification for order {}: {}",
+                    order.getId(), e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Sends a notification to the sender that their order has been returned to the hub
+     */
+    private void sendReturnedToHubNotification(Order order) {
+        try {
+
+            String senderUsername = order.getCreatedBy();
+            String message = "Your order has been returned to our hub after unsuccessful delivery attempts. " +
+                    "Please contact customer service to arrange for redelivery or pickup.";
+            String url = "/order/view" + order.getId();
+
+            notificationsService.create(
+                    "SYSTEM", // fromUser
+                    senderUsername, // toUser
+                    message,
+                    url
+            );
+
+            log.info("Sent returned-to-hub notification for order {} to sender {}",
+                    order.getId(), order.getSenderId());
+        } catch (Exception e) {
+            log.error("Failed to send returned-to-hub notification for order {}: {}",
+                    order.getId(), e.getMessage(), e);
+        }
+    }
     public List<TodayAssignmentShipperDto> getShipperAssignmentsTodayByHub(UUID hubId){
         // Check if hub exists
         if (!hubRepo.existsById(hubId)) {

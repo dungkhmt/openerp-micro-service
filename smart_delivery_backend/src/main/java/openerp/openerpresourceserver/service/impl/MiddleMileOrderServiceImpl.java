@@ -176,7 +176,7 @@ public class MiddleMileOrderServiceImpl implements MiddleMileOrderService {
                     .orElseThrow(() -> new NotFoundException("Order not found: " + orderId));
 
             // Validate current status before changing
-            if (order.getStatus() != OrderStatus.COLLECTED_HUB) {
+            if (order.getStatus() != OrderStatus.COLLECTED_HUB && order.getStatus()!= OrderStatus.RETURNED_HUB_AFTER_DELIVERED) {
                 throw new IllegalStateException("Order " + orderId + " is not in CONFIRMED_AT_HUB status. Current status: " + order.getStatus());
             }
 

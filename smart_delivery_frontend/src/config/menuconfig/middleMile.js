@@ -23,6 +23,12 @@ export const middleMile = {
             text: "Lập lịch vận chuyển",
             child: [],
         },
+        {
+            id: "MENU_ROUTE.TRIP",
+            path: "/middle-mile/trip/manage",
+            text: "Quản lý trip",
+            child: [],
+        },
         // {
         //     id: "MENU_ROUTE.VEHICLE_ASSIGNMENTS",
         //     path: "/middle-mile/vehicle-assignments",

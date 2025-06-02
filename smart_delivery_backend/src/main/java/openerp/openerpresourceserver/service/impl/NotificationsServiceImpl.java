@@ -84,7 +84,6 @@ public class NotificationsServiceImpl implements NotificationsService {
         notification.setContent(content);
         notification.setUrl(url);
         notification.setStatusId(Notifications.STATUS_CREATED);
-
         notification = notificationsRepo.save(notification);
 
         // Publish message to queue

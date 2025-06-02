@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.sun.codemodel.JStringLiteral;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import openerp.openerpresourceserver.entity.enumentity.*;
 import openerp.openerpresourceserver.mapper.OrderMapper;
 import openerp.openerpresourceserver.repository.*;
 import openerp.openerpresourceserver.service.AssignmentService;
+import openerp.openerpresourceserver.service.NotificationsService;
 import openerp.openerpresourceserver.service.OrderService;
 import openerp.openerpresourceserver.utils.GAAutoAssign.GAAutoAssign;
 import org.slf4j.Logger;
@@ -43,7 +45,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderRepo orderRepo;
     @Autowired
     private VehicleRepository vehicleRepo;
-
+    @Autowired
+    private  NotificationsService notificationsService;
     private final OrderMapper orderMapper = OrderMapper.INSTANCE;
     @Autowired
     private AssignOrderShipperRepository assignOrderShipperRepository;
@@ -112,33 +115,38 @@ public class OrderServiceImpl implements OrderService {
         orderEntity.setSenderId(sender.getSenderId());
         orderEntity.setRecipientId(recipient.getRecipientId());
         orderEntity.setOrderType(orderREQ.getOrderType());
-        orderEntity.setOrderType(orderREQ.getOrderType());
         orderEntity.setCreatedBy(principal.getName());
         orderEntity.setSenderName(orderREQ.getSenderName());
         orderEntity.setRecipientName(orderREQ.getRecipientName());
+        orderEntity.setLength(orderREQ.getLength());
+        orderEntity.setWidth(orderREQ.getWidth());
+        orderEntity.setHeight(orderREQ.getHeight());
+        orderEntity.setWeight(orderREQ.getWeight());
         List<OrderItem> orderItems = new ArrayList<>();
         List<OrderItem> items = orderREQ.getItems();
-
+        Order savedOrder = orderRepo.save(orderEntity);
+        orderRepo.flush();
+        if (items == null || items.isEmpty()) {
+            throw new IllegalArgumentException("Order must contain at least one item.");
+        }
         for (OrderItem item : items) {
             OrderItem orderItem = OrderItem.builder()
-                    .name(item.getName())
-                    .quantity(item.getQuantity())
-                    .weight(item.getWeight())
-                    .price(item.getPrice())
-
+                    .code(item.getCode() == null ? "" : item.getCode())
+                    .name(item.getName() == null ? "" : item.getName())
+                    .quantity(item.getQuantity() == null ? 0 : item.getQuantity())
+                    .weight(item.getWeight() == null ? 0.0 : item.getWeight())
+                    .price(item.getPrice() == null ? 0.0 : item.getPrice())
                     .createdBy(principal.getName())
-                    .orderId(orderEntity.getId())
+                    .orderId(savedOrder.getId())
                     .build();
             orderItems.add(orderItem);
         }
 
         orderItemRepo.saveAll(orderItems);
 
-        orderEntity.setCreatedBy(principal.getName());
         logger.info("Created Order: {}", orderEntity);
 
         assignmentService.assignOrderToHub(orderEntity);
-        Order savedOrder = orderRepo.save(orderEntity);
 
         return savedOrder;
     }
@@ -688,7 +696,7 @@ public class OrderServiceImpl implements OrderService {
 
     public Double getOrderWeight(UUID orderId) {
         List<OrderItem> orderItems = orderItemRepo.findAllByOrderId(orderId);
-        return orderItems.stream().map(OrderItem::getWeight).reduce(0.0, Double::sum);
+        return orderItems.stream().map(o -> o.getWeight() != null ? o.getWeight() : Double.valueOf(0.0)).reduce(0.0, Double::sum);
     }
 
     public Double getOrderVolume(UUID orderId) {
@@ -712,7 +720,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public List<OrderSummaryDTO> getAllOrdersDeliveredInHub(UUID hubId){
-        List<Order> orderList = orderRepo.findAllByFinalHubIdAndStatus(hubId, OrderStatus.CONFIRMED_IN_FINAL_HUB);
+        List<Order> orderList1 = orderRepo.findAllByFinalHubIdAndStatus(hubId, OrderStatus.CONFIRMED_IN_FINAL_HUB);
+        List<Order> orderList = orderRepo.findAllByFinalHubIdAndStatus(hubId, OrderStatus.RETURNED_HUB_AFTER_SHIP_FAIL);
+        orderList.addAll(orderList1);
         List<OrderSummaryDTO> orderSummaries = new ArrayList<>();
         for (Order order : orderList) {
             // Thêm vào danh sách orderResponses
@@ -756,6 +766,14 @@ public class OrderServiceImpl implements OrderService {
                 .map(o -> new OrderSummaryDTO((Order) o))
                 .collect(Collectors.toList());
     }
+    @Override
+    public List<OrderSummaryDTO> getFailedShippedOrders(UUID hubId) {
+        // Get orders with status DELIVERY_FAILED at this hub
+        return orderRepo.findByFinalHubIdAndStatus(hubId, OrderStatus.SHIPPED_FAILED)
+                .stream()
+                .map(o -> new OrderSummaryDTO((Order) o))
+                .collect(Collectors.toList());
+    }
 
     @Override
     public boolean confirmOrdersIntoHub(Principal principal, UUID[] orderIds) {
@@ -763,39 +781,74 @@ public class OrderServiceImpl implements OrderService {
             for (UUID orderId : orderIds) {
                 Order order = orderRepo.findById(orderId)
                         .orElseThrow(() -> new RuntimeException("Order not found"));
+                if(!order.getStatus().equals(OrderStatus.COLLECTED_COLLECTOR) && !order.getStatus().equals(OrderStatus.SHIPPED_FAILED) && !order.getStatus().equals(OrderStatus.COLLECT_FAILED) && !order.getStatus().equals(OrderStatus.DELIVERED_FAILED)) {
+                    TripOrder tripOrder = tripOrderRepository.findTopByOrderIdOrderByCreatedAtDesc(order.getId());
+                    if (tripOrder != null) {
+                        tripOrder.setStatus("COMPLETED");
+                        tripOrderRepository.save(tripOrder);
+                    }
+                    Trip trip = tripRepository.findById(tripOrder.getTripId()).orElseThrow(() -> new NotFoundException("trip not found " + tripOrder.getTripId()));
+                    trip.setStatus(TripStatus.CONFIRMED_IN);
 
-                // Update status based on current status
-                switch (order.getStatus()) {
-                    case COLLECTED_COLLECTOR:
-                        order.setStatus(OrderStatus.COLLECTED_HUB);
-                        break;
-                    case DELIVERING:
-                        order.setStatus(OrderStatus.DELIVERED);
-                        break;
-                    case DELIVERED:
-                        order.setStatus(OrderStatus.CONFIRMED_IN_FINAL_HUB);
-                        break;
-                    case DELIVERED_FAILED:
-                        order.setStatus(OrderStatus.RETURNED_HUB_AFTER_DELIVERED);
-                        break;
-                    case SHIPPED_FAILED:
-                        order.setStatus(OrderStatus.RETURNED_HUB_AFTER_SHIP_FAIL);
-                        break;
-                                       default:
-                        // Maintain current status or set default
-                        break;
-                }
-                order.setChangedBy(principal.getName());
-                TripOrder tripOrder = tripOrderRepository.findTopByOrderIdOrderByCreatedAtDesc(order.getId());
-                if (tripOrder != null) {
-                    tripOrder.setStatus("COMPLETED");
+                    tripRepository.save(trip);
                     tripOrderRepository.save(tripOrder);
                 }
-                Trip trip = tripRepository.findById(tripOrder.getTripId()).orElseThrow(() -> new NotFoundException("trip not found " + tripOrder.getTripId()));
-                trip.setStatus(TripStatus.CONFIRMED_IN);
+                // Update status based on current status
 
-                tripRepository.save(trip);
-                tripOrderRepository.save(tripOrder);
+                switch (order.getStatus()) {
+                    case COLLECTED_COLLECTOR: {
+                        order.setStatus(OrderStatus.COLLECTED_HUB);
+                        break;
+                    }
+
+//                    case COLLECT_FAILED: {
+//                        if (order.getCollectAttemptCount() >= 2) {
+//                            order.setStatus(OrderStatus.CANCELLED);
+//                            sendCancelledNotification(order, "Đơn hàng đã bị hủy vì lấy hàng thất bại 2 lần.");
+//                        } else {
+//                            order.setStatus(OrderStatus.RETURNED_HUB_AFTER_COLLECT_FAIL);
+//                        }
+//                        break;
+//                    }
+
+                    case DELIVERING: {
+                        order.setStatus(OrderStatus.DELIVERED);
+                        break;
+                    }
+
+                    case DELIVERED: {
+                        order.setStatus(OrderStatus.CONFIRMED_IN_FINAL_HUB);
+                        break;
+                    }
+
+                    case DELIVERED_FAILED: {
+                        if (order.getDeliverAttemptCount() >= 2) {
+                            order.setStatus(OrderStatus.CANCELLED);
+                            sendCancelledNotification(order, "Đơn hàng đã bị hủy vì vận chuyển thất bại 2 lần.");
+                        } else {
+                            order.setStatus(OrderStatus.RETURNED_HUB_AFTER_DELIVERED);
+                        }
+                        break;
+                    }
+
+                    case SHIPPED_FAILED: {
+                        if (order.getShipAttemptCount() >= 2) {
+                            order.setStatus(OrderStatus.CANCELLED);
+                            sendCancelledNotification(order, "Đơn hàng đã bị hủy vì giao hàng thất bại 2 lần.");
+                        } else {
+                            order.setStatus(OrderStatus.RETURNED_HUB_AFTER_SHIP_FAIL);
+                        }
+                        break;
+                    }
+
+                    default: {
+                        // Giữ nguyên trạng thái hoặc xử lý mặc định nếu cần
+                        break;
+                    }
+                }
+
+                order.setChangedBy(principal.getName());
+
                 orderRepo.save(order);
 
 
@@ -806,7 +859,28 @@ public class OrderServiceImpl implements OrderService {
             return false;
         }
     }
+    private void sendCancelledNotification(Order order, String reason) {
+        try {
 
+            String senderUsername = order.getCreatedBy();
+            String message = "Rất tiếc, đơn hàng của bạn đã bị hủy. " + reason +
+            "Hãy liên lạc với chúng tôi để biết thêm chi tiết.";
+            String url = "/order/view/" + order.getId();
+
+            notificationsService.create(
+                    "SYSTEM", // fromUser
+                    senderUsername, // toUser
+                    message,
+                    url
+            );
+
+            log.info("Sent delivery cancellation notification for order {} to sender {}",
+                    order.getId(), order.getSenderId());
+        } catch (Exception e) {
+            log.error("Failed to send cancellation notification for order {}: {}",
+                    order.getId(), e.getMessage(), e);
+        }
+    }
     @Override
     public boolean confirmShipperPickup(Principal principal, UUID shipperId) {
         try {
@@ -998,6 +1072,152 @@ public class OrderServiceImpl implements OrderService {
             log.error("Error mapping assignment to shipper order history DTO: {}", e.getMessage(), e);
             throw new RuntimeException("Error processing assignment data", e);
         }
+    }
+    /**
+     * Sends a notification to the sender that their order has been returned to the hub
+     */
+    private void sendReturnedToHubNotification(Order order) {
+        try {
+            String senderUsername = order.getCreatedBy();
+
+            String message = "Your order has been returned to our hub after unsuccessful delivery attempts. " +
+                    "Please contact customer service to arrange for redelivery or pickup.";
+            String url = "/orders/" + order.getId();
+
+            notificationsService.create(
+                    "SYSTEM", // fromUser
+                    senderUsername, // toUser
+                    message,
+                    url
+            );
+
+            log.info("Sent returned-to-hub notification for order {} to sender {}",
+                    order.getId(), order.getSenderId());
+        } catch (Exception e) {
+            log.error("Failed to send returned-to-hub notification for order {}: {}",
+                    order.getId(), e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<OrderResponseCollectorShipperDto> suggestOrderToCollectorAssignment(
+            UUID hubId,
+            List<OrderRequestDto> orders,
+            List<EmployeeDTO> collectors) {
+
+        if (hubId == null || orders.isEmpty() || collectors.isEmpty()) {
+            throw new RuntimeException("Invalid data for assignment suggestion");
+        }
+
+        // Tìm Hub theo hubId
+        Hub hub = hubRepo.findById(hubId).orElseThrow(() ->
+                new NotFoundException("Hub not found")
+        );
+
+        // Chuẩn bị dữ liệu
+        List<Order> orderList = new ArrayList<>();
+        List<Employee> collectorList = new ArrayList<>();
+
+        // Tính khoảng cách cho từng đơn hàng
+        for (OrderRequestDto orderRequest : orders) {
+            Order order = orderRepo.findById(orderRequest.getId()).orElseThrow(() ->
+                    new NotFoundException("Order not found")
+            );
+            Sender sender = senderRepo.findById(order.getSenderId()).orElseThrow(() ->
+                    new NotFoundException("Sender not found"));
+
+            Double distance = calculateDistance(hub.getLatitude(), hub.getLongitude(),
+                    sender.getLatitude(), sender.getLongitude());
+            order.setDistance(distance);
+            orderList.add(order);
+        }
+
+        // Tạo danh sách collector
+        for (EmployeeDTO collectorDto : collectors) {
+            Collector collector = collectorRepo.findById(collectorDto.getId()).orElseThrow(() ->
+                    new NotFoundException("Collector not found")
+            );
+            collectorList.add(collector);
+        }
+
+        // Sử dụng thuật toán phân công để tạo đề xuất (KHÔNG lưu vào DB)
+        Map<UUID, List<Order>> orderCollectorMap = distributeContext.assignOrderToEmployees(
+                hub, orderList, collectorList);
+
+        // Tạo response với thông tin đề xuất
+        List<OrderResponseCollectorShipperDto> suggestions = new ArrayList<>();
+        for (Map.Entry<UUID, List<Order>> entry : orderCollectorMap.entrySet()) {
+            UUID collectorId = entry.getKey();
+            String collectorName = getCollectorNameById(collectorList, collectorId);
+            int sequenceNumber = 1;
+
+            for (Order order : entry.getValue()) {
+                OrderResponseCollectorShipperDto suggestion = OrderResponseCollectorShipperDto.builder()
+                        .id(order.getId())
+                        .collectorId(collectorId)
+                        .collectorName(collectorName)
+                        .sequenceNumber(sequenceNumber++)
+                        .senderName(order.getSenderName())
+                        .recipientName(order.getRecipientName())
+                        .status(OrderStatus.PENDING) // Vẫn giữ trạng thái pending
+                        .build();
+                suggestions.add(suggestion);
+            }
+        }
+
+        return suggestions;
+    }
+
+    @Override
+    @Transactional
+    public List<OrderResponseCollectorShipperDto> confirmOrderToCollectorAssignment(
+            Principal principal,
+            UUID hubId,
+            List<ConfirmAssignmentDto.AssignmentDetailDto> assignments) {
+
+        if (assignments.isEmpty()) {
+            throw new RuntimeException("No assignments to confirm");
+        }
+
+        List<AssignOrderCollector> assignOrderCollectors = new ArrayList<>();
+        List<Order> ordersToUpdate = new ArrayList<>();
+        List<OrderResponseCollectorShipperDto> responses = new ArrayList<>();
+
+        for (ConfirmAssignmentDto.AssignmentDetailDto assignment : assignments) {
+            // Tìm order
+            Order order = orderRepo.findById(assignment.getOrderId())
+                    .orElseThrow(() -> new NotFoundException("Order not found"));
+
+            // Cập nhật trạng thái order
+            order.setStatus(OrderStatus.ASSIGNED);
+            order.setChangedBy(principal.getName());
+            ordersToUpdate.add(order);
+
+            // Tạo AssignOrderCollector
+            AssignOrderCollector assignOrderCollector = new AssignOrderCollector();
+            assignOrderCollector.setOrderId(assignment.getOrderId());
+            assignOrderCollector.setCollectorId(assignment.getEmployeeId());
+            assignOrderCollector.setCollectorName(assignment.getEmployeeName());
+            assignOrderCollector.setSequenceNumber(assignment.getSequenceNumber());
+            assignOrderCollector.setStatus(CollectorAssignmentStatus.ASSIGNED);
+            assignOrderCollector.setCreatedBy(principal.getName());
+            assignOrderCollectors.add(assignOrderCollector);
+
+            // Tạo response
+            OrderResponseCollectorShipperDto response = OrderResponseCollectorShipperDto.builder()
+                    .id(order.getId())
+                    .collectorId(assignment.getEmployeeId())
+                    .collectorName(assignment.getEmployeeName())
+                    .status(OrderStatus.ASSIGNED)
+                    .build();
+            responses.add(response);
+        }
+
+        // Lưu tất cả vào database
+        orderRepo.saveAll(ordersToUpdate);
+        assignOrderCollectorRepository.saveAll(assignOrderCollectors);
+
+        return responses;
     }
 }
 

@@ -38,7 +38,7 @@ public class OrderResponseCollectorShipperDto{
     private UUID shipperId;
     private String shipperName;
     private String shipperPhone;
-
+    private int sequenceNumber;
     private List<OrderItem> items;
     private String orderType;
     private OrderStatus status;

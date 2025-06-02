@@ -15,6 +15,7 @@ import HumanManagerRouters from "./HumanManagerRouters";
 import MiddleMileRouter from "./MiddleMileRouter";
 import StationRouter from "./StatisticsRouter";
 import StatisticsRouter from "./StatisticsRouter";
+import AdminRouter from "./AdminRouter";
 const styles = {
   loadingProgress: {
     position: "fixed",
@@ -47,6 +48,7 @@ function MainAppRouter(props) {
           <PrivateRoute  component={HumanManagerRouters} path="/employee" />
           <PrivateRoute component={MiddleMileRouter} path="/middle-mile" />
           <PrivateRoute component={StatisticsRouter} path="/statistics" />
+          <PrivateRoute component={AdminRouter} path="/config" />
 
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />

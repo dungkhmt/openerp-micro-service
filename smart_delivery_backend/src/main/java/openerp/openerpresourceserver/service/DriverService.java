@@ -36,7 +36,7 @@ public interface DriverService {
 
     List<OrderForTripDto> getCurrentOrderItemsForDriver(String username, UUID tripId);
 
-    void deliverOrders(String username, List<UUID> orderIds);
+    void deliverOrders(String username, List<UUID> successOrderIds, List<UUID> failOrderIds);
 
     List<OrderSuggestionDto> getSuggestedOrderItemsForTrip(UUID tripId);
     /**

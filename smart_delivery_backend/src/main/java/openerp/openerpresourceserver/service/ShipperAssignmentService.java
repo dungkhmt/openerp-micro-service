@@ -8,6 +8,23 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ShipperAssignmentService {
+    /**
+     * Tạo đề xuất phân công shipper mà không lưu vào database
+     */
+    List<OrderResponseCollectorShipperDto> suggestOrdersToShippers(
+            UUID hubId,
+            List<OrderRequestDto> orders,
+            List<EmployeeDTO> shippers
+    );
+
+    /**
+     * Xác nhận và lưu phân công shipper vào database
+     */
+    List<OrderResponseCollectorShipperDto> confirmOrdersToShippers(
+            Principal principal,
+            UUID hubId,
+            List<ConfirmAssignmentDto.AssignmentDetailDto> assignments
+    );
 
     /**
      * Get orders that are ready for delivery at a specific hub

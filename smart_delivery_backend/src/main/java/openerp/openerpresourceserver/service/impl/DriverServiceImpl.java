@@ -138,7 +138,7 @@ public class DriverServiceImpl implements DriverService {
 
             // Update order
             order.setStatus(OrderStatus.DELIVERING);
-
+            order.setChangedBy(username);
             orders.add(order);
             TripOrder tripOrder = tripOrderRepository.findTopByOrderIdOrderByCreatedAtDesc(orderId);
             tripOrder.setStatus("DELIVERING");
@@ -160,8 +160,8 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     @Transactional
-    public void deliverOrders(String username, List<UUID> orderIds) {
-        if (orderIds == null || orderIds.isEmpty()) {
+    public void deliverOrders(String username, List<UUID> successOrderIds, List<UUID> failOrderIds) {
+        if (successOrderIds == null && failOrderIds == null || successOrderIds.isEmpty() && failOrderIds.isEmpty()) {
             throw new IllegalArgumentException("No orders provided for delivery");
         }
 
@@ -174,16 +174,17 @@ public class DriverServiceImpl implements DriverService {
         List<Order> orders = new ArrayList<>();
         List<TripOrder> tripOrders = new ArrayList<>();
         Trip trip = null;
-        for (UUID orderId : orderIds) {
+        for (UUID orderId : successOrderIds) {
             Order order = orderRepo.findById(orderId)
                     .orElseThrow(() -> new NotFoundException("Order not found with ID: " + orderId));
 
             TripOrder tripOrder = tripOrderRepository.findTopByOrderIdOrderByCreatedAtDesc(orderId);
             trip = tripRepository.findById(tripOrder.getTripId()).orElseThrow(() -> new NotFoundException("Trip not found"));
+
+            // Verify order is assigned to this driver
             if (!trip.getDriverId().equals(driver.getId())) {
                 throw new IllegalStateException("Order is not assigned to this driver: " + orderId);
             }
-            // Verify order is assigned to this driver
 
 
             // Verify order is in correct state
@@ -193,9 +194,30 @@ public class DriverServiceImpl implements DriverService {
 
             // Update order
             order.setStatus(OrderStatus.DELIVERED);
+            order.setChangedBy(username);
             orders.add(order);
             tripOrder.setStatus("DELIVERED");
             tripOrders.add(tripOrder);
+        }
+        if(failOrderIds != null && !failOrderIds.isEmpty()) {
+            for (UUID orderId : failOrderIds) {
+                Order order = orderRepo.findById(orderId)
+                        .orElseThrow(() -> new NotFoundException("Order not found with ID: " + orderId));
+
+                TripOrder tripOrder = tripOrderRepository.findTopByOrderIdOrderByCreatedAtDesc(orderId);
+                trip = tripRepository.findById(tripOrder.getTripId()).orElseThrow(() -> new NotFoundException("Trip not found"));
+                // Verify order is assigned to this driver
+                if (!trip.getDriverId().equals(driver.getId())) {
+                    throw new IllegalStateException("Order is not assigned to this driver: " + orderId);
+                }
+                // Update order
+                order.setStatus(OrderStatus.DELIVERED_FAILED);
+                order.setDeliverAttemptCount(order.getDeliverAttemptCount() + 1);
+                order.setChangedBy(username);
+                orders.add(order);
+                tripOrder.setStatus("FAILED");
+                tripOrders.add(tripOrder);
+            }
         }
         if(trip != null) {
             trip.setStatus(TripStatus.DELIVERED);
@@ -205,6 +227,7 @@ public class DriverServiceImpl implements DriverService {
         orderRepo.saveAll(orders);
         tripOrderRepository.saveAll(tripOrders);
     }
+
 
     @Override
     @Transactional
@@ -309,7 +332,7 @@ public class DriverServiceImpl implements DriverService {
 
             for (Order order : ordersForStop) {
                 // Check if adding this order would exceed capacity
-                if (canFitInVehicle(order, vehicle, currentWeight, currentVolume)) {
+                if (true) {
                     OrderSuggestionDto suggestion = createSimpleSuggestion(order, stop, vehicle);
                     suggestions.add(suggestion);
 
@@ -338,11 +361,16 @@ public class DriverServiceImpl implements DriverService {
      */
     private List<Order> getOrdersForRouteStop(UUID hubId, LocalDate date) {
         // Get orders that are ready for pickup/delivery at this hub on this date
-        return orderRepo.findByStatusAndFinalHubId(
+        List<Order> orders = orderRepo.findByStatusAndFinalHubId(
                 OrderStatus.COLLECTED_HUB,
-                hubId
+                hubId);
+        List<Order> orders1 = orderRepo.findByStatusAndFinalHubId(
+                OrderStatus.RETURNED_HUB_AFTER_DELIVERED,
+                hubId);
 
-        );
+                orders.addAll(orders1);
+        return orders;
+
     }
 
     /**
@@ -384,9 +412,14 @@ public class DriverServiceImpl implements DriverService {
         suggestion.setStopSequence(stop.getStopSequence());
 
         // Priority based on creation time (older = higher priority)
-        int priority = calculateTimePriority(order.getCreatedAt());
-        suggestion.setPriority(priority);
+        if(order.getDeliverAttemptCount() == 1){
+            suggestion.setPriority(200);
 
+        }
+        else {
+            int priority = calculateTimePriority(order.getCreatedAt());
+            suggestion.setPriority(priority);
+        }
         // Simple fit indication
         suggestion.setFitScore(100); // If we get here, it means it fits
 

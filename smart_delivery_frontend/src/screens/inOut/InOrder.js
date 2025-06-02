@@ -133,7 +133,7 @@ const InOrder = () => {
         try {
             await request(
                 "get",
-                `/smdeli/ordermanager/order/delivered-driver-failed/${hubId}`,
+                `/smdeli/ordermanager/order/delivered-failed/${hubId}`,
                 (res) => {
                     setDriverFailedOrders(res.data);
                     setLoading(false);
@@ -160,7 +160,7 @@ const InOrder = () => {
         try {
             await request(
                 "get",
-                `/smdeli/ordermanager/order/delivered-shipper-failed/${hubId}`,
+                `/smdeli/ordermanager/order/shipped-failed/${hubId}`,
                 (res) => {
                     setShipperFailedOrders(res.data);
                     setLoading(false);

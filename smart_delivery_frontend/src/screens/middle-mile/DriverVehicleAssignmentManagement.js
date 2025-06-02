@@ -33,10 +33,13 @@ const DriverAssignmentManagement = () => {
     });
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredAssignments, setFilteredAssignments] = useState([]);
-    const [driverSearchTerm, setDriverSearchTerm] = useState('');
-    const [vehicleSearchTerm, setVehicleSearchTerm] = useState('');
-    const [filteredDrivers, setFilteredDrivers] = useState([]);
-    const [filteredVehicles, setFilteredVehicles] = useState([]);
+
+    // Remove these problematic search states
+    // const [driverSearchTerm, setDriverSearchTerm] = useState('');
+    // const [vehicleSearchTerm, setVehicleSearchTerm] = useState('');
+    // const [filteredDrivers, setFilteredDrivers] = useState([]);
+    // const [filteredVehicles, setFilteredVehicles] = useState([]);
+
     const history = useHistory();
 
     useEffect(() => {
@@ -51,13 +54,11 @@ const DriverAssignmentManagement = () => {
             // Fetch all drivers
             await request('get', '/smdeli/humanresource/driver', (res) => {
                 setDrivers(res.data || []);
-                setFilteredDrivers(res.data || []);
             });
 
             // Fetch all vehicles
             await request('get', '/smdeli/vehicle/getAll', (res) => {
                 setVehicles(res.data || []);
-                setFilteredVehicles(res.data || []);
             });
 
             // Fetch all driver-vehicle assignments
@@ -85,40 +86,8 @@ const DriverAssignmentManagement = () => {
             const assignedDriverIds = assignments.map(a => a.driverId);
             const unassigned = drivers.filter(driver => !assignedDriverIds.includes(driver.id));
             setUnassignedDrivers(unassigned);
-            setFilteredDrivers(unassigned);
         }
     }, [drivers, assignments]);
-
-    // Filter drivers based on search term
-    useEffect(() => {
-        if (!driverSearchTerm) {
-            setFilteredDrivers(unassignedDrivers);
-        } else {
-            const term = driverSearchTerm.toLowerCase();
-            const filtered = unassignedDrivers.filter(driver =>
-                driver.name?.toLowerCase().includes(term) ||
-                driver.phone?.toLowerCase().includes(term) ||
-                driver.driverCode?.toLowerCase().includes(term)
-            );
-            setFilteredDrivers(filtered);
-        }
-    }, [driverSearchTerm, unassignedDrivers]);
-
-    // Filter vehicles based on search term
-    useEffect(() => {
-        if (!vehicleSearchTerm) {
-            setFilteredVehicles(unassignedVehicles);
-        } else {
-            const term = vehicleSearchTerm.toLowerCase();
-            const filtered = unassignedVehicles.filter(vehicle =>
-                vehicle.plateNumber?.toLowerCase().includes(term) ||
-                vehicle.manufacturer?.toLowerCase().includes(term) ||
-                vehicle.model?.toLowerCase().includes(term) ||
-                vehicle.vehicleType?.toLowerCase().includes(term)
-            );
-            setFilteredVehicles(filtered);
-        }
-    }, [vehicleSearchTerm, unassignedVehicles]);
 
     // Apply search filter for main table
     useEffect(() => {
@@ -140,8 +109,6 @@ const DriverAssignmentManagement = () => {
             driverId: '',
             vehicleId: ''
         });
-        setDriverSearchTerm('');
-        setVehicleSearchTerm('');
         setOpenAssignDialog(true);
     };
 
@@ -402,18 +369,23 @@ const DriverAssignmentManagement = () => {
                             <Grid item xs={12}>
                                 <FormControl fullWidth margin="dense" required>
                                     <Autocomplete
-                                        options={filteredDrivers}
+                                        options={unassignedDrivers}
                                         getOptionLabel={(driver) => `${driver.name} - ${driver.phone} (${driver.driverCode || 'No code'})`}
-                                        value={filteredDrivers.find(driver => driver.id === assignmentForm.driverId) || null}
+                                        value={unassignedDrivers.find(driver => driver.id === assignmentForm.driverId) || null}
                                         onChange={(event, newValue) => {
                                             setAssignmentForm({
                                                 ...assignmentForm,
                                                 driverId: newValue?.id || ''
                                             });
                                         }}
-                                        inputValue={driverSearchTerm}
-                                        onInputChange={(event, newInputValue) => {
-                                            setDriverSearchTerm(newInputValue);
+                                        filterOptions={(options, { inputValue }) => {
+                                            if (!inputValue) return options;
+                                            const term = inputValue.toLowerCase();
+                                            return options.filter(driver =>
+                                                driver.name?.toLowerCase().includes(term) ||
+                                                driver.phone?.toLowerCase().includes(term) ||
+                                                driver.driverCode?.toLowerCase().includes(term)
+                                            );
                                         }}
                                         renderInput={(params) => (
                                             <TextField
@@ -421,7 +393,6 @@ const DriverAssignmentManagement = () => {
                                                 label="Driver"
                                                 variant="outlined"
                                                 placeholder="Type to search driver"
-
                                             />
                                         )}
                                         noOptionsText="No drivers found"
@@ -432,18 +403,24 @@ const DriverAssignmentManagement = () => {
                             <Grid item xs={12}>
                                 <FormControl fullWidth margin="dense" required>
                                     <Autocomplete
-                                        options={filteredVehicles}
+                                        options={unassignedVehicles}
                                         getOptionLabel={(vehicle) => `${vehicle.plateNumber} - ${vehicle.manufacturer} ${vehicle.model} (${vehicle.vehicleType})`}
-                                        value={filteredVehicles.find(vehicle => vehicle.vehicleId === assignmentForm.vehicleId) || null}
+                                        value={unassignedVehicles.find(vehicle => vehicle.vehicleId === assignmentForm.vehicleId) || null}
                                         onChange={(event, newValue) => {
                                             setAssignmentForm({
                                                 ...assignmentForm,
                                                 vehicleId: newValue?.vehicleId || ''
                                             });
                                         }}
-                                        inputValue={vehicleSearchTerm}
-                                        onInputChange={(event, newInputValue) => {
-                                            setVehicleSearchTerm(newInputValue);
+                                        filterOptions={(options, { inputValue }) => {
+                                            if (!inputValue) return options;
+                                            const term = inputValue.toLowerCase();
+                                            return options.filter(vehicle =>
+                                                vehicle.plateNumber?.toLowerCase().includes(term) ||
+                                                vehicle.manufacturer?.toLowerCase().includes(term) ||
+                                                vehicle.model?.toLowerCase().includes(term) ||
+                                                vehicle.vehicleType?.toLowerCase().includes(term)
+                                            );
                                         }}
                                         renderInput={(params) => (
                                             <TextField

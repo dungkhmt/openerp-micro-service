@@ -26,7 +26,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
     public List<OrderSummaryDTO> findOrdersCreatedToday(UUID hubId) {
         StringBuilder SQL = new StringBuilder();
         SQL.append("SELECT * FROM smartdelivery_order ");
-        SQL.append("WHERE status = 'PENDING' ");
+        SQL.append("WHERE status = 'PENDING' OR status = 'COLLECT_FAILED' ");
         SQL.append("AND origin_hub_id = :hubId"); // Thêm điều kiện lọc theo hubId
 
         MapSqlParameterSource params = new MapSqlParameterSource();

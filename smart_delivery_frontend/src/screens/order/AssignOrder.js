@@ -1,660 +1,975 @@
 import LoadingScreen from "components/common/loading/loading";
-import { Box, Button, Grid, Tab, TextField, Typography } from "@mui/material";
-import { request } from "api";
 import {
-    ProductDropDown,
-    WarehouseDropDown,
-    BayDropDownWithSelectedPrdAndWh,
-} from "components/table/DropDown";
+    Box, Button, Grid, Tab, TextField, Typography, Dialog, DialogActions,
+    DialogContent, DialogTitle, Select, MenuItem, FormControl, InputLabel,
+    Checkbox, Chip, Stack, Alert, Autocomplete
+} from "@mui/material";
+import { request } from "api";
 import StandardTable from "components/StandardTable";
 import React, { Fragment, useEffect, useState } from "react";
 import useStyles from "screens/styles";
-import { convertToVNDFormat } from "screens/utils/utils";
-import { errorNoti, processingNoti, successNoti } from "utils/notification";
+import { errorNoti, processingNoti, successNoti, warningNoti } from "utils/notification";
 import withScreenSecurity from "components/common/withScreenSecurity";
 import { useHistory } from "react-router";
-import {Link, useRouteMatch} from "react-router-dom";
+import { Link, useRouteMatch } from "react-router-dom";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { useSelector} from "react-redux";
+import { useSelector } from "react-redux";
 import IconButton from "@mui/material/IconButton";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import SaveIcon from "@mui/icons-material/Save";
+import RestoreIcon from "@mui/icons-material/Restore";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 
 const AssignOrder = (props) => {
     const history = useHistory();
     const { path } = useRouteMatch();
-
     const orderId = props.match?.params?.id;
     const classes = useStyles();
 
+    // Basic state
     const [loading, setLoading] = useState(true);
-    const [orderInfo, setOrderInfo] = useState({});
-    const [remainingItems, setRemainingItems] = useState([]);
-    const [processedItems, setProcessedItems] = useState([]);
-    const [processingItems, setProcessingItems] = useState([]);
-    const [allWarehouses, setAllWarehouses] = useState([]);
     const [tabValue, setTabValue] = useState("1");
     const hubId = useSelector((state) => state.auth.user?.hubId);
 
-    const [selectedProductId, setSelectedProductId] = useState(null);
-    const [selectedProductName, setSelectedProductName] = useState(null);
-
-    const [bayList, setBayList] = useState([]);
-    const [selectedBayId, setSelectedBayId] = useState(null);
-    const [selectedBayCode, setSelectedBayCode] = useState(null);
-
-    const [selectedQuantity, setSelectedQuantity] = useState(null);
-
-    const [warehouseList, setWarehouseList] = useState([]);
-    const [selectedWarehouseId, setSelectedWarehouseId] = useState(null);
-    const [selectedWarehouseName, setSelectedWarehouseName] = useState(null);
-
-    const [selectedWarehouse, setSelectedWarehouse] = useState(null);
-    const [selectedWarehouseItems, setSelectedWarehouseItems] = useState([]);
-    const [maxQuantity, setMaxQuantity] = useState(0);
-    const [isDoneOrder, setIsDoneOrder] = useState(false);
-    const [collectors, setCollectors] = useState([]);
+    // Data state
     const [orders, setOrders] = useState([]);
-    const [isDoneCollectors, setIsDoneCollectors] = useState(false);
-    const [assigmentData, setAssigmentData] = useState([]);
+    const [collectors, setCollectors] = useState([]);
+    const [assignmentData, setAssignmentData] = useState([]);
 
-    const findWarehousesForProducts = (products, productIdList) => {
-        const result = {};
+    // Suggestion workflow state
+    const [suggestionMode, setSuggestionMode] = useState(false);
+    const [suggestedAssignments, setSuggestedAssignments] = useState([]);
+    const [modifiedAssignments, setModifiedAssignments] = useState([]);
+    const [selectedAssignments, setSelectedAssignments] = useState([]);
 
-        productIdList.forEach((productId) => {
-            result[productId] = [];
+    // Selection state for unassigned orders
+    const [selectedOrders, setSelectedOrders] = useState([]);
 
-            products.forEach((warehouse) => {
-                const matchingBays = warehouse.bayWithProducts.filter(
-                    (bay) => bay.productId === productId
-                );
-                if (matchingBays.length > 0) {
-                    result[productId].push({
-                        id: warehouse.id,
-                        name: warehouse.name,
-                        bays: matchingBays.map((bay) => ({
-                            id: bay.bayId,
-                            code: bay.code,
-                            quantityOnHand: bay.quantityOnHandTotal,
-                        })),
-                    });
-                }
-            });
-        });
+    // Saved suggestions state
+    const [savedSuggestions, setSavedSuggestions] = useState([]);
+    const [hasSavedSuggestion, setHasSavedSuggestion] = useState(false);
 
-        return result;
-    };
+    // Dialogs state
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [bulkEditDialogOpen, setBulkEditDialogOpen] = useState(false);
 
-    // fetch Data
+    // Updated: Use objects for selected collectors instead of just IDs
+    const [selectedCollectorForEdit, setSelectedCollectorForEdit] = useState(null);
+    const [selectedCollectorForBulkEdit, setSelectedCollectorForBulkEdit] = useState(null);
+
+    // Load saved suggestions from localStorage on component mount
     useEffect(() => {
-        async function fetchData() {
-            var productIds;
-            await request(
-                "get",
-                `/smdeli/humanresource/collector/hub/${hubId}`,
-                (res) => {
-                    setCollectors(res.data);
-                    if (
-                        res.data.statusCode == "COMPLETED" ||
-                        res.data.statusCode == "CANCELLED"
-                    ) {
-                        setIsDoneOrder(true);
-                        setIsDoneCollectors(true);
-                    }
-                }
-            );
-            await request(
-                "get",
-                `/smdeli/ordermanager/order/assign/collector/today/${hubId}`,
-                (res) => {
-                    setAssigmentData(res.data);
-                }
-            );
-
-            await request(
-                "get",
-                `/smdeli/ordermanager/order/hub/today/${hubId}`,
-                (res) => {
-                    setOrders(res.data);
-                },
-                {},
-                productIds
-            );
-
-            setLoading(false);
-        }
-
-        fetchData();
-    }, []);
-
-    const getProductOrderQuantity = (productId) => {
-        for (var i = 0; i < remainingItems?.length; i++) {
-            if (remainingItems[i]?.productId == productId) {
-                return remainingItems[i]?.quantity;
+        const saved = localStorage.getItem(`assignmentSuggestion_${hubId}`);
+        if (saved) {
+            try {
+                const parsedSaved = JSON.parse(saved);
+                setSavedSuggestions(parsedSaved);
+                setHasSavedSuggestion(true);
+            } catch (error) {
+                console.error("Error parsing saved suggestions:", error);
+                localStorage.removeItem(`assignmentSuggestion_${hubId}`);
             }
         }
-        return Number.MAX_SAFE_INTEGER;
+    }, [hubId]);
+
+    // Debug selectedAssignments changes
+    useEffect(() => {
+        console.log("selectedAssignments updated:", selectedAssignments);
+        console.log("selectedAssignments length:", selectedAssignments.length);
+    }, [selectedAssignments]);
+
+    // Debug dialog states
+    useEffect(() => {
+        console.log("editDialogOpen:", editDialogOpen);
+        console.log("bulkEditDialogOpen:", bulkEditDialogOpen);
+    }, [editDialogOpen, bulkEditDialogOpen]);
+
+    // Debug collectors data
+    useEffect(() => {
+        console.log("collectors:", collectors);
+    }, [collectors]);
+
+    // Fetch initial data
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                // Fetch collectors
+                await request(
+                    "get",
+                    `/smdeli/humanresource/collector/hub/${hubId}`,
+                    (res) => {
+                        setCollectors(res.data);
+                    }
+                );
+
+                // Fetch current assignments
+                await request(
+                    "get",
+                    `/smdeli/ordermanager/order/assign/collector/today/${hubId}`,
+                    (res) => {
+                        setAssignmentData(res.data);
+                    }
+                );
+
+                // Fetch orders to be assigned
+                await request(
+                    "get",
+                    `/smdeli/ordermanager/order/hub/today/${hubId}`,
+                    (res) => {
+                        setOrders(res.data);
+                    }
+                );
+
+                setLoading(false);
+            } catch (error) {
+                errorNoti("Lỗi khi tải dữ liệu");
+                setLoading(false);
+            }
+        }
+        fetchData();
+    }, [hubId]);
+
+    // Handle selection change for unassigned orders
+    const handleOrderSelectionChange = (selectedIds, selectedRows) => {
+        setSelectedOrders(selectedRows || []);
     };
 
-    useEffect(() => {
-        setWarehouseList(allWarehouses[selectedProductId]);
-    }, [selectedProductId]);
-
-    useEffect(() => {
-        setBayList(
-            allWarehouses[selectedProductId]?.find(
-                (wh) => wh.id === selectedWarehouseId
-            ).bays
-        );
-    }, [selectedWarehouseId]);
-
-    useEffect(() => {
-        let totalProductOnBay = bayList?.find(
-            (bay) => bay.id === selectedBayId
-        )?.quantityOnHand;
-        setMaxQuantity(
-            Math.min(
-                totalProductOnBay,
-                getProductOrderQuantity(selectedProductId)
-            )
-        );
-    }, [selectedBayId]);
-
-    // Save processing item
-    const saveProcessingItems = () => {
-
-
+    // Handle selection change for assignments - sử dụng callback từ StandardTable
+    const handleAssignmentSelectionChange = (selectedIds, selectedRows) => {
+        setSelectedAssignments(selectedRows || []);
     };
 
-    // Auto assign
-    const autoAssignButtonHandle = () => {
+    // Create manual assignment from selected orders
+    const createManualAssignmentButtonHandle = () => {
+        if (selectedOrders.length === 0) {
+            errorNoti("Vui lòng chọn ít nhất một đơn hàng");
+            return;
+        }
+
+        // Create assignments with default sequence numbers
+        const manualAssignments = selectedOrders.map((order, index) => ({
+            id: order.id,
+            senderName: order.senderName,
+            recipientName: order.recipientName,
+            collectorId: null, // Will be assigned later
+            collectorName: "Chưa phân công",
+            sequenceNumber: index + 1
+        }));
+
+        setModifiedAssignments(manualAssignments);
+        setSuggestionMode(true);
+        setSelectedOrders([]); // Reset orders selection
+        setSelectedAssignments([]); // Reset assignments selection
+        successNoti(`Đã tạo ${selectedOrders.length} phân công thủ công - Có thể chỉnh sửa trước khi xác nhận`);
+    };
+
+    // Get assignment suggestions - chỉ cho orders được selected
+    const getSuggestionButtonHandle = () => {
+        // Check if there are selected orders
+        if (selectedOrders.length === 0) {
+            errorNoti("Vui lòng chọn ít nhất một đơn hàng để tạo đề xuất phân công");
+            return;
+        }
+
+        if (collectors.length === 0) {
+            errorNoti("Không có shipper nào khả dụng");
+            return;
+        }
+
         setLoading(true);
         const updatedCollectors = collectors.map(collector => ({
             id: collector.id,
             hubId: hubId,
         }));
+
         request(
             "post",
-            "/smdeli/ordermanager/order/assign/collector",
+            "/smdeli/ordermanager/order/suggest/collector",
             (res) => {
-                setAssigmentData(res.data);
-                successNoti("Phân công thành công");
+                setSuggestedAssignments(res.data);
+                setModifiedAssignments([...res.data]); // Đảm bảo có thể sửa đổi được
+                setSuggestionMode(true);
+                setSelectedAssignments([]); // Reset selection
+                setSelectedOrders([]); // Reset orders selection
                 setLoading(false);
-
+                successNoti(`Đã tạo đề xuất phân công cho ${selectedOrders.length} đơn hàng - Có thể chỉnh sửa trước khi xác nhận`);
             },
             {
                 500: () => {
-                    errorNoti("Không tìm được phân phối phù hợp");
+                    errorNoti("Không thể tạo đề xuất phân công");
                     setLoading(false);
                 },
                 400: () => {
-                    successNoti("Phân công thành công");
+                    errorNoti("Dữ liệu không hợp lệ");
                     setLoading(false);
                 },
             },
             {
                 employees: updatedCollectors,
-                orders: orders,
+                orders: selectedOrders, // Chỉ gửi orders được selected
                 hubId: hubId,
             }
         );
-        console.log("new order info => ", orderInfo);
-        console.log("all warehouse => ", allWarehouses);
     };
 
-    const columns = [
+    // Save suggestions to localStorage
+    const saveSuggestionButtonHandle = () => {
+        if (modifiedAssignments.length === 0) {
+            errorNoti("Không có phân công nào để lưu");
+            return;
+        }
+
+        const dataToSave = {
+            suggestions: modifiedAssignments,
+            timestamp: new Date().toISOString(),
+            ordersCount: modifiedAssignments.length
+        };
+
+        localStorage.setItem(`assignmentSuggestion_${hubId}`, JSON.stringify(dataToSave));
+        setSavedSuggestions(dataToSave);
+        setHasSavedSuggestion(true);
+        successNoti("Đã lưu đề xuất phân công");
+    };
+
+    // Load saved suggestions
+    const loadSavedSuggestionButtonHandle = () => {
+        if (savedSuggestions.suggestions) {
+            setModifiedAssignments([...savedSuggestions.suggestions]);
+            setSuggestionMode(true);
+            setSelectedAssignments([]); // Reset selection
+            setSelectedOrders([]); // Reset orders selection
+            successNoti("Đã tải đề xuất phân công đã lưu - Có thể chỉnh sửa trước khi xác nhận");
+        } else {
+            errorNoti("Không có đề xuất nào đã lưu");
+        }
+    };
+
+    // Clear saved suggestions
+    const clearSavedSuggestionButtonHandle = () => {
+        localStorage.removeItem(`assignmentSuggestion_${hubId}`);
+        setSavedSuggestions([]);
+        setHasSavedSuggestion(false);
+        successNoti("Đã xóa đề xuất đã lưu");
+    };
+
+    // Confirm assignment after editing - chỉ gửi những order được chọn
+    const confirmAssignmentButtonHandle = () => {
+        if (modifiedAssignments.length === 0) {
+            errorNoti("Không có phân công nào để xác nhận");
+            return;
+        }
+
+        setLoading(true);
+
+        // Transform data to match backend DTO - chỉ gửi những assignment có trong modifiedAssignments
+        const assignmentsToConfirm = modifiedAssignments.map(assignment => ({
+            orderId: assignment.id,
+            employeeId: assignment.collectorId,
+            employeeName: assignment.collectorName,
+            sequenceNumber: assignment.sequenceNumber || 1
+        }));
+
+        // Chỉ gửi orderIds của những order được phân công
+        const orderIds = modifiedAssignments.map(assignment => assignment.id);
+
+        request(
+            "post",
+            "/smdeli/ordermanager/order/confirm/collector",
+            (res) => {
+                // Clear saved suggestions after successful confirmation
+                localStorage.removeItem(`assignmentSuggestion_${hubId}`);
+                successNoti(`Phân công thành công ${orderIds.length} đơn hàng`);
+                // Reload trang sau khi xác nhận thành công
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000); // Delay 1 giây để user thấy notification
+            },
+            {
+                500: () => {
+                    errorNoti("Không thể xác nhận phân công");
+                    setLoading(false);
+                },
+                400: () => {
+                    errorNoti("Dữ liệu phân công không hợp lệ");
+                    setLoading(false);
+                },
+            },
+            {
+                hubId: hubId,
+                assignments: assignmentsToConfirm,
+                orderIds: orderIds // Thêm danh sách orderIds
+            }
+        );
+    };
+
+    // Cancel suggestion
+    const cancelSuggestionButtonHandle = () => {
+        setSuggestionMode(false);
+        setSuggestedAssignments([]);
+        setModifiedAssignments([]);
+        setSelectedAssignments([]);
+        successNoti("Đã hủy đề xuất phân công");
+    };
+
+    // Open bulk edit dialog
+    const handleBulkEditAssignment = () => {
+        console.log("handleBulkEditAssignment called");
+        console.log("selectedAssignments:", selectedAssignments);
+        console.log("selectedAssignments.length:", selectedAssignments.length);
+
+        if (selectedAssignments.length === 0) {
+            errorNoti("Vui lòng chọn ít nhất một phân công để chỉnh sửa");
+            return;
+        }
+
+        setBulkEditDialogOpen(true);
+    };
+
+    // Save bulk edit
+    const handleSaveBulkEdit = () => {
+        if (!selectedCollectorForBulkEdit) {
+            errorNoti("Vui lòng chọn collector");
+            return;
+        }
+
+        const selectedIds = selectedAssignments.map(assignment => assignment.id);
+        console.log("Updating assignments for IDs:", selectedIds);
+        console.log("New collector:", selectedCollectorForBulkEdit);
+
+        setModifiedAssignments(prev => {
+            const updated = prev.map(assignment =>
+                selectedIds.includes(assignment.id)
+                    ? {
+                        ...assignment,
+                        collectorId: selectedCollectorForBulkEdit.id,
+                        collectorName: selectedCollectorForBulkEdit.name
+                    }
+                    : assignment
+            );
+            console.log("Updated assignments:", updated);
+            return updated;
+        });
+
+        setBulkEditDialogOpen(false);
+        setSelectedCollectorForBulkEdit(null);
+        setSelectedAssignments([]);
+        successNoti(`Đã cập nhật ${selectedIds.length} phân công`);
+    };
+
+    // Delete selected assignments
+    const handleDeleteSelectedAssignments = () => {
+        if (selectedAssignments.length === 0) {
+            errorNoti("Vui lòng chọn ít nhất một phân công để xóa");
+            return;
+        }
+
+        const selectedIds = selectedAssignments.map(assignment => assignment.id);
+        setModifiedAssignments(prev =>
+            prev.filter(assignment => !selectedIds.includes(assignment.id))
+        );
+        setSelectedAssignments([]);
+        successNoti(`Đã xóa ${selectedIds.length} phân công`);
+    };
+
+    // State cho single edit dialog
+    const [editingAssignment, setEditingAssignment] = useState(null);
+
+    // Open single edit dialog
+    const handleEditSingleAssignment = (assignment) => {
+        console.log("handleEditSingleAssignment called with:", assignment);
+        setEditingAssignment(assignment); // Lưu assignment riêng để edit
+
+        // Find the current collector object
+        const currentCollector = collectors.find(c => c.id === assignment.collectorId);
+        setSelectedCollectorForEdit(currentCollector || null);
+        setEditDialogOpen(true);
+    };
+
+    // Save single edit
+    const handleSaveSingleEdit = () => {
+        if (!selectedCollectorForEdit) {
+            errorNoti("Vui lòng chọn collector");
+            return;
+        }
+
+        console.log("Editing assignment:", editingAssignment);
+        console.log("New collector:", selectedCollectorForEdit);
+
+        setModifiedAssignments(prev => {
+            const updated = prev.map(assignment =>
+                assignment.id === editingAssignment.id
+                    ? {
+                        ...assignment,
+                        collectorId: selectedCollectorForEdit.id,
+                        collectorName: selectedCollectorForEdit.name
+                    }
+                    : assignment
+            );
+            console.log("Updated assignments after single edit:", updated);
+            return updated;
+        });
+
+        setEditDialogOpen(false);
+        setSelectedCollectorForEdit(null);
+        setEditingAssignment(null);
+        successNoti("Đã cập nhật phân công");
+    };
+
+    // Refresh orders list
+    const refreshOrdersList = async () => {
+        try {
+            await request(
+                "get",
+                `/smdeli/ordermanager/order/hub/today/${hubId}`,
+                (res) => {
+                    setOrders(res.data);
+                }
+            );
+        } catch (error) {
+            console.error("Error refreshing orders list:", error);
+        }
+    };
+
+    // Refresh assignment data
+    const refreshAssignmentData = async () => {
+        try {
+            await request(
+                "get",
+                `/smdeli/ordermanager/order/assign/collector/today/${hubId}`,
+                (res) => {
+                    setAssignmentData(res.data);
+                }
+            );
+        } catch (error) {
+            console.error("Error refreshing assignment data:", error);
+        }
+    };
+
+    // Remove single assignment from suggestions
+    const handleRemoveFromSuggestion = (orderId) => {
+        setModifiedAssignments(prev =>
+            prev.filter(assignment => assignment.id !== orderId)
+        );
+        successNoti("Đã xóa khỏi danh sách phân công");
+    };
+
+    // Get collector assignment statistics
+    const getCollectorStats = () => {
+        const stats = {};
+        modifiedAssignments.forEach(assignment => {
+            if (!stats[assignment.collectorId]) {
+                stats[assignment.collectorId] = {
+                    name: assignment.collectorName,
+                    count: 0
+                };
+            }
+            stats[assignment.collectorId].count++;
+        });
+        return Object.values(stats);
+    };
+
+    // Columns for unassigned orders table
+    const unassignedOrdersColumns = [
+        { title: "Mã đơn hàng", field: "id" },
+        { title: "Tên người gửi", field: "senderName" },
+        { title: "Tên người nhận", field: "recipientName" },
+        { title: "Ngày tạo đơn", field: "createdAt", type: "datetime" },
+        { title: "Trạng thái", field: "status" },
         {
-            title: "Tên sản phẩm",
-            field: "productName",
-            editComponent: (
-                <ProductDropDown
-                    productList={remainingItems.filter(
-                        (item) => item.quantity > 0
-                    )}
-                    setSelectedProductId={setSelectedProductId}
-                    setSelectedProductName={setSelectedProductName}
-                />
-            ),
-        },
-        {
-            title: "Kho",
-            field: "warehouseName",
-            editComponent: (
-                <WarehouseDropDown
-                    warehouseList={warehouseList}
-                    setSelectedWarehouseId={setSelectedWarehouseId}
-                    setSelectedWarehouseName={setSelectedWarehouseName}
-                />
-            ),
-        },
-        {
-            title: "Vị trí kệ hàng",
-            field: "bayCode",
-            editComponent: (
-                <BayDropDownWithSelectedPrdAndWh
-                    bayList={bayList}
-                    setSelectedBayId={setSelectedBayId}
-                    setSelectedBayCode={setSelectedBayCode}
-                />
-            ),
-        },
-        {
-            title: "Số lượng",
-            field: "quantity",
-            editComponent: (
-                <TextField
-                    type="number"
-                    InputProps={{
-                        inputProps: {
-                            max: maxQuantity,
-                            min: 1,
-                        },
-                    }}
-                    value={selectedQuantity}
-                    onChange={(e) => setSelectedQuantity(e.target.value)}
-                />
+            title: "Thao tác",
+            sorting: false,
+            cellStyle: { textAlign: 'center' },
+            headerStyle: { textAlign: "center" },
+            renderCell: (rowData) => (
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '5px' }}>
+                    <IconButton
+                        style={{ padding: '5px' }}
+                        color="primary"
+                        onClick={() => {
+                            console.log("View order:", rowData.id);
+                        }}
+                    >
+                        <VisibilityIcon />
+                    </IconButton>
+                </div>
             ),
         },
     ];
 
-    const onRowAdd = (newData) => {
-        new Promise((resolve, reject) => {
-            setTimeout(() => {
-                if (
-                    selectedProductId == null ||
-                    selectedWarehouseId == null ||
-                    selectedBayId == null ||
-                    selectedQuantity < 1 ||
-                    selectedQuantity > maxQuantity
-                ) {
-                    errorNoti("Giá trị thêm mới không hợp lệ");
-                    return;
-                }
-                const adder = {
-                    productId: selectedProductId,
-                    productName: selectedProductName,
-                    warehouseId: selectedWarehouseId,
-                    warehouseName: selectedWarehouseName,
-                    bayId: selectedBayId,
-                    bayCode: selectedBayCode,
-                    quantity: selectedQuantity,
-                };
-                setProcessingItems([...processingItems, adder]);
+    // Columns for suggestion table - sử dụng selection built-in
+    const suggestionColumns = [
+        {
+            title: "Mã đơn hàng",
+            field: "id",
+            width: 200
+        },
+        {
+            title: "Tên người gửi",
+            field: "senderName",
+            width: 150
+        },
+        {
+            title: "Tên người nhận",
+            field: "recipientName",
+            width: 150
+        },
+        {
+            title: "Collector",
+            field: "collectorName",
+            width: 120
+        },
+        {
+            title: "Thứ tự",
+            field: "sequenceNumber",
+            width: 80,
+            type: "numeric"
+        },
+        {
+            title: "Thao tác",
+            sorting: false,
+            width: 120,
+            cellStyle: { textAlign: 'center', width: '120px' },
+            headerStyle: { textAlign: "center", width: '120px' },
+            renderCell: (rowData) => (
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '5px' }}>
+                    <IconButton
+                        style={{ padding: '5px' }}
+                        color="primary"
+                        onClick={() => handleEditSingleAssignment(rowData)}
+                        title="Chỉnh sửa phân công"
+                        size="small"
+                    >
+                        <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                        style={{ padding: '5px' }}
+                        color="error"
+                        onClick={() => handleRemoveFromSuggestion(rowData.id)}
+                        title="Xóa khỏi phân công"
+                        size="small"
+                    >
+                        <DeleteIcon fontSize="small" />
+                    </IconButton>
+                </div>
+            ),
+        },
+    ];
 
-                // update số lượng sản phẩm cần phân phối
-                setRemainingItems((prevItems) => {
-                    return prevItems.map((item) => {
-                        if (item.productId === selectedProductId) {
-                            const newQuantity =
-                                item.quantity - selectedQuantity;
-                            return { ...item, quantity: newQuantity };
-                        }
-                        return item;
-                    });
-                });
+    // Columns for today's assignments
+    const assignmentColumns = [
+        { title: "Mã nhân viên", field: "collectorId" },
+        { title: "Tên nhân viên", field: "collectorName" },
+        { title: "Số đơn hàng", field: "numOfOrders" },
+        { title: "Đã hoàn thành", field: "numOfCompleted" },
+        {
+            title: "Thao tác",
+            field: "actions",
+            centerHeader: true,
+            sorting: false,
+            renderCell: (rowData) => (
+                <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
+                    <IconButton
+                        style={{ padding: '5px' }}
+                        onClick={() => {
+                            window.location.href = `${window.location.pathname}/today/${rowData.collectorId}`;
+                        }}
+                        color="success"
+                        title="Xem chi tiết"
+                    >
+                        <VisibilityIcon />
+                    </IconButton>
+                    <IconButton
+                        style={{ padding: '5px' }}
+                        onClick={() => {
+                            window.location.href = `${window.location.pathname}/today/${rowData.collectorId}`;
+                        }}
+                        title="Chỉnh sửa"
+                    >
+                        <EditIcon />
+                    </IconButton>
+                </div>
+            ),
+        },
+    ];
 
-                // update lại số lượng hàng tại kho ở FE
-                let newAllWarehouses = { ...allWarehouses };
-
-                const warehouseList = newAllWarehouses[selectedProductId];
-                if (warehouseList) {
-                    for (let i = 0; i < warehouseList.length; i++) {
-                        if (warehouseList[i].id === selectedWarehouseId) {
-                            for (
-                                let j = 0;
-                                j < warehouseList[i].bays.length;
-                                j++
-                            ) {
-                                if (
-                                    warehouseList[i].bays[j].id ===
-                                    selectedBayId
-                                ) {
-                                    const newBays = [...warehouseList[i].bays];
-                                    newBays[j].quantityOnHand -=
-                                        selectedQuantity;
-
-                                    const updatedWarehouse = {
-                                        ...warehouseList[i],
-                                        bays: newBays,
-                                    };
-                                    newAllWarehouses[selectedProductId][i] =
-                                        updatedWarehouse;
-                                }
-                            }
-                        }
-                    }
-                }
-                setAllWarehouses(newAllWarehouses);
-
-                // update lại giá trị đã chọn cho adder
-                setSelectedProductId(null);
-                setSelectedProductName(null);
-                setSelectedBayId(null);
-                setSelectedBayCode(null);
-                setSelectedWarehouseId(null);
-                setSelectedWarehouseName(null);
-                setSelectedQuantity(null);
-
-                resolve();
-            });
-        });
-    };
-
-    const onRowDelete = (oldData) => {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                for (var i = 0; i < oldData.length; i++) {
-                    console.log("onRowDelete, data: ", oldData[i], 'processingItem: ', processingItems);
-                    // Xóa bản ghi khỏi dữ liệu UI
-                    let isDeleted = false;
-                    const newProcessingItems = processingItems.filter(
-                        (item) => {
-                            if (
-                                !isDeleted &&
-                                item.productId === oldData[i].productId &&
-                                item.warehouseId === oldData[i].warehouseId &&
-                                item.bayId === oldData[i].bayId &&
-                                item.quantity === oldData[i].quantity
-                            ) {
-                                isDeleted = true;
-                                return false;
-                            }
-                            return true;
-                        }
-                    );
-                    setProcessingItems(newProcessingItems);
-
-                    // Cập nhật lại số lượng sản phẩm cần phân phối
-                    const newRemainingItems = remainingItems.map((item) => {
-                        if (item.productId === oldData[i].productId) {
-                            const newQuantity =
-                                parseInt(item.quantity, 10) + parseInt(oldData[i].quantity, 10);
-                            return { ...item, quantity: newQuantity };
-                        }
-
-                        return item;
-                    });
-                    setRemainingItems(newRemainingItems);
-
-                    // Cập nhật lại số lượng hàng tại kho ở FE
-                    const newAllWarehouses = { ...allWarehouses };
-
-
-                    const warehouseList =
-                        newAllWarehouses[oldData[i].productId];
-                    console.log('Start Cập nhật lại số lượng hàng tại kho ở FE: ', warehouseList[i].id, oldData[i].warehouseId);
-                    if (warehouseList) {
-                        for (let i = 0; i < warehouseList.length; i++) {
-                            if ( warehouseList[i]?.id == oldData[i]?.warehouseId ) {
-                                for (
-                                    let j = 0;
-                                    j < warehouseList[i].bays.length;
-                                    j++
-                                ) {
-                                    if (
-                                        warehouseList[i].bays[j].id ==
-                                        oldData[i].bayId
-                                    ) {
-                                        const newBays = [
-                                            ...warehouseList[i].bays,
-                                        ];
-                                        newBays[j].quantityOnHand +=
-                                            parseInt(oldData[i].quantity, 10);
-
-                                        const updatedWarehouse = {
-                                            ...warehouseList[i],
-                                            bays: newBays,
-                                        };
-                                        newAllWarehouses[oldData[i].productId][
-                                            i
-                                            ] = updatedWarehouse;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    console.log('Done Cập nhật lại số lượng hàng tại kho ở FE: ', newAllWarehouses);
-                    setAllWarehouses(newAllWarehouses);
-                }
-
-                resolve();
-            });
-        });
-    };
-
-    console.log("matching option: ", allWarehouses);
     return loading ? (
         <LoadingScreen />
     ) : (
         <Fragment>
-            {/*<Box>*/}
-            {/*    <Grid*/}
-            {/*        container*/}
-            {/*        justifyContent="space-between"*/}
-            {/*        className={classes.headerBox}*/}
-            {/*    >*/}
-            {/*        <Grid>*/}
-            {/*            <Typography variant="h5">Phân công lấy hàng</Typography>*/}
-            {/*        </Grid>*/}
-            {/*    </Grid>*/}
-            {/*</Box>*/}
-
             <Box className={classes.bodyBox}>
+                {/* Saved suggestion alert */}
+                {hasSavedSuggestion && !suggestionMode && (
+                    <Alert
+                        severity="info"
+                        sx={{ mb: 2 }}
+                        action={
+                            <Box>
+                                <Button
+                                    color="inherit"
+                                    size="small"
+                                    onClick={loadSavedSuggestionButtonHandle}
+                                    startIcon={<RestoreIcon />}
+                                    sx={{ mr: 1 }}
+                                >
+                                    Tải đề xuất đã lưu
+                                </Button>
+                                <Button
+                                    color="inherit"
+                                    size="small"
+                                    onClick={clearSavedSuggestionButtonHandle}
+                                >
+                                    Xóa
+                                </Button>
+                            </Box>
+                        }
+                    >
+                        Bạn có một đề xuất phân công đã lưu ({savedSuggestions.ordersCount} đơn hàng)
+                        từ {new Date(savedSuggestions.timestamp).toLocaleString()}
+                    </Alert>
+                )}
 
-
-                {/* Xu ly hang hoa */}
                 <TabContext value={tabValue}>
                     <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
                         <TabList
-                            onChange={(event, newValue) =>
-                                setTabValue(newValue)
-                            }
+                            onChange={(event, newValue) => setTabValue(newValue)}
                         >
                             <Tab label="Bảng phân công hôm nay" value="4" />
-                            <Tab
-                                label="Đơn hàng cần phân công"
-                                value="1"
-                            />
-                            {/*<Tab label="Danh sách nhân viên lấy hàng" value="2" />*/}
-                            {/*<Tab label="Đơn hàng đã phân công" value="3" />*/}
-
+                            <Tab label="Đơn hàng cần phân công" value="1" />
                         </TabList>
                     </Box>
 
                     <TabPanel value="1">
-                        <StandardTable
-                            rowKey="id"
-                            title="Danh sách đơn hàng chưa phân công"
-                            columns={[
-                                { title: "Mã đơn hàng", field: "id" },
-                                { title: "Ngày tạo đơn", field: "createdAt" },
-                                { title: "Trạng thái", field: "status" },
-                                {
-                                    title: "Thao tác",
-                                    sorting: false,
-                                    cellStyle: {
-                                        textAlign: 'center', // Align the content to the left
+                        {suggestionMode ? (
+                            <Box>
+                                {/* Collector statistics */}
+                                {modifiedAssignments.length > 0 && (
+                                    <Box sx={{ mb: 2 }}>
+                                        <Typography variant="h6" sx={{ mb: 1 }}>
+                                            Thống kê phân công:
+                                        </Typography>
+                                        <Stack direction="row" spacing={1} flexWrap="wrap">
+                                            {getCollectorStats().map((stat, index) => (
+                                                <Chip
+                                                    key={index}
+                                                    label={`${stat.name}: ${stat.count} đơn`}
+                                                    color="primary"
+                                                    variant="outlined"
+                                                />
+                                            ))}
+                                        </Stack>
+                                    </Box>
+                                )}
 
-                                    },
-                                    headerStyle: {
-                                        textAlign:"center"
-                                    },
-                                    render: (rowData) => (
-                                        <div style={{ display: 'flex', justifyContent: 'center', gap: '5px' }}>
-                                            <IconButton
-                                                style={{ padding: '5px' }}
-                                                // onClick={() => handleEdit(rowData)}
-                                                color="success"
-                                            >
-                                                <VisibilityIcon />
-                                            </IconButton>
-                                            <IconButton
-                                                style={{ padding: '5px' }}
-                                                // onClick={() => handleEdit(rowData)}
-                                            >
-                                                <EditIcon />
-                                            </IconButton>
-                                            <IconButton
-                                                style={{ padding: '5px' }}
-                                                // onClick={() => handleDelete(rowData)}
-                                                color="error"
-                                            >
-                                                <DeleteIcon />
-                                            </IconButton>
-                                        </div>
-                                    ),
-                                },
-                            ]}
-                                data={orders}
+                                {/* Selection info for assignments */}
+                                {selectedAssignments.length > 0 && (
+                                    <Box sx={{ mb: 2 }}>
+                                        <Alert severity="info">
+                                            Đã chọn {selectedAssignments.length} phân công
+                                        </Alert>
+                                    </Box>
+                                )}
+
+                                {/* Bulk action buttons for assignments */}
+                                <Box sx={{ mb: 2 }}>
+                                    <Button
+                                        variant="outlined"
+                                        startIcon={<SwapHorizIcon />}
+                                        onClick={handleBulkEditAssignment}
+                                        disabled={selectedAssignments.length === 0}
+                                        sx={{ mr: 1 }}
+                                        color={selectedAssignments.length > 0 ? "primary" : "inherit"}
+                                    >
+                                        Đổi collector cho {selectedAssignments.length > 0 ? selectedAssignments.length : 'các'} mục đã chọn
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        color="error"
+                                        startIcon={<DeleteIcon />}
+                                        onClick={handleDeleteSelectedAssignments}
+                                        disabled={selectedAssignments.length === 0}
+                                    >
+                                        Xóa {selectedAssignments.length > 0 ? selectedAssignments.length : 'các'} mục đã chọn
+                                    </Button>
+                                </Box>
+
+                                <StandardTable
+                                    key="suggestion-table"
+                                    rowKey="id"
+                                    title="Đề xuất phân công - Có thể chỉnh sửa trước khi xác nhận"
+                                    columns={suggestionColumns}
+                                    data={modifiedAssignments}
+                                    options={{
+                                        selection: true, // Bật selection
+                                        pageSize: 10,
+                                        search: true,
+                                        sorting: true,
+                                    }}
+                                    onSelectionChange={handleAssignmentSelectionChange}
+                                    actions={[
+                                        {
+                                            tooltip: "Lưu đề xuất",
+                                            icon: SaveIcon,
+                                            iconOnClickHandle: saveSuggestionButtonHandle,
+                                            disabled: modifiedAssignments.length === 0
+                                        },
+                                        {
+                                            tooltip: "Xác nhận phân công",
+                                            iconOnClickHandle: confirmAssignmentButtonHandle,
+                                            disabled: modifiedAssignments.length === 0
+                                        },
+                                        {
+                                            tooltip: "Hủy đề xuất",
+                                            iconOnClickHandle: cancelSuggestionButtonHandle,
+                                        },
+                                    ]}
+                                />
+                            </Box>
+                        ) : (
+                            <Box>
+                                {/* Selection info for orders */}
+                                {selectedOrders.length > 0 && (
+                                    <Box sx={{ mb: 2 }}>
+                                        <Alert severity="info">
+                                            Đã chọn {selectedOrders.length} đơn hàng
+                                        </Alert>
+                                    </Box>
+                                )}
+
+                                <StandardTable
+                                    rowKey="id"
+                                    title="Danh sách đơn hàng chưa phân công"
+                                    columns={unassignedOrdersColumns}
+                                    data={orders}
+                                    options={{
+                                        selection: true, // Bật selection cho bảng orders
+                                        pageSize: 10,
+                                        search: true,
+                                        sorting: true,
+                                    }}
+                                    onSelectionChange={handleOrderSelectionChange}
+                                    actions={[
+                                        ...(hasSavedSuggestion ? [{
+                                            tooltip: "Tải đề xuất đã lưu",
+                                            icon: RestoreIcon,
+                                            iconOnClickHandle: loadSavedSuggestionButtonHandle,
+                                        }] : []),
+                                        {
+                                            tooltip: "Tạo phân công thủ công",
+                                            iconOnClickHandle: createManualAssignmentButtonHandle,
+                                            disabled: selectedOrders.length === 0
+                                        },
+                                        {
+                                            tooltip: "Lấy đề xuất phân công tự động",
+                                            iconOnClickHandle: getSuggestionButtonHandle,
+                                            disabled: selectedOrders.length === 0 || collectors.length === 0
+                                        },
+                                    ]}
+                                />
+                            </Box>
+                        )}
+                    </TabPanel>
+
+                    <TabPanel value="4">
+                        <StandardTable
+                            rowKey="collectorId"
+                            title="Bảng phân công lấy hàng hôm nay"
+                            columns={assignmentColumns}
+                            data={assignmentData}
                             options={{
                                 selection: false,
                                 pageSize: 10,
                                 search: true,
                                 sorting: true,
                             }}
-                            editable={
-                                {
-                                    onRowDelete: onRowDelete,
-                                }
-                            }
                             actions={[
-
                                 {
-                                    tooltip: "Phân công tự động",
-                                    iconOnClickHandle:
-                                    autoAssignButtonHandle,
+                                    tooltip: "Làm mới dữ liệu",
+                                    iconOnClickHandle: refreshAssignmentData,
                                 },
                             ]}
                         />
                     </TabPanel>
-
-                    {/* Tab 2: San pham dang phan phoi*/}
-                    <TabPanel value="2">
-                        <StandardTable
-                            rowKey="id"
-                            title="Danh sách nhân viên lấy hàng"
-                            hideCommandBar={true}
-                            columns={[
-                                { title: "Mã nhân viên", field: "id" },
-                                { title: "Số điện thoại", field: "phone" },
-                                { title: "Trạng thái", field: "" },
-
-                            ]}
-                            data={processingItems}
-                            options={{
-                                selection: false,
-                                pageSize: 5,
-                                search: true,
-                                sorting: true,
-                            }}
-                            editable={
-                                !isDoneOrder && {
-                                    onRowAdd: onRowAdd,
-                                    onRowDelete: onRowDelete,
-                                }
-                            }
-                            actions={
-                                !isDoneOrder && [
-                                    {
-                                        tooltip: "Lưu",
-                                        iconOnClickHandle: saveProcessingItems,
-                                    },
-                                    {
-                                        tooltip: "Phân phối tự động",
-                                        iconOnClickHandle:
-                                        autoAssignButtonHandle,
-                                    },
-                                ]
-                            }
-                        />
-                    </TabPanel>
-
-                    {/* Tab 3: San pham da phan phoi */}
-                    <TabPanel value="3">
-                        <StandardTable
-                            title="Danh sách sản phẩm đã phân phối"
-                            hideCommandBar={true}
-                            columns={[
-                                { title: "Tên sản phẩm", field: "productName" },
-                                { title: "Số lượng", field: "quantity" },
-                                { title: "Kho", field: "warehouseName" },
-                                { title: "Vị trí kệ hàng", field: "bayCode" },
-                                { title: "Trạng thái", field: "status" },
-                                { title: "Số lô", field: "lotId" },
-                                {
-                                    title: "Ngày phân phối",
-                                    field: "createdDate",
-                                },
-                            ]}
-                            data={processedItems}
-                            options={{
-                                selection: false,
-                                pageSize: 5,
-                                search: true,
-                                sorting: true,
-                            }}
-                        />
-                    </TabPanel>
-
-                    <TabPanel value="4">
-                    <StandardTable
-                        title="Bảng phân công lấy hàng hôm nay"
-                        columns={[
-                            { title: "Mã nhân viên", field: "collectorId" },
-                            { title: "Tên nhân viên", field: "collectorName" },
-                            { title: "Số đơn hàng", field: "numOfOrders" },
-
-                            { title: "Đã hoàn thành", field: "numOfCompleted" },
-                            {
-                                title: "Thao tác",
-                                field: "actions", // Field này vẫn cần để tránh lỗi nếu StandardTable sử dụng nó
-                                centerHeader: true,
-                                sorting: false,
-                                renderCell: (rowData) => ( // Sử dụng renderCell thay vì render
-                                    <div style={{ display: 'flex', gap: '5px', padding: '0px'}}>
-                                        <IconButton
-                                            style={{ padding: '5px' }}
-                                            onClick={() => {
-                                                window.location.href = `${window.location.pathname}/today/${rowData.collectorId}`;
-                                            }}
-                                            color="success"
-                                        >
-                                            <VisibilityIcon />
-                                        </IconButton>
-                                        <IconButton
-                                            style={{ padding: '5px' }}
-                                            onClick={() => {
-                                                window.location.href = `${window.location.pathname}/today/${rowData.collectorId}`;
-                                            }}                                        >
-                                            <EditIcon />
-                                        </IconButton>
-                                        <IconButton
-                                            style={{ padding: '5px' }}
-                                            onClick={() => console.log("Delete", rowData)}
-                                            color="error"
-                                        >
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </div>
-                                ),
-                            },
-
-                        ]}
-                        data={assigmentData}
-                        options={{
-                            selection: false,
-                            pageSize: 10,
-                            search: true,
-                            sorting: true,
-                        }}
-
-
-                    />
-                    </TabPanel>
-
                 </TabContext>
             </Box>
+
+            {/* Single Edit Dialog với Autocomplete Search */}
+            <Dialog
+                open={editDialogOpen}
+                onClose={() => {
+                    console.log("Closing edit dialog");
+                    setEditDialogOpen(false);
+                    setSelectedCollectorForEdit(null);
+                    setEditingAssignment(null);
+                }}
+                maxWidth="sm"
+                fullWidth
+            >
+                <DialogTitle>Chỉnh sửa phân công</DialogTitle>
+                <DialogContent>
+                    {editingAssignment ? (
+                        <Box sx={{ pt: 2 }}>
+                            <Typography variant="body1" sx={{ mb: 2 }}>
+                                <strong>Đơn hàng:</strong> {editingAssignment.id}
+                            </Typography>
+                            <Typography variant="body1" sx={{ mb: 2 }}>
+                                <strong>Người gửi:</strong> {editingAssignment.senderName}
+                            </Typography>
+                            <Typography variant="body1" sx={{ mb: 2 }}>
+                                <strong>Người nhận:</strong> {editingAssignment.recipientName}
+                            </Typography>
+                            <Typography variant="body1" sx={{ mb: 2 }}>
+                                <strong>Collector hiện tại:</strong> {editingAssignment.collectorName || "Chưa phân công"}
+                            </Typography>
+
+                            {/* Autocomplete Search cho Collector */}
+                            <Autocomplete
+                                value={selectedCollectorForEdit}
+                                onChange={(event, newValue) => {
+                                    console.log("Selected collector:", newValue);
+                                    setSelectedCollectorForEdit(newValue);
+                                }}
+                                options={collectors}
+                                getOptionLabel={(option) => `${option.name} - ${option.phone}`}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label="Chọn Collector mới"
+                                        placeholder="Tìm kiếm theo tên hoặc số điện thoại..."
+                                        fullWidth
+                                        sx={{ mt: 2 }}
+                                    />
+                                )}
+                                renderOption={(props, option) => (
+                                    <Box component="li" {...props}>
+                                        <Box>
+                                            <Typography variant="body1" fontWeight="bold">
+                                                {option.name}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                {option.phone} - ID: {option.id}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                )}
+                                isOptionEqualToValue={(option, value) => option.id === value?.id}
+                                filterOptions={(options, { inputValue }) => {
+                                    return options.filter(option =>
+                                        option.name.toLowerCase().includes(inputValue.toLowerCase()) ||
+                                        option.phone.includes(inputValue) ||
+                                        option.id.toString().includes(inputValue)
+                                    );
+                                }}
+                                clearText="Xóa"
+                                noOptionsText="Không tìm thấy collector"
+                                isClearable
+                            />
+                        </Box>
+                    ) : (
+                        <Typography>Không có dữ liệu phân công</Typography>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => {
+                        setEditDialogOpen(false);
+                        setSelectedCollectorForEdit(null);
+                        setEditingAssignment(null);
+                    }}>
+                        Hủy
+                    </Button>
+                    <Button
+                        onClick={handleSaveSingleEdit}
+                        variant="contained"
+                        disabled={!selectedCollectorForEdit}
+                    >
+                        Lưu thay đổi
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Bulk Edit Dialog với Autocomplete Search */}
+            <Dialog
+                open={bulkEditDialogOpen}
+                onClose={() => setBulkEditDialogOpen(false)}
+                maxWidth="sm"
+                fullWidth
+            >
+                <DialogTitle>Đổi collector cho nhiều phân công</DialogTitle>
+                <DialogContent>
+                    <Box sx={{ pt: 2 }}>
+                        <Typography variant="body1" sx={{ mb: 2 }}>
+                            Bạn đang thay đổi collector cho <strong>{selectedAssignments.length}</strong> phân công được chọn
+                        </Typography>
+
+                        {/* Hiển thị danh sách assignments được chọn */}
+                        <Box sx={{ mb: 2, p: 2, border: '1px solid #e0e0e0', borderRadius: 1, maxHeight: 200, overflow: 'auto' }}>
+                            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                                Danh sách đơn hàng được chọn:
+                            </Typography>
+                            {selectedAssignments.map((assignment, index) => (
+                                <Typography key={assignment.id} variant="body2" sx={{ mb: 0.5 }}>
+                                    {index + 1}. {assignment.id} - {assignment.senderName} → {assignment.recipientName}
+                                </Typography>
+                            ))}
+                        </Box>
+
+                        {/* Autocomplete Search cho Bulk Edit */}
+                        <Autocomplete
+                            value={selectedCollectorForBulkEdit}
+                            onChange={(event, newValue) => {
+                                console.log("Selected collector for bulk edit:", newValue);
+                                setSelectedCollectorForBulkEdit(newValue);
+                            }}
+                            options={collectors}
+                            getOptionLabel={(option) => `${option.name} - ${option.phone}`}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label="Chọn Collector mới"
+                                    placeholder="Tìm kiếm theo tên hoặc số điện thoại..."
+                                    fullWidth
+                                />
+                            )}
+                            renderOption={(props, option) => (
+                                <Box component="li" {...props}>
+                                    <Box>
+                                        <Typography variant="body1" fontWeight="bold">
+                                            {option.name}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {option.phone} - ID: {option.id}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            )}
+                            isOptionEqualToValue={(option, value) => option.id === value?.id}
+                            filterOptions={(options, { inputValue }) => {
+                                return options.filter(option =>
+                                    option.name.toLowerCase().includes(inputValue.toLowerCase()) ||
+                                    option.phone.includes(inputValue) ||
+                                    option.id.toString().includes(inputValue)
+                                );
+                            }}
+                            clearText="Xóa"
+                            noOptionsText="Không tìm thấy collector"
+                            isClearable
+                        />
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setBulkEditDialogOpen(false)}>
+                        Hủy
+                    </Button>
+                    <Button
+                        onClick={handleSaveBulkEdit}
+                        variant="contained"
+                        disabled={!selectedCollectorForBulkEdit}
+                    >
+                        Áp dụng cho {selectedAssignments.length} phân công
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Fragment>
     );
 };

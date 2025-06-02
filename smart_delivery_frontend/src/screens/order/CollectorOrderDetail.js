@@ -25,6 +25,7 @@ const CollectorOrderDetail = () => {
     const { register, errors, handleSubmit } = useForm();
     const location = useLocation();
     const assignmentId = location.state?.assignmentId;
+    const [assignment, setAssignment] = useState(null);
 
     // Get role from Redux state
     const role = useSelector((state) => state.auth.user?.role);
@@ -47,6 +48,20 @@ const CollectorOrderDetail = () => {
     // Role-specific storage keys
     const assignmentsStorageKey = isCollector ? 'collector_assignments' : 'shipper_assignments';
     const nextOrderStorageKey = isCollector ? 'collector_nextOrder' : 'shipper_nextOrder';
+
+    // Helper function to check if assignment is completed based on role
+    const isAssignmentCompleted = (assignmentData) => {
+        if (!assignmentData) return false;
+
+        if (isCollector) {
+            return assignmentData.assignmentStatus === "COMPLETED" || assignmentData.assignmentStatus === "FAILED_ONCE";
+        } else {
+            return assignmentData.assignmentStatus === "COMPLETED" || assignmentData.assignmentStatus === "FAILED_ATTEMPT";
+        }
+    };
+
+    // Check if action buttons should be disabled
+    const isActionDisabled = isAssignmentCompleted(assignment);
 
     const [formData, setFormData] = useState({
         senderName: '',
@@ -101,7 +116,28 @@ const CollectorOrderDetail = () => {
         }
     }, [orderId]);
 
+    // Fetch assignment data to check status
+    useEffect(() => {
+        if (assignmentId) {
+            // Get assignment data from session storage first
+            const storedAssignments = JSON.parse(sessionStorage.getItem(assignmentsStorageKey)) || [];
+            const currentAssignment = storedAssignments.find(a => a.id === assignmentId);
+
+            if (currentAssignment) {
+                setAssignment(currentAssignment);
+            } else {
+                // If not found in storage, could fetch from API if needed
+                console.warn("Assignment not found in session storage");
+            }
+        }
+    }, [assignmentId, assignmentsStorageKey]);
+
     const handleSuccessfulAction = async () => {
+        if (isActionDisabled) {
+            errorNoti("Không thể thực hiện thao tác này - đơn hàng đã được xử lý");
+            return;
+        }
+
         try {
             await request(
                 "put",
@@ -139,7 +175,14 @@ const CollectorOrderDetail = () => {
     };
 
     const handleFailedAction = async () => {
+        if (isActionDisabled) {
+            errorNoti("Không thể thực hiện thao tác này - đơn hàng đã được xử lý");
+            return;
+        }
+
         try {
+            const failedStatus = isCollector ? 'FAILED_ONCE' : 'FAILED_ATTEMPT';
+
             await request(
                 "put",
                 assignmentEndpoint,
@@ -149,7 +192,7 @@ const CollectorOrderDetail = () => {
                     const nextOrder = storedAssignments[currentIndex + 1] || null;
                     sessionStorage.setItem(nextOrderStorageKey, JSON.stringify(nextOrder));
 
-                    successNoti(`${actionCapitalized} thất bại!`);
+                    successNoti(`${actionCapitalized} thất bại đã được ghi nhận!`);
                     setTimeout(() => {
                         history.goBack();
                     }, 1500);
@@ -167,7 +210,7 @@ const CollectorOrderDetail = () => {
                 },
                 {
                     assignmentId: assignmentId,
-                    status: 'FAILED_ONCE'
+                    status: failedStatus
                 }
             );
         } catch (error) {
@@ -462,6 +505,11 @@ const CollectorOrderDetail = () => {
                             <Typography variant="h5">
                                 {"Chi tiết đơn hàng"}
                             </Typography>
+                            {isActionDisabled && (
+                                <Typography variant="body2" sx={{ color: 'orange', fontStyle: 'italic', marginTop: '8px' }}>
+                                    Đơn hàng này đã được xử lý - không thể thực hiện thao tác
+                                </Typography>
+                            )}
                         </Grid>
                     </Grid>
                 </Box>
@@ -713,7 +761,12 @@ const CollectorOrderDetail = () => {
                                         variant="contained"
                                         color="primary"
                                         onClick={handleSuccessfulAction}
-                                        style={{ marginRight: '16px' }}
+                                        disabled={isActionDisabled}
+                                        style={{
+                                            marginRight: '16px',
+                                            opacity: isActionDisabled ? 0.6 : 1,
+                                            cursor: isActionDisabled ? 'not-allowed' : 'pointer'
+                                        }}
                                     >
                                         {actionCapitalized} thành công
                                     </Button>
@@ -721,6 +774,11 @@ const CollectorOrderDetail = () => {
                                         variant="contained"
                                         color="error"
                                         onClick={handleFailedAction}
+                                        disabled={isActionDisabled}
+                                        style={{
+                                            opacity: isActionDisabled ? 0.6 : 1,
+                                            cursor: isActionDisabled ? 'not-allowed' : 'pointer'
+                                        }}
                                     >
                                         {actionCapitalized} thất bại
                                     </Button>

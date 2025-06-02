@@ -955,6 +955,7 @@ public class TripServiceImpl implements TripService {
                             .date(tripDate)
                             .status(TripStatus.PLANNED)
                             .currentStopIndex(0)
+                            .plannedStartTime(routeSchedule.getStartTime())
                             .ordersPickedUp(0)
                             .ordersDelivered(0)
                             .build();
@@ -1050,6 +1051,7 @@ public class TripServiceImpl implements TripService {
                 .routeCode(route.getRouteCode())
                 .status(trip.getStatus())
                 .startTime(trip.getStartTime())
+                .plannedStartTime(trip.getPlannedStartTime())
                 .endTime(trip.getEndTime())
                 .date(trip.getDate())
                 .currentStopIndex(trip.getCurrentStopIndex())
@@ -1117,5 +1119,319 @@ public class TripServiceImpl implements TripService {
         List<Trip> trips = tripRepository.findAllTripsByHubIdAndDateThrough(hubId, LocalDate.now());
         return trips.stream().map(this::convertToTripDTO)
                 .collect(Collectors.toList());
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public List<TripDTO> getAllTrips() {
+        log.info("Getting all trips");
+        List<Trip> trips = tripRepository.findAll();
+        return trips.stream()
+                .map(this::convertToTripDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TripDetailsDTO getTripById(UUID tripId) {
+        log.info("Getting trip details for tripId: {}", tripId);
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new NotFoundException("Trip not found with id: " + tripId));
+
+        return convertToTripDetailsDTO(trip);
+    }
+
+//    @Override
+//    @Transactional(readOnly = true)
+//    public List<TripDTO> getTripsWithFilter(LocalDate startDate, LocalDate endDate,
+//                                            String status, UUID driverId, UUID vehicleId) {
+//        log.info("Getting trips with filters - startDate: {}, endDate: {}, status: {}, driverId: {}, vehicleId: {}",
+//                startDate, endDate, status, driverId, vehicleId);
+//
+//        List<Trip> trips = tripRepository.findTripsWithFilters(startDate, endDate, status, driverId, vehicleId);
+//        return trips.stream()
+//                .map(this::convertToTripDTO)
+//                .collect(Collectors.toList());
+//    }
+
+    @Override
+    public Trip updateTrip(UUID tripId, TripUpdateDto updateDTO, String changedBy) {
+        log.info("Updating trip: {} by user: {}", tripId, changedBy);
+
+        Trip existingTrip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new NotFoundException("Trip not found with id: " + tripId));
+
+        // Validate status transition if status is being updated
+        if (updateDTO.getStatus() != null) {
+            validateStatusTransition(existingTrip.getStatus(), updateDTO.getStatus());
+        }
+
+        // Validate field updates based on current status
+        validateFieldUpdates(existingTrip.getStatus(), updateDTO);
+
+        // Apply updates
+        applyUpdates(existingTrip, updateDTO, changedBy);
+
+        Trip savedTrip = tripRepository.save(existingTrip);
+        log.info("Trip updated successfully: {}", tripId);
+
+        return savedTrip;
+    }
+
+    @Override
+    public void deleteTrip(UUID tripId) {
+        log.info("Deleting trip: {}", tripId);
+
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new NotFoundException("Trip not found with id: " + tripId));
+
+        // Only allow deletion of PLANNED trips
+        if (trip.getStatus() != TripStatus.PLANNED) {
+            throw new IllegalStateException("Only PLANNED trips can be deleted. Current status: " + trip.getStatus());
+        }
+
+        tripRepository.delete(trip);
+        log.info("Trip deleted successfully: {}", tripId);
+    }
+    private TripDetailsDTO convertToTripDetailsDTO(Trip trip) {
+
+
+        // Find the route for this trip
+        UUID routeScheduleId = trip.getRouteScheduleId(); // This now represents the route ID directly
+        RouteSchedule routeSchedule = routeScheduleRepository.findById(routeScheduleId)
+                .orElseThrow(() -> new NotFoundException("Route not found"));
+
+        Route route = routeRepository.findById(routeSchedule.getRouteId()).orElseThrow(() -> new NotFoundException());
+        // Get route stops
+        List<RouteStop> routeStops = routeStopRepository.findByRouteIdOrderByStopSequence(routeSchedule.getRouteId());
+        List<TripOrder> tripOrders = tripOrderRepository.findByTripId(trip.getId());
+
+        int orderCount = tripOrders.size();
+
+        // Convert to DTOs and set status based on current stop index
+        List<TripStopDTO> stopDTOs = new ArrayList<>();
+        for (int i = 0; i < routeStops.size(); i++) {
+            RouteStop stop = routeStops.get(i);
+            Hub hub = hubRepo.findById(stop.getHubId())
+                    .orElseThrow(() -> new NotFoundException("Hub not found"));
+
+            String status;
+            if (i < trip.getCurrentStopIndex() || i == trip.getCurrentStopIndex() && ("COMPLETED".equals(trip.getStatus()) || TripStatus.COMPLETED.equals(trip.getStatus()))) {
+                status = "COMPLETED";
+            } else if (i == trip.getCurrentStopIndex()) {
+                status = "CURRENT";
+            } else {
+                status = "PENDING";
+            }
+
+            // Count orders for this stop
+
+            // Calculate estimated arrival time (this would be more complex in a real system)
+            LocalTime baseTime = LocalTime.of(8, 0); // Assume 8:00 AM start
+            LocalTime estimatedTime = baseTime.plusMinutes(stop.getStopSequence() * 45L); // 45 min between stops
+
+            TripStopDTO stopDTO = TripStopDTO.builder()
+                    .id(stop.getId())
+                    .hubId(hub.getHubId())
+                    .hubName(hub.getName())
+                    .address(hub.getAddress())
+                    .latitude(hub.getLatitude())
+                    .longitude(hub.getLongitude())
+                    .stopSequence(stop.getStopSequence())
+                    .estimatedArrivalTime(estimatedTime.format(DateTimeFormatter.ofPattern("HH:mm")))
+                    .status(status)
+                    .orderCount(orderCount)
+                    .build();
+
+            stopDTOs.add(stopDTO);
+        }
+        List<OrderSummaryDTO> orderDtos = tripOrders.stream()
+                .map(tripOrder -> {
+                    Order order = orderRepo.findById(tripOrder.getOrderId())
+                            .orElseThrow(() -> new NotFoundException("Order not found"));
+                    return new OrderSummaryDTO(order); // You need this conversion step
+                })
+                .collect(Collectors.toList());
+        // Count completed orders
+        int ordersDelivered = tripOrderRepository.findByTripIdAndDeliveredIsTrue(trip.getId()).size();
+
+        return TripDetailsDTO.builder()
+                .id(trip.getId())
+                .routeScheduleId(routeScheduleId)
+                .routeName(route.getRouteName())
+                .status(trip.getStatus())
+                .startTime(trip.getStartTime())
+                .endTime(trip.getEndTime())
+                .currentStopIndex(trip.getCurrentStopIndex())
+                .totalStops(routeStops.size())
+                .ordersCount(orderCount)
+                .ordersDelivered(ordersDelivered)
+                .stops(stopDTOs)
+                .orders(orderDtos)
+                .build();
+    }
+
+    // Private helper methods
+    private void validateStatusTransition(TripStatus currentStatus, TripStatus targetStatus) {
+        if (currentStatus == null || targetStatus == null) {
+            throw new IllegalArgumentException("Status cannot be null");
+        }
+
+        boolean isValidTransition = false;
+
+        if (currentStatus == TripStatus.PENDING) {
+            isValidTransition = targetStatus == TripStatus.PLANNED || targetStatus == TripStatus.CANCELLED;
+        } else if (currentStatus == TripStatus.PLANNED) {
+            isValidTransition = targetStatus == TripStatus.IN_PROGRESS ||
+                    targetStatus == TripStatus.DELAYED ||
+                    targetStatus == TripStatus.CANCELLED;
+        } else if (currentStatus == TripStatus.IN_PROGRESS) {
+            isValidTransition = targetStatus == TripStatus.CAME_FIRST_STOP ||
+                    targetStatus == TripStatus.CAME_STOP ||
+                    targetStatus == TripStatus.DELAYED ||
+                    targetStatus == TripStatus.CANCELLED;
+        } else if (currentStatus == TripStatus.CAME_FIRST_STOP) {
+            isValidTransition = targetStatus == TripStatus.PICKED_UP ||
+                    targetStatus == TripStatus.CAME_STOP ||
+                    targetStatus == TripStatus.DELAYED ||
+                    targetStatus == TripStatus.CANCELLED;
+        } else if (currentStatus == TripStatus.CAME_STOP) {
+            isValidTransition = targetStatus == TripStatus.PICKED_UP ||
+                    targetStatus == TripStatus.DELIVERED ||
+                    targetStatus == TripStatus.DONE_STOP ||
+                    targetStatus == TripStatus.DELAYED ||
+                    targetStatus == TripStatus.CANCELLED;
+        } else if (currentStatus == TripStatus.PICKED_UP) {
+            isValidTransition = targetStatus == TripStatus.DELIVERED ||
+                    targetStatus == TripStatus.CAME_STOP ||
+                    targetStatus == TripStatus.CAME_LAST_STOP ||
+                    targetStatus == TripStatus.DELAYED ||
+                    targetStatus == TripStatus.CANCELLED;
+        } else if (currentStatus == TripStatus.DELIVERED) {
+            isValidTransition = targetStatus == TripStatus.DONE_STOP ||
+                    targetStatus == TripStatus.CAME_STOP ||
+                    targetStatus == TripStatus.CAME_LAST_STOP ||
+                    targetStatus == TripStatus.DELAYED ||
+                    targetStatus == TripStatus.CANCELLED;
+        } else if (currentStatus == TripStatus.DONE_STOP) {
+            isValidTransition = targetStatus == TripStatus.CAME_STOP ||
+                    targetStatus == TripStatus.CAME_LAST_STOP ||
+                    targetStatus == TripStatus.CONFIRMED_OUT ||
+                    targetStatus == TripStatus.DELAYED ||
+                    targetStatus == TripStatus.CANCELLED;
+        } else if (currentStatus == TripStatus.CAME_LAST_STOP) {
+            isValidTransition = targetStatus == TripStatus.CONFIRMED_OUT ||
+                    targetStatus == TripStatus.COMPLETED ||
+                    targetStatus == TripStatus.DELAYED ||
+                    targetStatus == TripStatus.CANCELLED;
+        } else if (currentStatus == TripStatus.CONFIRMED_IN) {
+            isValidTransition = targetStatus == TripStatus.IN_PROGRESS ||
+                    targetStatus == TripStatus.CAME_FIRST_STOP ||
+                    targetStatus == TripStatus.DELAYED ||
+                    targetStatus == TripStatus.CANCELLED;
+        } else if (currentStatus == TripStatus.CONFIRMED_OUT) {
+            isValidTransition = targetStatus == TripStatus.COMPLETED ||
+                    targetStatus == TripStatus.CANCELLED;
+        } else if (currentStatus == TripStatus.DELAYED) {
+            // From DELAYED, can return to previous appropriate state or cancel
+            isValidTransition = targetStatus == TripStatus.IN_PROGRESS ||
+                    targetStatus == TripStatus.CAME_FIRST_STOP ||
+                    targetStatus == TripStatus.CAME_STOP ||
+                    targetStatus == TripStatus.CAME_LAST_STOP ||
+                    targetStatus == TripStatus.PICKED_UP ||
+                    targetStatus == TripStatus.DELIVERED ||
+                    targetStatus == TripStatus.DONE_STOP ||
+                    targetStatus == TripStatus.CONFIRMED_OUT ||
+                    targetStatus == TripStatus.CANCELLED;
+        } else if (currentStatus == TripStatus.COMPLETED || currentStatus == TripStatus.CANCELLED) {
+            isValidTransition = false; // Final states
+        }
+
+        if (!isValidTransition) {
+            throw new IllegalStateException(
+                    String.format("Invalid status transition from %s to %s", currentStatus, targetStatus));
+        }
+    }
+
+
+    private void validateFieldUpdates(TripStatus currentStatus, TripUpdateDto updateDTO) {
+        // Validate that only appropriate fields are updated based on current status
+        switch (currentStatus) {
+            case PLANNED -> {
+                // Can update: driverId, vehicleId, date, plannedStartTime, status
+                if (updateDTO.getEndTime() != null || updateDTO.getCompletionNotes() != null) {
+                    throw new IllegalArgumentException("Cannot set completion fields for PLANNED trip");
+                }
+            }
+            case IN_PROGRESS, CONFIRMED_IN -> {
+                // Can update: currentStopIndex, lastStopArrivalTime, distanceTraveled,
+                // ordersPickedUp, ordersDelivered, delayEvents, status
+                if (updateDTO.getDriverId() != null || updateDTO.getVehicleId() != null ||
+                        updateDTO.getDate() != null || updateDTO.getPlannedStartTime() != null) {
+                    throw new IllegalArgumentException("Cannot update basic trip info while trip is in progress");
+                }
+            }
+            case COMPLETED, CANCELLED -> {
+                throw new IllegalArgumentException("Cannot update completed or cancelled trips");
+            }
+        }
+
+        // Validate completion requirements
+        if (updateDTO.getStatus() == TripStatus.COMPLETED) {
+            if (updateDTO.getEndTime() == null) {
+                throw new IllegalArgumentException("End time is required when completing trip");
+            }
+            if (updateDTO.getOrdersPickedUp() == null || updateDTO.getOrdersDelivered() == null) {
+                throw new IllegalArgumentException("Order counts are required when completing trip");
+            }
+        }
+    }
+
+    private void applyUpdates(Trip existingTrip, TripUpdateDto updateDTO, String changedBy) {
+        if (updateDTO.getStatus() != null) {
+            existingTrip.setStatus(updateDTO.getStatus());
+        }
+        if (updateDTO.getDriverId() != null) {
+            existingTrip.setDriverId(updateDTO.getDriverId());
+        }
+        if (updateDTO.getVehicleId() != null) {
+            existingTrip.setVehicleId(updateDTO.getVehicleId());
+        }
+        if (updateDTO.getDate() != null) {
+            existingTrip.setDate(updateDTO.getDate());
+        }
+        if (updateDTO.getPlannedStartTime() != null) {
+            existingTrip.setPlannedStartTime(updateDTO.getPlannedStartTime());
+        }
+        if (updateDTO.getStartTime() != null) {
+            existingTrip.setStartTime(updateDTO.getStartTime());
+        }
+        if (updateDTO.getEndTime() != null) {
+            existingTrip.setEndTime(updateDTO.getEndTime());
+        }
+        if (updateDTO.getCurrentStopIndex() != null) {
+            existingTrip.setCurrentStopIndex(updateDTO.getCurrentStopIndex());
+        }
+        if (updateDTO.getLastStopArrivalTime() != null) {
+            existingTrip.setLastStopArrivalTime(updateDTO.getLastStopArrivalTime());
+        }
+        if (updateDTO.getDistanceTraveled() != null) {
+            existingTrip.setDistanceTraveled(updateDTO.getDistanceTraveled());
+        }
+        if (updateDTO.getCompletionNotes() != null) {
+            existingTrip.setCompletionNotes(updateDTO.getCompletionNotes());
+        }
+        if (updateDTO.getOrdersPickedUp() != null) {
+            existingTrip.setOrdersPickedUp(updateDTO.getOrdersPickedUp());
+        }
+        if (updateDTO.getOrdersDelivered() != null) {
+            existingTrip.setOrdersDelivered(updateDTO.getOrdersDelivered());
+        }
+        if (updateDTO.getDelayEvents() != null) {
+            existingTrip.setDelayEvents(updateDTO.getDelayEvents());
+        }
+
+        // Set system fields
+        existingTrip.setChangedBy(changedBy);
+        existingTrip.setUpdatedAt(Instant.now());
     }
 }

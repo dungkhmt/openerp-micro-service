@@ -18,6 +18,7 @@ import DriverRouteMap from "../screens/middle-mile/DriverRouteMap";
 import DriverHubOperations from "../screens/middle-mile/DriverHubOperations";
 import VehicleScheduler from "../screens/middle-mile/VehicleScheduler";
 import DriverSchedule from "../screens/middle-mile/DriverSchedule";
+import TripCreator from "../screens/middle-mile/TripCreator";
 
 export default function MiddleMileRouter() {
     let {path} = useRouteMatch();
@@ -35,6 +36,7 @@ export default function MiddleMileRouter() {
                     exact path={`${path}/vehicles/:id`} component={VehicleDetail}
                 />
                 <Route exact path={`${path}/trips`} component={TripManagement}/>
+                <Route exact path={`${path}/trip/manage`} component={TripCreator}/>
                 <Route exact path={`${path}/trips/:routeVehicleId/orders`} component={OrderAssignment}/>
                 <Route exact path={`${path}/driver/manage`} component={DriverManagement}/>
                 <Route exact path={`${path}/vehicle/manage`} component={VehicleManagement}/>

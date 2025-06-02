@@ -15,4 +15,5 @@ export const API_PATH = {
     PRODUCT_CATEGORY: "/smdeli/hubmanager/product/category",
     PRODUCT_PRICE: "/smdeli/hubmanager/product/price-config",
     RECEIPT: "/smdeli/hubmanager/receipt",
+    ADMIN: "/smdeli/admin",
 }

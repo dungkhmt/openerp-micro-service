@@ -163,9 +163,9 @@ public class DriverController {
      */
     @PreAuthorize("hasRole('DRIVER')")
     @PutMapping("/deliver-orders")
-    public ResponseEntity<Void> deliverOrders(@RequestBody List<UUID> orderIds, Principal principal) {
+    public ResponseEntity<Void> deliverOrders(@RequestBody OrderIdListsDto orderIdListsDto,  Principal principal) {
         String username = principal.getName();
-        driverService.deliverOrders(username, orderIds);
+        driverService.deliverOrders(username, orderIdListsDto.getSuccessOrderIds(), orderIdListsDto.getFailOrderIds());
         return ResponseEntity.ok().build();
     }
 

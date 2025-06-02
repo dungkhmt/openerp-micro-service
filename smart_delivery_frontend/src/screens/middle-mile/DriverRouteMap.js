@@ -622,55 +622,6 @@ const DriverRouteMap = () => {
                         </CardContent>
                     </Card>
 
-                    {/* Flow info card */}
-                    <Card sx={{ mb: 3 }}>
-                        <CardContent>
-                            <Typography variant="h6" gutterBottom>
-                                Trip Flow
-                            </Typography>
-                            <Divider sx={{ mb: 2 }} />
-                            <Alert severity="info" sx={{ mb: 2 }}>
-                                Follow these steps at each stop:
-                            </Alert>
-                            <List>
-                                <ListItem>
-                                    <Chip size="small" label="1" color="primary" sx={{ mr: 1, minWidth: 28 }} />
-                                    <ListItemText
-                                        primary="Arrived at hub"
-                                        secondary="Click 'Proceed' to handle pickups/deliveries"
-                                    />
-                                </ListItem>
-                                <ListItem>
-                                    <Chip size="small" label="2" color="primary" sx={{ mr: 1, minWidth: 28 }} />
-                                    <ListItemText
-                                        primary="Process orders"
-                                        secondary="Pick up or deliver orders at the hub"
-                                    />
-                                </ListItem>
-                                <ListItem>
-                                    <Chip size="small" label="3" color="primary" sx={{ mr: 1, minWidth: 28 }} />
-                                    <ListItemText
-                                        primary="Done Stop"
-                                        secondary="Click when finished at current stop"
-                                    />
-                                </ListItem>
-                                <ListItem>
-                                    <Chip size="small" label="4" color="primary" sx={{ mr: 1, minWidth: 28 }} />
-                                    <ListItemText
-                                        primary="Came Next Stop"
-                                        secondary="Click when arriving at next stop"
-                                    />
-                                </ListItem>
-                                <ListItem>
-                                    <Chip size="small" label="5" color="primary" sx={{ mr: 1, minWidth: 28 }} />
-                                    <ListItemText
-                                        primary="Complete Trip"
-                                        secondary="Click at final stop when confirmed in"
-                                    />
-                                </ListItem>
-                            </List>
-                        </CardContent>
-                    </Card>
 
                     <Card>
                         <CardContent>

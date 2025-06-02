@@ -26,7 +26,6 @@ import ShowChartIcon from "@mui/icons-material/ShowChart";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import WarehouseIcon from "@mui/icons-material/Warehouse";
 import GroupIcon from "@mui/icons-material/Group";
-
 import TeachingIcon from "assets/icons/mathematics.svg";
 import { CiEdit } from "react-icons/ci";
 import { GiTeacher } from "react-icons/gi";
@@ -40,6 +39,7 @@ import {humanResources} from "./menuconfig/humanResources";
 import {statistics} from "./menuconfig/statistics";
 import {confirmOrder} from "./menuconfig/confirmOrder";
 import {middleMile} from "./menuconfig/middleMile";
+import {config} from "./menuconfig/config";
 
 export const MENUS = [];
 
@@ -50,6 +50,7 @@ MENUS.push(humanResources);
 MENUS.push(confirmOrder);
 MENUS.push(middleMile);
 MENUS.push(statistics);
+MENUS.push(config);
 
 
 export const menuIconMap = new Map();

@@ -44,4 +44,11 @@ public class DistributeContext {
         }
        return distributeStrategy.assignOrderToEmployees( hub,  orders, employees);
     }
+
+    public String getCurrentStrategy() {
+        if (distributeStrategy == null) {
+            throw new IllegalStateException("Strategy chưa được cấu hình.");
+        }
+        return distributeStrategy.getName();
+    }
 }

@@ -16,7 +16,7 @@ function OrderList() {
 
     // Get user data from Redux store
     const role = useSelector((state) => state.auth.user?.role);
-    const hubId = useSelector((state) => state.auth.hubId);
+    const hubId = useSelector((state) => state.auth.user?.hubId);
     const username = useSelector((state) => state.auth.user.username);
 
     // Function to parse raw order data if it comes in an unexpected format

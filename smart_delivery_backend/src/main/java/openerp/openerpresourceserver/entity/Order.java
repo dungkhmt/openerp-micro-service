@@ -48,6 +48,7 @@ public class Order {
     private String finalHubName;
     private Integer collectAttemptCount=0;
     private Integer shipAttemptCount=0;
+    private Integer deliverAttemptCount=0;
     @Version
     private Integer version;
     @CreatedBy
@@ -62,7 +63,9 @@ public class Order {
     private Timestamp updatedAt;
     private String changedBy;
 
-    public double getVolume() {
-        return length * width * height;
-    }
-}
+    public Double getVolume() {
+        if (length == null || width == null || height == null) {
+            return null;
+        }
+        return length * width * height/1000000;
+    }}

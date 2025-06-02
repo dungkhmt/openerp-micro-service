@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "customers")
+@Table(name = "smart_delivey_customer")
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,6 +13,9 @@ public class Customer {
 
     @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
+    private String userName;
 
     @Column(nullable = false, unique = true)
     private String email;

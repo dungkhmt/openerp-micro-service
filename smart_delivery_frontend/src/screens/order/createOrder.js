@@ -61,7 +61,11 @@ const CreateOrder = () => {
         shippingPrice: 200000,
         finalPrice: 0,
         orderType: '', // Thêm trường orderType
-
+        // Thêm trường mới cho kích thước đơn hàng
+        length: 0.0, // Thay đổi tên từ packageLength thành length để match với backend
+        width: 0.0,  // Thay đổi tên từ packageWidth thành width để match với backend
+        height: 0.0, // Thay đổi tên từ packageHeight thành height để match với backend
+        weight: 0.0, // Thay đổi tên từ packageWeight thành weight để match với backend
     });
 
     useEffect(() => {
@@ -78,11 +82,12 @@ const CreateOrder = () => {
             updatedItems[index][fieldName] = value;
             setFormData({ ...formData, items: updatedItems });
         }
-        else if(name === 'totalPrice'){
-            const newValue = parseFloat(value);
+        else if(name === 'totalPrice' || name === 'length' || name === 'width' || name === 'height' || name === 'weight'){
+            // Đảm bảo các giá trị số là double
+            const newValue = parseFloat(value) || 0.0; // Nếu không parse được thì mặc định là 0.0
             setFormData({ ...formData, [name]: newValue });
         }
-            else {
+        else {
             setFormData({ ...formData, [name]: value });
         }
     };
@@ -98,6 +103,11 @@ const CreateOrder = () => {
         const finalFormData = {
             ...formData,
             finalPrice: formData.totalPrice+20000,
+            // Đảm bảo các giá trị kích thước không null
+            length: formData.length || 0.0,
+            width: formData.width || 0.0,
+            height: formData.height || 0.0,
+            weight: formData.weight || 0.0
         }
         console.log("Submitting data:", finalFormData); // Log dữ liệu để kiểm tra
         request(
@@ -168,7 +178,7 @@ const CreateOrder = () => {
                         p: 4,
                     }}>
                         <Typography variant="h5">
-                           Chọn vị trí
+                            Chọn vị trí
                             <Button
                                 variant="outlined"
                                 onClick={() => {
@@ -422,6 +432,81 @@ const CreateOrder = () => {
                                                 </Box>
                                             </Grid>
                                         </Grid>
+
+                                        {/* Phần thêm kích thước của đơn hàng */}
+                                        <Typography className={classes.inforTitle} variant="h6" style={{ marginTop: '20px' }}>
+                                            3. Kích thước đơn hàng
+                                        </Typography>
+                                        <Grid container spacing={3} className={classes.inforWrap}>
+                                            <Grid item xs={3}>
+                                                <Box className={classes.inputWrap}>
+                                                    <Box className={classes.labelInput}>
+                                                        Dài (cm)
+                                                    </Box>
+                                                    <TextField
+                                                        fullWidth
+                                                        variant="outlined"
+                                                        size="small"
+                                                        type="number"
+                                                        name="length"
+                                                        inputProps={{ step: "0.1", min: "0" }}
+                                                        value={formData.length}
+                                                        onChange={(e) => handleInputChange(e)}
+                                                    />
+                                                </Box>
+                                            </Grid>
+                                            <Grid item xs={3}>
+                                                <Box className={classes.inputWrap}>
+                                                    <Box className={classes.labelInput}>
+                                                        Rộng (cm)
+                                                    </Box>
+                                                    <TextField
+                                                        fullWidth
+                                                        variant="outlined"
+                                                        size="small"
+                                                        type="number"
+                                                        name="width"
+                                                        inputProps={{ step: "0.1", min: "0" }}
+                                                        value={formData.width}
+                                                        onChange={(e) => handleInputChange(e)}
+                                                    />
+                                                </Box>
+                                            </Grid>
+                                            <Grid item xs={3}>
+                                                <Box className={classes.inputWrap}>
+                                                    <Box className={classes.labelInput}>
+                                                        Cao (cm)
+                                                    </Box>
+                                                    <TextField
+                                                        fullWidth
+                                                        variant="outlined"
+                                                        size="small"
+                                                        type="number"
+                                                        name="height"
+                                                        inputProps={{ step: "0.1", min: "0" }}
+                                                        value={formData.height}
+                                                        onChange={(e) => handleInputChange(e)}
+                                                    />
+                                                </Box>
+                                            </Grid>
+                                            <Grid item xs={3}>
+                                                <Box className={classes.inputWrap}>
+                                                    <Box className={classes.labelInput}>
+                                                        Khối lượng (kg)
+                                                    </Box>
+                                                    <TextField
+                                                        fullWidth
+                                                        variant="outlined"
+                                                        size="small"
+                                                        type="number"
+                                                        name="weight"
+                                                        inputProps={{ step: "0.1", min: "0" }}
+                                                        value={formData.weight}
+                                                        onChange={(e) => handleInputChange(e)}
+                                                    />
+                                                </Box>
+                                            </Grid>
+                                        </Grid>
                                     </Box>
                                 </Grid>
                                 <Grid item xs={5}>
@@ -636,8 +721,7 @@ const CreateOrder = () => {
                     </Box>
                 </Box>
             </Fragment>
-       )
+        )
     );
 };
-
 export default CreateOrder;

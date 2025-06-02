@@ -138,7 +138,7 @@ const EnhancedTableHead = (props) => {
                     headerCells.map((headCell) => (
                         <TableCell
                             key={headCell.id}
-                             align={headCell.centerHeader === true? 'center' : 'left'}
+                            align={headCell.centerHeader === true? 'center' : 'left'}
                             // align={"left"}
                             padding={
                                 headCell.disablePadding ? "none" : "normal"
@@ -303,6 +303,7 @@ const StandardTable = ({
                            deletable,
                            defaultOrderBy = "id", // Thêm prop mới để thiết lập orderBy mặc định
                            defaultOrder = "asc",  // Add this line with "asc" as default
+                           onSelectionChange, // Thêm prop mới cho selection callback
 
                        }) => {
     const [selected, setSelected] = React.useState([]);
@@ -328,6 +329,13 @@ const StandardTable = ({
         setOriginalRows(buildTableData(data, columns));
         setSearchQuery(""); // work around for bug: not re-render table with rows after fetching data from server
     }, [data]);
+
+    // Thêm useEffect để gọi onSelectionChange khi selection thay đổi
+    React.useEffect(() => {
+        if (typeof onSelectionChange === 'function') {
+            onSelectionChange(selected, selectedData);
+        }
+    }, [selected, selectedData, onSelectionChange]);
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === "asc";
@@ -729,6 +737,7 @@ StandardTable.propTypes = {
     onRowClick: PropTypes.func,
     rowKey: PropTypes.string.isRequired,
     deletable: PropTypes.bool,
+    onSelectionChange: PropTypes.func, // Thêm PropType cho callback mới
 };
 
 export default StandardTable;

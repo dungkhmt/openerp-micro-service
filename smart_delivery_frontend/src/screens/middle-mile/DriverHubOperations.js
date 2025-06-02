@@ -34,6 +34,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import PlaceIcon from '@mui/icons-material/Place';
 import InventoryIcon from '@mui/icons-material/Inventory';
+import WarningIcon from '@mui/icons-material/Warning';
 import { useParams, useHistory, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { request } from 'api';
@@ -60,6 +61,7 @@ const DriverHubOperations = () => {
     const [hub, setHub] = useState(null);
     const [vehicle, setVehicle] = useState(null);
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+    const [deliveryWarningDialogOpen, setDeliveryWarningDialogOpen] = useState(false);
     const [operationLoading, setOperationLoading] = useState(false);
     const [scannerOpen, setScannerOpen] = useState(false);
     const [scannedOrderId, setScannedOrderId] = useState("");
@@ -106,10 +108,9 @@ const DriverHubOperations = () => {
 
             // Get pending orders based on operation type
             await fetchOrderData();
-
         } catch (error) {
             console.error("Error loading data: ", error);
-            errorNoti("Failed to load hub data");
+            errorNoti("Không thể tải dữ liệu hub");
         } finally {
             setLoading(false);
         }
@@ -126,13 +127,12 @@ const DriverHubOperations = () => {
                 // we'll use the current orders and filter them client-side
                 endpoint = `/smdeli/driver/current-orders/${tripId}`;
             } else {
-                showNotification("Invalid operation type", "error");
+                showNotification("Loại hoạt động không hợp lệ", "error");
                 return;
             }
 
             await request('get', endpoint, (res) => {
                 let orders = res.data || [];
-
                 // If we're in delivery mode, filter for orders that should be delivered to this hub
                 if (operationType === 'delivery') {
                     orders = orders.filter(order => {
@@ -141,19 +141,17 @@ const DriverHubOperations = () => {
                         return order.status === 'DELIVERING';
                     });
                 }
-
                 setPendingOrders(orders);
-
-                if (tripDetails.currentStopIndex === tripDetails.stops.length) {
+                if (tripDetails && tripDetails.currentStopIndex === tripDetails.stops.length) {
                     setProcessingComplete(true);
-                    showNotification("No orders to process at this hub", "info");
+                    showNotification("Không có đơn hàng để xử lý tại hub này", "info");
                 } else {
-                    showNotification(`${orders.length} orders ready for ${operationType}`, "info");
+                    showNotification(`${orders.length} đơn hàng sẵn sàng để ${operationType === 'pickup' ? 'lấy hàng' : 'giao hàng'}`, "info");
                 }
             });
         } catch (error) {
             console.error("Error fetching orders: ", error);
-            errorNoti("Failed to load orders");
+            errorNoti("Không thể tải danh sách đơn hàng");
         }
     };
 
@@ -189,22 +187,21 @@ const DriverHubOperations = () => {
     const processScannedOrder = () => {
         // Check if the order ID is valid
         if (!scannedOrderId || scannedOrderId.trim() === "") {
-            showNotification("Please enter a valid order ID", "warning");
+            showNotification("Vui lòng nhập mã đơn hàng hợp lệ", "warning");
             return;
         }
 
         const order = pendingOrders.find(o => o.id === scannedOrderId);
-
         if (order) {
             if (!selectedOrders.includes(scannedOrderId)) {
                 setSelectedOrders([...selectedOrders, scannedOrderId]);
-                showNotification(`Order added: ${scannedOrderId.substring(0, 8)}...`, "success");
+                showNotification(`Đã thêm đơn hàng: ${scannedOrderId.substring(0, 8)}...`, "success");
             } else {
-                showNotification(`Order already selected`, "info");
+                showNotification(`Đơn hàng đã được chọn`, "info");
             }
             setScannedOrderId("");
         } else {
-            showNotification(`Order not found or not eligible for ${operationType}`, "error");
+            showNotification(`Không tìm thấy đơn hàng hoặc không đủ điều kiện để ${operationType === 'pickup' ? 'lấy hàng' : 'giao hàng'}`, "error");
         }
         setScannerOpen(false);
     };
@@ -218,15 +215,26 @@ const DriverHubOperations = () => {
 
     // Open confirm dialog
     const openConfirmDialog = () => {
-        if (selectedOrders.length === 0) {
-            showNotification("Please select at least one order", "warning");
+        // Bỏ validation này cho delivery
+        if (operationType === 'pickup' && selectedOrders.length === 0) {
+            showNotification("Vui lòng chọn ít nhất một đơn hàng", "warning");
             return;
         }
 
-        // If delivery operation, open signature dialog instead
+        // If delivery operation, check if all orders are selected
         if (operationType === 'delivery') {
-            setSignatureOpen(true);
+            const totalOrders = getFilteredOrders().length;
+            const selectedCount = selectedOrders.length;
+
+            // If not all orders are selected, show warning dialog
+            if (selectedCount < totalOrders) {
+                setDeliveryWarningDialogOpen(true);
+            } else {
+                // All orders selected, proceed directly to signature
+                setSignatureOpen(true);
+            }
         } else {
+            // Pickup operation, show normal confirm dialog
             setConfirmDialogOpen(true);
         }
     };
@@ -236,13 +244,9 @@ const DriverHubOperations = () => {
 
     // Process orders based on operation type
     const processOrders = async () => {
-        if (selectedOrders.length === 0) {
-            showNotification("No orders selected", "warning");
-            return;
-        }
+    
 
         setOperationLoading(true);
-
         try {
             if (operationType === 'pickup') {
                 // Call pickup API
@@ -250,29 +254,25 @@ const DriverHubOperations = () => {
                     'put',
                     '/smdeli/driver/pickup-orders',
                     (res) => {
-                        showNotification(`${selectedOrders.length} orders picked up successfully`, "success");
-
+                        showNotification(`Đã lấy ${selectedOrders.length} đơn hàng thành công`, "success");
                         // Update orders in state by removing the processed ones
                         setPendingOrders(pendingOrders.filter(order => !selectedOrders.includes(order.id)));
-
                         // Check if all orders have been processed
                         const remainingOrders = pendingOrders.filter(order => !selectedOrders.includes(order.id));
                         if (remainingOrders.length === 0) {
                             setProcessingComplete(true);
                         }
-
                         setSelectedOrders([]);
-
                         // If this is part of a trip and all orders were processed, offer to advance
                         if (tripId && remainingOrders.length === 0) {
-                            if (window.confirm("All orders processed. Advance to next stop?")) {
+                            if (window.confirm("Tất cả đơn hàng đã được xử lý. Chuyển đến điểm dừng tiếp theo?")) {
                                 handleAdvanceToNextStop();
                             }
                         }
                     },
                     {
-                        401: () => showNotification("Unauthorized action", "error"),
-                        400: () => showNotification("Unable to pick up orders", "error")
+                        401: () => showNotification("Không có quyền thực hiện hành động này", "error"),
+                        400: () => showNotification("Không thể lấy hàng", "error")
                     },
                     {
                         orderItemIds: selectedOrders,
@@ -280,80 +280,91 @@ const DriverHubOperations = () => {
                     }
                 );
             } else if (operationType === 'delivery') {
-                // Call deliver API with signature
-                const signatureDataURL = signatureData || "no-signature-provided";
+                // Call deliver API with new format
+                const allOrderIds = getFilteredOrders().map(order => order.id);
+                const unselectedOrders = allOrderIds.filter(id => !selectedOrders.includes(id));
+
+                const deliveryData = {
+                    successOrderIds: selectedOrders,
+                    failOrderIds: unselectedOrders.length > 0 ? unselectedOrders : null
+                };
 
                 await request(
                     'put',
                     '/smdeli/driver/deliver-orders',
                     (res) => {
-                        showNotification(`${selectedOrders.length} orders delivered successfully`, "success");
+                        const successCount = selectedOrders.length;
+                        const failCount = unselectedOrders.length;
 
-                        // Update orders in state by removing the processed ones
-                        setPendingOrders(pendingOrders.filter(order => !selectedOrders.includes(order.id)));
-
-                        // Check if all orders have been processed
-                        const remainingOrders = pendingOrders.filter(order => !selectedOrders.includes(order.id));
-                        if (remainingOrders.length === 0) {
-                            setProcessingComplete(true);
+                        let message = `Đã giao ${successCount} đơn hàng thành công`;
+                        if (failCount > 0) {
+                            message += `, ${failCount} đơn hàng giao thất bại`;
                         }
 
+                        showNotification(message, "success");
+
+                        // Update orders in state by removing all processed ones
+                        setPendingOrders([]);
+                        setProcessingComplete(true);
                         setSelectedOrders([]);
 
-                        // If this is part of a trip and all orders were processed, offer to advance
-                        if (tripId && remainingOrders.length === 0) {
-                            if (window.confirm("All orders processed. Advance to next stop?")) {
+                        // If this is part of a trip, offer to advance
+                        if (tripId) {
+                            if (window.confirm("Tất cả đơn hàng đã được xử lý. Chuyển đến điểm dừng tiếp theo?")) {
                                 handleAdvanceToNextStop();
                             }
                         }
                     },
                     {
-                        401: () => showNotification("Unauthorized action", "error"),
-                        400: () => showNotification("Unable to deliver orders", "error")
+                        401: () => showNotification("Không có quyền thực hiện hành động này", "error"),
+                        400: () => showNotification("Không thể giao hàng", "error")
                     },
-                    selectedOrders
+                    deliveryData
                 );
             }
         } catch (error) {
             console.error("Error processing orders: ", error);
-            showNotification("Failed to process orders", "error");
+            showNotification("Không thể xử lý đơn hàng", "error");
         } finally {
             setOperationLoading(false);
             setConfirmDialogOpen(false);
+            setDeliveryWarningDialogOpen(false);
             setSignatureOpen(false);
         }
     };
 
     const handleCompleteTrip = async () => {
         if (!tripId) return;
-
         try {
             setOperationLoading(true);
             await request(
                 'post',
                 `/smdeli/driver/trips/${tripId}/complete`,
                 () => {
-                    showNotification("Trip completed successfully", "success");
+                    showNotification("Hoàn thành chuyến đi thành công", "success");
                     // Navigate back to the dashboard
                     history.push('/middle-mile/driver/dashboard');
                 },
                 {
-                    401: () => showNotification("Unauthorized action", "error"),
-                    400: (err) => showNotification(err.response?.data?.message || "Failed to complete trip", "error")
+                    401: () => showNotification("Không có quyền thực hiện hành động này", "error"),
+                    400: (err) => showNotification(err.response?.data?.message || "Không thể hoàn thành chuyến đi", "error"),
+                    409: (err) => showNotification(err.response?.data?.message || "Hãy đợi nhân viên hub xác nhận!", "error")
+
                 }
             );
         } catch (error) {
             console.error("Error completing trip: ", error);
-            showNotification("Failed to complete trip", "error");
+            showNotification("Không thể hoàn thành chuyến đi", "error");
         } finally {
             setOperationLoading(false);
         }
     };
+
     // Handle signature capture
     const handleSignatureCapture = () => {
         // Simulate signature capture (in a real app, use a signature pad library)
         setSignatureData("signature-data-capture");
-        showNotification("Signature captured", "success");
+        showNotification("Đã lưu chữ ký", "success");
     };
 
     // Clear signature
@@ -364,25 +375,24 @@ const DriverHubOperations = () => {
     // Handle advancing to next stop in a trip
     const handleAdvanceToNextStop = async () => {
         if (!tripId) return;
-
         try {
             setOperationLoading(true);
             await request(
                 'post',
                 `/smdeli/driver/trips/${tripId}/advance`,
                 (res) => {
-                    showNotification("Advanced to next stop", "success");
+                    showNotification("Đã chuyển đến điểm dừng tiếp theo", "success");
                     // Navigate back to the trip view
                     history.push(`/middle-mile/driver/route/${routeVehicleId}?tripId=${tripId}`);
                 },
                 {
-                    401: () => showNotification("Unauthorized action", "error"),
-                    400: (err) => showNotification(err.response?.data?.message || "Failed to advance to next stop", "error")
+                    401: () => showNotification("Không có quyền thực hiện hành động này", "error"),
+                    400: (err) => showNotification(err.response?.data?.message || "Không thể chuyển đến điểm dừng tiếp theo", "error")
                 }
             );
         } catch (error) {
             console.error("Error advancing to next stop: ", error);
-            showNotification("Failed to advance to next stop", "error");
+            showNotification("Không thể chuyển đến điểm dừng tiếp theo", "error");
         } finally {
             setOperationLoading(false);
         }
@@ -395,14 +405,12 @@ const DriverHubOperations = () => {
             if (filters.status.length > 0 && !filters.status.includes(order.status)) {
                 return false;
             }
-
             // Filter by destination if specified
             if (filters.destination &&
                 !order.recipientAddress?.toLowerCase().includes(filters.destination.toLowerCase()) &&
                 !order.recipientName?.toLowerCase().includes(filters.destination.toLowerCase())) {
                 return false;
             }
-
             return true;
         });
     };
@@ -411,7 +419,7 @@ const DriverHubOperations = () => {
     const applyFilters = () => {
         setFilterDialogOpen(false);
         const filteredCount = getFilteredOrders().length;
-        showNotification(`Showing ${filteredCount} of ${pendingOrders.length} orders`, "info");
+        showNotification(`Hiển thị ${filteredCount} trong ${pendingOrders.length} đơn hàng`, "info");
     };
 
     // Reset filters
@@ -445,7 +453,7 @@ const DriverHubOperations = () => {
         return (
             <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="80vh">
                 <CircularProgress size={60} sx={{ mb: 3 }} />
-                <Typography variant="h6">Loading hub operations...</Typography>
+                <Typography variant="h6">Đang tải hoạt động hub...</Typography>
             </Box>
         );
     }
@@ -462,7 +470,7 @@ const DriverHubOperations = () => {
                         <ArrowBackIcon />
                     </IconButton>
                     <Typography variant="h4" component="h1">
-                        {operationType === 'pickup' ? 'Pickup Orders' : 'Deliver Orders'}
+                        {operationType === 'pickup' ? 'Lấy hàng' : 'Giao hàng'}
                     </Typography>
                 </Box>
 
@@ -479,21 +487,21 @@ const DriverHubOperations = () => {
                         <CardContent>
                             <Grid container spacing={2}>
                                 <Grid item xs={12} md={4}>
-                                    <Typography variant="body2" color="text.secondary">Operation Type:</Typography>
+                                    <Typography variant="body2" color="text.secondary">Loại hoạt động:</Typography>
                                     <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                        {operationType === 'pickup' ? 'Picking Up Packages' : 'Delivering Packages'}
+                                        {operationType === 'pickup' ? 'Lấy hàng' : 'Giao hàng'}
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={12} md={4}>
-                                    <Typography variant="body2" color="text.secondary">Vehicle:</Typography>
+                                    <Typography variant="body2" color="text.secondary">Phương tiện:</Typography>
                                     <Typography variant="body1">
                                         {vehicle?.plateNumber} ({vehicle?.vehicleType})
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={12} md={4}>
-                                    <Typography variant="body2" color="text.secondary">Pending Orders:</Typography>
+                                    <Typography variant="body2" color="text.secondary">Đơn hàng chờ xử lý:</Typography>
                                     <Typography variant="body1" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                                        {pendingOrders.length} {operationType === 'pickup' ? 'to pick up' : 'to deliver'}
+                                        {pendingOrders.length} {operationType === 'pickup' ? 'cần lấy' : 'cần giao'}
                                     </Typography>
                                 </Grid>
                             </Grid>
@@ -503,50 +511,45 @@ const DriverHubOperations = () => {
 
                 {/* Trip Information (if part of a trip) */}
                 {tripDetails && (
-
-// Then let's update the Trip Information card to show the appropriate button
                     <Card sx={{ mb: 4, boxShadow: 3, bgcolor: 'primary.light', color: 'white' }}>
                         <CardContent>
                             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                                 <LocalShippingIcon sx={{ mr: 2, fontSize: 28 }} />
                                 <Typography variant="h6">
-                                    Active Trip - {isLastStop ? 'Final Stop' : `Stop ${tripDetails.currentStopIndex + 1} of ${tripDetails.stops?.length}`}
+                                    Chuyến đi đang hoạt động - {isLastStop ? 'Điểm cuối' : `Điểm dừng ${tripDetails.currentStopIndex + 1} / ${tripDetails.stops?.length}`}
                                 </Typography>
                             </Box>
                             <Divider sx={{ mb: 2, borderColor: 'rgba(255,255,255,0.3)' }} />
-
                             <Grid container spacing={2}>
                                 <Grid item xs={12} md={6}>
-                                    <Typography variant="body2" sx={{ opacity: 0.8 }}>Current Stop:</Typography>
+                                    <Typography variant="body2" sx={{ opacity: 0.8 }}>Điểm dừng hiện tại:</Typography>
                                     <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                        {tripDetails.stops?.[tripDetails.currentStopIndex]?.hubName || 'Unknown'}
+                                        {tripDetails.stops?.[tripDetails.currentStopIndex]?.hubName || 'Không xác định'}
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={12} md={6}>
                                     <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                                        {isLastStop ? 'Final Destination' : 'Next Stop:'}
+                                        {isLastStop ? 'Điểm đến cuối' : 'Điểm dừng tiếp theo:'}
                                     </Typography>
                                     <Typography variant="body1">
                                         {isLastStop
-                                            ? 'End of Route'
-                                            : tripDetails.stops?.[tripDetails.currentStopIndex + 1]?.hubName || 'End of Route'}
+                                            ? 'Kết thúc tuyến đường'
+                                            : tripDetails.stops?.[tripDetails.currentStopIndex + 1]?.hubName || 'Kết thúc tuyến đường'}
                                     </Typography>
                                 </Grid>
                             </Grid>
-                            { isLastStop &&
+                            {isLastStop && (
                                 <Button
                                     variant="contained"
-                                    color={isLastStop ? "success" : "secondary"}
+                                    color="success"
                                     sx={{ mt: 2 }}
-                                    onClick={handleCompleteTrip }
+                                    onClick={handleCompleteTrip}
                                 >
-                                    'Complete Trip'
+                                    Hoàn thành chuyến đi
                                 </Button>
-                            }
-
+                            )}
                         </CardContent>
                     </Card>
-
                 )}
 
                 {processingComplete && (
@@ -560,19 +563,19 @@ const DriverHubOperations = () => {
                                     size="small"
                                     onClick={isLastStop ? handleCompleteTrip : handleAdvanceToNextStop}
                                 >
-                                    {isLastStop ? 'COMPLETE TRIP' : 'NEXT STOP'}
+                                    {isLastStop ? 'HOÀN THÀNH CHUYẾN ĐI' : 'ĐIỂM DỪNG TIẾP THEO'}
                                 </Button>
                             )
                         }
                     >
                         <Typography variant="subtitle1">
-                            All orders have been processed at this hub
+                            Tất cả đơn hàng đã được xử lý tại hub này
                         </Typography>
                         {tripId
                             ? isLastStop
-                                ? "You have reached the final stop. You can now complete your trip."
-                                : "You can now proceed to the next stop in your route."
-                            : "You can now return to your dashboard."
+                                ? "Bạn đã đến điểm dừng cuối cùng. Bây giờ bạn có thể hoàn thành chuyến đi."
+                                : "Bây giờ bạn có thể chuyển đến điểm dừng tiếp theo trong tuyến đường."
+                            : "Bây giờ bạn có thể quay lại dashboard."
                         }
                     </Alert>
                 )}
@@ -581,8 +584,8 @@ const DriverHubOperations = () => {
                 <Card sx={{ mb: 3, boxShadow: 2 }}>
                     <CardContent sx={{ pb: 1 }}>
                         <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 2 }}>
-                            <Tab label={`Pending Packages (${filteredOrders.length})`} />
-                            <Tab label={`Selected (${selectedOrders.length})`} disabled={selectedOrders.length === 0} />
+                            <Tab label={`Đơn hàng chờ xử lý (${filteredOrders.length})`} />
+                            <Tab label={`Đã chọn (${selectedOrders.length})`} disabled={selectedOrders.length === 0} />
                         </Tabs>
 
                         {activeTab === 0 && (
@@ -595,25 +598,23 @@ const DriverHubOperations = () => {
                                             onClick={() => setFilterDialogOpen(true)}
                                             sx={{ mr: 1 }}
                                         >
-                                            Filter
+                                            Lọc
                                         </Button>
-
                                         <Button
                                             variant="outlined"
                                             onClick={selectAllOrders}
                                             disabled={filteredOrders.length === 0}
                                         >
-                                            {selectedOrders.length === filteredOrders.length && filteredOrders.length > 0 ? 'Unselect All' : 'Select All'}
+                                            {selectedOrders.length === filteredOrders.length && filteredOrders.length > 0 ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
                                         </Button>
                                     </Box>
-
                                     <Button
                                         variant="outlined"
                                         startIcon={<QrCodeScannerIcon />}
                                         onClick={() => setScannerOpen(true)}
                                         disabled={pendingOrders.length === 0}
                                     >
-                                        Scan Order
+                                        Quét mã
                                     </Button>
                                 </Box>
 
@@ -621,12 +622,11 @@ const DriverHubOperations = () => {
                                     <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'background.default' }}>
                                         <InventoryIcon color="disabled" sx={{ fontSize: 48, mb: 2, opacity: 0.6 }} />
                                         <Typography variant="h6" color="text.secondary">
-                                            No pending orders found
+                                            Không tìm thấy đơn hàng chờ xử lý
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                            {pendingOrders.length > 0 ? 'Try changing your filters' : 'All orders have been processed'}
+                                            {pendingOrders.length > 0 ? 'Thử thay đổi bộ lọc' : 'Tất cả đơn hàng đã được xử lý'}
                                         </Typography>
-
                                         {pendingOrders.length === 0 && tripId && (
                                             <Button
                                                 variant="contained"
@@ -634,7 +634,7 @@ const DriverHubOperations = () => {
                                                 sx={{ mt: 3 }}
                                                 onClick={isLastStop ? handleCompleteTrip : handleAdvanceToNextStop}
                                             >
-                                                {isLastStop ? 'Complete Trip' : 'Proceed to Next Stop'}
+                                                {isLastStop ? 'Hoàn thành chuyến đi' : 'Chuyển đến điểm dừng tiếp theo'}
                                             </Button>
                                         )}
                                     </Paper>
@@ -681,24 +681,24 @@ const DriverHubOperations = () => {
                                                             <Grid container spacing={1} sx={{ mt: 0.5 }}>
                                                                 <Grid item xs={12} sm={6}>
                                                                     <Typography variant="caption" color="text.secondary" component="span">
-                                                                        From:
+                                                                        Từ:
                                                                     </Typography>
                                                                     <Typography variant="body2" component="span" sx={{ ml: 0.5 }}>
-                                                                        {order.senderName || "Unknown"}
+                                                                        {order.senderName || "Không xác định"}
                                                                     </Typography>
                                                                 </Grid>
                                                                 <Grid item xs={12} sm={6}>
                                                                     <Typography variant="caption" color="text.secondary" component="span">
-                                                                        To:
+                                                                        Đến:
                                                                     </Typography>
                                                                     <Typography variant="body2" component="span" sx={{ ml: 0.5 }}>
-                                                                        {order.recipientName || "Unknown"}
+                                                                        {order.recipientName || "Không xác định"}
                                                                     </Typography>
                                                                 </Grid>
                                                                 {order.createdAt && (
                                                                     <Grid item xs={12}>
                                                                         <Typography variant="caption" color="text.secondary">
-                                                                            Created: {new Date(order.createdAt).toLocaleString()}
+                                                                            Tạo lúc: {new Date(order.createdAt).toLocaleString()}
                                                                         </Typography>
                                                                     </Grid>
                                                                 )}
@@ -717,10 +717,9 @@ const DriverHubOperations = () => {
                             <>
                                 <Box sx={{ mb: 2 }}>
                                     <Alert severity="info">
-                                        {selectedOrders.length} orders selected for {operationType === 'pickup' ? 'pickup' : 'delivery'}
+                                        {selectedOrders.length} đơn hàng được chọn để {operationType === 'pickup' ? 'lấy hàng' : 'giao hàng'}
                                     </Alert>
                                 </Box>
-
                                 <List sx={{ maxHeight: '60vh', overflow: 'auto' }}>
                                     {pendingOrders
                                         .filter(order => selectedOrders.includes(order.id))
@@ -754,24 +753,24 @@ const DriverHubOperations = () => {
                                                             <Grid container spacing={1} sx={{ mt: 0.5 }}>
                                                                 <Grid item xs={12} sm={6}>
                                                                     <Typography variant="caption" color="text.secondary" component="span">
-                                                                        From:
+                                                                        Từ:
                                                                     </Typography>
                                                                     <Typography variant="body2" component="span" sx={{ ml: 0.5 }}>
-                                                                        {order.senderName || "Unknown"}
+                                                                        {order.senderName || "Không xác định"}
                                                                     </Typography>
                                                                 </Grid>
                                                                 <Grid item xs={12} sm={6}>
                                                                     <Typography variant="caption" color="text.secondary" component="span">
-                                                                        To:
+                                                                        Đến:
                                                                     </Typography>
                                                                     <Typography variant="body2" component="span" sx={{ ml: 0.5 }}>
-                                                                        {order.recipientName || "Unknown"}
+                                                                        {order.recipientName || "Không xác định"}
                                                                     </Typography>
                                                                 </Grid>
                                                                 {order.createdAt && (
                                                                     <Grid item xs={12}>
                                                                         <Typography variant="caption" color="text.secondary">
-                                                                            Created: {new Date(order.createdAt).toLocaleString()}
+                                                                            Tạo lúc: {new Date(order.createdAt).toLocaleString()}
                                                                         </Typography>
                                                                     </Grid>
                                                                 )}
@@ -788,13 +787,17 @@ const DriverHubOperations = () => {
                 </Card>
 
                 {/* Action Button - Only show if there are pending orders */}
+                {/* Action Button - Only show if there are pending orders */}
                 {!processingComplete && pendingOrders.length > 0 && (
                     <Box sx={{ position: 'fixed', bottom: 24, left: 0, right: 0, textAlign: 'center', zIndex: 100 }}>
                         <Button
                             variant="contained"
                             color="primary"
                             size="large"
-                            disabled={selectedOrders.length === 0 || operationLoading}
+                            disabled={
+                                (operationType === 'pickup' && selectedOrders.length === 0) ||
+                                operationLoading
+                            }
                             onClick={openConfirmDialog}
                             startIcon={operationType === 'pickup' ? <LocalShippingIcon /> : <CheckCircleIcon />}
                             sx={{
@@ -808,14 +811,16 @@ const DriverHubOperations = () => {
                                 <CircularProgress size={24} color="inherit" />
                             ) : (
                                 operationType === 'pickup'
-                                    ? `Pick Up ${selectedOrders.length} Orders`
-                                    : `Deliver ${selectedOrders.length} Orders`
+                                    ? `Lấy ${selectedOrders.length} đơn hàng`
+                                    : selectedOrders.length === 0
+                                        ? `Đánh dấu tất cả giao thất bại`
+                                        : `Giao ${selectedOrders.length} đơn hàng`
                             )}
                         </Button>
                     </Box>
                 )}
 
-                {/* Confirmation Dialog */}
+                {/* Confirmation Dialog for Pickup */}
                 <Dialog
                     open={confirmDialogOpen}
                     onClose={() => !operationLoading && setConfirmDialogOpen(false)}
@@ -823,19 +828,15 @@ const DriverHubOperations = () => {
                     fullWidth
                 >
                     <DialogTitle>
-                        {operationType === 'pickup' ? 'Confirm Pickup' : 'Confirm Delivery'}
+                        Xác nhận lấy hàng
                     </DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            {operationType === 'pickup'
-                                ? `Are you sure you want to pick up ${selectedOrders.length} orders from ${hub?.name}?`
-                                : `Are you sure you want to deliver ${selectedOrders.length} orders to ${hub?.name}?`
-                            }
+                            Bạn có chắc chắn muốn lấy {selectedOrders.length} đơn hàng từ {hub?.name}?
                         </DialogContentText>
-
                         <Box sx={{ mt: 3, mb: 2 }}>
                             <Typography variant="subtitle2" gutterBottom>
-                                Selected Orders:
+                                Đơn hàng đã chọn:
                             </Typography>
                             <Paper variant="outlined" sx={{ p: 1, maxHeight: 120, overflow: 'auto' }}>
                                 {selectedOrders.map(id => {
@@ -851,10 +852,9 @@ const DriverHubOperations = () => {
                                 })}
                             </Paper>
                         </Box>
-
                         <TextField
                             margin="dense"
-                            label="Notes (optional)"
+                            label="Ghi chú (tùy chọn)"
                             fullWidth
                             multiline
                             rows={3}
@@ -867,7 +867,7 @@ const DriverHubOperations = () => {
                             onClick={() => setConfirmDialogOpen(false)}
                             disabled={operationLoading}
                         >
-                            Cancel
+                            Hủy
                         </Button>
                         <Button
                             onClick={processOrders}
@@ -878,8 +878,60 @@ const DriverHubOperations = () => {
                             {operationLoading ? (
                                 <CircularProgress size={24} color="inherit" />
                             ) : (
-                                'Confirm'
+                                'Xác nhận'
                             )}
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
+                {/* Delivery Warning Dialog */}
+                <Dialog
+                    open={deliveryWarningDialogOpen}
+                    onClose={() => !operationLoading && setDeliveryWarningDialogOpen(false)}
+                    maxWidth="sm"
+                    fullWidth
+                >
+                    <DialogTitle>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <WarningIcon color="warning" sx={{ mr: 1 }} />
+                            Cảnh báo giao hàng
+                        </Box>
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText sx={{ mb: 2 }}>
+                            Bạn chỉ chọn {selectedOrders.length} trong tổng số {getFilteredOrders().length} đơn hàng.
+                        </DialogContentText>
+                        <Alert severity="warning" sx={{ mb: 2 }}>
+                            <Typography variant="subtitle2" gutterBottom>
+                                Lưu ý quan trọng:
+                            </Typography>
+                            <Typography variant="body2">
+                                • Các đơn hàng được chọn sẽ được đánh dấu là <strong>giao thành công</strong><br/>
+                                • Các đơn hàng không được chọn sẽ được đánh dấu là <strong>giao thất bại</strong><br/>
+                                • Hành động này không thể hoàn tác
+                            </Typography>
+                        </Alert>
+                        <Typography variant="body2" color="text.secondary">
+                            Bạn có muốn tiếp tục với {selectedOrders.length} đơn hàng được chọn không?
+                        </Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            onClick={() => setDeliveryWarningDialogOpen(false)}
+                            disabled={operationLoading}
+                        >
+                            Hủy
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                setDeliveryWarningDialogOpen(false);
+                                setSignatureOpen(true);
+                            }}
+                            variant="contained"
+                            color="warning"
+                            disabled={operationLoading}
+                        >
+                            Tiếp tục
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -891,16 +943,15 @@ const DriverHubOperations = () => {
                     maxWidth="md"
                     fullWidth
                 >
-                    <DialogTitle>Delivery Confirmation Signature</DialogTitle>
+                    <DialogTitle>Xác nhận giao hàng bằng chữ ký</DialogTitle>
                     <DialogContent>
                         <DialogContentText sx={{ mb: 2 }}>
-                            Please obtain a signature to confirm delivery of {selectedOrders.length} orders to {hub?.name}.
+                            Vui lòng lấy chữ ký để xác nhận giao {selectedOrders.length} đơn hàng tại {hub?.name}.
                         </DialogContentText>
-
                         <Grid container spacing={3}>
                             <Grid item xs={12} md={7}>
                                 <Typography variant="subtitle2" gutterBottom>
-                                    Signature Area:
+                                    Khu vực chữ ký:
                                 </Typography>
                                 <Paper
                                     variant="outlined"
@@ -930,16 +981,15 @@ const DriverHubOperations = () => {
                                     >
                                         {signatureData ? (
                                             <Typography variant="h6" color="primary">
-                                                ✓ Signature Captured
+                                                ✓ Đã lưu chữ ký
                                             </Typography>
                                         ) : (
                                             <Typography color="text.secondary">
-                                                Click here to sign
+                                                Nhấn vào đây để ký
                                             </Typography>
                                         )}
                                     </Box>
                                 </Paper>
-
                                 <Button
                                     variant="outlined"
                                     size="small"
@@ -947,28 +997,25 @@ const DriverHubOperations = () => {
                                     onClick={clearSignature}
                                     disabled={!signatureData}
                                 >
-                                    Clear Signature
+                                    Xóa chữ ký
                                 </Button>
                             </Grid>
-
                             <Grid item xs={12} md={5}>
                                 <Typography variant="subtitle2" gutterBottom>
-                                    Delivery Details:
+                                    Chi tiết giao hàng:
                                 </Typography>
-
                                 <TextField
                                     margin="dense"
-                                    label="Recipient Name"
+                                    label="Tên người nhận"
                                     fullWidth
                                     required
                                     value={recipientName}
                                     onChange={(e) => setRecipientName(e.target.value)}
                                     sx={{ mb: 2 }}
                                 />
-
                                 <TextField
                                     margin="dense"
-                                    label="Notes (optional)"
+                                    label="Ghi chú (tùy chọn)"
                                     fullWidth
                                     multiline
                                     rows={3}
@@ -983,7 +1030,7 @@ const DriverHubOperations = () => {
                             onClick={() => setSignatureOpen(false)}
                             disabled={operationLoading}
                         >
-                            Cancel
+                            Hủy
                         </Button>
                         <Button
                             onClick={processOrders}
@@ -994,7 +1041,7 @@ const DriverHubOperations = () => {
                             {operationLoading ? (
                                 <CircularProgress size={24} color="inherit" />
                             ) : (
-                                'Confirm Delivery'
+                                'Xác nhận giao hàng'
                             )}
                         </Button>
                     </DialogActions>
@@ -1010,17 +1057,17 @@ const DriverHubOperations = () => {
                     <DialogTitle>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <QrCodeScannerIcon sx={{ mr: 1 }} />
-                            Scan Order QR Code
+                            Quét mã QR đơn hàng
                         </Box>
                     </DialogTitle>
                     <DialogContent>
                         <DialogContentText sx={{ mb: 2 }}>
-                            Enter or scan the order ID using a barcode scanner
+                            Nhập hoặc quét mã đơn hàng bằng máy quét mã vạch
                         </DialogContentText>
                         <TextField
                             autoFocus
                             margin="dense"
-                            label="Order ID"
+                            label="Mã đơn hàng"
                             fullWidth
                             variant="outlined"
                             value={scannedOrderId}
@@ -1029,18 +1076,18 @@ const DriverHubOperations = () => {
                             sx={{ mb: 2 }}
                         />
                         <Alert severity="info" sx={{ mb: 2 }}>
-                            Make sure the scanner is configured to emit an Enter key after scanning
+                            Đảm bảo máy quét được cấu hình để phát ra phím Enter sau khi quét
                         </Alert>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => setScannerOpen(false)}>Cancel</Button>
+                        <Button onClick={() => setScannerOpen(false)}>Hủy</Button>
                         <Button
                             onClick={processScannedOrder}
                             variant="contained"
                             color="primary"
                             disabled={!scannedOrderId}
                         >
-                            Add Order
+                            Thêm đơn hàng
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -1052,10 +1099,10 @@ const DriverHubOperations = () => {
                     maxWidth="sm"
                     fullWidth
                 >
-                    <DialogTitle>Filter Orders</DialogTitle>
+                    <DialogTitle>Lọc đơn hàng</DialogTitle>
                     <DialogContent>
                         <Typography variant="subtitle2" gutterBottom sx={{ mt: 1 }}>
-                            Status:
+                            Trạng thái:
                         </Typography>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
                             {['CONFIRMED_OUT','COLLECTED_HUB', 'DELIVERING'].map(status => (
@@ -1079,13 +1126,12 @@ const DriverHubOperations = () => {
                                 />
                             ))}
                         </Box>
-
                         <Typography variant="subtitle2" gutterBottom>
-                            Destination:
+                            Địa chỉ đến:
                         </Typography>
                         <TextField
                             fullWidth
-                            placeholder="Search by destination address or recipient name"
+                            placeholder="Tìm kiếm theo địa chỉ đến hoặc tên người nhận"
                             value={filters.destination}
                             onChange={(e) => setFilters({
                                 ...filters,
@@ -1096,13 +1142,13 @@ const DriverHubOperations = () => {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={resetFilters} color="inherit">
-                            Reset Filters
+                            Đặt lại bộ lọc
                         </Button>
                         <Button onClick={() => setFilterDialogOpen(false)}>
-                            Cancel
+                            Hủy
                         </Button>
                         <Button onClick={applyFilters} variant="contained" color="primary">
-                            Apply Filters
+                            Áp dụng bộ lọc
                         </Button>
                     </DialogActions>
                 </Dialog>

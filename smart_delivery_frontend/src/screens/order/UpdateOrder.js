@@ -187,19 +187,20 @@ const UpdateOrder = () =>{
     const formatStatus = (status) => {
         const statusMap = {
             'PENDING': 'Đang xử lý',
-            'ASSIGNED': 'Đã phân công',
-            'COLLECTED_COLLECTOR': 'Đã thu gom',
-            'COLLECTED_HUB': 'Đã về hub',
-            'CONFIRMED_OUT': 'Đã xác nhận xuất',
-            'DELIVERING': 'Đang vận chuyển',
-            'DELIVERED': 'Đã giao đến đích',
+            'ASSIGNED': 'Đã phân công lấy hàng',
+            'COLLECTED_COLLECTOR': 'Đã lấy hàng',
+            'COLLECTED_HUB': 'Đã về hub nguồn',
+            'CONFIRMED_IN': 'Đã về hub',
+            'CONFIRMED_OUT': 'Đã xác nhận xuất hub nguồn',
+            'DELIVERING': 'Đang vận chuyển đến hub đích',
+            'DELIVERED': 'Đã giao đến hub đích',
             'CONFIRMED_IN_FINAL_HUB': 'Đã xác nhận nhập hub đích',
-            'ASSIGNED_SHIPPER': 'Đã giao cho shipper',
+            'ASSIGNED_SHIPPER': 'Đã phân công giao hàng',
             'SHIPPING': 'Đang giao hàng',
             'SHIPPED': 'Đã giao hàng',
-            'COMPLETED': 'Hoàn thành',
+            'COMPLETED': 'Giao hàng thành công',
             'CANCELLED': 'Đã hủy',
-            'DELIVERED_FAILED': 'Giao hàng thất bại',
+            'DELIVERED_FAILED': 'Giao hàng đến hub thất bại',
             'SHIPPED_FAILED': 'Shipper giao thất bại'
         };
         return statusMap[status] || status;
@@ -821,9 +822,7 @@ const UpdateOrder = () =>{
                                                         color={getStatusColor(history.status)}
                                                         size="small"
                                                     />
-                                                    <Typography variant="body2" color="textSecondary">
-                                                        Phiên bản {history.version}
-                                                    </Typography>
+
                                                 </Box>
                                             }
                                             secondary={
@@ -841,11 +840,7 @@ const UpdateOrder = () =>{
                                                             <strong>Lý do:</strong> {history.changeReason}
                                                         </Typography>
                                                     )}
-                                                    {history.totalPrice && (
-                                                        <Typography variant="body2">
-                                                            <strong>Tổng tiền:</strong> {history.totalPrice.toLocaleString('vi-VN')}đ
-                                                        </Typography>
-                                                    )}
+
                                                 </Box>
                                             }
                                         />

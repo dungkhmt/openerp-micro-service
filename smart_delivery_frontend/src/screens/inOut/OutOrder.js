@@ -6,6 +6,8 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import SearchIcon from "@mui/icons-material/Search";
+import ClearIcon from "@mui/icons-material/Clear";
 import StandardTable from "../../components/StandardTable";
 import {
     Box,
@@ -22,7 +24,12 @@ import {
     Tabs,
     Tab,
     Divider,
-    CircularProgress
+    CircularProgress,
+    TextField,
+    InputAdornment,
+    Stack,
+    Avatar,
+    Paper
 } from "@mui/material";
 import {useSelector} from "react-redux";
 import {errorNoti, successNoti} from "../../utils/notification";
@@ -36,10 +43,14 @@ const OutOrder = () => {
     // Driver related states
     const [trips, setTrips] = useState([]);
     const [tripsWithVehicles, setTripsWithVehicles] = useState([]);
+    const [cameFirstStopTrips, setCameFirstStopTrips] = useState([]);
+    const [otherTrips, setOtherTrips] = useState([]);
     const [selectedTrip, setSelectedTrip] = useState(null);
     const [suggestedOrders, setSuggestedOrders] = useState([]);
+    const [filteredOrders, setFilteredOrders] = useState([]);
     const [selectedOrders, setSelectedOrders] = useState([]);
     const [assignOrdersDialog, setAssignOrdersDialog] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     // Shipper related states
     const [shipperPickupRequests, setShipperPickupRequests] = useState([]);
@@ -48,6 +59,22 @@ const OutOrder = () => {
     // Loading states
     const [loading, setLoading] = useState(false);
     const [processingIds, setProcessingIds] = useState([]);
+
+    // Filter orders based on search query
+    useEffect(() => {
+        if (!searchQuery.trim()) {
+            setFilteredOrders(suggestedOrders);
+        } else {
+            const filtered = suggestedOrders.filter(order =>
+                order.orderCode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                order.senderName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                order.recipientName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                order.hubName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                order.currentStatus?.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+            setFilteredOrders(filtered);
+        }
+    }, [searchQuery, suggestedOrders]);
 
     // Fetch data based on active tab
     useEffect(() => {
@@ -68,6 +95,17 @@ const OutOrder = () => {
             fetchVehiclesForTrips(tripIds);
         }
     }, [trips]);
+
+    // Separate trips when tripsWithVehicles updates
+    useEffect(() => {
+        if (tripsWithVehicles.length > 0) {
+            const cameFirstStop = tripsWithVehicles.filter(trip => trip.status === 'CAME_FIRST_STOP');
+            const others = tripsWithVehicles.filter(trip => trip.status !== 'CAME_FIRST_STOP');
+
+            setCameFirstStopTrips(cameFirstStop);
+            setOtherTrips(others);
+        }
+    }, [tripsWithVehicles]);
 
     const fetchTripsForToday = () => {
         setLoading(true);
@@ -137,6 +175,7 @@ const OutOrder = () => {
     const handleAssignOrders = (trip) => {
         setSelectedTrip(trip);
         setSelectedOrders([]);
+        setSearchQuery('');
         fetchSuggestedOrders(trip.id);
         setAssignOrdersDialog(true);
     };
@@ -148,6 +187,7 @@ const OutOrder = () => {
             `smdeli/middle-mile/trip/${tripId}/suggested-orders`,
             (res) => {
                 setSuggestedOrders(res.data);
+                setFilteredOrders(res.data);
                 setLoading(false);
             },
             {
@@ -174,6 +214,23 @@ const OutOrder = () => {
             return;
         }
 
+        // Check capacity limits
+        const totalWeight = selectedOrders.reduce((sum, order) => sum + (order.weight || 0), 0);
+        const totalVolume = selectedOrders.reduce((sum, order) => sum + (order.volume || 0), 0);
+
+        const maxWeight = selectedTrip.vehicle?.weightCapacity || 0;
+        const maxVolume = selectedTrip.vehicle?.volumeCapacity || 0;
+
+        if (maxWeight > 0 && totalWeight > maxWeight) {
+            errorNoti(`Total weight (${totalWeight.toFixed(1)} kg) exceeds vehicle capacity (${maxWeight} kg)`);
+            return;
+        }
+
+        if (maxVolume > 0 && totalVolume > maxVolume) {
+            errorNoti(`Total volume (${totalVolume.toFixed(2)} m³) exceeds vehicle capacity (${maxVolume} m³)`);
+            return;
+        }
+
         const orderIds = selectedOrders.map(order => order.orderId);
         setLoading(true);
 
@@ -184,6 +241,7 @@ const OutOrder = () => {
                 successNoti("Orders assigned to driver successfully");
                 setAssignOrdersDialog(false);
                 setSelectedOrders([]);
+                setSearchQuery('');
                 fetchTripsForToday();
                 setLoading(false);
             },
@@ -208,6 +266,18 @@ const OutOrder = () => {
             setSelectedOrders(selectedOrders.filter(selected => selected.orderId !== order.orderId));
         } else {
             setSelectedOrders([...selectedOrders, order]);
+        }
+    };
+
+    const handleClearSearch = () => {
+        setSearchQuery('');
+    };
+
+    const handleSelectAll = () => {
+        if (selectedOrders.length === filteredOrders.length) {
+            setSelectedOrders([]);
+        } else {
+            setSelectedOrders([...filteredOrders]);
         }
     };
 
@@ -346,8 +416,58 @@ const OutOrder = () => {
         }
     };
 
-    // Trip table columns for driver tab
-    const tripColumns = [
+    // Trip table columns for CAME_FIRST_STOP trips
+    const cameFirstStopColumns = [
+        {
+            title: "Trip ID",
+            field: "id",
+            renderCell: (rowData) => rowData.id.substring(0, 8) + "..."
+        },
+        {
+            title: "Route",
+            field: "routeName",
+        },
+        {
+            title: "Vehicle Plate",
+            field: "plateNumber",
+        },
+        {
+            title: "Date",
+            field: "date",
+        },
+        {
+            title: "Orders Count",
+            field: "ordersCount",
+            renderCell: (rowData) => rowData.ordersCount || 0
+        },
+        {
+            title: "Actions",
+            field: "actions",
+            centerHeader: true,
+            sorting: false,
+            renderCell: (rowData) => (
+                <Box>
+                    <IconButton
+                        onClick={() => handleTripSelection(rowData)}
+                        color="primary"
+                        title="View Trip Details"
+                    >
+                        <VisibilityIcon />
+                    </IconButton>
+                    <IconButton
+                        onClick={() => handleAssignOrders(rowData)}
+                        color="secondary"
+                        title="Assign Orders"
+                    >
+                        <AssignmentIcon />
+                    </IconButton>
+                </Box>
+            ),
+        },
+    ];
+
+    // Trip table columns for other trips
+    const otherTripColumns = [
         {
             title: "Trip ID",
             field: "id",
@@ -395,15 +515,6 @@ const OutOrder = () => {
                     >
                         <VisibilityIcon />
                     </IconButton>
-                    {rowData.status === 'CAME_FIRST_STOP' && (
-                        <IconButton
-                            onClick={() => handleAssignOrders(rowData)}
-                            color="secondary"
-                            title="Assign Orders"
-                        >
-                            <AssignmentIcon />
-                        </IconButton>
-                    )}
                 </Box>
             ),
         },
@@ -529,6 +640,30 @@ const OutOrder = () => {
         window.location.href = `/order/detail/${order.id}`;
     };
 
+    // Calculate capacity warnings
+    const getCapacityWarning = () => {
+        if (selectedOrders.length === 0 || !selectedTrip?.vehicle) return null;
+
+        const totalWeight = selectedOrders.reduce((sum, order) => sum + (order.weight || 0), 0);
+        const totalVolume = selectedOrders.reduce((sum, order) => sum + (order.volume || 0), 0);
+        const maxWeight = selectedTrip.vehicle.weightCapacity || 0;
+        const maxVolume = selectedTrip.vehicle.volumeCapacity || 0;
+
+        const weightExceeded = maxWeight > 0 && totalWeight > maxWeight;
+        const volumeExceeded = maxVolume > 0 && totalVolume > maxVolume;
+
+        if (!weightExceeded && !volumeExceeded) return null;
+
+        return {
+            weightExceeded,
+            volumeExceeded,
+            totalWeight,
+            totalVolume,
+            maxWeight,
+            maxVolume
+        };
+    };
+
     return (
         <div>
             <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
@@ -555,11 +690,43 @@ const OutOrder = () => {
             {/* Driver Tab */}
             {activeTab === 0 && (
                 <Box>
+                    {/* Trips Ready for Order Assignment */}
+                    {cameFirstStopTrips.length > 0 && (
+                        <>
+                            <StandardTable
+                                title={ <Box display="flex" alignItems="center" gap={1} mb={2}>
+                                    <AssignmentIcon color="warning" />
+                                    <Typography variant="h6" color="warning.main">
+                                        Trip đã đến hub - {cameFirstStopTrips.length}
+                                    </Typography>
+                                </Box>}
+                                columns={cameFirstStopColumns}
+                                data={cameFirstStopTrips}
+                                rowKey="id"
+                                defaultOrderBy="date"
+                                defaultOrder="desc"
+                                isLoading={loading}
+                                options={{
+                                    pageSize: 5,
+                                    search: true,
+                                    sorting: true,
+                                    headerStyle: {
+                                        backgroundColor: '#fff3e0',
+                                        fontWeight: 'bold'
+                                    }
+                                }}
+                            />
+                        </>
+                    )}
+
+                    {/* All Other Trips */}
                     <StandardTable
-                        title="Today's Driver Trips - Outbound Orders"
-                        columns={tripColumns}
-                        data={tripsWithVehicles}
+                        title="Các trip khác sẽ khởi hành từ hub"
+                        columns={otherTripColumns}
+                        data={otherTrips}
                         rowKey="id"
+                        defaultOrderBy="status"
+                        defaultOrder="desc"
                         isLoading={loading}
                         options={{
                             pageSize: 10,
@@ -590,31 +757,33 @@ const OutOrder = () => {
                             )}
                         </DialogTitle>
 
-                        <DialogContent>
+                        <DialogContent sx={{ px: 3, py: 1 }}>
                             {loading ? (
                                 <Box display="flex" justifyContent="center" alignItems="center" p={4}>
-                                    <CircularProgress />
+                                    <CircularProgress size={24} />
                                     <Typography sx={{ ml: 2 }}>Loading suggested orders...</Typography>
                                 </Box>
                             ) : (
                                 <Box>
-                                    <Typography variant="h6" gutterBottom>
-                                        Suggested Orders ({suggestedOrders.length})
-                                    </Typography>
-
+                                    {/* Vehicle Capacity Info */}
                                     {selectedTrip?.vehicle && (
                                         <Card sx={{ mb: 2 }}>
-                                            <CardContent>
-                                                <Typography variant="subtitle1">Vehicle Capacity</Typography>
+                                            <CardContent sx={{ py: 1, px: 2 }}>
+                                                <Typography variant="body2" fontWeight="bold">Vehicle Capacity</Typography>
                                                 <Grid container spacing={2}>
-                                                    <Grid item xs={6}>
-                                                        <Typography variant="body2">
+                                                    <Grid item xs={4}>
+                                                        <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
                                                             Max Weight: {selectedTrip.vehicle.weightCapacity || 'N/A'} kg
                                                         </Typography>
                                                     </Grid>
-                                                    <Grid item xs={6}>
-                                                        <Typography variant="body2">
+                                                    <Grid item xs={4}>
+                                                        <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
                                                             Max Volume: {selectedTrip.vehicle.volumeCapacity || 'N/A'} m³
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={4}>
+                                                        <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
+                                                            Selected: {selectedOrders.length} orders
                                                         </Typography>
                                                     </Grid>
                                                 </Grid>
@@ -622,12 +791,51 @@ const OutOrder = () => {
                                         </Card>
                                     )}
 
-                                    <Typography variant="subtitle1" gutterBottom>
-                                        Selected Orders: {selectedOrders.length}
+                                    {/* Search and Filter Section */}
+                                    <Grid container spacing={1} alignItems="center" sx={{ mb: 2 }}>
+                                        <Grid item xs={8}>
+                                            <TextField
+                                                fullWidth
+                                                placeholder="Search orders..."
+                                                value={searchQuery}
+                                                onChange={(e) => setSearchQuery(e.target.value)}
+                                                InputProps={{
+                                                    startAdornment: (
+                                                        <InputAdornment position="start">
+                                                            <SearchIcon color="action" />
+                                                        </InputAdornment>
+                                                    ),
+                                                    endAdornment: searchQuery && (
+                                                        <InputAdornment position="end">
+                                                            <IconButton onClick={handleClearSearch} size="small">
+                                                                <ClearIcon />
+                                                            </IconButton>
+                                                        </InputAdornment>
+                                                    ),
+                                                }}
+                                                size="small"
+                                            />
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <Stack direction="row" spacing={1} alignItems="center">
+                                                <Button
+                                                    variant={selectedOrders.length === filteredOrders.length && filteredOrders.length > 0 ? "contained" : "outlined"}
+                                                    onClick={handleSelectAll}
+                                                    disabled={filteredOrders.length === 0}
+                                                    size="small"
+                                                >
+                                                    {selectedOrders.length === filteredOrders.length && filteredOrders.length > 0 ? 'Deselect All' : 'Select All'}
+                                                </Button>
+                                            </Stack>
+                                        </Grid>
+                                    </Grid>
+
+                                    <Typography variant="body2" fontWeight="bold" sx={{ mb: 1 }}>
+                                        Suggested Orders ({filteredOrders.length})
                                     </Typography>
 
-                                    <Box sx={{ maxHeight: 400, overflowY: 'auto' }}>
-                                        {suggestedOrders.map((order) => {
+                                    <Box sx={{ maxHeight: 350, overflowY: 'auto', pr: 1 }}>
+                                        {filteredOrders.map((order, index) => {
                                             const isSelected = selectedOrders.some(selected => selected.orderId === order.orderId);
                                             return (
                                                 <Card
@@ -635,51 +843,89 @@ const OutOrder = () => {
                                                     sx={{
                                                         mb: 1,
                                                         cursor: 'pointer',
-                                                        border: isSelected ? '2px solid #1976d2' : '1px solid #e0e0e0',
-                                                        '&:hover': { backgroundColor: '#f5f5f5' }
+                                                        border: isSelected ? '1px solid' : '1px solid',
+                                                        borderColor: isSelected ? 'primary.main' : 'grey.300',
+                                                        bgcolor: isSelected ? 'primary.50' : 'background.paper',
+                                                        '&:hover': {
+                                                            bgcolor: isSelected ? 'primary.100' : 'grey.50',
+                                                        }
                                                     }}
                                                     onClick={() => handleOrderSelection(order)}
                                                 >
-                                                    <CardContent sx={{ py: 1 }}>
-                                                        <Grid container spacing={2} alignItems="center">
+                                                    <CardContent sx={{ py: 1, px: 2 }}>
+                                                        <Grid container spacing={1} alignItems="center">
+                                                            {/* Order Code and Priority */}
                                                             <Grid item xs={2}>
-                                                                <Typography variant="body2" fontWeight="bold">
+                                                                <Typography variant="body2" fontWeight="bold" color="primary.main">
                                                                     {order.orderCode}
                                                                 </Typography>
                                                                 <Chip
-                                                                    label={`Priority: ${order.priority}`}
+                                                                    label={`"Độ ưu tiên:"  {order.priority}`}
                                                                     color={getPriorityColor(order.priority)}
                                                                     size="small"
+                                                                    sx={{ fontSize: '0.65rem', height: '16px' }}
                                                                 />
                                                             </Grid>
+
+                                                            {/* Sender and Recipient */}
                                                             <Grid item xs={3}>
-                                                                <Typography variant="body2">
-                                                                    From: {order.senderName}
+                                                                <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.7rem' }}>
+                                                                    FROM
                                                                 </Typography>
-                                                                <Typography variant="body2">
-                                                                    To: {order.recipientName}
+                                                                <Typography variant="body2" fontWeight="medium" noWrap sx={{ fontSize: '0.8rem' }}>
+                                                                    {order.senderName}
+                                                                </Typography>
+                                                                <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.7rem' }}>
+                                                                    TO
+                                                                </Typography>
+                                                                <Typography variant="body2" fontWeight="medium" noWrap sx={{ fontSize: '0.8rem' }}>
+                                                                    {order.recipientName}
                                                                 </Typography>
                                                             </Grid>
+
+                                                            {/* Weight and Volume */}
                                                             <Grid item xs={2}>
-                                                                <Typography variant="body2">
+                                                                <Typography variant="caption" color="textSecondary">
                                                                     Weight: {order.weight} kg
                                                                 </Typography>
-                                                                <Typography variant="body2">
+                                                                <br />
+                                                                <Typography variant="caption" color="textSecondary">
                                                                     Volume: {order.volume} m³
                                                                 </Typography>
                                                             </Grid>
-                                                            <Grid item xs={3}>
-                                                                <Typography variant="body2">
+
+                                                            {/* Hub and Stop */}
+                                                            <Grid item xs={2}>
+                                                                <Typography variant="caption" color="textSecondary">
                                                                     Hub: {order.hubName}
                                                                 </Typography>
-                                                                <Typography variant="body2">
-                                                                    Stop: {order.stopSequence}
-                                                                </Typography>
+                                                                <br />
+                                                                <Chip
+                                                                    label={`#${order.stopSequence}`}
+                                                                    color="info"
+                                                                    size="small"
+                                                                    variant="outlined"
+                                                                    sx={{ fontSize: '0.65rem', height: '16px' }}
+                                                                />
                                                             </Grid>
+
+                                                            {/* Status */}
                                                             <Grid item xs={2}>
-                                                                {isSelected && (
-                                                                    <CheckCircleIcon color="primary" />
-                                                                )}
+                                                                <Chip
+                                                                    label={order.currentStatus}
+                                                                    color={getOrderStatusColor(order.currentStatus)}
+                                                                    size="small"
+                                                                    sx={{ fontSize: '0.8rem', height: '16px' }}
+                                                                />
+                                                            </Grid>
+
+                                                            {/* Selection Indicator */}
+                                                            <Grid item xs={1}>
+                                                                <Box display="flex" justifyContent="center">
+                                                                    {isSelected && (
+                                                                        <CheckCircleIcon color="primary" sx={{ fontSize: '20px' }} />
+                                                                    )}
+                                                                </Box>
                                                             </Grid>
                                                         </Grid>
                                                     </CardContent>
@@ -688,19 +934,85 @@ const OutOrder = () => {
                                         })}
                                     </Box>
 
-                                    {suggestedOrders.length === 0 && !loading && (
-                                        <Typography color="textSecondary" align="center" sx={{ mt: 2 }}>
-                                            No orders available for this trip route.
+                                    {/* Capacity Warning */}
+                                    {(() => {
+                                        const warning = getCapacityWarning();
+                                        if (!warning) return null;
+
+                                        return (
+                                            <Card sx={{ mt: 1, bgcolor: 'error.50', border: '1px solid', borderColor: 'error.main' }}>
+                                                <CardContent sx={{ py: 1, px: 2 }}>
+                                                    <Typography variant="body2" fontWeight="bold" color="error.main" gutterBottom>
+                                                        Capacity Exceeded
+                                                    </Typography>
+                                                    {warning.weightExceeded && (
+                                                        <Typography variant="caption" color="error.main">
+                                                            Weight: {warning.totalWeight.toFixed(1)} kg / {warning.maxWeight} kg (Exceeded by {(warning.totalWeight - warning.maxWeight).toFixed(1)} kg)
+                                                        </Typography>
+                                                    )}
+                                                    {warning.volumeExceeded && (
+                                                        <Typography variant="caption" color="error.main" sx={{ display: 'block' }}>
+                                                            Volume: {warning.totalVolume.toFixed(2)} m³ / {warning.maxVolume} m³ (Exceeded by {(warning.totalVolume - warning.maxVolume).toFixed(2)} m³)
+                                                        </Typography>
+                                                    )}
+                                                </CardContent>
+                                            </Card>
+                                        );
+                                    })()}
+
+                                    {/* Summary Section */}
+                                    {selectedOrders.length > 0 && (
+                                        <Card sx={{ mt: 2, bgcolor: 'success.50', border: '1px solid', borderColor: 'success.200' }}>
+                                            <CardContent sx={{ py: 1, px: 2 }}>
+                                                <Typography variant="body2" fontWeight="bold" color="success.main" gutterBottom>
+                                                    Selection Summary
+                                                </Typography>
+                                                <Grid container spacing={1}>
+                                                    <Grid item xs={3}>
+                                                        <Typography variant="caption" color="textSecondary">Orders</Typography>
+                                                        <Typography variant="body2" fontWeight="bold" color="success.main">
+                                                            {selectedOrders.length}
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={3}>
+                                                        <Typography variant="caption" color="textSecondary">Total Weight</Typography>
+                                                        <Typography variant="body2" fontWeight="bold" color="success.main">
+                                                            {selectedOrders.reduce((sum, order) => sum + (order.weight || 0), 0).toFixed(1)} kg
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={3}>
+                                                        <Typography variant="caption" color="textSecondary">Total Volume</Typography>
+                                                        <Typography variant="body2" fontWeight="bold" color="success.main">
+                                                            {selectedOrders.reduce((sum, order) => sum + (order.volume || 0), 0).toFixed(2)} m³
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={3}>
+                                                        <Typography variant="caption" color="textSecondary">Avg Priority</Typography>
+                                                        <Typography variant="body2" fontWeight="bold" color="success.main">
+                                                            {(selectedOrders.reduce((sum, order) => sum + (order.priority || 0), 0) / selectedOrders.length).toFixed(1)}
+                                                        </Typography>
+                                                    </Grid>
+                                                </Grid>
+                                            </CardContent>
+                                        </Card>
+                                    )}
+
+                                    {/* Empty State */}
+                                    {filteredOrders.length === 0 && !loading && (
+                                        <Typography color="textSecondary" align="center" sx={{ mt: 2, fontSize: '0.9rem' }}>
+                                            {searchQuery ? 'No orders match your search' : 'No orders available for this trip route.'}
                                         </Typography>
                                     )}
                                 </Box>
                             )}
                         </DialogContent>
 
-                        <DialogActions>
+                        <DialogActions sx={{ p: 3, bgcolor: 'grey.50' }}>
                             <Button
                                 onClick={() => setAssignOrdersDialog(false)}
                                 disabled={loading}
+                                size="large"
+                                sx={{ minWidth: 120 }}
                             >
                                 Cancel
                             </Button>
@@ -709,8 +1021,10 @@ const OutOrder = () => {
                                 variant="contained"
                                 disabled={loading || selectedOrders.length === 0}
                                 startIcon={loading ? <CircularProgress size={20} /> : <AssignmentIcon />}
+                                size="large"
+                                sx={{ minWidth: 200 }}
                             >
-                                Assign {selectedOrders.length} Orders
+                                {loading ? 'Assigning...' : `Assign ${selectedOrders.length} Orders`}
                             </Button>
                         </DialogActions>
                     </Dialog>
@@ -718,8 +1032,9 @@ const OutOrder = () => {
                     {/* Instructions for Driver Tab */}
                     <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
                         <Typography variant="body2" color="textSecondary">
-                            <strong>Driver Trips:</strong> Review and assign orders to driver trips for middle-mile delivery.
-                            Click "Assign Orders" for trips with status "CAME_FIRST_STOP" to load orders into the vehicle.
+                            <strong>Driver Trips:</strong> Trips with status "CAME_FIRST_STOP" are displayed in the priority section above
+                            and are ready for order assignment. Use the "Assign Orders" button to load orders into these vehicles.
+                            All other trips are shown in the table below for monitoring purposes.
                         </Typography>
                     </Box>
                 </Box>
@@ -804,6 +1119,6 @@ const OutOrder = () => {
             )}
         </div>
     );
-}
+};
 
 export default OutOrder;

@@ -24,6 +24,10 @@ public class OrderRequestDto {
     private String recipientAddress;
     private Double recipientLongitude;
     private Double recipientLatitude;
+    private Double length;
+    private Double width;
+    private Double height;
+    private Double weight;
 
     private List<OrderItem> items;
 

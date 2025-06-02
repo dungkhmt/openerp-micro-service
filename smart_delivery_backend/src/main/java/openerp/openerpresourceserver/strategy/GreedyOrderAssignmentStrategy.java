@@ -17,7 +17,7 @@ public class GreedyOrderAssignmentStrategy implements DistributeStrategy {
 
     @Autowired
     private AssignOrderCollectorRepository assignOrderCollectorRepository;
-
+    private String name = "GreedyStrategy";
     @Autowired
     private GraphHopperCalculator graphHopperCalculator;
 
@@ -117,4 +117,10 @@ public class GreedyOrderAssignmentStrategy implements DistributeStrategy {
                 .findFirst()
                 .orElse(null);
     }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
 }

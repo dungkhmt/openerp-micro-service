@@ -63,6 +63,25 @@ const TodayOrder = (props) => {
     // Role-specific navigation paths
     const detailPath = isCollector ? '/order/collector/' : '/order/shipper/';
 
+    // Helper function to check if assignment is completed based on role
+    const isAssignmentCompleted = (assignment) => {
+        if (isCollector) {
+            return assignment.assignmentStatus === "COMPLETED" || assignment.assignmentStatus === "FAILED_ONCE";
+        } else {
+            return assignment.assignmentStatus === "COMPLETED" || assignment.assignmentStatus === "SHIPPED_FAILED";
+        }
+    };
+
+    // Helper function to check if assignment can be operated on
+    const canOperateOnAssignment = (assignment) => {
+        return !isAssignmentCompleted(assignment);
+    };
+
+    // Filter assignments for map display (exclude completed ones)
+    const getActiveAssignments = () => {
+        return assignmentData.filter(assignment => !isAssignmentCompleted(assignment));
+    };
+
     useEffect(() => {
         async function fetchId() {
             await request(
@@ -122,6 +141,13 @@ const TodayOrder = (props) => {
         const addressField = isCollector ? 'senderAddress' : 'recipientAddress';
         const phoneField = isCollector ? 'senderPhone' : 'recipientPhone';
 
+        // Check if next order can be operated on
+        const canOperate = nextOrderData ? canOperateOnAssignment(nextOrderData) : false;
+
+        // Check if there are any active assignments left
+        const activeAssignments = getActiveAssignments();
+        const hasActiveAssignments = activeAssignments.length > 0;
+
         return (
             <Box sx={{paddingTop: 1.25, paddingLeft:2, paddingBottom: 1.25, paddingRight: 2, backgroundColor: '#f5f5f5', borderRadius: 2, marginBottom: 0.8}}>
                 <Box sx={{display: 'flex', alignItems: 'center', marginBottom: '8px'}}>
@@ -129,25 +155,37 @@ const TodayOrder = (props) => {
                         Đơn tiếp theo:
                     </Typography>
 
-
                     <Box sx={{width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                         <Box>
-                            {nextOrderData != null ?
-                                <Typography>Tên {personTypeText}: {nextOrderData?.[nameField]}</Typography> :
-                                "Không có đơn hàng!"}
-                            {nextOrderData != null && <Typography>Địa chỉ: {nextOrderData?.[addressField]}</Typography>}
+                            {!hasActiveAssignments ? (
+                                <Typography sx={{ color: 'green', fontWeight: 'bold' }}>
+                                    Không còn đơn hàng cần {actionProcessText}!
+                                </Typography>
+                            ) : nextOrderData != null ? (
+                                <>
+                                    <Typography>Tên {personTypeText}: {nextOrderData?.[nameField]}</Typography>
+                                    <Typography>Địa chỉ: {nextOrderData?.[addressField]}</Typography>
+                                </>
+                            ) : (
+                                <Typography>Không có đơn hàng!</Typography>
+                            )}
                         </Box>
-                        {nextOrderData != null && <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
+                        {hasActiveAssignments && nextOrderData != null && <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
                             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                                 <Typography>Số điện thoại: {nextOrderData?.[phoneField]}</Typography>
                                 <Typography>Số lượng package: {nextOrderData?.numOfItem}</Typography>
+                                {!canOperate && (
+                                    <Typography sx={{ color: 'orange', fontStyle: 'italic', fontSize: '0.875rem' }}>
+                                        (Đơn hàng đã hoàn thành - chỉ có thể xem)
+                                    </Typography>
+                                )}
                             </Box>
                             <Button
                                 variant="contained"
-                                color="primary"
+                                color={canOperate ? "primary" : "secondary"}
                                 onClick={handleGoToDetails}
                             >
-                                Thao tác
+                                {canOperate ? "Thao tác" : "Xem đơn hàng"}
                             </Button>
                         </Box>}
                     </Box>
@@ -178,10 +216,13 @@ const TodayOrder = (props) => {
                         setAssignmentData(sortedData);
                         sessionStorage.setItem(assignmentsStorageKey, JSON.stringify(sortedData));
 
-                        if (sortedData.length > 0 && !sessionStorage.getItem(savedNextOrderKey)) {
-                            sessionStorage.setItem(nextOrderStorageKey, JSON.stringify(sortedData[0]));
+                        // Find first active (non-completed) assignment for next order
+                        const activeAssignments = sortedData.filter(assignment => !isAssignmentCompleted(assignment));
+
+                        if (activeAssignments.length > 0 && !sessionStorage.getItem(savedNextOrderKey)) {
+                            sessionStorage.setItem(nextOrderStorageKey, JSON.stringify(activeAssignments[0]));
                             sessionStorage.setItem(savedNextOrderKey, "1");
-                            setNextOrder(sortedData[0]);
+                            setNextOrder(activeAssignments[0]);
                         }
                     }
                 }
@@ -194,8 +235,12 @@ const TodayOrder = (props) => {
             const sortedAssignments = parsedAssignments?.sort((a, b) => a.sequenceNumber - b.sequenceNumber);
             setAssignmentData(sortedAssignments);
 
+            // Find first active assignment if no next order is set
             if (sortedAssignments?.length > 0 && !sessionStorage.getItem(nextOrderStorageKey)) {
-                sessionStorage.setItem(nextOrderStorageKey, JSON.stringify(sortedAssignments[0]));
+                const activeAssignments = sortedAssignments.filter(assignment => !isAssignmentCompleted(assignment));
+                if (activeAssignments.length > 0) {
+                    sessionStorage.setItem(nextOrderStorageKey, JSON.stringify(activeAssignments[0]));
+                }
             }
         }
 
@@ -203,20 +248,33 @@ const TodayOrder = (props) => {
         setLoading(false);
     }, [employeeId, assignmentsEndpoint, assignmentsStorageKey, nextOrderStorageKey, savedNextOrderKey]);
 
-    // Get role-specific coordinates for routes
-    const routingPoints = assignmentData?.map(order => {
-        if (isCollector) {
-            return {
-                lat: order.senderLatitude,
-                lng: order.senderLongitude
-            };
-        } else {
-            return {
-                lat: order.recipientLatitude,
-                lng: order.recipientLongitude
-            };
+    // Get role-specific coordinates for routes (only for active assignments)
+    const routingPoints = (() => {
+        const activeAssignments = getActiveAssignments();
+        const points = activeAssignments?.map(order => {
+            if (isCollector) {
+                return {
+                    lat: order.senderLatitude,
+                    lng: order.senderLongitude
+                };
+            } else {
+                return {
+                    lat: order.recipientLatitude,
+                    lng: order.recipientLongitude
+                };
+            }
+        }).filter(point => point.lat && point.lng) || [];
+
+        // If no active assignments, return hub location as the only point
+        if (points.length === 0 && hub) {
+            return [{
+                lat: hub.latitude,
+                lng: hub.longitude
+            }];
         }
-    }).filter(point => point.lat && point.lng);
+
+        return points;
+    })();
 
     const handleShowRoute = () => {
         setOpenModal(true);
@@ -255,27 +313,39 @@ const TodayOrder = (props) => {
                     );
                 }
             },
-            {title: "Trạng thái", field: "assignmentStatus"},
+            {
+                title: "Trạng thái",
+                field: "assignmentStatus",
+                renderCell: (rowData) => {
+                    const completed = isAssignmentCompleted(rowData);
+                    return (
+                            rowData.assignmentStatus
+                    );
+                }
+            },
             {
                 title: "Thao tác",
                 field: "actions",
                 centerHeader: true,
                 sorting: false,
-                renderCell: (rowData) => (
-                    <div>
-                        <IconButton
-                            onClick={() => {
-                                history.push({
-                                    pathname: `${detailPath}${rowData.orderId}`,
-                                    state: { assignmentId: rowData.id }
-                                });
-                            }}
-                            color="success"
-                        >
-                            <VisibilityIcon/>
-                        </IconButton>
-                    </div>
-                ),
+                renderCell: (rowData) => {
+                    return (
+                        <div>
+                            <IconButton
+                                onClick={() => {
+                                    history.push({
+                                        pathname: `${detailPath}${rowData.orderId}`,
+                                        state: { assignmentId: rowData.id }
+                                    });
+                                }}
+                                color="info"
+                                title="Xem đơn hàng"
+                            >
+                                <VisibilityIcon/>
+                            </IconButton>
+                        </div>
+                    );
+                }
             }
         ];
 
@@ -381,7 +451,7 @@ const TodayOrder = (props) => {
                                 <NextOrderInfo />
                                 <EnhancedMap
                                     points={routingPoints}
-                                    assignments={assignmentData}
+                                    assignments={getActiveAssignments()} // Only pass active assignments to map
                                     onNextOrder={setNextOrder}
                                     nextOrder={nextOrder}
                                     hub={hub}
@@ -416,15 +486,11 @@ const TodayOrder = (props) => {
                                             Số điểm dừng hoàn thành
                                         </Typography>
                                         <Typography variant="h4" sx={{ color: 'secondary.main' }}>
-                                            {assignmentData?.filter(order =>
-                                                order.assignmentStatus === "COMPLETED" ||
-                                                order.assignmentStatus === "FAILED_ONCE"
-                                            ).length}
+                                            {assignmentData?.filter(order => isAssignmentCompleted(order)).length}
                                         </Typography>
                                     </Box>
                                 </Grid>
 
-                                {/* Tổng số package */}
                                 {/* Tổng số package */}
                                 <Grid item xs={6}>
                                     <Box sx={{ padding: 2, backgroundColor: 'white', borderRadius: 2, textAlign: 'center' }}>
@@ -437,7 +503,6 @@ const TodayOrder = (props) => {
                                     </Box>
                                 </Grid>
 
-                                {/* Tổng số package đã thu/giao */}
                                 {/* Tổng số đơn đã thu/giao */}
                                 <Grid item xs={6}>
                                     <Box sx={{ padding: 2, backgroundColor: 'white', borderRadius: 2, textAlign: 'center' }}>
@@ -452,7 +517,6 @@ const TodayOrder = (props) => {
                             </Grid>
                         </Box>
                     </TabPanel>
-
 
                 </TabContext>
             </Box>
