@@ -28,6 +28,6 @@ public interface AbsenceRepository extends JpaRepository<Absence, Long>, JpaSpec
             "JOIN a.absenceType at " +
             "WHERE a.startTime >= :startTime AND a.endTime <= :endTime " +
             "AND a.status = :status " +
-            "AND at.hasValue = true AND at.type = :type")
-    List<Absence> getAbsenceHasValue(LocalDateTime startTime, LocalDateTime endTime, Integer type, Integer status);
+            "AND at.hasValue = :hasValue AND at.type = :type")
+    List<Absence> getAbsences(LocalDateTime startTime, LocalDateTime endTime, Integer type, Integer status, Boolean hasValue);
 }

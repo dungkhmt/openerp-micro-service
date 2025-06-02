@@ -12,6 +12,7 @@ import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.opencv.opencv_core.*;
 import org.bytedeco.opencv.opencv_face.LBPHFaceRecognizer;
 import org.bytedeco.opencv.opencv_objdetect.CascadeClassifier;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,6 +40,7 @@ public class FaceRecognitionService {
     private static final String HAAR_CASCADE_FILE = "src/main/resources/haarcascade_frontalface_default.xml";
 
     @PostConstruct
+    @Scheduled(cron = "0 0 2 * * *")
     public void init() {
         File root = new File(trainingDir);
         FilenameFilter imgFilter = (dir, name) -> {

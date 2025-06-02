@@ -15,11 +15,6 @@ public interface AttendanceRangeRepository extends JpaRepository<AttendanceRange
     boolean existsByCode(String code);
 
     boolean existsByIdNotAndCode(long id, String code);
-
-    List<AttendanceRange> findAllAndByStatus(StatusEnum status);
-
-    Optional<AttendanceRange> findByCode(String code);
-
     @Query(value = """
             SELECT ar FROM AttendanceRange ar
             JOIN Employee e ON e.attendanceRange.id = ar.id AND e.email = :userEmail

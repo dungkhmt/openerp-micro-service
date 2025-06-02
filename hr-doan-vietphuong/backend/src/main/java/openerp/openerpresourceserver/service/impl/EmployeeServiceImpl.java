@@ -22,11 +22,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -71,6 +73,37 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         return result;
+    }
+
+    public List<Map<String, String>> getEmployeeFacesById(Long id) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Employee not found with id: " + id));
+
+        Integer employeeId = employee.getEmployeeId();
+        File faceDir = new File("faces");
+
+        if (!faceDir.exists() || !faceDir.isDirectory()) {
+            throw new NotFoundException("Faces directory not found");
+        }
+
+        File[] faceFiles = faceDir.listFiles((dir, name) -> name.startsWith(employeeId + "-") &&
+                (name.endsWith(".jpg") || name.endsWith(".png")));
+
+        List<Map<String, String>> images = new ArrayList<>();
+        for (File file : faceFiles) {
+            try {
+                byte[] bytes = Files.readAllBytes(file.toPath());
+                String base64 = Base64.getEncoder().encodeToString(bytes);
+
+                Map<String, String> map = new HashMap<>();
+                map.put("filename", file.getName());
+                map.put("base64", base64);
+                images.add(map);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return images;
     }
 
     @Override
@@ -219,6 +252,21 @@ public class EmployeeServiceImpl implements EmployeeService {
         String imageUrl = uploadService.upload(image.getBytes(), image.getOriginalFilename(), "avatars");
         employee.setImageUrl(imageUrl);
         return employeeRepository.save(employee);
+    }
+
+    @Override
+    public String deleteFaces(String filename) {
+        Path facePath = Paths.get("./faces", filename);
+
+        if (!Files.exists(facePath)) {
+            throw new NotFoundException("Ảnh không tồn tại hoặc không hợp lệ.");
+        }
+        try {
+            Files.delete(facePath);
+            return filename;
+        } catch (IOException e) {
+            throw new BadRequestException("Không thể xoá ảnh");
+        }
     }
 
     private SimpleEmployeeResponse mapToSimpleEmployeeResponse(Employee employee) {

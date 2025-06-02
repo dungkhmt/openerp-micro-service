@@ -39,6 +39,11 @@ public class AdminEmployeeController {
         return Result.ok(employeeService.getEmployeeById(id));
     }
 
+    @GetMapping("/{id}/faces")
+    public Result getEmployeeFacesById(@PathVariable Long id) throws NotFoundException {
+        return Result.ok(employeeService.getEmployeeFacesById(id));
+    }
+
     @PostMapping
     public Result addEmployee(@RequestBody @Valid EmployeeRequest dto) throws BadRequestException {
         return Result.ok(employeeService.addEmployee(dto));
@@ -59,5 +64,10 @@ public class AdminEmployeeController {
     @DeleteMapping
     public Result deleteEmployee(@RequestBody List<Long> idList) throws NotFoundException {
         return Result.ok(employeeService.deleteEmployee(idList));
+    }
+
+    @DeleteMapping("delete-faces")
+    public Result deleteEmployeeFaces(@RequestParam("filename") String filename) {
+        return Result.ok(employeeService.deleteFaces(filename));
     }
 }

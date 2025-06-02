@@ -7,6 +7,7 @@ import openerp.openerpresourceserver.enums.SettingEnum;
 import openerp.openerpresourceserver.repo.SettingRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
@@ -16,6 +17,7 @@ import java.util.Optional;
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 @SpringBootApplication
 @RequiredArgsConstructor
+@EnableScheduling
 public class OpenerpResourceServerApplication {
     private final SettingRepository settingRepository;
 

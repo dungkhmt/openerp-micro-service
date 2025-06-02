@@ -110,12 +110,26 @@ public class ExportServiceImpl implements ExportService {
         ));
 
         // Get absence values
-        List<Absence> absenceWithValues = absenceRepository.getAbsenceHasValue(
+        List<Absence> absenceWithValues = absenceRepository.getAbsences(
                 LocalDateTime.of(startDate, LocalTime.of(0, 0)),
                 LocalDateTime.of(endDate, LocalTime.of(23, 59, 59)),
                 AbsenceTypeEnum.ABSENCE.ordinal(),
-                AbsenceStatus.APPROVED.ordinal());
+                AbsenceStatus.APPROVED.ordinal(),
+                true);
         Map<Integer, Double> absenceWithValueMap = absenceWithValues.stream()
+                .collect(Collectors.groupingBy(
+                        absence -> absence.getEmployee().getEmployeeId(),
+                        Collectors.summingDouble(Absence::getLength)
+                ));
+
+        // Get absence no values
+        List<Absence> absenceWithoutValues = absenceRepository.getAbsences(
+                LocalDateTime.of(startDate, LocalTime.of(0, 0)),
+                LocalDateTime.of(endDate, LocalTime.of(23, 59, 59)),
+                AbsenceTypeEnum.ABSENCE.ordinal(),
+                AbsenceStatus.APPROVED.ordinal(),
+                false);
+        Map<Integer, Double> absenceWithoutValueMap = absenceWithoutValues.stream()
                 .collect(Collectors.groupingBy(
                         absence -> absence.getEmployee().getEmployeeId(),
                         Collectors.summingDouble(Absence::getLength)
@@ -208,12 +222,21 @@ public class ExportServiceImpl implements ExportService {
                 totalAttendanceDays.setCellStyle(boldBlackFontBlackBorderCenterCellStyle);
 
                 // insert total absence days
-                Cell totalAbsenceDays = ExcelUtil.getCell(row, endOfDayColumn + 2);
-                Double absenceDays = absenceWithValueMap.get(employee.getEmployeeId());
-                totalAbsenceDays.setCellStyle(boldBlackFontBlackBorderCenterCellStyle);
-                if (absenceDays != null) {
-                    totalAbsenceDays.setCellValue(
-                            absenceDays
+                Cell totalAbsenceWithValueDays = ExcelUtil.getCell(row, endOfDayColumn + 2);
+                Double absenceWithValueDays = absenceWithValueMap.get(employee.getEmployeeId());
+                totalAbsenceWithValueDays.setCellStyle(boldBlackFontBlackBorderCenterCellStyle);
+                if (absenceWithValueDays != null) {
+                    totalAbsenceWithValueDays.setCellValue(
+                            absenceWithValueDays
+                    );
+                }
+
+                Cell totalAbsenceWithoutValueDays = ExcelUtil.getCell(row, endOfDayColumn + 4);
+                Double absenceWithoutValueDays = absenceWithoutValueMap.get(employee.getEmployeeId());
+                totalAbsenceWithoutValueDays.setCellStyle(boldBlackFontBlackBorderCenterCellStyle);
+                if (absenceWithoutValueDays != null) {
+                    totalAbsenceWithoutValueDays.setCellValue(
+                            absenceWithoutValueDays
                     );
                 }
 
@@ -264,10 +287,7 @@ public class ExportServiceImpl implements ExportService {
                 workbook));
         // include notes
         int startIndex = START_OF_DAY_COLUMN;
-        System.out.println("Map: " + absenceDescriptionMap);
         for (Map.Entry<String, CellStyle> entry : noteStyleMap.entrySet()) {
-            System.out.println("KEY=[" + entry.getKey() + "]");
-            System.out.println(absenceDescriptionMap.get(entry.getKey()));
             formatNote(headerRow, fontBlack9InSize, entry.getValue(), absenceDescriptionMap.get(entry.getKey()), startIndex, workbook);
             startIndex += 4;
         }
@@ -333,7 +353,6 @@ public class ExportServiceImpl implements ExportService {
                 headerRow,
                 startIndex + 1,
                 ExcelUtil.createAlignedCellStyle(font, HorizontalAlignment.LEFT, VerticalAlignment.CENTER, workbook));
-//        System.out.println("Setting cell value: " + absenceType);
         cell.setCellValue(absenceType);
     }
 

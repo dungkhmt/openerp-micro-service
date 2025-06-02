@@ -37,8 +37,7 @@ public class SyncAttendanceServiceImpl implements SyncAttendanceService {
     private final AttendanceReportRepository attendanceReportRepository;
     private final SyncAttendanceRepository syncAttendanceRepository;
     private final AttendanceRangeRepository attendanceRangeRepository;
-    private final AttendanceRepository attendanceRepository;
-    private final EmployeeRepository employeeRepository;
+
     private LocalTime startTime;
     private LocalTime endTime;
     private LocalTime startLunch;

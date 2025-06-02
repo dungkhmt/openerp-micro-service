@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public interface EmployeeService {
     Employee getEmployeeInfo();
@@ -25,6 +26,8 @@ public interface EmployeeService {
 
     EmployeeResponseProjection getEmployeeById(Long id) throws NotFoundException;
 
+    List<Map<String, String>> getEmployeeFacesById(Long id);
+
     Employee addEmployee(EmployeeRequest dto) throws BadRequestException;
 
     Employee updateEmployee(EmployeeRequest dto) throws BadRequestException, NotFoundException;
@@ -34,4 +37,6 @@ public interface EmployeeService {
     List<SimpleEmployeeResponse> getAllEmployees();
 
     Employee updateAvatar(MultipartFile image) throws IOException;
+
+    String deleteFaces(String filename);
 }
