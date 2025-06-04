@@ -19,7 +19,7 @@ import {
   TextField,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { CircularProgress } from "@nextui-org/react";
+import { CircularProgress } from "@heroui/react";
 import { useNavigate, useParams } from 'react-router-dom';
 import { request } from "../../../api";
 import { toast, Toaster } from "react-hot-toast";

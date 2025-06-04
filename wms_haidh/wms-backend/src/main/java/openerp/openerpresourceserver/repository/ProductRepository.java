@@ -22,14 +22,23 @@ import openerp.openerpresourceserver.projection.ProductProjection;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, UUID> {
 	@Query(value = "SELECT p.productId as id, p.code as code, p.name as name, "
-			+ "COALESCE(SUM(pw.quantityOnHand), 0) as totalQuantityOnHand, " + "p.dateUpdated as dateUpdated "
-			+ "FROM Product p " + "LEFT JOIN ProductWarehouse pw ON p.productId = pw.productId "
-			+ "WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
-			+ "GROUP BY p.productId, p.code, p.name, p.dateUpdated "
-			+ "ORDER BY p.dateUpdated DESC", countQuery = "SELECT COUNT(DISTINCT p.productId) " + "FROM Product p "
-					+ "LEFT JOIN ProductWarehouse pw ON p.productId = pw.productId "
-					+ "WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
-	Page<ProductInventoryProjection> findProductInventory(@Param("searchTerm") String searchTerm, Pageable pageable);
+			+ "COALESCE(pw.quantityOnHand, 0) as totalQuantityOnHand, " + "p.dateUpdated as dateUpdated "
+			+ "FROM Product p "
+			+ "LEFT JOIN ProductWarehouse pw ON p.productId = pw.productId AND pw.warehouseId = :warehouseId "
+			+ "WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " + "ORDER BY p.dateUpdated DESC")
+	Page<ProductInventoryProjection> findProductInventory(@Param("searchTerm") String searchTerm, Pageable pageable,
+			@Param("warehouseId") UUID warehouseId);
+	
+	@Query(value = "SELECT p.productId as id, p.code as code, p.name as name, "
+	        + "COALESCE(pw.quantityOnHand, 0) as totalQuantityOnHand, p.dateUpdated as dateUpdated "
+	        + "FROM Product p "
+	        + "LEFT JOIN ProductWarehouse pw ON p.productId = pw.productId AND pw.warehouseId = :warehouseId "
+	        + "WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+	        + "AND COALESCE(pw.quantityOnHand, 0) = 0 "
+	        + "ORDER BY p.dateUpdated DESC")
+	Page<ProductInventoryProjection> findOutOfStockProductInventory(@Param("searchTerm") String searchTerm,
+	        Pageable pageable, @Param("warehouseId") UUID warehouseId);
+
 
 	@Query(value = "SELECT p.productId as id, p.code as code, p.name as name, p.dateUpdated as dateUpdated "
 			+ "FROM Product p " + "WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "

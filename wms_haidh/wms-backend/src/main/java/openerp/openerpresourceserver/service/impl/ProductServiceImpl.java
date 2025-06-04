@@ -39,8 +39,13 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public Page<ProductInventoryProjection> getAllProductInventory(String searchTerm, Pageable pageable) {
-		return productRepository.findProductInventory(searchTerm, pageable);
+	public Page<ProductInventoryProjection> getAllProductInventory(String searchTerm, Pageable pageable,
+	        UUID warehouseId, boolean outOfStockOnly) {
+	    if (outOfStockOnly) {
+	        return productRepository.findOutOfStockProductInventory(searchTerm, pageable, warehouseId);
+	    } else {
+	        return productRepository.findProductInventory(searchTerm, pageable, warehouseId);
+	    }
 	}
 
 	@Override

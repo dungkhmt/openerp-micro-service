@@ -13,7 +13,7 @@ import { menuState } from "./state/MenuState";
 import { notificationState } from "./state/NotificationState";
 // import { ReactComponent as Logo } from "./assets/icons/logo.svg";
 import { BrowserRouter as Router } from "react-router-dom";
-import {NextUIProvider} from "@nextui-org/react";
+import {HeroUIProvider} from "@heroui/react";
 export const theme = createTheme({
   typography: {
     fontFamily: `-apple-system, "Segoe UI", BlinkMacSystemFont, "Roboto", "Oxygen",
@@ -88,7 +88,7 @@ function App() {
   }, []);
 
   return (
-    <NextUIProvider>
+    <HeroUIProvider>
     <ReactKeycloakProvider
       authClient={keycloak}
       initOptions={initOptions}
@@ -115,7 +115,7 @@ function App() {
         </Router>
       </ThemeProvider>
     </ReactKeycloakProvider>
-    </NextUIProvider>
+    </HeroUIProvider>
   );
 }
 

@@ -8,7 +8,8 @@ import {
   TableCell,
   Input,
   Pagination,
-} from "@nextui-org/react";
+  Select, MenuItem, Checkbox
+} from "@heroui/react";
 import { SearchIcon } from "../../components/icon/SearchIcon";
 import { columns } from "../../config/productpurchase";
 import { useState, useEffect, useMemo, useCallback } from "react";
@@ -24,6 +25,18 @@ export default function ProductList() {
   const [pages, setPages] = useState(1);
   const [items, setItems] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
+  const [warehouseId, setWarehouseId] = useState("");
+  const [warehouses, setWarehouses] = useState([]);
+  const [isSelected, setIsSelected] = useState(false);
+  useEffect(() => {
+    request("get", "/warehouses", (res) => {
+      const warehouseList = res.data;
+      setWarehouses(warehouseList);
+      if (warehouseList.length > 0) {
+        setWarehouseId(warehouseList[0].warehouseId);
+      }
+    }).then();
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -36,12 +49,13 @@ export default function ProductList() {
 
   // useEffect để gửi request sau khi giá trị tìm kiếm đã debounce
   useEffect(() => {
-    request("get", `/products/inventory?page=${page - 1}&size=${rowsPerPage}&search=${debouncedSearchTerm}`, (res) => {
-      setItems(res.data.content);
-      setTotalItems(res.data.totalElements);
-      setPages(res.data.totalPages);
-    }).then();
-  }, [page, rowsPerPage, debouncedSearchTerm]);
+    if (warehouseId)
+      request("get", `/products/inventory?page=${page - 1}&size=${rowsPerPage}&search=${debouncedSearchTerm}&warehouseId=${warehouseId}&outOfStockOnly=${isSelected}`, (res) => {
+        setItems(res.data.content);
+        setTotalItems(res.data.totalElements);
+        setPages(res.data.totalPages);
+      }).then();
+  }, [page, rowsPerPage, debouncedSearchTerm, warehouseId, isSelected]);
 
   const renderCell = useCallback((item, columnKey) => {
     const cellValue = item[columnKey];
@@ -69,17 +83,48 @@ export default function ProductList() {
   const topContent = useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
-        <div className="flex justify-between gap-3 items-end">
-          <Input
-            isClearable
-            className="w-full sm:max-w-[44%]"
-            placeholder="Search by name..."
-            startContent={<SearchIcon />}
-            value={filterValue}
-            onClear={() => setDebouncedSearchTerm("")}
-            onValueChange={onSearchChange}
-          />
-        </div>
+        {warehouseId && (
+          <>
+            <div className="flex justify-start gap-3 items-end">
+              <div className="flex-shrink-0 w-[25%]">
+
+                <Select
+                  aria-label="Warehouse"
+                  defaultSelectedKeys={[warehouseId]}
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0];
+                    setWarehouseId(selected);
+                  }}
+
+                  className="w-full"
+                >
+
+                  {warehouses.map((wh) => (
+                    <MenuItem key={wh.warehouseId} value={wh.warehouseId}>
+                      {wh.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </div>
+              <Input
+                isClearable
+                className="w-full sm:max-w-[44%]"
+                placeholder="Search by name..."
+                startContent={<SearchIcon />}
+                value={filterValue}
+                onClear={() => setDebouncedSearchTerm("")}
+                onValueChange={onSearchChange}
+              />
+            </div>
+            <Checkbox isSelected={isSelected} onValueChange={setIsSelected} color="success" classNames={{
+              label: "text-md text-default-600 font-medium", // chỉnh font size và màu
+            }}>
+              Out of stock
+            </Checkbox>
+          </>
+        )
+        }
+
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">Total {totalItems} items</span>
           <label className="flex items-center text-default-400 text-small">

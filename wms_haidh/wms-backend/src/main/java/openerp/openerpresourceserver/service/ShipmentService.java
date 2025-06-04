@@ -26,7 +26,7 @@ public class ShipmentService {
     }
     
     public List<Shipment> getAllShipments() {
-        return shipmentRepository.findAllByOrderByExpectedDeliveryStampDesc();
+        return shipmentRepository.findAllUpcomingShipments();
     }
     
     public Page<Shipment> getAllShipments(int page, int size, String search) {

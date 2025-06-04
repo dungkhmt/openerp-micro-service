@@ -1,6 +1,5 @@
 package openerp.openerpresourceserver.service;
 
-
 import java.util.List;
 import java.util.UUID;
 
@@ -19,18 +18,19 @@ import openerp.openerpresourceserver.projection.ProductProjection;
 
 public interface ProductService {
 
-    Page<ProductInventoryProjection> getAllProductInventory(String searchTerm,Pageable pageable);
-    
-    Page<ProductGeneralProjection> getAllProductGeneral(String searchTerm,Pageable pageable);
+	Page<ProductInventoryProjection> getAllProductInventory(String searchTerm, Pageable pageable, UUID warehouseId,
+			boolean outOfStockOnly);
+
+	Page<ProductGeneralProjection> getAllProductGeneral(String searchTerm, Pageable pageable);
 
 	Product getProductById(UUID productId);
 
 	boolean updateProduct(ProductCreateRequest productDto, MultipartFile imageFile);
 
 	boolean createProduct(ProductCreateRequest productDto, MultipartFile imageFile);
-	
+
 	List<ProductNameProjection> searchProductNames(String searchTerm);
-	
+
 	public ProductDetailProjection getProductDetail(UUID productId);
 
 	Page<ProductProjection> getProducts(Pageable pageable, String searchTerm, UUID categoryId);
@@ -40,4 +40,3 @@ public interface ProductService {
 	String getProductNameById(UUID productId);
 
 }
-

@@ -3,7 +3,7 @@ import {
     Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
     Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem,
     Pagination, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Select, MenuItem
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { VerticalDotsIcon } from "../../../components/icon/VerticalDotsIcon";
 import { SearchIcon } from "../../../components/icon/SearchIcon";
 import { columns, statusOptions } from "../../../config/distance";

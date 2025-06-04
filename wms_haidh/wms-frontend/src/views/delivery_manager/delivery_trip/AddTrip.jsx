@@ -374,7 +374,7 @@ const AddTrip = () => {
                 >
                   {shipmentOptions.map((item) => (
                     <MenuItem key={item.shipmentId} value={item.shipmentId}>
-                      {formatDate(item.expectedDeliveryStamp)}
+                      {item.shipmentId} - {formatDate(item.expectedDeliveryStamp)}
                     </MenuItem>
                   ))}
                 </Select>

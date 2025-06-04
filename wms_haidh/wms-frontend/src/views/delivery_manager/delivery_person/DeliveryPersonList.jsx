@@ -14,7 +14,7 @@ import {
   DropdownItem,
   Pagination,
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Select, MenuItem
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { PlusIcon } from "../../../components/icon/PlusIcon";
 import { VerticalDotsIcon } from "../../../components/icon/VerticalDotsIcon";
 import { SearchIcon } from "../../../components/icon/SearchIcon";

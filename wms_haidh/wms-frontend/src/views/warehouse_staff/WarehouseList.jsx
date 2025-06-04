@@ -13,7 +13,7 @@ import {
     DropdownMenu,
     DropdownItem,
     Pagination,
-} from "@nextui-org/react";
+} from "@heroui/react";
 
 import { VerticalDotsIcon } from "../../components/icon/VerticalDotsIcon";
 import { SearchIcon } from "../../components/icon/SearchIcon";

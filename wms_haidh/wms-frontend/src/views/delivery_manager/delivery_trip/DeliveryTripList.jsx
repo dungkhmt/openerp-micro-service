@@ -13,7 +13,7 @@ import {
   DropdownItem,
   Pagination,
   Select, MenuItem
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { VerticalDotsIcon } from "../../../components/icon/VerticalDotsIcon";
 import { PlusIcon } from "../../../components/icon/PlusIcon";
 import { Badge } from "../../../components/button/badge";
@@ -54,9 +54,7 @@ export default function DeliveryTrip() {
       case "distance":
         return Math.round(cellValue);
       case "status":
-        return (
-          <Badge variant={statusColorMap[item.status]}>{cellValue.replace(/_/g, ' ')}</Badge>
-        );
+        return (<Badge variant={statusColorMap[item.status]}>{cellValue.replace(/_/g, ' ')}</Badge>);
       case "actions":
         return (
           <div className="relative flex justify-end items-center gap-2">

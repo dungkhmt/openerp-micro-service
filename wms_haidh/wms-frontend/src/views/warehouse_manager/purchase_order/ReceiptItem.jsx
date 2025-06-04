@@ -19,7 +19,7 @@ import {
   TextField
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { CircularProgress } from "@nextui-org/react";
+import { CircularProgress } from "@heroui/react";
 import { useNavigate, useParams } from 'react-router-dom';
 import { request } from "../../../api";
 import { formatDate, formatPrice } from '../../../utils/utils';
@@ -95,7 +95,7 @@ const ReceiptItem = () => {
         request("get", `/receipt-items?requestId=${id2}`, (res) => {
           setDetails(res.data);
         });
-        toast.success("Create new purchase order successfully!");
+        toast.success("Create new receipt item successfully!");
       } else {
         toast.error("Error occurred while creating receipt item!");
       }

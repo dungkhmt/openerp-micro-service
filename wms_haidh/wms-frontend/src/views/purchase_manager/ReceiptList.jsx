@@ -13,7 +13,7 @@ import {
   DropdownItem,
   Pagination,
   Select, MenuItem
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { VerticalDotsIcon } from "../../components/icon/VerticalDotsIcon";
 import { Badge } from "../../components/button/badge";
 import { columns, statusOptions } from "../../config/receipt";
@@ -73,9 +73,7 @@ export default function ReceiptList() {
 
     switch (columnKey) {
       case "status":
-        return (
-          <Badge variant={statusColorMap[item.status]}>{cellValue.replace(/_/g, ' ')}</Badge>
-        );
+        return (<Badge variant={statusColorMap[item.status]}>{cellValue.replace(/_/g, ' ')}</Badge>);
       case "actions":
         return (
           <div className="relative flex justify-end items-center gap-2">

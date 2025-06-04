@@ -14,7 +14,7 @@ import {
   DropdownItem,
   Pagination,
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { PlusIcon } from "../../../components/icon/PlusIcon";
 import { VerticalDotsIcon } from "../../../components/icon/VerticalDotsIcon";
 import { SearchIcon } from "../../../components/icon/SearchIcon";
@@ -153,7 +153,7 @@ export default function Shipment() {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            placeholder="Search by name..."
+            placeholder="Search by shipment ID..."
             startContent={<SearchIcon />}
             value={filterValue}
             onClear={() => setDebouncedSearchTerm("")}

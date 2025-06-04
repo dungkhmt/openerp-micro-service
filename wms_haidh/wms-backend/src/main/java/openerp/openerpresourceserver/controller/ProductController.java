@@ -57,10 +57,10 @@ public class ProductController {
 	@GetMapping("/inventory")
 	public ResponseEntity<Page<ProductInventoryProjection>> getProductInventoryWithPaging(
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size,
-			@RequestParam(required = false) String search) {
+			@RequestParam(required = false) String search, @RequestParam UUID warehouseId, boolean outOfStockOnly) {
 
 		Pageable pageable = PageRequest.of(page, size);
-		Page<ProductInventoryProjection> products = productService.getAllProductInventory(search, pageable);
+		Page<ProductInventoryProjection> products = productService.getAllProductInventory(search, pageable, warehouseId, outOfStockOnly);
 
 		return ResponseEntity.ok(products);
 	}
