@@ -1,6 +1,6 @@
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import { Box, Icon, Typography } from "@mui/material";
-import TertiaryButton from "../../components/button/TertiaryButton";
+// import TertiaryButton from "../../components/button/TertiaryButton";
 import { FiCheckCircle } from "react-icons/fi";
 import { GiInfo } from "react-icons/gi";
 import { IconContext } from "react-icons/lib/cjs";
@@ -54,30 +54,30 @@ export const updateErrorNoti = (toastId, message) =>
     ),
   });
 
-export const wifiOffNotify = (toastId) =>
-  toast.dark(
-    <Box display="flex" alignItems="center">
-      <Icon style={{ margin: 6 }}>wifi_off_rounded</Icon>
-      <Typography component="span" style={{ padding: 6, flexGrow: 1 }}>
-        Bạn đang offline.
-      </Typography>
-      <TertiaryButton
-        disableRipple
-        onClick={() => window.location.reload(false)}
-        style={{ fontSize: "1rem", color: "#42a5f5" }}
-      >
-        Làm mới
-      </TertiaryButton>
-    </Box>,
-    {
-      toastId: toastId,
-      autoClose: false,
-      pauseOnHover: true,
-      closeOnClick: false,
-      draggable: true,
-      progress: undefined,
-    }
-  );
+// export const wifiOffNotify = (toastId) =>
+//   toast.dark(
+//     <Box display="flex" alignItems="center">
+//       <Icon style={{ margin: 6 }}>wifi_off_rounded</Icon>
+//       <Typography component="span" style={{ padding: 6, flexGrow: 1 }}>
+//         Bạn đang offline.
+//       </Typography>
+//       <TertiaryButton
+//         disableRipple
+//         onClick={() => window.location.reload(false)}
+//         style={{ fontSize: "1rem", color: "#42a5f5" }}
+//       >
+//         Làm mới
+//       </TertiaryButton>
+//     </Box>,
+//     {
+//       toastId: toastId,
+//       autoClose: false,
+//       pauseOnHover: true,
+//       closeOnClick: false,
+//       draggable: true,
+//       progress: undefined,
+//     }
+//   );
 
 const ContentContainer = (props) => (
   <Box display="flex" alignItems="center">

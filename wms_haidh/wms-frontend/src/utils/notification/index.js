@@ -6,6 +6,5 @@ export {
   unduplicatedErrorNoti,
   updateErrorNoti,
   updateSuccessNoti,
-  warningNoti,
-  wifiOffNotify,
+  warningNoti
 } from "./Notification";

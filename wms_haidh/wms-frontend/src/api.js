@@ -1,7 +1,7 @@
 import axios from "axios";
 import { config } from "./config/constant";
 import keycloak from "./config/keycloak";
-import { infoNoti, wifiOffNotify } from "./utils/notification";
+import { infoNoti } from "./utils/notification";
 
 export const isFunction = (func) =>
   func &&
@@ -95,7 +95,7 @@ export async function request(
       if (isFunction(errorHandlers["noResponse"])) {
         errorHandlers["noResponse"](e);
       }
-      wifiOffNotify(wifiOffNotifyToastId);
+      // wifiOffNotify(wifiOffNotifyToastId);
     } else {
       console.log("Something happened in setting up the request: ", e.message);
     }

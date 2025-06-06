@@ -1,9 +1,9 @@
 import { LinearProgress } from "@mui/material";
 import { Layout } from "../layout";
 import { drawerWidth } from "../layout/sidebar/SideBar";
-import { Suspense, useEffect } from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
-import { useNotificationState } from "../state/NotificationState";
+import { Suspense } from "react";
+import { Route, Routes } from "react-router-dom";
+// import { useNotificationState } from "../state/NotificationState";
 import NotFound from "../views/errors/NotFound";
 import { useKeycloak } from "@react-keycloak/web";
 import WarehouseManagerRouter from "./WarehouseManagerRouter";
@@ -30,13 +30,13 @@ const styles = {
 };
 
 function MainAppRouter() {
-  const location = useLocation();
-  const notificationState = useNotificationState();
+  // const location = useLocation();
+  // const notificationState = useNotificationState();
   const { keycloak } = useKeycloak();
 
-  useEffect(() => {
-    notificationState.open.set(false);
-  }, [location.pathname, keycloak]);
+  // useEffect(() => {
+  //   notificationState.open.set(false);
+  // }, [location.pathname, keycloak]);
 
   const renderPrivateRoute = (Component) => {
     if (!keycloak.authenticated) {
