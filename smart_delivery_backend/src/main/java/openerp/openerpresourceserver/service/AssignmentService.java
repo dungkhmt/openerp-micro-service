@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface AssignmentService {
     void assignOrderToHub(Order order);
-    void updateAssignmentStatus(Principal principal, UUID assignmentId, CollectorAssignmentStatus status);
+//    void updateAssignmentStatus(Principal principal, UUID assignmentId, CollectorAssignmentStatus status);
 
     @Transactional
     void decreaseVehicleLoad(UUID vehicleId, UUID orderId);

@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.strategy;
+package openerp.openerpresourceserver.service.strategy;
 
 import openerp.openerpresourceserver.entity.Employee;
 import openerp.openerpresourceserver.entity.Hub;

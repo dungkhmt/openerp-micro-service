@@ -15,7 +15,7 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "smart_delivery_username_hub_id")
+@Table(name = "smartdelivery_username_hub_id")
 public class UsernameHubId {
     @Id
     @GenericGenerator(name = "uuid1", strategy = "org.hibernate.id.UUIDGenerator")

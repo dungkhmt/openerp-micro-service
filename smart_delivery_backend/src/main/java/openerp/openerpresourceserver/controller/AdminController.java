@@ -1,6 +1,6 @@
 package openerp.openerpresourceserver.controller;
 
-import openerp.openerpresourceserver.context.DistributeContext;
+import openerp.openerpresourceserver.service.context.DistributeContext;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.strategy;
+package openerp.openerpresourceserver.service.strategy;
 
 import jakarta.ws.rs.NotFoundException;
 import openerp.openerpresourceserver.entity.*;

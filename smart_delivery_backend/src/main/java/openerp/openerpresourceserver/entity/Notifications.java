@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "smart_delivery_notifications")
+@Table(name = "smartdelivery_notifications")
 @EntityListeners(AuditingEntityListener.class)
 public class Notifications {
     public static final String STATUS_CREATED = "NOTIFICATION_CREATED";

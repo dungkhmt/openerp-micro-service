@@ -115,11 +115,11 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
 
-    // Get
-    @GetMapping("/order/assign/collector/today/{hubId}")
-    public ResponseEntity<List<TodayAssignmentDto>> getAssignmentTodayByHubId(@PathVariable UUID hubId) {
-        return ResponseEntity.ok(orderService.getAssignmentTodayByHubId(hubId));
-    }
+//    // Get
+//    @GetMapping("/order/assign/collector/today/{hubId}")
+//    public ResponseEntity<List<TodayAssignmentDto>> getAssignmentTodayByHubId(@PathVariable UUID hubId) {
+//        return ResponseEntity.ok(orderService.getAssignmentTodayByHubId(hubId));
+//    }
     @GetMapping("/order/assign/hub/shipper/today/{hubId}")
     public ResponseEntity<List<TodayAssignmentShipperDto>> getShipperAssignmentTodayByHubId(@PathVariable UUID hubId) {
         return ResponseEntity.ok(shipperAssignmentService.getShipperAssignmentsTodayByHub(hubId));
@@ -130,10 +130,10 @@ public class OrderController {
     }
 
 
-    @GetMapping("/order/assign/today/collector/{collectorId}")
-    public ResponseEntity<List<AssignOrderCollectorDTO>> getAssignmentTodayByCollectorId(@PathVariable UUID collectorId) {
-        return ResponseEntity.ok(orderService.getAssignmentTodayByCollectorId(collectorId));
-    }
+//    @GetMapping("/order/assign/today/collector/{collectorId}")
+//    public ResponseEntity<List<AssignOrderCollectorDTO>> getAssignmentTodayByCollectorId(@PathVariable UUID collectorId) {
+//        return ResponseEntity.ok(orderService.getAssignmentTodayByCollectorId(collectorId));
+//    }
     /**
      * Get order history for collector with order details
      */
@@ -156,17 +156,17 @@ public class OrderController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return ResponseEntity.ok(orderService.getShipperOrderHistory(shipperId, startDate, endDate));
     }
-    @PutMapping("/order/assignment/collector")
-    public ResponseEntity<?> updateAssignment(@RequestBody UpdateAssignmentRequest request, Principal principal) {
-        try {
-            assignmentService.updateAssignmentStatus(principal, request.getAssignmentId(), request.getStatus());
-            return ResponseEntity.ok("Assignment updated successfully");
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong");
-        }
-    }
+//    @PutMapping("/order/assignment/collector")
+//    public ResponseEntity<?> updateAssignment(@RequestBody UpdateAssignmentRequest request, Principal principal) {
+//        try {
+//            assignmentService.updateAssignmentStatus(principal, request.getAssignmentId(), request.getStatus());
+//            return ResponseEntity.ok("Assignment updated successfully");
+//        } catch (NotFoundException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong");
+//        }
+//    }
 
     /**
      * Update assignment status
@@ -293,44 +293,44 @@ public class OrderController {
     public ResponseEntity<List<TodayAssignmentShipperDto>> getShipperPickupRequests(@PathVariable UUID hubId) {
         return ResponseEntity.ok(orderService.getShipperPickupRequests(hubId));
     }
-    /**
-     * API để lấy đề xuất phân công (không lưu vào database)
-     */
-    @PostMapping("/order/suggest/collector")
-    public ResponseEntity<List<OrderResponseCollectorShipperDto>> suggestOrderAssignment(@RequestBody AssignOrderDto request) {
-        try {
-            // Gọi service để tạo đề xuất phân công
-            List<OrderResponseCollectorShipperDto> suggestions = orderService.suggestOrderToCollectorAssignment(
-                    request.getHubId(),
-                    request.getOrders(),
-                    request.getEmployees()
-            );
-            return ResponseEntity.ok(suggestions);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(null);
-        }
-    }
+//    /**
+//     * API để lấy đề xuất phân công (không lưu vào database)
+//     */
+//    @PostMapping("/order/suggest/collector")
+//    public ResponseEntity<List<OrderResponseCollectorShipperDto>> suggestOrderAssignment(@RequestBody AssignOrderDto request) {
+//        try {
+//            // Gọi service để tạo đề xuất phân công
+//            List<OrderResponseCollectorShipperDto> suggestions = orderService.suggestOrderToCollectorAssignment(
+//                    request.getHubId(),
+//                    request.getOrders(),
+//                    request.getEmployees()
+//            );
+//            return ResponseEntity.ok(suggestions);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(null);
+//        }
+//    }
 
-    /**
-     * API để xác nhận phân công (lưu vào database)
-     */
-    @PostMapping("/order/confirm/collector")
-    public ResponseEntity<List<OrderResponseCollectorShipperDto>> confirmOrderAssignment(
-            Principal principal,
-            @RequestBody ConfirmAssignmentDto request) {
-        try {
-            List<OrderResponseCollectorShipperDto> result = orderService.confirmOrderToCollectorAssignment(
-                    principal,
-                    request.getHubId(),
-                    request.getAssignments()
-            );
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(null);
-        }
-    }
+//    /**
+//     * API để xác nhận phân công (lưu vào database)
+//     */
+//    @PostMapping("/order/confirm/collector")
+//    public ResponseEntity<List<OrderResponseCollectorShipperDto>> confirmOrderAssignment(
+//            Principal principal,
+//            @RequestBody ConfirmAssignmentDto request) {
+//        try {
+//            List<OrderResponseCollectorShipperDto> result = orderService.confirmOrderToCollectorAssignment(
+//                    principal,
+//                    request.getHubId(),
+//                    request.getAssignments()
+//            );
+//            return ResponseEntity.ok(result);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(null);
+//        }
+//    }
     @PostMapping("/order/suggest/shipper")
     public ResponseEntity<List<OrderResponseCollectorShipperDto>> suggestShipperAssignment(@RequestBody AssignOrderDto request) {
         try {

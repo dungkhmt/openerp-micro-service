@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.strategy;
+package openerp.openerpresourceserver.service.strategy;
 
 import openerp.openerpresourceserver.entity.Order;
 import openerp.openerpresourceserver.entity.Sender;

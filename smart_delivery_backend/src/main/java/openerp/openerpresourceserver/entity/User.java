@@ -19,7 +19,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Entity
 @Table(name = "user_login")
-public class User {
+public class    User {
 
     @Id
     @Column(name = "user_login_id", updatable = false, nullable = false)

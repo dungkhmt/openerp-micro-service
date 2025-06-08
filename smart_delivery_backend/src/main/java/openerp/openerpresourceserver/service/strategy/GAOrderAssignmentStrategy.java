@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.strategy;
+package openerp.openerpresourceserver.service.strategy;
 
 import jakarta.ws.rs.NotFoundException;
 import openerp.openerpresourceserver.dto.OrderResponseCollectorShipperDto;
@@ -9,8 +9,6 @@ import openerp.openerpresourceserver.repository.AssignOrderCollectorRepository;
 import openerp.openerpresourceserver.repository.SenderRepo;
 import openerp.openerpresourceserver.repository.RecipientRepo;
 import openerp.openerpresourceserver.utils.DistanceCalculator.GraphHopperCalculator;
-import  openerp.openerpresourceserver.strategy.Individual;
-import  openerp.openerpresourceserver.strategy.Population;
 
 
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.strategy;
+package openerp.openerpresourceserver.service.strategy;
 
 import lombok.Getter;
 import openerp.openerpresourceserver.entity.Employee;
@@ -49,7 +49,7 @@ public class Population {
         }
     }
 
-    public List<openerp.openerpresourceserver.strategy.Individual> selectParents() {
+    public List<Individual> selectParents() {
         List<Individual> selectedParents = new ArrayList<>();
         individuals.sort(Comparator.comparingDouble(Individual::getFitness).reversed());
         for (int i = 0; i < individuals.size() / 2; i++) {

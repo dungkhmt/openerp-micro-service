@@ -1,9 +1,9 @@
-package openerp.openerpresourceserver.context;
+package openerp.openerpresourceserver.service.context;
 
 import openerp.openerpresourceserver.entity.Employee;
 import openerp.openerpresourceserver.entity.Hub;
 import openerp.openerpresourceserver.entity.Order;
-import openerp.openerpresourceserver.strategy.DistributeStrategy;
+import openerp.openerpresourceserver.service.strategy.DistributeStrategy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

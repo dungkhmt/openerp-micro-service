@@ -4,12 +4,11 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.sun.codemodel.JStringLiteral;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import openerp.openerpresourceserver.cache.RedisCacheService;
-import openerp.openerpresourceserver.context.DistributeContext;
+import openerp.openerpresourceserver.service.context.DistributeContext;
 import openerp.openerpresourceserver.dto.*;
 import openerp.openerpresourceserver.entity.*;
 import openerp.openerpresourceserver.entity.enumentity.*;
@@ -481,43 +480,43 @@ public class OrderServiceImpl implements OrderService {
                 .orElse(null); // hoặc trả về giá trị mặc định
     }
     // Phương thức để lấy các bản ghi trong ngày hôm nay theo hubId
-    public List<TodayAssignmentDto> getAssignmentTodayByHubId(UUID hubId) {
-        LocalDate today = LocalDate.now();
-        Timestamp startOfDay = Timestamp.valueOf(today.atStartOfDay());
-        Timestamp endOfDay = Timestamp.valueOf(today.plusDays(1).atStartOfDay());
-        List<Collector> collectors = collectorRepo.findAllByHubId(hubId);
-
-        List<AssignOrderCollector> assignments = new ArrayList<>();
-        for(Collector collector : collectors){
-            List<AssignOrderCollector> assignOrderShippers = assignOrderCollectorRepository
-                    .findByCollectorIdAndCreatedAtBetween(
-                            collector.getId(),
-                            startOfDay,
-                            endOfDay
-                    );
-            assignments.addAll(assignOrderShippers);
-        }
-
-
-        // Chuyển đối tượng AssignOrderCollector thành TodayAssignmentDto
-        return assignments.stream()
-                .collect(Collectors.toMap(
-                        AssignOrderCollector::getCollectorId, // Group by collectorId
-                        assignment -> TodayAssignmentDto.builder()
-                                .collectorId(assignment.getCollectorId()) // ID của collector
-                                .collectorName(assignment.getCollectorName()) // Tên collector
-                                .numOfOrders(countOrdersForCollector(assignments, assignment.getCollectorId())) // Số đơn hàng
-                                .numOfCompleted(assignments.stream()
-                                        .filter(a -> a.getCollectorId().equals(assignment.getCollectorId()))
-                                        .filter(a -> "COMPLETED".equals(a.getStatus().toString()))
-                                        .count())
-                                .status(assignment.getStatus().toString()) // Trạng thái
-                                .build(),
-                        (existing, replacement) -> existing) // Nếu có trùng lặp, giữ lại bản ghi đầu tiên
-                ).values().stream() // Lấy danh sách các giá trị (TodayAssignmentDto)
-                .sorted(Comparator.comparing(TodayAssignmentDto::getCollectorName)) // Sắp xếp theo collectorId
-                .collect(Collectors.toList());
-    }
+//    public List<TodayAssignmentDto> getAssignmentTodayByHubId(UUID hubId) {
+//        LocalDate today = LocalDate.now();
+//        Timestamp startOfDay = Timestamp.valueOf(today.atStartOfDay());
+//        Timestamp endOfDay = Timestamp.valueOf(today.plusDays(1).atStartOfDay());
+//        List<Collector> collectors = collectorRepo.findAllByHubId(hubId);
+//
+//        List<AssignOrderCollector> assignments = new ArrayList<>();
+//        for(Collector collector : collectors){
+//            List<AssignOrderCollector> assignOrderShippers = assignOrderCollectorRepository
+//                    .findByCollectorIdAndCreatedAtBetween(
+//                            collector.getId(),
+//                            startOfDay,
+//                            endOfDay
+//                    );
+//            assignments.addAll(assignOrderShippers);
+//        }
+//
+//
+//        // Chuyển đối tượng AssignOrderCollector thành TodayAssignmentDto
+//        return assignments.stream()
+//                .collect(Collectors.toMap(
+//                        AssignOrderCollector::getCollectorId, // Group by collectorId
+//                        assignment -> TodayAssignmentDto.builder()
+//                                .collectorId(assignment.getCollectorId()) // ID của collector
+//                                .collectorName(assignment.getCollectorName()) // Tên collector
+//                                .numOfOrders(countOrdersForCollector(assignments, assignment.getCollectorId())) // Số đơn hàng
+//                                .numOfCompleted(assignments.stream()
+//                                        .filter(a -> a.getCollectorId().equals(assignment.getCollectorId()))
+//                                        .filter(a -> "COMPLETED".equals(a.getStatus().toString()))
+//                                        .count())
+//                                .status(assignment.getStatus().toString()) // Trạng thái
+//                                .build(),
+//                        (existing, replacement) -> existing) // Nếu có trùng lặp, giữ lại bản ghi đầu tiên
+//                ).values().stream() // Lấy danh sách các giá trị (TodayAssignmentDto)
+//                .sorted(Comparator.comparing(TodayAssignmentDto::getCollectorName)) // Sắp xếp theo collectorId
+//                .collect(Collectors.toList());
+//    }
 
     // Phương thức đếm số đơn hàng cho collectorId trong danh sách assignments
     private Long countOrdersForCollector(List<AssignOrderCollector> assignments, UUID collectorId) {
@@ -527,18 +526,18 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-    public List<AssignOrderCollectorDTO> getAssignmentTodayByCollectorId(UUID collectorId) {
-        LocalDate today = LocalDate.now();
-        Timestamp startOfDay = Timestamp.valueOf(today.atStartOfDay());
-        Timestamp endOfDay = Timestamp.valueOf(today.plusDays(1).atStartOfDay());
-
-        // Chuyển đối tượng AssignOrderCollector thành TodayAssignmentDto
-        return assignOrderCollectorRepository.findByCollectorIdAndCreatedAtBetween1(
-                collectorId,
-                startOfDay,
-                endOfDay
-        );
-    }
+//    public List<AssignOrderCollectorDTO> getAssignmentTodayByCollectorId(UUID collectorId) {
+//        LocalDate today = LocalDate.now();
+//        Timestamp startOfDay = Timestamp.valueOf(today.atStartOfDay());
+//        Timestamp endOfDay = Timestamp.valueOf(today.plusDays(1).atStartOfDay());
+//
+//        // Chuyển đối tượng AssignOrderCollector thành TodayAssignmentDto
+//        return assignOrderCollectorRepository.findByCollectorIdAndCreatedAtBetween1(
+//                collectorId,
+//                startOfDay,
+//                endOfDay
+//        );
+//    }
     @Override
     @Transactional
     public boolean confirmCollectedHub(Principal principal, UUID[] orderIds) {
@@ -1099,126 +1098,126 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
-    @Override
-    public List<OrderResponseCollectorShipperDto> suggestOrderToCollectorAssignment(
-            UUID hubId,
-            List<OrderRequestDto> orders,
-            List<EmployeeDTO> collectors) {
+//    @Override
+//    public List<OrderResponseCollectorShipperDto> suggestOrderToCollectorAssignment(
+//            UUID hubId,
+//            List<OrderRequestDto> orders,
+//            List<EmployeeDTO> collectors) {
+//
+//        if (hubId == null || orders.isEmpty() || collectors.isEmpty()) {
+//            throw new RuntimeException("Invalid data for assignment suggestion");
+//        }
+//
+//        // Tìm Hub theo hubId
+//        Hub hub = hubRepo.findById(hubId).orElseThrow(() ->
+//                new NotFoundException("Hub not found")
+//        );
+//
+//        // Chuẩn bị dữ liệu
+//        List<Order> orderList = new ArrayList<>();
+//        List<Employee> collectorList = new ArrayList<>();
+//
+//        // Tính khoảng cách cho từng đơn hàng
+//        for (OrderRequestDto orderRequest : orders) {
+//            Order order = orderRepo.findById(orderRequest.getId()).orElseThrow(() ->
+//                    new NotFoundException("Order not found")
+//            );
+//            Sender sender = senderRepo.findById(order.getSenderId()).orElseThrow(() ->
+//                    new NotFoundException("Sender not found"));
+//
+//            Double distance = calculateDistance(hub.getLatitude(), hub.getLongitude(),
+//                    sender.getLatitude(), sender.getLongitude());
+//            order.setDistance(distance);
+//            orderList.add(order);
+//        }
+//
+//        // Tạo danh sách collector
+//        for (EmployeeDTO collectorDto : collectors) {
+//            Collector collector = collectorRepo.findById(collectorDto.getId()).orElseThrow(() ->
+//                    new NotFoundException("Collector not found")
+//            );
+//            collectorList.add(collector);
+//        }
+//
+//        // Sử dụng thuật toán phân công để tạo đề xuất (KHÔNG lưu vào DB)
+//        Map<UUID, List<Order>> orderCollectorMap = distributeContext.assignOrderToEmployees(
+//                hub, orderList, collectorList);
+//
+//        // Tạo response với thông tin đề xuất
+//        List<OrderResponseCollectorShipperDto> suggestions = new ArrayList<>();
+//        for (Map.Entry<UUID, List<Order>> entry : orderCollectorMap.entrySet()) {
+//            UUID collectorId = entry.getKey();
+//            String collectorName = getCollectorNameById(collectorList, collectorId);
+//            int sequenceNumber = 1;
+//
+//            for (Order order : entry.getValue()) {
+//                OrderResponseCollectorShipperDto suggestion = OrderResponseCollectorShipperDto.builder()
+//                        .id(order.getId())
+//                        .collectorId(collectorId)
+//                        .collectorName(collectorName)
+//                        .sequenceNumber(sequenceNumber++)
+//                        .senderName(order.getSenderName())
+//                        .recipientName(order.getRecipientName())
+//                        .status(OrderStatus.PENDING) // Vẫn giữ trạng thái pending
+//                        .build();
+//                suggestions.add(suggestion);
+//            }
+//        }
+//
+//        return suggestions;
+//    }
 
-        if (hubId == null || orders.isEmpty() || collectors.isEmpty()) {
-            throw new RuntimeException("Invalid data for assignment suggestion");
-        }
-
-        // Tìm Hub theo hubId
-        Hub hub = hubRepo.findById(hubId).orElseThrow(() ->
-                new NotFoundException("Hub not found")
-        );
-
-        // Chuẩn bị dữ liệu
-        List<Order> orderList = new ArrayList<>();
-        List<Employee> collectorList = new ArrayList<>();
-
-        // Tính khoảng cách cho từng đơn hàng
-        for (OrderRequestDto orderRequest : orders) {
-            Order order = orderRepo.findById(orderRequest.getId()).orElseThrow(() ->
-                    new NotFoundException("Order not found")
-            );
-            Sender sender = senderRepo.findById(order.getSenderId()).orElseThrow(() ->
-                    new NotFoundException("Sender not found"));
-
-            Double distance = calculateDistance(hub.getLatitude(), hub.getLongitude(),
-                    sender.getLatitude(), sender.getLongitude());
-            order.setDistance(distance);
-            orderList.add(order);
-        }
-
-        // Tạo danh sách collector
-        for (EmployeeDTO collectorDto : collectors) {
-            Collector collector = collectorRepo.findById(collectorDto.getId()).orElseThrow(() ->
-                    new NotFoundException("Collector not found")
-            );
-            collectorList.add(collector);
-        }
-
-        // Sử dụng thuật toán phân công để tạo đề xuất (KHÔNG lưu vào DB)
-        Map<UUID, List<Order>> orderCollectorMap = distributeContext.assignOrderToEmployees(
-                hub, orderList, collectorList);
-
-        // Tạo response với thông tin đề xuất
-        List<OrderResponseCollectorShipperDto> suggestions = new ArrayList<>();
-        for (Map.Entry<UUID, List<Order>> entry : orderCollectorMap.entrySet()) {
-            UUID collectorId = entry.getKey();
-            String collectorName = getCollectorNameById(collectorList, collectorId);
-            int sequenceNumber = 1;
-
-            for (Order order : entry.getValue()) {
-                OrderResponseCollectorShipperDto suggestion = OrderResponseCollectorShipperDto.builder()
-                        .id(order.getId())
-                        .collectorId(collectorId)
-                        .collectorName(collectorName)
-                        .sequenceNumber(sequenceNumber++)
-                        .senderName(order.getSenderName())
-                        .recipientName(order.getRecipientName())
-                        .status(OrderStatus.PENDING) // Vẫn giữ trạng thái pending
-                        .build();
-                suggestions.add(suggestion);
-            }
-        }
-
-        return suggestions;
-    }
-
-    @Override
-    @Transactional
-    public List<OrderResponseCollectorShipperDto> confirmOrderToCollectorAssignment(
-            Principal principal,
-            UUID hubId,
-            List<ConfirmAssignmentDto.AssignmentDetailDto> assignments) {
-
-        if (assignments.isEmpty()) {
-            throw new RuntimeException("No assignments to confirm");
-        }
-
-        List<AssignOrderCollector> assignOrderCollectors = new ArrayList<>();
-        List<Order> ordersToUpdate = new ArrayList<>();
-        List<OrderResponseCollectorShipperDto> responses = new ArrayList<>();
-
-        for (ConfirmAssignmentDto.AssignmentDetailDto assignment : assignments) {
-            // Tìm order
-            Order order = orderRepo.findById(assignment.getOrderId())
-                    .orElseThrow(() -> new NotFoundException("Order not found"));
-
-            // Cập nhật trạng thái order
-            order.setStatus(OrderStatus.ASSIGNED);
-            order.setChangedBy(principal.getName());
-            ordersToUpdate.add(order);
-
-            // Tạo AssignOrderCollector
-            AssignOrderCollector assignOrderCollector = new AssignOrderCollector();
-            assignOrderCollector.setOrderId(assignment.getOrderId());
-            assignOrderCollector.setCollectorId(assignment.getEmployeeId());
-            assignOrderCollector.setCollectorName(assignment.getEmployeeName());
-            assignOrderCollector.setSequenceNumber(assignment.getSequenceNumber());
-            assignOrderCollector.setStatus(CollectorAssignmentStatus.ASSIGNED);
-            assignOrderCollector.setCreatedBy(principal.getName());
-            assignOrderCollectors.add(assignOrderCollector);
-
-            // Tạo response
-            OrderResponseCollectorShipperDto response = OrderResponseCollectorShipperDto.builder()
-                    .id(order.getId())
-                    .collectorId(assignment.getEmployeeId())
-                    .collectorName(assignment.getEmployeeName())
-                    .status(OrderStatus.ASSIGNED)
-                    .build();
-            responses.add(response);
-        }
-
-        // Lưu tất cả vào database
-        orderRepo.saveAll(ordersToUpdate);
-        assignOrderCollectorRepository.saveAll(assignOrderCollectors);
-
-        return responses;
-    }
+//    @Override
+//    @Transactional
+//    public List<OrderResponseCollectorShipperDto> confirmOrderToCollectorAssignment(
+//            Principal principal,
+//            UUID hubId,
+//            List<ConfirmAssignmentDto.AssignmentDetailDto> assignments) {
+//
+//        if (assignments.isEmpty()) {
+//            throw new RuntimeException("No assignments to confirm");
+//        }
+//
+//        List<AssignOrderCollector> assignOrderCollectors = new ArrayList<>();
+//        List<Order> ordersToUpdate = new ArrayList<>();
+//        List<OrderResponseCollectorShipperDto> responses = new ArrayList<>();
+//
+//        for (ConfirmAssignmentDto.AssignmentDetailDto assignment : assignments) {
+//            // Tìm order
+//            Order order = orderRepo.findById(assignment.getOrderId())
+//                    .orElseThrow(() -> new NotFoundException("Order not found"));
+//
+//            // Cập nhật trạng thái order
+//            order.setStatus(OrderStatus.ASSIGNED);
+//            order.setChangedBy(principal.getName());
+//            ordersToUpdate.add(order);
+//
+//            // Tạo AssignOrderCollector
+//            AssignOrderCollector assignOrderCollector = new AssignOrderCollector();
+//            assignOrderCollector.setOrderId(assignment.getOrderId());
+//            assignOrderCollector.setCollectorId(assignment.getEmployeeId());
+//            assignOrderCollector.setCollectorName(assignment.getEmployeeName());
+//            assignOrderCollector.setSequenceNumber(assignment.getSequenceNumber());
+//            assignOrderCollector.setStatus(CollectorAssignmentStatus.ASSIGNED);
+//            assignOrderCollector.setCreatedBy(principal.getName());
+//            assignOrderCollectors.add(assignOrderCollector);
+//
+//            // Tạo response
+//            OrderResponseCollectorShipperDto response = OrderResponseCollectorShipperDto.builder()
+//                    .id(order.getId())
+//                    .collectorId(assignment.getEmployeeId())
+//                    .collectorName(assignment.getEmployeeName())
+//                    .status(OrderStatus.ASSIGNED)
+//                    .build();
+//            responses.add(response);
+//        }
+//
+//        // Lưu tất cả vào database
+//        orderRepo.saveAll(ordersToUpdate);
+//        assignOrderCollectorRepository.saveAll(assignOrderCollectors);
+//
+//        return responses;
+//    }
 }
 
 

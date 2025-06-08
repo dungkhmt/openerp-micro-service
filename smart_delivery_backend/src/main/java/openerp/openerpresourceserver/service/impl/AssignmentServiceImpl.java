@@ -94,42 +94,42 @@ public class AssignmentServiceImpl implements AssignmentService {
         order.setDistance(min1);
     }
 
-    /**
-     * Updates the status of a collector assignment and the related order if necessary.
-     *
-     * @param principal
-     * @param assignmentId The ID of the assignment to update
-     * @param status       The new status to set
-     * @throws NotFoundException if the assignment is not found
-     */
-    public void updateAssignmentStatus(Principal principal, UUID assignmentId, CollectorAssignmentStatus status) {
-        AssignOrderCollector assignment = assignOrderCollectorRepository.findById(assignmentId)
-                .orElseThrow(() -> new NotFoundException("Assignment not found"));
-
-        assignment.setStatus(status);
-        Order order = orderRepo.findById(assignment.getOrderId())
-                .orElseThrow(() -> new NotFoundException("Order not found"));
-        // If assignment is completed, update the order status accordingly
-        if (status == CollectorAssignmentStatus.COMPLETED) {
-
-            order.setStatus(OrderStatus.COLLECTED_COLLECTOR);
-            order.setChangedBy(principal.getName());
-        }
-        else if (status == CollectorAssignmentStatus.FAILED_ONCE) {
-            order.setCollectAttemptCount(order.getCollectAttemptCount() + 1);
-            if(order.getCollectAttemptCount() >= 2) {
-                order.setStatus(OrderStatus.CANCELLED);
-                sendCancelledNotification(order, "Đơn hàng đã bị hủy do không thể thu gom sau 2 lần thử. ");
-            }
-            else{
-            order.setStatus(OrderStatus.COLLECT_FAILED);
-            }
-            order.setChangedBy(principal.getName());
-        }
-
-        orderRepo.save(order);
-        assignOrderCollectorRepository.save(assignment);
-    }
+//    /**
+//     * Updates the status of a collector assignment and the related order if necessary.
+//     *
+//     * @param principal
+//     * @param assignmentId The ID of the assignment to update
+//     * @param status       The new status to set
+//     * @throws NotFoundException if the assignment is not found
+//     */
+//    public void updateAssignmentStatus(Principal principal, UUID assignmentId, CollectorAssignmentStatus status) {
+//        AssignOrderCollector assignment = assignOrderCollectorRepository.findById(assignmentId)
+//                .orElseThrow(() -> new NotFoundException("Assignment not found"));
+//
+//        assignment.setStatus(status);
+//        Order order = orderRepo.findById(assignment.getOrderId())
+//                .orElseThrow(() -> new NotFoundException("Order not found"));
+//        // If assignment is completed, update the order status accordingly
+//        if (status == CollectorAssignmentStatus.COMPLETED) {
+//
+//            order.setStatus(OrderStatus.COLLECTED_COLLECTOR);
+//            order.setChangedBy(principal.getName());
+//        }
+//        else if (status == CollectorAssignmentStatus.FAILED_ONCE) {
+//            order.setCollectAttemptCount(order.getCollectAttemptCount() + 1);
+//            if(order.getCollectAttemptCount() >= 2) {
+//                order.setStatus(OrderStatus.CANCELLED);
+//                sendCancelledNotification(order, "Đơn hàng đã bị hủy do không thể thu gom sau 2 lần thử. ");
+//            }
+//            else{
+//            order.setStatus(OrderStatus.COLLECT_FAILED);
+//            }
+//            order.setChangedBy(principal.getName());
+//        }
+//
+//        orderRepo.save(order);
+//        assignOrderCollectorRepository.save(assignment);
+//    }
     private void sendCancelledNotification(Order order, String reason) {
         try {
 
