@@ -176,10 +176,12 @@ export default function SupplierList() {
           setPages(res.data.totalPages);
         }).then();
         toast.success("Suppier saved successfully!");
-      } else {
-        toast.error("Something went wrong!");
       }
-    }, {}, payload);
+    }, {
+      onError: (e) => {
+        toast.error(e?.response?.data || "Error occured!");
+      }
+    }, payload);
 
     handleCloseModal();
   };

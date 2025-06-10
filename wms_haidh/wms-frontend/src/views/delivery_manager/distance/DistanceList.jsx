@@ -90,10 +90,12 @@ export default function Distance() {
                     setTotalItems(res.data.totalElements);
                     setPages(res.data.totalPages);
                 });
-            } else {
-                alert("Error occurred!");
             }
-        }, {}, payload);
+        }, {
+            onError: (e) => {
+                toast.error(e?.response?.data || "Error occured!");
+            }
+        }, payload);
         handleCloseModal();
     };
 
@@ -112,8 +114,10 @@ export default function Distance() {
                         setPages(res.data.totalPages);
                     }
                 );
-            } else {
-                toast.error("Failed to update distances!");
+            }
+        }, {
+            onError: (e) => {
+                toast.error(e?.response?.data || "Error occured!");
             }
         });
     };
@@ -257,7 +261,7 @@ export default function Distance() {
 
     return (
         <>
-        <Toaster/>
+            <Toaster />
             <Table
                 isCompact
                 removeWrapper

@@ -65,7 +65,7 @@ public class ProductController {
 			return ResponseEntity.ok(products);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi khi xử lý yêu cầu.");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred");
 		}
 		
 	}
@@ -81,7 +81,7 @@ public class ProductController {
 			return ResponseEntity.ok(products);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi khi xử lý yêu cầu.");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occured");
 		}
 	}
 
@@ -114,6 +114,9 @@ public class ProductController {
 			}
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid UUID format");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occured");
 		}
 	}
 
@@ -149,7 +152,7 @@ public class ProductController {
 			if (isCreated) {
 				return ResponseEntity.ok("Product created successfully");
 			} else {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating product");
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Product code already exists");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -80,11 +80,13 @@ const RoutingRecommendation = () => {
       (res) => {
         if (res.status === 200) {
           navigate("result", { state: { routingResult: res.data } });
-        } else {
-          alert("Error occurred!");
         }
       },
-      {},
+      {
+        onError: (e) => {
+          toast.error(e?.response?.data || "Error occured!");
+        }
+      },
       { vehicles }
     );
   };

@@ -126,10 +126,12 @@ const ProductForm = () => {
       if (res.status === 200) {
         alert("Product saved successfully!");
         navigate(`/warehouse-manager/product`);
-      } else {
-        alert("Something went wrong!");
-      }
-    }, {}, formData);
+      } 
+    }, {
+      onError: (e) => {
+        toast.error(e?.response?.data || "Error occured!");
+      },
+    }, formData);
   };
 
 

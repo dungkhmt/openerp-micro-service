@@ -154,11 +154,13 @@ const AddReceipt = () => {
         if (res.status === 200) {
           alert("Receipt saved successfully!");
           navigate(`/purchase-staff/receipts`);
-        } else {
-          alert("Error occurred while saving.");
         }
       },
-      {},
+      {
+        onError: (e) => {
+          toast.error(e?.response?.data || "Error occured!");
+        }
+      },
       receiptData
     );
   };

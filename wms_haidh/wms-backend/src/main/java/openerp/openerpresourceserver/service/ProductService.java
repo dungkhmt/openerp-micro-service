@@ -63,8 +63,7 @@ public class ProductService {
 		return null;
 	}
 
-	public boolean createProduct(ProductCreateRequest productDto, MultipartFile imageFile) {
-		try {
+	public boolean createProduct(ProductCreateRequest productDto, MultipartFile imageFile) throws IOException {
 			Optional<Product> existingProduct = productRepository.findByCode(productDto.getCode());
 			if (existingProduct.isPresent()) {
 				return false;
@@ -85,15 +84,9 @@ public class ProductService {
 			}
 			productRepository.save(newProduct);
 			return true;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-
 	}
 
-	public boolean updateProduct(ProductCreateRequest productDto, MultipartFile imageFile) {
-		try {
+	public boolean updateProduct(ProductCreateRequest productDto, MultipartFile imageFile) throws IOException {
 			// Tìm sản phẩm theo productId
 			Optional<Product> existingProductOpt = productRepository.findById(productDto.getProductId());
 
@@ -128,11 +121,6 @@ public class ProductService {
 			// Lưu sản phẩm đã cập nhật vào cơ sở dữ liệu
 			productRepository.save(existingProduct);
 			return true;
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
 	}
 
 	public List<ProductNameResponse> searchProductNames(String searchTerm) {

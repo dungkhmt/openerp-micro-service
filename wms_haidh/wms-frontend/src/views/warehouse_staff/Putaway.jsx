@@ -110,10 +110,11 @@ const Putaway = () => {
                     setTotalItems(res.data.totalElements);
                 });
                 toast.success("Item putawayed successfully!");
-            } else {
-                toast.error("Something went wrong!");
             }
-
+        }, {
+            onError: (e) => {
+                toast.error(e?.response?.data || "Error occured!");
+            },
         });
     };
 

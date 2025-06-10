@@ -97,7 +97,11 @@ const RoutingResult = () => {
                     newAddressInfoMap[address.customerAddressId] = { name: address.addressName, lat: address.latitude, lng: address.longitude };
                 });
                 setAddressInfoMap(prev => ({ ...prev, ...newAddressInfoMap }));
-            }, {}, payload).then();
+            }, {
+            onError: (e) => {
+                toast.error(e?.response?.data || "Error occured!");
+            }
+        }, payload).then();
         }
 
         // fetch delivery items 1 lần
@@ -115,7 +119,11 @@ const RoutingResult = () => {
                     };
                 });
                 setDeliveryItemInfoMap(prev => ({ ...prev, ...newDeliveryItemInfoMap }));
-            }, {}, payload).then();
+            }, {
+            onError: (e) => {
+                toast.error(e?.response?.data || "Error occured!");
+            }
+        }, payload).then();
         }
 
         setLoading(false);
@@ -164,16 +172,18 @@ const RoutingResult = () => {
             };
         });
 
-        console.log('Submit payload:', payload); 
+        console.log('Submit payload:', payload);
         const requestUrl = "/delivery-trips/batch";
         request("post", requestUrl, (res) => {
             if (res.status === 200) {
                 alert("Trips created successfully!");
                 navigate(`/delivery-manager/shipments/${id}`);
-            } else {
-                alert("Failed to create trips!");
             }
-        }, {}, payload);
+        }, {
+            onError: (e) => {
+                toast.error(e?.response?.data || "Error occured!");
+            }
+        }, payload);
     };
 
 

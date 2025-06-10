@@ -40,10 +40,12 @@ const ReceiptDetail = () => {
         if (res.status === 200) {
           alert('Receipt approved successfully!')
           navigate(`/purchase-manager/process-receipts`);
-        } else {
-          alert("Error approving receipt!");
         }
-      }
+      }, {
+      onError: (e) => {
+        toast.error(e?.response?.data || "Error occured!");
+      },
+    }
     );
   };
 
@@ -55,10 +57,12 @@ const ReceiptDetail = () => {
         if (res.status === 200) {
           alert("The receipt has been cancelled!");
           navigate(`/purchase-manager/process-receipts`);
-        } else {
-          alert("Error rejecting receipt!");
         }
-      }
+      }, {
+      onError: (e) => {
+        toast.error(e?.response?.data || "Error occured!");
+      },
+    }
     );
   };
 

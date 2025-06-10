@@ -46,10 +46,12 @@ const DeliveryTripDetail = () => {
           setGeneralInfo(res.data);
         });
         toast.success("Your delivery trip has started. Good luck!");
-      } else {
-        toast.error("Error occurred while starting trip!");
+      } 
+    }, {
+      onError: (e) => {
+        toast.error(e?.response?.data || "Error occured!");
       }
-    }, {});
+    });
   };
 
   const handleToggleMap = () => {

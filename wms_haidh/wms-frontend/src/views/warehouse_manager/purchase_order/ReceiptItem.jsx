@@ -96,10 +96,12 @@ const ReceiptItem = () => {
           setDetails(res.data);
         });
         toast.success("Create new receipt item successfully!");
-      } else {
-        toast.error("Error occurred while creating receipt item!");
       }
-    }, {}, payload);
+    }, {
+      onError: (e) => {
+        toast.error(e?.response?.data || "Error occured!");
+      }
+    }, payload);
   };
 
 

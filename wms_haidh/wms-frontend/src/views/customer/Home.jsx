@@ -177,13 +177,13 @@ export default function Home() {
                     disabled={page === 1}
                     onClick={() => setPage((prev) => prev - 1)}
                     sx={{
-                        backgroundColor: '#019160',
+                        backgroundColor: '#6fd649',
                         color: '#fff',
                         '&:hover': {
-                            backgroundColor: '#019160',
+                            backgroundColor: '#4caf50',
                         },
                         '&:active': {
-                            backgroundColor: '#01b075',
+                            backgroundColor: '#3e8e41',
                         },
                         minWidth: '40px'
                     }}
@@ -199,13 +199,13 @@ export default function Home() {
                     disabled={page === totalPages}
                     onClick={() => setPage((prev) => prev + 1)}
                     sx={{
-                        backgroundColor: '#019160',
+                        backgroundColor: '#6fd649',
                         color: '#fff',
                         '&:hover': {
-                            backgroundColor: '#019160', // giữ nguyên khi hover
+                            backgroundColor: '#4caf50', // giữ nguyên khi hover
                         },
                         '&:active': {
-                            backgroundColor: '#01b075', // hiệu ứng nhấn
+                            backgroundColor: '#3e8e41', // hiệu ứng nhấn
                         },
                         minWidth: '40px'
                     }}

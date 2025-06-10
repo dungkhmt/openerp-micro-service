@@ -110,10 +110,11 @@ const OrderPicking = () => {
                     setTotalItems(res.data.totalElements);
                 });
                 toast.success("Item picked successfully!");
-            } else {
-                toast.error("Something went wrong!");
             }
-
+        }, {
+            onError: (e) => {
+                toast.error(e?.response?.data || "Error occured!");
+            },
         });
     };
 

@@ -225,7 +225,11 @@ const AddTrip = () => {
       } else {
         alert("Failed to create trip!");
       }
-    }, {}, payload);
+    }, {
+      onError: (e) => {
+        toast.error(e?.response?.data || "Error occured!");
+      }
+    }, payload);
   };
 
   const handleChangePage = (event, newPage) => {

@@ -84,10 +84,12 @@ const PriceConfig = () => {
             if (res.status === 200) {
                 fetchPriceList();
                 toast.success("Add new price successfully!")
-            } else {
-                toast.error("Error occcured while add new price!");
             }
-        }, {}, payload);
+        }, {
+            onError: (e) => {
+                toast.error(e?.response?.data || "Error occured!");
+            }
+        }, payload);
 
     };
 

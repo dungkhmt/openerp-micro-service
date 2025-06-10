@@ -44,9 +44,11 @@ const SaleOrderDetail = () => {
       if (res.status === 200) {
         alert('Order approved successfully!');
         navigate('/sale-manager/sale-order');
-      } else {
-        alert('Failed to approve order.');
       }
+    }, {
+      onError: (e) => {
+        toast.error(e?.response?.data || "Error occured!");
+      },
     });
   };
 
@@ -55,9 +57,11 @@ const SaleOrderDetail = () => {
       if (res.status === 200) {
         alert('Order cancelled successfully!');
         navigate('/sale-manager/sale-order');
-      } else {
-        alert('Failed to cancel order.');
       }
+    }, {
+      onError: (e) => {
+        toast.error(e?.response?.data || "Error occured!");
+      },
     });
   };
 

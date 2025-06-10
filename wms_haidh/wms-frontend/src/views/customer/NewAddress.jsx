@@ -23,10 +23,12 @@ const NewAddress = () => {
       request("post", `/geocoding/address`, (res) => {
         if (res.status === 200) {
           setAddressName(res.data.formattedAddress);
-        } else {
-          alert("Error occcured !");
         }
-      }, {}, coordinates);
+      }, {
+        onError: (e) => {
+          toast.error(e?.response?.data || "Error occured!");
+        }
+      }, coordinates);
   }, [coordinates]);
 
   const handleSelectLocation = (coords) => {
@@ -49,17 +51,19 @@ const NewAddress = () => {
         // Quay lại trang checkout
         alert("Add new address successfully!");
         navigate("/customer/cart/checkout");
-      } else {
-        alert("Error occcured !");
       }
-    }, {}, payload);
+    }, {
+      onError: (e) => {
+        toast.error(e?.response?.data || "Error occured!");
+      }
+    }, payload);
 
 
   };
 
   return (
     <div className="flex justify-start p-6">
-      <Toaster/>
+      <Toaster />
       <div className="w-full space-y-6">
         <BreadcrumbsCustom paths={breadcrumbPaths} />
         <Card className="p-6 space-y-4">

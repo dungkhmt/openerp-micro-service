@@ -6,10 +6,12 @@ const fetchRoute = async (coordinates, setRoute, setDistance, setLoadingMap) => 
     if (res.status === 200) {
       setRoute(res.data.path);
       setDistance(res.data.distance);
-    } else {
-       alert("Error occurred while loading route !");
     }
-  }, {}, payload).then(() => setLoadingMap(false));
+  }, {
+    onError: (e) => {
+      alert("Error occurred while loading route !");
+    }
+  }, payload).then(() => setLoadingMap(false));
   ;
 };
 export default fetchRoute;

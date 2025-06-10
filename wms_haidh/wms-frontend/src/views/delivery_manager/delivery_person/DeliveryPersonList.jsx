@@ -190,10 +190,12 @@ export default function DeliveryPerson() {
           setPages(res.data.totalPages);
         });
         toast.success("Delivery staff saved successfully!");
-      } else {
-        toast.error("Something went wrong!");
       }
-    }, {}, payload);
+    }, {
+      onError: (e) => {
+        toast.error(e?.response?.data || "Error occured!");
+      }
+    }, payload);
 
     handleCloseModal();
   };

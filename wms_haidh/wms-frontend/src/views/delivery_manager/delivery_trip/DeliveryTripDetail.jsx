@@ -42,10 +42,12 @@ const DeliveryTripDetail = () => {
       if (res.status === 200) {
         alert("Trip cancelled successfully !");
         navigate(`/delivery-manager/delivery-trip`); // Redirect after success
-      } else {
-        alert("Error occurred while canceling trip !");
       }
-    }, {});
+    }, {
+      onError: (e) => {
+        toast.error(e?.response?.data || "Error occured!");
+      },
+    });
   };
 
   const handleToggleMap = () => {

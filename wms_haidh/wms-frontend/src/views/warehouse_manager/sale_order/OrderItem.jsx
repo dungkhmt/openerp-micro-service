@@ -122,10 +122,12 @@ const OrderItem = () => {
           setDetails(res.data);
         });
         toast.success("Assign successfully!")
-      } else {
-        toast.error("Error occcured while assigning order item!");
       }
-    }, {}, payload);
+    }, {
+      onError: (e) => {
+        toast.error(e?.response?.data || "Error occured!");
+      }
+    }, payload);
   };
 
   return (
