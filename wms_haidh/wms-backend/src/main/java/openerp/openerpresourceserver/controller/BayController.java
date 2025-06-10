@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.dto.response.BayResponse;
 import openerp.openerpresourceserver.entity.Bay;
-import openerp.openerpresourceserver.projection.BayProjection;
 import openerp.openerpresourceserver.service.BayService;
 
 @RestController
@@ -28,8 +28,8 @@ public class BayController {
 
 	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping
-	public ResponseEntity<List<BayProjection>> getAllBays(@RequestParam UUID warehouseId) {
-		List<BayProjection> warehouses = bayService.getBaysProjectionByWarehouseId(warehouseId);
+	public ResponseEntity<List<BayResponse>> getAllBays(@RequestParam UUID warehouseId) {
+		List<BayResponse> warehouses = bayService.getBaysByWarehouseId(warehouseId);
 		return ResponseEntity.ok(warehouses);
 	}
 

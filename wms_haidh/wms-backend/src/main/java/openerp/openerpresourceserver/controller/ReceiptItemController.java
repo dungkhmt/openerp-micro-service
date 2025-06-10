@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.dto.request.ReceiptItemCreateRequest;
+import openerp.openerpresourceserver.dto.response.PutawayItemResponse;
+import openerp.openerpresourceserver.dto.response.ReceiptItemResponse;
 import openerp.openerpresourceserver.entity.ReceiptItem;
-import openerp.openerpresourceserver.projection.PutawayItemProjection;
-import openerp.openerpresourceserver.projection.ReceiptItemProjection;
 import openerp.openerpresourceserver.service.ReceiptItemService;
 
 @RestController
@@ -36,8 +36,8 @@ public class ReceiptItemController {
 
 	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping
-	public ResponseEntity<List<ReceiptItemProjection>> getItemsByReceiptItemRequestId(@RequestParam UUID requestId) {
-		List<ReceiptItemProjection> items = receiptItemService.getItemsByRequestId(requestId);
+	public ResponseEntity<List<ReceiptItemResponse>> getItemsByReceiptItemRequestId(@RequestParam UUID requestId) {
+		List<ReceiptItemResponse> items = receiptItemService.getItemsByRequestId(requestId);
 		return ResponseEntity.ok(items);
 	}
 
@@ -59,7 +59,7 @@ public class ReceiptItemController {
 
 	@Secured("ROLE_WMS_WAREHOUSE_STAFF")
 	@GetMapping("/assigned")
-	public Page<PutawayItemProjection> getReceiptItems(@RequestParam UUID bayId,
+	public Page<PutawayItemResponse> getReceiptItems(@RequestParam UUID bayId,
 			@RequestParam(defaultValue = "CREATED") String status, @RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size) {
 		Pageable pageable = PageRequest.of(page, size);

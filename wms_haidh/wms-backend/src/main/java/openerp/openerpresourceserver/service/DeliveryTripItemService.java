@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import openerp.openerpresourceserver.dto.response.CustomerDeliveryResponse;
+import openerp.openerpresourceserver.dto.response.DeliveryItemDetailResponse;
 import openerp.openerpresourceserver.entity.DeliveryTripItem;
-import openerp.openerpresourceserver.projection.CustomerDeliveryProjection;
-import openerp.openerpresourceserver.projection.DeliveryItemDetailProjection;
 import openerp.openerpresourceserver.repository.DeliveryTripItemRepository;
 
 @Service
@@ -21,11 +21,11 @@ public class DeliveryTripItemService {
 
 	private final DeliveryTripItemRepository deliveryTripItemRepository;
 
-	public List<CustomerDeliveryProjection> getCustomersByDeliveryTripId(String deliveryTripId) {
+	public List<CustomerDeliveryResponse> getCustomersByDeliveryTripId(String deliveryTripId) {
 		return deliveryTripItemRepository.findCustomersByDeliveryTripId(deliveryTripId);
 	}
 
-	public Page<DeliveryItemDetailProjection> getDeliveryItems(String deliveryTripId, UUID orderId, int page,
+	public Page<DeliveryItemDetailResponse> getDeliveryItems(String deliveryTripId, UUID orderId, int page,
 			int size) {
 		Pageable pageable = PageRequest.of(page, size);
 		return deliveryTripItemRepository.findDeliveryItemsByTripAndOrder(deliveryTripId, orderId, pageable);

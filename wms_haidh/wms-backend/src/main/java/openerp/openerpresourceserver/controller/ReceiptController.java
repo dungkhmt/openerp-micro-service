@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.dto.request.ReceiptCreateRequest;
+import openerp.openerpresourceserver.dto.response.ReceiptInfoResponse;
+import openerp.openerpresourceserver.dto.response.ReceiptResponse;
 import openerp.openerpresourceserver.entity.Receipt;
-import openerp.openerpresourceserver.projection.ReceiptInfoProjection;
-import openerp.openerpresourceserver.projection.ReceiptProjection;
 import openerp.openerpresourceserver.service.ReceiptItemRequestService;
 import openerp.openerpresourceserver.service.ReceiptService;
 
@@ -38,13 +38,13 @@ public class ReceiptController {
 
 	@Secured({"ROLE_WMS_WAREHOUSE_MANAGER","ROLE_WMS_PURCHASE_STAFF","ROLE_WMS_PURCHASE_MANAGER"})
 	@GetMapping
-	public ResponseEntity<Page<ReceiptInfoProjection>> getReceiptsByStatus(
+	public ResponseEntity<Page<ReceiptInfoResponse>> getReceiptsByStatus(
 
 			@RequestParam(defaultValue = "CREATED") String status, @RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size) {
 		try {
 			Pageable pageable = PageRequest.of(page, size);
-			Page<ReceiptInfoProjection> receipts = receiptService.searchReceipts(status, pageable);
+			Page<ReceiptInfoResponse> receipts = receiptService.searchReceipts(status, pageable);
 			return ResponseEntity.ok(receipts);
 		} catch (Exception e) {
 			// Log the error for further investigation
@@ -55,7 +55,7 @@ public class ReceiptController {
 
 	@Secured({"ROLE_WMS_WAREHOUSE_MANAGER","ROLE_WMS_PURCHASE_STAFF","ROLE_WMS_PURCHASE_MANAGER"})
 	@GetMapping("/{id}")
-	public ResponseEntity<ReceiptProjection> getReceiptDetailsById(@PathVariable UUID id) {
+	public ResponseEntity<ReceiptResponse> getReceiptDetailsById(@PathVariable UUID id) {
         return receiptService.getReceiptDetailsById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());

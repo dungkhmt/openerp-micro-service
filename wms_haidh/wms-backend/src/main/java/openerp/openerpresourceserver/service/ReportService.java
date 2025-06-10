@@ -6,8 +6,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import openerp.openerpresourceserver.projection.CategoryProfitDatapoint;
-import openerp.openerpresourceserver.projection.ProfitDatapoint;
+import openerp.openerpresourceserver.dto.response.CategoryProfitDatapoint;
+import openerp.openerpresourceserver.dto.response.ProfitDatapoint;
+import openerp.openerpresourceserver.dto.response.RevenueProfitDatapoint;
 import openerp.openerpresourceserver.repository.OrderRepository;
 
 @Service
@@ -19,17 +20,15 @@ public class ReportService {
         this.orderRepository = orderRepository;
     }
 
-    public record RevenueProfitDatapoint(String date, double revenue, double profit) {}
-
     public List<RevenueProfitDatapoint> getMonthlyStats() {
         Map<String, Double> profitMap = orderRepository.getMonthlyProfit().stream()
-            .collect(Collectors.toMap(ProfitDatapoint::getDate, ProfitDatapoint::getProfit));
+            .collect(Collectors.toMap(ProfitDatapoint::date, ProfitDatapoint::profit));
 
         return orderRepository.getMonthlyRevenue().stream()
             .map(r -> new RevenueProfitDatapoint(
-                r.getDate(),
-                r.getRevenue(),
-                profitMap.getOrDefault(r.getDate(), 0.0)
+                r.date(),
+                r.revenue(),
+                profitMap.getOrDefault(r.date(), 0.0)
             ))
             .sorted(Comparator.comparing(RevenueProfitDatapoint::date))
             .toList();

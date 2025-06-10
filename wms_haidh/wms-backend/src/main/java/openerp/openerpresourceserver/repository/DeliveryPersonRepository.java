@@ -6,14 +6,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import openerp.openerpresourceserver.dto.response.DeliveryPersonResponse;
 import openerp.openerpresourceserver.entity.DeliveryPerson;
-import openerp.openerpresourceserver.projection.DeliveryPersonProjection;
 
 public interface DeliveryPersonRepository extends JpaRepository<DeliveryPerson, String> {
 
-	@Query("SELECT d.userLoginId AS userLoginId, d.fullName AS fullName "
+	@Query("SELECT new openerp.openerpresourceserver.dto.response.DeliveryPersonResponse(d.userLoginId, d.fullName) "
 			+ "FROM DeliveryPerson d WHERE d.status = 'AVAILABLE'")
-	List<DeliveryPersonProjection> findAllAvailableDeliveryPersons();
+	List<DeliveryPersonResponse> findAllAvailableDeliveryPersons();
 
 	Page<DeliveryPerson> findByFullNameContainingIgnoreCaseAndStatus(String fullName, String status, Pageable pageable);
 

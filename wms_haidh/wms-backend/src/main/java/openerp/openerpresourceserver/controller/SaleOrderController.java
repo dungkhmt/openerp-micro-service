@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.dto.request.SaleOrderCreateRequest;
+import openerp.openerpresourceserver.dto.response.CustomerOrderResponse;
+import openerp.openerpresourceserver.dto.response.OrderResponse;
 import openerp.openerpresourceserver.entity.Order;
-import openerp.openerpresourceserver.projection.CustomerOrderProjection;
-import openerp.openerpresourceserver.projection.OrderProjection;
 import openerp.openerpresourceserver.service.OrderService;
 
 @RestController
@@ -37,19 +37,19 @@ public class SaleOrderController {
 
 	@Secured({"ROLE_WMS_WAREHOUSE_MANAGER","ROLE_WMS_SALE_MANAGER"})
 	@GetMapping
-	public ResponseEntity<Page<OrderProjection>> getOrders(@RequestParam(defaultValue = "CREATED") String status,
+	public ResponseEntity<Page<OrderResponse>> getOrders(@RequestParam(defaultValue = "CREATED") String status,
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
 		Pageable pageable = PageRequest.of(page, size);
-		Page<OrderProjection> orders = orderService.getOrders(status, pageable);
+		Page<OrderResponse> orders = orderService.getOrders(status, pageable);
 		return ResponseEntity.ok(orders);
 	}
 
 	@Secured("ROLE_WMS_ONLINE_CUSTOMER")
 	@GetMapping("/by-user")
-	public ResponseEntity<Page<OrderProjection>> getOrdersByUserLoginId(Principal principal,
+	public ResponseEntity<Page<OrderResponse>> getOrdersByUserLoginId(Principal principal,
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
 		Pageable pageable = PageRequest.of(page, size);
-		Page<OrderProjection> orders = orderService.getOrdersByUserLoginId(principal.getName(), pageable);
+		Page<OrderResponse> orders = orderService.getOrdersByUserLoginId(principal.getName(), pageable);
 		return ResponseEntity.ok(orders);
 	}
 
@@ -62,8 +62,8 @@ public class SaleOrderController {
 
 	@Secured({"ROLE_WMS_WAREHOUSE_MANAGER","ROLE_WMS_SALE_MANAGER","ROLE_WMS_DELIVERY_MANAGER","ROLE_WMS_ONLINE_CUSTOMER"})
 	@GetMapping("/{orderId}/customer-address")
-	public ResponseEntity<CustomerOrderProjection> getCustomerOrderById(@PathVariable UUID orderId) {
-		Optional<CustomerOrderProjection> order = orderService.getCustomerOrderById(orderId);
+	public ResponseEntity<CustomerOrderResponse> getCustomerOrderById(@PathVariable UUID orderId) {
+		Optional<CustomerOrderResponse> order = orderService.getCustomerOrderById(orderId);
 		return order.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
 	}
 	

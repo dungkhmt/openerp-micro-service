@@ -119,7 +119,7 @@ export default function SaleOrderList() {
               className="w-full"
             >
               {statusOptions.map((cat) => (
-                <MenuItem key={cat.uid} value={cat.uid}>
+                <MenuItem style={{ outline: "none" }} key={cat.uid} value={cat.uid}>
                   {cat.name}
                 </MenuItem>
               ))}

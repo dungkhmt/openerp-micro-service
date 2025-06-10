@@ -13,20 +13,20 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import openerp.openerpresourceserver.dto.request.Item;
+import openerp.openerpresourceserver.dto.response.AssignedOrderItemResponse;
+import openerp.openerpresourceserver.dto.response.DeliveryOrderItemResponse;
+import openerp.openerpresourceserver.dto.response.PickedOrderItemResponse;
 import openerp.openerpresourceserver.entity.AssignedOrderItem;
-import openerp.openerpresourceserver.projection.AssignedOrderItemProjection;
-import openerp.openerpresourceserver.projection.DeliveryOrderItemProjection;
-import openerp.openerpresourceserver.projection.PickedOrderItemProjection;
 
 @Repository
 public interface AssignedOrderItemRepository extends JpaRepository<AssignedOrderItem, UUID> {
 
 	@Query("""
-			    SELECT w.name AS warehouseName,
-			           b.code AS bayCode,
-			           aoi.lotId AS lotId,
-			           aoi.quantity AS quantity,
-			           aoi.status AS status
+			    SELECT new openerp.openerpresourceserver.dto.response.AssignedOrderItemResponse(w.name,
+			           b.code,
+			           aoi.lotId,
+			           aoi.quantity,
+			           aoi.status AS status)
 			    FROM AssignedOrderItem aoi
 			    JOIN Bay b ON aoi.bayId = b.bayId
 			    JOIN Warehouse w ON aoi.warehouseId = w.warehouseId
@@ -36,18 +36,18 @@ public interface AssignedOrderItemRepository extends JpaRepository<AssignedOrder
 			        SELECT soi.productId FROM SaleOrderItem soi WHERE soi.saleOrderItemId = :saleOrderItemId
 			    )
 			""")
-	List<AssignedOrderItemProjection> findAssignedOrderItemsBySaleOrderItemId(
+	List<AssignedOrderItemResponse> findAssignedOrderItemsBySaleOrderItemId(
 			@Param("saleOrderItemId") UUID saleOrderItemId);
 
 	@Query("""
-			    SELECT
-			        aoi.assignedOrderItemId AS assignedOrderItemId,
-			        aoi.orderId AS orderId,
-			        p.name AS productName,
-			        p.weight AS weight,
-			        aoi.quantity AS originalQuantity,
-			        b.code AS bayCode,
-			        aoi.lotId AS lotId
+			    SELECT new openerp.openerpresourceserver.dto.response.DeliveryOrderItemResponse(
+			        aoi.assignedOrderItemId,
+			        aoi.orderId,
+			        p.name,
+			        p.weight,
+			        aoi.quantity,
+			        b.code,
+			        aoi.lotId)
 			    FROM AssignedOrderItem aoi
 			    JOIN Product p ON aoi.productId = p.productId
 			    JOIN Bay b ON aoi.bayId = b.bayId
@@ -55,24 +55,24 @@ public interface AssignedOrderItemRepository extends JpaRepository<AssignedOrder
 			    WHERE aoi.warehouseId = :warehouseId
 			    AND aoi.status='PICKED' AND (o.status = 'PICK_COMPLETE' OR o.status='DELIVERING')
 			""")
-	Page<DeliveryOrderItemProjection> findAllDeliveryOrderItemsByWarehouse(@Param("warehouseId") UUID warehouseId,
+	Page<DeliveryOrderItemResponse> findAllDeliveryOrderItemsByWarehouse(@Param("warehouseId") UUID warehouseId,
 			Pageable pageable);
 
 	@Query("""
-			    SELECT
-			        aoi.assignedOrderItemId AS assignedOrderItemId,
-			        p.name AS productName,
-			        aoi.quantity AS originalQuantity,
-			        b.code AS bayCode,
-			        aoi.lotId AS lotId,
-			        aoi.status AS status
+			     SELECT new openerp.openerpresourceserver.dto.response.PickedOrderItemResponse(
+			        aoi.assignedOrderItemId,
+			        p.name,
+			        aoi.quantity,
+			        b.code,
+			        aoi.lotId,
+			        aoi.status)
 			    FROM AssignedOrderItem aoi
 			    JOIN Product p ON aoi.productId = p.productId
 			    JOIN Bay b ON aoi.bayId = b.bayId
 			    AND aoi.bayId = :bayId
 			    AND aoi.status = :status
 			""")
-	Page<PickedOrderItemProjection> findAllPickedOrderItemsByBay(@Param("bayId") UUID bayId, String status,
+	Page<PickedOrderItemResponse> findAllPickedOrderItemsByBay(@Param("bayId") UUID bayId, String status,
 			Pageable pageable);
 
 	@Modifying
@@ -90,20 +90,20 @@ public interface AssignedOrderItemRepository extends JpaRepository<AssignedOrder
 	List<Item> getAllItems();
 
 	@Query("""
-			    SELECT
-			        a.assignedOrderItemId AS assignedOrderItemId,
-			        a.orderId AS orderId,
-			        p.name AS productName,
-			        p.weight AS weight,
-			        a.quantity AS originalQuantity,
-			        b.code AS bayCode,
-			        a.lotId AS lotId
+			     SELECT new openerp.openerpresourceserver.dto.response.DeliveryOrderItemResponse(
+			        a.assignedOrderItemId,
+			        a.orderId,
+			        p.name,
+			        p.weight,
+			        a.quantity,
+			        b.code,
+			        a.lotId)
 			    FROM AssignedOrderItem a
 			    JOIN Product p ON a.productId = p.productId
 			    JOIN Bay b ON a.bayId = b.bayId
 			    WHERE a.assignedOrderItemId IN :assignedOrderItemIds
 			""")
-	List<DeliveryOrderItemProjection> findDeliveryOrderItemsByIds(List<UUID> assignedOrderItemIds);
+	List<DeliveryOrderItemResponse> findDeliveryOrderItemsByIds(List<UUID> assignedOrderItemIds);
 
 	@Query("SELECT COUNT(a) FROM AssignedOrderItem a WHERE a.orderId = :orderId")
 	long countAssignedItems(@Param("orderId") UUID orderId);

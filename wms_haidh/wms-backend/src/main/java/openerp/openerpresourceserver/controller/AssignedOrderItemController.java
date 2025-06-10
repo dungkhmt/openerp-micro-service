@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.dto.request.AssignedOrderItemCreateRequest;
+import openerp.openerpresourceserver.dto.response.AssignedOrderItemResponse;
+import openerp.openerpresourceserver.dto.response.DeliveryOrderItemResponse;
+import openerp.openerpresourceserver.dto.response.PickedOrderItemResponse;
 import openerp.openerpresourceserver.entity.AssignedOrderItem;
-import openerp.openerpresourceserver.projection.AssignedOrderItemProjection;
-import openerp.openerpresourceserver.projection.DeliveryOrderItemProjection;
-import openerp.openerpresourceserver.projection.PickedOrderItemProjection;
 import openerp.openerpresourceserver.service.AssignedOrderItemService;
 
 @RestController
@@ -38,28 +38,28 @@ public class AssignedOrderItemController {
 
 	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping
-	public List<AssignedOrderItemProjection> getAssignedOrderItemsBySaleOrderItemId(
+	public List<AssignedOrderItemResponse> getAssignedOrderItemsBySaleOrderItemId(
 			@RequestParam UUID saleOrderItemId) {
 		return assignedOrderItemService.getAssignedOrderItemsBySaleOrderItemId(saleOrderItemId);
 	}
 
 	@Secured("ROLE_WMS_WAREHOUSE_STAFF")
 	@GetMapping("/assigned")
-	public ResponseEntity<Page<PickedOrderItemProjection>> getAssignedOrderItems(@RequestParam UUID bayId,
+	public ResponseEntity<Page<PickedOrderItemResponse>> getAssignedOrderItems(@RequestParam UUID bayId,
 			@RequestParam(defaultValue = "CREATED") String status, @RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size) {
 		Pageable pageable = PageRequest.of(page, size);
-		Page<PickedOrderItemProjection> orderItems = assignedOrderItemService.getAllPickedOrderItems(bayId, status,
+		Page<PickedOrderItemResponse> orderItems = assignedOrderItemService.getAllPickedOrderItems(bayId, status,
 				pageable);
 		return ResponseEntity.ok(orderItems);
 	}
 
 	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@GetMapping("/picked")
-	public ResponseEntity<Page<DeliveryOrderItemProjection>> getPickedAssignedOrderItems(@RequestParam UUID warehouseId,
+	public ResponseEntity<Page<DeliveryOrderItemResponse>> getPickedAssignedOrderItems(@RequestParam UUID warehouseId,
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
 		Pageable pageable = PageRequest.of(page, size);
-		Page<DeliveryOrderItemProjection> orderItems = assignedOrderItemService.getAllDeliveryOrderItems(warehouseId,
+		Page<DeliveryOrderItemResponse> orderItems = assignedOrderItemService.getAllDeliveryOrderItems(warehouseId,
 				pageable);
 		return ResponseEntity.ok(orderItems);
 	}
@@ -80,9 +80,9 @@ public class AssignedOrderItemController {
 
 	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@PostMapping("/delivery-items")
-	public ResponseEntity<List<DeliveryOrderItemProjection>> getDeliveryOrderItems(
+	public ResponseEntity<List<DeliveryOrderItemResponse>> getDeliveryOrderItems(
 			@RequestBody List<UUID> assignedOrderItemIds) {
-		List<DeliveryOrderItemProjection> items = assignedOrderItemService.getDeliveryOrderItems(assignedOrderItemIds);
+		List<DeliveryOrderItemResponse> items = assignedOrderItemService.getDeliveryOrderItems(assignedOrderItemIds);
 		return ResponseEntity.ok(items);
 	}
 

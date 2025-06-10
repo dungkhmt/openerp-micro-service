@@ -13,13 +13,13 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import openerp.openerpresourceserver.dto.request.AssignedOrderItemCreateRequest;
 import openerp.openerpresourceserver.dto.request.Item;
+import openerp.openerpresourceserver.dto.response.AssignedOrderItemResponse;
+import openerp.openerpresourceserver.dto.response.DeliveryOrderItemResponse;
+import openerp.openerpresourceserver.dto.response.PickedOrderItemResponse;
 import openerp.openerpresourceserver.entity.AssignedOrderItem;
 import openerp.openerpresourceserver.entity.InventoryItem;
 import openerp.openerpresourceserver.entity.Order;
 import openerp.openerpresourceserver.entity.SaleOrderItem;
-import openerp.openerpresourceserver.projection.AssignedOrderItemProjection;
-import openerp.openerpresourceserver.projection.DeliveryOrderItemProjection;
-import openerp.openerpresourceserver.projection.PickedOrderItemProjection;
 import openerp.openerpresourceserver.repository.AssignedOrderItemRepository;
 import openerp.openerpresourceserver.repository.InventoryItemRepository;
 import openerp.openerpresourceserver.repository.OrderRepository;
@@ -39,15 +39,15 @@ public class AssignedOrderItemService {
 	@Autowired
 	private InventoryService inventoryService;
 
-	public List<AssignedOrderItemProjection> getAssignedOrderItemsBySaleOrderItemId(UUID saleOrderItemId) {
+	public List<AssignedOrderItemResponse> getAssignedOrderItemsBySaleOrderItemId(UUID saleOrderItemId) {
 		return assignedOrderItemRepository.findAssignedOrderItemsBySaleOrderItemId(saleOrderItemId);
 	}
 
-	public Page<PickedOrderItemProjection> getAllPickedOrderItems(UUID bayId, String status, Pageable pageable) {
+	public Page<PickedOrderItemResponse> getAllPickedOrderItems(UUID bayId, String status, Pageable pageable) {
 		return assignedOrderItemRepository.findAllPickedOrderItemsByBay(bayId, status, pageable);
 	}
 
-	public Page<DeliveryOrderItemProjection> getAllDeliveryOrderItems(UUID warehouseId, Pageable pageable) {
+	public Page<DeliveryOrderItemResponse> getAllDeliveryOrderItems(UUID warehouseId, Pageable pageable) {
 		return assignedOrderItemRepository.findAllDeliveryOrderItemsByWarehouse(warehouseId, pageable);
 	}
 
@@ -107,7 +107,7 @@ public class AssignedOrderItemService {
 		return assignedOrderItemRepository.getAllItems();
 	}
 
-	public List<DeliveryOrderItemProjection> getDeliveryOrderItems(List<UUID> assignedOrderItemIds) {
+	public List<DeliveryOrderItemResponse> getDeliveryOrderItems(List<UUID> assignedOrderItemIds) {
 		return assignedOrderItemRepository.findDeliveryOrderItemsByIds(assignedOrderItemIds);
 	}
 

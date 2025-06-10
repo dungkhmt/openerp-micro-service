@@ -9,13 +9,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import openerp.openerpresourceserver.dto.response.BayResponse;
 import openerp.openerpresourceserver.entity.Bay;
-import openerp.openerpresourceserver.projection.BayProjection;
 
 @Repository
 public interface BayRepository extends JpaRepository<Bay, UUID> {
-    @Query("SELECT b.bayId AS bayId, b.code AS code FROM Bay b WHERE b.warehouseId = :warehouseId")
-    List<BayProjection> findByWarehouseIdWithProjection(@Param("warehouseId") UUID warehouseId);
+    @Query("SELECT new openerp.openerpresourceserver.dto.response.BayResponse(b.bayId, b.code) FROM Bay b WHERE b.warehouseId = :warehouseId")
+    List<BayResponse> findByWarehouseId(@Param("warehouseId") UUID warehouseId);
 
     Optional<Bay> findByBayId(UUID bayId);
 

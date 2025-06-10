@@ -100,7 +100,7 @@ export default function ProductList() {
                 >
 
                   {warehouses.map((wh) => (
-                    <MenuItem key={wh.warehouseId} value={wh.warehouseId}>
+                    <MenuItem style={{ outline: "none" }} key={wh.warehouseId} value={wh.warehouseId}>
                       {wh.name}
                     </MenuItem>
                   ))}
@@ -145,7 +145,8 @@ export default function ProductList() {
     filterValue,
     onSearchChange,
     onRowsPerPageChange,
-    totalItems
+    totalItems,
+    isSelected
   ]);
 
   const bottomContent = useMemo(() => {

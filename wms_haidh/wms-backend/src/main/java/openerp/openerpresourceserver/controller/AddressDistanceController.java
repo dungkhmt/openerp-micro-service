@@ -1,7 +1,6 @@
 package openerp.openerpresourceserver.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.dto.request.UpdateDistanceRequest;
 import openerp.openerpresourceserver.entity.AddressType;
-import openerp.openerpresourceserver.projection.AddressDistanceProjection;
 import openerp.openerpresourceserver.service.AddressDistanceService;
 
 @RestController
@@ -32,12 +30,18 @@ public class AddressDistanceController {
 
 	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@GetMapping
-	public Page<AddressDistanceProjection> getDistanceList(@RequestParam(defaultValue = "0") int page,
+	public ResponseEntity<?> getDistanceList(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "WAREHOUSE") AddressType fromType,
 			@RequestParam(defaultValue = "CUSTOMER") AddressType toType,
 			@RequestParam(required = false) String fromLocation, @RequestParam(required = false) String toLocation) {
-		Pageable pageable = PageRequest.of(page, size, Sort.by("lastUpdatedStamp").descending());
-		return addressDistanceService.getAllDistances(fromType, toType, fromLocation, toLocation, pageable);
+		try {
+			Pageable pageable = PageRequest.of(page, size, Sort.by("lastUpdatedStamp").descending());
+			return ResponseEntity.ok(addressDistanceService.getAllDistances(fromType, toType, fromLocation, toLocation, pageable));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occured.");
+		}
+		
 	}
 
 	@Secured("ROLE_WMS_DELIVERY_MANAGER")

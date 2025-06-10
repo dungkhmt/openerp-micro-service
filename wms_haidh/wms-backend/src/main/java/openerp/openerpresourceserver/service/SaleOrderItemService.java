@@ -8,9 +8,9 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import openerp.openerpresourceserver.dto.request.SaleOrderItemDTO;
+import openerp.openerpresourceserver.dto.response.SaleOrderItemDetailResponse;
+import openerp.openerpresourceserver.dto.response.SaleOrderItemResponse;
 import openerp.openerpresourceserver.entity.SaleOrderItem;
-import openerp.openerpresourceserver.projection.SaleOrderItemDetailProjection;
-import openerp.openerpresourceserver.projection.SaleOrderItemProjection;
 import openerp.openerpresourceserver.repository.SaleOrderItemRepository;
 
 @Service
@@ -21,11 +21,11 @@ public class SaleOrderItemService {
         this.saleOrderItemRepository = saleOrderItemRepository;
     }
     
-    public List<SaleOrderItemProjection> getSaleOrderItems(UUID id) {
+    public List<SaleOrderItemResponse> getSaleOrderItems(UUID id) {
         return saleOrderItemRepository.findSaleOrderItems(id);
     }
     
-    public SaleOrderItemDetailProjection getSaleOrderItemDetail(UUID id) {
+    public SaleOrderItemDetailResponse getSaleOrderItemDetail(UUID id) {
         return saleOrderItemRepository.findSaleOrderItemDetailById(id);
     }
     

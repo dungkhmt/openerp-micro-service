@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
-import openerp.openerpresourceserver.projection.BayProjection;
-import openerp.openerpresourceserver.projection.ReceiptItemRequestDetailProjection;
-import openerp.openerpresourceserver.projection.ReceiptItemRequestProjection;
+import openerp.openerpresourceserver.dto.response.BayResponse;
+import openerp.openerpresourceserver.dto.response.ReceiptItemRequestDetailResponse;
+import openerp.openerpresourceserver.dto.response.ReceiptItemRequestResponse;
 import openerp.openerpresourceserver.service.ReceiptItemRequestService;
 
 @RestController
@@ -29,20 +29,20 @@ public class ReceiptItemRequestController {
 	
 	@Secured({"ROLE_WMS_WAREHOUSE_MANAGER","ROLE_WMS_PURCHASE_STAFF","ROLE_WMS_PURCHASE_MANAGER"})
 	@GetMapping
-	public ResponseEntity<List<ReceiptItemRequestProjection>> getAllReceiptItemRequests(@RequestParam UUID receiptId) {
-		List<ReceiptItemRequestProjection> receiptItems = receiptItemRequestService.getAllReceiptItemRequests(receiptId);
+	public ResponseEntity<List<ReceiptItemRequestResponse>> getAllReceiptItemRequests(@RequestParam UUID receiptId) {
+		List<ReceiptItemRequestResponse> receiptItems = receiptItemRequestService.getAllReceiptItemRequests(receiptId);
 		return ResponseEntity.ok(receiptItems);
 	}
 
 	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping("/{id}/bays")
-	public ResponseEntity<List<BayProjection>> getBaysByReceiptItemRequestId(@PathVariable UUID id) {
+	public ResponseEntity<List<BayResponse>> getBaysByReceiptItemRequestId(@PathVariable UUID id) {
 		return ResponseEntity.ok(receiptItemRequestService.getBaysByReceiptItemRequestId(id));
 	}
 
 	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping("/{id}/general-info")
-	public ResponseEntity<ReceiptItemRequestDetailProjection> getReceiptItemRequestDetail(@PathVariable UUID id) {
+	public ResponseEntity<ReceiptItemRequestDetailResponse> getReceiptItemRequestDetail(@PathVariable UUID id) {
 		return receiptItemRequestService.getReceiptItemRequestDetail(id).map(ResponseEntity::ok)
 				.orElse(ResponseEntity.notFound().build());
 	}

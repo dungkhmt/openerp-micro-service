@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.dto.request.DeliveryPersonCreateRequest;
+import openerp.openerpresourceserver.dto.response.DeliveryPersonResponse;
 import openerp.openerpresourceserver.entity.DeliveryPerson;
-import openerp.openerpresourceserver.projection.DeliveryPersonProjection;
 import openerp.openerpresourceserver.service.DeliveryPersonService;
 
 @RestController
@@ -42,7 +42,7 @@ public class DeliveryPersonController {
 	
 	@Secured("ROLE_WMS_DELIVERY_MANAGER")
 	@GetMapping("/available")
-	public List<DeliveryPersonProjection> getAllDeliveryPersons() {
+	public List<DeliveryPersonResponse> getAllDeliveryPersons() {
 		return deliveryPersonService.getAllDeliveryPersons();
 	}
 	

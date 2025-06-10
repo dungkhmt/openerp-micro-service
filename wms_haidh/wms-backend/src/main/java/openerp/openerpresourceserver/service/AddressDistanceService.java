@@ -19,9 +19,9 @@ import openerp.openerpresourceserver.dto.request.AddressDistanceDTO;
 import openerp.openerpresourceserver.dto.request.CoordinateDTO;
 import openerp.openerpresourceserver.dto.request.CoordinatePair;
 import openerp.openerpresourceserver.dto.request.UpdateDistanceRequest;
+import openerp.openerpresourceserver.dto.response.AddressDistanceResponse;
 import openerp.openerpresourceserver.entity.AddressDistance;
 import openerp.openerpresourceserver.entity.AddressType;
-import openerp.openerpresourceserver.projection.AddressDistanceProjection;
 import openerp.openerpresourceserver.repository.AddressDistanceRepository;
 import openerp.openerpresourceserver.service.route.RouteService;
 
@@ -32,7 +32,7 @@ public class AddressDistanceService {
 	private AddressDistanceRepository addressDistanceRepository;
 	private RouteService routeService;
 
-	public Page<AddressDistanceProjection> getAllDistances(AddressType fromType, AddressType toType,
+	public Page<AddressDistanceResponse> getAllDistances(AddressType fromType, AddressType toType,
 			String fromLocation, String toLocation, Pageable pageable) {
 		switch (fromType) {
 		case WAREHOUSE:

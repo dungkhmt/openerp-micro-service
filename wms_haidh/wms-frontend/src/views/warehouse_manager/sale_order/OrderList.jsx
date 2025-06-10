@@ -117,7 +117,7 @@ export default function SaleOrderList() {
       <div className="flex flex-col gap-4">
         <div className="flex justify-between items-center gap-3">
           {/* Status Select */}
-          <div className="flex-shrink-0 w-40">
+          <div className="w-[20%]">
             <Select
               aria-label="Status"
               labelId="status-label"
@@ -127,7 +127,7 @@ export default function SaleOrderList() {
               className="w-full"
             >
               {statusOptions.map((cat) => (
-                <MenuItem key={cat.uid} value={cat.uid}>
+                <MenuItem style={{ outline: "none" }} key={cat.uid} value={cat.uid}>
                   {cat.name}
                 </MenuItem>
               ))}

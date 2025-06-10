@@ -23,10 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.dto.request.DeliveryTripCreateRequest;
+import openerp.openerpresourceserver.dto.response.DeliveryTripGeneralResponse;
+import openerp.openerpresourceserver.dto.response.DeliveryTripResponse;
+import openerp.openerpresourceserver.dto.response.TodayDeliveryTripResponse;
 import openerp.openerpresourceserver.entity.DeliveryTrip;
-import openerp.openerpresourceserver.projection.DeliveryTripGeneralProjection;
-import openerp.openerpresourceserver.projection.DeliveryTripProjection;
-import openerp.openerpresourceserver.projection.TodayDeliveryTripProjection;
 import openerp.openerpresourceserver.service.DeliveryTripService;
 
 @RestController
@@ -43,7 +43,7 @@ public class DeliveryTripController {
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
 		try {
 			Pageable pageable = PageRequest.of(page, size, Sort.by("lastUpdatedStamp").descending());
-			Page<DeliveryTripProjection> deliveryTrips = deliveryTripService.getFilteredDeliveryTrips(status, pageable);
+			Page<DeliveryTripResponse> deliveryTrips = deliveryTripService.getFilteredDeliveryTrips(status, pageable);
 			return ResponseEntity.ok(deliveryTrips);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -63,20 +63,20 @@ public class DeliveryTripController {
 
 	@Secured("ROLE_WMS_DELIVERY_PERSON")
 	@GetMapping("/today")
-	public ResponseEntity<Page<TodayDeliveryTripProjection>> getTodayDeliveryTrips(Principal principal,
+	public ResponseEntity<Page<TodayDeliveryTripResponse>> getTodayDeliveryTrips(Principal principal,
 			@RequestParam(defaultValue = "CREATED") String status, @RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size) {
 
 		Pageable pageable = PageRequest.of(page, size, Sort.by("createdStamp").descending());
-		Page<TodayDeliveryTripProjection> trips = deliveryTripService.getTodayDeliveryTrips(principal.getName(), status,
+		Page<TodayDeliveryTripResponse> trips = deliveryTripService.getTodayDeliveryTrips(principal.getName(), status,
 				pageable);
 		return ResponseEntity.ok(trips);
 	}
 
 	@Secured({ "ROLE_WMS_DELIVERY_PERSON", "ROLE_WMS_DELIVERY_MANAGER" })
 	@GetMapping("/{deliveryTripId}/general-info")
-	public ResponseEntity<DeliveryTripGeneralProjection> getDeliveryTripDetail(@PathVariable String deliveryTripId) {
-		DeliveryTripGeneralProjection tripDetail = deliveryTripService.getDeliveryTripById(deliveryTripId);
+	public ResponseEntity<DeliveryTripGeneralResponse> getDeliveryTripDetail(@PathVariable String deliveryTripId) {
+		DeliveryTripGeneralResponse tripDetail = deliveryTripService.getDeliveryTripById(deliveryTripId);
 		return ResponseEntity.ok(tripDetail);
 	}
 

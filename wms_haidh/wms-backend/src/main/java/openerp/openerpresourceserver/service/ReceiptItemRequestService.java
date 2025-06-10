@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
 import openerp.openerpresourceserver.dto.request.ReceiptItemRequestDTO;
+import openerp.openerpresourceserver.dto.response.BayResponse;
+import openerp.openerpresourceserver.dto.response.ReceiptItemRequestDetailResponse;
+import openerp.openerpresourceserver.dto.response.ReceiptItemRequestResponse;
 import openerp.openerpresourceserver.entity.ReceiptItemRequest;
-import openerp.openerpresourceserver.projection.BayProjection;
-import openerp.openerpresourceserver.projection.ReceiptItemRequestDetailProjection;
-import openerp.openerpresourceserver.projection.ReceiptItemRequestProjection;
 import openerp.openerpresourceserver.repository.ReceiptItemRequestRepository;
 
 @Service
@@ -30,16 +30,16 @@ public class ReceiptItemRequestService {
 						"ReceiptItemRequest not found for ID: " + receiptItemRequestId));
 	}
 	
-	public List<BayProjection> getBaysByReceiptItemRequestId(UUID receiptItemRequestId) {
+	public List<BayResponse> getBaysByReceiptItemRequestId(UUID receiptItemRequestId) {
 		UUID warehouseId = getWarehouseIdByReceiptItemRequestId(receiptItemRequestId);
-		return bayService.getBaysProjectionByWarehouseId(warehouseId);
+		return bayService.getBaysByWarehouseId(warehouseId);
 	}
     
-    public List<ReceiptItemRequestProjection> getAllReceiptItemRequests(UUID receiptId) {
+    public List<ReceiptItemRequestResponse> getAllReceiptItemRequests(UUID receiptId) {
         return receiptItemRequestRepository.findAllWithDetails(receiptId);
     }
     
-    public Optional<ReceiptItemRequestDetailProjection> getReceiptItemRequestDetail(UUID receiptItemRequestId) {
+    public Optional<ReceiptItemRequestDetailResponse> getReceiptItemRequestDetail(UUID receiptItemRequestId) {
         return receiptItemRequestRepository.findDetailById(receiptItemRequestId);
     }
     

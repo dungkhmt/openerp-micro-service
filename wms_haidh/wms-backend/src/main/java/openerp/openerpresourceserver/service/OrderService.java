@@ -13,9 +13,9 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.dto.request.SaleOrderCreateRequest;
 import openerp.openerpresourceserver.dto.request.SaleOrderItemDTO;
+import openerp.openerpresourceserver.dto.response.CustomerOrderResponse;
+import openerp.openerpresourceserver.dto.response.OrderResponse;
 import openerp.openerpresourceserver.entity.Order;
-import openerp.openerpresourceserver.projection.CustomerOrderProjection;
-import openerp.openerpresourceserver.projection.OrderProjection;
 import openerp.openerpresourceserver.repository.OrderRepository;
 
 @Service
@@ -27,12 +27,12 @@ public class OrderService {
 	private final ProductWarehouseService productWarehouseService;
 	private final ProductService productService;
 
-	public Page<OrderProjection> getOrders(String status, Pageable pageable) {
+	public Page<OrderResponse> getOrders(String status, Pageable pageable) {
 
 		return orderRepository.findOrdersByStatus(status, pageable);
 	}
 
-	public Page<OrderProjection> getOrdersByUserLoginId(String userLoginId, Pageable pageable) {
+	public Page<OrderResponse> getOrdersByUserLoginId(String userLoginId, Pageable pageable) {
 		return orderRepository.findOrdersByUserLoginId(userLoginId, pageable);
 	}
 
@@ -41,7 +41,7 @@ public class OrderService {
 				.orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
 	}
 
-	public Optional<CustomerOrderProjection> getCustomerOrderById(UUID orderId) {
+	public Optional<CustomerOrderResponse> getCustomerOrderById(UUID orderId) {
 		return orderRepository.findCustomerOrderById(orderId);
 	}
 

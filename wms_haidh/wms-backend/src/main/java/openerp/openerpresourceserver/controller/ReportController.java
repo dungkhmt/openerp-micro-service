@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
-import openerp.openerpresourceserver.projection.CategoryProfitDatapoint;
-import openerp.openerpresourceserver.projection.ProfitDatapoint;
+import openerp.openerpresourceserver.dto.response.CategoryProfitDatapoint;
+import openerp.openerpresourceserver.dto.response.ProfitDatapoint;
+import openerp.openerpresourceserver.dto.response.RevenueProfitDatapoint;
 import openerp.openerpresourceserver.service.ReportService;
-import openerp.openerpresourceserver.service.ReportService.RevenueProfitDatapoint;
 
 @RestController
 @RequestMapping("/reports")

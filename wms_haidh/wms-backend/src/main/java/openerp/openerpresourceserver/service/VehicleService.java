@@ -5,8 +5,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import openerp.openerpresourceserver.dto.response.VehicleResponse;
 import openerp.openerpresourceserver.entity.Vehicle;
-import openerp.openerpresourceserver.projection.VehicleProjection;
 import openerp.openerpresourceserver.repository.VehicleRepository;
 
 @Service
@@ -18,7 +18,7 @@ public class VehicleService {
         this.vehicleRepository = vehicleRepository;
     }
 
-    public List<VehicleProjection> getAllVehicles() {
+    public List<VehicleResponse> getAllVehicles() {
         return vehicleRepository.findAllAvailableVehicles();
     }
     
@@ -30,7 +30,7 @@ public class VehicleService {
         vehicleRepository.save(vehicle); 
     }
     
-    public VehicleProjection getVehicleById(UUID vehicleId) {
+    public VehicleResponse getVehicleById(UUID vehicleId) {
     	 return vehicleRepository.findVehicleProjectionById(vehicleId);
     }
 }

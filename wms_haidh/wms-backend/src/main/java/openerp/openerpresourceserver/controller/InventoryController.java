@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
+import openerp.openerpresourceserver.dto.response.BayResponse;
+import openerp.openerpresourceserver.dto.response.InventoryItemResponse;
+import openerp.openerpresourceserver.dto.response.LotIdResponse;
 import openerp.openerpresourceserver.entity.Warehouse;
-import openerp.openerpresourceserver.projection.BayProjection;
-import openerp.openerpresourceserver.projection.InventoryItemProjection;
-import openerp.openerpresourceserver.projection.LotIdProjection;
 import openerp.openerpresourceserver.service.InventoryService;
 
 @RestController
@@ -35,13 +35,13 @@ public class InventoryController {
 
 	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping
-	public ResponseEntity<Page<InventoryItemProjection>> getInventoryItems(@RequestParam UUID bayId,
+	public ResponseEntity<Page<InventoryItemResponse>> getInventoryItems(@RequestParam UUID bayId,
 			@RequestParam(required = false) String lotId, @RequestParam(required = false) String search,
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
 		try {
 
 			Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "lastUpdatedStamp"));
-			Page<InventoryItemProjection> inventoryItems = inventoryService.getInventoryItems(bayId, lotId, search,
+			Page<InventoryItemResponse> inventoryItems = inventoryService.getInventoryItems(bayId, lotId, search,
 					pageable);
 
 			return ResponseEntity.ok(inventoryItems);
@@ -64,17 +64,17 @@ public class InventoryController {
 
 	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping("/available-bays")
-	public ResponseEntity<List<BayProjection>> getBaysWithProductsInSaleOrder(@RequestParam UUID saleOrderItemId,
+	public ResponseEntity<List<BayResponse>> getBaysWithProductsInSaleOrder(@RequestParam UUID saleOrderItemId,
 			@RequestParam UUID warehouseId) {
-		List<BayProjection> bays = inventoryService.getBaysWithProductsInSaleOrder(saleOrderItemId, warehouseId);
+		List<BayResponse> bays = inventoryService.getBaysWithProductsInSaleOrder(saleOrderItemId, warehouseId);
 		return ResponseEntity.ok(bays);
 	}
 
 	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping("/available-lots")
-	public ResponseEntity<List<LotIdProjection>> getLotIdsBySaleOrderItemIdAndBayId(@RequestParam UUID saleOrderItemId,
+	public ResponseEntity<List<LotIdResponse>> getLotIdsBySaleOrderItemIdAndBayId(@RequestParam UUID saleOrderItemId,
 			@RequestParam UUID bayId) {
-		List<LotIdProjection> lotIds = inventoryService.getLotIdsBySaleOrderItemIdAndBayId(saleOrderItemId, bayId);
+		List<LotIdResponse> lotIds = inventoryService.getLotIdsBySaleOrderItemIdAndBayId(saleOrderItemId, bayId);
 		return ResponseEntity.ok(lotIds);
 	}
 

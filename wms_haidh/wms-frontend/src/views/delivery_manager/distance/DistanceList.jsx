@@ -83,6 +83,7 @@ export default function Distance() {
         }
         request("post", `/address-distances/update`, (res) => {
             if (res.status === 200) {
+                toast.success("Distance updated successfully!");
                 request("get", `/address-distances?page=${page - 1}&size=${rowsPerPage}&fromLocation=${debouncedFrom}`, (res) => {
                     setItems(res.data.content);
                     setPage(1);
@@ -167,7 +168,7 @@ export default function Distance() {
                         className="w-full"
                     >
                         {statusOptions.map((cat) => (
-                            <MenuItem key={cat.key} value={cat.key}>
+                            <MenuItem style={{ outline: "none" }} key={cat.key} value={cat.key}>
                                 {cat.name}
                             </MenuItem>
                         ))}

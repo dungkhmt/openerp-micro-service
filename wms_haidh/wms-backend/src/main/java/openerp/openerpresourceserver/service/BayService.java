@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
+import openerp.openerpresourceserver.dto.response.BayResponse;
 import openerp.openerpresourceserver.entity.Bay;
-import openerp.openerpresourceserver.projection.BayProjection;
 import openerp.openerpresourceserver.repository.BayRepository;
 
 @Service
@@ -17,8 +17,8 @@ public class BayService {
 	@Autowired
 	private BayRepository bayRepository;
 
-	public List<BayProjection> getBaysProjectionByWarehouseId(UUID warehouseId) {
-		return bayRepository.findByWarehouseIdWithProjection(warehouseId);
+	public List<BayResponse> getBaysByWarehouseId(UUID warehouseId) {
+		return bayRepository.findByWarehouseId(warehouseId);
 	}
 
 	public List<Bay> getBaysByWarehouseIdAndShelf(UUID warehouseId, int shelf) {

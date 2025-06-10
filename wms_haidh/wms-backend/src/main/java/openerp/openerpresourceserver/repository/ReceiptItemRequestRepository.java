@@ -9,9 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import openerp.openerpresourceserver.dto.response.ReceiptItemRequestDetailResponse;
+import openerp.openerpresourceserver.dto.response.ReceiptItemRequestResponse;
 import openerp.openerpresourceserver.entity.ReceiptItemRequest;
-import openerp.openerpresourceserver.projection.ReceiptItemRequestDetailProjection;
-import openerp.openerpresourceserver.projection.ReceiptItemRequestProjection;
 
 @Repository
 public interface ReceiptItemRequestRepository extends JpaRepository<ReceiptItemRequest, UUID> {
@@ -19,29 +19,32 @@ public interface ReceiptItemRequestRepository extends JpaRepository<ReceiptItemR
 	Optional<ReceiptItemRequest> findByReceiptItemRequestId(UUID receiptItemRequestId);
 
 	@Query(value = """
-			 SELECT r.receiptItemRequestId AS receiptItemRequestId,
-			        r.quantity AS quantity,
-			        r.completed AS completed,
-			        p.name AS productName,
-			        p.uom AS uom
+			 SELECT new openerp.openerpresourceserver.dto.response.ReceiptItemRequestResponse( 
+			        r.receiptItemRequestId,
+			        r.quantity,
+			        r.completed,
+			        p.name,
+			        p.uom)
 			 FROM ReceiptItemRequest r
 			 JOIN Product p ON r.productId = p.productId
 			 WHERE r.receiptId = :receiptId
 			 ORDER BY r.lastUpdated DESC
 			""")
-	List<ReceiptItemRequestProjection> findAllWithDetails(@Param("receiptId") UUID id);
+	List<ReceiptItemRequestResponse> findAllWithDetails(@Param("receiptId") UUID id);
 
 	@Query("""
-			 SELECT r.quantity AS quantity,
-			        r.completed AS completed,
-			        p.name AS productName,
-			        p.uom AS uom,
-			        w.name AS warehouseName
+			 SELECT new openerp.openerpresourceserver.dto.response.ReceiptItemRequestDetailResponse(
+			        r.receiptItemRequestId,
+			        r.quantity,
+			        r.completed,
+			        p.name,
+			        p.uom,
+			        w.name)
 			 FROM ReceiptItemRequest r
 			 JOIN Product p ON r.productId = p.productId
 			 JOIN Warehouse w ON r.warehouseId = w.warehouseId
 			 WHERE r.receiptItemRequestId = :receiptItemRequestId
 			""")
-	Optional<ReceiptItemRequestDetailProjection> findDetailById(@Param("receiptItemRequestId") UUID receiptItemRequestId);
+	Optional<ReceiptItemRequestDetailResponse> findDetailById(@Param("receiptItemRequestId") UUID receiptItemRequestId);
 
 }

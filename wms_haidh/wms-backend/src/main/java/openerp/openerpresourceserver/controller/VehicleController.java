@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
-import openerp.openerpresourceserver.projection.VehicleProjection;
+import openerp.openerpresourceserver.dto.response.VehicleResponse;
 import openerp.openerpresourceserver.service.VehicleService;
 
 @RestController
@@ -26,14 +26,14 @@ public class VehicleController {
 
     @Secured("ROLE_WMS_DELIVERY_MANAGER")
     @GetMapping
-    public List<VehicleProjection> getVehicles() {
+    public List<VehicleResponse> getVehicles() {
         return vehicleService.getAllVehicles();
     }
     
     @Secured("ROLE_WMS_DELIVERY_MANAGER")
     @GetMapping("/{id}")
-    public ResponseEntity<VehicleProjection> getVehicleById(@PathVariable UUID id) {
-        VehicleProjection vehicle = vehicleService.getVehicleById(id);
+    public ResponseEntity<VehicleResponse> getVehicleById(@PathVariable UUID id) {
+        VehicleResponse vehicle = vehicleService.getVehicleById(id);
         return ResponseEntity.ok(vehicle);
     }
 }

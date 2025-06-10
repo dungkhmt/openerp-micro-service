@@ -13,18 +13,20 @@ import org.springframework.stereotype.Repository;
 
 import jakarta.transaction.Transactional;
 import openerp.openerpresourceserver.dto.request.AddressDistanceDTO;
+import openerp.openerpresourceserver.dto.response.AddressDistanceResponse;
 import openerp.openerpresourceserver.entity.AddressDistance;
 import openerp.openerpresourceserver.entity.AddressType;
-import openerp.openerpresourceserver.projection.AddressDistanceProjection;
 
 @Repository
 public interface AddressDistanceRepository extends JpaRepository<AddressDistance, UUID> {
 
 	@Query("""
-			    SELECT ad.addressDistanceId AS addressDistanceId,
-			           w.name AS fromLocationName,
-			           c.addressName AS toLocationName,
-			           ad.distance AS distance
+			    SELECT new openerp.openerpresourceserver.dto.response.AddressDistanceResponse(
+			     ad.addressDistanceId,
+			     w.name,
+			     c.addressName,
+			     ad.distance
+			 )
 			    FROM AddressDistance ad
 			    JOIN Warehouse w ON ad.fromLocationId = w.warehouseId
 			    JOIN CustomerAddress c ON ad.toLocationId = c.customerAddressId
@@ -33,14 +35,14 @@ public interface AddressDistanceRepository extends JpaRepository<AddressDistance
 			      AND (:fromLocation IS NULL OR LOWER(w.name) LIKE LOWER(CONCAT('%', :fromLocation, '%')))
 			      AND (:toLocation IS NULL OR LOWER(c.addressName) LIKE LOWER(CONCAT('%', :toLocation, '%')))
 			""")
-	Page<AddressDistanceProjection> findWarehouseToCustomer(@Param("fromLocation") String fromLocation,
+	Page<AddressDistanceResponse> findWarehouseToCustomer(@Param("fromLocation") String fromLocation,
 			@Param("toLocation") String toLocation, Pageable pageable);
 
 	@Query("""
-			    SELECT ad.addressDistanceId AS addressDistanceId,
-			           c.addressName AS fromLocationName,
-			           w.name AS toLocationName,
-			           ad.distance AS distance
+			    SELECT new openerp.openerpresourceserver.dto.response.AddressDistanceResponse(ad.addressDistanceId,
+			           c.addressName,
+			           w.name,
+			           ad.distance)
 			    FROM AddressDistance ad
 			    JOIN CustomerAddress c ON ad.fromLocationId = c.customerAddressId
 			    JOIN Warehouse w ON ad.toLocationId = w.warehouseId
@@ -49,14 +51,14 @@ public interface AddressDistanceRepository extends JpaRepository<AddressDistance
 			      AND (:fromLocation IS NULL OR LOWER(c.addressName) LIKE LOWER(CONCAT('%', :fromLocation, '%')))
 			      AND (:toLocation IS NULL OR LOWER(w.name) LIKE LOWER(CONCAT('%', :toLocation, '%')))
 			""")
-	Page<AddressDistanceProjection> findCustomerToWarehouse(@Param("fromLocation") String fromLocation,
+	Page<AddressDistanceResponse> findCustomerToWarehouse(@Param("fromLocation") String fromLocation,
 			@Param("toLocation") String toLocation, Pageable pageable);
 
 	@Query("""
-			    SELECT ad.addressDistanceId AS addressDistanceId,
-			           c1.addressName AS fromLocationName,
-			           c2.addressName AS toLocationName,
-			           ad.distance AS distance
+			     SELECT new openerp.openerpresourceserver.dto.response.AddressDistanceResponse(ad.addressDistanceId,
+			           c1.addressName,
+			           c2.addressName,
+			           ad.distance)
 			    FROM AddressDistance ad
 			    JOIN CustomerAddress c1 ON ad.fromLocationId = c1.customerAddressId
 			    JOIN CustomerAddress c2 ON ad.toLocationId = c2.customerAddressId
@@ -65,7 +67,7 @@ public interface AddressDistanceRepository extends JpaRepository<AddressDistance
 			      AND (:fromLocation IS NULL OR LOWER(c1.addressName) LIKE LOWER(CONCAT('%', :fromLocation, '%')))
 			      AND (:toLocation IS NULL OR LOWER(c2.addressName) LIKE LOWER(CONCAT('%', :toLocation, '%')))
 			""")
-	Page<AddressDistanceProjection> findCustomerToCustomer(@Param("fromLocation") String fromLocation,
+	Page<AddressDistanceResponse> findCustomerToCustomer(@Param("fromLocation") String fromLocation,
 			@Param("toLocation") String toLocation, Pageable pageable);
 
 	@Modifying
@@ -105,7 +107,7 @@ public interface AddressDistanceRepository extends JpaRepository<AddressDistance
 			           WHERE ad.distance = 0
 			""")
 	List<AddressDistanceDTO> findCustomerToCustomerWithDistanceZero();
-	
+
 	List<AddressDistance> findByFromLocationTypeAndToLocationType(AddressType fromType, AddressType toType);
 
 }

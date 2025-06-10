@@ -10,9 +10,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import openerp.openerpresourceserver.dto.request.ReceiptCreateRequest;
+import openerp.openerpresourceserver.dto.response.ReceiptInfoResponse;
+import openerp.openerpresourceserver.dto.response.ReceiptResponse;
 import openerp.openerpresourceserver.entity.Receipt;
-import openerp.openerpresourceserver.projection.ReceiptInfoProjection;
-import openerp.openerpresourceserver.projection.ReceiptProjection;
 import openerp.openerpresourceserver.repository.ReceiptRepository;
 
 @Service
@@ -21,11 +21,11 @@ public class ReceiptService {
 	@Autowired
 	private ReceiptRepository receiptRepository;
 
-	public Optional<ReceiptProjection> getReceiptDetailsById(UUID id) {
+	public Optional<ReceiptResponse> getReceiptDetailsById(UUID id) {
         return receiptRepository.findReceiptDetailsById(id);
     }
 
-	public Page<ReceiptInfoProjection> searchReceipts(String status, Pageable pageable) {
+	public Page<ReceiptInfoResponse> searchReceipts(String status, Pageable pageable) {
 		return receiptRepository.findReceiptsByStatus(status, pageable);
 	}
 

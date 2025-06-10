@@ -9,41 +9,40 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import openerp.openerpresourceserver.dto.response.SaleOrderItemDetailResponse;
+import openerp.openerpresourceserver.dto.response.SaleOrderItemResponse;
 import openerp.openerpresourceserver.entity.SaleOrderItem;
-import openerp.openerpresourceserver.projection.SaleOrderItemDetailProjection;
-import openerp.openerpresourceserver.projection.SaleOrderItemProjection;
 
 @Repository
 public interface SaleOrderItemRepository extends JpaRepository<SaleOrderItem, UUID> {
 	@Query("""
-			    SELECT soi.saleOrderItemId AS saleOrderItemId,
-			           p.name AS productName,
-			           soi.quantity AS quantity,
+			    SELECT new openerp.openerpresourceserver.dto.response.SaleOrderItemResponse( soi.saleOrderItemId,
+			           p.name,
+			           soi.quantity,
 			           p.uom AS uom,
-			           soi.priceUnit AS priceUnit,
-			           soi.completed AS completed
+			           soi.priceUnit,
+			           soi.completed)
 			    FROM SaleOrderItem soi
 			    JOIN Product p ON soi.productId = p.productId
 			    WHERE soi.orderId = :orderId
 			    ORDER BY soi.lastUpdated DESC
 			""")
-	List<SaleOrderItemProjection> findSaleOrderItems(@Param("orderId") UUID id);
+	List<SaleOrderItemResponse> findSaleOrderItems(@Param("orderId") UUID id);
 
 	@Query("""
-		    SELECT p.name AS productName,
-		           soi.quantity AS quantity,
-		           soi.priceUnit AS priceUnit,
-		           p.uom AS uom,
-		           soi.completed AS completed,
-		           ca.addressName AS addressName
-		    FROM SaleOrderItem soi
-		    JOIN Product p ON soi.productId = p.productId
-		    JOIN Order o ON soi.orderId = o.orderId
-		    JOIN CustomerAddress ca ON o.customerAddressId = ca.customerAddressId
-		    WHERE soi.saleOrderItemId = :id
-		""")
-		SaleOrderItemDetailProjection findSaleOrderItemDetailById(@Param("id") UUID id);
-
+			    SELECT new openerp.openerpresourceserver.dto.response.SaleOrderItemDetailResponse( p.name,
+			           soi.quantity,
+			           soi.priceUnit,
+			           p.uom,
+			           soi.completed,
+			           ca.addressName)
+			    FROM SaleOrderItem soi
+			    JOIN Product p ON soi.productId = p.productId
+			    JOIN Order o ON soi.orderId = o.orderId
+			    JOIN CustomerAddress ca ON o.customerAddressId = ca.customerAddressId
+			    WHERE soi.saleOrderItemId = :id
+			""")
+	SaleOrderItemDetailResponse findSaleOrderItemDetailById(@Param("id") UUID id);
 
 	@Query("""
 			    SELECT soi.productId

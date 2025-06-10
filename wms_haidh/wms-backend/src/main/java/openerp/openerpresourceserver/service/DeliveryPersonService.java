@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.dto.request.DeliveryPersonCreateRequest;
+import openerp.openerpresourceserver.dto.response.DeliveryPersonResponse;
 import openerp.openerpresourceserver.entity.DeliveryPerson;
 import openerp.openerpresourceserver.entity.User;
-import openerp.openerpresourceserver.projection.DeliveryPersonProjection;
 import openerp.openerpresourceserver.repository.DeliveryPersonRepository;
 import openerp.openerpresourceserver.repository.UserRepository;
 
@@ -25,7 +25,7 @@ public class DeliveryPersonService {
 	private UserRepository userRepository;
 	private DeliveryPersonRepository deliveryPersonRepository;
 
-	public List<DeliveryPersonProjection> getAllDeliveryPersons() {
+	public List<DeliveryPersonResponse> getAllDeliveryPersons() {
 		return deliveryPersonRepository.findAllAvailableDeliveryPersons();
 	}
 

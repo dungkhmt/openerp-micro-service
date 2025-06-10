@@ -15,11 +15,11 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.dto.request.DeliveryTripCreateRequest;
+import openerp.openerpresourceserver.dto.response.DeliveryTripGeneralResponse;
+import openerp.openerpresourceserver.dto.response.DeliveryTripResponse;
+import openerp.openerpresourceserver.dto.response.TodayDeliveryTripResponse;
 import openerp.openerpresourceserver.entity.DeliveryTrip;
 import openerp.openerpresourceserver.entity.DeliveryTripItem;
-import openerp.openerpresourceserver.projection.DeliveryTripGeneralProjection;
-import openerp.openerpresourceserver.projection.DeliveryTripProjection;
-import openerp.openerpresourceserver.projection.TodayDeliveryTripProjection;
 import openerp.openerpresourceserver.repository.DeliveryTripRepository;
 
 @Service
@@ -35,16 +35,16 @@ public class DeliveryTripService {
 	private DeliveryPersonService deliveryPersonService;
 	private OrderService orderService;
 
-	public Page<DeliveryTripProjection> getFilteredDeliveryTrips(String status, Pageable pageable) {
+	public Page<DeliveryTripResponse> getFilteredDeliveryTrips(String status, Pageable pageable) {
 		return deliveryTripRepository.findFilteredDeliveryTrips(status, pageable);
 	}
 
-	public Page<TodayDeliveryTripProjection> getTodayDeliveryTrips(String deliveryPersonId, String status,
+	public Page<TodayDeliveryTripResponse> getTodayDeliveryTrips(String deliveryPersonId, String status,
 			Pageable pageable) {
 		return deliveryTripRepository.findTodayTripsByDeliveryPerson(deliveryPersonId, status, pageable);
 	}
 
-	public DeliveryTripGeneralProjection getDeliveryTripById(String deliveryTripId) {
+	public DeliveryTripGeneralResponse getDeliveryTripById(String deliveryTripId) {
 		return deliveryTripRepository.findDeliveryTripById(deliveryTripId)
 				.orElseThrow(() -> new EntityNotFoundException("DeliveryTrip not found with id: " + deliveryTripId));
 	}

@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
-import openerp.openerpresourceserver.projection.SaleOrderItemDetailProjection;
-import openerp.openerpresourceserver.projection.SaleOrderItemProjection;
+import openerp.openerpresourceserver.dto.response.SaleOrderItemDetailResponse;
+import openerp.openerpresourceserver.dto.response.SaleOrderItemResponse;
 import openerp.openerpresourceserver.service.SaleOrderItemService;
 
 @RestController
@@ -27,13 +27,13 @@ public class SaleOrderItemController {
 
 	@Secured({"ROLE_WMS_WAREHOUSE_MANAGER","ROLE_WMS_ONLINE_CUSTOMER","ROLE_WMS_SALE_MANAGER"})
 	@GetMapping
-	public List<SaleOrderItemProjection> getAllSaleOrderItems(@RequestParam UUID orderId) {
+	public List<SaleOrderItemResponse> getAllSaleOrderItems(@RequestParam UUID orderId) {
 		return saleOrderItemService.getSaleOrderItems(orderId);
 	}
 	
 	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping("/{id}")
-	public SaleOrderItemDetailProjection getSaleOrderItemDetail(@PathVariable UUID id) {
+	public SaleOrderItemDetailResponse getSaleOrderItemDetail(@PathVariable UUID id) {
 		return saleOrderItemService.getSaleOrderItemDetail(id);
 	}
 

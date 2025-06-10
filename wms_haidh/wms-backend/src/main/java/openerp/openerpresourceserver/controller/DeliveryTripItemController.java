@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
-import openerp.openerpresourceserver.projection.CustomerDeliveryProjection;
-import openerp.openerpresourceserver.projection.DeliveryItemDetailProjection;
+import openerp.openerpresourceserver.dto.response.CustomerDeliveryResponse;
+import openerp.openerpresourceserver.dto.response.DeliveryItemDetailResponse;
 import openerp.openerpresourceserver.service.DeliveryTripItemService;
 
 @RestController
@@ -28,18 +28,18 @@ public class DeliveryTripItemController {
 
 	@Secured({ "ROLE_WMS_DELIVERY_PERSON", "ROLE_WMS_DELIVERY_MANAGER" })
 	@GetMapping
-	public ResponseEntity<Page<DeliveryItemDetailProjection>> getDeliveryItems(@RequestParam String deliveryTripId,
+	public ResponseEntity<Page<DeliveryItemDetailResponse>> getDeliveryItems(@RequestParam String deliveryTripId,
 			@RequestParam UUID orderId, @RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size) {
-		Page<DeliveryItemDetailProjection> items = deliveryTripItemService.getDeliveryItems(deliveryTripId, orderId,
+		Page<DeliveryItemDetailResponse> items = deliveryTripItemService.getDeliveryItems(deliveryTripId, orderId,
 				page, size);
 		return ResponseEntity.ok(items);
 	}
 
 	@Secured({ "ROLE_WMS_DELIVERY_PERSON", "ROLE_WMS_DELIVERY_MANAGER" })
 	@GetMapping("/customers")
-	public ResponseEntity<List<CustomerDeliveryProjection>> getCustomers(@RequestParam String deliveryTripId) {
-		List<CustomerDeliveryProjection> customers = deliveryTripItemService
+	public ResponseEntity<List<CustomerDeliveryResponse>> getCustomers(@RequestParam String deliveryTripId) {
+		List<CustomerDeliveryResponse> customers = deliveryTripItemService
 				.getCustomersByDeliveryTripId(deliveryTripId);
 		return ResponseEntity.ok(customers);
 	}

@@ -11,37 +11,37 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import openerp.openerpresourceserver.dto.response.CustomerDeliveryResponse;
+import openerp.openerpresourceserver.dto.response.DeliveryItemDetailResponse;
 import openerp.openerpresourceserver.entity.DeliveryTripItem;
-import openerp.openerpresourceserver.projection.CustomerDeliveryProjection;
-import openerp.openerpresourceserver.projection.DeliveryItemDetailProjection;
 
 @Repository
 public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripItem, UUID> {
 	@Query("""
-			    SELECT DISTINCT
-			        o.orderId AS orderId,
-			        o.customerName AS customerName,
-			        o.customerPhoneNumber AS customerPhoneNumber,
-			        ca.addressName AS customerAddress,
-			        dti.sequence AS sequence,
-			        dti.status AS status
+			    SELECT DISTINCT new openerp.openerpresourceserver.dto.response.CustomerDeliveryResponse(
+			        o.orderId,
+			        o.customerName,
+			        o.customerPhoneNumber,
+			        ca.addressName,
+			        dti.sequence,
+			        dti.status)
 			    FROM DeliveryTripItem dti
 			    JOIN Order o ON dti.orderId = o.orderId
 			    JOIN CustomerAddress ca ON o.customerAddressId = ca.customerAddressId
 			    WHERE dti.deliveryTripId = :deliveryTripId
 			    ORDER BY dti.sequence
 			""")
-	List<CustomerDeliveryProjection> findCustomersByDeliveryTripId(@Param("deliveryTripId") String deliveryTripId);
+	List<CustomerDeliveryResponse> findCustomersByDeliveryTripId(@Param("deliveryTripId") String deliveryTripId);
 
 	@Query("""
-			    SELECT
-			        dti.deliveryTripItemId AS id,
-			        p.name AS productName,
-			        p.weight AS weight,
-			        dti.quantity AS quantity,
-			        p.uom AS uom,
-			        b.code AS bayCode,
-			        aoi.lotId AS lotId
+			   SELECT new openerp.openerpresourceserver.dto.response.DeliveryItemDetailResponse(
+			        dti.deliveryTripItemId ,
+			        p.name,
+			        p.weight,
+			        dti.quantity,
+			        p.uom,
+			        b.code,
+			        aoi.lotId)
 			    FROM DeliveryTripItem dti
 			    JOIN AssignedOrderItem aoi ON dti.assignedOrderItemId = aoi.assignedOrderItemId
 			    JOIN Product p ON aoi.productId = p.productId
@@ -49,7 +49,7 @@ public interface DeliveryTripItemRepository extends JpaRepository<DeliveryTripIt
 			    WHERE dti.deliveryTripId = :deliveryTripId
 			      AND aoi.orderId = :orderId
 			""")
-	Page<DeliveryItemDetailProjection> findDeliveryItemsByTripAndOrder(@Param("deliveryTripId") String deliveryTripId,
+	Page<DeliveryItemDetailResponse> findDeliveryItemsByTripAndOrder(@Param("deliveryTripId") String deliveryTripId,
 			@Param("orderId") UUID orderId, Pageable pageable);
 
 	@Query("SELECT d.assignedOrderItemId FROM DeliveryTripItem d WHERE d.deliveryTripId = :deliveryTripId")

@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
 import openerp.openerpresourceserver.dto.request.ReceiptItemCreateRequest;
+import openerp.openerpresourceserver.dto.response.PutawayItemResponse;
+import openerp.openerpresourceserver.dto.response.ReceiptItemResponse;
 import openerp.openerpresourceserver.entity.Receipt;
 import openerp.openerpresourceserver.entity.ReceiptItem;
-import openerp.openerpresourceserver.projection.PutawayItemProjection;
-import openerp.openerpresourceserver.projection.ReceiptItemProjection;
 import openerp.openerpresourceserver.repository.ReceiptItemRepository;
 import openerp.openerpresourceserver.repository.ReceiptRepository;
 
@@ -30,7 +30,7 @@ public class ReceiptItemService {
 	@Autowired
 	private InventoryService inventoryService;
 
-	public List<ReceiptItemProjection> getItemsByRequestId(UUID receiptItemRequestId) {
+	public List<ReceiptItemResponse> getItemsByRequestId(UUID receiptItemRequestId) {
 		return repository.findByReceiptItemRequestId(receiptItemRequestId);
 	}
 
@@ -61,7 +61,7 @@ public class ReceiptItemService {
 	    return savedReceiptItem;
 	}
 
-	public Page<PutawayItemProjection> getPutawayItems(UUID bayId, String status, Pageable pageable) {
+	public Page<PutawayItemResponse> getPutawayItems(UUID bayId, String status, Pageable pageable) {
 		return repository.findPutawayItems(bayId, status, pageable);
 	}
 

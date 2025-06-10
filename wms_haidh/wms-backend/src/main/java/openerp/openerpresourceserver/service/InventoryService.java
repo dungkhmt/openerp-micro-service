@@ -11,13 +11,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
+import openerp.openerpresourceserver.dto.response.BayResponse;
+import openerp.openerpresourceserver.dto.response.InventoryItemResponse;
+import openerp.openerpresourceserver.dto.response.LotIdResponse;
 import openerp.openerpresourceserver.entity.AssignedOrderItem;
 import openerp.openerpresourceserver.entity.InventoryItem;
 import openerp.openerpresourceserver.entity.InventoryItemDetail;
 import openerp.openerpresourceserver.entity.Warehouse;
-import openerp.openerpresourceserver.projection.BayProjection;
-import openerp.openerpresourceserver.projection.InventoryItemProjection;
-import openerp.openerpresourceserver.projection.LotIdProjection;
 import openerp.openerpresourceserver.repository.InventoryItemDetailRepository;
 import openerp.openerpresourceserver.repository.InventoryItemRepository;
 import openerp.openerpresourceserver.repository.WarehouseRepository;
@@ -85,7 +85,7 @@ public class InventoryService {
 		inventoryItemDetailRepository.save(inventoryItemDetail);
 	}
 
-	public Page<InventoryItemProjection> getInventoryItems(UUID bayId, String lotId, String search, Pageable pageable) {
+	public Page<InventoryItemResponse> getInventoryItems(UUID bayId, String lotId, String search, Pageable pageable) {
 		if (lotId.equals("all"))
 			return inventoryItemRepository.findAllInventoryItems(bayId, search, pageable);
 		else
@@ -98,11 +98,11 @@ public class InventoryService {
 		return warehouseRepository.findAllById(warehouseIds);
 	}
 
-	public List<BayProjection> getBaysWithProductsInSaleOrder(UUID saleOrderItemId, UUID warehouseId) {
-		return inventoryItemRepository.findBayProjectionsBySaleOrderItemIdAndWarehouseId(saleOrderItemId, warehouseId);
+	public List<BayResponse> getBaysWithProductsInSaleOrder(UUID saleOrderItemId, UUID warehouseId) {
+		return inventoryItemRepository.findBaysBySaleOrderItemIdAndWarehouseId(saleOrderItemId, warehouseId);
 	}
 
-	public List<LotIdProjection> getLotIdsBySaleOrderItemIdAndBayId(UUID saleOrderItemId, UUID bayId) {
+	public List<LotIdResponse> getLotIdsBySaleOrderItemIdAndBayId(UUID saleOrderItemId, UUID bayId) {
 		return inventoryItemRepository.findLotIdsBySaleOrderItemIdAndBayId(saleOrderItemId, bayId);
 	}
 

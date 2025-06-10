@@ -8,18 +8,18 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import openerp.openerpresourceserver.dto.response.VehicleResponse;
 import openerp.openerpresourceserver.entity.Vehicle;
-import openerp.openerpresourceserver.projection.VehicleProjection;
 
 @Repository
 public interface VehicleRepository extends JpaRepository<Vehicle, UUID> {
 
-	@Query("SELECT v.vehicleId AS vehicleId, CONCAT(v.licensePlate, ' - ', v.description) AS name, v.maxWeight AS maxWeight "
+	@Query(" SELECT new openerp.openerpresourceserver.dto.response.VehicleResponse( v.vehicleId, CONCAT(v.licensePlate, ' - ', v.description), v.maxWeight) "
 			+ "FROM Vehicle v WHERE v.status = 'AVAILABLE'")
-	List<VehicleProjection> findAllAvailableVehicles();
+	List<VehicleResponse> findAllAvailableVehicles();
 
-	@Query("SELECT v.vehicleId AS vehicleId, " + "CONCAT(v.licensePlate, ' - ', v.description) AS name, "
-			+ "v.maxWeight AS maxWeight " + "FROM Vehicle v " + "WHERE v.vehicleId = :vehicleId")
-	VehicleProjection findVehicleProjectionById(@Param("vehicleId") UUID vehicleId);
+	@Query("SELECT new openerp.openerpresourceserver.dto.response.VehicleResponse( v.vehicleId, " + "CONCAT(v.licensePlate, ' - ', v.description), "
+			+ "v.maxWeight) " + "FROM Vehicle v " + "WHERE v.vehicleId = :vehicleId")
+	VehicleResponse findVehicleProjectionById(@Param("vehicleId") UUID vehicleId);
 
 }

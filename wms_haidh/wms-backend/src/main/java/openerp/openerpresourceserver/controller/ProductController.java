@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -24,13 +23,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AllArgsConstructor;
 import openerp.openerpresourceserver.dto.request.ProductCreateRequest;
+import openerp.openerpresourceserver.dto.response.ProductDetailResponse;
+import openerp.openerpresourceserver.dto.response.ProductGeneralResponse;
+import openerp.openerpresourceserver.dto.response.ProductInventoryResponse;
+import openerp.openerpresourceserver.dto.response.ProductNameResponse;
+import openerp.openerpresourceserver.dto.response.ProductPriceResponse;
+import openerp.openerpresourceserver.dto.response.ProductResponse;
 import openerp.openerpresourceserver.entity.Product;
-import openerp.openerpresourceserver.projection.ProductDetailProjection;
-import openerp.openerpresourceserver.projection.ProductGeneralProjection;
-import openerp.openerpresourceserver.projection.ProductInventoryProjection;
-import openerp.openerpresourceserver.projection.ProductNameProjection;
-import openerp.openerpresourceserver.projection.ProductPriceProjection;
-import openerp.openerpresourceserver.projection.ProductProjection;
 import openerp.openerpresourceserver.service.ProductService;
 
 @RestController
@@ -43,26 +42,32 @@ public class ProductController {
 
 	@Secured("ROLE_WMS_WAREHOUSE_MANAGER")
 	@GetMapping
-	public ResponseEntity<Page<ProductGeneralProjection>> getProductGeneralWithPaging(
+	public ResponseEntity<Page<ProductGeneralResponse>> getProductGeneralWithPaging(
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size,
 			@RequestParam(required = false) String search) {
 
 		Pageable pageable = PageRequest.of(page, size);
-		Page<ProductGeneralProjection> products = productService.getAllProductGeneral(search, pageable);
+		Page<ProductGeneralResponse> products = productService.getAllProductGeneral(search, pageable);
 
 		return ResponseEntity.ok(products);
 	}
 
 	@Secured("ROLE_WMS_PURCHASE_STAFF")
 	@GetMapping("/inventory")
-	public ResponseEntity<Page<ProductInventoryProjection>> getProductInventoryWithPaging(
+	public ResponseEntity<?> getProductInventoryWithPaging(
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size,
 			@RequestParam(required = false) String search, @RequestParam UUID warehouseId, boolean outOfStockOnly) {
 
-		Pageable pageable = PageRequest.of(page, size);
-		Page<ProductInventoryProjection> products = productService.getAllProductInventory(search, pageable, warehouseId, outOfStockOnly);
+		try {
+			Pageable pageable = PageRequest.of(page, size);
+			Page<ProductInventoryResponse> products = productService.getAllProductInventory(search, pageable, warehouseId, outOfStockOnly);
 
-		return ResponseEntity.ok(products);
+			return ResponseEntity.ok(products);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi khi xử lý yêu cầu.");
+		}
+		
 	}
 
 	@Secured("ROLE_WMS_ONLINE_CUSTOMER")
@@ -71,10 +76,8 @@ public class ProductController {
 			@RequestParam(defaultValue = "3") int size, @RequestParam(required = false) String searchTerm,
 			@RequestParam(required = false) UUID categoryId, @RequestParam(defaultValue = "asc") String sortDir) {
 		try {
-			Sort sort = Sort.by("price");
-			sort = sortDir.equalsIgnoreCase("desc") ? sort.descending() : sort.ascending();
-			Pageable pageable = PageRequest.of(page, size, sort);
-			Page<ProductProjection> products = productService.getProducts(pageable, searchTerm, categoryId);
+			Pageable pageable = PageRequest.of(page, size);
+			Page<ProductResponse> products = productService.getProducts(pageable, searchTerm, categoryId, sortDir);
 			return ResponseEntity.ok(products);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -102,7 +105,7 @@ public class ProductController {
 	@GetMapping("/public/{id}")
 	public ResponseEntity<?> getPublicProductDetail(@PathVariable("id") UUID productId) {
 		try {
-			ProductDetailProjection product = productService.getProductDetail(productId);
+			ProductDetailResponse product = productService.getProductDetail(productId);
 
 			if (product != null) {
 				return ResponseEntity.ok(product);
@@ -116,17 +119,17 @@ public class ProductController {
 
 	@Secured("ROLE_WMS_PURCHASE_STAFF")
 	@GetMapping("/names")
-	public ResponseEntity<List<ProductNameProjection>> searchProducts(@RequestParam("search") String searchTerm) {
-		List<ProductNameProjection> products = productService.searchProductNames(searchTerm);
+	public ResponseEntity<List<ProductNameResponse>> searchProducts(@RequestParam("search") String searchTerm) {
+		List<ProductNameResponse> products = productService.searchProductNames(searchTerm);
 		return ResponseEntity.ok(products);
 	}
 
 	@Secured("ROLE_WMS_SALE_MANAGER")
 	@GetMapping("/price")
-	public ResponseEntity<Page<ProductPriceProjection>> getProductsWithPrice(@RequestParam(defaultValue = "0") int page,
+	public ResponseEntity<Page<ProductPriceResponse>> getProductsWithPrice(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "5") int size, @RequestParam(required = false) String search) {
 		Pageable pageable = PageRequest.of(page, size);
-		Page<ProductPriceProjection> productList = productService.getProductsWithPrice(pageable, search);
+		Page<ProductPriceResponse> productList = productService.getProductsWithPrice(pageable, search);
 
 		return ResponseEntity.ok(productList);
 	}
