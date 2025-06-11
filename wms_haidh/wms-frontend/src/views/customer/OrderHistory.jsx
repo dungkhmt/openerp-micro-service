@@ -94,7 +94,7 @@ const OrderHistory = () => {
                                                 <TableCell align="center">{formatDate(order.orderDate)}</TableCell>
                                                 <TableCell align="center">{order.customerName}</TableCell>
                                                 <TableCell align="center">{formatPrice(order.totalOrderCost)}</TableCell>
-                                                <TableCell align="center">{order.status}</TableCell>
+                                                <TableCell align="center">{order.status?.replace(/_/g, ' ')}</TableCell>
                                                 <TableCell align="center">
                                                     <IconButton
                                                         color="primary"

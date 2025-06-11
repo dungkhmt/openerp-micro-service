@@ -73,7 +73,10 @@ const OrderDetail = () => {
                         <Typography><b>Description:</b> {generalInfo && generalInfo.description}</Typography>
                         <Typography><b>Payment Type:</b> {generalInfo && generalInfo.paymentType}</Typography>
                         <Typography><b>Order Type:</b> {generalInfo && generalInfo.orderType}</Typography>
-                        <Typography><b>Status:</b> {generalInfo && generalInfo.status}</Typography>
+                        <Typography>
+                            <b>Status:</b> {generalInfo && generalInfo.status?.replaceAll('_', ' ')}
+                        </Typography>
+
                     </Paper>
                 </Grid>
 
