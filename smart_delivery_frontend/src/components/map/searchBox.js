@@ -7,7 +7,7 @@ import {ListItemIcon} from "@mui/material";
 import {ListItemText} from "@mui/material";
 import { Divider } from "@mui/material";
 import { PLACE_HOLDER_ICON_URL } from "components/constants";
-
+import image from "../../assets/icons/placeholder.png"
 const NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org/search?";
 
 export default function SearchBox(props) {
@@ -72,7 +72,7 @@ export default function SearchBox(props) {
                   >
                     <ListItemIcon>
                       <img
-                        src={ PLACE_HOLDER_ICON_URL }
+                        src={ image }
                         alt="Placeholder"
                         style={{ width: 38, height: 38 }}
                       />

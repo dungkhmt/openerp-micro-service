@@ -107,7 +107,7 @@ const AssignOrder = (props) => {
                 // Fetch current assignments
                 await request(
                     "get",
-                    `/smdeli/ordermanager/order/assign/collector/today/${hubId}`,
+                    `/smdeli/assignment/collector/order/assign/collector/today/${hubId}`,
                     (res) => {
                         setAssignmentData(res.data);
                     }
@@ -186,7 +186,7 @@ const AssignOrder = (props) => {
 
         request(
             "post",
-            "/smdeli/ordermanager/order/suggest/collector",
+            "/smdeli/assignment/collector/order/suggest/collector",
             (res) => {
                 setSuggestedAssignments(res.data);
                 setModifiedAssignments([...res.data]); // Đảm bảo có thể sửa đổi được
@@ -276,15 +276,16 @@ const AssignOrder = (props) => {
 
         request(
             "post",
-            "/smdeli/ordermanager/order/confirm/collector",
+            "/smdeli/assignment/collector/order/confirm/collector",
             (res) => {
                 // Clear saved suggestions after successful confirmation
                 localStorage.removeItem(`assignmentSuggestion_${hubId}`);
                 successNoti(`Phân công thành công ${orderIds.length} đơn hàng`);
+                setLoading(false);
                 // Reload trang sau khi xác nhận thành công
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000); // Delay 1 giây để user thấy notification
+                // setTimeout(() => {
+                //     window.location.reload();
+                // }, 1000); // Delay 1 giây để user thấy notification
             },
             {
                 500: () => {
@@ -422,7 +423,7 @@ const AssignOrder = (props) => {
         try {
             await request(
                 "get",
-                `/smdeli/ordermanager/order/hub/today/${hubId}`,
+                `/smdeli/assignment/collector/order/hub/today/${hubId}`,
                 (res) => {
                     setOrders(res.data);
                 }
@@ -437,7 +438,7 @@ const AssignOrder = (props) => {
         try {
             await request(
                 "get",
-                `/smdeli/ordermanager/order/assign/collector/today/${hubId}`,
+                `/smdeli/assignment/collector/order/assign/collector/today/${hubId}`,
                 (res) => {
                     setAssignmentData(res.data);
                 }
@@ -520,12 +521,7 @@ const AssignOrder = (props) => {
             field: "collectorName",
             width: 120
         },
-        {
-            title: "Thứ tự",
-            field: "sequenceNumber",
-            width: 80,
-            type: "numeric"
-        },
+
         {
             title: "Thao tác",
             sorting: false,
@@ -728,14 +724,8 @@ const AssignOrder = (props) => {
                             </Box>
                         ) : (
                             <Box>
-                                {/* Selection info for orders */}
-                                {selectedOrders.length > 0 && (
-                                    <Box sx={{ mb: 2 }}>
-                                        <Alert severity="info">
-                                            Đã chọn {selectedOrders.length} đơn hàng
-                                        </Alert>
-                                    </Box>
-                                )}
+
+
 
                                 <StandardTable
                                     rowKey="id"

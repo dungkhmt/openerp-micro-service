@@ -16,4 +16,5 @@ export const API_PATH = {
     PRODUCT_PRICE: "/smdeli/hubmanager/product/price-config",
     RECEIPT: "/smdeli/hubmanager/receipt",
     ADMIN: "/smdeli/admin",
+    ASSIGN_COLLECTOR : "smdeli/assignment/collector",
 }

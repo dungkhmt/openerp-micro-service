@@ -10,9 +10,8 @@ import TodayOrder from "../screens/order/TodayOrder";
 import CollectorOrderDetail from "../screens/order/CollectorOrderDetail";
 import InOrder from "../screens/inOut/InOrder";
 import OutOrder from "../screens/inOut/OutOrder";
-import TripOrderItemsOut from "../screens/inOut/TripOrderItemsOut";
-import TripOrderItemsIn from "../screens/inOut/TripOrderItemsIn";
 import AssignOrderShipper from "../screens/order/AssignOrderShipper";
+import OrderTracking from "../screens/order/OrderTracking";
 export default function OrderRouters() {
     let { path } = useRouteMatch();
     console.log("Base path:", path); // Add this line for debugging
@@ -53,7 +52,17 @@ export default function OrderRouters() {
                 <Route
                     component={TodayOrder}
                     exact
-                    path={`${path}/assign/today/me`}
+                    path={`${path}/assign/today/:id`}
+                />
+                <Route
+                    component={TodayOrder}
+                    exact
+                    path={`${path}/assign/collector/today/:id`}
+                />
+                <Route
+                    component={TodayOrder}
+                    exact
+                    path={`${path}/assign/shipper/today/:id`}
                 />
                 <Route
                     component={CollectorOrderDetail}
@@ -66,6 +75,11 @@ export default function OrderRouters() {
                     path={`${path}/shipper/:id`}
                 />
                 <Route
+                    component={OrderTracking}
+                    exact
+                    path={`${path}/tracuu`}
+                />
+                <Route
                     component={InOrder}
                     exact
                     path={`${path}/confirm/in`}
@@ -75,16 +89,7 @@ export default function OrderRouters() {
                     exact
                     path={`${path}/out/confirm`}
                 />
-                <Route
-                    component={TripOrderItemsOut}
-                    exact
-                    path={`${path}/trip/items/:tripId/out`}
-                />
-                <Route
-                    component={TripOrderItemsIn}
-                    exact
-                    path={`${path}/trip/items/:tripId/in`}
-                />
+
 
             </Switch>
         </div>

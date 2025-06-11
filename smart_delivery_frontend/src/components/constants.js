@@ -1,4 +1,4 @@
-export const PLACE_HOLDER_ICON_URL = "../../assets/icons/placeholder.png"
+export const PLACE_HOLDER_ICON_URL = "../../../assets/icons/placeholder.png"
 
 export const BLUE_PLACE_HOLDER_ICON_URL = "../../../../../../../blueplaceholder.png"
 

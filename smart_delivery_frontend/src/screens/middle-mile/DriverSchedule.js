@@ -72,7 +72,7 @@ const DriverSchedule = () => {
     // Helper function to translate status to Vietnamese
     const getStatusText = (status) => {
         switch (status) {
-            case 'PLANNED': return 'PLANNED';
+            case 'PLANNED': return 'Đã lên lịch';
             case 'IN_PROGRESS': return 'Đang thực hiện';
             case 'CONFIRMED_IN': return 'Đã xác nhận';
             case 'CAME_FIRST_STOP': return 'Đã đến điểm đầu';
@@ -80,6 +80,38 @@ const DriverSchedule = () => {
             case 'COMPLETED': return 'Hoàn thành';
             case 'CANCELLED': return 'Đã hủy';
             default: return status;
+        }
+    };
+
+    // Helper function to get stop status text
+    const getStopStatusText = (stop, index, tripStatus) => {
+        // Nếu trip có trạng thái PLANNED và đây là stop đầu tiên
+        if (tripStatus === 'PLANNED' && index === 0) {
+            return 'Điểm dừng kế tiếp';
+        }
+
+        // Các trường hợp khác theo logic cũ
+        switch (stop.status) {
+            case 'CURRENT': return 'Hiện tại';
+            case 'COMPLETED': return 'Hoàn thành';
+            case 'PENDING' : return 'Đang chờ';
+            case 'CAME_STOP' : return 'Đã đến';
+            default: return stop.status;
+        }
+    };
+
+    // Helper function to get stop status color
+    const getStopStatusColor = (stop, index, tripStatus) => {
+        // Nếu trip có trạng thái PLANNED và đây là stop đầu tiên
+        if (tripStatus === 'PLANNED' && index === 0) {
+            return 'primary';
+        }
+
+        // Các trường hợp khác theo logic cũ
+        switch (stop.status) {
+            case 'CURRENT': return 'warning';
+            case 'COMPLETED': return 'success';
+            default: return 'default';
         }
     };
 
@@ -489,7 +521,7 @@ const DriverSchedule = () => {
                                 </CardContent>
                             ) : (
                                 <CardContent>
-                                    <Grid container spacing={3}>
+                                    <Grid container spacing={0}>
                                         {/* Trip Summary */}
                                         <Grid item xs={12}>
                                             <Typography variant="h6" gutterBottom>
@@ -502,9 +534,7 @@ const DriverSchedule = () => {
                                                 <Typography variant="body2" color="text.secondary">
                                                     <strong>Mã tuyến:</strong> {tripDetails.routeCode}
                                                 </Typography>
-                                                <Typography variant="body2" color="text.secondary">
-                                                    <strong>Ngày:</strong> {tripDetails.date}
-                                                </Typography>
+
                                                 {tripDetails.plannedStartTime && (
                                                     <Typography variant="body2" color="text.secondary">
                                                         <strong>Thời gian dự kiến:</strong> {formatTime(tripDetails.plannedStartTime)}
@@ -534,19 +564,19 @@ const DriverSchedule = () => {
                                                         key={stop.id || index}
                                                         sx={{
                                                             mb: 1,
-                                                            borderLeft: stop.status === 'CURRENT' ? '4px solid #ff9800' :
-                                                                stop.status === 'COMPLETED' ? '4px solid #4caf50' : 'none'
+                                                            borderLeft:
+                                                            // Nếu trip PLANNED và stop đầu tiên
+                                                                (tripDetails.status === 'PLANNED' && index === 0) ? '4px solid #2196f3' :
+                                                                    // Các trường hợp khác
+                                                                    stop.status === 'CURRENT' ? '4px solid #ff9800' :
+                                                                        stop.status === 'COMPLETED' ? '4px solid #4caf50' : 'none'
                                                         }}
                                                     >
                                                         <ListItem
                                                             secondaryAction={
                                                                 <Chip
-                                                                    label={stop.status === 'CURRENT' ? 'Hiện tại' :
-                                                                        stop.status === 'COMPLETED' ? 'Hoàn thành' : stop.status}
-                                                                    color={
-                                                                        stop.status === 'CURRENT' ? 'warning' :
-                                                                            stop.status === 'COMPLETED' ? 'success' : 'default'
-                                                                    }
+                                                                    label={getStopStatusText(stop, index, tripDetails.status)}
+                                                                    color={getStopStatusColor(stop, index, tripDetails.status)}
                                                                     size="small"
                                                                 />
                                                             }
@@ -560,16 +590,13 @@ const DriverSchedule = () => {
                                                                 secondary={
                                                                     <>
                                                                         <Typography variant="body2" color="text.secondary">
-                                                                            {stop.address}
-                                                                        </Typography>
+                                                                            <Typography variant="body2" color="text.secondary">
+                                                                                {`${stop.address} - ${stop.district} - ${stop.city}`}
+                                                                            </Typography>                                                                        </Typography>
                                                                         <Typography variant="body2" color="text.secondary">
                                                                             Đơn hàng: {stop.orderCount || 0}
                                                                         </Typography>
-                                                                        {stop.estimatedArrivalTime && (
-                                                                            <Typography variant="body2" color="text.secondary">
-                                                                                Thời gian dự kiến đến: {stop.estimatedArrivalTime}
-                                                                            </Typography>
-                                                                        )}
+
                                                                     </>
                                                                 }
                                                             />

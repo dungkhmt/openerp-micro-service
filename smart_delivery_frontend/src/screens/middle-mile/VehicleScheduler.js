@@ -261,7 +261,7 @@ const VehicleScheduler = () => {
                     borderRadius: 2
                 }}>
                     <Typography id="modal-title" variant="h6" component="h2" sx={{ mb: 3 }}>
-                        {selectedAssignment ? "Chi tiết phân công" : "Phân công phương tiện mới"}
+                        {selectedAssignment ? "Chi tiết phân công" : "Phân công lịch trình cho phương tiện"}
                     </Typography>
 
                     {selectedAssignment ? (

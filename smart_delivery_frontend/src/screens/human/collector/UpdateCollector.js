@@ -28,10 +28,13 @@ import {useHistory} from "react-router";
 import {useParams, useRouteMatch} from "react-router-dom";
 import useStyles from "screens/styles.js";
 import {API_PATH} from "../../apiPaths";
+import {useSelector} from "react-redux";
 
 const UpdateCollector = () => {
 
     const {id: collectorId} = useParams();
+    const role = useSelector((state) => state.auth.user?.role);
+
     const classes = useStyles();
     const [isLoading, setLoading] = useState(true);
     const [districtOptions, setDistrictOptions] = useState([]);
@@ -189,7 +192,7 @@ const UpdateCollector = () => {
                           className={classes.headerBox} >
                         <Grid>
                             <Typography variant="h5">
-                                {"Thông tin nhân viên giao hàng" }
+                                {"Thông tin nhân viên thu gom" }
                             </Typography>
                         </Grid>
                         <Grid className={classes.buttonWrap}>
@@ -423,55 +426,144 @@ const UpdateCollector = () => {
                                         </Typography>
                                         <Grid container spacing={3} className={classes.inforWrap}>
                                             <Grid item xs={7}>
+
                                                 <Box className={classes.inputWrap}>
+
                                                     <Box className={classes.labelInput}>
+
                                                         Tên đăng nhập
+
                                                     </Box>
-                                                    <TextField
-                                                        fullWidth
-                                                        variant="outlined"
-                                                        size="small"
-                                                        inputRef={register({ required: "Vui lòng điền tên đăng nhập" })}
-                                                        name="username"
-                                                        error={!!errors.username}
-                                                        helperText={errors.username?.message}
-                                                        value={formData.username}
-                                                        onChange={(e) => handleInputChange(e)}
-                                                    />
+
+                                                    {role === "HUB_MANAGER" ? (
+
+                                                        <TextField
+
+                                                            fullWidth
+
+                                                            variant="outlined"
+
+                                                            size="small"
+
+                                                            name="username"
+
+                                                            value={formData.username}
+
+                                                            InputProps={{
+
+                                                                readOnly: true,
+
+                                                            }}
+
+                                                            sx={{
+
+                                                                '& .MuiInputBase-input': {
+
+                                                                    backgroundColor: '#f5f5f5',
+
+                                                                },
+
+                                                            }}
+
+                                                        />
+
+                                                    ) : (
+
+                                                        <TextField
+
+                                                            fullWidth
+
+                                                            variant="outlined"
+
+                                                            size="small"
+
+                                                            inputRef={register({ required: "Vui lòng điền tên đăng nhập" })}
+
+                                                            name="username"
+
+                                                            error={!!errors.username}
+
+                                                            helperText={errors.username?.message}
+
+                                                            value={formData.username}
+
+                                                            onChange={(e) => handleInputChange(e)}
+
+                                                        />
+
+                                                    )}
+
                                                 </Box>
+
                                             </Grid>
-                                            <Grid item xs={7}>
-                                                <Box className={classes.inputWrap}>
-                                                    <Box className={classes.labelInput}>
-                                                        Mật khẩu
+
+                                            {role !== "HUB_MANAGER" && (
+
+                                                <Grid item xs={7}>
+
+                                                    <Box className={classes.inputWrap}>
+
+                                                        <Box className={classes.labelInput}>
+
+                                                            Mật khẩu
+
+                                                        </Box>
+
+                                                        <TextField
+
+                                                            fullWidth
+
+                                                            variant="outlined"
+
+                                                            size="small"
+
+                                                            inputRef={register({ required: "Vui lòng điền mật khẩu" })}
+
+                                                            name="password"
+
+                                                            type={showPassword ? 'text' : 'password'} // Đổi giữa type text và password
+
+                                                            error={!!errors.password}
+
+                                                            helperText={errors.password?.message}
+
+                                                            value={formData.password}
+
+                                                            onChange={(e) => handleInputChange(e)}
+
+                                                            InputProps={{
+
+                                                                endAdornment: (
+
+                                                                    <InputAdornment position="end">
+
+                                                                        <IconButton
+
+                                                                            onClick={handleClickShowPassword}
+
+                                                                            onMouseDown={(e) => e.preventDefault()} // Ngăn chặn sự kiện mặc định khi nhấn giữ
+
+                                                                            edge="end"
+
+                                                                        >
+
+                                                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+
+                                                                        </IconButton>
+
+                                                                    </InputAdornment>
+
+                                                                ),
+
+                                                            }}
+
+                                                        />
+
                                                     </Box>
-                                                    <TextField
-                                                        fullWidth
-                                                        variant="outlined"
-                                                        size="small"
-                                                        inputRef={register({ required: "Vui lòng điền mật khẩu" })}
-                                                        name="password"
-                                                        type={showPassword ? 'text' : 'password'} // Đổi giữa type text và password
-                                                        error={!!errors.password}
-                                                        helperText={errors.password?.message}
-                                                        value={formData.password}
-                                                        onChange={(e) => handleInputChange(e)}
-                                                        InputProps={{
-                                                            endAdornment: (
-                                                                <InputAdornment position="end">
-                                                                    <IconButton
-                                                                        onClick={handleClickShowPassword}
-                                                                        onMouseDown={(e) => e.preventDefault()} // Ngăn chặn sự kiện mặc định khi nhấn giữ
-                                                                        edge="end"
-                                                                    >
-                                                                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                                                                    </IconButton>
-                                                                </InputAdornment>
-                                                            ),
-                                                        }}
-                                                    />
-                                                </Box>
-                                            </Grid>
+
+                                                </Grid>
+
+                                            )}
 
                                         </Grid>
 

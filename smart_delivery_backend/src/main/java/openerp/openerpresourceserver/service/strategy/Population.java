@@ -28,7 +28,7 @@ public class Population {
         this.distanceMatrix = distanceMatrix; // Nhận mảng khoảng cách
 
         for (int i = 0; i < populationSize; i++) {
-            Individual individual = new Individual(senderMap, orderList.size(), employees.size(), orderList, graphHopperCalculator, distanceMatrix);
+            Individual individual = new Individual(orderList.size(), employees.size(), orderList, graphHopperCalculator, distanceMatrix);
             individual.randomInit();
             this.individuals.add(individual);
         }
@@ -59,10 +59,16 @@ public class Population {
     }
 
     public List<Individual> reproduct(List<Individual> parents) {
-        List<Individual> offspring = new ArrayList<>();
         Random random = new Random();
         int parentSize = parents.size();
+        List<Individual> offspring = new ArrayList<>(); // Giữ lại các cá thể cha mẹ
 
+        // 1. ELITISM - Chỉ giữ lại 1-2 cá thể tốt nhất (5-10%)
+        int eliteSize = Math.max(1, populationSize / 20); // 5% elite
+        individuals.sort(Comparator.comparingDouble(Individual::getFitness).reversed());
+        for (int i = 0; i < eliteSize && i < individuals.size(); i++) {
+            offspring.add(individuals.get(i)); // Copy cá thể tốt nhất
+        }
         while(offspring.size()< populationSize){
             int p1 = random.nextInt(parentSize);
             int p2 = random.nextInt(parentSize);
@@ -82,7 +88,11 @@ public class Population {
 
     public void mutate(List<Individual> offspring) {
         Random random = new Random();
-        for (Individual individual : offspring) {
+        int eliteSize = Math.max(1, populationSize / 20); // 5% elite
+
+        // Chỉ mutate các cá thể không phải elite (từ index eliteSize trở đi)
+        for (int i = eliteSize; i < offspring.size(); i++) {
+            Individual individual = offspring.get(i);
             if (random.nextDouble() < mutationRate) {
                 individual.mutate();
             }

@@ -6,14 +6,14 @@ export const humanResources = {
         {
             id: "MENU_EMPLOYEE_COLLECTOR",
             path: "/employee/collector",
-            text: "Danh sách collector",
+            text: "Danh sách nhân viên thu gom",
             child: [],
         },
         {
             id: "MENU_EMPLOYEE_SHIPPER",
             path: "/employee/shipper",
             icon: "StarBorder",
-            text: "Danh sách shipper",
+            text: "Danh sách nhân viên giao hàng",
             child: [],
         },
         {

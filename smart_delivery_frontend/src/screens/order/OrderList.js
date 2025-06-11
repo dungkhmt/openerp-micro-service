@@ -212,12 +212,7 @@ function OrderList() {
                 </span>
             )
         },
-        {
-            title: "In/chưa in",
-            field: "isPrinted",
-            sorting: false,
-            renderCell: (rowData) => rowData.isPrinted ? "Đã in" : "Chưa in"
-        },
+
         {
             title: "Thao tác",
             field: "actions",
@@ -382,10 +377,7 @@ function OrderList() {
     // Custom actions for the table toolbar
     const tableActions = [
     
-        {
-            tooltip: "Xóa hàng loạt",
-            iconOnClickHandle: handleBulkDelete
-        }
+
     ];
 
     // Additional props for the editable functionality

@@ -48,9 +48,7 @@ function ColectorList() {
         {
             title: "Email",
             field: "email",
-        },
-        { title: "Trạng thái", field: "status" },
-        {
+        },  {
             title: "Thao tác",
             field: "actions", // Field này vẫn cần để tránh lỗi nếu StandardTable sử dụng nó
             centerHeader: true,
@@ -120,7 +118,7 @@ function ColectorList() {
         <div>
             <StandardTable
                 rowKey="id"
-                title="Danh sách nhân viên lấy hàng"
+                title="Danh sách nhân viên thu gom"
                 columns={columns}
                 data={collectors}
                 options={{

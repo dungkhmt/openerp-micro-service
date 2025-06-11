@@ -45,7 +45,7 @@ public class GraphHopperCalculator  {
         if (path == null) {
             throw new NotFoundException(String.format("Not path found from Point(lat:%f, lon:%f) to Point(lat:%f, lon:%f)", fromLat, fromLon, toLat, toLon));
         }
-        return path.getDistance();
+        return path.getDistance()/1000; // Trả về khoảng cách tính bằng km
     }
 
     private double roundBigDecimal(BigDecimal b) {

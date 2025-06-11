@@ -43,7 +43,6 @@ import {config} from "./menuconfig/config";
 
 export const MENUS = [];
 
-MENUS.push(general);
 MENUS.push(hub);
 MENUS.push(order);
 MENUS.push(humanResources);

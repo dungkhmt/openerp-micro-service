@@ -835,11 +835,7 @@ const UpdateOrder = () =>{
                                                             <strong>Người thay đổi:</strong> {history.changedBy}
                                                         </Typography>
                                                     )}
-                                                    {history.changeReason && (
-                                                        <Typography variant="body2">
-                                                            <strong>Lý do:</strong> {history.changeReason}
-                                                        </Typography>
-                                                    )}
+
 
                                                 </Box>
                                             }

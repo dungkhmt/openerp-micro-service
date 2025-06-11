@@ -546,7 +546,7 @@ const TripManagement = () => {
                             startIcon={<AddIcon />}
                             onClick={handleOpenRouteDialog}
                         >
-                            Create New Route
+                            Tạo tuyến đường mới
                         </Button>
                     </Box>
 
@@ -572,7 +572,7 @@ const TripManagement = () => {
                             startIcon={<AddIcon />}
                             onClick={handleOpenModal}
                         >
-                            Create New Route Schedule
+                            Tạo lịch trình mới
                         </Button>
                     </Box>
 
@@ -613,7 +613,7 @@ const TripManagement = () => {
 
                     <Box component="form" sx={{ mt: 3 }}>
                         <FormControl fullWidth sx={{ mb: 3 }}>
-                            <InputLabel id="route-schedule-label">Route</InputLabel>
+                            <InputLabel id="route-schedule-label">Tuyến</InputLabel>
                             <Select
                                 labelId="route-schedule-label"
                                 value={selectedRoute || ''}
@@ -689,13 +689,13 @@ const TripManagement = () => {
 
             {/* Create Route Dialog */}
             <Dialog open={openRouteDialog} onClose={handleCloseRouteDialog} maxWidth="md" fullWidth>
-                <DialogTitle>Create New Route</DialogTitle>
+                <DialogTitle>Tạo tuyến đường mới</DialogTitle>
                 <DialogContent>
                     <Box sx={{ mt: 2 }}>
                         <Grid container spacing={2}>
                             <Grid item xs={12} md={6}>
                                 <TextField
-                                    label="Route Code"
+                                    label="Mã tuyến đường"
                                     name="routeCode"
                                     value={routeForm.routeCode}
                                     onChange={handleRouteFormChange}
@@ -705,7 +705,7 @@ const TripManagement = () => {
                             </Grid>
                             <Grid item xs={12} md={6}>
                                 <TextField
-                                    label="Route Name"
+                                    label="Tên tuyến đường"
                                     name="routeName"
                                     value={routeForm.routeName}
                                     onChange={handleRouteFormChange}
@@ -715,20 +715,9 @@ const TripManagement = () => {
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
-                                    label="Description"
+                                    label="Mô tả"
                                     name="description"
                                     value={routeForm.description}
-                                    onChange={handleRouteFormChange}
-                                    fullWidth
-                                    multiline
-                                    rows={2}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    label="Notes"
-                                    name="notes"
-                                    value={routeForm.notes}
                                     onChange={handleRouteFormChange}
                                     fullWidth
                                     multiline
@@ -738,7 +727,7 @@ const TripManagement = () => {
                         </Grid>
 
                         <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
-                            Route Stops
+                            Các điểm dừng trên tuyến
                         </Typography>
 
                         {routeForm.stops.map((stop, index) => (
@@ -760,9 +749,9 @@ const TripManagement = () => {
                                         </Select>
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={6} md={3}>
+                                <Grid item xs={6} md={2}>
                                     <TextField
-                                        label="Sequence"
+                                        label="Số thứ tự"
                                         type="number"
                                         value={stop.stopSequence}
                                         onChange={(e) => handleStopChange(index, 'stopSequence', parseInt(e.target.value))}
@@ -770,9 +759,9 @@ const TripManagement = () => {
                                         disabled
                                     />
                                 </Grid>
-                                <Grid item xs={6} md={2}>
+                                <Grid item xs={6} md={3}>
                                     <TextField
-                                        label="Wait Time (min)"
+                                        label="Thời gian chờ ước tính (phút)"
                                         type="number"
                                         value={stop.estimatedWaitTime}
                                         onChange={(e) => handleStopChange(index, 'estimatedWaitTime', parseInt(e.target.value))}
@@ -786,7 +775,7 @@ const TripManagement = () => {
                                             onClick={() => removeStop(index)}
                                             size="small"
                                         >
-                                            Remove
+                                            Xóa
                                         </Button>
                                     )}
                                 </Grid>
@@ -799,18 +788,18 @@ const TripManagement = () => {
                             sx={{ mt: 1 }}
                             startIcon={<AddIcon />}
                         >
-                            Add Stop
+                            Thêm điểm dừng
                         </Button>
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseRouteDialog}>Cancel</Button>
+                    <Button onClick={handleCloseRouteDialog}>Hủy</Button>
                     <Button
                         onClick={handleSubmitRoute}
                         variant="contained"
                         disabled={!routeForm.routeCode || !routeForm.routeName || routeForm.stops.some(stop => !stop.hubId)}
                     >
-                        Create Route
+                        Tạo tuyến đường
                     </Button>
                 </DialogActions>
             </Dialog>

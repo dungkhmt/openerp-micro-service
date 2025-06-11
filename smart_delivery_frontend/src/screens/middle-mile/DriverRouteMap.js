@@ -479,49 +479,10 @@ const DriverRouteMap = () => {
 
     return (
         <Box sx={{ p: 3 }}>
-            <Button
-                startIcon={<ArrowBackIcon />}
-                onClick={handleBack}
-                sx={{ mb: 2 }}
-            >
-                Back to Dashboard
-            </Button>
+            {/* Header with buttons - removed route name */}
 
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h4">
-                    Route Map: {activeTrip?.routeName || 'Loading...'}
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                    <Button
-                        variant="outlined"
-                        startIcon={<MapIcon />}
-                        onClick={handleViewOrders}
-                    >
-                        View Orders
-                    </Button>
-                    {activeTrip ? (
-                        canCompleteTrip ? (
-                            <Button
-                                variant="contained"
-                                color="success"
-                                onClick={handleCompleteTrip}
-                            >
-                                Complete Trip
-                            </Button>
-                        ) : null
-                    ) : (
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={handleStartTrip}
-                        >
-                            Start Trip
-                        </Button>
-                    )}
-                </Box>
-            </Box>
 
-            {/* Trip information banner */}
+            {/* Trip information banner - now includes route name */}
             {activeTrip && (
                 <Paper
                     sx={{
@@ -538,13 +499,13 @@ const DriverRouteMap = () => {
                 >
                     <Box>
                         <Typography variant="h6">
-                            Active Trip - Stop {currentStop} of {stopSequence.length}{isLastStop ? " (Final Stop)" : ""}
+                            Tuyến {activeTrip.routeName} - Điểm dừng {currentStop}/{stopSequence.length}{isLastStop ? " (Final Stop)" : ""}
                         </Typography>
                         <Typography variant="body2">
-                            Started: {activeTrip.startTime ? new Date(activeTrip.startTime).toLocaleString() : 'Not started'}
+                            Mã tuyến : {activeTrip.routeCode} - Khởi hành lúc: {activeTrip.startTime ? new Date(activeTrip.startTime).toLocaleString() : 'Not started'}
                         </Typography>
                         <Typography variant="body2">
-                            Status: {activeTrip.status}
+                            Trạng thái: {activeTrip.status}
                         </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', gap: 2 }}>
@@ -554,7 +515,7 @@ const DriverRouteMap = () => {
                                 color="info"
                                 onClick={handleDoneStop}
                             >
-                                Done Stop
+                                Hoàn thành điểm dừng
                             </Button>
                         )}
 
@@ -573,62 +534,12 @@ const DriverRouteMap = () => {
 
             <Grid container spacing={3}>
                 <Grid item xs={12} md={4}>
-                    <Card sx={{ mb: 3 }}>
-                        <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                <RouteIcon fontSize="large" color="primary" sx={{ mr: 2 }} />
-                                <Typography variant="h6">
-                                    Route Information
-                                </Typography>
-                            </Box>
-                            <Divider sx={{ mb: 2 }} />
-                            <Grid container spacing={2}>
-                                <Grid item xs={12}>
-                                    <Typography variant="subtitle2" color="text.secondary">
-                                        Route
-                                    </Typography>
-                                    <Typography variant="body1" gutterBottom>
-                                        {activeTrip?.routeName || "Not assigned"}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="subtitle2" color="text.secondary">
-                                        Orders
-                                    </Typography>
-                                    <Typography variant="body1">
-                                        Picked up: {activeTrip?.ordersCount || 0}  Delivered: {activeTrip?.ordersDelivered || 0}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="subtitle2" color="text.secondary">
-                                        Status
-                                    </Typography>
-                                    <Chip
-                                        label={activeTrip?.status || "Not started"}
-                                        color={
-                                            !activeTrip ? 'default' :
-                                                activeTrip?.status === 'CAME_FIRST_STOP' ? 'info' :
-                                                    activeTrip?.status === 'DONE_STOP' ? 'warning' :
-                                                        activeTrip?.status === 'CAME_STOP' ? 'info' :
-                                                            activeTrip?.status === 'PICKED_UP' ? 'primary' :
-                                                                activeTrip?.status === 'DELIVERED' ? 'secondary' :
-                                                                    activeTrip?.status === 'CONFIRMED_IN' ? 'warning' :
-                                                                        activeTrip?.status === 'COMPLETED' ? 'success' : 'default'
-                                        }
-                                        size="small"
-                                    />
-                                </Grid>
-                            </Grid>
-                        </CardContent>
-                    </Card>
-
-
                     <Card>
                         <CardContent>
                             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                                 <DateRangeIcon fontSize="large" color="primary" sx={{ mr: 2 }} />
                                 <Typography variant="h6">
-                                    Route Stops
+                                    Danh sách điểm dừng
                                 </Typography>
                             </Box>
                             <Divider sx={{ mb: 2 }} />
@@ -685,7 +596,7 @@ const DriverRouteMap = () => {
                                                 </Box>
                                                 {isCurrent && activeTrip && (
                                                     <Chip
-                                                        label="CURRENT"
+                                                        label="Điểm hiện tại"
                                                         color="success"
                                                         size="small"
                                                         sx={{ ml: 1 }}
@@ -704,8 +615,8 @@ const DriverRouteMap = () => {
                                                     onClick={() => handleArrivalAtHub(stop.hubId, stopNumber)}
                                                 >
                                                     {isOriginHub
-                                                        ? "Process Pickup Orders"
-                                                        : "Process Delivery Orders"}
+                                                        ? "Xử lý lấy hàng"
+                                                        : "Xử lý giao hàng"}
                                                 </Button>
                                             )}
 
@@ -722,7 +633,7 @@ const DriverRouteMap = () => {
                                             {isPending && (
                                                 <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                     <Typography variant="body2" color="text.secondary">
-                                                        Upcoming stop
+                                                        Điểm tiếp theo
                                                     </Typography>
                                                 </Box>
                                             )}
@@ -746,7 +657,7 @@ const DriverRouteMap = () => {
                                     hub={hub}
                                     currentLocation={currentLocation}
                                     currentStop={currentStop}
-                                    nextPointLabel="Next Stop"
+                                    nextPointLabel="Điểm dừng tiếp theo"
                                 />
                             ) : (
                                 <Box
@@ -762,7 +673,19 @@ const DriverRouteMap = () => {
                     </Card>
                 </Grid>
             </Grid>
-
+            <Button
+                variant="outlined"
+                startIcon={<MapIcon />}
+                onClick={handleViewOrders}
+            >
+                View Orders
+            </Button>
+            <Button
+                startIcon={<ArrowBackIcon />}
+                onClick={handleBack}
+            >
+                Back to Dashboard
+            </Button>
             {/* Arrival confirmation dialog */}
             <Dialog
                 open={confirmArrivalDialog}

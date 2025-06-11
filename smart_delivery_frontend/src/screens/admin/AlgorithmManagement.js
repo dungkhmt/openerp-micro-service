@@ -21,15 +21,15 @@ const AlgorithmManagement = () => {
     const algorithmInfo = {
         'GreedyStrategy': {
             name: 'Giải thuật Tham lam',
-            description: 'Thuật toán đơn giản và nhanh chóng gán từng đơn hàng cho nhân viên gần nhất. Phù hợp với phân phối quy mô nhỏ nhưng có thể không luôn đưa ra giải pháp tối ưu nhất.',
-            bestFor: 'Phân công nhanh, dữ liệu nhỏ, phân phối thời gian thực',
+            description: 'Thuật toán đơn giản và nhanh chóng gán từng đơn hàng cho nhân viên gần nhất. Kết quả đưa ra thường không giải pháp tối ưu nhưng có thể châp nhận được.',
+            bestFor: 'Trường hợp cần kết quả tốc độ nhanh và độ tối ưu mức khá,',
             complexity: 'Thấp',
             timeComplexity: 'O(n)'
         },
         'GAStrategy': {
             name: 'Giải thuật Di truyền (GA)',
             description: 'Thuật toán tiến hóa tối ưu hóa phân phối đơn hàng bằng cách mô phỏng quá trình chọn lọc tự nhiên. Tạo ra các tuyến đường tốt hơn qua nhiều thế hệ và có thể tìm thấy các giải pháp tối ưu hơn.',
-            bestFor: 'Bài toán phân phối phức tạp, dữ liệu lớn, tối ưu hóa nhiều ràng buộc',
+            bestFor: 'Trường hợp cần kết quả tốc độ mức khá và độ tối ưu cao.',
             complexity: 'Cao',
             timeComplexity: 'O(n * g)',
             note: 'Trong đó g là số thế hệ (hiện tại là 50)'
@@ -191,20 +191,6 @@ const AlgorithmManagement = () => {
                                                         {algorithmInfo[selectedAlgorithm]?.bestFor || 'Mục đích chung'}
                                                     </Typography>
 
-                                                    <Typography variant="subtitle2" color="primary" gutterBottom>
-                                                        Độ phức tạp:
-                                                    </Typography>
-                                                    <Typography variant="body2">
-                                                        {algorithmInfo[selectedAlgorithm]?.complexity || 'Không xác định'}
-                                                        {algorithmInfo[selectedAlgorithm]?.timeComplexity &&
-                                                            ` (${algorithmInfo[selectedAlgorithm].timeComplexity})`}
-                                                    </Typography>
-
-                                                    {algorithmInfo[selectedAlgorithm]?.note && (
-                                                        <Typography variant="body2" sx={{ mt: 1, fontStyle: 'italic' }}>
-                                                            Ghi chú: {algorithmInfo[selectedAlgorithm].note}
-                                                        </Typography>
-                                                    )}
                                                 </Box>
                                             </Box>
                                         )}

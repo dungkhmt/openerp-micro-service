@@ -17,6 +17,7 @@ import java.util.UUID;
 public class TripDetailsDTO {
     private UUID id;
     private UUID routeId;
+    private String routeCode;
     private String routeName;
     private TripStatus status;
     private Instant startTime;

@@ -26,7 +26,7 @@ export const middleMile = {
         {
             id: "MENU_ROUTE.TRIP",
             path: "/middle-mile/trip/manage",
-            text: "Quản lý trip",
+            text: "Quản lý chuyến xe",
             child: [],
         },
         // {

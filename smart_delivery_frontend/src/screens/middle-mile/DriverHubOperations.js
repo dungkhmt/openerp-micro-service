@@ -244,7 +244,7 @@ const DriverHubOperations = () => {
 
     // Process orders based on operation type
     const processOrders = async () => {
-    
+
 
         setOperationLoading(true);
         try {
@@ -465,89 +465,73 @@ const DriverHubOperations = () => {
         <Container maxWidth="lg">
             <Box sx={{ mt: 3, mb: 6 }}>
                 {/* Header with back button */}
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                    <IconButton onClick={handleBack} sx={{ mr: 2 }}>
-                        <ArrowBackIcon />
-                    </IconButton>
-                    <Typography variant="h4" component="h1">
-                        {operationType === 'pickup' ? 'Lấy hàng' : 'Giao hàng'}
-                    </Typography>
-                </Box>
+
 
                 {/* Hub Information Card */}
                 {hub && (
-                    <Card sx={{ mb: 4, boxShadow: 3 }}>
-                        <CardHeader
-                            avatar={<PlaceIcon fontSize="large" color="primary" />}
-                            title={
-                                <Typography variant="h5">{hub.name} ({hub.code})</Typography>
-                            }
-                            subheader={hub.address}
-                        />
-                        <CardContent>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12} md={4}>
-                                    <Typography variant="body2" color="text.secondary">Loại hoạt động:</Typography>
+                    <Card sx={{ mb: 4, boxShadow: 3, bgcolor: 'primary.main', color: 'white' }}>
+                        <CardContent sx={{ p: 3 }}>
+                            {/* Header with back button and title */}
+                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                                <IconButton onClick={handleBack} sx={{ mr: 2, color: 'white' }}>
+                                    <ArrowBackIcon />
+                                </IconButton>
+                                <PlaceIcon fontSize="large" sx={{ mr: 2 }} />
+                                <Box>
+                                    <Typography variant="h5" sx={{ opacity: 0.9 }}>
+                                        {hub.name} ({hub.code})
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                                        {hub.address}
+                                    </Typography>
+                                </Box>
+                            </Box>
+
+                            {/* Information Grid */}
+                            <Grid container spacing={3}>
+                                <Grid item xs={12} sm={6} md={2}>
+                                    <Typography variant="body2" sx={{ opacity: 0.8 }}>Loại hoạt động:</Typography>
                                     <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                                         {operationType === 'pickup' ? 'Lấy hàng' : 'Giao hàng'}
                                     </Typography>
                                 </Grid>
-                                <Grid item xs={12} md={4}>
-                                    <Typography variant="body2" color="text.secondary">Phương tiện:</Typography>
-                                    <Typography variant="body1">
+                                <Grid item xs={12} sm={6} md={2}>
+                                    <Typography variant="body2" sx={{ opacity: 0.8 }}>Phương tiện:</Typography>
+                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                                         {vehicle?.plateNumber} ({vehicle?.vehicleType})
                                     </Typography>
                                 </Grid>
-                                <Grid item xs={12} md={4}>
-                                    <Typography variant="body2" color="text.secondary">Đơn hàng chờ xử lý:</Typography>
-                                    <Typography variant="body1" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                                <Grid item xs={12} sm={6} md={2}>
+                                    <Typography variant="body2" sx={{ opacity: 0.8 }}>Đơn hàng chờ xử lý:</Typography>
+                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                                         {pendingOrders.length} {operationType === 'pickup' ? 'cần lấy' : 'cần giao'}
                                     </Typography>
                                 </Grid>
-                            </Grid>
-                        </CardContent>
-                    </Card>
-                )}
+                                {tripDetails && (
+                                    <Grid item xs={12} sm={6} md={2}>
+                                        <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                                            <LocalShippingIcon sx={{ fontSize: 16, mr: 0.5, verticalAlign: 'middle' }} />
+                                            Chuyến đi:
+                                        </Typography>
+                                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                            {isLastStop ? 'Điểm cuối' : `Điểm ${tripDetails.currentStopIndex + 1}/${tripDetails.stops?.length}`}
+                                        </Typography>
+                                    </Grid>
 
-                {/* Trip Information (if part of a trip) */}
-                {tripDetails && (
-                    <Card sx={{ mb: 4, boxShadow: 3, bgcolor: 'primary.light', color: 'white' }}>
-                        <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                <LocalShippingIcon sx={{ mr: 2, fontSize: 28 }} />
-                                <Typography variant="h6">
-                                    Chuyến đi đang hoạt động - {isLastStop ? 'Điểm cuối' : `Điểm dừng ${tripDetails.currentStopIndex + 1} / ${tripDetails.stops?.length}`}
-                                </Typography>
-                            </Box>
-                            <Divider sx={{ mb: 2, borderColor: 'rgba(255,255,255,0.3)' }} />
-                            <Grid container spacing={2}>
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="body2" sx={{ opacity: 0.8 }}>Điểm dừng hiện tại:</Typography>
-                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                        {tripDetails.stops?.[tripDetails.currentStopIndex]?.hubName || 'Không xác định'}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={12} md={6}>
+                                )}
+                                <Grid item xs={12} md={3}>
                                     <Typography variant="body2" sx={{ opacity: 0.8 }}>
                                         {isLastStop ? 'Điểm đến cuối' : 'Điểm dừng tiếp theo:'}
                                     </Typography>
-                                    <Typography variant="body1">
+                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                                         {isLastStop
-                                            ? 'Kết thúc tuyến đường'
+                                            ? tripDetails.stops?.[tripDetails.currentStopIndex]?.hubName
                                             : tripDetails.stops?.[tripDetails.currentStopIndex + 1]?.hubName || 'Kết thúc tuyến đường'}
                                     </Typography>
                                 </Grid>
+
                             </Grid>
-                            {isLastStop && (
-                                <Button
-                                    variant="contained"
-                                    color="success"
-                                    sx={{ mt: 2 }}
-                                    onClick={handleCompleteTrip}
-                                >
-                                    Hoàn thành chuyến đi
-                                </Button>
-                            )}
+
                         </CardContent>
                     </Card>
                 )}
@@ -1169,7 +1153,16 @@ const DriverHubOperations = () => {
                     </Alert>
                 </Snackbar>
             </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                <IconButton onClick={handleBack} sx={{ mr: 2 }}>
+                    <ArrowBackIcon />
+                </IconButton>
+                <Typography variant="h4" component="h1">
+                    {operationType === 'pickup' ? 'Lấy hàng' : 'Giao hàng'}
+                </Typography>
+            </Box>
         </Container>
+
     );
 };
 

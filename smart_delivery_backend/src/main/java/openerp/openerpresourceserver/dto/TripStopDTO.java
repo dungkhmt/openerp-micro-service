@@ -16,6 +16,8 @@ public class TripStopDTO {
     private UUID hubId;
     private String hubName;
     private String address;
+    private String city;
+    private String ward;
     private Double latitude;
     private Double longitude;
     private Integer stopSequence;

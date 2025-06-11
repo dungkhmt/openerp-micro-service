@@ -5,7 +5,7 @@ import StandardTable from "components/StandardTable";
 import React, {Fragment, useEffect, useState, useCallback} from "react";
 import useStyles from "screens/styles";
 import {errorNoti, processingNoti, successNoti} from "utils/notification";
-import {useHistory} from "react-router";
+import {useHistory, useLocation} from "react-router";
 import {useParams, useRouteMatch} from "react-router-dom";
 import {TabContext, TabList, TabPanel} from "@mui/lab";
 import {useSelector} from "react-redux";
@@ -18,6 +18,20 @@ import {API_PATH} from "../apiPaths";
 
 const TodayOrder = (props) => {
     const history = useHistory();
+    const {id: pathId} = useParams(); // Lấy ID từ path
+    const location = useLocation();
+
+    // Determine target type from path
+    const getTargetTypeFromPath = () => {
+        if (location.pathname.includes('/collector/')) {
+            return 'collector';
+        } else if (location.pathname.includes('/shipper/')) {
+            return 'shipper';
+        }
+        return null;
+    };
+
+    const targetType = getTargetTypeFromPath();
     const {path} = useRouteMatch();
     const username = useSelector((state) => state.auth.user?.username);
     const role = useSelector((state) => state.auth.user?.role);
@@ -37,6 +51,7 @@ const TodayOrder = (props) => {
     // Determine if user is collector or shipper
     const isCollector = role === 'COLLECTOR';
     const isShipper = role === 'SHIPPER';
+    const isHubManager = role === 'HUB_MANAGER'; // Thêm dòng này
 
     // Session storage keys based on role
     const assignmentsStorageKey = isCollector ? 'collector_assignments' : 'shipper_assignments';
@@ -44,10 +59,10 @@ const TodayOrder = (props) => {
     const savedNextOrderKey = isCollector ? 'collector_savedNextOrder' : 'shipper_savedNextOrder';
 
     // Role-specific strings
-    const roleText = isCollector ? 'lấy hàng' : 'giao hàng';
+    const roleText = (isCollector  || targetType === "collector")? 'thu gom' : 'giao hàng';
     const personTypeText = isCollector ? 'người gửi' : 'người nhận';
     const actionProcessText = isCollector ? 'thu gom' : 'giao';
-    const packageActionText = isCollector ? 'đã thu' : 'đã giao';
+    const packageActionText = isCollector ? 'đã thu gom' : 'đã giao';
 
     // Role-specific API endpoints
     const userEndpoint = isCollector
@@ -55,8 +70,16 @@ const TodayOrder = (props) => {
         : `/user/get-shipper/${username}`;
 
     const assignmentsEndpoint = useCallback((id) => {
+        if (isHubManager) {
+            // HUB_MANAGER xem assignments dựa trên type trong path
+            if (targetType === 'collector') {
+                return `/smdeli/assignment/collector/order/assign/today/collector/${id}`;
+            } else if (targetType === 'shipper') {
+                return `/smdeli/ordermanager/order/assign/shipper/today/${id}`;
+            }
+        }
         return isCollector
-            ? `/smdeli/ordermanager/order/assign/today/collector/${id}`
+            ? `/smdeli/assignment/collector/order/assign/today/collector/${id}`
             : `/smdeli/ordermanager/order/assign/shipper/today/${id}`;
     }, [isCollector]);
 
@@ -84,6 +107,11 @@ const TodayOrder = (props) => {
 
     useEffect(() => {
         async function fetchId() {
+            if (isHubManager) {
+                console.log("HUB_MANAGER - ID from path:", pathId);
+                setEmployeeId(pathId);
+                return;
+            }
             await request(
                 "get",
                 userEndpoint,
@@ -349,7 +377,7 @@ const TodayOrder = (props) => {
             }
         ];
 
-        if (isCollector) {
+        if (isCollector || targetType == "collector") {
             return [
                 ...commonColumns.slice(0, 2),
                 {title: "Tên người gửi", field: "senderName"},
@@ -379,15 +407,16 @@ const TodayOrder = (props) => {
                             onChange={(event, newValue) => setTabValue(newValue)}
                         >
                             <Tab label="Danh sách đơn hàng" value="1"/>
-                            <Tab label="Bản đồ" value="2"/>
-                            <Tab label="Tiến trình" value="3"/>
+                            {/* Chỉ hiển thị tab Bản đồ và Tiến trình nếu KHÔNG phải HUB_MANAGER */}
+                            {!isHubManager && <Tab label="Bản đồ" value="2"/>}
+                            {!isHubManager && <Tab label="Tiến trình" value="3"/>}
 
                         </TabList>
                     </Box>
 
                     <TabPanel value="1">
                         <StandardTable
-                            title={`Bảng phân công ${roleText} hôm nay`}
+                            title={`Bảng phân công ${isHubManager ? `${roleText} hôm nay - Mã nhân viên: ${pathId}` : `${roleText} hôm nay`}`}
                             columns={getTableColumns()}
                             data={assignmentData}
                             options={{

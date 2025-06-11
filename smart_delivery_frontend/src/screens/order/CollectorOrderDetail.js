@@ -35,14 +35,14 @@ const CollectorOrderDetail = () => {
     const isShipper = role === 'SHIPPER';
 
     // Role-specific text constants
-    const actionText = isCollector ? 'lấy hàng' : 'giao hàng';
-    const actionCapitalized = isCollector ? 'Lấy hàng' : 'Giao hàng';
+    const actionText = isCollector ? 'thu gom' : 'giao hàng';
+    const actionCapitalized = isCollector ? 'Thu gom' : 'Giao hàng';
     const personTypeText = isCollector ? 'người gửi' : 'người nhận';
     const oppositePersonText = isCollector ? 'người nhận' : 'người gửi';
 
     // Role-specific API endpoints
     const assignmentEndpoint = isCollector
-        ? `${API_PATH.ORDER}/assignment/collector`
+        ? `${API_PATH.ASSIGN_COLLECTOR}/order/assignment/collector`
         : `${API_PATH.ORDER}/assignment/shipper`;
 
     // Role-specific storage keys

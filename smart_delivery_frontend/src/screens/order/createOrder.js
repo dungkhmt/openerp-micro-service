@@ -178,58 +178,60 @@ const CreateOrder = () => {
                         p: 4,
                     }}>
                         <Typography variant="h5">
-                            Chọn vị trí
-                            <Button
-                                variant="outlined"
-                                onClick={() => {
-                                    if (navigator.geolocation) {
-                                        navigator.geolocation.getCurrentPosition(
-                                            (position) => {
-                                                const { latitude, longitude } = position.coords;
-                                                const display_name = `Lat: ${latitude}, Lon: ${longitude}`; // Placeholder
-                                                setSelectPosition({
-                                                    lat: latitude,
-                                                    lon: longitude,
-                                                    display_name,
-                                                });
-                                            },
-                                            (error) => {
-                                                console.error("Error fetching location: ", error.message);
-                                            },
-                                            { enableHighAccuracy: true }
-                                        );
-                                    } else {
-                                        alert("Trình duyệt không hỗ trợ lấy vị trí hiện tại!");
-                                    }
-                                }}
-                            >
-                                Chọn vị trí hiện tại
-                            </Button>
-                            <Button
-                                variant="contained"
-                                className={classes.addButton}
-                                type="submit"
-                                onClick={() => {
-                                    setOpenModal(false);
-                                    if (selectedField === 'sender') {
-                                        setFormData({
-                                            ...formData,
-                                            senderLongitude: selectPosition?.lon,
-                                            senderLatitude: selectPosition?.lat,
-                                            senderAddress: selectPosition?.display_name // Cập nhật địa chỉ người gửi
-                                        });
-                                    } else if (selectedField === 'recipient') {
-                                        setFormData({
-                                            ...formData,
-                                            recipientLongitude: selectPosition?.lon,
-                                            recipientLatitude: selectPosition?.lat,
-                                            recipientAddress: selectPosition?.display_name // Cập nhật địa chỉ người nhận
-                                        });
-                                    }
-                                }}
-                            >
-                                Lưu
-                            </Button>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                Chọn vị trí
+                                <Button
+                                    variant="outlined"
+                                    onClick={() => {
+                                        if (navigator.geolocation) {
+                                            navigator.geolocation.getCurrentPosition(
+                                                (position) => {
+                                                    const { latitude, longitude } = position.coords;
+                                                    const display_name = `Lat: ${latitude}, Lon: ${longitude}`;
+                                                    setSelectPosition({
+                                                        lat: latitude,
+                                                        lon: longitude,
+                                                        display_name,
+                                                    });
+                                                },
+                                                (error) => {
+                                                    console.error("Error fetching location: ", error.message);
+                                                },
+                                                { enableHighAccuracy: true }
+                                            );
+                                        } else {
+                                            alert("Trình duyệt không hỗ trợ lấy vị trí hiện tại!");
+                                        }
+                                    }}
+                                >
+                                    Chọn vị trí hiện tại
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    className={classes.addButton}
+                                    type="submit"
+                                    onClick={() => {
+                                        setOpenModal(false);
+                                        if (selectedField === 'sender') {
+                                            setFormData({
+                                                ...formData,
+                                                senderLongitude: selectPosition?.lon,
+                                                senderLatitude: selectPosition?.lat,
+                                                senderAddress: selectPosition?.display_name
+                                            });
+                                        } else if (selectedField === 'recipient') {
+                                            setFormData({
+                                                ...formData,
+                                                recipientLongitude: selectPosition?.lon,
+                                                recipientLatitude: selectPosition?.lat,
+                                                recipientAddress: selectPosition?.display_name
+                                            });
+                                        }
+                                    }}
+                                >
+                                    Lưu
+                                </Button>
+                            </Box>
                         </Typography>
 
                         <div style={{
@@ -278,12 +280,11 @@ const CreateOrder = () => {
                                         </Typography>
                                         <Grid container spacing={3} className={classes.inforWrap}>
                                             <Grid item xs={6}>
-                                                <Box className={classes.inputWrap}>
-                                                    <Box className={classes.labelInput}>
-                                                        Người gửi
-                                                    </Box>
+                                                <Box> {/* Bỏ className={classes.inputWrap} vì nó không tồn tại */}
+                                                    <Box className={classes.labelInput}>Người gửi <span style={{ color: 'red' }}>*</span></Box>
                                                     <TextField
                                                         fullWidth
+                                                        required
                                                         variant="outlined"
                                                         size="small"
                                                         inputRef={register({ required: "Vui lòng điền tên người gửi" })}
@@ -296,12 +297,11 @@ const CreateOrder = () => {
                                                 </Box>
                                             </Grid>
                                             <Grid item xs={6}>
-                                                <Box className={classes.inputWrap}>
-                                                    <Box className={classes.labelInput}>
-                                                        Số điện thoại
-                                                    </Box>
+                                                <Box>
+                                                    <Box className={classes.labelInput}>Số điện thoại <span style={{ color: 'red' }}>*</span></Box>
                                                     <TextField
                                                         fullWidth
+                                                        required
                                                         variant="outlined"
                                                         size="small"
                                                         inputRef={register({ required: "Vui lòng điền số điện thoại người gửi" })}
@@ -322,6 +322,7 @@ const CreateOrder = () => {
                                                     </Box>
                                                     <TextField
                                                         fullWidth
+                                                        required
                                                         variant="outlined"
                                                         size="small"
                                                         inputRef={register({ required: "Vui lòng điền địa chỉ người gửi" })}
@@ -334,15 +335,14 @@ const CreateOrder = () => {
                                                     />
                                                 </Box>
                                             </Grid>
-                                        </Grid>
-                                        <Grid container spacing={3} className={classes.inforWrap}>
+
+                                            {/* === Thông tin người nhận === */}
                                             <Grid item xs={6}>
-                                                <Box className={classes.inputWrap}>
-                                                    <Box className={classes.labelInput}>
-                                                        Người nhận
-                                                    </Box>
+                                                <Box>
+                                                    <Box className={classes.labelInput}>Người nhận <span style={{ color: 'red' }}>*</span></Box>
                                                     <TextField
                                                         fullWidth
+                                                        required
                                                         variant="outlined"
                                                         size="small"
                                                         inputRef={register({ required: "Vui lòng điền tên người nhận" })}
@@ -355,12 +355,11 @@ const CreateOrder = () => {
                                                 </Box>
                                             </Grid>
                                             <Grid item xs={6}>
-                                                <Box className={classes.inputWrap}>
-                                                    <Box className={classes.labelInput}>
-                                                        Số điện thoại
-                                                    </Box>
+                                                <Box>
+                                                    <Box className={classes.labelInput}>Số điện thoại <span style={{ color: 'red' }}>*</span></Box>
                                                     <TextField
                                                         fullWidth
+                                                        required
                                                         variant="outlined"
                                                         size="small"
                                                         inputRef={register({ required: "Vui lòng điền số điện thoại người nhận" })}
@@ -375,12 +374,13 @@ const CreateOrder = () => {
                                             <Grid item xs={12}>
                                                 <Box className={classes.inputWrap}>
                                                     <Box className={classes.labelInput}>
-                                                        Địa chỉ <Button style={{ "margin-bottom": 0 }}
+                                                        Địa chỉ <span style={{ color: 'red' }}>*</span><Button style={{ "margin-bottom": 0 }}
                                                                         onClick={() => {setOpenModal(!openModal);
                                                                             setSelectedField('recipient')}}><MapIcon /></Button>
                                                     </Box>
                                                     <TextField
                                                         fullWidth
+                                                        required
                                                         variant="outlined"
                                                         size="small"
                                                         inputRef={register({ required: "Vui lòng điền địa chỉ người nhận" })}
@@ -393,14 +393,17 @@ const CreateOrder = () => {
                                                     />
                                                 </Box>
                                             </Grid>
+
+                                            {/* === Dịch vụ & Thu hộ === */}
                                             <Grid item xs={6}>
                                                 <Box className={classes.inputWrap}>
                                                     <Box className={classes.labelInput}>
-                                                        Dịch vụ chuyển phát
+                                                        Dịch vụ chuyển phát <span style={{ color: 'red' }}>*</span>
                                                     </Box>
                                                     <TextField
                                                         select // Dùng select thay vì input text
                                                         fullWidth
+                                                        required
                                                         variant="outlined"
                                                         size="small"
                                                         value={formData.orderType}
@@ -416,10 +419,11 @@ const CreateOrder = () => {
                                             <Grid item xs={6}>
                                                 <Box className={classes.inputWrap}>
                                                     <Box className={classes.labelInput}>
-                                                        Tiền thu hộ
+                                                        Tiền thu hộ <span style={{ color: 'red' }}>*</span>
                                                     </Box>
                                                     <TextField
                                                         fullWidth
+                                                        required
                                                         variant="outlined"
                                                         size="small"
                                                         inputRef={register({ required: "Vui lòng điền" })}
@@ -431,6 +435,8 @@ const CreateOrder = () => {
                                                     />
                                                 </Box>
                                             </Grid>
+
+
                                         </Grid>
 
                                         {/* Phần thêm kích thước của đơn hàng */}
@@ -441,10 +447,11 @@ const CreateOrder = () => {
                                             <Grid item xs={3}>
                                                 <Box className={classes.inputWrap}>
                                                     <Box className={classes.labelInput}>
-                                                        Dài (cm)
+                                                        Dài (cm) <span style={{ color: 'red' }}>*</span>
                                                     </Box>
                                                     <TextField
                                                         fullWidth
+                                                        required
                                                         variant="outlined"
                                                         size="small"
                                                         type="number"
@@ -458,10 +465,11 @@ const CreateOrder = () => {
                                             <Grid item xs={3}>
                                                 <Box className={classes.inputWrap}>
                                                     <Box className={classes.labelInput}>
-                                                        Rộng (cm)
+                                                        Rộng (cm) <span style={{ color: 'red' }}>*</span>
                                                     </Box>
                                                     <TextField
                                                         fullWidth
+                                                        required
                                                         variant="outlined"
                                                         size="small"
                                                         type="number"
@@ -475,10 +483,11 @@ const CreateOrder = () => {
                                             <Grid item xs={3}>
                                                 <Box className={classes.inputWrap}>
                                                     <Box className={classes.labelInput}>
-                                                        Cao (cm)
+                                                        Cao (cm) <span style={{ color: 'red' }}>*</span>
                                                     </Box>
                                                     <TextField
                                                         fullWidth
+                                                        required
                                                         variant="outlined"
                                                         size="small"
                                                         type="number"
@@ -492,9 +501,10 @@ const CreateOrder = () => {
                                             <Grid item xs={3}>
                                                 <Box className={classes.inputWrap}>
                                                     <Box className={classes.labelInput}>
-                                                        Khối lượng (kg)
+                                                        Khối lượng (kg) <span style={{ color: 'red' }}>*</span>
                                                     </Box>
                                                     <TextField
+                                                        required
                                                         fullWidth
                                                         variant="outlined"
                                                         size="small"
@@ -537,7 +547,7 @@ const CreateOrder = () => {
                                                             <Grid item xs={6}>
                                                                 <Box className={classes.inputWrap}>
                                                                     <Box className={classes.labelInput}>
-                                                                        Tên sản phẩm
+                                                                        Tên sản phẩm <span style={{ color: 'red' }}>*</span>
                                                                     </Box>
                                                                     <TextField
                                                                         fullWidth
@@ -546,19 +556,6 @@ const CreateOrder = () => {
                                                                         name={`items[${index}].name`}
                                                                         value={item.name}
                                                                         onChange={(e) => handleInputChange(e, index, 'name')}
-                                                                    />
-                                                                </Box>
-                                                            </Grid>
-                                                            <Grid item xs={12}>
-                                                                <Box className={classes.inputWrap}>
-                                                                    <FormControlLabel
-                                                                        control={
-                                                                            <Checkbox
-                                                                                checked={item.viewBeforeReceive || false}
-                                                                                onChange={handleCheckboxChange(index)}
-                                                                            />
-                                                                        }
-                                                                        label="Cho khách xem trước khi nhận"
                                                                     />
                                                                 </Box>
                                                             </Grid>
@@ -582,7 +579,7 @@ const CreateOrder = () => {
                                                             <Grid item xs={6}>
                                                                 <Box className={classes.inputWrap}>
                                                                     <Box className={classes.labelInput}>
-                                                                        Khối lượng
+                                                                        Khối lượng (kg)
                                                                     </Box>
                                                                     <TextField
                                                                         fullWidth
@@ -646,7 +643,7 @@ const CreateOrder = () => {
                                                             <Grid item xs={6}>
                                                                 <Box className={classes.inputWrap}>
                                                                     <Box className={classes.labelInput}>
-                                                                        Giá
+                                                                        Giá (đ)<span style={{ color: 'red' }}>*</span>
                                                                     </Box>
                                                                     <TextField
                                                                         fullWidth

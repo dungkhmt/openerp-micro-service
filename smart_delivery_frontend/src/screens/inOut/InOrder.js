@@ -27,27 +27,27 @@ import {errorNoti, successNoti} from "../../utils/notification";
 const InOrder = () => {
     const hubId = useSelector((state) => state.auth.user?.hubId);
 
-    // Tab state
+    // Trạng thái tab
     const [activeTab, setActiveTab] = useState(0);
 
-    // Collector orders (collected by collectors and brought to hub)
+    // Đơn hàng từ nhân viên thu gom (được thu gom và mang về hub)
     const [collectorOrders, setCollectorOrders] = useState([]);
 
-    // Driver orders (delivered to hub by drivers from other hubs)
+    // Đơn hàng từ tài xế (được giao đến hub từ các hub khác)
     const [driverOrders, setDriverOrders] = useState([]);
 
-    // Failed delivery orders (from drivers/shippers delivery attempts)
+    // Đơn hàng giao thất bại (từ tài xế/nhân viên giao hàng)
     const [driverFailedOrders, setDriverFailedOrders] = useState([]);
     const [shipperFailedOrders, setShipperFailedOrders] = useState([]);
 
-    // For Driver Orders: Trip/Vehicle view vs Order list view
+    // Cho Đơn hàng Tài xế: Xem theo chuyến/xe vs Xem danh sách đơn hàng
     const [selectedTripGroup, setSelectedTripGroup] = useState(null);
 
-    // Loading states
+    // Trạng thái loading
     const [loading, setLoading] = useState(false);
     const [processingIds, setProcessingIds] = useState([]);
 
-    // Fetch data based on active tab
+    // Lấy dữ liệu dựa trên tab đang active
     useEffect(() => {
         if (hubId) {
             switch (activeTab) {
@@ -69,7 +69,7 @@ const InOrder = () => {
         }
     }, [hubId, activeTab]);
 
-    // Reset selected trip when changing tabs
+    // Reset chuyến đã chọn khi đổi tab
     useEffect(() => {
         setSelectedTripGroup(null);
     }, [activeTab]);
@@ -86,17 +86,17 @@ const InOrder = () => {
                 },
                 {
                     400: () => {
-                        errorNoti("Invalid data");
+                        errorNoti("Dữ liệu không hợp lệ");
                         setLoading(false);
                     },
                     500: () => {
-                        errorNoti("Server error");
+                        errorNoti("Lỗi máy chủ");
                         setLoading(false);
                     }
                 }
             );
         } catch (error) {
-            errorNoti("Cannot load collector orders");
+            errorNoti("Không thể tải đơn hàng từ nhân viên thu gom");
             setLoading(false);
         }
     };
@@ -113,17 +113,17 @@ const InOrder = () => {
                 },
                 {
                     400: () => {
-                        errorNoti("Invalid data");
+                        errorNoti("Dữ liệu không hợp lệ");
                         setLoading(false);
                     },
                     500: () => {
-                        errorNoti("Server error");
+                        errorNoti("Lỗi máy chủ");
                         setLoading(false);
                     }
                 }
             );
         } catch (error) {
-            errorNoti("Cannot load driver orders");
+            errorNoti("Không thể tải đơn hàng từ tài xế");
             setLoading(false);
         }
     };
@@ -140,17 +140,17 @@ const InOrder = () => {
                 },
                 {
                     400: () => {
-                        errorNoti("Invalid data");
+                        errorNoti("Dữ liệu không hợp lệ");
                         setLoading(false);
                     },
                     500: () => {
-                        errorNoti("Server error");
+                        errorNoti("Lỗi máy chủ");
                         setLoading(false);
                     }
                 }
             );
         } catch (error) {
-            errorNoti("Cannot load driver failed orders");
+            errorNoti("Không thể tải đơn hàng giao thất bại của tài xế");
             setLoading(false);
         }
     };
@@ -167,29 +167,29 @@ const InOrder = () => {
                 },
                 {
                     400: () => {
-                        errorNoti("Invalid data");
+                        errorNoti("Dữ liệu không hợp lệ");
                         setLoading(false);
                     },
                     500: () => {
-                        errorNoti("Server error");
+                        errorNoti("Lỗi máy chủ");
                         setLoading(false);
                     }
                 }
             );
         } catch (error) {
-            errorNoti("Cannot load shipper failed orders");
+            errorNoti("Không thể tải đơn hàng giao thất bại của nhân viên giao hàng");
             setLoading(false);
         }
     };
 
-    // Group orders by tripId and vehicleInfo (used for driver orders)
+    // Nhóm đơn hàng theo mã chuyến và thông tin xe (dùng cho đơn hàng tài xế)
     const groupOrdersByTrip = (orders) => {
         const grouped = orders.reduce((acc, order) => {
             const tripKey = `${order.tripId}_${order.vehicleType}_${order.vehiclePlateNumber}`;
             if (!acc[tripKey]) {
                 acc[tripKey] = {
                     tripId: order.tripId,
-                    tripCode: order.tripCode || `TRIP-${order.tripId.substring(0, 8)}`,
+                    tripCode: order.tripCode || `CHUYẾN-${order.tripId.substring(0, 8)}`,
                     date: order.date,
                     vehicleType: order.vehicleType,
                     vehiclePlateNumber: order.vehiclePlateNumber,
@@ -214,6 +214,17 @@ const InOrder = () => {
         }
     };
 
+    const getOrderStatusText = (status) => {
+        switch (status) {
+            case 'COLLECTED_COLLECTOR': return 'Đã thu gom';
+            case 'COLLECTED_HUB': return 'Đã nhận tại hub';
+            case 'DELIVERED': return 'Đã giao';
+            case 'DELIVERY_FAILED': return 'Giao thất bại';
+            case 'OUT_FOR_DELIVERY': return 'Đang giao';
+            default: return status;
+        }
+    };
+
     const getVehicleTypeColor = (vehicleType) => {
         switch (vehicleType) {
             case 'TRUCK': return 'primary';
@@ -223,11 +234,29 @@ const InOrder = () => {
         }
     };
 
+    const getVehicleTypeText = (vehicleType) => {
+        switch (vehicleType) {
+            case 'TRUCK': return 'Xe tải';
+            case 'VAN': return 'Xe van';
+            case 'MOTORBIKE': return 'Xe máy';
+            default: return vehicleType;
+        }
+    };
+
+    const getOrderTypeText = (orderType) => {
+        switch (orderType) {
+            case 'DELIVERY': return 'Giao hàng';
+            case 'PICKUP': return 'Lấy hàng';
+            case 'RETURN': return 'Trả hàng';
+            default: return orderType;
+        }
+    };
+
     const handleViewOrder = (order) => {
         window.location.href = `/order/detail/${order.id}`;
     };
 
-    // Confirm single order
+    // Xác nhận đơn hàng đơn lẻ
     const confirmSingleOrder = async (orderId) => {
         setProcessingIds(prev => [...prev, orderId]);
 
@@ -236,8 +265,8 @@ const InOrder = () => {
                 "put",
                 `/smdeli/ordermanager/order/confirm-in-hub/${orderId}`,
                 (res) => {
-                    successNoti("Order confirmed successfully");
-                    // Refresh current tab data
+                    successNoti("Xác nhận đơn hàng thành công");
+                    // Làm mới dữ liệu tab hiện tại
                     switch (activeTab) {
                         case 0:
                             fetchCollectorOrders();
@@ -256,21 +285,21 @@ const InOrder = () => {
                     }
                 },
                 {
-                    400: () => errorNoti("Invalid request"),
-                    500: () => errorNoti("Server error occurred")
+                    400: () => errorNoti("Yêu cầu không hợp lệ"),
+                    500: () => errorNoti("Đã xảy ra lỗi máy chủ")
                 }
             );
         } catch (error) {
-            errorNoti("Error confirming order");
+            errorNoti("Lỗi khi xác nhận đơn hàng");
         } finally {
             setProcessingIds(prev => prev.filter(id => id !== orderId));
         }
     };
 
-    // Bulk confirm orders
+    // Xác nhận hàng loạt đơn hàng
     const handleBulkConfirm = async (selectedIds) => {
         if (!selectedIds || selectedIds.length === 0) {
-            errorNoti("Please select at least one order");
+            errorNoti("Vui lòng chọn ít nhất một đơn hàng");
             return;
         }
 
@@ -286,8 +315,8 @@ const InOrder = () => {
                 "put",
                 `/smdeli/ordermanager/order/confirm-in-hub/${idsString}`,
                 (res) => {
-                    successNoti(`Successfully confirmed ${selectedIds.length} orders`);
-                    // Refresh current tab data
+                    successNoti(`Đã xác nhận thành công ${selectedIds.length} đơn hàng`);
+                    // Làm mới dữ liệu tab hiện tại
                     switch (activeTab) {
                         case 0:
                             fetchCollectorOrders();
@@ -306,66 +335,67 @@ const InOrder = () => {
                     }
                 },
                 {
-                    400: () => errorNoti("Invalid request"),
-                    500: () => errorNoti("Server error occurred")
+                    400: () => errorNoti("Yêu cầu không hợp lệ"),
+                    500: () => errorNoti("Đã xảy ra lỗi máy chủ")
                 }
             );
         } catch (error) {
-            errorNoti("Error confirming orders");
+            errorNoti("Lỗi khi xác nhận đơn hàng");
         } finally {
             setProcessingIds([]);
             setLoading(false);
         }
     };
 
-    // Bulk confirm orders by trip
+    // Xác nhận hàng loạt đơn hàng theo chuyến
     const handleBulkConfirmByTrip = async (orders) => {
         const orderIds = orders.map(order => order.id);
         await handleBulkConfirm(orderIds);
     };
 
-    // Common columns for all tabs
+    // Cột chung cho tất cả các tab
     const getColumns = () => [
         {
-            title: "Order ID",
+            title: "Mã đơn hàng",
             field: "id",
             renderCell: (rowData) => rowData.id.substring(0, 8) + "..."
         },
         {
-            title: "Sender",
+            title: "Người gửi",
             field: "senderName",
         },
         {
-            title: "Recipient",
+            title: "Người nhận",
             field: "recipientName",
         },
         {
-            title: "Order Type",
-            field: "orderType"
+            title: "Loại đơn hàng",
+            field: "orderType",
+            renderCell: (rowData) => getOrderTypeText(rowData.orderType)
         },
         {
-            title: "Status",
+            title: "Trạng thái",
             field: "status",
             renderCell: (rowData) => (
                 <Chip
-                    label={rowData.status}
+                    label={getOrderStatusText(rowData.status)}
                     color={getOrderStatusColor(rowData.status)}
                     size="small"
                 />
             )
         },
         {
-            title: "Total Price",
+            title: "Tổng tiền",
             field: "totalPrice",
-            renderCell: (rowData) => `$${rowData.totalPrice?.toFixed(2) || '0.00'}`
+            renderCell: (rowData) => `${(rowData.totalPrice?.toLocaleString() || '0')} VNĐ`
         },
         {
-            title: "Created At",
+            title: "Thời gian tạo",
             field: "createdAt",
-            renderCell: (rowData) => new Date(rowData.createdAt).toLocaleString()
+            renderCell: (rowData) => new Date(rowData.createdAt).toLocaleString('vi-VN')
         },
         {
-            title: "Actions",
+            title: "Thao tác",
             field: "actions",
             centerHeader: true,
             sorting: false,
@@ -374,7 +404,7 @@ const InOrder = () => {
                     <IconButton
                         onClick={() => handleViewOrder(rowData)}
                         color="primary"
-                        title="View Order Details"
+                        title="Xem chi tiết đơn hàng"
                     >
                         <VisibilityIcon />
                     </IconButton>
@@ -382,7 +412,7 @@ const InOrder = () => {
                         onClick={() => confirmSingleOrder(rowData.id)}
                         color="success"
                         disabled={processingIds.includes(rowData.id)}
-                        title="Confirm Order Into Hub"
+                        title="Xác nhận đơn hàng vào hub"
                     >
                         {processingIds.includes(rowData.id) ?
                             <CircularProgress size={24} color="inherit" /> :
@@ -412,67 +442,69 @@ const InOrder = () => {
     const getTabTitle = () => {
         switch (activeTab) {
             case 0:
-                return `Orders from Collectors (${collectorOrders.length})`;
+                return `Đơn hàng từ nhân viên thu gom (${collectorOrders.length})`;
             case 1:
                 return selectedTripGroup
-                    ? `Orders from Trip: ${selectedTripGroup.tripCode} (${selectedTripGroup.orders.length})`
-                    : `Driver Delivery Trips`;
+                    ? `Đơn hàng từ chuyến: ${selectedTripGroup.tripCode} (${selectedTripGroup.orders.length})`
+                    : `Chuyến giao hàng của tài xế`;
             case 2:
-                return `Driver Failed Delivery Orders (${driverFailedOrders.length})`;
+                return `Đơn hàng giao thất bại của tài xế (${driverFailedOrders.length})`;
+            case 3:
+                return `Đơn hàng giao thất bại của nhân viên giao hàng (${shipperFailedOrders.length})`;
             default:
-                return "Orders";
+                return "Đơn hàng";
         }
     };
 
-    // Render trips table for driver orders
+    // Hiển thị bảng chuyến cho đơn hàng tài xế
     const renderDriverTripsTable = () => {
         const groupedOrders = groupOrdersByTrip(driverOrders);
 
         const tripColumns = [
             {
-                title: "Trip Code",
+                title: "Mã chuyến",
                 field: "tripCode",
-                renderCell: (rowData) => rowData.tripCode || `TRIP-${rowData.tripId.substring(0, 8)}`
+                renderCell: (rowData) => rowData.tripCode || `CHUYẾN-${rowData.tripId.substring(0, 8)}`
             },
             {
-                title: "Vehicle Type",
+                title: "Loại xe",
                 field: "vehicleType",
                 renderCell: (rowData) => (
                     <Chip
-                        label={rowData.vehicleType}
+                        label={getVehicleTypeText(rowData.vehicleType)}
                         color={getVehicleTypeColor(rowData.vehicleType)}
                         size="small"
                     />
                 )
             },
             {
-                title: "Plate Number",
+                title: "Biển số xe",
                 field: "vehiclePlateNumber",
             },
             {
-                title: "Date",
+                title: "Ngày",
                 field: "date",
-                renderCell: (rowData) => new Date(rowData.date).toLocaleDateString()
+                renderCell: (rowData) => new Date(rowData.date).toLocaleDateString('vi-VN')
             },
             {
-                title: "Orders Count",
+                title: "Số lượng đơn hàng",
                 field: "ordersCount",
                 renderCell: (rowData) => (
                     <Chip
-                        label={`${rowData.orders.length} orders`}
+                        label={`${rowData.orders.length} đơn hàng`}
                         color="primary"
                         size="small"
                     />
                 )
             },
             {
-                title: "Total Value",
+                title: "Tổng giá trị",
                 field: "totalValue",
                 renderCell: (rowData) =>
-                    `${rowData.orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0).toFixed(2)}`
+                    `${rowData.orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0).toLocaleString()} VNĐ`
             },
             {
-                title: "Actions",
+                title: "Thao tác",
                 field: "actions",
                 centerHeader: true,
                 sorting: false,
@@ -481,7 +513,7 @@ const InOrder = () => {
                         <IconButton
                             onClick={() => setSelectedTripGroup(rowData)}
                             color="primary"
-                            title="View Orders"
+                            title="Xem đơn hàng"
                         >
                             <VisibilityIcon />
                         </IconButton>
@@ -489,7 +521,7 @@ const InOrder = () => {
                             onClick={() => handleBulkConfirmByTrip(rowData.orders)}
                             color="success"
                             disabled={loading}
-                            title="Confirm All Orders"
+                            title="Xác nhận tất cả đơn hàng"
                         >
                             {loading ?
                                 <CircularProgress size={24} color="inherit" /> :
@@ -503,7 +535,7 @@ const InOrder = () => {
 
         return (
             <StandardTable
-                title={`Driver Delivery Trips (${groupedOrders.length} trips, ${driverOrders.length} orders)`}
+                title={`Chuyến giao hàng của tài xế (${groupedOrders.length} chuyến, ${driverOrders.length} đơn hàng)`}
                 columns={tripColumns}
                 data={groupedOrders}
                 rowKey={(row) => `${row.tripId}_${row.vehiclePlateNumber}`}
@@ -511,11 +543,11 @@ const InOrder = () => {
                 actions={[
                     {
                         iconOnClickHandle: (selectedIds, selectedRows) => {
-                            // Confirm all orders from selected trips
+                            // Xác nhận tất cả đơn hàng từ các chuyến đã chọn
                             const allOrderIds = selectedRows.flatMap(trip => trip.orders.map(order => order.id));
                             handleBulkConfirm(allOrderIds);
                         },
-                        tooltip: "Confirm All Orders from Selected Trips",
+                        tooltip: "Xác nhận tất cả đơn hàng từ các chuyến đã chọn",
                         icon: () => loading ? <CircularProgress size={24} /> : <CheckIcon />,
                         disabled: loading
                     }
@@ -534,7 +566,7 @@ const InOrder = () => {
         );
     };
 
-    // Render orders table for selected trip
+    // Hiển thị bảng đơn hàng cho chuyến đã chọn
     const renderSelectedTripOrders = () => {
         return (
             <Box>
@@ -544,14 +576,14 @@ const InOrder = () => {
                         onClick={() => setSelectedTripGroup(null)}
                         sx={{ mr: 2 }}
                     >
-                        Back to Trips
+                        Quay lại danh sách chuyến
                     </Button>
                     <Box sx={{ flex: 1 }}>
                         <Typography variant="h6">
-                            Trip: {selectedTripGroup.tripCode}
+                            Chuyến: {selectedTripGroup.tripCode}
                         </Typography>
                         <Typography variant="body2" color="textSecondary">
-                            {selectedTripGroup.vehicleType} • {selectedTripGroup.vehiclePlateNumber} • {new Date(selectedTripGroup.date).toLocaleDateString()}
+                            {getVehicleTypeText(selectedTripGroup.vehicleType)} • {selectedTripGroup.vehiclePlateNumber} • {new Date(selectedTripGroup.date).toLocaleDateString('vi-VN')}
                         </Typography>
                     </Box>
                     <Button
@@ -561,7 +593,7 @@ const InOrder = () => {
                         onClick={() => handleBulkConfirmByTrip(selectedTripGroup.orders)}
                         disabled={loading}
                     >
-                        Confirm All Orders ({selectedTripGroup.orders.length})
+                        Xác nhận tất cả đơn hàng ({selectedTripGroup.orders.length})
                     </Button>
                 </Box>
 
@@ -574,7 +606,7 @@ const InOrder = () => {
                     actions={[
                         {
                             iconOnClickHandle: handleBulkConfirm,
-                            tooltip: "Confirm Selected Orders",
+                            tooltip: "Xác nhận các đơn hàng đã chọn",
                             icon: () => loading ? <CircularProgress size={24} /> : <CheckIcon />,
                             disabled: loading
                         }
@@ -598,10 +630,10 @@ const InOrder = () => {
         <div>
             <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
                 <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)}>
-                    <Tab label={`From Collectors (${collectorOrders.length})`} />
-                    <Tab label={`From Drivers (${driverOrders.length})`} />
-                    <Tab label={`Driver Failed (${driverFailedOrders.length})`} />
-                    <Tab label={`Shipper Failed (${shipperFailedOrders.length})`} />
+                    <Tab label={`Từ nhân viên thu gom (${collectorOrders.length})`} />
+                    <Tab label={`Từ tài xế (${driverOrders.length})`} />
+                    <Tab label={`Tài xế giao thất bại (${driverFailedOrders.length})`} />
+                    <Tab label={`Nhân viên giao thất bại (${shipperFailedOrders.length})`} />
                 </Tabs>
             </Box>
 
@@ -621,7 +653,7 @@ const InOrder = () => {
                     actions={[
                         {
                             iconOnClickHandle: handleBulkConfirm,
-                            tooltip: "Confirm Selected Orders Into Hub",
+                            tooltip: "Xác nhận các đơn hàng đã chọn vào hub",
                             icon: () => loading ? <CircularProgress size={24} /> : <CheckIcon />,
                             disabled: loading
                         }
@@ -643,66 +675,38 @@ const InOrder = () => {
                 selectedTripGroup ? renderSelectedTripOrders() : renderDriverTripsTable()
             )}
 
-            {!loading && activeTab === 2 && (
-                <StandardTable
-                    title={getTabTitle()}
-                    columns={getColumns()}
-                    data={getCurrentData()}
-                    rowKey="id"
-                    isLoading={loading}
-                    actions={[
-                        {
-                            iconOnClickHandle: handleBulkConfirm,
-                            tooltip: "Confirm Selected Orders Into Hub",
-                            icon: () => loading ? <CircularProgress size={24} /> : <CheckIcon />,
-                            disabled: loading
-                        }
-                    ]}
-                    options={{
-                        selection: true,
-                        pageSize: 10,
-                        search: true,
-                        sorting: true,
-                        headerStyle: {
-                            backgroundColor: '#f5f5f5',
-                            fontWeight: 'bold'
-                        }
-                    }}
-                />
-            )}
-
-            {/* Instructions for each tab */}
+            {/* Hướng dẫn cho từng tab */}
             <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
                 {activeTab === 0 && (
                     <Typography variant="body2" color="textSecondary">
-                        <strong>Collector Orders:</strong> These are orders that have been collected by collectors
-                        and brought to the hub. Confirm to officially receive them into the hub inventory.
+                        <strong>Đơn hàng từ nhân viên thu gom:</strong> Đây là những đơn hàng đã được nhân viên thu gom
+                        thu thập và mang về hub. Xác nhận để chính thức nhận chúng vào kho hub.
                     </Typography>
                 )}
                 {activeTab === 1 && !selectedTripGroup && (
                     <Typography variant="body2" color="textSecondary">
-                        <strong>Driver Delivery Trips:</strong> These are trips where drivers have delivered orders to this hub.
-                        Click on a trip card to view and manage the individual orders within that trip.
-                        You can confirm all orders from a trip at once, or manage them individually.
+                        <strong>Chuyến giao hàng của tài xế:</strong> Đây là những chuyến mà tài xế đã giao đơn hàng đến hub này.
+                        Nhấp vào thẻ chuyến để xem và quản lý các đơn hàng riêng lẻ trong chuyến đó.
+                        Bạn có thể xác nhận tất cả đơn hàng từ một chuyến cùng lúc, hoặc quản lý từng đơn riêng lẻ.
                     </Typography>
                 )}
                 {activeTab === 1 && selectedTripGroup && (
                     <Typography variant="body2" color="textSecondary">
-                        <strong>Trip Orders:</strong> These are the individual orders from the selected trip.
-                        You can confirm orders individually or select multiple orders to confirm them together.
-                        Use the "Back to Trips" button to return to the trips overview.
+                        <strong>Đơn hàng trong chuyến:</strong> Đây là các đơn hàng riêng lẻ từ chuyến đã chọn.
+                        Bạn có thể xác nhận từng đơn hàng riêng lẻ hoặc chọn nhiều đơn hàng để xác nhận cùng lúc.
+                        Sử dụng nút "Quay lại danh sách chuyến" để trở về tổng quan các chuyến.
                     </Typography>
                 )}
                 {activeTab === 2 && (
                     <Typography variant="body2" color="textSecondary">
-                        <strong>Driver Failed Delivery Orders:</strong> These are orders where delivery attempts failed
-                        by drivers. Confirm to return them to hub inventory for re-processing.
+                        <strong>Đơn hàng giao thất bại của tài xế:</strong> Đây là những đơn hàng mà việc giao hàng đã thất bại
+                        bởi tài xế. Xác nhận để đưa chúng trở lại kho hub để xử lý lại.
                     </Typography>
                 )}
                 {activeTab === 3 && (
                     <Typography variant="body2" color="textSecondary">
-                        <strong>Shipper Failed Delivery Orders:</strong> These are orders where delivery attempts failed
-                        by shippers. Confirm to return them to hub inventory for re-processing.
+                        <strong>Đơn hàng giao thất bại của nhân viên giao hàng:</strong> Đây là những đơn hàng mà việc giao hàng đã thất bại
+                        bởi nhân viên giao hàng. Xác nhận để đưa chúng trở lại kho hub để xử lý lại.
                     </Typography>
                 )}
             </Box>
