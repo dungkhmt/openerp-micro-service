@@ -5,11 +5,14 @@ import { useNavigate } from "react-router-dom";
 import BreadcrumbsCustom from "../../components/BreadcrumbsCustom";
 import { request } from '../../api';
 import { toast, Toaster } from "react-hot-toast";
+import { InputAdornment, Tooltip, IconButton } from "@mui/material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 const NewAddress = () => {
   const navigate = useNavigate();
   const [coordinates, setCoordinates] = useState(null);
   const [addressName, setAddressName] = useState("");
+  const [isAutoPan, setIsAutoPan] = useState(false);
 
   const breadcrumbPaths = [
     { label: "Home", link: "/" },
@@ -33,7 +36,29 @@ const NewAddress = () => {
 
   const handleSelectLocation = (coords) => {
     setCoordinates(coords);
+    setIsAutoPan(false);
   };
+
+  const handleUseCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const coords = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          setCoordinates(coords);
+          setIsAutoPan(true);
+        },
+        (error) => {
+          toast.error("Failed to get current location.");
+        }
+      );
+    } else {
+      toast.error("Geolocation is not supported by this browser.");
+    }
+  };
+
 
   const handleSubmit = () => {
     if (!coordinates) {
@@ -68,12 +93,34 @@ const NewAddress = () => {
         <BreadcrumbsCustom paths={breadcrumbPaths} />
         <Card className="p-6 space-y-4">
           <h3 className="text-lg font-semibold text-center">Select Your Position</h3>
-          <Map enableSelection={true} onSelectLocation={handleSelectLocation} />
+          <Map enableSelection={true} onSelectLocation={handleSelectLocation}
+            selectedCoordinates={coordinates} shouldAutoPan={isAutoPan} />
+          {/* Nút dùng vị trí hiện tại */}
+          <div className="flex justify-end">
+            <Button
+              variant="outlined"
+              onClick={handleUseCurrentLocation}
+            >
+              Current Location
+            </Button>
+          </div>
+
           <TextField
             label="Selected Address"
             fullWidth
-            value={addressName ? addressName : ""}
-            disabled
+            value={addressName}
+            onChange={(e) => setAddressName(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Tooltip title="Sometimes the house number is missing from the map. You can adjust it manually.">
+                    <IconButton edge="end">
+                      <InfoOutlinedIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </InputAdornment>
+              )
+            }}
           />
         </Card>
         <div className="flex justify-center">

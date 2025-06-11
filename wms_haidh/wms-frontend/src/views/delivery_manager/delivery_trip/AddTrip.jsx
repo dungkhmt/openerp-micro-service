@@ -600,7 +600,7 @@ const AddTrip = () => {
                     Loading route...
                   </Typography>
                 ) : (
-                  <MyMap route={route} />
+                  <MyMap route={route} markerCoordinates={coordinates} />
                 )}
               </Box>
             </Paper>

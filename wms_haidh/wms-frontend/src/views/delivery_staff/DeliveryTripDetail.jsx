@@ -28,6 +28,7 @@ const DeliveryTripDetail = () => {
   const [route, setRoute] = useState([]);
   const [loadingMap, setLoadingMap] = useState(true);
   const [isMapOpen, setIsMapOpen] = useState(false);
+  const [waypoints, setWaypoints] = useState([]);
 
   useEffect(() => {
     request('get', `/delivery-trips/${id}/general-info`, (res) => {
@@ -46,7 +47,7 @@ const DeliveryTripDetail = () => {
           setGeneralInfo(res.data);
         });
         toast.success("Your delivery trip has started. Good luck!");
-      } 
+      }
     }, {
       onError: (e) => {
         toast.error(e?.response?.data || "Error occured!");
@@ -76,20 +77,22 @@ const DeliveryTripDetail = () => {
     });
   };
 
-
   useEffect(() => {
     if (isMapOpen && id && route.length === 0) {
       setLoadingMap(true);
       request('get', `/delivery-trip-paths?deliveryTripId=${id}`, (res) => {
         if (res.status === 200) {
           setRoute(res.data.path);
-        } else {
-          alert('Error fetching route data!');
         }
         setLoadingMap(false);
       });
+      request('get', `/delivery-trip-paths/waypoints?deliveryTripId=${id}`, (res) => {
+        if (res.status === 200) {
+          setWaypoints(res.data);
+        }   
+      });
     }
-  }, [isMapOpen, id]);
+  }, [isMapOpen, id, route]);
 
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
@@ -264,7 +267,7 @@ const DeliveryTripDetail = () => {
                 {loadingMap ? (
                   <Typography variant="h6" align="center">Loading route...</Typography>
                 ) : (
-                  <Map route={route} />
+                  <Map route={route} markerCoordinates={waypoints} />
                 )}
               </Box>
             </Paper>

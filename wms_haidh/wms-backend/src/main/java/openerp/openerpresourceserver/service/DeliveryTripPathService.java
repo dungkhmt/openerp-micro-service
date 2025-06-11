@@ -35,4 +35,8 @@ public class DeliveryTripPathService {
 		deliveryTripPathRepository.saveAll(paths);
 	}
 
+	public List<CoordinateDTO> getWaypoints(String deliveryTripId) {
+		return deliveryTripPathRepository.findByDeliveryTripId(deliveryTripId);
+	}
+
 }

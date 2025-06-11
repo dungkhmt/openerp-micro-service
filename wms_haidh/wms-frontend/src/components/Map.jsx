@@ -2,11 +2,12 @@ import React, { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-const Map = ({ route, enableSelection = false, onSelectLocation }) => {
+const Map = ({ route, enableSelection = false, onSelectLocation, selectedCoordinates, shouldAutoPan, markerCoordinates = [] }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const routeLayerRef = useRef(null);
   const markerRef = useRef(null);
+  const markersRef = useRef([]);
 
   useEffect(() => {
     if (!mapInstanceRef.current) {
@@ -60,6 +61,39 @@ const Map = ({ route, enableSelection = false, onSelectLocation }) => {
       map.off("click"); // Cleanup event listener khi unmount
     };
   }, [route, enableSelection, onSelectLocation]);
+
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !selectedCoordinates) return;
+
+    const { lat, lng } = selectedCoordinates;
+
+    if (markerRef.current) {
+      markerRef.current.remove();
+    }
+
+    markerRef.current = L.marker([lat, lng]).addTo(map);
+
+    if (shouldAutoPan) {
+      map.setView([lat, lng], 16); // ❗chỉ zoom nếu là vị trí hiện tại
+    }
+  }, [selectedCoordinates, shouldAutoPan]);
+
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current = [];
+
+    markerCoordinates.forEach(({ lat, lng }) => {
+      const marker = L.marker([lat, lng]).addTo(map);
+      markersRef.current.push(marker);
+    });
+  }, [markerCoordinates]);
+
+
+
 
   return <div ref={mapRef} style={{ width: "100%", height: "400px" }} />;
 };

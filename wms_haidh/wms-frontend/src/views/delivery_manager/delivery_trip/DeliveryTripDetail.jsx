@@ -26,6 +26,7 @@ const DeliveryTripDetail = () => {
   const [route, setRoute] = useState([]);
   const [loadingMap, setLoadingMap] = useState(true);
   const [isMapOpen, setIsMapOpen] = useState(false);
+  const [waypoints, setWaypoints] = useState([]);
 
   useEffect(() => {
     request('get', `/delivery-trips/${id}/general-info`, (res) => {
@@ -60,10 +61,13 @@ const DeliveryTripDetail = () => {
       request('get', `/delivery-trip-paths?deliveryTripId=${id}`, (res) => {
         if (res.status === 200) {
           setRoute(res.data.path);
-        } else {
-          alert('Error fetching route data!');
-        }
+        } 
         setLoadingMap(false);
+      });
+      request('get', `/delivery-trip-paths/waypoints?deliveryTripId=${id}`, (res) => {
+        if (res.status === 200) {
+          setWaypoints(res.data);
+        }   
       });
     }
   }, [isMapOpen, id, route]);
@@ -225,7 +229,7 @@ const DeliveryTripDetail = () => {
                       Loading route...
                     </Typography>
                   ) : (
-                    <Map route={route} />
+                    <Map route={route} markerCoordinates={waypoints} />
                   )}
                 </Box>
               </Paper>
