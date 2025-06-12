@@ -130,21 +130,17 @@ public class GreedyInsertionService {
 			List<UUID> r = truck.route;
 			if (r.size() == 2)
 				continue;
-			System.out.println(r.size());
 			for (int i = 1; i < r.size(); i++) {
-				System.out.println(i);
 				UUID from = r.get(i - 1);
 				UUID to = r.get(i);
 				if (i == 1) {
 					truck.routeDistance += y.get(Pair.of(truck.warehouseId, to));
 					truck.addressToIndexMap.put(to, i);
-					System.out.println(to.toString() + " " + i);
 				} else if (i == r.size() - 1) {
 					truck.routeDistance += z.get(Pair.of(from, truck.warehouseId));
 				} else {
 					truck.routeDistance += x.get(Pair.of(from, to));
 					truck.addressToIndexMap.put(to, i);
-					System.out.println(to.toString() + " " + i);
 				}
 			}
 
@@ -160,7 +156,6 @@ public class GreedyInsertionService {
 			List<UUID> loadedItemUUIDs = truck.loadedItems.stream().map(Item::getItemId).collect(Collectors.toList());
 			List<Integer> itemSequences = truck.loadedItems.stream()
 					.map(item -> truck.addressToIndexMap.get(item.getCustomerAddressId())).collect(Collectors.toList());
-			System.out.println(itemSequences.get(0));
 			TruckDTO truckDTO = TruckDTO.builder().vehicleId(truck.id).warehouse(truck.warehouseId)
 					.totalWeight(truck.currentWeight).maxWeight(truck.maxWeight).route(truck.route)
 					.loadedItems(loadedItemUUIDs).itemSequences(itemSequences).routeDistance(truck.routeDistance)
