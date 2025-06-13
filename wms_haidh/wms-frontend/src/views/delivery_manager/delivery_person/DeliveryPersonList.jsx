@@ -183,14 +183,14 @@ export default function DeliveryPerson() {
     if (staffInfo.userLoginId) delete payload.email;
 
     request("post", requestUrl, (res) => {
-      if (res.status === 200) {
-        request("get", `/delivery-persons/paged?page=${page - 1}&size=${rowsPerPage}&status=${statusFilter}`, (res) => {
-          setItems(res.data.content);
-          setTotalItems(res.data.totalElements);
-          setPages(res.data.totalPages);
-        });
-        toast.success("Delivery staff saved successfully!");
-      }
+        if (res.data === true) {
+          request("get", `/delivery-persons/paged?page=${page - 1}&size=${rowsPerPage}&status=${statusFilter}`, (res) => {
+            setItems(res.data.content);
+            setTotalItems(res.data.totalElements);
+            setPages(res.data.totalPages);
+          });
+          toast.success("Delivery staff saved successfully!");
+        } else toast.error("User email not found!");
     }, {
       onError: (e) => {
         toast.error(e?.response?.data || "Error occured!");

@@ -98,10 +98,10 @@ const RoutingResult = () => {
                 });
                 setAddressInfoMap(prev => ({ ...prev, ...newAddressInfoMap }));
             }, {
-            onError: (e) => {
-                toast.error(e?.response?.data || "Error occured!");
-            }
-        }, payload).then();
+                onError: (e) => {
+                    toast.error(e?.response?.data || "Error occured!");
+                }
+            }, payload).then();
         }
 
         // fetch delivery items 1 lần
@@ -120,10 +120,10 @@ const RoutingResult = () => {
                 });
                 setDeliveryItemInfoMap(prev => ({ ...prev, ...newDeliveryItemInfoMap }));
             }, {
-            onError: (e) => {
-                toast.error(e?.response?.data || "Error occured!");
-            }
-        }, payload).then();
+                onError: (e) => {
+                    toast.error(e?.response?.data || "Error occured!");
+                }
+            }, payload).then();
         }
 
         setLoading(false);
@@ -318,22 +318,27 @@ const RoutingResult = () => {
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
-                                                {trip.loadedItems.map((itemId, idx) => {
-                                                    const item = deliveryItemInfoMap[itemId];
-                                                    const sequence = trip.itemSequences[idx];
-                                                    if (!item) return null;
-                                                    return (
-                                                        <TableRow key={idx}>
-                                                            <TableCell>{sequence}</TableCell>
-                                                            <TableCell>{item.productName}</TableCell>
-                                                            <TableCell>{item.weight}</TableCell>
-                                                            <TableCell>{item.originalQuantity}</TableCell>
-                                                            <TableCell>{item.bayCode}</TableCell>
-                                                            <TableCell>{item.lotId}</TableCell>
-                                                        </TableRow>
-                                                    );
-                                                })}
+                                                {[...trip.loadedItems.map((itemId, idx) => ({
+                                                    itemId,
+                                                    sequence: trip.itemSequences[idx],
+                                                }))]
+                                                    .sort((a, b) => a.sequence - b.sequence) 
+                                                    .map(({ itemId, sequence }, idx) => {
+                                                        const item = deliveryItemInfoMap[itemId];
+                                                        if (!item) return null;
+                                                        return (
+                                                            <TableRow key={idx}>
+                                                                <TableCell>{sequence}</TableCell>
+                                                                <TableCell>{item.productName}</TableCell>
+                                                                <TableCell>{item.weight}</TableCell>
+                                                                <TableCell>{item.originalQuantity}</TableCell>
+                                                                <TableCell>{item.bayCode}</TableCell>
+                                                                <TableCell>{item.lotId}</TableCell>
+                                                            </TableRow>
+                                                        );
+                                                    })}
                                             </TableBody>
+
                                         </Table>
                                     </TableContainer>
                                 </Box>

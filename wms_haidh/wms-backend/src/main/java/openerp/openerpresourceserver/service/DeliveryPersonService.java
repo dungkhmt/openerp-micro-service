@@ -51,7 +51,7 @@ public class DeliveryPersonService {
 		User user = optionalUser.get();
 
 		DeliveryPerson deliveryPerson = DeliveryPerson.builder().userLoginId(user.getId())
-				.fullName(request.getFullName()).phoneNumber(request.getPhoneNumber()).build();
+				.fullName(request.getFullName()).phoneNumber(request.getPhoneNumber()).status("AVAILABLE").build();
 
 		deliveryPersonRepository.save(deliveryPerson);
 		return true;

@@ -33,6 +33,7 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, UU
 			JOIN Product p ON i.productId = p.productId
 			WHERE i.bayId = :bayId
 			AND i.lotId = :lotId
+			AND i.quantityOnHandTotal > 0
 			AND (:search IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')))
 			""")
 	Page<InventoryItemResponse> findInventoryItems(@Param("bayId") UUID bayId, @Param("lotId") String lotId,
@@ -49,6 +50,7 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, UU
 			FROM InventoryItem i
 			JOIN Product p ON i.productId = p.productId
 			WHERE i.bayId = :bayId
+		    AND i.quantityOnHandTotal > 0
 			AND (:search IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')))
 			""")
 	Page<InventoryItemResponse> findAllInventoryItems(UUID bayId, String search, Pageable pageable);
