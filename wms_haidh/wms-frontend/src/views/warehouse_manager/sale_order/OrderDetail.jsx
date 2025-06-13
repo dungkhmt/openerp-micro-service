@@ -60,7 +60,7 @@ const OrderDetail = () => {
             <Grid item xs={6}>
               <Typography><strong>Order date:</strong> {formatDate(generalInfo.orderDate)}</Typography>
               <Typography><strong>Order type:</strong> {generalInfo.orderType}</Typography>
-              <Typography><strong>Status:</strong> {generalInfo.status}</Typography>
+              <Typography><strong>Status:</strong> {generalInfo.status.replace(/_/g, ' ')}</Typography>
               <Typography><strong>Description:</strong> {generalInfo.description}</Typography>
             </Grid>
             <Grid item xs={6}>

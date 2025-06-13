@@ -58,7 +58,9 @@ const ReceiptDetail = () => {
             </Grid>
             <Grid item xs={6}>
               <Typography><strong>Warehouse:</strong> {generalInfo.warehouseName}</Typography>
-              <Typography><strong>Status:</strong> {generalInfo.status}</Typography>
+              <Typography>
+                <strong>Status:</strong> {generalInfo.status.replace(/_/g, ' ')}
+              </Typography>
               <Typography><strong>Description:</strong> {generalInfo.description}</Typography>
             </Grid>
           </Grid>
