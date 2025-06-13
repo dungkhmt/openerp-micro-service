@@ -98,9 +98,9 @@ public class AddressDistanceService {
 		return updatedRows > 0;
 	}
 
-	public Map<Pair<UUID, UUID>, Double> getDistance(AddressType from, AddressType to) {
+	public Map<Pair<UUID, UUID>, Double> getDistance(AddressType fromType, AddressType toType) {
 		List<AddressDistance> customerDistances = addressDistanceRepository
-				.findByFromLocationTypeAndToLocationType(from, to);
+				.findByFromLocationTypeAndToLocationType(fromType, toType);
 		return customerDistances.stream().collect(Collectors
 				.toMap(ad -> Pair.of(ad.getFromLocationId(), ad.getToLocationId()), AddressDistance::getDistance));
 	}
