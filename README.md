@@ -1,13 +1,5 @@
 # Hệ thống Quản lý Giao vận 3 Chặng
 
-## Giới thiệu
-
-Hiện nay, với sự phát triển mạnh mẽ của công nghệ thông tin và xu hướng chuyển đổi số trong lĩnh vực logistics, nhiều doanh nghiệp vận tải đã chủ động ứng dụng các hệ thống phần mềm để nâng cao hiệu quả vận hành. Trên thị trường hiện đã xuất hiện nhiều giải pháp quản lý giao vận hiện đại như Viettel Post hay GHTK, cung cấp đầy đủ tính năng cần thiết, giúp các doanh nghiệp theo dõi, điều phối và tối ưu quy trình giao nhận hàng hóa.
-
-## Động lực phát triển
-
-Tuy nhiên, nhu cầu làm chủ công nghệ lõi, linh hoạt điều chỉnh hoặc phát triển thêm các tính năng phù hợp với đặc thù mô hình vận hành luôn là một trong những mục tiêu mà nhiều tổ chức hướng tới. Do đó, trong khuôn khổ đồ án tốt nghiệp, chúng tôi đã thiết kế và phát triển một hệ thống quản lý giao vận 3 chặng – mô hình vận hành đang ngày càng phổ biến trong thực tế.
-
 ## Mô hình 3 chặng
 
 Hệ thống hỗ trợ các doanh nghiệp tổ chức hiệu quả hoạt động vận chuyển hàng hóa theo 3 chặng:
