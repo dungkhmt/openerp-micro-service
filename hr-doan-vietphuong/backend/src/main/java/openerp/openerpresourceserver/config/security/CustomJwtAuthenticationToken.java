@@ -9,12 +9,14 @@ import java.util.Collection;
 public class CustomJwtAuthenticationToken extends JwtAuthenticationToken {
     private final String email;
     private final Integer employeeId;
+    private final Long id;
 
     public CustomJwtAuthenticationToken(Jwt jwt, Collection<? extends GrantedAuthority> authorities,
-                                        String email, Integer employeeId) {
+                                        String email, Integer employeeId, Long id) {
         super(jwt, authorities, email);
         this.email = email;
         this.employeeId = employeeId;
+        this.id = id;
     }
 
     public String getEmail() {
@@ -23,5 +25,9 @@ public class CustomJwtAuthenticationToken extends JwtAuthenticationToken {
 
     public Integer getEmployeeId() {
         return employeeId;
+    }
+
+    public Long getUserId() {
+        return id;
     }
 }

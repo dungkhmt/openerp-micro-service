@@ -8,6 +8,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @UtilityClass
 @Slf4j
 public class SecurityUtil {
+    public Long getUserId() {
+        return getCustomToken().getUserId();
+    }
 
     public String getUserEmail() {
         return getCustomToken().getEmail();

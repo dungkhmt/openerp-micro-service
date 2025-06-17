@@ -60,7 +60,8 @@ public class Jwt2AuthenticationConverter implements Converter<Jwt, AbstractAuthe
                 jwt,
                 authorities,
                 employee.getEmail(),
-                employee.getEmployeeId()
+                employee.getEmployeeId(),
+                employee.getId()
         );
     }
 

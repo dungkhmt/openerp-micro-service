@@ -170,6 +170,9 @@ public class AdditionalCheckInServiceImpl implements AdditionalCheckInService {
         for (long id : dto.getIdList()) {
             Absence absence = absenceRepository.findById(id)
                     .orElseThrow(() -> new NotFoundException("Additional check-in not found"));
+            if (!Objects.equals(absence.getLeadId(), SecurityUtil.getUserId())) {
+                throw new BadRequestException("You don't have permission to approve this additional check-in form");
+            }
             Employee employee = absence.getEmployee();
             AttendanceRange attendanceRange = employee.getAttendanceRange();
             if (absence.getStatus() != AbsenceStatus.PENDING.ordinal()) continue;
@@ -236,6 +239,9 @@ public class AdditionalCheckInServiceImpl implements AdditionalCheckInService {
         for (long id : dto.getIdList()) {
             Absence absence = absenceRepository.findById(id)
                     .orElseThrow(() -> new NotFoundException("Additional check-in not found"));
+            if (!Objects.equals(absence.getLeadId(), SecurityUtil.getUserId())) {
+                throw new BadRequestException("You don't have permission to reject this additional check-in form");
+            }
             absence.setStatus(AbsenceStatus.REJECTED.ordinal());
             absence.setUpdatedBy(SecurityUtil.getUserEmail());
             result.add(absenceRepository.save(absence));
