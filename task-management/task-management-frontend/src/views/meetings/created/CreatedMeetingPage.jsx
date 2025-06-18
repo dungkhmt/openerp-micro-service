@@ -36,7 +36,7 @@ const steps = [
   { statusId: "PLAN_DRAFT", label: "Bản nháp" },
   { statusId: "PLAN_REG_OPEN", label: "Mở đăng ký" },
   { statusId: "PLAN_REG_CLOSED", label: "Đóng đăng ký" },
-  { statusId: "PLAN_ASSIGNED", label: "Đã phân công" },
+  { statusId: "PLAN_ASSIGNED", label: "Phân công" },
   { statusId: "PLAN_IN_PROGRESS", label: "Đang diễn ra" },
   { statusId: "PLAN_COMPLETED", label: "Hoàn thành" },
 ];
@@ -63,6 +63,7 @@ const CreatedMeetingPage = ({ scrollPositions, onScrollUpdate }) => {
   const { currentPlan, members, assignments } = useSelector(
     (state) => state.meetingPlan
   );
+  const { sessions } = useSelector((state) => state.meetingSessions);
   const activeStep = steps.findIndex(
     (step) => step.statusId === currentPlan?.statusId
   );
@@ -81,10 +82,10 @@ const CreatedMeetingPage = ({ scrollPositions, onScrollUpdate }) => {
 
   useLayoutEffect(() => {
     if (scrollRef.current) {
-      const scrollTop = scrollPositions?.[tabValue] ?? 0;
+      const scrollTop = scrollPositions ?? 0;
       scrollRef.current.scrollTop = scrollTop;
     }
-  }, [tabValue, scrollPositions]);
+  }, [scrollPositions]);
 
   const handleChange = (event, newValue) => {
     setTabValue(newValue);
@@ -158,7 +159,7 @@ const CreatedMeetingPage = ({ scrollPositions, onScrollUpdate }) => {
 
   const finalizeDialogContent = (
     <Box>
-      <Typography variant="body1" >
+      <Typography variant="body1">
         Sau khi hoàn tất phân công, danh sách phân công sẽ không thể chỉnh sửa.
         Bạn có chắc chắn muốn tiếp tục?
       </Typography>
@@ -415,6 +416,7 @@ const CreatedMeetingPage = ({ scrollPositions, onScrollUpdate }) => {
                 tooltip="Bắt đầu giai đoạn đăng ký cho cuộc họp."
                 onClick={() => handleStatusUpdate("PLAN_REG_OPEN")}
                 color="warning.main"
+                disabled={sessions.length === 0 && members.length === 0}
               />
             )}
             {currentPlan?.statusId === "PLAN_REG_OPEN" && (
@@ -492,7 +494,7 @@ const CreatedMeetingPage = ({ scrollPositions, onScrollUpdate }) => {
         </Tabs>
       </Card>
 
-      <Box>
+      <Box sx={{ mb: 10 }}>
         <Fade in={tabValue === 0} timeout={500}>
           <Box style={{ display: tabValue === 0 ? "block" : "none" }}>
             <Grid container spacing={3}>
@@ -544,7 +546,7 @@ const CreatedMeetingPage = ({ scrollPositions, onScrollUpdate }) => {
 
 CreatedMeetingPage.propTypes = {
   onScrollUpdate: PropTypes.func,
-  scrollPositions: PropTypes.object,
+  scrollPositions: PropTypes.number,
 };
 
 export default CreatedMeetingPage;

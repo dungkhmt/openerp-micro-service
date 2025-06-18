@@ -2,7 +2,7 @@ package com.hust.openerp.taskmanagement.algorithm;
 
 import java.util.*;
 
-public class HopcroftKarpBinarySearch {
+public class HopcroftKarpBinarySearch implements AssignmentStrategy {
     private final int numUsers;
     private final int numSessions;
     private final List<List<Integer>> userChoices;

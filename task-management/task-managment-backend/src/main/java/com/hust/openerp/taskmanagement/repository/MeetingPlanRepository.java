@@ -16,8 +16,16 @@ import com.hust.openerp.taskmanagement.entity.MeetingPlan;
 
 @Repository
 public interface MeetingPlanRepository extends JpaRepository<MeetingPlan, UUID>, JpaSpecificationExecutor<MeetingPlan> {
-	List<MeetingPlan> findByStatusIdAndRegistrationDeadlineBefore(String statusId, Date date);
+    @Query(
+        value = "SELECT * FROM task_management_meeting_plan WHERE status_id = :statusId AND registration_deadline < :date",
+        nativeQuery = true
+    )
+    List<MeetingPlan> findByStatusIdAndRegistrationDeadlineBefore(String statusId, Date date);
 
+    @Query(
+        value = "SELECT * FROM task_management_meeting_plan WHERE status_id = :statusId",
+        nativeQuery = true
+    )
 	List<MeetingPlan> findByStatusId(String statusId);
 	
 	@Modifying

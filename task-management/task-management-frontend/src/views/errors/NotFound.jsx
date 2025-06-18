@@ -1,8 +1,9 @@
-import { Box, Container, Typography } from "@mui/material";
+import { Box, Container, Typography, Button } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { Helmet } from "react-helmet";
 import { usePreventOverflow } from "../../hooks/usePreventOverflow";
 import { useEffect } from "react";
+import { useNavigate } from "react-router";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -24,6 +25,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const NotFound = () => {
+  const navigate = useNavigate();
   const classes = useStyles();
   const { ref, updateMaxHeight } = usePreventOverflow();
 
@@ -46,6 +48,7 @@ const NotFound = () => {
           display: "flex",
           alignItems: "center",
           flexDirection: "column",
+          pb: 10,
         }}
       >
         <Container maxWidth="md">
@@ -62,6 +65,16 @@ const NotFound = () => {
               className={classes.image}
               src="/static/images/undraw_page_not_found_su7k.svg"
             />
+          </Box>
+          <Box mt={4} textAlign="center">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => navigate("/")}
+              sx={{ textTransform: "none" }}
+            >
+              Về trang chủ
+            </Button>
           </Box>
         </Container>
       </Box>

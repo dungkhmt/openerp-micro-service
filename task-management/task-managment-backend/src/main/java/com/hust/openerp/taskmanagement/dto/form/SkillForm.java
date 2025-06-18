@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SkillForm {
-    private String skillId;
-    private String skillName;
-    private String skillDescription;
+    private String code;
+    private String name;
+    private String description;
 }

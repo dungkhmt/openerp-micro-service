@@ -39,4 +39,5 @@ public class Notifications {
     @CreatedDate
     private Date createdStamp;
 
+    private String organizationCode;
 }

@@ -330,7 +330,6 @@ const ManageTable = ({
           </Button>
           <Button
             onClick={handleAdd}
-            color="success"
             variant="contained"
             disabled={
               addFields && addFields.length > 0

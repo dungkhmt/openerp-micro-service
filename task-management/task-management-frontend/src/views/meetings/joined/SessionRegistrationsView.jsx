@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { Typography, Card, CardContent, Box } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
-import dayjs from "dayjs";
-
 import toast from "react-hot-toast";
 import { useParams } from "react-router";
 import { Icon } from "@iconify/react";
@@ -10,10 +8,14 @@ import SessionRegisterDialog from "../../../components/meetings/SessionRegisterD
 import RegisterButton from "../../../components/meetings/RegisterButton";
 import SessionCard from "../../../components/meetings/SessionCard";
 import { updateMyMeetingSessions } from "../../../store/meeting-plan/meeting-sessions";
+import {
+  isRegistrationMode,
+  isRegistrationOpen,
+} from "../../../utils/meetingUtils";
 
 const SessionRegistrationsView = () => {
   const dispatch = useDispatch();
-  const { pid } = useParams();
+  const { meetingId } = useParams();
   const { isCreator, currentPlan, myAssignment } = useSelector(
     (state) => state.meetingPlan
   );
@@ -24,21 +26,14 @@ const SessionRegistrationsView = () => {
   const [loading, setLoading] = useState(false);
   const [openRegisterDialog, setOpenRegisterDialog] = useState(false);
 
-  const isRegistrationMode = ["PLAN_REG_OPEN", "PLAN_REG_CLOSED"].includes(
-    currentPlan?.statusId
-  );
-  const isRegistrationOpen =
-    currentPlan?.statusId === "PLAN_REG_OPEN" &&
-    dayjs().isBefore(dayjs(currentPlan?.registrationDeadline));
-
-  const dataList = isRegistrationMode
+  const dataList = isRegistrationMode(currentPlan.statusId)
     ? myRegistrations
-    : myAssignment?.meetingSession
-    ? [myAssignment?.meetingSession]
+    : myAssignment
+    ? [myAssignment]
     : [];
   const hasData = dataList.length > 0;
 
-  const cardColor = isRegistrationMode
+  const cardColor = isRegistrationMode(currentPlan.statusId)
     ? hasData
       ? "primary"
       : "warning"
@@ -79,7 +74,7 @@ const SessionRegistrationsView = () => {
       setLoading(true);
       await dispatch(
         updateMyMeetingSessions({
-          meetingPlanId: pid,
+          meetingPlanId: meetingId,
           data: { sessionIds: selectedSessions },
         })
       ).unwrap();
@@ -105,7 +100,7 @@ const SessionRegistrationsView = () => {
         >
           <CardContent>
             <Typography variant="h6" gutterBottom>
-              {isRegistrationMode
+              {isRegistrationMode(currentPlan.statusId)
                 ? "Các Phiên Họp Đã Đăng Ký"
                 : "Phiên Họp Được Phân Công"}
             </Typography>
@@ -133,18 +128,23 @@ const SessionRegistrationsView = () => {
                   color="textSecondary"
                   sx={{ fontStyle: "italic" }}
                 >
-                  {isRegistrationMode
+                  {isRegistrationMode(currentPlan?.statusId)
                     ? "Bạn chưa đăng ký phiên họp nào"
                     : "Không có phiên họp nào được phân công."}
                 </Typography>
               </Box>
             )}
 
-            {isRegistrationMode && (
+            {isRegistrationMode(currentPlan?.statusId) && (
               <RegisterButton
                 hasData={hasData}
                 onClick={() => setOpenRegisterDialog(true)}
-                disabled={!isRegistrationOpen}
+                disabled={
+                  !isRegistrationOpen(
+                    currentPlan?.statusId,
+                    currentPlan?.registrationDeadline
+                  )
+                }
               />
             )}
           </CardContent>

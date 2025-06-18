@@ -9,11 +9,11 @@ import org.springframework.stereotype.Repository;
 import com.hust.openerp.taskmanagement.entity.TaskSkill;
 
 @Repository
-public interface TaskSkillRepository extends JpaRepository<TaskSkill, UUID> {
+public interface TaskSkillRepository extends JpaRepository<TaskSkill, TaskSkill.TaskSkillId> {
 	
 	List<TaskSkill> findByTaskId(UUID taskId);
 	
 	void deleteByTaskId(UUID taskId);
 	
-	void deleteBySkillId(String skillId);
+	void deleteBySkillId(UUID skillId);
 }

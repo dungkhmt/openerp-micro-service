@@ -2,13 +2,17 @@ import { Icon } from "@iconify/react";
 import { Box, Button, Typography, useTheme } from "@mui/material";
 import { useKeycloak } from "@react-keycloak/web";
 import Redirect from "../routers/Redirect";
+import { useSelector } from "react-redux";
 
 const Home = () => {
   const { keycloak, initialized } = useKeycloak();
-
   const theme = useTheme();
+  const { currentOrganization } = useSelector((state) => state.organization);
 
   if (initialized && keycloak.authenticated) {
+    if (!currentOrganization) {
+      return <Redirect to="/new-organization" />;
+    }
     return <Redirect to="/dashboard" />;
   }
 

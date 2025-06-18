@@ -1,13 +1,10 @@
 import { useKeycloak } from "@react-keycloak/web";
 import { useEffect } from "react";
-import { Outlet } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { fetchCategories } from "../store/category";
-import { fetchPriorities } from "../store/priority";
-import { fetchStatuses } from "../store/status";
-import { fetchSkills } from "../store/skill";
-import { fetchMyProfile } from "../store/my-profile";
-import { fetchAllUsers } from "../store/user-management";
+import { Outlet } from "react-router-dom";
+import { fetchOrganizationData } from "../store/utils/organizationContext";
+import { useSelector } from "react-redux";
+import { CircularProgressLoading } from "../components/common/loading/CircularProgressLoading";
 
 function PrivateRoute() {
   const { keycloak } = useKeycloak();
@@ -17,20 +14,16 @@ function PrivateRoute() {
   }
 
   const dispatch = useDispatch();
+  const { currentOrganization } = useSelector((state) => state.organization);
 
   useEffect(() => {
-    const fetchData = () =>
-      Promise.all([
-        dispatch(fetchStatuses()),
-        dispatch(fetchCategories()),
-        dispatch(fetchPriorities()),
-        dispatch(fetchSkills()),
-        dispatch(fetchMyProfile()),
-        dispatch(fetchAllUsers()),
-      ]);
+    if (currentOrganization?.id) {
+      fetchOrganizationData(dispatch, currentOrganization.id);
+    }
+  }, [dispatch, currentOrganization]);
 
-    fetchData();
-  }, [dispatch]);
+  if (!keycloak.authenticated || !currentOrganization?.id)
+    return <CircularProgressLoading />;
 
   return <Outlet />;
 }

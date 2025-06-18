@@ -1,6 +1,7 @@
 package com.hust.openerp.taskmanagement.service.implement;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,16 +24,16 @@ public class UserSkillServiceImplement implements UserSkillService {
 
 	@Override
 	public List<UserSkillDTO> getMySkills(String userId) {
-      var entities = userSkillRepository.findByUserId(userId);
+      var entities = userSkillRepository.findByUserIdWithSkill(userId);
       return entities.stream().map(entity -> modelMapper.map(entity, UserSkillDTO.class)).toList();
 	}
 
 	@Override
 	@Transactional
-	public void updateMySkills(String userId, List<String> skillList) {
+	public void updateMySkills(String userId, List<UUID> skillList) {
 		userSkillRepository.deleteByUserId(userId);
 		
-		for (String skillId : skillList) {
+		for (UUID skillId : skillList) {
             UserSkill userSkill = new UserSkill();
             userSkill.setUserId(userId);
             userSkill.setSkillId(skillId);

@@ -40,8 +40,9 @@ import ItemSelector from "../../components/mui/dialog/ItemSelector";
 import { useDispatch } from "react-redux";
 import { fetchEvents } from "../../store/project/events";
 import { useParams } from "react-router";
-import { clearCache } from "../../store/project/tasks";
+import { clearCache as clearProjectTasksCache } from "../../store/project/tasks";
 import { removeDiacritics } from "../../utils/stringUtils.js";
+import { clearCache as clearAssignedTasksCache } from "../../store/assigned-tasks";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />;
@@ -160,7 +161,8 @@ const DialogEditTask = ({ open, setOpen }) => {
 
       const originalEventId = task.event ? task.event.id : null;
       if (updatedEventId !== originalEventId) dispatch(fetchEvents(id));
-      dispatch(clearCache());
+      dispatch(clearProjectTasksCache());
+      dispatch(clearAssignedTasksCache());
       toast.success("Cập nhật nhiệm vụ thành công");
       setIsUpdate(!isUpdate);
       setOpen(false);

@@ -19,7 +19,9 @@ import lombok.Setter;
 public class CreateEventForm {
 	@NotEmpty
     private String name;
-	@NotNull
+    @NotNull
+    private Date startDate;
+    @Nullable
     private Date dueDate;
 	@Nullable
     private String description;

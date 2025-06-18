@@ -1,7 +1,12 @@
 package com.hust.openerp.taskmanagement.service.implement;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
+import com.hust.openerp.taskmanagement.dto.SkillDTO;
+import com.hust.openerp.taskmanagement.dto.form.SkillForm;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,44 +26,47 @@ import lombok.AllArgsConstructor;
 public class SkillServiceImplement implements SkillService {
 
     private final SkillRepository skillRepository;
-    
     private final UserSkillRepository userSkillRepository;
-    
     private final TaskSkillRepository taskSkillRepository;
+    private final ModelMapper modelMapper;
 
     @Override
-    public List<Skill> getAllSkills() {
-        return skillRepository.findAllByOrderByCreatedStampDesc();
+    public List<SkillDTO> getAllSkills() {
+        return skillRepository.findAllByOrderByCreatedStampDesc().
+            stream().map(x -> modelMapper.map(x, SkillDTO.class)).
+            collect(Collectors.toList());
     }
 
     @Override
-    public Skill create(Skill skill) {
-    	if (skillRepository.existsById(skill.getSkillId())) {
+    public SkillDTO create(SkillForm form) {
+    	if (skillRepository.existsByCode(form.getCode())) {
     		throw new ApiException(ErrorCode.SKILL_EXIST);
         }
-        
-    	skillRepository.findByName(skill.getName()).ifPresent(e -> {
-        	throw new ApiException(ErrorCode.SKILL_EXIST);
-        });
-    	
-        return skillRepository.save(skill);
+
+        Skill skill = new Skill();
+        skill.setSkillId(UUID.randomUUID());
+        skill.setCode(form.getCode());
+        skill.setName(form.getName());
+        skill.setDescription(form.getDescription());
+
+        return modelMapper.map(skillRepository.save(skill), SkillDTO.class);
     }
 
     @Override
     @Transactional
-    public void delete(String skillId) {
+    public void delete(UUID skillId) {
     	userSkillRepository.deleteBySkillId(skillId);
-    	
+
         taskSkillRepository.deleteBySkillId(skillId);
-        
+
     	skillRepository.deleteById(skillId);
     }
 
 	@Override
-	public void update(String id, Skill updatedSkill) {
+	public void update(UUID id, Skill updatedSkill) {
 		Skill skill = skillRepository.findById(id).orElseThrow(
 				() -> new ApiException(ErrorCode.SKILL_NOT_FOUND));
-        
+
 		skill.setDescription(updatedSkill.getDescription());
 		skillRepository.save(skill);
 	}

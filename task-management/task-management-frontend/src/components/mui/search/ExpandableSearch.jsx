@@ -14,7 +14,7 @@ const ExpandableSearch = ({
   iconSize = 20,
   inputSx = {},
   containerSx = {},
-  debounceDelay = 500,
+  debounceDelay = 1000,
 }) => {
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const [searchTerm, setSearchTerm] = useState("");
@@ -86,7 +86,11 @@ const ExpandableSearch = ({
       sx={{ ...containerSx }}
     >
       {isExpanded ? (
-        <Box width={width}>
+        <Box
+          sx={{
+            width: typeof width === "object" ? width : { xs: width },
+          }}
+        >
           <TextField
             fullWidth
             placeholder={placeholder}
@@ -140,7 +144,11 @@ const ExpandableSearch = ({
 ExpandableSearch.propTypes = {
   initialExpanded: PropTypes.bool,
   placeholder: PropTypes.string,
-  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  width: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.object,
+  ]),
   onSearchChange: PropTypes.func,
   onSearchSubmit: PropTypes.func,
   onClear: PropTypes.func,

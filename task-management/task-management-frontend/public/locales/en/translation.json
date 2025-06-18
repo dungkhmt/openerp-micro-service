@@ -18,5 +18,6 @@
   "The status not found": "Không tìm thấy trạng thái",
   "The role not found": "Không tìm thấy vai trò",
   "The skill not found": "Không tìm thấy kỹ năng",
-  "Invalid meeting plan status transition": "Chuyển đổi trạng thái kế hoạch họp không hợp lệ."
+  "Invalid meeting plan status transition": "Chuyển đổi trạng thái kế hoạch họp không hợp lệ.",
+  "The organization code already exists": "Mã tổ chức đã tồn tại"
 }

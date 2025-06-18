@@ -158,8 +158,13 @@ export const meetingPlansSlice = createSlice({
       state.isCreator = action.payload;
     },
     resetMeetingPlans: (state) => {
-      // eslint-disable-next-line no-unused-vars
-      state = { ...initialState };
+      state.currentPlan = null;
+      state.members = [];
+      state.assignments = [];
+      state.myAssignment = null;
+      state.isCreator = false;
+      state.fetchLoading = false;
+      state.errors = [];
     },
   },
   extraReducers: (builder) => {

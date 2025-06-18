@@ -1,13 +1,13 @@
 import { Helmet } from "react-helmet";
-import { UserManagementView } from "../../views/user-management/UserManagementView";
+import UserManagementPage from "../../views/user-management/UserManagementPage";
 
 const UserManagement = () => {
   return (
     <>
       <Helmet>
-        <title>Quản lý nhân viên | Task management</title>
+        <title>Danh sách nhân viên | Task management</title>
       </Helmet>
-      <UserManagementView />
+      <UserManagementPage />
     </>
   );
 };

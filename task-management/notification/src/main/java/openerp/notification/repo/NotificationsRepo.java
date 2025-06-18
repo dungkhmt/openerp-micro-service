@@ -22,7 +22,8 @@ public interface NotificationsRepo
         QuerydslPredicateExecutor<Notifications>,
         QuerydslBinderCustomizer<QNotifications> {
 
-    long countByToUserAndStatusId(String toUser, String statusId);
+    long countByToUserAndStatusIdAndOrganizationCode(String toUser, String statusId,
+                                                     String organizationCode);
 
     @Query(value = """
              select
@@ -40,57 +41,66 @@ public interface NotificationsRepo
             	n.from_user = ul.user_login_id
             where
             	n.to_user = ?
+                and n.organization_code = ?
             """,
             nativeQuery = true)
-    Page<NotificationProjection> findAllNotifications(String toUser, Pageable pageable);
+    Page<NotificationProjection> findAllNotifications(String toUser, String orgCode, Pageable pageable);
 
     @Query(value = """
             with cte as (
             select
-            	created_stamp
+                created_stamp
             from
-            	notifications
+                notifications
             where
-            	id = ?2 )
+                id = ?2
+                and organization_code = ?3
+            )
             select
-            	cast(id as varchar),
-            	content,
-            	from_user fromUser,
-            	url,
-            	first_name firstName,
-            	last_name lastName,
-            	n2.status_id statusId,
-            	n2.created_stamp createdStamp
+                cast(id as varchar),
+                content,
+                from_user fromUser,
+                url,
+                first_name firstName,
+                last_name lastName,
+                n2.status_id statusId,
+                n2.created_stamp createdStamp
             from
-            	notifications n2
+                notifications n2
             left join user_login ul on
-            	n2.from_user = ul.user_login_id,
-            	cte
+                n2.from_user = ul.user_login_id
+                and n2.organization_code = ul.organization_code,
+                cte
             where
-            	n2.to_user = ?1
-            	and n2.created_stamp < cte.created_stamp
+                n2.to_user = ?1
+                and n2.organization_code = ?3
+                and n2.created_stamp < cte.created_stamp
             """,
             nativeQuery = true,
             countQuery = """
                     with cte as (
                     select
-                    	created_stamp
+                        created_stamp
                     from
-                    	notifications
+                        notifications
                     where
-                    	id = ?2 )
+                        id = ?2
+                        and organization_code = ?3
+                    )
                     select
-                    	count(n2.id)
+                        count(n2.id)
                     from
-                    	notifications n2
+                        notifications n2
                     left join user_login ul on
-                    	n2.from_user = ul.user_login_id,
-                    	cte
+                        n2.from_user = ul.user_login_id
+                        and n2.organization_code = ul.organization_code,
+                        cte
                     where
-                    	n2.to_user = ?1
-                    	and n2.created_stamp < cte.created_stamp
+                        n2.to_user = ?1
+                        and n2.organization_code = ?3
+                        and n2.created_stamp < cte.created_stamp
                     """)
-    Page<NotificationProjection> findNotificationsFromId(String toUser, UUID fromId, Pageable pageable);
+    Page<NotificationProjection> findNotificationsFromId(String toUser, UUID fromId, String orgCode, Pageable pageable);
 
     @Query(value = """
             select

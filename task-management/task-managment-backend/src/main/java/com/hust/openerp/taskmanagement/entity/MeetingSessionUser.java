@@ -3,6 +3,7 @@ package com.hust.openerp.taskmanagement.entity;
 import java.io.Serializable;
 import java.util.UUID;
 
+import com.hust.openerp.taskmanagement.multitenancy.entity.AbstractBaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -25,7 +26,7 @@ import lombok.Setter;
 @Builder
 @Table(name = "task_management_meeting_session_user")
 @IdClass(MeetingSessionUser.MeetingSessionUserId.class)
-public class MeetingSessionUser {
+public class MeetingSessionUser extends AbstractBaseEntity {
 
 	@Id
     @Column(name = "user_id", length = 60)
@@ -42,8 +43,7 @@ public class MeetingSessionUser {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
-    
-    @SuppressWarnings("serial")
+
     @AllArgsConstructor
     @NoArgsConstructor
     @Getter

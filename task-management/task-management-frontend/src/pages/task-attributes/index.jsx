@@ -2,9 +2,6 @@ import { Box, Tab, Tabs } from "@mui/material";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import SkillManage from "../../views/task-attributes/SkillManage";
-import StatusManage from "../../views/task-attributes/StatusManage";
-import CategoryManage from "../../views/task-attributes/CategoryManage";
-import PriorityManage from "../../views/task-attributes/PriorityManage";
 import { usePreventOverflow } from "../../hooks/usePreventOverflow";
 
 function TabPanel(props) {
@@ -65,9 +62,9 @@ const AttributeManager = () => {
         sx={{ borderRight: 1, borderColor: "divider" }}
       >
         <Tab label="Quản lý kỹ năng" {...a11yProps(0)} />
-        <Tab label="Quản lý trạng thái" {...a11yProps(1)} />
+        {/* <Tab label="Quản lý trạng thái" {...a11yProps(1)} />
         <Tab label="Quản lý danh mục" {...a11yProps(2)} />
-        <Tab label="Quản lý độ ưu tiên" {...a11yProps(3)} />
+        <Tab label="Quản lý độ ưu tiên" {...a11yProps(3)} /> */}
       </Tabs>
       <Box
         ref={ref}
@@ -81,7 +78,7 @@ const AttributeManager = () => {
         <TabPanel value={value} index={0}>
           <SkillManage />
         </TabPanel>
-        <TabPanel value={value} index={1}>
+        {/* <TabPanel value={value} index={1}>
           <StatusManage />
         </TabPanel>
         <TabPanel value={value} index={2}>
@@ -89,7 +86,7 @@ const AttributeManager = () => {
         </TabPanel>
         <TabPanel value={value} index={3}>
           <PriorityManage />
-        </TabPanel>
+        </TabPanel> */}
       </Box>
     </Box>
   );

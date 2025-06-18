@@ -172,23 +172,43 @@ const DialogEditEvent = ({
               />
             </FormControl>
           </Grid>
-          <Grid item sm={4} xs={12}>
+          <Grid item sm={6} xs={12}>
             <FormControl fullWidth>
               <Controller
-                name="dueDate"
+                name="startDate"
                 control={control}
-                defaultValue={dayjs(event.dueDate).toDate()}
+                defaultValue={event.startDate ? dayjs(event.startDate).toDate() : null}
                 as={
                   <DatePicker
-                    label="Ngày diễn ra"
+                    disablePast
+                    label="Ngày bắt đầu"
                     format="dd/MM/yyyy"
                     renderInput={(params) => <TextField {...params} />}
+                    slotProps={{ popper: { placement: "top" } }}
                   />
                 }
               />
             </FormControl>
           </Grid>
-          <Grid item sm={4} xs={12}>
+          <Grid item sm={6} xs={12}>
+            <FormControl fullWidth>
+              <Controller
+                name="dueDate"
+                control={control}
+                defaultValue={event.dueDate ? dayjs(event.dueDate).toDate() : null}
+                as={
+                  <DatePicker
+                    disablePast
+                    label="Ngày kết thúc"
+                    format="dd/MM/yyyy"
+                    renderInput={(params) => <TextField {...params} />}
+                    slotProps={{ popper: { placement: "top" } }}
+                  />
+                }
+              />
+            </FormControl>
+          </Grid>
+          <Grid item sm={12} xs={12}>
             <ItemSelector
               items={filteredMembers.map(({ member }) => member)}
               selectedItems={selectedUsers}

@@ -3,6 +3,7 @@ package com.hust.openerp.taskmanagement.entity;
 import java.io.Serializable;
 import java.util.UUID;
 
+import com.hust.openerp.taskmanagement.multitenancy.entity.AbstractBaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -25,7 +26,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EventUser {
+public class EventUser extends AbstractBaseEntity {
 
     @Id
     @Column(name = "event_id")
@@ -34,7 +35,6 @@ public class EventUser {
     @Id
     @Column(name = "user_id")
     private String userId;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id", nullable = false, insertable = false, updatable = false)

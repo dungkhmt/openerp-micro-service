@@ -10,10 +10,10 @@ const GroupedAvatars = ({ users, max_displayed_users = 5 }) => {
   const isLg = useMediaQuery(theme.breakpoints.up("lg"));
 
   // Determine max avatars dynamically based on screen size
-  let responsiveLimit = 2;
-  if (isSm) responsiveLimit = 3;
-  else if (isMd) responsiveLimit = 4;
-  else if (isLg) responsiveLimit = 5;
+  let responsiveLimit = 3;
+  if (isSm) responsiveLimit = 4;
+  else if (isMd) responsiveLimit = 5;
+  else if (isLg) responsiveLimit = 6;
 
   const maxAvatars = Math.min(max_displayed_users, responsiveLimit);
   const displayedUsers = users.slice(0, maxAvatars);

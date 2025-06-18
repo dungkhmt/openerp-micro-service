@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.service.implement;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;

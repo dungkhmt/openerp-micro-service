@@ -109,8 +109,11 @@ const meetingSessionsSlice = createSlice({
       state.errors = [];
     },
     resetMeetingSessions: (state) => {
-      // eslint-disable-next-line no-unused-vars
-      state = { ...initialState };
+      state.sessions = [];
+      state.myRegistrations = [];
+      state.memberRegistrations = [];
+      state.fetchLoading = false;
+      state.errors = [];
     },
   },
   extraReducers: (builder) => {

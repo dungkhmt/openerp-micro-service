@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { TaskService } from "../../services/api/task.service";
-import { UserService } from "../../services/api/user.service";
+import { OrganizationService } from "../../services/api/organization.service";
 
 export const handleRejected = (state, action) => {
   state.errors.push(action.payload || action.error);
@@ -9,8 +9,10 @@ export const handleRejected = (state, action) => {
 
 export const fetchAllUsers = createAsyncThunk(
   "userManagement/fetchAllUsers",
-  async (params) => {
-    const users = await UserService.getAll(params);
+  async (organizationId) => {
+    const users = await OrganizationService.getUsersByOrganizationId(
+      organizationId
+    );
     return users;
   }
 );
@@ -18,7 +20,10 @@ export const fetchAllUsers = createAsyncThunk(
 export const fetchAssignedTasksForUser = createAsyncThunk(
   "userManagement/fetchAssignedTasksForUser",
   async ({ id, filters }) => {
-    const paginationTasks = await TaskService.getAssignedTasksForUser(id, filters);
+    const paginationTasks = await TaskService.getAssignedTasksForUser(
+      id,
+      filters
+    );
     return paginationTasks;
   }
 );
@@ -79,9 +84,16 @@ export const userManagementSlice = createSlice({
     resetUsersData: (state) => {
       state.usersCache = initialState.usersCache;
     },
-    resetuserManagement: (state) => {
-      // eslint-disable-next-line no-unused-vars
-      state = initialState;
+    resetUserManagement: (state) => {
+      state.usersCache = initialState.usersCache;
+      state.tasksCache = initialState.tasksCache;
+      state.totalCount = initialState.totalCount;
+      state.search = initialState.search;
+      state.pagination = initialState.pagination;
+      state.sort = initialState.sort;
+      state.tabValue = initialState.tabValue;
+      state.fetchLoading = initialState.fetchLoading;
+      state.errors = initialState.errors;
     },
   },
   extraReducers: (builder) => {
@@ -90,7 +102,7 @@ export const userManagementSlice = createSlice({
         state.fetchLoading = true;
       })
       .addCase(fetchAllUsers.fulfilled, (state, action) => {
-        state.usersCache = action.payload;
+        state.usersCache = action.payload.map(({ user }) => user);
         state.fetchLoading = false;
       })
       .addCase(fetchAllUsers.rejected, handleRejected)
@@ -117,6 +129,7 @@ export const {
   clearCache,
   setSearch,
   resetSearch,
+  resetUserManagement,
 } = userManagementSlice.actions;
 
 export default userManagementSlice.reducer;

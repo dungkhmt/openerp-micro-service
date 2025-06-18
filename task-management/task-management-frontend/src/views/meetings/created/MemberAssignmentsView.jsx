@@ -19,10 +19,10 @@ import { MeetingPlanService } from "../../../services/api/meeting-plan.service";
 import ConfirmationDialog from "../../../components/mui/dialog/ConfirmationDialog";
 import ExpandableSearch from "../../../components/mui/search/ExpandableSearch";
 import { updateMemberAssignments } from "../../../store/meeting-plan";
-
+import { removeDiacritics } from "../../../utils/stringUtils.js";
 
 const MemberAssignmentsView = () => {
-  const { pid } = useParams();
+  const { meetingId } = useParams();
   const dispatch = useDispatch();
   const { memberRegistrations, sessions } = useSelector(
     (state) => state.meetingSessions
@@ -37,6 +37,9 @@ const MemberAssignmentsView = () => {
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [filteredMembers, setFilteredMembers] = useState(members);
+
+
+
 
   useEffect(() => {
     const initial = assignments.reduce((acc, { userId, sessionId }) => {
@@ -77,7 +80,10 @@ const MemberAssignmentsView = () => {
     };
     try {
       await dispatch(
-        updateMemberAssignments({ meetingPlanId: pid, data: assignmentData })
+        updateMemberAssignments({
+          meetingPlanId: meetingId,
+          data: assignmentData,
+        })
       ).unwrap();
       setInitialAssignments(manualAssignments);
       toast.success("Lưu phân công thành công!");
@@ -108,7 +114,7 @@ const MemberAssignmentsView = () => {
     }
 
     try {
-      const res = await MeetingPlanService.autoAssignMembers(pid, {
+      const res = await MeetingPlanService.autoAssignMembers(meetingId, {
         memberPreferences,
       });
       setManualAssignments(res.assignment);
@@ -131,7 +137,7 @@ const MemberAssignmentsView = () => {
           .toLowerCase();
         const email = member.email?.toLowerCase() || "";
         return (
-          fullName.includes(searchTerm.toLowerCase()) ||
+          removeDiacritics(fullName).includes(searchTerm.toLowerCase()) ||
           email.includes(searchTerm.toLowerCase())
         );
       });
@@ -189,7 +195,14 @@ const MemberAssignmentsView = () => {
   const MAX_INITIAL_SESSIONS = 8;
 
   return (
-    <Card sx={{ px: 7, py: 3, borderRadius: 3 }}>
+    <Card
+      sx={{
+        px: 7,
+        py: 3,
+        borderRadius: 3,
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
+      }}
+    >
       <Box
         sx={{
           display: "flex",
@@ -210,6 +223,7 @@ const MemberAssignmentsView = () => {
             placeholder="Tìm kiếm thành viên..."
             onSearchChange={handleSearch}
             iconSize={24}
+            width={{ xs: "100%", sm: "200px", md: "300px" }}
           />
         </Box>
       </Box>

@@ -13,8 +13,4 @@ import com.hust.openerp.taskmanagement.entity.Event;
 @Repository
 public interface EventRepository extends JpaRepository<Event, UUID> {
 	List<Event> findByProjectIdOrderByDueDateDesc(UUID projectId);
-	
-	@Query("SELECT e.id FROM Event e WHERE e.project.id = :projectId")
-	List<UUID> findEventIdsByProjectId(@Param("projectId") UUID projectId);
-
 }

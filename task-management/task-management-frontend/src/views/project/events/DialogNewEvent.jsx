@@ -17,7 +17,7 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Controller, useForm } from "react-hook-form";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { createEvent } from "../../../store/project/events";
 import toast from "react-hot-toast";
 import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
@@ -26,6 +26,7 @@ import ItemSelector from "../../../components/mui/dialog/ItemSelector";
 import { DatePicker } from "@mui/x-date-pickers";
 
 const DialogNewEvent = ({ openDialog, setOpenDialog }) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { id } = useParams();
 
@@ -57,7 +58,7 @@ const DialogNewEvent = ({ openDialog, setOpenDialog }) => {
       setCreateLoading(true);
       data.name = data.name?.trim();
       data.description = data.description?.trim();
-      await dispatch(
+      const res = await dispatch(
         createEvent({
           ...data,
           projectId: id,
@@ -65,6 +66,7 @@ const DialogNewEvent = ({ openDialog, setOpenDialog }) => {
         })
       );
       toast.success("Tạo sự kiện thành công");
+      navigate(`/project/${id}/events/${res.payload.id}`);
     } catch (e) {
       console.error(e);
       toast.error("Lỗi khi tạo sự kiện");
@@ -147,23 +149,43 @@ const DialogNewEvent = ({ openDialog, setOpenDialog }) => {
               />
             </FormControl>
           </Grid>
-          <Grid item sm={4} xs={12}>
+          <Grid item sm={6} xs={12}>
             <FormControl fullWidth>
               <Controller
-                name="dueDate"
+                name="startDate"
                 control={control}
                 defaultValue={new Date()}
                 as={
                   <DatePicker
-                    label="Ngày diễn ra"
+                    disablePast
+                    label="Ngày bắt đầu"
                     format="dd/MM/yyyy"
                     renderInput={(params) => <TextField {...params} />}
+                    slotProps={{ popper: { placement: "top" } }}
                   />
                 }
               />
             </FormControl>
           </Grid>
-          <Grid item sm={4} xs={12}>
+          <Grid item sm={6} xs={12}>
+            <FormControl fullWidth>
+              <Controller
+                name="dueDate"
+                control={control}
+                as={
+                  <DatePicker
+                    disablePast
+                    label="Ngày kết thúc"
+                    format="dd/MM/yyyy"
+                    renderInput={(params) => <TextField {...params} />}
+                    slotProps={{ popper: { placement: "top" } }}
+                  />
+                }
+              />
+            </FormControl>
+          </Grid>
+
+          <Grid item sm={12} xs={12}>
             <ItemSelector
               items={filteredMembers.map(({ member }) => member)}
               selectedItems={selectedUsers}
@@ -191,12 +213,12 @@ const DialogNewEvent = ({ openDialog, setOpenDialog }) => {
           onClick={handleCloseDialog}
           variant="outlined"
           sx={{
-            color: "#696969",
-            borderColor: "#D3D3D3",
+            color: "grey.700",
+            borderColor: "grey.500",
             textTransform: "none",
             "&:hover": {
-              borderColor: "#B0B0B0",
-              backgroundColor: "rgba(211, 211, 211, 0.5)",
+              borderColor: "grey.200",
+              backgroundColor: "grey.200",
             },
           }}
         >

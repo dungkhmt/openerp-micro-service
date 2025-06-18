@@ -9,6 +9,7 @@ import keycloak from "../../../config/keycloak";
 import { useNotificationState } from "../../../state/NotificationState";
 import NotificationMenu from "./NotificationMenu";
 import { request } from "../../../api";
+import { useSelector } from "react-redux";
 
 const StyledAvatar = styled(Box)(({ isOpen, theme }) => ({
   width: 25,
@@ -55,17 +56,26 @@ const processNotificationsContent = (notifications) => {
 function NotificationButton() {
   const [open, setOpen] = React.useState(false);
   const { notifications, numUnRead, hasMore } = useNotificationState();
+  const organizationCode = useSelector(
+    (state) => state.organization.currentOrganization?.code
+  );
 
   // return focus to the button when we transitioned from !open -> open
   const prevOpen = React.useRef(open);
   const anchorRef = React.useRef(null);
 
-  //
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
   };
 
   const fetchNotification = () => {
+    if (!organizationCode) {
+      notifications.set([]);
+      numUnRead.set(0);
+      hasMore.set(false);
+      return;
+    }
+
     let fromId = null;
     const fetchedNoties = notifications.get();
     if (fetchedNoties && fetchedNoties.length > 0) {
@@ -74,7 +84,7 @@ function NotificationButton() {
     try {
       request(
         "get",
-        `/notification?fromId=${fromId || ""}&page=${0}&size=${20}`,
+        `/notification?fromId=${fromId || ""}&page=${0}&size=${10}`,
         (res) => {
           let data = res.data;
           const noties = processNotificationsContent(
@@ -101,13 +111,16 @@ function NotificationButton() {
     if (prevOpen.current === true && open === false) {
       anchorRef.current.focus();
     }
-
     prevOpen.current = open;
-
     // if (open.get() === false && numUnRead.get() > 0) numUnRead.set(0);
   }, [open]);
 
   React.useEffect(() => {
+    // Reset notification state when organization changes
+    notifications.set([]);
+    numUnRead.set(0);
+    hasMore.set(false);
+
     // When user open multiple tabs, only one tab will receive events at any point of time,
     // all other tabs will wait for "heartbeatTimeout" secs and reconnect to server,
     // one of them will successfully connect and receive next events
@@ -214,6 +227,7 @@ function NotificationButton() {
       es = new EventSourcePolyfill(`${BASE_URL}/notification/subscription`, {
         headers: {
           Authorization: bearerAuth(keycloak.token),
+          "X-Organization-Code": organizationCode,
           // Count: count++,
         },
         heartbeatTimeout: 120000,
@@ -244,7 +258,7 @@ function NotificationButton() {
       es = null;
       // console.info(new Date(), `SSE closed`);
     };
-  }, []);
+  }, [organizationCode]);
 
   return (
     <>

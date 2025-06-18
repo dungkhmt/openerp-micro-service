@@ -30,7 +30,7 @@ public interface MeetingPlanService {
     
     void closeRegistrations(Date now);
     
-    void assignMeetingPlans(Date now);
+    void startMeetingPlans(Date now);
     
     void completeMeetingPlans(Date now);
 }

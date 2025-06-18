@@ -1,10 +1,10 @@
 import { Box, Typography } from "@mui/material";
 import PropTypes from "prop-types";
 
-const DescriptionText = ({ text, noDataText = "Không có mô tả" }) => {
+const DescriptionText = ({ text, noDataText = "Không có mô tả", sx = {} }) => {
   if (!text) {
     return (
-      <Typography variant="body2" sx={{ mb: 2, fontStyle: "italic" }}>
+      <Typography variant="body2" sx={{ mb: 2, fontStyle: "italic", ...sx }}>
         {noDataText}
       </Typography>
     );
@@ -18,6 +18,7 @@ const DescriptionText = ({ text, noDataText = "Không có mô tả" }) => {
         overflowX: "hidden",
         wordBreak: "break-word",
         whiteSpace: "pre-wrap",
+        ...sx,
       }}
     >
       {text.split("\n").map((line, index) => (
@@ -33,6 +34,7 @@ const DescriptionText = ({ text, noDataText = "Không có mô tả" }) => {
 DescriptionText.propTypes = {
   text: PropTypes.string.isRequired,
   noDataText: PropTypes.string,
+  sx: PropTypes.object,
 };
 
 export default DescriptionText;

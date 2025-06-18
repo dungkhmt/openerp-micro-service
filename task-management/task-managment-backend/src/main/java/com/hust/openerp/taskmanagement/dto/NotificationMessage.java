@@ -12,5 +12,7 @@ import lombok.NoArgsConstructor;
 public class NotificationMessage {
     private String userId;
 
+    private String organizationCode;
+
     private Channel channels;
 }

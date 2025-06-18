@@ -9,9 +9,11 @@ import {
   Typography,
   InputAdornment,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import { Icon } from "@iconify/react";
 import PropTypes from "prop-types";
+import { useDebounce } from "../../../hooks/useDebounce";
 
 const ItemSelector = ({
   items,
@@ -27,15 +29,17 @@ const ItemSelector = ({
   maxHeight = 200,
   maxWidth = 400,
   showCheckbox = true,
+  debounceDelay = 300,
 }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [search, setSearch] = useState("");
-  const [position, setPosition] = useState({
+  const debouncedSearchTerm = useDebounce(searchTerm, debounceDelay);
+  const containerRef = useRef(null);
+  const position = useRef({
     anchorOrigin: { vertical: "bottom", horizontal: "left" },
     transformOrigin: { vertical: "top", horizontal: "left" },
   });
-
-  const containerRef = useRef(null);
 
   const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -47,15 +51,10 @@ const ItemSelector = ({
       availableSpaceBelow < maxHeight &&
       availableSpaceAbove > availableSpaceBelow
     ) {
-      setPosition({
+      position.current = {
         anchorOrigin: { vertical: "top", horizontal: "left" },
         transformOrigin: { vertical: "bottom", horizontal: "left" },
-      });
-    } else {
-      setPosition({
-        anchorOrigin: { vertical: "bottom", horizontal: "left" },
-        transformOrigin: { vertical: "top", horizontal: "left" },
-      });
+      };
     }
   };
 
@@ -66,14 +65,43 @@ const ItemSelector = ({
   const open = Boolean(anchorEl);
 
   useEffect(() => {
-    handleSearch(search);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search]);
+  if (searchTerm !== debouncedSearchTerm) {
+    setIsLoading(true);
+  } else {
+    setIsLoading(false);
+  }
+}, [searchTerm, debouncedSearchTerm]);
+
+  useEffect(() => {
+  handleSearch(debouncedSearchTerm);
+}, [debouncedSearchTerm]);
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      setIsLoading(true);
+      handleSearch(searchTerm);
+      setIsLoading(false);
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleClear = () => {
+    setSearchTerm("");
+    setIsLoading(false);
+  };
 
   return (
     <Box ref={containerRef}>
       <Box
-        sx={{ display: "flex", justifyContent: "flex-start", height: "50px" }}
+        sx={{
+          display: "flex",
+          justifyContent: "flex-start",
+          height: "50px",
+        }}
       >
         <Button
           variant="outlined"
@@ -125,8 +153,8 @@ const ItemSelector = ({
         open={open}
         anchorEl={anchorEl}
         onClose={handleClose}
-        anchorOrigin={position.anchorOrigin}
-        transformOrigin={position.transformOrigin}
+        anchorOrigin={position.current.anchorOrigin}
+        transformOrigin={position.current.transformOrigin}
       >
         <Box sx={{ p: 2, height: 40, mb: 3 }}>
           <TextField
@@ -134,8 +162,9 @@ const ItemSelector = ({
             autoComplete="off"
             fullWidth
             placeholder={placeholder}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchTerm}
+            onChange={handleSearchChange}
+            onKeyDown={handleKeyDown}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -143,9 +172,9 @@ const ItemSelector = ({
                 </InputAdornment>
               ),
               sx: { height: 40 },
-              endAdornment: search && (
+              endAdornment: searchTerm && (
                 <IconButton
-                  onClick={() => setSearch("")}
+                  onClick={handleClear}
                   sx={{ padding: 0, marginRight: "-4px" }}
                 >
                   <Icon icon="mdi:close" fontSize={20} />
@@ -159,16 +188,37 @@ const ItemSelector = ({
           <Typography
             variant="subtitle2"
             color="text.secondary"
-            sx={{ pl: 5, pb: 1, fontSize: "0.9rem" }}
+            sx={{
+              pl: 5,
+              pb: 1,
+              fontSize: "0.9rem",
+            }}
           >
             Đã chọn <strong>{selectedItems.length}</strong> mục
           </Typography>
         )}
 
         <List
-          sx={{ maxHeight: maxHeight, overflowY: "auto", maxWidth: maxWidth }}
+          sx={{
+            maxHeight: maxHeight,
+            overflowY: "auto",
+            maxWidth: maxWidth,
+          }}
         >
-          {items.length === 0 ? (
+          {isLoading ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                maxWidth: maxWidth,
+                minHeight: maxHeight,
+                p: 2,
+              }}
+            >
+              <CircularProgress size={28} />
+            </Box>
+          ) : items.length === 0 ? (
             <Box sx={{ p: 2 }}>
               <Typography
                 variant="body2"
@@ -193,7 +243,9 @@ const ItemSelector = ({
                 >
                   {showCheckbox && (
                     <IconButton
-                      sx={{ color: isSelected ? "primary.main" : "grey.500" }}
+                      sx={{
+                        color: isSelected ? "primary.main" : "grey.500",
+                      }}
                     >
                       <Icon
                         icon={
@@ -230,6 +282,7 @@ ItemSelector.propTypes = {
   maxHeight: PropTypes.number,
   maxWidth: PropTypes.number,
   showCheckbox: PropTypes.bool,
+  debounceDelay: PropTypes.number,
 };
 
 export default ItemSelector;

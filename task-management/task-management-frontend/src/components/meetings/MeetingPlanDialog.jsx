@@ -40,8 +40,10 @@ const MeetingPlanDialog = ({
 
   const isFormReadOnly = initialValues?.statusId === "PLAN_COMPLETED";
   const isDeadlineEditable =
-    ["PLAN_REG_OPEN", "PLAN_DRAFT"].includes(initialValues?.statusId) ||
-    !initialValues?.registrationDeadline;
+    !initialValues?.registrationDeadline ||
+    (["PLAN_REG_OPEN", "PLAN_DRAFT"].includes(initialValues?.statusId) &&
+      initialValues?.registrationDeadline &&
+      dayjs().isBefore(dayjs(initialValues.registrationDeadline)));
 
   const handleClose = () => {
     onClose();

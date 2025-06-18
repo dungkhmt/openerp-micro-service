@@ -1,7 +1,9 @@
 package com.hust.openerp.taskmanagement.entity;
 
 import java.io.Serializable;
+import java.util.UUID;
 
+import com.hust.openerp.taskmanagement.multitenancy.entity.AbstractBaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -22,15 +24,15 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "task_management_user_skill")
-public class UserSkill {
+public class UserSkill extends AbstractBaseEntity {
 	@Id
     @Column(name = "user_id")
     private String userId;
 
 	@Id
     @Column(name = "skill_id")
-    private String skillId;
-    
+    private UUID skillId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
     private User user;
@@ -39,15 +41,13 @@ public class UserSkill {
     @JoinColumn(name = "skill_id", nullable = false, insertable = false, updatable = false)
     private Skill skill;
 
-
-    @SuppressWarnings("serial")
 	@AllArgsConstructor
     @NoArgsConstructor
     @Getter
     @Setter
     public static class UserSkillId implements Serializable {
         private String userId;
-        private String skillId;
+        private UUID skillId;
 
         @Override
         public boolean equals(Object o) {

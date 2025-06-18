@@ -2,6 +2,7 @@ package com.hust.openerp.taskmanagement.config;
 
 import java.util.concurrent.Callable;
 
+import com.hust.openerp.taskmanagement.multitenancy.async.OrganizationTaskDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
@@ -33,6 +34,8 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.setCorePoolSize(5); // So thread toi da duoc tao trong Pool khi co request, qua 5 thi vao hang doi
         executor.setMaxPoolSize(10); // So thread moi duoc tao toi da
         executor.setQueueCapacity(25); // Khi hang doi full - 25 thi bat dau tao them thread moi
+        executor.setTaskDecorator(new OrganizationTaskDecorator());
+        executor.initialize();
 
         return executor;
     }

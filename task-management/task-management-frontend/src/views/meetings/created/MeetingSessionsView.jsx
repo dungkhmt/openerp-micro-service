@@ -9,10 +9,13 @@ import CreateSessionsDialog from "../../../components/meetings/CreateSessionsDia
 import SessionCard from "../../../components/meetings/SessionCard";
 import ConfirmationDialog from "../../../components/mui/dialog/ConfirmationDialog";
 import dayjs from "dayjs";
-import { createMeetingSessions, deleteMeetingSession } from "../../../store/meeting-plan/meeting-sessions";
+import {
+  createMeetingSessions,
+  deleteMeetingSession,
+} from "../../../store/meeting-plan/meeting-sessions";
 
 const MeetingSessionsView = () => {
-  const { pid } = useParams();
+  const { meetingId } = useParams();
   const dispatch = useDispatch();
   const { isCreator, currentPlan } = useSelector((state) => state.meetingPlan);
   const { sessions } = useSelector((state) => state.meetingSessions);
@@ -44,7 +47,7 @@ const MeetingSessionsView = () => {
     try {
       await dispatch(
         deleteMeetingSession({
-          meetingPlanId: pid,
+          meetingPlanId: meetingId,
           meetingSessionId: deleteSession.id,
         })
       ).unwrap();
@@ -69,7 +72,7 @@ const MeetingSessionsView = () => {
 
     try {
       await dispatch(
-        createMeetingSessions({ meetingPlanId: pid, data: batchRequest })
+        createMeetingSessions({ meetingPlanId: meetingId, data: batchRequest })
       ).unwrap();
       toast.success("Tạo phiên họp thành công!");
     } catch (error) {
@@ -81,7 +84,9 @@ const MeetingSessionsView = () => {
 
   return (
     <>
-      <Card sx={{ borderRadius: 3 }}>
+      <Card
+        sx={{ borderRadius: 3, boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)" }}
+      >
         <CardContent>
           {/* Header: Title + Add Button */}
           <Box
@@ -94,12 +99,23 @@ const MeetingSessionsView = () => {
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Typography variant="h6">Phiên họp</Typography>
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: 600, color: "text.secondary" }}
+              <Box
+                sx={{
+                  backgroundColor: "primary.background",
+                  px: 1.5,
+                  borderRadius: 3,
+                }}
               >
-                ({sessions?.length})
-              </Typography>
+                <Typography
+                  sx={{
+                    fontSize: "0.8rem",
+                    fontWeight: 600,
+                    color: "primary.main",
+                  }}
+                >
+                  {sessions?.length}
+                </Typography>
+              </Box>
             </Box>
 
             {isEditable && (
