@@ -119,32 +119,28 @@ const UserManagementPage = () => {
     getUsers();
   }, [getUsers]);
 
-
-  console.log(usersCache);
-
-
-
   useEffect(() => {
-    setFilterUsers(
-      usersCache
-        .filter(( user ) => {
+    const filtered = usersCache.filter((user) => {
+      const fullName = `${user.firstName ?? ""} ${
+        user.lastName ?? ""
+      }`.toLowerCase();
+      const id = user.id.toLowerCase();
+      const email = user.email?.toLowerCase() ?? "";
 
+      return (
+        fullName.includes(search.toLowerCase()) ||
+        id.includes(search.toLowerCase()) ||
+        email.includes(search.toLowerCase())
+      );
+    });
 
+    const sorted = filtered.sort((a, b) => {
+      const aHasInfo = a.firstName || a.lastName || a.email;
+      const bHasInfo = b.firstName || b.lastName || b.email;
+      return aHasInfo === bHasInfo ? 0 : aHasInfo ? -1 : 1;
+    });
 
-          const fullName =
-            `${user.firstName ?? ""} ${user.lastName ?? ""}`?.toLowerCase() ??
-            "";
-          const id = user.id.toLowerCase();
-          const email = user.email?.toLowerCase() ?? "";
-          if (!user.firstName && !user.lastName && !user.email) return false;
-          return (
-            fullName.includes(search.toLowerCase()) ||
-            id.includes(search.toLowerCase()) ||
-            email.includes(search.toLowerCase())
-          );
-        })
-        
-    );
+    setFilterUsers(sorted);
   }, [search, usersCache]);
 
   useEffect(() => {
@@ -207,7 +203,7 @@ const UserManagementPage = () => {
             </Box>
           </Box>
 
-          <Box ref={ref}>
+          <Box ref={ref} sx={{pb: 3}}>
             <DataGrid
               rows={filterUsers}
               columns={columns}
@@ -223,7 +219,7 @@ const UserManagementPage = () => {
                 }
               }}
               columnHeaderHeight={0}
-              hideFooter
+              hideFooterSelectedRowCount
             />
           </Box>
         </Card>

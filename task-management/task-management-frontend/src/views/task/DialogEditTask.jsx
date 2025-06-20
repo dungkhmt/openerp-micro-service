@@ -504,7 +504,7 @@ const DialogEditTask = ({ open, setOpen }) => {
                       textOverflow: "ellipsis",
                     }}
                   >
-                    {item.name}
+                    {item?.name}
                   </Typography>
                 )}
                 renderSelectedItem={(items) => (
