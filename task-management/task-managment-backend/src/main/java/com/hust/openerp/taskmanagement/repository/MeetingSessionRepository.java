@@ -14,12 +14,26 @@ import java.util.UUID;
 public interface MeetingSessionRepository extends JpaRepository<MeetingSession, UUID> {
     List<MeetingSession> findByPlanIdOrderByStartTimeAsc(UUID planId);
 
-    @Query("SELECT s FROM MeetingSession s WHERE s.planId IN :planIds AND s.startTime = (" +
-        "SELECT MIN(s2.startTime) FROM MeetingSession s2 WHERE s2.planId = s.planId)")
+    @Query(value = """
+        SELECT * FROM task_management_meeting_session s
+        WHERE s.plan_id IN (:planIds)
+          AND s.start_time = (
+              SELECT MIN(s2.start_time)
+              FROM task_management_meeting_session s2
+              WHERE s2.plan_id = s.plan_id
+          )
+    """, nativeQuery = true)
     List<MeetingSession> findEarliestByPlanIds(@Param("planIds") List<UUID> planIds);
 
-    @Query("SELECT s FROM MeetingSession s WHERE s.planId IN :planIds AND s.endTime = (" +
-        "SELECT MAX(s2.endTime) FROM MeetingSession s2 WHERE s2.planId = s.planId)")
+    @Query(value = """
+        SELECT * FROM task_management_meeting_session s
+        WHERE s.plan_id IN (:planIds)
+          AND s.end_time = (
+              SELECT MAX(s2.end_time)
+              FROM task_management_meeting_session s2
+              WHERE s2.plan_id = s.plan_id
+          )
+    """, nativeQuery = true)
     List<MeetingSession> findLatestByPlanIds(@Param("planIds") List<UUID> planIds);
 }
 
