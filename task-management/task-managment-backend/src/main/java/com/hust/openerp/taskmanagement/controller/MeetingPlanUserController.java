@@ -17,6 +17,7 @@ import com.hust.openerp.taskmanagement.config.OpenApiConfig;
 import com.hust.openerp.taskmanagement.dto.MeetingAutoAssignRequestDTO;
 import com.hust.openerp.taskmanagement.dto.MeetingAutoAssignResponseDTO;
 import com.hust.openerp.taskmanagement.dto.MeetingPlanUserDTO;
+import com.hust.openerp.taskmanagement.dto.MeetingSessionDTO;
 import com.hust.openerp.taskmanagement.dto.form.AddMeetingPlanUserForm;
 import com.hust.openerp.taskmanagement.dto.form.UpdateMemberAssignmentsForm;
 import com.hust.openerp.taskmanagement.entity.User;
@@ -54,7 +55,7 @@ public class MeetingPlanUserController {
     }
     
     @GetMapping("/assignments/me")
-    public MeetingPlanUserDTO getMyAssignment(Principal principal, @PathVariable UUID planId) {
+    public MeetingSessionDTO getMyAssignment(Principal principal, @PathVariable UUID planId) {
         return meetingPlanUserService.getMyAssignment(principal.getName(), planId);
     }
     

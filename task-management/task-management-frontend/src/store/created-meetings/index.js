@@ -42,6 +42,7 @@ const initialState = {
     sort: "desc",
     field: "createdStamp",
   },
+  statusCategory: "upcoming",
   fetchLoading: false,
   errors: [],
 };
@@ -71,12 +72,24 @@ export const createdMeetingPlansSlice = createSlice({
     resetSort: (state) => {
       state.sort = initialState.sort;
     },
+    setStatusCategory: (state, action) => {
+      state.statusCategory = action.payload;
+    },
+    resetStatusCategory: (state) => {
+      state.statusCategory = initialState.statusCategory;
+    },
     clearCache: (state) => {
       state.plansCache = {};
     },
     resetCreatedMeetings: (state) => {
-      // eslint-disable-next-line no-unused-vars
-      state = { ...initialState };
+      state.plansCache = initialState.plansCache;
+      state.totalCount = initialState.totalCount;
+      state.search = initialState.search;
+      state.sort = initialState.sort;
+      state.pagination = initialState.pagination;
+      state.statusCategory = initialState.statusCategory;
+      state.fetchLoading = initialState.fetchLoading;
+      state.errors = initialState.errors;
     },
   },
   extraReducers: (builder) => {
@@ -108,6 +121,8 @@ export const {
   resetPagination,
   setSort,
   resetSort,
+  setStatusCategory,
+  resetStatusCategory,
   clearCache,
   resetCreatedMeetings,
 } = createdMeetingPlansSlice.actions;

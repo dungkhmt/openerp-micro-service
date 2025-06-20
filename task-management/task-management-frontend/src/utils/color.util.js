@@ -1,4 +1,9 @@
 import dayjs from "dayjs";
+import {
+  INVITATION_STATUS_IDS,
+  PLAN_STATUS_IDS,
+  TASK_STATUS_IDS,
+} from "../constants/statuses";
 
 export const getCategoryColor = (category) => {
   switch (category) {
@@ -20,36 +25,45 @@ export const getCategoryColor = (category) => {
 export const getStatusColor = (status) => {
   switch (status) {
     // Task statuses
-    case "ASSIGNMENT_ACTIVE":
+    case TASK_STATUS_IDS.active:
       return "success";
-    case "ASSIGNMENT_INACTIVE":
+    case TASK_STATUS_IDS.inactive:
       return "secondary";
-    case "TASK_INPROGRESS":
+    case TASK_STATUS_IDS.inProgress:
       return "primary";
-    case "TASK_OPEN":
+    case TASK_STATUS_IDS.open:
       return "warning";
-    case "TASK_RESOLVED":
+    case TASK_STATUS_IDS.resolved:
       return "success";
-    case "TASK_CLOSED":
+    case TASK_STATUS_IDS.closed:
       return "error";
 
     // Meeting plan statuses
-    case "PLAN_DRAFT":
+    case PLAN_STATUS_IDS.draft:
       return "secondary";
-    case "PLAN_REG_OPEN":
+    case PLAN_STATUS_IDS.registrationOpen:
       return "warning";
-    case "PLAN_REG_CLOSED":
+    case PLAN_STATUS_IDS.registrationClosed:
       return "info";
-    case "PLAN_ASSIGNED":
+    case PLAN_STATUS_IDS.assigned:
       return "success";
-    case "PLAN_IN_PROGRESS":
+    case PLAN_STATUS_IDS.inProgress:
       return "primary";
-    case "PLAN_COMPLETED":
+    case PLAN_STATUS_IDS.completed:
       return "success";
-    case "PLAN_CANCELED":
+    case PLAN_STATUS_IDS.canceled:
       return "error";
 
-    // Fallback for unknown statuses
+    // Invitation statuses
+    case INVITATION_STATUS_IDS.pending:
+      return "warning";
+    case INVITATION_STATUS_IDS.accepted:
+      return "success";
+    case INVITATION_STATUS_IDS.declined:
+      return "error";
+    case INVITATION_STATUS_IDS.expired:
+      return "secondary";
+
     default:
       return "info";
   }

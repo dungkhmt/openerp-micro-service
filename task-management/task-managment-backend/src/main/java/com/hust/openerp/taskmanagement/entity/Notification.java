@@ -3,23 +3,19 @@ package com.hust.openerp.taskmanagement.entity;
 import java.util.Date;
 import java.util.UUID;
 
+import com.hust.openerp.taskmanagement.multitenancy.entity.AbstractBaseEntity;
+import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.Data;
 
 @Data
 @Entity
 @Table(name = "notifications")
 @EntityListeners(AuditingEntityListener.class)
-public class Notification {
+public class Notification extends AbstractBaseEntity {
 
     public static final String STATUS_CREATED = "NOTIFICATION_CREATED";
 
@@ -44,5 +40,4 @@ public class Notification {
 
     @CreatedDate
     private Date createdStamp;
-
 }

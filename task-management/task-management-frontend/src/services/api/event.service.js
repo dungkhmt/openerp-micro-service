@@ -47,6 +47,9 @@ const EventService = {
         endPoints.updateEvent(eventId),
         data
       );
+
+      console.log(response);
+
       if (response?.data && isFunction(cb)) cb(null, response.data);
       return response?.data;
     } catch (e) {

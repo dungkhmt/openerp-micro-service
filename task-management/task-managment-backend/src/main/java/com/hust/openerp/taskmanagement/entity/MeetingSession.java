@@ -3,6 +3,7 @@ package com.hust.openerp.taskmanagement.entity;
 import java.util.Date;
 import java.util.UUID;
 
+import com.hust.openerp.taskmanagement.multitenancy.entity.AbstractBaseEntity;
 import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
@@ -25,7 +26,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @Table(name = "task_management_meeting_session")
-public class MeetingSession {
+public class MeetingSession extends AbstractBaseEntity {
 
     @Id
     @Column
@@ -43,7 +44,7 @@ public class MeetingSession {
     @CreationTimestamp
     @Column(name = "created_stamp")
     private Date createdStamp;
-
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plan_id", insertable = false, updatable = false)
     private MeetingPlan meetingPlan;

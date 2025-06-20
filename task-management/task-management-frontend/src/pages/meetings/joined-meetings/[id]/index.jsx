@@ -21,9 +21,9 @@ import { IconButton } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useAPIExceptionHandler } from "../../../../hooks/useAPIExceptionHandler";
 
-const JoinedMeeting = () => {
+const JoinedMeetingDetails = () => {
   const navigate = useNavigate();
-  const { pid } = useParams();
+  const { meetingId } = useParams();
   const dispatch = useDispatch();
   const {
     currentPlan,
@@ -35,19 +35,19 @@ const JoinedMeeting = () => {
   );
 
   useEffect(() => {
-    if (!pid) return;
+    if (!meetingId) return;
     const fetchData = async () => {
       try {
         dispatch(setIsCreator(false));
         await Promise.all([
-          dispatch(fetchMeetingPlan(pid)),
-          dispatch(fetchMeetingSessions(pid)),
+          dispatch(fetchMeetingPlan(meetingId)),
+          dispatch(fetchMeetingSessions(meetingId)),
         ]);
-        if (!currentPlan || currentPlan.id !== pid) {
+        if (!currentPlan || currentPlan.id !== meetingId) {
           await Promise.all([
-            dispatch(fetchMyMeetingSessions(pid)),
-            dispatch(fetchMyAssignment(pid)),
-            dispatch(fetchMeetingPlanMembers(pid)),
+            dispatch(fetchMyMeetingSessions(meetingId)),
+            dispatch(fetchMyAssignment(meetingId)),
+            dispatch(fetchMeetingPlanMembers(meetingId)),
           ]);
         }
       } catch (error) {
@@ -56,7 +56,7 @@ const JoinedMeeting = () => {
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, pid]);
+  }, [dispatch, meetingId]);
 
   useAPIExceptionHandler(planLoading, planErrors, clearPlanErrors);
   useAPIExceptionHandler(sessionLoading, sessionErrors, clearSessionErrors);
@@ -82,4 +82,4 @@ const JoinedMeeting = () => {
     </>
   );
 };
-export default JoinedMeeting;
+export default JoinedMeetingDetails;

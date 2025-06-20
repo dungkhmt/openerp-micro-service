@@ -3,7 +3,7 @@ import privateClient from "../client/private.client";
 
 const endPoints = {
   getAll: "/users",
-  sync: "/",
+  sync: "/users/sync",
   getMyProfile: "/users/me",
   updateMyProfile: "/users/me",
   getAssignedTaskCreator: "/users/assigned-task-creator",

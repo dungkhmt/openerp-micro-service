@@ -21,9 +21,10 @@ import {
   addMemberToMeetingPlan,
   removeMemberFromMeetingPlan,
 } from "../../../store/meeting-plan";
+import { removeDiacritics } from "../../../utils/stringUtils.js";
 
 const MeetingMembersView = () => {
-  const { pid } = useParams();
+  const { meetingId } = useParams();
   const dispatch = useDispatch();
   const { usersCache } = useSelector((state) => state.userManagement);
   const { members, currentPlan, isCreator } = useSelector(
@@ -76,7 +77,7 @@ const MeetingMembersView = () => {
           .toLowerCase();
         const email = member.email?.toLowerCase() || "";
         return (
-          fullName.includes(searchTerm.toLowerCase()) ||
+          removeDiacritics(fullName).includes(searchTerm.toLowerCase()) ||
           email.includes(searchTerm.toLowerCase())
         );
       });
@@ -98,7 +99,7 @@ const MeetingMembersView = () => {
     try {
       await dispatch(
         removeMemberFromMeetingPlan({
-          meetingPlanId: pid,
+          meetingPlanId: meetingId,
           userId: deletedMembers.id,
         })
       ).unwrap();
@@ -118,7 +119,7 @@ const MeetingMembersView = () => {
         userId: selectedMembers.map((member) => member.id),
       };
       await dispatch(
-        addMemberToMeetingPlan({ meetingPlanId: pid, data })
+        addMemberToMeetingPlan({ meetingPlanId: meetingId, data })
       ).unwrap();
       toast.success("Thêm thành viên thành công!");
     } catch (error) {
@@ -130,6 +131,7 @@ const MeetingMembersView = () => {
   };
 
   useEffect(() => {
+    if (!usersCache) return;
     setFilteredUsers(
       usersCache.filter(
         (user) =>
@@ -147,7 +149,9 @@ const MeetingMembersView = () => {
   return (
     <>
       {/* Members */}
-      <Card sx={{ borderRadius: 3 }}>
+      <Card
+        sx={{ borderRadius: 3, boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)" }}
+      >
         <CardContent>
           <Box
             sx={{
@@ -159,12 +163,23 @@ const MeetingMembersView = () => {
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Typography variant="h6">Thành viên</Typography>
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: 600, color: "text.secondary" }}
+              <Box
+                sx={{
+                  backgroundColor: "primary.background",
+                  px: 1.5,
+                  borderRadius: 3,
+                }}
               >
-                ({members?.length})
-              </Typography>
+                <Typography
+                  sx={{
+                    fontSize: "0.8rem",
+                    fontWeight: 600,
+                    color: "primary.main",
+                  }}
+                >
+                  {members?.length}
+                </Typography>
+              </Box>
             </Box>
 
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>

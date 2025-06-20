@@ -22,6 +22,8 @@ import { GroupedAvatars } from "../../../components/common/avatar/GroupedAvatars
 import { Icon } from "@iconify/react";
 import { getDeadlineColor } from "../../../utils/color.util";
 import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
+import { CircularProgressLoading } from "../../../components/common/loading/CircularProgressLoading";
+import { isRegistrationMode } from "../../../utils/meetingUtils";
 
 const statusCategoryOptions = [
   { value: "upcoming", label: "Sắp diễn ra" },
@@ -56,8 +58,7 @@ const JoinedMeetingsListPage = ({
   };
 
   return (
-    <Box sx={{ p: 2 }}>
-      {/* Header (unchanged) */}
+    <Box>
       <Box
         sx={{
           mb: 2,
@@ -74,7 +75,7 @@ const JoinedMeetingsListPage = ({
         </Typography>
       </Box>
 
-      <Grid container spacing={2} sx={{ mb: 2, alignItems: "center" }}>
+      <Grid container spacing={2} sx={{ mb: 2, pr: 5, alignItems: "center" }}>
         <Grid item xs={8}>
           <SearchField
             value={search}
@@ -102,18 +103,14 @@ const JoinedMeetingsListPage = ({
         </Grid>
       </Grid>
 
-      {/* Card-based layout */}
       <Box ref={ref} sx={{ overflowY: "auto" }}>
-        {fetchLoading && (
-          <Typography variant="body1" sx={{ textAlign: "center", my: 2 }}>
-            Đang tải...
-          </Typography>
-        )}
+        {fetchLoading && <CircularProgressLoading />}
         <Grid container spacing={2}>
           {(plansCache[pagination.page] ?? []).map((row) => (
             <Grid item xs={12} key={row.id}>
               <Card
                 sx={{
+                  mr: 2,
                   borderRadius: 4,
                   boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
                 }}
@@ -121,7 +118,6 @@ const JoinedMeetingsListPage = ({
                 <CardContent
                   sx={{ display: "flex", alignItems: "center", gap: 2 }}
                 >
-                  {/* Main Content */}
                   <Box sx={{ flex: 1 }}>
                     <Box
                       sx={{
@@ -161,70 +157,70 @@ const JoinedMeetingsListPage = ({
                         }}
                       />
                     </Box>
-                    {/* Date and Time */}
                     <Box>
-                      {row.assignedSession && (
-                        <Box
-                          sx={{
-                            display: "flex",
-                            flexDirection: "row",
-                            gap: 2,
-                            color: getDeadlineColor(
-                              row.assignedSession.startTime
-                            ),
-                          }}
-                        >
+                      {!isRegistrationMode(row.statusId) &&
+                        row.assignedSession && (
                           <Box
                             sx={{
                               display: "flex",
-                              alignItems: "center",
-                              gap: 1,
+                              flexDirection: "row",
+                              gap: 2,
+                              color: getDeadlineColor(
+                                row.assignedSession.startTime
+                              ),
                             }}
                           >
-                            <Icon icon="lets-icons:date-today" />
-                            <Typography
-                              variant="body2"
+                            <Box
                               sx={{
-                                fontWeight: 600,
-                                color: getDeadlineColor(
-                                  row.assignedSession.startTime
-                                ),
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
                               }}
                             >
-                              {dayjs(row.assignedSession.startTime).format(
-                                "dddd, DD MMM YYYY"
-                              )}
-                            </Typography>
-                          </Box>
+                              <Icon icon="lets-icons:date-today" />
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontWeight: 600,
+                                  color: getDeadlineColor(
+                                    row.assignedSession.startTime
+                                  ),
+                                }}
+                              >
+                                {dayjs(row.assignedSession.startTime).format(
+                                  "dddd, DD MMM YYYY"
+                                )}
+                              </Typography>
+                            </Box>
 
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
-                            }}
-                          >
-                            <Icon icon="mingcute:time-line" />
-                            <Typography
-                              variant="body2"
+                            <Box
                               sx={{
-                                fontWeight: 600,
-                                color: getDeadlineColor(
-                                  row.assignedSession.startTime
-                                ),
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
                               }}
                             >
-                              {dayjs(row.assignedSession.startTime).format(
-                                "HH:mm A"
-                              )}{" "}
-                              -{" "}
-                              {dayjs(row.assignedSession.endTime).format(
-                                "HH:mm A"
-                              )}
-                            </Typography>
+                              <Icon icon="mingcute:time-line" />
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontWeight: 600,
+                                  color: getDeadlineColor(
+                                    row.assignedSession.startTime
+                                  ),
+                                }}
+                              >
+                                {dayjs(row.assignedSession.startTime).format(
+                                  "HH:mm A"
+                                )}{" "}
+                                -{" "}
+                                {dayjs(row.assignedSession.endTime).format(
+                                  "HH:mm A"
+                                )}
+                              </Typography>
+                            </Box>
                           </Box>
-                        </Box>
-                      )}
+                        )}
                     </Box>
 
                     <Divider sx={{ my: 2 }} />
@@ -322,7 +318,6 @@ const JoinedMeetingsListPage = ({
                     </Box>
                   </Box>
 
-                  {/* Participants */}
                   <Box
                     sx={{ display: "flex", alignItems: "center", gap: 1 }}
                   ></Box>
@@ -332,15 +327,33 @@ const JoinedMeetingsListPage = ({
           ))}
         </Grid>
 
-        {/* Pagination Controls */}
+        {!fetchLoading && plansCache[pagination.page]?.length === 0 && (
+          <Box
+            sx={{
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Typography variant="body1" sx={{ textAlign: "center", my: 2 }}>
+              Không có dữ liệu
+            </Typography>
+          </Box>
+        )}
+
         {totalCount > 0 && (
           <Box
             sx={{
+              position: "sticky",
+              bottom: 0,
+              width: "100%",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              my: 3,
-              gap: 1,
+              py: 2,
+              backgroundColor: "background.default",
+              zIndex: 10,
             }}
           >
             <Pagination
@@ -354,13 +367,6 @@ const JoinedMeetingsListPage = ({
               showLastButton={false}
             />
           </Box>
-        )}
-
-        {/* No Data Message */}
-        {!fetchLoading && plansCache[pagination.page]?.length === 0 && (
-          <Typography variant="body1" sx={{ textAlign: "center", my: 2 }}>
-            Không có dữ liệu
-          </Typography>
         )}
       </Box>
     </Box>

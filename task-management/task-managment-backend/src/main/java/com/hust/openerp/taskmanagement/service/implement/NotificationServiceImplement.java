@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.hust.openerp.taskmanagement.multitenancy.util.OrganizationContext;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hust.openerp.taskmanagement.dto.NotificationMessage;
 import com.hust.openerp.taskmanagement.dto.NotificationProjection;
 import com.hust.openerp.taskmanagement.dto.rabbitmq.Channel;
@@ -86,6 +89,8 @@ public class NotificationServiceImplement implements NotificationService {
     }
 
     private void publishMessage(NotificationMessage message) {
+        message.setOrganizationCode(OrganizationContext.getCurrentOrganizationCode());
+        
         Map<String, Object> headers = new HashMap<>();
         headers.put("channels.inApp", message.getChannels().getInApp() != null);
         headers.put("channels.email", message.getChannels().getEmail() != null);

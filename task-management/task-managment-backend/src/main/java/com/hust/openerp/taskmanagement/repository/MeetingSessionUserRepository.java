@@ -18,9 +18,6 @@ import com.hust.openerp.taskmanagement.entity.User;
 public interface MeetingSessionUserRepository
 		extends JpaRepository<MeetingSessionUser, MeetingSessionUser.MeetingSessionUserId> {
 
-	@Query("SELECT u FROM User u JOIN MeetingSessionUser msu ON u.id = msu.userId WHERE msu.sessionId = :sessionId")
-	List<User> findUsersBySessionId(@Param("sessionId") UUID sessionId);
-
 	@Query("SELECT ms FROM MeetingSession ms JOIN MeetingSessionUser msu ON ms.id = msu.sessionId "
 			+ "WHERE msu.userId = :userId AND ms.planId = :planId ORDER BY ms.startTime")
 	List<MeetingSession> findSessionsByUserIdAndPlanId(@Param("userId") String userId, @Param("planId") UUID planId);

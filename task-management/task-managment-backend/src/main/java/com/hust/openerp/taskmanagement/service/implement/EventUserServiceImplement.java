@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,7 +25,10 @@ import com.hust.openerp.taskmanagement.service.ProjectMemberService;
 import com.hust.openerp.taskmanagement.service.UserService;
 
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class EventUserServiceImplement implements EventUserService {
+
+    private static final Logger log = LoggerFactory.getLogger(EventUserServiceImplement.class);
 
 	private final EventUserRepository eventUserRepository;
 
@@ -32,21 +38,10 @@ public class EventUserServiceImplement implements EventUserService {
 
 	private final UserService userService;
 
-	private NotificationService notiService;
+	private final NotificationService notiService;
 
 	@Value("${app.endpoint.client}")
 	private String clientEndpoint;
-
-	@Autowired
-	public EventUserServiceImplement(EventUserRepository eventUserRepository, EventRepository eventRepository,
-			ProjectMemberService projectMemberService, UserService userService, NotificationService notiService) {
-		super();
-		this.eventUserRepository = eventUserRepository;
-		this.eventRepository = eventRepository;
-		this.projectMemberService = projectMemberService;
-		this.userService = userService;
-		this.notiService = notiService;
-	}
 
 	@Override
 	public List<User> getEventUsers(String userId, UUID eventId) {
@@ -55,8 +50,7 @@ public class EventUserServiceImplement implements EventUserService {
 			throw new ApiException(ErrorCode.NOT_A_MEMBER_OF_PROJECT);
 		}
 
-		List<User> users = eventUserRepository.findUsersByEventId(eventId);
-		return users;
+        return eventUserRepository.findUsersByEventId(eventId);
 	}
 
 	@Override
@@ -72,13 +66,13 @@ public class EventUserServiceImplement implements EventUserService {
 		if (member == null) {
 			throw new ApiException(ErrorCode.USER_NOT_EXIST);
 		}
-		
+
 		EventUser res = EventUser.builder().eventId(eventId).userId(memberId).build();
 		eventUserRepository.save(res);
 
 		// Send notifications if the added user is not the one performing the operation
 		try {
-			if (member == null || (adderId != null && adderId.equals(member.getId()))) {
+			if (adderId != null && adderId.equals(member.getId())) {
 				return;
 			}
 
@@ -86,24 +80,8 @@ public class EventUserServiceImplement implements EventUserService {
 
 			notiService.createInAppNotification(adderId, member.getId(), subject,
 					"/project/" + event.getProjectId() + "/events/" + event.getId());
-
-			if (member.getEmail() == null || member.getEmail().isEmpty()) {
-				return;
-			}
-
-			User adder = userService.findById(adderId);
-			Map<String, Object> model = new HashMap<>();
-			model.put("participantName",
-					(member.getFirstName() == null && member.getLastName() == null) ? member.getId()
-							: member.getFirstName() + " " + member.getLastName());
-			model.put("eventName", event.getName());
-			model.put("eventDate", event.getDueDate() == null ? "Không xác định"
-					: new SimpleDateFormat("dd-MM-yyyy HH:mm").format(event.getDueDate()));
-			model.put("link", clientEndpoint + "/project/" + event.getProjectId() + "/event/" + event.getId());
-
-			notiService.createMailNotification(adder.getEmail(), member.getEmail(), subject, "add-event", model);
 		} catch (Exception e) {
-			e.printStackTrace();
+            log.error("Failed to send notifications when adding user {} to event {}: {}", memberId, eventId, e.getMessage(), e);
 		}
 	}
 

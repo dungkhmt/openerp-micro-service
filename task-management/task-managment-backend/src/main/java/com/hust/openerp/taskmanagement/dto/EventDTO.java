@@ -12,5 +12,7 @@ public class EventDTO {
   private UUID id;
   private String name;
   private String description;
+  private Date startDate;
   private Date dueDate;
+  private Date createdStamp;
 }

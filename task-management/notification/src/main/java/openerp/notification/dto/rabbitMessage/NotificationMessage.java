@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NotificationMessage {
-    private User user;
+    private String userId;
+
+    private String organizationCode;
 
     private Channel channels;
 }

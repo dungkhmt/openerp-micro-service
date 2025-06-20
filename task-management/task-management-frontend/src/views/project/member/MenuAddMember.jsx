@@ -19,8 +19,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { UserAvatar } from "../../../components/common/avatar/UserAvatar";
 import { LoadingButton } from "../../../components/mui/button/LoadingButton";
 import { useDebounce } from "../../../hooks/useDebounce";
-import { UserService } from "../../../services/api/user.service";
 import { addMember } from "../../../store/project";
+import { removeDiacritics } from "../../../utils/stringUtils.js";
 
 function renderUserItem(user) {
   const { firstName, lastName, id } = user;
@@ -69,8 +69,9 @@ function renderUserItem(user) {
 
 const MenuAddMember = ({ anchorEl, onClose }) => {
   const { members, project } = useSelector((state) => state.project);
-  const dispatch = useDispatch();
+  const { usersCache } = useSelector((state) => state.userManagement);
 
+  const dispatch = useDispatch();
   const [addLoading, setAddLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(false);
   const [users, setUsers] = useState([]);
@@ -78,26 +79,40 @@ const MenuAddMember = ({ anchorEl, onClose }) => {
   const [search, setSearch] = useState("");
   const searchDebounce = useDebounce(search, 500);
 
-  const getUsers = useCallback(async () => {
+  const getUsers = useCallback(() => {
+    setFetchLoading(true);
     try {
-      setFetchLoading(true);
-      const encodedQuery = encodeURIComponent(searchDebounce).replace(
-        /%20/g,
-        "%1F"
-      );
-      const users = await UserService.getAll({
-        q: searchDebounce
-          ? `id:*${encodedQuery}* OR firstName:*${encodedQuery}* OR lastName:*${encodedQuery}*`
-          : "",
-      });
-      setUsers(users);
+      const query = removeDiacritics(searchDebounce.trim().toLowerCase());
+
+      const filteredUsers = query
+        ? usersCache.filter((user) => {
+            const fullName = `${user.firstName || ""} ${user.lastName || ""}`;
+            const normalizedId = user.id?.toLowerCase() || "";
+            const normalizedFirstName = removeDiacritics(
+              user.firstName || ""
+            ).toLowerCase();
+            const normalizedLastName = removeDiacritics(
+              user.lastName || ""
+            ).toLowerCase();
+            const normalizedFullName = removeDiacritics(fullName).toLowerCase();
+
+            return (
+              normalizedId.includes(query) ||
+              normalizedFirstName.includes(query) ||
+              normalizedLastName.includes(query) ||
+              normalizedFullName.includes(query)
+            );
+          })
+        : usersCache;
+
+      setUsers(filteredUsers);
     } catch (e) {
       console.log(e);
-      toast.error("Lỗi khi lấy danh sách người dùng");
+      toast.error("Lỗi khi tìm kiếm người dùng trong cache");
     } finally {
       setFetchLoading(false);
     }
-  }, [searchDebounce]);
+  }, [searchDebounce, usersCache]);
 
   const handleAddMember = async () => {
     if (!selectedUser) return;

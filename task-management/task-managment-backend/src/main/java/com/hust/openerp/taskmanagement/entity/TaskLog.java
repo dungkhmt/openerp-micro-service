@@ -4,18 +4,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import com.hust.openerp.taskmanagement.multitenancy.entity.AbstractBaseEntity;
+import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,7 +21,7 @@ import lombok.Setter;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TaskLog {
+public class TaskLog extends AbstractBaseEntity {
 	@Id
 	@SequenceGenerator(name = "task_management_task_log_generator", sequenceName = "task_management_task_log_sequence", allocationSize = 1)
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "task_management_task_log_generator")
@@ -56,4 +48,5 @@ public class TaskLog {
 	@ManyToOne(fetch = jakarta.persistence.FetchType.EAGER)
 	@JoinColumn(name = "user_id", insertable = false, updatable = false)
 	private User creator;
+
 }

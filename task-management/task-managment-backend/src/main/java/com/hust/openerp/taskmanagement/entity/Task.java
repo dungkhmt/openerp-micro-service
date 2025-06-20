@@ -3,6 +3,7 @@ package com.hust.openerp.taskmanagement.entity;
 import java.util.Date;
 import java.util.UUID;
 
+import com.hust.openerp.taskmanagement.multitenancy.entity.AbstractBaseEntity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -26,7 +27,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @Table(name = "task_management_task")
-public class Task {
+public class Task extends AbstractBaseEntity {
 
     @Id
     // @GeneratedValue(strategy = GenerationType.AUTO)

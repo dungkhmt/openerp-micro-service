@@ -15,7 +15,9 @@ public class EventOverviewDTO {
   private UUID id;
   private String name;
   private String description;
+  private Date startDate;
   private Date dueDate;
+  private Date createdStamp;
   private List<User> eventUsers;
   private int totalTasks;
   private int finishedTasks;

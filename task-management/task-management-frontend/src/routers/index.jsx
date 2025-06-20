@@ -18,10 +18,16 @@ import PrivateRoute from "./PrivateRoute";
 import Redirect from "./Redirect";
 import { AttributeManager } from "../pages/task-attributes";
 import CreatedMeetings from "../pages/meetings/created-meetings";
-import CreatedMeeting from "../pages/meetings/created-meetings/[id]";
+import CreatedMeetingDetails from "../pages/meetings/created-meetings/[id]";
 import JoinedMeetings from "../pages/meetings/joined-meetings";
-import JoinedMeeting from "../pages/meetings/joined-meetings/[id]";
+import JoinedMeetingDetails from "../pages/meetings/joined-meetings/[id]";
 import Unknown from "../views/errors/Unknown";
+import UserGroups from "../pages/user-management/group";
+import GroupDetails from "../pages/user-management/group/[id]";
+import NewOrganization from "../pages/organization/new";
+import OrganizationMembersView from "../pages/organization/settings/OrganizationMembersView";
+import MyInvitationsPage from "../views/organization/MyInvitationsTable";
+import InvitationDetail from "../views/organization/InvitationDetail";
 
 export const router = createBrowserRouter([
   {
@@ -32,11 +38,32 @@ export const router = createBrowserRouter([
         element: <Home />,
       },
       {
+        path: "/new-organization",
+        element: <NewOrganization />,
+      },
+      {
+        path: "/invitations",
+        children: [
+          {
+            path: "",
+            element: <MyInvitationsPage />,
+          },
+          {
+            path: ":invitationToken",
+            element: <InvitationDetail />,
+          },
+        ],
+      },
+      {
         element: <PrivateRoute />,
         children: [
           {
             path: "/dashboard",
             element: <DashBoard />,
+          },
+          {
+            path: "/settings/members",
+            element: <OrganizationMembersView />,
           },
           {
             path: "/my-profile",
@@ -107,22 +134,35 @@ export const router = createBrowserRouter([
                 element: <CreatedMeetings />,
               },
               {
-                path: "created-meetings/:pid",
-                element: <CreatedMeeting />,
+                path: "created-meetings/:meetingId",
+                element: <CreatedMeetingDetails />,
               },
               {
                 path: "joined-meetings",
                 element: <JoinedMeetings />,
               },
               {
-                path: "joined-meetings/:pid",
-                element: <JoinedMeeting />,
+                path: "joined-meetings/:meetingId",
+                element: <JoinedMeetingDetails />,
               },
             ],
           },
           {
             path: "/user-management",
-            element: <UserManagement />,
+            children: [
+              {
+                path: "groups",
+                element: <UserGroups />,
+              },
+              {
+                path: "groups/:groupId",
+                element: <GroupDetails />,
+              },
+              {
+                path: "",
+                element: <UserManagement />,
+              },
+            ],
           },
           {
             path: "/attribute-management",

@@ -43,7 +43,7 @@ public class TaskSkillServiceImplement implements TaskSkillService {
 
 	@Override
 	@Transactional
-	public void updateTaskSkills(UUID taskId, List<String> skillIdList, String userId) {
+	public void updateTaskSkills(UUID taskId, List<UUID> skillIdList, String userId) {
 		var task = taskRepository.findById(taskId).orElseThrow(
                 () -> new ApiException(ErrorCode.TASK_NOT_EXIST));
 
@@ -53,7 +53,7 @@ public class TaskSkillServiceImplement implements TaskSkillService {
         
         taskSkillRepository.deleteByTaskId(taskId);
         
-        for(String skillId : skillIdList) {
+        for(UUID skillId : skillIdList) {
     		TaskSkill taskSkill = TaskSkill.builder().taskId(taskId).skillId(skillId).build();
     		taskSkillRepository.save(taskSkill);
     	}

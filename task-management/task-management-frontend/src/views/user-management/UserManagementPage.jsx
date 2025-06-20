@@ -10,7 +10,6 @@ import {
   setCurrentUser,
   setTabValue,
 } from "../../store/user-management";
-import { CircularProgressLoading } from "../../components/common/loading/CircularProgressLoading";
 import { TabUserProjects } from "./TabUserProjects";
 import { TabUserTasks } from "./TabUserTasks";
 import PropTypes from "prop-types";
@@ -91,10 +90,11 @@ function a11yProps(index) {
   };
 }
 
-const UserManagementView = () => {
+const UserManagementPage = () => {
   const { usersCache, fetchLoading, currentUser, tabValue } = useSelector(
     (state) => state.userManagement
   );
+  const { currentOrganization } = useSelector((state) => state.organization);
   const [filterUsers, setFilterUsers] = useState(usersCache);
   const [search, setSearch] = useState("");
   const { ref, updateHeight } = usePreventOverflow();
@@ -107,9 +107,9 @@ const UserManagementView = () => {
   const getUsers = useCallback(async () => {
     if (usersCache?.length > 0) return;
     try {
-      await dispatch(fetchAllUsers());
+      await dispatch(fetchAllUsers(currentOrganization.id));
     } catch (e) {
-      console.log(e);
+      console.error(e);
       toast.error("Lỗi khi lấy danh sách người dùng");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -119,42 +119,48 @@ const UserManagementView = () => {
     getUsers();
   }, [getUsers]);
 
+
+  console.log(usersCache);
+
+
+
   useEffect(() => {
     setFilterUsers(
-      usersCache.filter((user) => {
-        const fullName =
-          `${user.firstName ?? ""} ${user.lastName ?? ""}`?.toLowerCase() ?? "";
-        const id = user.id.toLowerCase();
-        const email = user.email?.toLowerCase() ?? "";
-        if (!user.firstName && !user.lastName && !user.email) return false;
-        return (
-          fullName.includes(search.toLowerCase()) ||
-          id.includes(search.toLowerCase()) ||
-          email.includes(search.toLowerCase())
-        );
-      })
+      usersCache
+        .filter(( user ) => {
+
+
+
+          const fullName =
+            `${user.firstName ?? ""} ${user.lastName ?? ""}`?.toLowerCase() ??
+            "";
+          const id = user.id.toLowerCase();
+          const email = user.email?.toLowerCase() ?? "";
+          if (!user.firstName && !user.lastName && !user.email) return false;
+          return (
+            fullName.includes(search.toLowerCase()) ||
+            id.includes(search.toLowerCase()) ||
+            email.includes(search.toLowerCase())
+          );
+        })
+        
     );
   }, [search, usersCache]);
 
   useEffect(() => {
-    updateHeight(10);
+    updateHeight(15);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [window.innerHeight]);
-
-  if (usersCache?.length === 0 && fetchLoading) {
-    return <CircularProgressLoading />;
-  }
 
   return (
     <Grid container spacing={3}>
       <Grid item md={4} xs={4}>
         <Card
-          ref={ref}
           sx={{
-            height: "100%",
             display: "flex",
             flexDirection: "column",
             borderRadius: "20px",
+            mb: -5,
           }}
         >
           <Box
@@ -201,22 +207,25 @@ const UserManagementView = () => {
             </Box>
           </Box>
 
-          <DataGrid
-            rows={filterUsers}
-            columns={columns}
-            getRowId={(row) => row.id}
-            rowSelectionModel={currentUser ? [currentUser.id] : []}
-            onRowSelectionModelChange={(newSelection) => {
-              const selectedUser = filterUsers.find(
-                (user) => user.id === newSelection[0]
-              );
-              if (selectedUser) {
-                dispatch(setCurrentUser(selectedUser));
-              }
-            }}
-            columnHeaderHeight={0}
-            hideFooter
-          />
+          <Box ref={ref}>
+            <DataGrid
+              rows={filterUsers}
+              columns={columns}
+              getRowId={(row) => row.id}
+              loading={fetchLoading}
+              rowSelectionModel={currentUser ? [currentUser.id] : []}
+              onRowSelectionModelChange={(newSelection) => {
+                const selectedUser = filterUsers.find(
+                  (user) => user.id === newSelection[0]
+                );
+                if (selectedUser) {
+                  dispatch(setCurrentUser(selectedUser));
+                }
+              }}
+              columnHeaderHeight={0}
+              hideFooter
+            />
+          </Box>
         </Card>
       </Grid>
       <Grid item md={8} xs={8}>
@@ -267,4 +276,4 @@ const UserManagementView = () => {
   );
 };
 
-export { UserManagementView };
+export default UserManagementPage;

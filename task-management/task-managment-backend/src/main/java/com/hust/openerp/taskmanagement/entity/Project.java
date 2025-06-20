@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.entity;
 
+import com.hust.openerp.taskmanagement.multitenancy.entity.AbstractBaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
@@ -17,7 +18,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Table(name = "task_management_project")
-public class Project {
+public class Project extends AbstractBaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")

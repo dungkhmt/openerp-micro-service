@@ -1,7 +1,10 @@
 package com.hust.openerp.taskmanagement.controller;
 
 import java.util.List;
+import java.util.UUID;
 
+import com.hust.openerp.taskmanagement.dto.SkillDTO;
+import com.hust.openerp.taskmanagement.dto.form.SkillForm;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,22 +31,22 @@ public class SkillController {
     private final SkillService skillService;
 
     @GetMapping
-    public List<Skill> getAllSkills() {
+    public List<SkillDTO> getAllSkills() {
         return skillService.getAllSkills();
     }
 
     @PostMapping
-    public Skill createSkill(@RequestBody Skill skill) {
+    public SkillDTO createSkill(@RequestBody SkillForm skill) {
         return skillService.create(skill);
     }
 
     @DeleteMapping("{id}")
-    public void deleteSkill(@PathVariable("id") String id) {
+    public void deleteSkill(@PathVariable("id") UUID id) {
         skillService.delete(id);
     }
      
     @PutMapping("{id}")
-    public void updateSkill(@PathVariable("id") String id, @RequestBody Skill updatedSkill) {
+    public void updateSkill(@PathVariable("id") UUID id, @RequestBody Skill updatedSkill) {
         skillService.update(id, updatedSkill);
     }
 }

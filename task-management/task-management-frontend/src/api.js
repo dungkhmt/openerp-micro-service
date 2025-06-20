@@ -1,6 +1,7 @@
 import axios from "axios";
 import { config } from "./config/config";
 import keycloak from "./config/keycloak";
+import { store } from "./store";
 
 export const isFunction = (func) =>
   func &&
@@ -39,6 +40,12 @@ export async function request(
   config
 ) {
   try {
+    const state = store.getState();
+    const currentOrganization = state.organization.currentOrganization;
+    const organizationCode = currentOrganization
+      ? currentOrganization.code
+      : null;
+
     const res = await axiosInstance.request({
       method: method.toLowerCase(),
       url: url,
@@ -46,6 +53,9 @@ export async function request(
       ...config,
       headers: {
         authorization: bearerAuth(keycloak.token),
+        ...(organizationCode
+          ? { "X-Organization-Code": organizationCode }
+          : {}),
         ...config?.headers,
       },
     });

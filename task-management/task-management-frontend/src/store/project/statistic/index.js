@@ -106,6 +106,13 @@ export const statisticSlice = createSlice({
     setStartDate: (state, action) => {
       state.period.startDate = action.payload;
     },
+    resetStatistic: (state) => {
+      state.created = initialState.created;
+      state.inprogress = initialState.inprogress;
+      state.completed = initialState.completed;
+      state.workloadByStatus = initialState.workloadByStatus;
+      state.period = initialState.period;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -158,6 +165,6 @@ export const statisticSlice = createSlice({
   },
 });
 
-export const { setStartDate } = statisticSlice.actions;
+export const { setStartDate, resetStatistic } = statisticSlice.actions;
 
 export default statisticSlice.reducer;

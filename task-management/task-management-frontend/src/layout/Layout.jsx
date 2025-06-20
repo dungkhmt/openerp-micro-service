@@ -1,10 +1,9 @@
 import { Icon } from "@iconify/react";
-import { Box, LinearProgress, useMediaQuery } from "@mui/material";
+import { Box, LinearProgress, Typography, useMediaQuery } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import IconButton from "@mui/material/IconButton";
 import SvgIcon from "@mui/material/SvgIcon";
 import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import { useKeycloak } from "@react-keycloak/web";
 import React, { Suspense, useEffect } from "react";
@@ -15,6 +14,13 @@ import AccountButton from "./components/account/AccountButton";
 import NotificationButton from "./components/notification/NotificationButton";
 import SideBar, { collapsedNavWidth, navWidth } from "./SideBar";
 import AutocompleteComponent from "./components/autocomplete/AutoComplete";
+import Organization from "./components/organization/Organization";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import {
+  fetchLastOrganizationByMe,
+  fetchOrganizationsByMe,
+} from "../store/organization";
 
 const Offset = styled("div")(({ theme }) => ({
   display: "flex",
@@ -71,15 +77,7 @@ const styles = {
       height: "40px",
     },
   }),
-  sectionDesktop: (theme) => ({
-    display: "none",
-    [theme.breakpoints.up("md")]: {
-      display: "flex",
-      alignItems: "center",
-    },
-  }),
   appName: (theme) => ({
-    paddingLeft: 0.5,
     display: "none",
     color: "#ddeeddee",
     [theme.breakpoints.up("sm")]: {
@@ -90,11 +88,8 @@ const styles = {
 
 function Layout() {
   const { keycloak } = useKeycloak();
-  const hidden =
-    useMediaQuery((theme) => theme.breakpoints.down("lg")) ||
-    !keycloak.authenticated;
-
-  //
+  const dispatch = useDispatch();
+  const {fetchLoading, currentOrganization } = useSelector((state) => state.organization);
   const [navCollapsed, setNavCollapsed] = React.useState(false);
   // ** For mobile
   const [navVisible, setNavVisible] = React.useState(false);
@@ -104,16 +99,46 @@ function Layout() {
 
   const notificationState = useNotificationState();
 
+  // Route-based exclusion logic
+  const excludedPaths = ["/invitations", "/new-organization"];
+  const isExcludedRoute = excludedPaths.some((path) =>
+    location.pathname.startsWith(path)
+  );
+  const showLayoutComponents = keycloak.authenticated && !isExcludedRoute;
+
+  const hidden =
+    useMediaQuery((theme) => theme.breakpoints.down("lg")) ||
+    !showLayoutComponents;
+
   useEffect(() => {
     notificationState.open.set(false);
   }, [location.pathname, notificationState.open]);
+
+  useEffect(() => {
+    const fetchOrgs = async () => {
+      try {
+        await dispatch(fetchLastOrganizationByMe()).unwrap();
+        await dispatch(fetchOrganizationsByMe()).unwrap();
+      } catch (err) {
+        console.error("Failed to fetch organizations", err);
+      }
+    };
+
+    if (keycloak.authenticated) {
+      fetchOrgs();
+    }
+  }, [dispatch, keycloak.authenticated]);
+
+  if (fetchLoading && !currentOrganization) {
+    return <LinearProgress />;
+  }
 
   return (
     <Suspense fallback={<LinearProgress />}>
       <Box sx={styles.root}>
         <AppBar position="fixed" color="inherit" sx={styles.appBar}>
           <Toolbar>
-            {keycloak.authenticated && (
+            {showLayoutComponents && (
               <IconButton
                 color="inherit"
                 aria-label="open drawer"
@@ -137,36 +162,48 @@ function Layout() {
                 <Icon icon="mingcute:menu-fill" />
               </IconButton>
             )}
+
             <SvgIcon fontSize="large">
               <Logo width={14} height={14} x={0} y={5} />
             </SvgIcon>
 
-            <Typography sx={styles.appName} variant="h6" noWrap>
-              Taskforce
-            </Typography>
+            {showLayoutComponents ? (
+              <Organization />
+            ) : (
+              <Typography sx={styles.appName} variant="h6" noWrap>
+                Taskforce
+              </Typography>
+            )}
 
-            {/* Use this div tag to push the icons to the right */}
-            <div
-              style={{
-                flexGrow: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              {!hidden && <AutocompleteComponent hidden={hidden} />}
-            </div>
-            <Box sx={styles.sectionDesktop}>
-              {keycloak.authenticated && (
-                <>
-                  <NotificationButton />
-                  <AccountButton />
-                </>
-              )}
-            </Box>
+            {!hidden && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  left: "55%",
+                  transform: "translateX(-55%)",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <AutocompleteComponent hidden={hidden} />
+              </Box>
+            )}
+
+            {showLayoutComponents && (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginLeft: "auto",
+                }}
+              >
+                <NotificationButton />
+                <AccountButton />
+              </Box>
+            )}
           </Toolbar>
         </AppBar>
-        {keycloak.authenticated && (
+        {showLayoutComponents && (
           <SideBar
             navCollapsed={navCollapsed}
             setNavCollapsed={setNavCollapsed}

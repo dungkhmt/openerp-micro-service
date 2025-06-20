@@ -154,14 +154,13 @@ function ActionsWithNotificationButton() {
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
       return;
     }
-
-    open.set(false);
+    setOpen(false);
   };
 
   function handleListKeyDown(event) {
     if (event.key === "Tab") {
       event.preventDefault();
-      open.set(false);
+      setOpen(false);
     }
   }
 

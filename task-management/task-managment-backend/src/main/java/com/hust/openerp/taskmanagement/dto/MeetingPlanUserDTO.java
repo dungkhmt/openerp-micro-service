@@ -13,5 +13,4 @@ public class MeetingPlanUserDTO {
     private String userId;
     private UUID planId;
     private UUID sessionId;
-    private MeetingSessionDTO meetingSession;
 }

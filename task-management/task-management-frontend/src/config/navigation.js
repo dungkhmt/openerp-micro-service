@@ -67,11 +67,11 @@ const navigation = [
     children: [
       {
         title: "Cuộc họp đã tạo",
-        path: "meetings/created-meetings",
+        path: "/meetings/created-meetings",
       },
       {
         title: "Cuộc họp tham gia",
-        path: "meetings/joined-meetings",
+        path: "/meetings/joined-meetings",
       },
     ],
   },
@@ -85,6 +85,10 @@ const navigation = [
       {
         title: "Danh sách nhân viên",
         path: "/user-management",
+      },
+      {
+        title: "Danh sách nhóm",
+        path: "/user-management/groups",
       },
     ],
   },

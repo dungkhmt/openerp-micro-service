@@ -2,6 +2,7 @@ package com.hust.openerp.taskmanagement.controller;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -32,7 +33,7 @@ public class UserSkillController {
 
     @PutMapping("/me")
     public void updateMySkills(Principal principal, 
-    		@RequestBody List<String> skillList) {
+    		@RequestBody List<UUID> skillList) {
         userSkillService.updateMySkills(principal.getName(), skillList);
     }
 

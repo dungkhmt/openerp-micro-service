@@ -355,8 +355,8 @@ const Event = () => {
       <Box
         ref={ref}
         sx={{
-          pr: 2,
-          pl: 1,
+          px: 2,
+          pb: 3,
           overflowY: "auto",
         }}
       >
@@ -519,7 +519,13 @@ const Event = () => {
                     fontSize: "0.9rem",
                   }}
                 >
-                  {dayjs(event.dueDate).format("DD MMMM, YYYY")}
+                  {event.startDate
+                    ? dayjs(event.startDate).format("DD MMM")
+                    : "_"}{" "}
+                  -{" "}
+                  {event.dueDate
+                    ? dayjs(event.dueDate).format("DD MMM, YYYY")
+                    : "_"}
                 </Typography>
               </Box>
             </Card>
@@ -582,7 +588,11 @@ const Event = () => {
                     );
                   })
                 ) : (
-                  <Typography variant="body2" color="textSecondary" sx={{fontStyle: "italic"}}>
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{ fontStyle: "italic" }}
+                  >
                     Không có thành viên.
                   </Typography>
                 )}

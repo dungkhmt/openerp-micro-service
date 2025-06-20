@@ -1,5 +1,6 @@
 package com.hust.openerp.taskmanagement.entity;
 
+import com.hust.openerp.taskmanagement.multitenancy.entity.AbstractBaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProjectMember {
+public class ProjectMember extends AbstractBaseEntity {
 
     @Id
     @Column(name = "project_id")

@@ -12,6 +12,6 @@ public interface TaskSkillService {
 	
     List<Skill> getTaskSkills(UUID taskId, String userId);
     
-    void updateTaskSkills(UUID taskId, List<String> skillIdList, String userId);
+    void updateTaskSkills(UUID taskId, List<UUID> skillIdList, String userId);
 
 }

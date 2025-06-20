@@ -21,9 +21,9 @@ import { IconButton } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useAPIExceptionHandler } from "../../../../hooks/useAPIExceptionHandler";
 
-const CreatedMeeting = () => {
+const CreatedMeetingDetails = () => {
   const navigate = useNavigate();
-  const { pid } = useParams();
+  const { meetingId } = useParams();
   const dispatch = useDispatch();
   const {
     currentPlan,
@@ -36,31 +36,31 @@ const CreatedMeeting = () => {
 
   const scrollPositions = useRef({});
 
-  if (pid && !scrollPositions.current[pid]) {
-    scrollPositions.current[pid] = { 0: 0, 1: 0 };
+  if (meetingId && !scrollPositions.current[meetingId]) {
+    scrollPositions.current[meetingId] = 0;
   }
 
   useEffect(() => {
-    if (!pid) return;
+    if (!meetingId) return;
     const fetchData = async () => {
       try {
         dispatch(setIsCreator(true));
-        if (!currentPlan || currentPlan.id !== pid) {
+        if (!currentPlan || currentPlan.id !== meetingId) {
           await Promise.all([
-            dispatch(fetchMeetingPlan(pid)),
-            dispatch(fetchMeetingPlanMembers(pid)),
-            dispatch(fetchMeetingSessions(pid)),
-            dispatch(fetchMemberAssignments(pid)),
+            dispatch(fetchMeetingPlan(meetingId)),
+            dispatch(fetchMeetingPlanMembers(meetingId)),
+            dispatch(fetchMeetingSessions(meetingId)),
+            dispatch(fetchMemberAssignments(meetingId)),
           ]);
         }
-        await dispatch(fetchAllSessionRegistrations(pid));
+        await dispatch(fetchAllSessionRegistrations(meetingId));
       } catch (error) {
         console.error(error);
       }
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, pid]);
+  }, [dispatch, meetingId]);
 
   useAPIExceptionHandler(planLoading, planErrors, clearPlanErrors);
   useAPIExceptionHandler(sessionLoading, sessionErrors, clearSessionErrors);
@@ -83,13 +83,13 @@ const CreatedMeeting = () => {
         <Icon fontSize={24} icon="mdi:arrow-left" />
       </IconButton>
       <CreatedMeetingPage
-        scrollPositions={scrollPositions.current[pid]}
+        scrollPositions={scrollPositions.current[meetingId]}
         onScrollUpdate={(tabValue, scrollTop) => {
-          scrollPositions.current[pid][tabValue] = scrollTop;
+          scrollPositions.current[meetingId] = scrollTop;
         }}
       />
     </>
   );
 };
 
-export default CreatedMeeting;
+export default CreatedMeetingDetails;

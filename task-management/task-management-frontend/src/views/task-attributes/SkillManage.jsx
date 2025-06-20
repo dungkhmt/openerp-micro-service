@@ -12,12 +12,12 @@ const SkillManage = () => {
   const { skills, fetchLoading } = useSelector((state) => state.skill);
 
   const handleCreateSkill = async (data) => {
-    const skillId = data.name
+    const code = data.name
       .trim()
       .toUpperCase()
       .replace(/\s+/g, "_")
       .substring(0, 60);
-    const dataForm = { skillId, ...data };
+    const dataForm = { code, ...data };
     try {
       await dispatch(addSkill(dataForm)).unwrap();
       toast.success("Đã thêm mới kỹ năng thành công!", true);

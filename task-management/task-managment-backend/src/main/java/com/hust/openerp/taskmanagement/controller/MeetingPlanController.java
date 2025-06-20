@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -74,7 +75,7 @@ public class MeetingPlanController {
         meetingPlanService.updateMeetingPlan(principal.getName(), planId, form);
     }
     
-    @PutMapping("/{planId}/status")
+    @PatchMapping("/{planId}/status")
     public void updateStatus(Principal principal, 
                                   @PathVariable("planId") UUID planId, 
                                   @RequestBody @Valid UpdateMeetingStatusForm form) {

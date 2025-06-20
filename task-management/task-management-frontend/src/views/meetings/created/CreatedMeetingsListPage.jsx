@@ -166,10 +166,10 @@ const CreatedMeetingsListPage = ({
   }, [window.innerHeight]);
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ pr: 2}}>
       <Box
         sx={{
-          mb: 5,
+          mb: 2,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",

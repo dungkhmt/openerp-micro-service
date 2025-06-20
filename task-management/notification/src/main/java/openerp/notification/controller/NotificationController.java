@@ -55,30 +55,32 @@ public class NotificationController {
      */
     @GetMapping("/subscription")
     public ResponseEntity<SseEmitter> subscribes(
-            @CurrentSecurityContext(expression = "authentication.name") String toUser
+            @CurrentSecurityContext(expression = "authentication.name") String toUser,
+            @RequestHeader("X-Organization-Code") String organizationCode
     ) {
-        SseEmitter subscription;
-        subscription = new SseEmitter(Long.MAX_VALUE);
-        Runnable callback = () -> subscriptions.remove(toUser);
+        SseEmitter subscription = new SseEmitter(Long.MAX_VALUE);
+        String subscriptionKey = toUser + ":" + organizationCode;
+        Runnable callback = () -> subscriptions.remove(subscriptionKey);
 
-        subscription.onTimeout(callback); // OK
-        subscription.onCompletion(callback); // OK
-        subscription.onError((ex) -> { // Must consider carefully, but currently OK
+        subscription.onTimeout(callback);
+        subscription.onCompletion(callback);
+        subscription.onError((ex) -> {
             log.error("onError fired with exception: " + ex);
         });
 
         // Add new subscription to user's connection list.
-        if (subscriptions.containsKey(toUser)) {
-            subscriptions.get(toUser).add(subscription);
+        if (subscriptions.containsKey(subscriptionKey)) {
+            subscriptions.get(subscriptionKey).add(subscription);
             log.info(
-                    "{} RE-SUBSCRIBES --> #CURRENT CONNECTION = {}",
+                    "{}:{} RE-SUBSCRIBES --> #CURRENT CONNECTION = {}",
                     toUser,
-                    subscriptions.get(toUser).size());
+                    organizationCode,
+                    subscriptions.get(subscriptionKey).size());
         } else {
-            subscriptions.put(toUser, new ArrayList<SseEmitter>() {{
+            subscriptions.put(subscriptionKey, new ArrayList<>() {{
                 add(subscription);
             }});
-            log.info("{} SUBSCRIBES", toUser);
+            log.info("{}:{} SUBSCRIBES", toUser, organizationCode);
         }
 
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -137,13 +139,15 @@ public class NotificationController {
     @GetMapping(params = {"fromId", "page", "size"})
     public ResponseEntity<?> getNotifications(
             @CurrentSecurityContext(expression = "authentication.name") String toUser,
+            @RequestHeader("X-Organization-Code") String organizationCode,
             @RequestParam(required = false) UUID fromId,
             @RequestParam(defaultValue = "0") @PositiveOrZero Integer page,
             @RequestParam(defaultValue = "10") @Positive Integer size
     ) {
         GetNotifications om = new GetNotifications(
-                notificationsService.getNotifications(toUser, fromId, page, size),
-                notificationsService.countNumUnreadNotification(toUser));
+                notificationsService.getNotifications(toUser, fromId, page, size,
+                        organizationCode),
+                notificationsService.countNumUnreadNotification(toUser, organizationCode));
 
         return ResponseEntity.ok().body(om);
     }
@@ -155,7 +159,8 @@ public class NotificationController {
      * @param body request body
      */
     @PatchMapping("/{id}/status")
-    public ResponseEntity<?> updateStatus(@PathVariable UUID id, @RequestBody Map<String, Object> body) {
+    public ResponseEntity<?> updateStatus(@PathVariable UUID id,
+                                          @RequestBody Map<String, Object> body) {
         Object value = body.get("status");
         String status = null == value ? null : value.toString();
 
@@ -177,7 +182,8 @@ public class NotificationController {
     @PatchMapping("/status")
     public ResponseEntity<?> updateMultipleNotificationsStatus(
             @CurrentSecurityContext(expression = "authentication.name") String userId,
-            @RequestBody UpdateMultipleNotificationStatus body
+            @RequestBody UpdateMultipleNotificationStatus body,
+            @RequestHeader("X-Organization-Code") String organizationCode
     ) {
         if (!Notifications.STATUS_READ.equals(body.getStatus())) {
             return ResponseEntity.badRequest().body("Invalid status");
@@ -185,21 +191,23 @@ public class NotificationController {
             notificationsService.updateMultipleNotificationsStatus(
                     userId,
                     Notifications.STATUS_READ,
-                    body.getBeforeOrAt());
+                    body.getBeforeOrAt(),
+                    organizationCode);
             return ResponseEntity.ok().body(null);
         }
     }
 
     @GetMapping("/test")
     public void test() {
-        notificationsService.create("anonymous", "dungpq", "test", "/");
+        notificationsService.create("anonymous", "dungpq", "test", "/", "test");
     }
 
     @PostMapping
     public ResponseEntity<?> createNotification(
             @CurrentSecurityContext(expression = "authentication.name") String fromUser,
+            @RequestHeader("X-Organization-Code") String organizationCode,
             @RequestBody NewNotificationRequest request) {
-        notificationsService.create(fromUser, request.getToUser(), request.getContent(), request.getUrl());
+        notificationsService.create(fromUser, request.getToUser(), request.getContent(), request.getUrl(), organizationCode);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

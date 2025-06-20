@@ -3,6 +3,7 @@ package com.hust.openerp.taskmanagement.service;
 import com.hust.openerp.taskmanagement.dto.form.UpdateProfileForm;
 import com.hust.openerp.taskmanagement.entity.User;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface UserService {

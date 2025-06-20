@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { INVITATION_STATUS_IDS } from "../constants/statuses";
 
 export const getDiffDateWithCurrent = (from) => {
   // return  [2, seconds] or [2, minutes], [3, hours], [4, days], [5, weeks], [6, months], [7, years]
@@ -57,4 +58,17 @@ export const getTimeUntilDeadline = (toDate) => {
   }
 
   return `Còn ${result.join(" và ")}`;
+};
+
+export const getInvitationExpirationText = (expirationTime, statusId) => {
+  const expiration = dayjs(expirationTime);
+
+  if (statusId === INVITATION_STATUS_IDS.expired) {
+    return `Hết hạn vào ${expiration.format("D MMM, YYYY")}`;
+  }
+
+  if (statusId === INVITATION_STATUS_IDS.pending) {
+    return getTimeUntilDeadline(expiration);
+  }
+  return "";
 };

@@ -3,6 +3,7 @@ package com.hust.openerp.taskmanagement.entity;
 import java.util.Date;
 import java.util.UUID;
 
+import com.hust.openerp.taskmanagement.multitenancy.entity.AbstractBaseEntity;
 import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
@@ -22,7 +23,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Table(name = "task_management_event")
-public class Event {
+public class Event extends AbstractBaseEntity {
     @Id
     @Column(name = "id")
     private UUID id;
@@ -37,6 +38,9 @@ public class Event {
     @CreationTimestamp
     @Column(name = "created_stamp")
     private Date createdStamp;
+
+    @Column(name = "start_date")
+    private Date startDate;
     
     @Column(name = "due_date")
     private Date dueDate;

@@ -35,7 +35,7 @@ public class TaskSkillController {
     
     @PutMapping("{taskId}")
     public void updateTaskSkills(@PathVariable("taskId") UUID taskId, 
-    		@RequestBody List<String> skillIdList, Principal principal) {
+    		@RequestBody List<UUID> skillIdList, Principal principal) {
     	taskSkillService.updateTaskSkills(taskId, skillIdList, principal.getName());
     }
 }

@@ -19,13 +19,13 @@ public interface NotificationsService {
     // Use concurrent instead of synchronized collection because of performance and thread-safe
     ConcurrentHashMap<String, List<SseEmitter>> subscriptions = new ConcurrentHashMap<>();
 
-    Page<NotificationProjection> getNotifications(String toUser, UUID fromId, int page, int size);
+    Page<NotificationProjection> getNotifications(String toUser, UUID fromId, int page, int size, String orgCode);
 
-    long countNumUnreadNotification(String toUser);
+    long countNumUnreadNotification(String toUser, String orgCode);
 
-    void create(String fromUser, String toUser, String content, String url);
+    void create(String fromUser, String toUser, String content, String url, String orgCode);
 
     void updateStatus(UUID notificationId, String status);
 
-    void updateMultipleNotificationsStatus(String userId, String status, Date beforeOrAt);
+    void updateMultipleNotificationsStatus(String userId, String status, Date beforeOrAt, String orgCode);
 }

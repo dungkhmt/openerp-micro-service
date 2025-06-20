@@ -96,7 +96,7 @@ const MeetingPlanService = {
   },
   updateStatus: async (meetingPlanId, statusId, cb) => {
     try {
-      const response = await privateClient.put(
+      const response = await privateClient.patch(
         endPoints.updateStatus(meetingPlanId),
         statusId
       );
@@ -113,7 +113,6 @@ const MeetingPlanService = {
       const response = await privateClient.get(
         endPoints.getMeetingPlanUsers(meetingPlanId)
       );
-
       if (response?.data && isFunction(cb)) cb(null, response.data);
       return response?.data;
     } catch (e) {

@@ -16,6 +16,8 @@ import lombok.Setter;
 public class UpdateEventForm {
 	@Nullable
     private String name;
+    @Nullable
+    private Date startDate;
 	@Nullable
     private Date dueDate;
 	@Nullable

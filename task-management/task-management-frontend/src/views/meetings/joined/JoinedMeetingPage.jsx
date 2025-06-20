@@ -38,7 +38,6 @@ const JoinedMeetingPage = () => {
 
   return (
     <Box ref={ref} sx={{ p: 3, overflowY: "auto" }}>
-      {/* Header */}
       <Box sx={{ mb: 5 }}>
         <Grid xs={12} md={12}>
           <Box
@@ -50,7 +49,6 @@ const JoinedMeetingPage = () => {
               pb: { md: 0, xs: 3 },
             }}
           >
-            {/* Meeting Name */}
             <Typography
               variant="h4"
               sx={{
@@ -62,7 +60,6 @@ const JoinedMeetingPage = () => {
               {currentPlan?.name || "-"}
             </Typography>
 
-            {/* Creator & Created Time */}
             <Box
               sx={{
                 display: "flex",
@@ -108,25 +105,32 @@ const JoinedMeetingPage = () => {
         </Grid>
       </Box>
 
-      {/* Body Section*/}
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
-          {/* Meeting Description */}
-          <Card sx={{ mb: 3, borderRadius: 2 }}>
+          <Card
+            sx={{
+              mb: 3,
+              borderRadius: 2,
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
+            }}
+          >
             <CardContent>
               <Typography variant="h6">Mô tả</Typography>
               <DescriptionText text={currentPlan?.description} />
             </CardContent>
           </Card>
-          {/* Assigned Session */}
           <SessionRegistrationsView />
         </Grid>
 
         <Grid item xs={12} md={4}>
-          {/* Meeting Details (Status, Deadline, Location) */}
-          <Card sx={{ mb: 3, borderRadius: 3 }}>
+          <Card
+            sx={{
+              mb: 3,
+              borderRadius: 3,
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
+            }}
+          >
             <CardContent>
-              {/* Status */}
               <Box sx={{ mb: 3 }}>
                 <Typography
                   sx={{ fontSize: "1rem", fontWeight: 600, mb: 1 }}
@@ -151,7 +155,6 @@ const JoinedMeetingPage = () => {
                 <Divider sx={{ width: "80%" }} />
               </Box>
 
-              {/* Registration Deadline */}
               <Box sx={{ mt: 2, mb: 3 }}>
                 <Typography
                   sx={{ fontSize: "1rem", fontWeight: 600, mb: 1 }}
@@ -191,7 +194,6 @@ const JoinedMeetingPage = () => {
                 <Divider sx={{ width: "80%" }} />
               </Box>
 
-              {/* Location */}
               <Box sx={{ mt: 2 }}>
                 <Typography
                   sx={{ fontSize: "1rem", fontWeight: 600, mb: 1 }}
@@ -231,7 +233,6 @@ const JoinedMeetingPage = () => {
             </CardContent>
           </Card>
 
-          {/* Meeting Members */}
           <MeetingMembersView />
         </Grid>
       </Grid>

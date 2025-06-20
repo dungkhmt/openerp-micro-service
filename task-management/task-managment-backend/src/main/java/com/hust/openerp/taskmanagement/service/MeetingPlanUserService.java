@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.hust.openerp.taskmanagement.dto.MeetingAutoAssignRequestDTO;
 import com.hust.openerp.taskmanagement.dto.MeetingAutoAssignResponseDTO;
 import com.hust.openerp.taskmanagement.dto.MeetingPlanUserDTO;
+import com.hust.openerp.taskmanagement.dto.MeetingSessionDTO;
 import com.hust.openerp.taskmanagement.dto.form.AddMeetingPlanUserForm;
 import com.hust.openerp.taskmanagement.dto.form.UpdateMemberAssignmentsForm;
 import com.hust.openerp.taskmanagement.entity.User;
@@ -22,7 +23,7 @@ public interface MeetingPlanUserService {
     
     List<MeetingPlanUserDTO> getMemberAssignments(String userId, UUID planId);
     
-    MeetingPlanUserDTO getMyAssignment(String userId, UUID planId);
+    MeetingSessionDTO getMyAssignment(String userId, UUID planId);
     
     void updateMemberAssignment(String userId, UUID planId, UpdateMemberAssignmentsForm assignments);
     

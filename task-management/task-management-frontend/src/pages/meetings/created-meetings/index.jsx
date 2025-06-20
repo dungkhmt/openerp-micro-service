@@ -11,6 +11,7 @@ import {
   setPagination,
   setSort,
   setSearch as setSearchAction,
+  setStatusCategory,
 } from "../../../store/created-meetings";
 import { useDispatch } from "react-redux";
 import { useCallback, useEffect, useState } from "react";
@@ -37,10 +38,10 @@ const CreatedMeetings = () => {
     search: searchStore,
     fetchLoading,
     errors,
+    statusCategory,
   } = useSelector((state) => state.createdMeetings);
 
   const [search, setSearch] = useState(searchStore || "");
-  const [statusCategory, setStatusCategory] = useState("upcoming");
   const searchDebounce = useDebounce(search, 1000);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -109,7 +110,7 @@ const CreatedMeetings = () => {
   };
 
   const onStatusCategoryChange = (newCategory) => {
-    setStatusCategory(newCategory);
+    dispatch(setStatusCategory(newCategory));
     dispatch(resetPagination());
     dispatch(clearCache());
   };

@@ -1,6 +1,7 @@
 package com.hust.openerp.taskmanagement.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -16,4 +17,10 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
 
     @Query("Select u from User u inner join Task t on u.id = t.assigneeId where t.creatorId = :userId")
     List<User> getAllUserAssignTaskAssignMe(String userId);
+
+    @Query(
+        value = "SELECT * FROM user_login WHERE email = :email",
+        nativeQuery = true
+    )
+    Optional<User> findByEmail(String email);
 }

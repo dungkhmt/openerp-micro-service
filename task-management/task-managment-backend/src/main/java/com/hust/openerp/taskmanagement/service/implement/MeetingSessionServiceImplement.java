@@ -46,7 +46,7 @@ public class MeetingSessionServiceImplement implements MeetingSessionService {
 			var session = modelMapper.map(sessionForm, MeetingSession.class);
 			session.setId(UUID.randomUUID());
 			session.setPlanId(planId);
-			session = meetingSessionRepository.save(session);
+			meetingSessionRepository.save(session);
 		}
 	}
 
