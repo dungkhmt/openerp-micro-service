@@ -173,7 +173,7 @@ const TabUserTasks = () => {
       );
     } catch (error) {
       toast.error("Lỗi khi lấy dữ liệu");
-      console.log(error);
+      console.error(error);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination, sort, tasksCache, buildQueryString, dispatch]);
