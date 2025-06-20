@@ -1,0 +1,46 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam defaultTextAlignment center
+
+package "Domain" {
+  class "Model" 
+  interface "DomainService"
+}
+
+package "Application" {
+  class "UseCase"
+  interface "PortIn (InputPort)"
+}
+
+package "Adapters" {
+  package "In" {
+    class "Controller"
+  }
+
+  package "Out" {
+    class "RepositoryImpl"
+    class "ExternalServiceAdapter"
+  }
+}
+
+package "Infrastructure" {
+  class "Database"
+  class "ExternalAPI"
+}
+
+' Relationships
+"UseCase" ..> "PortIn (InputPort)" : implements
+"Controller" --> "PortIn (InputPort)" : calls
+"UseCase" --> "DomainService" : uses
+"UseCase" --> "Model" : manipulates
+
+"RepositoryImpl" ..> "PortOut (OutputPort)" : implements
+"UseCase" --> "PortOut (OutputPort)" : uses
+
+"RepositoryImpl" --> "Database" : accesses
+"ExternalServiceAdapter" --> "ExternalAPI" : calls
+
+' Interfaces (Ports)
+interface "PortOut (OutputPort)"
+
+@enduml

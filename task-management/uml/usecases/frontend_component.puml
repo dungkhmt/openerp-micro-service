@@ -1,0 +1,43 @@
+@startuml
+!theme vibrant
+
+skinparam component {
+  ArrowColor #1E8449
+  BorderColor #1E8449
+  BackgroundColor #D5F5E3
+}
+
+package "routers" <<Routing>>
+package "layout" <<Layout>>
+package "views/pages" <<Views>>
+package "components" <<Reusable Components>>
+package "services" <<API>>
+package "store" <<Redux>>
+package "config" <<Configuration>>
+package "hooks" <<Custom Hooks>>
+package "theme" <<Styling>>
+
+' Router là trung tâm điều phối, quyết định layout và page nào được hiển thị
+routers --> layout
+routers --> "views/pages"
+
+' Layout chứa các thành phần chung như sidebar, header
+layout --> components
+layout --> config
+
+' Pages (các trang cụ thể) sử dụng các thành phần khác để xây dựng giao diện
+"views/pages" --> components
+"views/pages" --> services
+"views/pages" --> store
+"views/pages" --> hooks
+
+' Store (Redux) gọi services để lấy dữ liệu từ API
+store --> services
+
+' Components có thể tái sử dụng các custom hooks
+components --> hooks
+
+' Theme được áp dụng cho các components để nhất quán về giao diện
+theme --> components
+
+@enduml

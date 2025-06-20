@@ -341,14 +341,15 @@ const ConfigurableRosterPageInternal = () => {
 
 
     const rosterGenerationPayload = {
-      template_id: applicationDetails.templateId, // Gửi template_id thay vì toàn bộ template_name
+      template_id: applicationDetails.templateId,
       start_date: applicationDetails.startDate,
       end_date: applicationDetails.endDate,
       department_codes: applicationDetails.departmentCodes,
       job_position_codes: applicationDetails.jobPositionCodes,
-      // defined_shifts và active_hard_constraints sẽ được lấy từ template trên backend dựa vào template_id
+      defined_shifts: applicationDetails.shiftsAndConstraints.definedShifts || [],
+      active_hard_constraints: applicationDetails.shiftsAndConstraints.activeHardConstraints || {}
     };
-    const API_ENDPOINT_GENERATE = "/roster/generate-from-template"; // Endpoint mới
+    const API_ENDPOINT_GENERATE = "/roster/generate";
 
     try {
       await request( "post", API_ENDPOINT_GENERATE, (res) => {

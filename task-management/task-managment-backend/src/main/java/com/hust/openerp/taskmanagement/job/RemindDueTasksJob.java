@@ -51,7 +51,7 @@ public class RemindDueTasksJob {
         }));
     }
 
-    @Scheduled(cron = "${app.job.cron.remind-due-tasks-expression:-}")
+    //@Scheduled(cron = "${app.job.cron.remind-due-tasks-expression:-}")
     public void remindDueTasks() {
         LOG.info("Remind due tasks job every day at 8:00 AM");
 

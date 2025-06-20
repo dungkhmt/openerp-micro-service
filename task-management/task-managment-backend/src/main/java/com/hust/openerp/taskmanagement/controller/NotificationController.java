@@ -51,7 +51,7 @@ public class NotificationController {
      * @param toUser
      * @return
      */
-    @GetMapping("/subscription")
+    //@GetMapping("/subscription")
     public ResponseEntity<SseEmitter> subscribes(
             @CurrentSecurityContext(expression = "authentication.name") String toUser) {
         SseEmitter subscription;
@@ -91,7 +91,7 @@ public class NotificationController {
      * To keep connection alive
      */
     @Async
-    @Scheduled(fixedRate = 40000)
+    //@Scheduled(fixedRate = 40000)
     public void sendHeartbeatSignal() {
         // log.info("#CURRENT ACTIVE USER = {}, START SENDING HEARTBEAT EVENT",
         // subscriptions.size());

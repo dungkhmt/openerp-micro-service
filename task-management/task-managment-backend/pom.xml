@@ -18,6 +18,7 @@
     <java.version>17</java.version>
     <org.mapstruct.version>1.4.1.Final</org.mapstruct.version>
     <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+    <go-offline-maven-plugin.version>1.2.8</go-offline-maven-plugin.version>
   </properties>
   <dependencies>
     <!-- JPA -->
@@ -160,13 +161,7 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-amqp</artifactId>
     </dependency>
-    
-    <!-- Google OR-tools -->
-    <dependency>
-	    <groupId>com.google.ortools</groupId>
-	    <artifactId>ortools-java</artifactId>
-	    <version>9.10.4067</version>
-	</dependency>
+
 
    <!-- map struct-->
     <dependency>
@@ -206,6 +201,16 @@
       <artifactId>ortools-java</artifactId>
       <version>9.12.4544</version>
     </dependency>
+    <dependency>
+      <groupId>com.google.cloud.sql</groupId>
+      <artifactId>jdbc-socket-factory-core</artifactId>
+      <version>1.18.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.cloud.sql</groupId>
+      <artifactId>postgres-socket-factory</artifactId>
+      <version>1.18.0</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -231,6 +236,11 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>de.qaware.maven</groupId>
+        <artifactId>go-offline-maven-plugin</artifactId>
+        <version>${go-offline-maven-plugin.version}</version>
       </plugin>
     </plugins>
   </build>

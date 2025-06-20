@@ -141,7 +141,6 @@ const WeeklyAbsencePageInternal = () => {
       fetchedEmployees = (empRes.data?.data || []).map(e => ({
         ...e,
         id: String(e.staff_code || e.user_login_id || Date.now()),
-        // Tạo avatar URL trực tiếp ở đây để dùng chung
         avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(e.fullname || 'N V')}&background=random&size=64&font-size=0.5&bold=true`
       }));
       setEmployees(fetchedEmployees);

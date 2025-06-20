@@ -1,0 +1,103 @@
+@startuml
+!theme vibrant
+
+' --- Skinparams cho các loại stereotype ---
+skinparam stereotype {
+    CBackgroundColor #FDEDEC
+    SBackgroundColor #D5F5E3
+    RBackgroundColor #FDEDEC
+    EBackgroundColor #FDEDEC
+    DBackgroundColor #E8DAEF
+    DTOBackgroundColor #FDEBD0
+    PBackgroundColor #EBF5FB
+}
+
+' --- Khai báo các thành phần ---
+
+' Domain
+class PayrollModel <<Domain Model>> {
+    + period: String
+    + status: PayrollStatus
+}
+class PayrollDetailModel <<Domain Model>> {
+    + staffId: UUID
+    + finalAmount: Double
+}
+class StaffSalaryModel <<Domain Model>>
+
+' Application
+interface UseCaseHandler <<Inbound Port>> {
+  + handle(command)
+}
+interface IPayrollPort <<Outbound Port>> {
+  + save(model: PayrollModel)
+}
+interface IPayrollDetailPort <<Outbound Port>> {
+  + saveAll(details: List<PayrollDetailModel>)
+}
+class CreatePayrollHandler <<Use Case>> {
+  - calculator: PayrollCalculator
+  - payrollFilter: IPayrollPort
+  - detailFilter: IPayrollDetailPort
+  + handle(command)
+}
+class PayrollCalculator <<Service>> {
+  - salaryPort: IStaffSalaryPort
+  - ICheckinoutPort: ICheckinoutPort
+  + calculateForStaff(staff, period): PayrollDetailModel
+}
+
+' Infrastructure
+class PayrollController <<Controller>> {
+  - port: UseCaseHandler
+  + createPayroll(request)
+}
+class CreatePayrollRequest <<DTO>> {
+  + fromDate: LocalDate
+  + toDate: LocalDate
+}
+class PayrollAdapter <<Adapter>> {
+  - payrollRepo: PayrollRepo
+  + save(model: PayrollModel)
+}
+class PayrollDetailAdapter <<Adapter>> {
+  - detailRepo: PayrollDetailRepo
+  + saveAll(details)
+}
+interface PayrollRepo <<Repository>>
+entity PayrollEntity <<Entity>>
+interface PayrollDetailRepo <<Repository>>
+entity PayrollDetailEntity <<Entity>>
+interface IStaffSalaryPort <<Outbound Port>>
+interface ICheckinoutPort <<Outbound Port>>
+
+
+' --- Định nghĩa các liên kết ---
+
+' Association (DI)
+PayrollController "1" o-- "1" UseCaseHandler
+CreatePayrollHandler "1" o-- "1" PayrollCalculator
+CreatePayrollHandler "1" o-- "1" IPayrollPort
+CreatePayrollHandler "1" o-- "1" IPayrollDetailPort
+PayrollCalculator "1" o-- "1" IStaffSalaryPort
+PayrollCalculator "1" o-- "1" ICheckinoutPort
+PayrollAdapter "1" o-- "1" PayrollRepo
+PayrollDetailAdapter "1" o-- "1" PayrollDetailRepo
+
+' Composition
+PayrollModel "*" *-- "*" PayrollDetailModel
+
+' Implementation
+CreatePayrollHandler .up.|> UseCaseHandler
+PayrollAdapter .up.|> IPayrollPort
+PayrollDetailAdapter .up.|> IPayrollDetailPort
+
+' Dependency
+PayrollController ..> CreatePayrollRequest
+CreatePayrollHandler ..> PayrollModel : "creates"
+PayrollCalculator ..> StaffSalaryModel : "uses"
+PayrollCalculator ..> PayrollDetailModel : "returns"
+PayrollAdapter ..> PayrollEntity
+PayrollDetailAdapter ..> PayrollDetailEntity
+
+@enduml

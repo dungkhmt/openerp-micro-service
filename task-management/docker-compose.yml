@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./task-managment-backend
+      dockerfile: Dockerfile.dev
+    command: ./mvnw spring-boot:run
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./task-managment-backend:/app
+      - ~/.m2:/root/.m2
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./task-management-frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./task-management-frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=prod #prod development prod
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

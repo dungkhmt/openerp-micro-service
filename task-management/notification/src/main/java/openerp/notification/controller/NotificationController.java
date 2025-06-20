@@ -92,7 +92,7 @@ public class NotificationController {
      * To keep connection alive
      */
     @Async
-    @Scheduled(fixedRate = 40000)
+    //@Scheduled(fixedRate = 40000)
     public void sendHeartbeatSignal() {
 //        log.info("#CURRENT ACTIVE USER = {}, START SENDING HEARTBEAT EVENT", subscriptions.size());
         long start = System.currentTimeMillis();

@@ -1,0 +1,57 @@
+@startuml
+!theme vibrant
+
+title Thiết kế các thành phần cho giải pháp Xếp lịch tự động
+
+skinparam package {
+    borderColor #5D6D7E
+    backgroundColor #EAEDED
+}
+skinparam class {
+    borderColor #27AE60
+    backgroundColor #D5F5E3
+}
+skinparam component {
+    borderColor #D4AC0D
+    backgroundColor #F9E79F
+}
+
+package "Orchestration & Data" {
+    class RosterService <<Service>> {
+      + generateRoster(request)
+    }
+    class RosterRequest <<DTO>> {
+      + staffList: List<Staff>
+      + shiftTemplates: List<Shift>
+      + constraints: Map
+    }
+    class RosterSolution <<DTO>>
+}
+
+package "Solver Engine" {
+    class OrToolsSolverService <<Solver>> {
+      + solve(request): RosterSolution
+    }
+    component "Google OR-Tools\n(CP-SAT Solver)" as OrTools <<External Library>>
+}
+
+package "Core Solver Components" {
+    class CpModel <<OR-Tools>>
+    class CpSolver <<OR-Tools>>
+    class BoolVar <<Variable>>
+    class LinearExpr <<Constraint>>
+}
+
+' Relationships
+RosterService --> OrToolsSolverService : "<<delegates>>"
+OrToolsSolverService ..> OrTools : "<<uses>>"
+OrToolsSolverService --> RosterRequest : "<<reads>>"
+OrToolsSolverService ..> RosterSolution : "<<returns>>"
+
+OrToolsSolverService --> CpModel : "<<builds>>"
+OrToolsSolverService --> CpSolver : "<<calls>>"
+CpModel "1" *-- "*" BoolVar : "<<creates>>"
+CpModel "1" *-- "*" LinearExpr : "<<creates>>"
+CpSolver --> CpModel : "<<solves>>"
+
+@enduml

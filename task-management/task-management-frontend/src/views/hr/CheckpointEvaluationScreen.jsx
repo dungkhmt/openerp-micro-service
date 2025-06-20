@@ -229,7 +229,7 @@ const CheckpointEvaluationScreenInternal = () => {
         }
       },
       { Header: "Hành động", id: 'actions', Cell: ({ row }) => (
-          <Tooltip title="Đánh giá Checkpoint">
+          <Tooltip title="Đánh giá">
             <span>
                 <IconButton onClick={() => handleGradeClick(row.original)} disabled={!selectedPeriod || loadingPoints} size="small" color="primary">
                     <GradeIcon fontSize="small" />
@@ -278,7 +278,7 @@ const CheckpointEvaluationScreenInternal = () => {
     exportToPDF({
       data: staffData,
       columns: pdfExportColumns,
-      title: `Báo cáo Đánh giá Checkpoint - Kỳ: ${selectedPeriod?.name || 'Tất cả'}`,
+      title: `Báo cáo Đánh giá - Kỳ: ${selectedPeriod?.name || 'Tất cả'}`,
       fileName: `DS_DanhGiaCheckpoint_${selectedPeriod?.name || 'All'}_${dayjs().format("YYYYMMDD")}.pdf`,
       themePalette: theme.palette,
       customColumnWidths: {
@@ -327,7 +327,7 @@ const CheckpointEvaluationScreenInternal = () => {
       {/* ... Phần Paper header của trang ... */}
       <Paper sx={{ p: 2, mb: 2 }}>
         <Grid container spacing={2} alignItems="center" justifyContent="space-between" wrap="wrap">
-          <Grid item xs={12} md={6}> <Typography variant="h4" component="h1" sx={{display:'flex', alignItems:'center'}}> <AssessmentIcon sx={{mr:1.5, color:'primary.main', fontSize: '2rem'}}/> Đánh giá Checkpoint </Typography> </Grid>
+          <Grid item xs={12} md={6}> <Typography variant="h4" component="h1" sx={{display:'flex', alignItems:'center'}}> <AssessmentIcon sx={{mr:1.5, color:'primary.main', fontSize: '2rem'}}/> Đánh giá nhân viên</Typography> </Grid>
           <Grid item xs={12} md={6} lg={4}>
             <Autocomplete
               options={periods}

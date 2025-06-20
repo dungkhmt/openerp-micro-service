@@ -6,6 +6,7 @@ import com.hust.openerp.taskmanagement.hr_management.application.port.out.holida
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.payroll.usecase_data.CreatePayroll;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.GetAllStaffInfo;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff_salary.usecase_data.GetAllCurrentStaffSalary;
+import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceStatus;
 import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceType;
 import com.hust.openerp.taskmanagement.hr_management.constant.JobPositionType;
 import com.hust.openerp.taskmanagement.hr_management.constant.PayrollStatus;
@@ -222,6 +223,7 @@ public class PayrollCalculator extends BeanAwareUseCasePublisher {
             .userIds(userIds)
             .startDate(startDate)
             .endDate(endDate)
+            .status(AbsenceStatus.ACTIVE)
             .build();
         var absenceList = publishCollection(AbsenceModel.class, useCase);
         return absenceList.stream()

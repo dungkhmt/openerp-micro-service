@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wireframe - Xếp lịch tự động</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #ffffff;
+            color: #000000;
+            padding: 20px;
+        }
+        .wireframe-container {
+            border: 2px solid #000;
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+        .wireframe-header {
+            border-bottom: 2px dashed #ccc;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .wireframe-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .config-panel {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .wireframe-select, .wireframe-button {
+            border: 2px solid #000;
+            padding: 8px 16px;
+            background-color: #f0f0f0;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .roster-grid {
+            display: grid;
+            grid-template-columns: 150px repeat(7, 1fr); /* 1 column for names, 7 for days */
+            border: 1px solid #000;
+            margin-top: 25px;
+        }
+        .grid-header, .grid-cell, .staff-name {
+            border: 1px solid #ccc;
+            padding: 10px;
+            min-height: 60px;
+        }
+        .grid-header {
+            font-weight: bold;
+            text-align: center;
+            background-color: #e0e0e0;
+            border-bottom: 2px solid #000;
+        }
+        .staff-name {
+            font-weight: bold;
+            background-color: #f0f0f0;
+            border-right: 2px solid #000;
+        }
+        .shift-placeholder {
+            border: 1px dashed #555;
+            background-color: #e9e9e9;
+            padding: 5px;
+            font-size: 12px;
+            text-align: center;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="wireframe-container">
+    <div class="wireframe-header">
+        <div class="wireframe-title">[ Xếp lịch làm việc ]</div>
+        <div class="config-panel">
+            <div class="wireframe-select">[ Chọn Tuần/Tháng... ]</div>
+        </div>
+    </div>
+    <div class="roster-container">
+        <div class="roster-grid">
+            <div class="grid-header">[ Nhân viên ]</div>
+            <div class="grid-header">Thứ Hai</div>
+            <div class="grid-header">Thứ Ba</div>
+            <div class="grid-header">Thứ Tư</div>
+            <div class="grid-header">Thứ Năm</div>
+            <div class="grid-header">Thứ Sáu</div>
+            <div class="grid-header">Thứ Bảy</div>
+            <div class="grid-header">Chủ Nhật</div>
+
+            <div class="staff-name">[Unsigned]</div>
+            <div class="grid-cell"><div></div></div>
+            <div class="grid-cell"><div class="shift-placeholder">[ 08:00-17:00 ]</div></div>
+            <div class="grid-cell"><div class="shift-placeholder">[ 08:00-12:00 ]</div></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"><div class="shift-placeholder">[ 08:00-17:00 ]</div></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+
+            <div class="staff-name">[Nhân viên A]</div>
+            <div class="grid-cell"><div class="shift-placeholder">[ 08:00-17:00 ]</div></div>
+            <div class="grid-cell"><div class="shift-placeholder">[ 08:00-17:00 ]</div></div>
+            <div class="grid-cell"><div class="shift-placeholder">[ 08:00-12:00 ]</div></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"><div class="shift-placeholder">[ 08:00-17:00 ]</div></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+
+            <div class="staff-name">[Nhân viên B]</div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"><div class="shift-placeholder">[ 13:00-22:00 ]</div></div>
+            <div class="grid-cell"><div class="shift-placeholder">[ 13:00-22:00 ]</div></div>
+            <div class="grid-cell"><div class="shift-placeholder">[ 13:00-22:00 ]</div></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"><div class="shift-placeholder">[ 18:00-22:00 ]</div></div>
+            <div class="grid-cell"></div>
+
+            <div class="staff-name">[Nhân viên C]</div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"><div class="shift-placeholder">[ 13:00-22:00 ]</div></div>
+            <div class="grid-cell"><div class="shift-placeholder">[ 13:00-22:00 ]</div></div>
+            <div class="grid-cell"><div class="shift-placeholder">[ 13:00-22:00 ]</div></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"><div class="shift-placeholder">[ 18:00-22:00 ]</div></div>
+            <div class="grid-cell"></div>
+            <div class="staff-name">[Nhân viên D]</div>
+            <div class="grid-cell"><div class="shift-placeholder">[ 08:00-17:00 ]</div></div>
+            <div class="grid-cell"><div class="shift-placeholder">[ 08:00-17:00 ]</div></div>
+            <div class="grid-cell"><div class="shift-placeholder">[ 08:00-12:00 ]</div></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"><div class="shift-placeholder">[ 08:00-17:00 ]</div></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

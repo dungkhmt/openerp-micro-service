@@ -1,0 +1,70 @@
+@startuml
+!theme vibrant
+
+' --- Skinparams cho các loại stereotype ---
+skinparam stereotype {
+    CBackgroundColor #EBF5FB
+    IBackgroundColor #EBF5FB
+    UBackgroundColor #D5F5E3
+    ABackgroundColor #FDEDEC
+    RBackgroundColor #FDEDEC
+    EBackgroundColor #FDEDEC
+    DBackgroundColor #E8DAEF
+}
+
+' --- Khai báo các thành phần với stereotype ---
+
+class CheckpointStaffModel <<Domain Model>> {
+  + staffId: UUID
+  + periodId: UUID
+  + totalPoint: Double
+}
+class CheckpointPeriodModel <<Domain Model>> {
+  + periodId: UUID
+  + name: String
+  + startDate: LocalDate
+}
+
+interface UseCaseHandler <<Inbound Port>> {
+  + handle(command)
+}
+interface ICheckpointPort <<Outbound Port>> {
+  + save(model: CheckpointStaffModel)
+}
+class CheckpointStaffHandler <<Use Case>> {
+  - persistencePort: ICheckpointPort
+  + handle(command)
+}
+
+class CheckpointController <<Controller>> {
+  - port: UseCaseHandler
+  + checkpointStaff(request)
+}
+class CheckpointStaffAdapter <<Adapter>> {
+  - repo: CheckpointStaffRepo
+  + save(model: CheckpointStaffModel)
+}
+interface CheckpointStaffRepo <<Repository>> {
+  + save(entity: CheckpointStaffEntity)
+}
+entity CheckpointStaffEntity <<Entity>> {
+  - staffId: UUID
+  - periodId: UUID
+  - totalPoint: Double
+}
+
+
+' --- Định nghĩa các liên kết ---
+CheckpointController o-- UseCaseHandler
+CheckpointStaffHandler .up.|> UseCaseHandler
+CheckpointStaffHandler o-- ICheckpointPort
+CheckpointStaffAdapter .up.|> ICheckpointPort
+CheckpointStaffAdapter o-- CheckpointStaffRepo
+
+CheckpointStaffHandler ..> CheckpointStaffModel
+CheckpointStaffHandler ..> CheckpointPeriodModel
+CheckpointStaffAdapter ..> CheckpointStaffModel
+CheckpointStaffAdapter ..> CheckpointStaffEntity
+CheckpointStaffRepo ..> CheckpointStaffEntity
+
+@enduml

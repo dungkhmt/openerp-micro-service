@@ -1,0 +1,29 @@
+# /task-management-frontend/Dockerfile.dev
+# Dockerfile này DÀNH RIÊNG cho môi trường development
+
+# Bắt đầu từ image Node.js để có npm và vite
+FROM node:20
+
+# Đặt thư mục làm việc
+WORKDIR /app
+
+ARG NODE_ENV
+ENV NODE_ENV=$NODE_ENV
+
+# Copy file package.json trước để tận dụng cache
+COPY package*.json ./
+
+# Cài đặt tất cả các thư viện từ package.json
+# Dùng --legacy-peer-deps nếu bạn gặp lỗi xung đột phiên bản
+RUN npm install --legacy-peer-deps
+
+# Copy toàn bộ mã nguồn còn lại
+COPY . .
+
+# Mở cổng 3000 mà Vite dev server sẽ chạy
+EXPOSE 3000
+
+# Lệnh để khởi động dev server
+# --host: để server có thể được truy cập từ bên ngoài container
+# --port 3000: để đảm bảo nó chạy đúng cổng bạn muốn
+CMD ["npm", "run", "dev", "--", "--host", "--port", "3000"]

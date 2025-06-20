@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wireframe - Bộ Cấu Hình</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #ffffff;
+            color: #000000;
+            padding: 20px;
+        }
+        .wireframe-container {
+            border: 2px solid #000;
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed #ccc;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .main-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .wireframe-button {
+            border: 2px solid #000;
+            padding: 8px 16px;
+            background-color: #f0f0f0;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .config-block {
+            border: 1px solid #000;
+            margin-bottom: 25px;
+        }
+        .config-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: #e0e0e0;
+            border-bottom: 1px solid #000;
+        }
+        .config-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .config-body {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+        }
+        .column {
+            flex: 1;
+            border: 1px dashed #555;
+            padding: 15px;
+        }
+        .column-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+        .item-list {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wireframe-container">
+    <div class="main-header">
+        <div class="main-title">[ Quản Lý Bộ Cấu Hình Xếp Lịch ]</div>
+        <div class="wireframe-button">[ + Tạo Mới ]</div>
+    </div>
+
+    <div class="config-block">
+        <div class="config-header">
+            <div class="config-title">[ Bộ cấu hình 1 ]</div>
+            <div class="wireframe-button">[ Áp dụng ]</div>
+        </div>
+        <div class="config-body">
+            <div class="column">
+                <div class="column-title">[ Ca Làm Việc (4) ]</div>
+                <div class="item-list">
+                    - [ Sáng Hành Chính 1: 08:00 - 11:00 ]<br>
+                    - [ Sáng Hành Chính 2: 13:00 - 15:00 ]<br>
+                    - [ ... ]
+                </div>
+            </div>
+            <div class="column">
+                <div class="column-title">[ Ràng Buộc Áp Dụng (10) ]</div>
+                <div class="item-list">
+                    - [ Nghỉ cuối tuần: 2; 4 ]<br>
+                    - [ Không trùng ca: Đang áp dụng ]<br>
+                    - [ Giờ tối đa/tuần: 40 ]<br>
+                    - [ ... ]
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="config-block">
+        <div class="config-header">
+            <div class="config-title">[ Bộ cấu hình 2 ]</div>
+            <div class="wireframe-button">[ Áp dụng ]</div>
+        </div>
+        <div class="config-body">
+            <div class="column">
+                <div class="column-title">[ Ca Làm Việc (4) ]</div>
+                <div class="item-list">
+                    - [ Sáng Hành Chính 1: 08:00 - 11:00 ]<br>
+                    - [ Sáng Hành Chính 2: 13:00 - 15:00 ]<br>
+                    - [ ... ]
+                </div>
+            </div>
+            <div class="column">
+                <div class="column-title">[ Ràng Buộc Áp Dụng (10) ]</div>
+                <div class="item-list">
+                    - [ Nghỉ cuối tuần: 2; 4 ]<br>
+                    - [ Không trùng ca: Đang áp dụng ]<br>
+                    - [ Giờ tối đa/tuần: 40 ]<br>
+                    - [ ... ]
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

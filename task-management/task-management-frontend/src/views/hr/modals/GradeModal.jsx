@@ -176,7 +176,7 @@ const GradeModal = ({ open, onClose, staff, period, titleProps }) => {
         py:1.5, px:2.5 // Tăng padding
       }}>
         <Typography variant="h6" component="div" sx={{fontWeight: 600, fontSize: titleProps?.sx?.fontSize || '1.2rem'}}> {/* Tăng fontSize title */}
-          Đánh giá Checkpoint
+          Đánh giá nhân viên
         </Typography>
         <IconButton aria-label="đóng" onClick={onClose} sx={{color: 'primary.contrastText', p:0.5}}>
           <CloseIcon />

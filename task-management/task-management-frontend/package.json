@@ -51,6 +51,7 @@
     "i18next-browser-languagedetector": "^7.1.0",
     "i18next-http-backend": "^2.2.2",
     "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
     "keycloak-js": "21.0.2",
     "lodash": "^4.17.21",
     "lunar-calendar": "^0.1.4",

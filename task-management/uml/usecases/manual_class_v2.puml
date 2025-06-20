@@ -1,0 +1,41 @@
+@startuml
+!theme vibrant
+
+skinparam component {
+    borderColor #1E8449
+    backgroundColor #D5F5E3
+    ArrowColor #27AE60
+}
+
+' --- Định nghĩa các thành phần ---
+component ShiftScheduler <<Page/Orchestrator>>
+component TopBar <<Controls>>
+component CalendarHeader <<Grid Header>>
+component BulkActionsBar <<Conditional UI>>
+component ShiftsGrid <<Grid Container>>
+component DayCell <<Grid Cell>>
+component ShiftCard <<Draggable Item>>
+component UnassignedShiftsRow <<Special Row>>
+component ShiftModal <<Edit Modal>>
+component CopyShiftsModal <<Bulk Action Modal>>
+
+' --- Định nghĩa các mối quan hệ ---
+
+' ShiftScheduler chứa các thành phần giao diện chính
+ShiftScheduler "1" *-- "1" TopBar
+ShiftScheduler "1" *-- "1" CalendarHeader
+ShiftScheduler "1" *-- "1" BulkActionsBar
+ShiftScheduler "1" *-- "1" ShiftsGrid
+
+' ShiftScheduler quản lý và hiển thị các Modal
+ShiftScheduler "1" -- "1" ShiftModal
+ShiftScheduler "1" -- "1" CopyShiftsModal
+
+' Cấu trúc lồng nhau bên trong lưới (Grid)
+ShiftsGrid "1" *-- "1" UnassignedShiftsRow
+ShiftsGrid "1" *-- "*" DayCell
+
+' DayCell là thành phần chứa các thẻ ShiftCard
+DayCell "1" *-- "*" ShiftCard
+
+@enduml

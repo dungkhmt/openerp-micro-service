@@ -1,0 +1,79 @@
+name: CI/CD to Google Cloud
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  PROJECT_ID: hust-hrm
+  REGION: asia-southeast1
+  REPO_NAME: hrm-app-repo
+  CLOUD_SQL_CONNECTION_NAME: hust-hrm:asia-southeast1:hrm-cloudsql-instance
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    environment: Gcloud
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${REGION}-docker.pkg.dev
+
+      - name: Decode and write application.yml
+        run: |
+          mkdir -p ./task-managment-backend/src/main/resources
+          echo "${{ secrets.SPRING_APPLICATION_YML_B64 }}" | base64 --decode > ./task-managment-backend/src/main/resources/application.yml
+
+      - name: Build and push backend Docker image
+        run: |
+          docker build -t ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/backend:latest ./task-managment-backend
+          docker push ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/backend:latest
+
+      - name: Build and push frontend Docker image
+        run: |
+          docker build -t ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/frontend:latest \
+            --build-arg NODE_ENV=prod ./task-management-frontend
+          docker push ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/frontend:latest
+
+      - name: Deploy backend to Cloud Run
+        run: |
+          gcloud run deploy backend-service \
+            --image ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/backend:latest \
+            --platform managed \
+            --region ${REGION} \
+            --allow-unauthenticated \
+            --cpu=1 \
+            --memory=2Gi \
+            --add-cloudsql-instances=${CLOUD_SQL_CONNECTION_NAME} \
+            --set-env-vars="SPRING_DATASOURCE_URL=jdbc:postgresql:///erp_dev_2024?cloudSqlInstance=hust-hrm:asia-southeast1:hrm-cloudsql-instance&socketFactory=com.google.cloud.sql.postgres.SocketFactory" \
+            --set-env-vars="SPRING_DATASOURCE_USERNAME=postgres" \
+            --set-env-vars="SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }}" \
+            --set-env-vars="SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect"
+
+      - name: Deploy frontend to Cloud Run
+        run: |
+          gcloud run deploy frontend-service \
+            --image ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/frontend:latest \
+            --platform managed \
+            --region ${REGION} \
+            --allow-unauthenticated \
+            --port 80 \
+            --set-env-vars NODE_ENV=prod

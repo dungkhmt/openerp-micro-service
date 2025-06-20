@@ -6,32 +6,43 @@ import java.time.Duration;
 import java.time.LocalTime;
 
 public class WorkTimeCalculator {
+
     public static Float calculateWorkTimeByHours(
         LocalTime startTime,
         LocalTime endTime,
         CompanyConfigModel companyConfig
     ) {
-        if(startTime == null || endTime == null) return 0f;
+        if (startTime == null || endTime == null || companyConfig == null) {
+            return 0f;
+        }
         if (endTime.isBefore(startTime)) {
-
             return 0f;
         }
 
-        Duration totalDuration = Duration.between(startTime, endTime);
+        LocalTime companyWorkStart = companyConfig.getStartWorkTime();
+        LocalTime companyWorkEnd = companyConfig.getEndWorkTime();
+        LocalTime companyLunchStart = companyConfig.getStartLunchTime();
+        LocalTime companyLunchEnd = companyConfig.getEndLunchTime();
 
-        LocalTime lunchStart = companyConfig.getStartLunchTime();
-        LocalTime lunchEnd = companyConfig.getEndLunchTime();
+        LocalTime effectiveStartTime = startTime.isBefore(companyWorkStart) ? companyWorkStart : startTime;
+        LocalTime effectiveEndTime = endTime.isAfter(companyWorkEnd) ? companyWorkEnd : endTime;
 
-        LocalTime workStart = startTime.isBefore(lunchStart) ? lunchStart : startTime;
-        LocalTime workEnd = endTime.isAfter(lunchEnd) ? lunchEnd : endTime;
-
-        Duration overlapLunch = Duration.ZERO;
-        if (!workEnd.isBefore(workStart)) {
-            overlapLunch = Duration.between(workStart, workEnd);
+        if (effectiveEndTime.isBefore(effectiveStartTime)) {
+            return 0f;
         }
 
-        Duration actualWorkTime = totalDuration.minus(overlapLunch);
+        Duration grossWorkDuration = Duration.between(effectiveStartTime, effectiveEndTime);
 
-        return actualWorkTime.toMinutes() / 60f;
+        LocalTime overlapLunchStart = effectiveStartTime.isAfter(companyLunchStart) ? effectiveStartTime : companyLunchStart;
+        LocalTime overlapLunchEnd = effectiveEndTime.isBefore(companyLunchEnd) ? effectiveEndTime : companyLunchEnd;
+
+        Duration lunchDeduction = Duration.ZERO;
+        if (overlapLunchEnd.isAfter(overlapLunchStart)) {
+            lunchDeduction = Duration.between(overlapLunchStart, overlapLunchEnd);
+        }
+
+        Duration actualWorkTime = grossWorkDuration.minus(lunchDeduction);
+
+        return actualWorkTime.toMinutes() / 60.0f;
     }
 }

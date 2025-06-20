@@ -1,0 +1,90 @@
+@startuml
+!theme vibrant
+
+skinparam package {
+    roundCorner 10
+    borderColor #5D6D7E
+    backgroundColor #EAEDED
+}
+
+package "Domain Layer" {
+    skinparam class {
+        borderColor #AF7AC5
+        backgroundColor #E8DAEF
+    }
+    class CheckpointStaffModel
+    class CheckpointPeriodModel
+}
+
+package "Application Layer" {
+    skinparam package {
+        borderColor #2980B9
+    }
+    package "port.in" <<Ports>> {
+        skinparam interface {
+            borderColor #5DADE2
+            backgroundColor #EBF5FB
+        }
+        interface UseCaseHandler
+    }
+
+    package "port.out" <<Ports>> {
+        interface ICheckpointStaffPort
+    }
+
+    package "port.in" <<Use Cases>> {
+        skinparam class {
+            borderColor #2ECC71
+            backgroundColor #D5F5E3
+        }
+        class CheckpointStaffHandler
+    }
+}
+
+package "Infrastructure Layer" {
+    skinparam package {
+        borderColor #BA4A00
+    }
+    package "input.rest" <<Adapters>> {
+        skinparam class {
+            borderColor #E59866
+            backgroundColor #FDEDEC
+        }
+        class CheckpointController
+    }
+
+    package "output.persistence" <<Adapters>> {
+        skinparam class {
+            borderColor #E59866
+            backgroundColor #FDEDEC
+        }
+        class CheckpointStaffAdapter
+        interface CheckpointStaffRepo
+        entity CheckpointStaffEntity
+    }
+}
+
+' Định nghĩa các liên kết rõ ràng
+' 1. Controller nhận request và gọi vào Application Port
+CheckpointController o-- UseCaseHandler
+
+' 2. Use Case triển khai Application Port
+CheckpointStaffHandler .up.|> UseCaseHandler
+
+' 3. Use Case sử dụng các Domain Model
+CheckpointStaffHandler --> CheckpointStaffModel
+CheckpointStaffHandler --> CheckpointPeriodModel
+
+' 4. Use Case gọi ra Outbound Port để tương tác với DB
+CheckpointStaffHandler o-- ICheckpointStaffPort
+
+' 5. Adapter ở Infrastructure triển khai Outbound Port
+CheckpointStaffAdapter .up.|> ICheckpointStaffPort
+
+' 6. Adapter sử dụng Repository và Entity
+CheckpointStaffAdapter o-- CheckpointStaffRepo
+CheckpointStaffAdapter --> CheckpointStaffModel
+CheckpointStaffAdapter --> CheckpointStaffEntity
+CheckpointStaffRepo --> CheckpointStaffEntity
+
+@enduml

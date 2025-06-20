@@ -1,0 +1,27 @@
+# /task-management-backend/Dockerfile.dev (Phiên bản ĐÚNG)
+
+# Bắt đầu từ một image có sẵn Java và Maven
+FROM maven:3.8.5-openjdk-17
+
+# Tạo thư mục làm việc
+WORKDIR /app
+
+# Copy file pom.xml trước để tận dụng cache của Docker
+COPY pom.xml .
+
+# Tải các dependencies về trước
+RUN mvn dependency:go-offline
+
+# ---- CÁC DÒNG QUAN TRỌNG BỊ THIẾU TRƯỚC ĐÂY ----
+# Copy các file cần thiết để chạy mvnw
+COPY .mvn .mvn
+COPY mvnw .
+# Cấp quyền thực thi cho file mvnw
+RUN chmod +x mvnw
+# ---------------------------------------------
+
+# Copy mã nguồn
+COPY src ./src
+
+# Lệnh mặc định này sẽ được docker-compose.yml sử dụng để chạy app
+CMD ["./mvnw", "spring-boot:run"]

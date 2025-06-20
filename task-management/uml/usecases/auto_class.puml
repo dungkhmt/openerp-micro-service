@@ -1,0 +1,78 @@
+@startuml
+!theme vibrant
+
+' --- Skinparams cho các loại stereotype ---
+skinparam stereotype {
+    CBackgroundColor #FDEDEC
+    SBackgroundColor #D5F5E3
+    RBackgroundColor #FDEDEC
+    EBackgroundColor #FDEDEC
+    DBackgroundColor #E8DAEF
+    DTOBackgroundColor #FDEBD0
+    ExtBackgroundColor #F9E79F
+}
+
+
+' --- Khai báo các thành phần ---
+
+class ShiftModel <<Domain Model>> {
+    + staffId: UUID
+    + startTime: LocalDateTime
+}
+class RosterTemplateModel <<Domain Model>> {
+    + templateId: UUID
+    + constraints: Map
+}
+class ShiftDefinition <<Domain Model>>
+
+class RosterController <<Controller>> {
+  - service: RosterService
+  + generateRoster(request: RosterRequest)
+}
+class RosterRequest <<DTO>> {
+  + fromDate: LocalDate
+  + templateId: UUID
+}
+class RosterService <<Service>> {
+  - solver: OrToolsSolverService
+  - shiftRepo: ShiftRepo
+  + generateRoster(request)
+}
+class OrToolsSolverService <<Solver>> {
+  + solve(request, template): RosterSolution
+}
+interface ShiftRepo <<Repository>> {
+  + saveAll(shifts: List<ShiftEntity>)
+}
+entity ShiftEntity <<Entity>> {
+  - shiftId: UUID
+  - staffId: UUID
+}
+class RosterSolution <<DTO>>
+class RosterStatistics <<DTO>>
+class ScheduledShift <<DTO>>
+
+
+
+' --- Định nghĩa các liên kết ---
+
+' Association (DI)
+RosterController "1" o-- "1" RosterService
+RosterService "1" o-- "1" OrToolsSolverService
+RosterService "1" o-- "1" ShiftRepo
+
+' Composition
+RosterTemplateModel "*" *-- "*" ShiftDefinition
+RosterSolution "*" *-- "1" RosterStatistics
+RosterSolution "*" *-- "*" ScheduledShift
+
+' Dependency
+RosterController ..> RosterRequest
+OrToolsSolverService ..> OrTools
+OrToolsSolverService ..> RosterRequest
+OrToolsSolverService ..> RosterSolution : "returns"
+ShiftRepo ..> ShiftEntity
+RosterService ..> ShiftModel
+RosterService ..> RosterTemplateModel
+
+@enduml

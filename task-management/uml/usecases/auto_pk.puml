@@ -1,0 +1,68 @@
+@startuml
+!theme vibrant
+
+skinparam package {
+    roundCorner 10
+    borderColor #5D6D7E
+    backgroundColor #EAEDED
+}
+
+package "Domain Layer" {
+    skinparam class {
+        borderColor #AF7AC5
+        backgroundColor #E8DAEF
+    }
+    class ShiftModel
+    class RosterTemplateModel
+}
+
+package "Infrastructure Layer" {
+    skinparam package {
+        borderColor #BA4A00
+    }
+    package "input.rest" <<Adapters>> {
+        skinparam class {
+            borderColor #E59866
+            backgroundColor #FDEDEC
+        }
+        class RosterController
+        class RosterRequest <<DTO>>
+    }
+
+    package "service.roster" <<Service & Solver>> {
+         skinparam class {
+            borderColor #27AE60
+            backgroundColor #D5F5E3
+        }
+        class RosterService
+        class OrToolsSolverService
+    }
+
+    package "output.persistence" <<Adapters>> {
+        skinparam class {
+            borderColor #E59866
+            backgroundColor #FDEDEC
+        }
+        interface ShiftRepo
+        entity ShiftEntity
+    }
+}
+
+
+' Định nghĩa các liên kết rõ ràng
+' 1. Controller nhận request và gọi Service
+RosterController o-- RosterService
+RosterController ..> RosterRequest
+
+' 2. RosterService điều phối, gọi Solver và Repo
+RosterService o-- OrToolsSolverService
+RosterService o-- ShiftRepo
+RosterService --> RosterTemplateModel
+
+
+' 4. Repository tương tác với Entity
+ShiftRepo --> ShiftEntity
+' RosterService sau khi có kết quả sẽ làm việc với ShiftModel để lưu
+RosterService ..> ShiftModel
+
+@enduml

@@ -1,0 +1,4 @@
+deploy.txt
+*.sql
+cloud-sql-proxy.exe
+cloudbuild.yaml

@@ -1,0 +1,26 @@
+# Bỏ qua file này để nó không tự bỏ qua chính nó
+.gcloudignore
+
+# Bỏ qua thư mục node_modules ở bất kỳ đâu
+**/node_modules/
+
+# Bỏ qua thư mục target của Java/Maven
+**/target/
+
+# Bỏ qua thư mục dist/build của frontend
+**/dist/
+**/build/
+
+# Bỏ qua các file cấu hình IDE và hệ điều hành
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Bỏ qua các file môi trường local
+.env
+.env.*
+
+*.sql
+*.dump
+cloud-sql-proxy.exe

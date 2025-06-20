@@ -1,0 +1,384 @@
+\documentclass[../DoAn.tex]{subfiles}
+\begin{document}
+Chương này trình bày chi tiết về quá trình phân tích và đặc tả các yêu cầu cho hệ thống quản lý nhân sự. Nội dung bắt đầu bằng việc khảo sát hiện trạng và sự cần thiết của hệ thống, tiếp theo là phân tích tổng quan các chức năng thông qua biểu đồ use case tổng quát và các biểu đồ phân rã. Sau đó, chương sẽ đi sâu vào mô tả các quy trình nghiệp vụ chính và đặc tả chi tiết một số use case quan trọng. Cuối cùng, các yêu cầu phi chức năng của hệ thống cũng sẽ được đề cập.
+
+\section{Khảo sát hiện trạng}
+\label{section:2.1}
+Trong bối cảnh chuyển đổi số hiện nay, các doanh nghiệp, đặc biệt là doanh nghiệp vừa và nhỏ, đang đứng trước yêu cầu cấp thiết về việc tối ưu hóa quy trình quản lý nhân sự. Các phương pháp quản lý thủ công qua giấy tờ hoặc các công cụ văn phòng như Excel ngày càng bộc lộ nhiều hạn chế: tiêu tốn thời gian, dễ gây sai sót trong các nghiệp vụ nhạy cảm như chấm công, tính lương, quản lý phép, đồng thời gây khó khăn trong việc lưu trữ và truy xuất dữ liệu một cách nhất quán.
+
+Mặc dù thị trường đã có các phần mềm quản lý nhân sự (HRM), nhiều giải pháp tỏ ra không phù hợp với các doanh nghiệp vừa và nhỏ tại Việt Nam. Các sản phẩm quốc tế thường có chi phí cao và phức tạp khi triển khai. Trong khi đó, các giải pháp trong nước tuy có chi phí hợp lý hơn nhưng lại thiếu tính linh hoạt, khả năng mở rộng và đặc biệt là khả năng tùy biến để đáp ứng các quy trình nghiệp vụ đặc thù của nhiều loại hình tổ chức khác nhau (nhà hàng, bệnh viện, công ty sản xuất,...). Sự thiếu hụt một nền tảng linh hoạt, có thể cấu hình theo nhu cầu đã tạo ra một rào cản lớn, buộc doanh nghiệp phải thay đổi quy trình để phù hợp với phần mềm.
+
+Nhận thấy khoảng trống này, đồ án được thực hiện nhằm xây dựng một hệ thống quản lý nhân sự có tính tùy biến cao, giải quyết các bài toán cốt lõi:
+\begin{itemize}
+    \item \textbf{Quản lý thông tin nhân viên:} Tập trung hóa dữ liệu, dễ dàng quản lý hồ sơ.
+    \item \textbf{Quản lý chấm công và nghỉ phép:} Tự động hóa các quy trình hàng ngày của nhân viên.
+    \item \textbf{Quản lý lịch làm việc:} Hỗ trợ Admin sắp xếp lịch làm việc một cách hiệu quả.
+    \item \textbf{Quản lý lương và đánh giá:} Cung cấp công cụ để tính lương cơ bản và đánh giá hiệu suất nhân viên.
+\end{itemize}
+
+\section{Tổng quan chức năng}
+\label{section:2.2}
+Phần này tóm tắt các chức năng của phần mềm ở mức tổng quan, giúp có cái nhìn bao quát về những gì hệ thống sẽ cung cấp cho người dùng.
+
+\subsection{Biểu đồ use case tổng quát}
+\label{subsection:2.2.1}
+Biểu đồ use case tổng quát mô tả các chức năng chính của hệ thống và sự tương tác của các tác nhân (actor) với các chức năng đó.\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Hinhve/tổng quát.png}
+    \caption{Biểu đồ use case tổng quát của hệ thống}
+    \label{fig:uc_tong_quat}
+\end{figure}
+Hình 2.1 mô tả các use case chính và các tác nhân của hệ thống. Hệ thống có hai tác nhân chính là Admin và Nhân viên. Tác nhân Admin có quyền thực hiện các chức năng quản lý toàn diện như Quản lý nhân viên, Quản lý phòng ban, Quản lý lương, Xếp lịch làm việc và Quản lý công. Tác nhân Nhân viên có thể thực hiện các nghiệp vụ liên quan đến cá nhân như Xem thông tin cá nhân, Xin nghỉ phép và Chấm công. Cả hai tác nhân đều có thể sử dụng chức năng Xem lịch làm việc.
+
+\subsection{Biểu đồ use case phân rã}
+\label{subsection:2.2.2}
+Các use case mức cao sẽ được phân rã để làm rõ hơn các chức năng con bên trong.
+
+\subsubsection{Use case Quản lý nhân viên}
+Use case này được phân rã thành các chức năng cụ thể cho phép Admin quản lý hồ sơ nhân viên một cách toàn diện.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Hinhve/Quản lý nhân viên.png}
+    \caption{Biểu đồ use case phân rã chức năng Quản lý nhân viên}
+    \label{fig:uc_ql_nhanvien}
+\end{figure}
+Hình \ref{fig:uc_ql_nhanvien} mô tả chi tiết các hoạt động trong use case Quản lý nhân viên. Tác nhân Admin có thể thực hiện bốn chức năng chính: Thêm nhân viên mới để tạo hồ sơ cho nhân sự mới, Xoá nhân viên để loại bỏ hồ sơ nhân viên đã nghỉ việc, Xem thông tin chi tiết của nhân viên để tra cứu hồ sơ, và Chỉnh sửa thông tin nhân viên để cập nhật các thay đổi.
+
+\subsubsection{Use case Quản lý lịch làm việc}
+Use case này cho phép Admin thực hiện việc xếp lịch một cách linh hoạt, bao gồm cả tự động và thủ công.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Hinhve/quản lý lịch làm việc.png}
+    \caption{Biểu đồ use case phân rã chức năng Quản lý lịch làm việc}
+    \label{fig:uc_ql_lichlamviec}
+\end{figure}
+Hình \ref{fig:uc_ql_lichlamviec} thể hiện biểu đồ phân rã cho use case Xếp lịch làm việc. Chức năng cốt lõi là Xếp lịch tự động, cho phép hệ thống tự tạo lịch dựa trên các quy tắc đã định. Chức năng Xếp lịch thủ công là một trường hợp mở rộng (extend), cho phép Admin can thiệp, tinh chỉnh hoặc tạo lịch bằng tay dựa trên kết quả của việc xếp lịch tự động hoặc tạo mới hoàn toàn. Admin cũng có thể Xem lịch làm việc đã được tạo.
+
+\subsubsection{Use case Chấm công và Nghỉ phép}
+Các chức năng này cho phép nhân viên thực hiện các tác vụ hàng ngày của mình.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Hinhve/chấm công.png}
+    \caption{Biểu đồ use case phân rã chức năng Chấm công}
+    \label{fig:uc_chamcong}
+\end{figure}
+
+Hình \ref{fig:uc_chamcong} mô tả các chức năng chấm công của Nhân viên. Nhân viên có thể thực hiện nghiệp vụ Chấm công hàng ngày (check-in/check-out) và sử dụng chức năng Xem lịch sử chấm công để tra cứu lại dữ liệu chấm công của bản thân.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Hinhve/nghỉ phép.png}
+    \caption{Biểu đồ use case phân rã chức năng Quản lý nghỉ phép}
+    \label{fig:uc_nghiphep}
+\end{figure}
+Hình \ref{fig:uc_nghiphep} miêu tả các chức năng trong nghiệp vụ quản lý nghỉ phép của Nhân viên. Nhân viên có thể tạo một yêu cầu Xin nghỉ phép mới, Chỉnh sửa thông báo nghỉ phép khi có thay đổi, hoặc Huỷ thông báo nghỉ phép đã tạo. Ngoài ra, hệ thống cho phép họ Xem lịch sử nghỉ phép cá nhân để theo dõi số ngày phép đã sử dụng và còn lại.
+\subsection{Quy trình nghiệp vụ}
+\label{subsection:2.2.3}
+Phần này mô tả các quy trình nghiệp vụ quan trọng của hệ thống bằng biểu đồ hoạt động.
+
+\subsubsection{Quy trình Xếp ca làm việc tự động}
+Đây là một quy trình nghiệp vụ quan trọng giúp tiết kiệm thời gian cho Admin, bắt đầu từ việc cấu hình và kết thúc bằng việc hệ thống tự động tạo ra một lịch làm việc tối ưu.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Hinhve/Xếp ca làm việc tự động.png}
+    \caption{Biểu đồ hoạt động quy trình Xếp ca làm việc tự động}
+    \label{fig:act_xeplich}
+\end{figure}
+
+Hình \ref{fig:act_xeplich} mô tả quy trình nghiệp vụ Xếp ca làm việc tự động. Quy trình bắt đầu khi Admin chọn "Cấu hình xếp ca", sau đó thêm các thông tin về ca làm việc và các ràng buộc. Sau khi Admin "Tạo cấu hình", hệ thống sẽ lưu lại. Admin có thể chọn cấu hình này và áp dụng cho một phòng ban/vị trí trong một khoảng thời gian nhất định để hệ thống "Tạo lịch tự động". Nếu quá trình tạo lịch thành công, hệ thống sẽ tạo thông tin thống kê để Admin xem và xác nhận. Nếu thất bại, hệ thống sẽ báo lỗi. Admin có thể xác nhận lịch hoặc "rollback" để hủy các lịch vừa tạo.
+
+\subsubsection{Quy trình Đánh giá nhân viên}
+Quy trình này cho phép Admin thiết lập các kỳ đánh giá, tiêu chí và thực hiện việc chấm điểm. Nhân viên có thể xem kết quả đánh giá của mình.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Hinhve/Đánh giá nhân viên.png}
+    \caption{Biểu đồ hoạt động quy trình Đánh giá nhân viên}
+    \label{fig:act_danhgia}
+\end{figure}
+
+Hình \ref{fig:act_danhgia} mô tả quy trình nghiệp vụ Đánh giá nhân viên, thể hiện sự tương tác giữa ba bên: Admin, Hệ thống và Nhân viên. Đầu tiên, Admin khởi tạo một "Kỳ đánh giá", định nghĩa các tiêu chí và hệ số điểm. Hệ thống lưu lại thông tin này và hiển thị kỳ đánh giá mới. Sau đó, Admin chọn kỳ đánh giá và nhân viên để "Chấm điểm theo các tiêu chí". Sau khi Admin chấm điểm xong, hệ thống sẽ "Lưu điểm nhân viên" và Nhân viên có thể truy cập để "Chọn xem điểm ở kỳ đánh giá" và "Hiển thị điểm" của mình.
+
+\newpage
+\section{Đặc tả chức năng}
+\label{section:2.3}
+Phần này sẽ đặc tả chi tiết cho các use case quan trọng của hệ thống, bao gồm các chức năng quản lý của Admin và các tác vụ của nhân viên.
+
+\subsection{Đặc tả use case Quản lý nhân viên}
+\begin{longtable}{|p{0.3\textwidth}|p{0.6\textwidth}|}
+    \caption{Đặc tả use case Quản lý nhân viên} \label{tab:uc_ql_nhanvien_spec} \\
+    \hline
+    \textbf{Thuộc tính} & \textbf{Nội dung} \\
+    \hline
+    \endfirsthead
+    \multicolumn{2}{c}%
+    {{\tablename\ \thetable\ -- \textit{Tiếp tục từ trang trước}}} \\
+    \hline
+    \textbf{Thuộc tính} & \textbf{Nội dung} \\
+    \hline
+    \endhead
+    \hline \multicolumn{2}{r}{{\textit{Còn nữa ở trang tiếp theo}}} \\
+    \endfoot
+    \hline
+    \endlastfoot
+
+    Mã use case & UC001 \\
+    \hline
+    Tên use case & Quản lý nhân viên \\
+    \hline
+    Tác nhân & Admin \\
+    \hline
+    Mô tả & Use case này cho phép Admin quản lý thông tin nhân viên trong doanh nghiệp như thêm, sửa, xóa và xem thông tin nhân viên. \\
+    \hline
+    Tiền điều kiện & Admin đã đăng nhập vào hệ thống. \\
+    \hline
+    Luồng sự kiện chính &
+    \begin{enumerate}
+        \item Admin chọn menu Quản lý nhân viên.
+        \item Hệ thống hiển thị danh sách các nhân viên.
+        \item Admin chọn nút “Thêm mới” để thêm nhân viên.
+        \item Hệ thống hiển thị cửa sổ nhập thông tin nhân viên.
+        \item Admin nhập thông tin và nhấn lưu.
+        \item Hệ thống kiểm tra tính hợp lệ và lưu thông tin nếu đúng.
+        \item Admin có thể nhấn vào từng nhân viên để xem chi tiết.
+        \item Admin có thể nhấn “Chỉnh sửa” hoặc “Xóa” trong chi tiết.
+        \item Hệ thống xử lý cập nhật hoặc xóa thông tin tương ứng.
+    \end{enumerate} \\
+    \hline
+    Luồng sự kiện thay thế &
+    \begin{enumerate}
+        \item Tại bước 6, nếu thông tin không hợp lệ:
+        \begin{itemize}
+            \item[(a)] Hệ thống thông báo lỗi và yêu cầu nhập lại.
+        \end{itemize}
+        \item Tại bước 8, nếu xóa nhân viên:
+        \begin{itemize}
+            \item[(a)] Hệ thống yêu cầu xác nhận trước khi xóa.
+            \item[(b)] Nếu xác nhận, hệ thống xóa nhân viên khỏi danh sách.
+        \end{itemize}
+    \end{enumerate} \\
+    \hline
+    Hậu điều kiện & Hệ thống cập nhật thông tin nhân viên. \\
+\end{longtable}
+
+
+\subsection{Đặc tả use case Chấm công}
+\begin{longtable}{|p{0.3\textwidth}|p{0.6\textwidth}|}
+    \caption{Đặc tả use case Chấm công} \label{tab:uc_chamcong_spec} \\
+    \hline
+    \textbf{Thuộc tính} & \textbf{Nội dung} \\
+    \hline
+    \endfirsthead
+    \multicolumn{2}{c}%
+    {{\tablename\ \thetable\ -- \textit{Tiếp tục từ trang trước}}} \\
+    \hline
+    \textbf{Thuộc tính} & \textbf{Nội dung} \\
+    \hline
+    \endhead
+    \hline \multicolumn{2}{r}{{\textit{Còn nữa ở trang tiếp theo}}} \\
+    \endfoot
+    \hline
+    \endlastfoot
+
+    Mã use case & UC002 \\
+    \hline
+    Tên use case & Chấm công \\
+    \hline
+    Tác nhân & Admin / Nhân viên \\
+    \hline
+    Mô tả & Use case này cho phép Admin và nhân viên thực hiện và theo dõi chấm công. \\
+    \hline
+    Tiền điều kiện & Người dùng đã đăng nhập vào hệ thống. \\
+    \hline
+    Luồng sự kiện chính &
+    \begin{enumerate}
+        \item Nhân viên truy cập chức năng chấm công.
+        \item Hệ thống hiển thị form chấm công hôm nay.
+        \item Nhân viên thực hiện chấm công vào / ra.
+        \item Hệ thống ghi nhận thời gian chấm công.
+        \item Admin có thể xem danh sách chấm công theo ngày / nhân viên.
+    \end{enumerate} \\
+    \hline
+    Luồng sự kiện thay thế &
+    \begin{itemize}
+        \item Nếu đã chấm công rồi: hệ thống hiển thị thông báo đã chấm công.
+        \item Nếu lỗi hệ thống: hiện thông báo lỗi và không ghi nhận.
+    \end{itemize} \\
+    \hline
+    Hậu điều kiện & Thông tin chấm công được lưu trữ. \\
+\end{longtable}
+
+
+\subsection{Đặc tả use case Tạo nghỉ phép}
+\begin{longtable}{|p{0.3\textwidth}|p{0.6\textwidth}|}
+    \caption{Đặc tả use case Tạo nghỉ phép} \label{tab:uc_nghiphep_spec} \\
+    \hline
+    \textbf{Thuộc tính} & \textbf{Nội dung} \\
+    \hline
+    \endfirsthead
+    \multicolumn{2}{c}%
+    {{\tablename\ \thetable\ -- \textit{Tiếp tục từ trang trước}}} \\
+    \hline
+    \textbf{Thuộc tính} & \textbf{Nội dung} \\
+    \hline
+    \endhead
+    \hline \multicolumn{2}{r}{{\textit{Còn nữa ở trang tiếp theo}}} \\
+    \endfoot
+    \hline
+    \endlastfoot
+
+    Mã use case & UC003 \\
+    \hline
+    Tên use case & Tạo nghỉ phép \\
+    \hline
+    Tác nhân & Nhân viên \\
+    \hline
+    Mô tả & Cho phép nhân viên gửi yêu cầu nghỉ phép tới người quản lý. \\
+    \hline
+    Tiền điều kiện & Nhân viên đã đăng nhập vào hệ thống. \\
+    \hline
+    Luồng sự kiện chính &
+    \begin{enumerate}
+        \item Nhân viên chọn chức năng tạo yêu cầu nghỉ phép.
+        \item Hệ thống hiển thị form tạo yêu cầu nghỉ phép.
+        \item Nhân viên nhập thông tin (ngày bắt đầu, kết thúc, lý do).
+        \item Nhấn nút gửi.
+        \item Hệ thống lưu yêu cầu và gửi thông báo đến người quản lý.
+    \end{enumerate} \\
+    \hline
+    Luồng sự kiện thay thế &
+    \begin{itemize}
+        \item Nếu thông tin thiếu hoặc không hợp lệ, hệ thống hiển thị thông báo lỗi.
+    \end{itemize} \\
+    \hline
+    Hậu điều kiện & Yêu cầu nghỉ phép được lưu trữ trong hệ thống và chờ quản lý xử lý. \\
+\end{longtable}
+
+\subsection{Đặc tả use case Quản lý ngày nghỉ lễ}
+\begin{longtable}{|p{0.3\textwidth}|p{0.6\textwidth}|}
+    \caption{Đặc tả use case Quản lý ngày nghỉ lễ} \label{tab:uc_ql_nghile_spec} \\
+    \hline
+    \textbf{Thuộc tính} & \textbf{Nội dung} \\
+    \hline
+    \endfirsthead
+    \multicolumn{2}{c}%
+    {{\tablename\ \thetable\ -- \textit{Tiếp tục từ trang trước}}} \\
+    \hline
+    \textbf{Thuộc tính} & \textbf{Nội dung} \\
+    \hline
+    \endhead
+    \hline \multicolumn{2}{r}{{\textit{Còn nữa ở trang tiếp theo}}} \\
+    \endfoot
+    \hline
+    \endlastfoot
+
+    Mã use case & UC004 \\
+    \hline
+    Tên use case & Quản lý ngày nghỉ lễ \\
+    \hline
+    Tác nhân & Admin \\
+    \hline
+    Mô tả & Admin có thể thêm, sửa, xoá ngày nghỉ lễ. \\
+    \hline
+    Tiền điều kiện & Admin đã đăng nhập vào hệ thống. \\
+    \hline
+    Luồng sự kiện chính &
+    \begin{enumerate}
+        \item Admin chọn chức năng Ngày nghỉ lễ.
+        \item Hệ thống hiển thị danh sách ngày nghỉ lễ.
+        \item Admin thêm mới hoặc chỉnh sửa ngày nghỉ.
+        \item Hệ thống hiển thị form nhập.
+        \item Admin lưu thông tin.
+        \item Hệ thống xác thực và lưu.
+    \end{enumerate} \\
+    \hline
+    Luồng sự kiện thay thế &
+    \begin{enumerate}
+        \item Nếu thông tin không hợp lệ: hệ thống thông báo lỗi.
+        \item Nếu xoá: hệ thống yêu cầu xác nhận xoá.
+    \end{enumerate} \\
+    \hline
+    Hậu điều kiện & Danh sách ngày nghỉ lễ được cập nhật. \\
+\end{longtable}
+
+\subsection{Đặc tả use case Quản lý bảng lương}
+\begin{longtable}{|p{0.3\textwidth}|p{0.6\textwidth}|}
+    \caption{Đặc tả use case Quản lý bảng lương} \label{tab:uc_ql_bangluong_spec} \\
+    \hline
+    \textbf{Thuộc tính} & \textbf{Nội dung} \\
+    \hline
+    \endfirsthead
+    \multicolumn{2}{c}%
+    {{\tablename\ \thetable\ -- \textit{Tiếp tục từ trang trước}}} \\
+    \hline
+    \textbf{Thuộc tính} & \textbf{Nội dung} \\
+    \hline
+    \endhead
+    \hline \multicolumn{2}{r}{{\textit{Còn nữa ở trang tiếp theo}}} \\
+    \endfoot
+    \hline
+    \endlastfoot
+
+    Mã use case & UC005 \\
+    \hline
+    Tên use case & Quản lý bảng lương \\
+    \hline
+    Tác nhân & Admin \\
+    \hline
+    Mô tả & Cho phép xem, tính và điều chỉnh bảng lương nhân viên. \\
+    \hline
+    Tiền điều kiện & Đã đăng nhập và có quyền truy cập bảng lương. \\
+    \hline
+    Luồng sự kiện chính &
+    \begin{enumerate}
+        \item Người dùng chọn menu Bảng lương.
+        \item Hệ thống hiển thị danh sách bảng lương theo kỳ.
+        \item Người dùng chọn bảng lương cần xem.
+        \item Hệ thống hiển thị chi tiết bảng lương.
+        \item Người dùng có thể điều chỉnh lương nếu cần và lưu.
+    \end{enumerate} \\
+    \hline
+    Luồng sự kiện thay thế &
+    \begin{enumerate}
+        \item Nếu không có dữ liệu: hiển thị thông báo tương ứng.
+        \item Nếu sai định dạng lương: thông báo lỗi.
+    \end{enumerate} \\
+    \hline
+    Hậu điều kiện & Bảng lương được lưu và có thể xuất báo cáo. \\
+\end{longtable}
+
+
+\section{Yêu cầu phi chức năng}
+\label{section:2.4}
+Ngoài các yêu cầu về chức năng, hệ thống cần đáp ứng các yêu cầu phi chức năng sau để đảm bảo chất lượng và trải nghiệm người dùng.
+\begin{itemize}
+    \item \textbf{Hiệu năng (Performance):}
+    \begin{itemize}
+        \item Thời gian phản hồi của các chức năng chính không được vượt quá 2 giây.
+        \item Hệ thống có khả năng phục vụ đồng thời ít nhất 200 người dùng.
+    \end{itemize}
+    \item \textbf{Độ tin cậy (Reliability):}
+    \begin{itemize}
+        \item Hệ thống phải hoạt động ổn định 24/7, với thời gian uptime cam kết là 99.5\%.
+        \item Dữ liệu quan trọng phải được sao lưu định kỳ hàng ngày.
+    \end{itemize}
+    \item \textbf{Tính dễ sử dụng (Usability):}
+    \begin{itemize}
+        \item Giao diện người dùng phải được thiết kế một cách trực quan, sạch sẽ và nhất quán.
+        \item Người dùng mới có thể học cách sử dụng các chức năng cơ bản trong vòng 15 phút.
+    \end{itemize}
+    \item \textbf{Bảo mật (Security):}
+    \begin{itemize}
+        \item Mật khẩu người dùng phải được mã hóa một chiều.
+        \item Hệ thống phải có cơ chế phân quyền rõ ràng.
+    \end{itemize}
+    \item \textbf{Tính bảo trì (Maintainability):}
+    \begin{itemize}
+        \item Mã nguồn phải được viết theo chuẩn, có bình luận rõ ràng.
+        \item Hệ thống được xây dựng theo kiến trúc module hóa.
+    \end{itemize}
+\end{itemize}
+
+Chương này đã trình bày một cách tổng quan và chi tiết các yêu cầu chức năng và phi chức năng của hệ thống quản lý nhân sự. Các biểu đồ use case và hoạt động đã làm rõ các tính năng và luồng nghiệp vụ chính, trong khi phần đặc tả chi tiết các use case là cơ sở vững chắc cho giai đoạn thiết kế và triển khai hệ thống sau này.
+\end{document}

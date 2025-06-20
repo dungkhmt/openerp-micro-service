@@ -4,13 +4,20 @@ import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IA
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IConfigPort;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.absence.service.AbsenceValidator;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.absence.usecase_data.AnnounceAbsence;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.absence.usecase_data.GetAbsenceList;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.leave_hours.usecase_data.UpdateAbsenceLeaveHours;
+import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceStatus;
 import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceType;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.DomainComponent;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.ObservableUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.VoidUseCaseHandler;
+import com.hust.openerp.taskmanagement.hr_management.domain.exception.ApplicationException;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.AbsenceModel;
+import com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.dto.common.response.resource.ResponseCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 @DomainComponent
 @Slf4j
@@ -31,6 +38,16 @@ public class AnnounceAbsenceHandler extends ObservableUseCasePublisher
     public void handle(AnnounceAbsence useCase) {
         var model = useCase.toModel();
         var companyConfig = configPort.getCompanyConfig();
+        var dayAbsenceUseCase = GetAbsenceList.builder()
+            .status(AbsenceStatus.ACTIVE)
+            .userIds(List.of(useCase.getUserId()))
+            .startDate(useCase.getDate())
+            .endDate(useCase.getDate())
+            .build();
+        var absencesInDay = publishCollection(AbsenceModel.class, dayAbsenceUseCase).stream().toList();
+        if(model.hasTimeOverlap(absencesInDay)){
+            throw new ApplicationException(ResponseCode.CREATE_ABSENCE_ERROR, "time overlaps with an existing absence on the same day");
+        }
         absenceValidator.validate(model);
         if(useCase.getType() == AbsenceType.PAID_LEAVE){
             absenceValidator.validateLeaveHour(useCase.getUserId(), model.getDurationTimeAbsence(companyConfig));

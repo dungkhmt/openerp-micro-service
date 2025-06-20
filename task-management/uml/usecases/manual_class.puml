@@ -1,0 +1,24 @@
+@startuml
+!theme vibrant
+
+title Thiết kế các thành phần Frontend cho Giao diện Xếp lịch
+
+skinparam component {
+    borderColor #1E8449
+    backgroundColor #D5F5E3
+}
+
+component ShiftScheduler <<Page>>
+component ShiftsGrid <<Grid Container>>
+component ShiftCard <<Draggable Item>>
+component UnassignedShiftsRow <<Special Row>>
+component CopyShiftsModal <<Modal>>
+component HolidayDisplay <<Component>>
+
+ShiftScheduler "1" *-- "1" ShiftsGrid
+ShiftsGrid "1" *-- "*" ShiftCard
+ShiftsGrid "1" *-- "1" UnassignedShiftsRow
+ShiftScheduler "1" -- "1" CopyShiftsModal
+ShiftsGrid "1" *-- "*" HolidayDisplay
+
+@enduml

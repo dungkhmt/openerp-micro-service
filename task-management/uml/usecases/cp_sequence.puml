@@ -1,0 +1,27 @@
+@startuml
+!theme vibrant
+autonumber
+
+actor "Admin" as user
+participant "CheckpointEvaluationScreen" as screen
+participant "GradeModal" as modal
+participant "CheckpointController" as controller
+participant "CheckpointStaffHandler" as handler
+participant "CheckpointStaffAdapter" as adapter
+database "Database" as db
+
+user -> screen : Nhấn nút "Chấm điểm"
+screen -> modal : Hiển thị modal chấm điểm
+user -> modal : Nhập điểm và nhấn "Lưu"
+modal -> controller : POST /api/checkpoint/staffs\n(request)
+controller -> handler : handle(command)
+handler -> adapter : save(model)
+adapter -> db : INSERT/UPDATE
+db --> adapter : success
+adapter --> handler : return savedModel
+handler --> controller : return result
+controller --> modal : HTTP 200 OK
+modal -> screen : Đóng modal và cập nhật UI
+screen -> user : Hiển thị thông báo thành công
+
+@enduml

@@ -1,0 +1,182 @@
+@startuml
+!theme vibrant
+
+title Sơ đồ Thực thể Liên kết (ER Diagram) cho Hệ thống HR
+
+' hide the spot
+hide circle
+
+' avoid problems with angled crows feet
+skinparam linetype ortho
+skinparam shadowing false
+
+' ----- ENTITIES -----
+
+entity "user_login" as USER {
+  * user_id : varchar(60)
+  --
+  ...
+}
+
+entity "hr_staff" as STAFF {
+  * staff_code: varchar(100)
+  --
+  # user_login_id: varchar(60) (FK)
+  fullname: varchar(200)
+  leave_hours: double
+}
+
+entity "hr_department" as DEPT {
+  * department_code: varchar(100)
+  --
+  department_name: varchar(200)
+}
+
+entity "hr_job_position" as JOB {
+  * position_code: varchar(100)
+  --
+  position_name: varchar(500)
+  type: varchar(30)
+}
+
+entity "hr_staff_department" as STAFF_DEPT {
+  * # user_id: varchar(60) (FK)
+  * # department_code: varchar(100) (FK)
+  * from_date: timestamp
+  --
+  thru_date: timestamp
+}
+
+entity "hr_staff_job_position" as STAFF_JOB {
+  * # user_id: varchar(60) (FK)
+  * # position_code: varchar(100) (FK)
+  * from_date: timestamp
+  --
+  thru_date: timestamp
+}
+
+entity "hr_staff_salary" as SALARY {
+  * # user_id: varchar(60) (FK)
+  * from_date: timestamp
+  --
+  salary: integer
+  salary_type: varchar(45)
+}
+
+entity "hr_checkinout" as CHECKINOUT {
+  * id: uuid
+  --
+  # user_id: varchar(60) (FK)
+  time_point: timestamp
+}
+
+entity "hr_absence" as ABSENCE {
+  * id: uuid
+  --
+  # user_id: varchar(60) (FK)
+  date: date
+  reason: text
+  type: varchar(60)
+}
+
+entity "hr_shift" as SHIFT {
+  * id: uuid
+  --
+  # user_id: varchar(60) (FK)
+  date: date
+  start_time: time
+}
+
+entity "hr_payroll" as PAYROLL {
+  * id: uuid
+  --
+  name: varchar(100)
+  from_date: date
+  thru_date: date
+  # created_by: varchar(60) (FK)
+}
+
+entity "hr_payroll_details" as PAYROLL_DETAIL {
+  * id: uuid
+  --
+  # payroll_id: uuid (FK)
+  # user_id: varchar(60) (FK)
+  payroll_amount: integer
+}
+
+entity "hr_checkpoint_period" as PERIOD {
+  * id: uuid
+  --
+  name: varchar(100)
+  checkpoint_date: varchar(100)
+}
+
+entity "hr_checkpoint_configure" as CONFIGURE {
+  * checkpoint_code: varchar(100)
+  --
+  name: varchar(100)
+}
+
+entity "hr_checkpoint_period_configure" as PERIOD_CONFIG {
+  * # checkpoint_code: varchar(100) (FK)
+  * # checkpoint_period_id: uuid (FK)
+  --
+  coefficient: numeric
+}
+
+entity "hr_checkpoint_staff" as STAFF_CHECKPOINT {
+  * # user_id: varchar(60) (FK)
+  * # checkpoint_code: varchar(100) (FK)
+  * # checkpoint_period_id: uuid (FK)
+  --
+  point: numeric
+}
+
+entity "hr_roster_template" as ROSTER_TEMPLATE {
+    * id : uuid
+    --
+    template_name: varchar(255)
+    defined_shifts: jsonb
+}
+
+entity "hr_holiday" as HOLIDAY {
+    * id : uuid
+    --
+    name: varchar(100)
+    dates: date[]
+}
+
+entity "hr_config" as CONFIG {
+    * config_key: varchar(50)
+    --
+    config_value: text
+    config_group: varchar(50)
+}
+
+
+' ----- RELATIONSHIPS -----
+
+' Core Staff Relationships
+USER ||..|| STAFF : "has profile"
+USER ||--o{ STAFF_DEPT
+USER ||--o{ STAFF_JOB
+USER ||--o{ SALARY
+USER ||--o{ CHECKINOUT
+USER ||--o{ ABSENCE
+USER ||--o{ SHIFT
+USER ||--o{ PAYROLL_DETAIL
+USER ||--o{ STAFF_CHECKPOINT
+
+DEPT }o..|| STAFF_DEPT
+JOB }o..|| STAFF_JOB
+
+' Payroll Relationships
+PAYROLL ||--o{ PAYROLL_DETAIL
+
+' Checkpoint Relationships
+PERIOD ||--o{ PERIOD_CONFIG
+CONFIGURE ||--o{ PERIOD_CONFIG
+PERIOD ||--o{ STAFF_CHECKPOINT
+CONFIGURE ||--o{ STAFF_CHECKPOINT
+
+@enduml

@@ -1,0 +1,28 @@
+@startuml
+!theme vibrant
+autonumber
+
+actor "Admin" as user
+participant "ConfigurableRosterPage" as screen
+participant "RosterController" as controller
+participant "RosterService" as service
+participant "OrToolsSolverService" as solver
+database "Database" as db
+
+user -> screen : Chọn cấu hình và nhấn "Tạo lịch tự động"
+screen -> controller : POST /api/roster/generate\n(RosterRequest)
+controller -> service : generateRoster(request)
+service -> solver : solve(request)
+activate solver
+solver -> solver : Xây dựng model, thêm biến và ràng buộc
+solver -> solver : Gọi bộ giải của OR-Tools
+solver --> service : return RosterSolution
+deactivate solver
+service -> service : Chuyển đổi Solution thành các ShiftEntity
+service -> db : saveAll(shiftEntities)
+db --> service : success
+service --> controller : return success message
+controller --> screen : HTTP 200 OK
+screen -> user : Hiển thị lịch làm việc mới
+
+@enduml

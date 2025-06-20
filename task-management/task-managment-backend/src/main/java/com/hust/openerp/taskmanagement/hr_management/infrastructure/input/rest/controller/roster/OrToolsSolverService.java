@@ -26,11 +26,19 @@ public class OrToolsSolverService {
     private final IShiftPort shiftPort;
 
     static {
+        String env = System.getenv().getOrDefault("ENV", "local");
+
         try {
-            Loader.loadNativeLibraries();
+            if ("local".equalsIgnoreCase(env)) {
+                Loader.loadNativeLibraries();
+                System.out.println("Loaded native lib via Loader.loadNativeLibraries (local)");
+            } else {
+                System.loadLibrary("jniortools");
+                System.out.println("Loaded native lib via System.loadLibrary (cloud)");
+            }
         } catch (UnsatisfiedLinkError e) {
-            System.err.println("Native code library failed to load. Check OR-Tools setup.\n" + e);
-            System.exit(1);
+            System.err.println("Failed to load OR-Tools native lib. " + e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -103,10 +111,6 @@ public class OrToolsSolverService {
             }
         }
 
-        // --- APPLYING CONSTRAINTS (1-10, same logic as before) ---
-        // ... (Constraints 1-5, 7-10 are assumed to be here and correct from your previous version)
-        // Please ensure constraints 1-5 and 7-10 are correctly placed here.
-        // I will re-paste constraint 6, 9 for context.
         // Constraint 1: Min/Max employees per shift
         for (int d = 0; d < numDays; d++) {
             for (int s = 0; s < numShifts; s++) {

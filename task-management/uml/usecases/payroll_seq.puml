@@ -1,0 +1,51 @@
+@startuml
+!theme vibrant
+autonumber
+
+actor "Admin" as user
+participant "PayrollUI" as ui <<(React)>>
+participant "PayrollController" as controller <<(Adapter)>>
+participant "CreatePayrollHandler" as handler <<(Use Case)>>
+participant "PayrollCalculator" as calculator <<(Service)>>
+participant "PayrollAdapter" as adapter <<(Adapter)>>
+database "Database" as db
+
+user -> ui : 1. Chọn kỳ và nhấn "Tạo bảng lương"
+ui -> controller : 2. Gửi request `POST /api/payrolls`
+activate controller
+
+controller -> handler : 3. `handle(createPayrollCommand)`
+activate handler
+
+handler -> adapter : 4. `savePayroll(payrollModel)` (Lưu bảng lương chính)
+activate adapter
+adapter -> db : 5. `INSERT` vào bảng `hr_payroll`
+db --> adapter
+deactivate adapter
+
+loop cho mỗi nhân viên cần tính lương
+    handler -> calculator : 6. `calculateForStaff(staff, period)`
+    activate calculator
+
+    calculator -> db : 7. Lấy dữ liệu (lương, chấm công, nghỉ phép...)
+    db --> calculator
+
+    calculator -> calculator : 8. Thực hiện tính toán
+    calculator --> handler : 9. Trả về `PayrollDetailModel`
+    deactivate calculator
+end
+
+handler -> adapter : 10. `saveAll(listOfPayrollDetails)`
+activate adapter
+adapter -> db : 11. `INSERT` vào bảng `hr_payroll_details`
+db --> adapter
+deactivate adapter
+
+deactivate handler
+handler --> controller : 12. Trả về kết quả
+deactivate controller
+
+controller --> ui : 13. Phản hồi HTTP 200 OK
+ui -> user : 14. Hiển thị thông báo thành công
+
+@enduml

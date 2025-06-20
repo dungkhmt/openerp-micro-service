@@ -39,7 +39,7 @@ public class MeetingPlanStatusScheduler {
 		}));
 	}
 
-	@Scheduled(cron = "${app.job.cron.meeting-plan-status-update-expression:0 */5 * * * *}")
+	//@Scheduled(cron = "${app.job.cron.meeting-plan-status-update-expression:0 */5 * * * *}")
 	public void updateMeetingPlanStatuses() {
 		LOG.info("Running scheduled task to update meeting plan statuses");
 

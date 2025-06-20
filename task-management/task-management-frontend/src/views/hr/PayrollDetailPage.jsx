@@ -56,7 +56,7 @@ const InnerPayrollDetailPage = () => {
   const [holidaysMap, setHolidaysMap] = useState({});
 
   const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(20); // Default to 20, consistent
+  const [itemsPerPage, setItemsPerPage] = useState(200); // Default to 20, consistent
   const [pageCount, setPageCount] = useState(1);
   const [loadingPayroll, setLoadingPayroll] = useState(true);
   const [loadingDetails, setLoadingDetails] = useState(false); // Separate loading for details
@@ -88,8 +88,8 @@ const InnerPayrollDetailPage = () => {
     ...cellBorderStyle,
     position: "sticky",
     left: leftPosition,
-    background: defaultCellBgColor, // Use theme paper for sticky body cells
-    zIndex: 3, // Kept user's zIndex
+    background: defaultCellBgColor,
+    zIndex: 3,
     padding: '6px 10px',
   });
 
@@ -149,11 +149,9 @@ const InnerPayrollDetailPage = () => {
       page: currentPage,
       pageSize: itemsPerPage,
     };
-    // If filters are active but userFilter is empty due to no matching staff, send empty userIds to get no results for details
     if((searchName || department || jobPosition) && userFilter && userFilter.length === 0){
-      params.userIds = "EMPTY_FILTER_NO_MATCH"; // Ensure backend handles this or simply expect empty data
+      params.userIds = "EMPTY_FILTER_NO_MATCH";
     }
-
 
     request(
       "get",
@@ -237,8 +235,6 @@ const InnerPayrollDetailPage = () => {
           fullname: tempSearchName || null,
           departmentCode: tempDepartmentFilter?.code || null,
           jobPositionCode: tempJobPositionFilter?.code || null,
-          pageSize: 10000, // Assuming we need all matching staff_ids
-          page:0,
         },
       }
     );

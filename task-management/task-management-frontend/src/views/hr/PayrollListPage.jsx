@@ -71,18 +71,22 @@ const PayrollListPageInternal = () => {
   const debouncedSearchName = useDebounce(searchName, 500);
 
   const fetchUserNames = useCallback(async (userIds) => {
-    if (!userIds || userIds.length === 0) return;
-    try {
-      await request("get", "/staffs/details", (res) => {
-        const userMapResult = {};
-        (res.data.data || []).forEach(user => {
-          userMapResult[user.user_login_id] = user.fullname;
-        });
-        setUserMap(prevMap => ({ ...prevMap, ...userMapResult }));
-      }, {}, null, { params: { userIds: userIds.join(",") } });
-    } catch (error) {
-      console.error("Lỗi tải tên người dùng:", error);
-    }
+    if (!userIds || userIds.length === 0) return Promise.resolve();
+
+    return new Promise((resolve, reject) => {
+      request("get", "/staffs/details", (res) => {
+          const userMapResult = {};
+          (res.data.data || []).forEach(user => {
+            userMapResult[user.user_login_id] = user.fullname;
+          });
+          setUserMap(prevMap => ({ ...prevMap, ...userMapResult }));
+          resolve();
+        }, { onError: (err) => {
+            console.error("Lỗi tải tên người dùng:", err);
+            reject(err);
+          }}, null, { params: { userIds: userIds.join(",") } }
+      );
+    });
   }, []);
 
   const fetchPayrolls = useCallback(async (page = 0, size = itemsPerPage, name = debouncedSearchName, status = statusFilter, isInitialLoadOrFilterChange = false) => {
@@ -97,35 +101,49 @@ const PayrollListPageInternal = () => {
       await request("get", "/payrolls", async (res) => {
         const list = res.data.data || [];
         const meta = res.data.meta?.page_info || {};
-        setPayrolls(list.map(item => ({...item, id: item.id || item.payroll_id })));
-        setPageCount(meta.total_page || 0);
-        if (!isInitialLoadOrFilterChange) {
-          setCurrentPage(meta.page || 0);
-        } else {
-          setCurrentPage(0);
+
+        const userIdsInCurrentList = [...new Set(list.map(item => item.created_by).filter(Boolean))];
+        const userIdsToFetch = userIdsInCurrentList.filter(id => !userMap[id]);
+
+        if (userIdsToFetch.length > 0) {
+          try {
+            await fetchUserNames(userIdsToFetch);
+          } catch (userFetchError) {
+            // Lỗi fetch user names đã được log trong fetchUserNames, có thể không cần làm gì thêm ở đây
+          }
+          finally {
+            setLoading(false);
+          }
         }
 
-        const userIdsToFetch = [...new Set(list.map(item => item.created_by).filter(id => id && !userMap[id]))];
-        if (userIdsToFetch.length > 0) {
-          fetchUserNames(userIdsToFetch);
+        setPayrolls(list.map(item => ({...item, id: item.id || item.payroll_id })));
+        setPageCount(meta.total_page || 0);
+        if (isInitialLoadOrFilterChange) {
+          setCurrentPage(0);
+        } else {
+          setCurrentPage(meta.page || 0);
         }
+        setLoading(false);
       }, { onError: (err) => {
           console.error("Lỗi tải danh sách kỳ lương:", err);
           toast.error("Không thể tải danh sách kỳ lương.");
           setPayrolls([]);
+          setPageCount(0);
+          setCurrentPage(0);
         }}, null, { params: payload });
     } catch (error) {
       console.error("Ngoại lệ khi tải danh sách kỳ lương:", error);
       toast.error("Lỗi hệ thống khi tải danh sách kỳ lương.");
       setPayrolls([]);
-    } finally {
+      setPageCount(0);
+      setCurrentPage(0);
       setLoading(false);
     }
-  }, [itemsPerPage, fetchUserNames, userMap]);
+  }, [itemsPerPage, debouncedSearchName, statusFilter, fetchUserNames, userMap]);
 
   useEffect(() => {
     fetchPayrolls(0, itemsPerPage, debouncedSearchName, statusFilter, true);
-  }, [debouncedSearchName, statusFilter, itemsPerPage, fetchPayrolls]);
+  }, [debouncedSearchName, statusFilter, itemsPerPage]); // Bỏ fetchPayrolls khỏi dependencies để tránh vòng lặp vô hạn
 
   const handlePageChange = (newPage) => {
     fetchPayrolls(newPage, itemsPerPage, debouncedSearchName, statusFilter, false);
@@ -133,28 +151,21 @@ const PayrollListPageInternal = () => {
 
   const handleItemsPerPageChange = (newValue) => {
     setItemsPerPage(newValue);
+    // fetchPayrolls sẽ được gọi lại từ useEffect ở trên do itemsPerPage thay đổi
   };
-
 
   const handleDelete = () => {
     if (!deleteTarget) return;
     request("delete", `/payrolls/${deleteTarget.id}`, () => {
       toast.success(`Đã hủy kỳ lương "${deleteTarget.name}".`);
-      const newCurrentPageAfterDelete = (payrolls.length - 1 === itemsPerPage * currentPage && currentPage > 0)
-        ? currentPage -1
-        : currentPage;
-
-      const itemsOnCurrentPage = payrolls.filter(p => p.status === "ACTIVE").length % itemsPerPage;
-      let targetPage = newCurrentPageAfterDelete;
-      if(itemsOnCurrentPage === 1 && newCurrentPageAfterDelete > 0 && payrolls.length > 1){
-        targetPage = newCurrentPageAfterDelete -1;
-      }
-      if (payrolls.length -1 === 0 ) targetPage = 0;
-
-
-      fetchPayrolls(targetPage, itemsPerPage, debouncedSearchName, statusFilter);
       setConfirmDeleteOpen(false);
       setDeleteTarget(null);
+      // Fetch lại dữ liệu cho trang hiện tại hoặc trang trước đó nếu trang hiện tại trống
+      const newTotalItems = (pageCount * itemsPerPage) - 1; // Giả sử mỗi lần xóa 1 item
+      const newPageCount = Math.ceil(newTotalItems / itemsPerPage);
+      const newCurrentPage = Math.min(currentPage, Math.max(0, newPageCount - 1));
+      fetchPayrolls(newCurrentPage, itemsPerPage, debouncedSearchName, statusFilter);
+
     }, {onError: (err) => {
         toast.error(err.response?.data?.message || "Không thể hủy kỳ lương.");
         setConfirmDeleteOpen(false);
@@ -181,7 +192,7 @@ const PayrollListPageInternal = () => {
     };
 
     request("post", "/payrolls", () => {
-      fetchPayrolls(0, itemsPerPage, debouncedSearchName, statusFilter, true);
+      fetchPayrolls(0, itemsPerPage, "", statusFilter, true); // Fetch lại từ đầu và reset search name
       setCreateModalOpen(false);
       setNewPayroll({ name: "", fromDate: null, thruDate: null });
       toast.success("Tạo kỳ lương thành công!");
@@ -300,7 +311,7 @@ const PayrollListPageInternal = () => {
               </TableBody>
             </Table>
           </TableContainer>
-          {(pageCount > 0 && !loading) && (
+          {(pageCount > 0 && !loading && payrolls.length > 0) && ( // Chỉ hiển thị pagination khi có dữ liệu
             <Pagination
               currentPage={currentPage}
               pageCount={pageCount}
@@ -327,11 +338,11 @@ const PayrollListPageInternal = () => {
             <IconButton aria-label="đóng" size="small" onClick={() => setCreateModalOpen(false)}> <CloseIcon /> </IconButton>
           </DialogTitle>
           <DialogContent sx={{ pt: '12px' }}>
-            <Stack spacing={2.5} sx={{ alignItems: 'stretch' }}>
+            <Stack spacing={2.5} sx={{ alignItems: 'stretch', paddingTop: '6px' }}>
               <TextField fullWidth label="Tên kỳ lương" value={newPayroll.name} onChange={(e) => setNewPayroll((prev) => ({ ...prev, name: e.target.value }))} required size="small"/>
               <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="vi">
-                <Grid container sx={{ width: '100%' }}> {/* Bỏ spacing ở container */}
-                  <Grid item xs={12} sm={6} sx={{ pr: { xs: 0, sm: 1 } }}> {/* Thêm padding-right cho item trái (trên màn hình sm trở lên) */}
+                <Grid container sx={{ width: '100%' }}>
+                  <Grid item xs={12} sm={6} sx={{ pr: { xs: 0, sm: 1 } }}>
                     <DatePicker
                       label="Từ ngày"
                       value={newPayroll.fromDate}
@@ -381,4 +392,3 @@ const PayrollListPage = () => {
 };
 
 export default PayrollListPage;
-

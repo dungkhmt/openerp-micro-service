@@ -1,0 +1,53 @@
+@startuml
+!theme vibrant
+
+skinparam package {
+  borderColor #5D6D7E
+  backgroundColor #EAEDED
+  arrowColor #34495E
+}
+
+package "domain" <<Layer>> {
+  ' Chứa các Model, Enum, Exception nghiệp vụ cốt lõi
+}
+
+package "application" <<Layer>> {
+    package "port.in" <<In Ports>> {
+        ' Định nghĩa các cổng vào (inbound ports)
+        package "handler" {
+            ' Lớp xử lý logic nghiệp vụ
+        }
+    }
+
+    package "port.out" <<Outbound Ports>> {
+
+    }
+}
+
+
+package "infrastructure" <<Layer>> {
+    package "input" <<Adapters>> {
+        package "rest" {
+            ' REST Controllers & DTOs
+        }
+    }
+    package "output" <<Adapters>> {
+        package "adapter" {
+            ' Triển khai các cổng ra (outbound ports)
+        }
+        package "persistence" {
+            ' Chi tiết về CSDL: Entity, Repository, Mapper
+        }
+    }
+}
+
+' Định nghĩa các mối quan hệ phụ thuộc
+infrastructure.input.rest --> application.port.in
+application.port.in.handler --> domain
+application.port.in.handler --> application.port.out : "<<uses>>"
+
+infrastructure.output.adapter --> domain
+infrastructure.output.adapter .up.|> application.port.out
+infrastructure.output.adapter --> infrastructure.output.persistence
+
+@enduml
