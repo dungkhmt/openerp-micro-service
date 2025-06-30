@@ -16,6 +16,8 @@ import com.hust.openerp.taskmanagement.repository.UserRepository;
 import com.hust.openerp.taskmanagement.service.NotificationService;
 import com.hust.openerp.taskmanagement.service.OrganizationInvitationService;
 import com.hust.openerp.taskmanagement.service.PermissionService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -45,6 +47,9 @@ public class OrganizationInvitationServiceImplement implements OrganizationInvit
     private final NotificationService notificationService;
     private final UserRepository userRepository;
     private final OrganizationUserRepository organizationUserRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Value("${spring.mail.username}")
     private String systemEmail;
@@ -189,6 +194,20 @@ public class OrganizationInvitationServiceImplement implements OrganizationInvit
             notificationService.createMailNotification(systemEmail, email, message, "organization-invitation", model);
         } catch (Exception e) {
             logger.error("Failed to send invitation email to {} for organization {}: {}", email, organizationName, e.getMessage(), e);
+        }
+    }
+
+    @Transactional
+    public void findAndExpireInvitations() {
+        entityManager.joinTransaction();
+
+        Date now = new Date();
+        List<OrganizationInvitation> expired = organizationInvitationRepository
+            .findByStatusIdAndExpirationTimeBefore(OrgInvitationStatusEnum.PENDING.getStatusId(), now);
+
+        if (!expired.isEmpty()) {
+            expired.forEach(invite -> invite.setStatusId(OrgInvitationStatusEnum.EXPIRED.getStatusId()));
+            organizationInvitationRepository.saveAll(expired);
         }
     }
 }

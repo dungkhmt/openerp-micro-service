@@ -89,7 +89,9 @@ const styles = {
 function Layout() {
   const { keycloak } = useKeycloak();
   const dispatch = useDispatch();
-  const {fetchLoading, currentOrganization } = useSelector((state) => state.organization);
+  const { fetchLoading, currentOrganization } = useSelector(
+    (state) => state.organization
+  );
   const [navCollapsed, setNavCollapsed] = React.useState(false);
   // ** For mobile
   const [navVisible, setNavVisible] = React.useState(false);
@@ -124,10 +126,10 @@ function Layout() {
       }
     };
 
-    if (keycloak.authenticated) {
+    if (showLayoutComponents) {
       fetchOrgs();
     }
-  }, [dispatch, keycloak.authenticated]);
+  }, [dispatch, showLayoutComponents]);
 
   if (fetchLoading && !currentOrganization) {
     return <LinearProgress />;
@@ -189,7 +191,18 @@ function Layout() {
               </Box>
             )}
 
-            {showLayoutComponents && (
+            {keycloak.authenticated && (
+              isExcludedRoute ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginLeft: "auto",
+                }}
+              >
+                <AccountButton />
+              </Box>
+            ): (
               <Box
                 sx={{
                   display: "flex",
@@ -200,7 +213,7 @@ function Layout() {
                 <NotificationButton />
                 <AccountButton />
               </Box>
-            )}
+            ))}
           </Toolbar>
         </AppBar>
         {showLayoutComponents && (

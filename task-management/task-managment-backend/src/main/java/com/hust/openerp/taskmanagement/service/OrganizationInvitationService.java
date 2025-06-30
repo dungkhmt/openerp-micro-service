@@ -19,5 +19,7 @@ public interface OrganizationInvitationService {
     void declineInvitation(String token, String currentUserId);
 
     List<OrganizationInvitationDTO> getPendingInvitationsByOrgId(String currentUserId, UUID id);
+
+    void findAndExpireInvitations();
 }
 
