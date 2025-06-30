@@ -33,7 +33,7 @@ const NewOrganization = () => {
   });
 
   const name = useWatch({ control, name: "name" });
-  const { fetchLoading, errors: serverErrors } = useSelector(
+  const { fetchLoading, createErrors: serverErrors } = useSelector(
     (state) => state.organization
   );
 

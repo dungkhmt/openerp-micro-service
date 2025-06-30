@@ -7,6 +7,11 @@ export const handleRejected = (state, action) => {
   state.fetchLoading = false;
 };
 
+export const handleCreationRejected = (state, action) => {
+  state.createErrors.push(action.payload || action.error);
+  state.fetchLoading = false;
+};
+
 export const fetchOrganizationsByMe = createAsyncThunk(
   "organization/fetchOrganizationsByMe",
   async (_, { rejectWithValue }) => {
@@ -115,6 +120,7 @@ const initialState = {
   organizationMembers: [],
   fetchLoading: false,
   errors: [],
+  createErrors: [],
 };
 
 export const organizationSlice = createSlice({
@@ -163,7 +169,7 @@ export const organizationSlice = createSlice({
         state.fetchLoading = false;
       })
       .addCase(fetchUsersByOrganizationId.rejected, handleRejected)
-      .addCase(createOrganization.rejected, handleRejected)
+      .addCase(createOrganization.rejected, handleCreationRejected)
       .addCase(updateOrganization.rejected, handleRejected)
       .addCase(removeUserFromOrganization.rejected, handleRejected);
   },

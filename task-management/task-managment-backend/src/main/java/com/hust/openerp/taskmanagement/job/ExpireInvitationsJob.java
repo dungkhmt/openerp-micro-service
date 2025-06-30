@@ -3,7 +3,12 @@ package com.hust.openerp.taskmanagement.job;
 import com.hust.openerp.taskmanagement.entity.OrganizationInvitation;
 import com.hust.openerp.taskmanagement.model.OrgInvitationStatusEnum;
 import com.hust.openerp.taskmanagement.repository.OrganizationInvitationRepository;
+import com.hust.openerp.taskmanagement.service.OrganizationInvitationService;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 public class ExpireInvitationsJob {
     private static final Logger LOG = LoggerFactory.getLogger(ExpireInvitationsJob.class);
 
-    private final OrganizationInvitationRepository invitationRepository;
+    private final OrganizationInvitationService organizationInvitationService;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -46,21 +51,10 @@ public class ExpireInvitationsJob {
 
         executor.submit(() -> {
             try {
-                Date now = new Date();
-                List<OrganizationInvitation> expired = invitationRepository
-                    .findByStatusIdAndExpirationTimeBefore(OrgInvitationStatusEnum.PENDING.getStatusId(), now);
-
-                if (expired.isEmpty()) {
-                    LOG.info("No invitations to expire.");
-                    return;
-                }
-
-                expired.forEach(invite -> invite.setStatusId(OrgInvitationStatusEnum.EXPIRED.getStatusId()));
-                invitationRepository.saveAll(expired);
-
-                LOG.info("Expired {} invitations", expired.size());
+                organizationInvitationService.findAndExpireInvitations();
+                LOG.info("ExpireInvitationsJob completed.");
             } catch (Exception e) {
-                LOG.error("Error expiring invitations", e);
+                LOG.error("Error running expire invitation job", e);
             }
         });
     }
