@@ -59,6 +59,7 @@
     "nprogress": "^0.2.0",
     "overlayscrollbars": "^2.3.2",
     "overlayscrollbars-react": "^0.5.2",
+    "papaparse": "^5.5.3",
     "prop-types": "^15.8.1",
     "query-string": "^9.0.0",
     "randomcolor": "^0.6.2",

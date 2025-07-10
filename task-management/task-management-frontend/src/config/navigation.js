@@ -3,15 +3,23 @@ const navigation = [
     sectionTitle: "Dashboard",
   },
   {
-    id: "MENU_DASHBOARD_ADMIN",
+
     title: "Dashboard",
     icon: "mdi:home-outline",
+/*
     badgeContent: "Mới",
+*/
     badgeColor: "info",
     children: [
       {
+        id: "MENU_HR_DASHBOARD_ADMIN",
         title: "Dashboard",
         path: "/dashboard",
+      },
+      {
+        id: "MENU_HR_DASHBOARD_STAFF",
+        title: "Thống kê cá nhân",
+        path: "/dashboard/employee",
       },
     ],
   },
@@ -19,56 +27,13 @@ const navigation = [
     sectionTitle: "My Profile",
   },
   {
-    id: "MENU_PROFILE_GROUP",
-    title: "My Profile",
-    icon: "mdi:account-outline",
-    children: [
-      {
-        id: "PROFILE_VIEW",
-        title: "My Profile",
-        path: "/my-profile",
-      },
-    ],
-  },
-  {
-    sectionTitle: "Projects & Tasks",
-  },
-  {
-    id: "MENU_PROJECTS_GROUP",
-    title: "Theo dõi dự án",
-    icon: "mdi:file-document-outline",
-    children: [
-      {
-        id: "PROJECTS_LIST_VIEW",
-        title: "Danh sách dự án",
-        path: "/projects",
-      },
-      {
-        id: "PROJECTS_CREATE_NEW",
-        title: "Tạo mới dự án",
-        path: "/projects/new",
-      },
-    ],
-  },
-  {
-    id: "MENU_TASKS_GROUP",
-    title: "Theo dõi công việc",
-    icon: "mdi:format-list-checks",
-    children: [
-      {
-        id: "TASKS_ASSIGNED_TO_ME",
-        title: "Công việc được giao",
-        path: "/tasks/assign-me",
-      },
-      {
-        id: "TASKS_CREATED_BY_ME",
-        title: "Công việc đã tạo",
-        path: "/tasks/created-by-me",
-      },
-    ],
-  },
-  {
     sectionTitle: "HR Management",
+  },
+  {
+    id: "MENU_HR_CHECKIN_OUT",
+    title: "Profile",
+    path: "/hr/me",
+    icon: "mdi:account-card-details-outline",
   },
   {
     id: "MENU_HR_CHECKIN_OUT",
@@ -213,53 +178,6 @@ const navigation = [
     title: "Xếp lịch tự động",
     icon: "mdi:calendar",
     path: "/hr/shift-manager",
-  },
-  {
-    sectionTitle: "Meetings",
-  },
-  {
-    id: "MENU_MEETINGS_GROUP",
-    title: "Quản lý cuộc họp",
-    icon: "mdi:event-multiple-check",
-    children: [
-      {
-        id: "MEETINGS_CREATED_VIEW",
-        title: "Cuộc họp đã tạo",
-        path: "meetings/created-meetings",
-      },
-      {
-        id: "MEETINGS_JOINED_VIEW",
-        title: "Cuộc họp tham gia",
-        path: "meetings/joined-meetings",
-      },
-    ],
-  },
-  {
-    sectionTitle: "Administration",
-  },
-  {
-    id: "MENU_ADMIN_USER_MGMT_GROUP",
-    title: "Quản lý nhân viên",
-    icon: "mdi:users-group-outline",
-    children: [
-      {
-        id: "ADMIN_USER_LIST_VIEW",
-        title: "Danh sách nhân viên",
-        path: "/user-management",
-      },
-    ],
-  },
-  {
-    id: "MENU_ADMIN_ATTR_MGMT_GROUP",
-    title: "Quản lý thuộc tính",
-    icon: "mdi:category-outline",
-    children: [
-      {
-        id: "ADMIN_ATTR_LIST_VIEW",
-        title: "Danh sách thuộc tính",
-        path: "/attribute-management"
-      },
-    ],
   },
 ];
 

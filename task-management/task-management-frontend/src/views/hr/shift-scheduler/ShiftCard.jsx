@@ -1,11 +1,11 @@
-import React, {useState} from "react";
-import {Box, Checkbox, Chip, IconButton, Paper, Typography} from "@mui/material";
-import {alpha} from "@mui/material/styles";
+import React, { useState } from "react";
+import { Box, Checkbox, Chip, IconButton, Paper, Typography } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank.js";
 import CheckBoxIcon from "@mui/icons-material/CheckBox.js";
-import {parseISO} from "date-fns";
+import { parseISO } from "date-fns";
 import AddIcon from "@mui/icons-material/Add.js";
-import {FRONTEND_UNASSIGNED_SHIFT_USER_ID} from "./ShiftScheduler.jsx";
+import { FRONTEND_UNASSIGNED_SHIFT_USER_ID } from "./ShiftScheduler.jsx";
 
 const EMPLOYEE_SHIFT_TEXT_COLOR = '#673ab7';
 const EMPLOYEE_SHIFT_BACKGROUND_COLOR_LIGHT = '#f3e5f5';
@@ -14,7 +14,6 @@ const TIME_OFF_CARD_BACKGROUND_COLOR = '#ef9a9a';
 const TIME_OFF_CARD_BORDER_COLOR = '#e57373';
 const TIME_OFF_CARD_TEXT_COLOR = '#000000';
 const TIME_OFF_CARD_NOTE_TEXT_COLOR = 'rgba(0, 0, 0, 0.8)';
-
 
 export default function ShiftCard({
                                     shift,
@@ -27,12 +26,17 @@ export default function ShiftCard({
                                     isSelected,
                                     onToggleSelect,
                                     isAnyShiftSelected,
-                                    canAdmin
+                                    canAdmin,
+                                    companyConfigs = {}
                                   }) {
   const [isHovered, setIsHovered] = useState(false);
 
   const isUnassigned = shiftType === 'unassigned';
   const isTimeOff = shiftType === 'time_off';
+
+  const configStart = companyConfigs.START_WORK_TIME || "08:00";
+  const configEnd = companyConfigs.END_WORK_TIME || "17:00";
+  const isAllDayOff = isTimeOff && shift.startTime === configStart && shift.endTime === configEnd;
 
   const handleCheckboxClick = (e) => {
     e.stopPropagation();
@@ -46,9 +50,7 @@ export default function ShiftCard({
       e.target.closest('.add-action-button-area') ||
       e.target.closest('.add-unassigned-template-button-area')) return;
 
-    if (!canAdmin || isTimeOff) {
-      return;
-    }
+    if (!canAdmin || isTimeOff) return;
 
     if (!isAnyShiftSelected) {
       onEditShift(shift);
@@ -72,14 +74,12 @@ export default function ShiftCard({
   const showCheckbox = canAdmin && !isTimeOff && (isHovered || isAnyShiftSelected) && !snapshot.isDragging;
 
   const showAddButtonForUserOrTimeOff =
-    canAdmin &&
-    (shiftType === 'regular' || isTimeOff) &&
+    canAdmin && (shiftType === 'regular' || isTimeOff) &&
     shift.userId && shift.userId !== FRONTEND_UNASSIGNED_SHIFT_USER_ID &&
     isHovered && !isAnyShiftSelected && !snapshot.isDragging;
 
   const showAddButtonForUnassignedTemplate =
-    canAdmin &&
-    isUnassigned && isHovered && !snapshot.isDragging;
+    canAdmin && isUnassigned && isHovered && !snapshot.isDragging;
 
   let cardSxProps = {
     my: 0.5, height: 50, minHeight: 50, boxSizing: 'border-box',
@@ -105,7 +105,7 @@ export default function ShiftCard({
     cardSxProps.border = `1px dashed ${alpha(isUnassigned ? '#e0e0e0' : EMPLOYEE_SHIFT_TEXT_COLOR, 0.3)}`;
     cardSxProps.cursor = 'default';
   } else if (snapshot.isDragging) {
-    cardSxProps.bgcolor = 'primary.lighter';
+    cardSxProps.bgcolor = '#fff3e0';
     cardSxProps.cursor = 'grabbing';
   } else if (isSelected) {
     cardSxProps.bgcolor = (theme) => alpha(isUnassigned ? theme.palette.grey[400] : theme.palette.primary.main, 0.25);
@@ -131,7 +131,6 @@ export default function ShiftCard({
     contentPaddingRight = (SLOT_CHIP_WIDTH_APPROX + 12) / 8;
   }
 
-
   return (
     <Paper
       ref={provided.innerRef}
@@ -139,17 +138,13 @@ export default function ShiftCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       elevation={snapshot.isDragging && canAdmin ? 4 : (isSelected && canAdmin && !isTimeOff ? 3 : 1)}
-      sx={cardSxProps}
+      sx={{...cardSxProps}}
     >
-      <Box
-        className="selection-checkbox-area"
-        sx={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          width: showCheckbox ? 32 : 0,
-          flexShrink: 0, height: '100%',
-          transition: 'width 0.15s ease-in-out', overflow: 'hidden', zIndex: 1
-        }}
-      >
+      <Box className="selection-checkbox-area" sx={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        width: showCheckbox ? 32 : 0, flexShrink: 0, height: '100%',
+        transition: 'width 0.15s ease-in-out', overflow: 'hidden', zIndex: 1
+      }}>
         {showCheckbox && (
           <Checkbox
             size="small"
@@ -158,9 +153,7 @@ export default function ShiftCard({
             onClick={(e) => e.stopPropagation()}
             icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
             checkedIcon={<CheckBoxIcon fontSize="small" />}
-            sx={{
-              p: 0.5, opacity: 1, visibility: 'visible',
-            }}
+            sx={{ p: 0.5, opacity: 1, visibility: 'visible' }}
             tabIndex={0}
           />
         )}
@@ -181,12 +174,14 @@ export default function ShiftCard({
       >
         <Typography variant="caption" component="div"
                     sx={{ fontWeight: 'bold', color: currentShiftTimeTextColor, fontSize: '0.68rem', lineHeight: 1.3,
-                      whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} >
-          {`${shift.startTime} - ${shift.endTime}`}
-          <Typography component="span" variant="caption"
-                      sx={{ ml: 0.5, color: currentShiftTimeTextColor, opacity: 0.8, fontSize: '0.65rem' }}>
-            ({shift.duration})
-          </Typography>
+                      whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {isAllDayOff ? "Cả ngày" : `${shift.startTime} - ${shift.endTime}`}
+          {!isAllDayOff && (
+            <Typography component="span" variant="caption"
+                        sx={{ ml: 0.5, color: currentShiftTimeTextColor, opacity: 0.8, fontSize: '0.65rem' }}>
+              ({shift.duration})
+            </Typography>
+          )}
         </Typography>
 
         {shift.note && shift.note.trim() !== '' && (
@@ -194,55 +189,36 @@ export default function ShiftCard({
                       sx={{ fontSize: '0.65rem', color: currentShiftNoteTextColor,
                         opacity: (isUnassigned && !isTimeOff) ? (shift.muiTextColor ? 0.85 : 1.0) : 1.0,
                         lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                      title={shift.note} >
+                      title={shift.note}>
             {shift.note}
           </Typography>
         )}
       </Box>
 
       {isUnassigned && typeof shift.slots === 'number' && (
-        <Chip
-          label={shift.slots}
-          size="small"
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            right: showAddButtonForUnassignedTemplate ? SLOT_CHIP_SHIFTED_RIGHT_MARGIN : SLOT_CHIP_DEFAULT_RIGHT_MARGIN,
-            transform: 'translateY(-50%)',
-            height: '20px',
-            minWidth: '20px',
-            fontSize: '0.7rem',
-            lineHeight: '20px',
-            padding: '0 6px',
-            borderRadius: '4px',
-            backgroundColor: alpha('#878787', 0.75),
-            color: 'white',
-            zIndex: 1,
-            transition: 'right 0.15s ease-in-out',
-          }}
-        />
+        <Chip label={shift.slots} size="small" sx={{
+          position: 'absolute', top: '50%',
+          right: showAddButtonForUnassignedTemplate ? SLOT_CHIP_SHIFTED_RIGHT_MARGIN : SLOT_CHIP_DEFAULT_RIGHT_MARGIN,
+          transform: 'translateY(-50%)', height: '20px', minWidth: '20px', fontSize: '0.7rem',
+          lineHeight: '20px', padding: '0 6px', borderRadius: '4px',
+          backgroundColor: alpha('#878787', 0.75), color: 'white', zIndex: 1,
+          transition: 'right 0.15s ease-in-out',
+        }} />
       )}
 
       {showAddButtonForUnassignedTemplate && (
-        <Box
-          className="add-unassigned-template-button-area"
-          sx={{
-            position: 'absolute', top: '50%', right: ACTION_BUTTON_RIGHT_MARGIN, transform: 'translateY(-50%)',
-            width: ACTION_BUTTON_SIZE, height: ACTION_BUTTON_SIZE,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            zIndex: 2,
-          }}
-        >
-          <IconButton
-            size="small"
-            onClick={handleAddNewUnassignedFromCard}
-            sx={{
-              p: 0.3,
-              bgcolor: 'rgba(230,230,230,0.85)',
-              '&:hover': { bgcolor: 'rgba(210,210,210,1)' },
-              borderRadius: '4px', width: '100%', height: '100%'
-            }}
-            title="Thêm ca chờ gán mới vào ngày này"
+        <Box className="add-unassigned-template-button-area" sx={{
+          position: 'absolute', top: '50%', right: ACTION_BUTTON_RIGHT_MARGIN, transform: 'translateY(-50%)',
+          width: ACTION_BUTTON_SIZE, height: ACTION_BUTTON_SIZE,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2,
+        }}>
+          <IconButton size="small" onClick={handleAddNewUnassignedFromCard}
+                      sx={{
+                        p: 0.3, bgcolor: 'rgba(230,230,230,0.85)',
+                        '&:hover': { bgcolor: 'rgba(210,210,210,1)' },
+                        borderRadius: '4px', width: '100%', height: '100%'
+                      }}
+                      title="Thêm ca chờ gán mới vào ngày này"
           >
             <AddIcon sx={{ fontSize: '1rem' }} color="action" />
           </IconButton>
@@ -250,18 +226,20 @@ export default function ShiftCard({
       )}
 
       {showAddButtonForUserOrTimeOff && (
-        <Box
-          className="add-action-button-area"
-          sx={{ position: 'absolute', top: '50%', right: ACTION_BUTTON_RIGHT_MARGIN, transform: 'translateY(-50%)',
-            width: ACTION_BUTTON_SIZE, height: ACTION_BUTTON_SIZE, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            opacity: 1, zIndex: 1,
-          }}
-        >
-          <IconButton
-            size="small" onClick={handleAddNewShiftFromCard}
-            sx={{ p: 0.3, bgcolor: 'rgba(230,230,230,0.85)', '&:hover': { bgcolor: 'rgba(210,210,210,1)' }, borderRadius: '4px', width: '100%', height: '100%'}}
-            title="Thêm ca làm việc khác vào ngày này"
-          > <AddIcon sx={{ fontSize: '1rem' }} color="action" />
+        <Box className="add-action-button-area" sx={{
+          position: 'absolute', top: '50%', right: ACTION_BUTTON_RIGHT_MARGIN, transform: 'translateY(-50%)',
+          width: ACTION_BUTTON_SIZE, height: ACTION_BUTTON_SIZE,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 1, zIndex: 1,
+        }}>
+          <IconButton size="small" onClick={handleAddNewShiftFromCard}
+                      sx={{
+                        p: 0.3, bgcolor: 'rgba(230,230,230,0.85)',
+                        '&:hover': { bgcolor: 'rgba(210,210,210,1)' },
+                        borderRadius: '4px', width: '100%', height: '100%'
+                      }}
+                      title="Thêm ca làm việc khác vào ngày này"
+          >
+            <AddIcon sx={{ fontSize: '1rem' }} color="action" />
           </IconButton>
         </Box>
       )}

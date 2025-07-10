@@ -142,10 +142,9 @@ function Layout() {
             </SvgIcon>
 
             <Typography sx={styles.appName} variant="h6" noWrap>
-              Taskforce
+              HUST HRM
             </Typography>
 
-            {/* Use this div tag to push the icons to the right */}
             <div
               style={{
                 flexGrow: 1,
@@ -154,7 +153,7 @@ function Layout() {
                 justifyContent: "center",
               }}
             >
-              {!hidden && <AutocompleteComponent hidden={hidden} />}
+
             </div>
             <Box sx={styles.sectionDesktop}>
               {keycloak.authenticated && (

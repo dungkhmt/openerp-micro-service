@@ -181,7 +181,7 @@ const SalaryTab = ({ userLoginId, canEdit }) => {
                 helperText="Chọn loại hình nhận lương (theo tháng, tuần, giờ)."
               >
                 <MenuItem value="MONTHLY">Theo Tháng</MenuItem>
-                <MenuItem value="WEEKLY">Theo Tuần</MenuItem>
+             {/*   <MenuItem value="WEEKLY">Theo Tuần</MenuItem>*/}
                 <MenuItem value="HOURLY">Theo Giờ</MenuItem>
               </TextField>
             </Grid>

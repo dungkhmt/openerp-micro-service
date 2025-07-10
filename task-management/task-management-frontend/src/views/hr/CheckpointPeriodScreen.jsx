@@ -91,11 +91,11 @@ const CheckpointPeriodScreenInternal = () => {
           setCurrentPage(0);
         }
       }, {
-        onError: (err) => { console.error("Lỗi khi tải kỳ checkpoint:", err); toast.error("Không thể tải danh sách kỳ checkpoint."); },
+        onError: (err) => { console.error("Lỗi khi tải kỳ đánh giá:", err); toast.error("Không thể tải danh sách kỳ đánh giá."); },
       }, null, { params: payload });
     } catch (error) {
-      console.error("Ngoại lệ khi tải kỳ checkpoint:", error);
-      toast.error("Lỗi hệ thống khi tải danh sách kỳ checkpoint.");
+      console.error("Ngoại lệ khi tải kỳ đánh giá:", error);
+      toast.error("Lỗi hệ thống khi tải danh sách kỳ đánh giá.");
     } finally {
       setLoading(false);
     }
@@ -141,7 +141,7 @@ const CheckpointPeriodScreenInternal = () => {
   const columns = useMemo(
     () => [
       { Header: "#", accessor: (row, i) => currentPage * itemsPerPage + i + 1, width: 60, disableSortBy: true, id:'stt' },
-      { Header: "Tên Kỳ Checkpoint", accessor: "name", minWidth: 250, id:'name',
+      { Header: "Tên Kỳ đánh giá", accessor: "name", minWidth: 250, id:'name',
         Cell: ({ row }) => (
           <Typography
             variant="body1"
@@ -189,14 +189,14 @@ const CheckpointPeriodScreenInternal = () => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data, manualPagination: true, pageCount: pageCount, initialState: { pageIndex: currentPage }, }, usePagination );
 
   const handleDelete = () => {
-    if (!selectedPeriod || !selectedPeriod.id) { toast.error("Không tìm thấy ID kỳ checkpoint để xóa."); return; }
+    if (!selectedPeriod || !selectedPeriod.id) { toast.error("Không tìm thấy ID kỳ đánh giá để xóa."); return; }
     const periodIdToDelete = selectedPeriod.id;
     request("delete", `/checkpoints/periods/${periodIdToDelete}`, () => {
-        toast.success("Kỳ Checkpoint đã được xóa thành công.");
+        toast.success("Kỳ đánh giá đã được xóa thành công.");
         const newCurrentPage = (data.filter(d => d.id !== periodIdToDelete).length % itemsPerPage === 0 && currentPage > 0 && Math.floor((data.length -1) / itemsPerPage) < currentPage) ? currentPage - 1 : currentPage;
         fetchData(newCurrentPage, itemsPerPage, debouncedSearchTerm, newCurrentPage === 0 && data.length-1 === 0);
         setDeleteModalOpen(false); setSelectedPeriod(null);
-      }, { onError: (err) => { console.error("Lỗi khi xóa kỳ checkpoint:", err); toast.error(err.response?.data?.message || "Không thể xóa kỳ checkpoint."); } }
+      }, { onError: (err) => { console.error("Lỗi khi xóa kỳ đánh giá:", err); toast.error(err.response?.data?.message || "Không thể xóa kỳ đánh giá."); } }
     );
   };
 
@@ -206,7 +206,7 @@ const CheckpointPeriodScreenInternal = () => {
     exportToPDF({
       data: data,
       columns: pdfExportColumns,
-      title: "Danh sách Kỳ Checkpoint",
+      title: "Danh sách Kỳ đánh giá",
       fileName: `DSKyCheckpoint_${dayjs().format("YYYYMMDD")}.pdf`,
       themePalette: theme.palette,
       customColumnWidths: {
@@ -249,7 +249,7 @@ const CheckpointPeriodScreenInternal = () => {
     <Box sx={{ mr: 2, bgcolor: 'background.default', minHeight: 'calc(100vh - 64px)' }}>
       <Paper sx={{ p: 2, mb: 2 }}>
         <Grid container spacing={2} alignItems="center" justifyContent="space-between" wrap="wrap">
-          <Grid item> <Typography variant="h4" component="h1" sx={{display:'flex', alignItems:'center'}}> Kỳ Checkpoint </Typography> </Grid>
+          <Grid item> <Typography variant="h4" component="h1" sx={{display:'flex', alignItems:'center'}}> Kỳ đánh giá </Typography> </Grid>
           <Grid item> <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => { setSelectedPeriod(null); setOpenModal(true); }}> Thêm mới </Button> </Grid>
         </Grid>
       </Paper>
@@ -268,8 +268,8 @@ const CheckpointPeriodScreenInternal = () => {
         open={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
         onSubmit={handleDelete}
-        title="Xác nhận xóa Kỳ Checkpoint"
-        info={`Bạn có chắc chắn muốn xóa kỳ checkpoint "${selectedPeriod?.name}" không?`}
+        title="Xác nhận xóa Kỳ đánh giá"
+        info={`Bạn có chắc chắn muốn xóa kỳ đánh giá "${selectedPeriod?.name}" không?`}
         cancelLabel="Hủy"
         confirmLabel="Xóa"
         titleProps={{sx: modalTitleStyle}}
@@ -309,7 +309,7 @@ const CheckpointPeriodScreenInternal = () => {
             </TableHead>
             <TableBody {...getTableBodyProps()}>
               {loading && rows.length === 0 ? ( <TableRow><TableCell colSpan={columns.length} align="center" sx={{ py: 5 }}> <CircularProgress /> <Typography sx={{mt: 1.5}} variant="body1">Đang tải dữ liệu...</Typography> </TableCell></TableRow>
-              ) : !loading && rows.length === 0 ? ( <TableRow><TableCell colSpan={columns.length} align="center" sx={{ py: 5 }}> <Typography variant="h6">Không tìm thấy kỳ checkpoint nào.</Typography> <Typography variant="body1" color="text.secondary" sx={{mt:1}}> Vui lòng thử lại với từ khóa khác hoặc thêm kỳ mới. </Typography> </TableCell></TableRow>
+              ) : !loading && rows.length === 0 ? ( <TableRow><TableCell colSpan={columns.length} align="center" sx={{ py: 5 }}> <Typography variant="h6">Không tìm thấy kỳ đánh giá nào.</Typography> <Typography variant="body1" color="text.secondary" sx={{mt:1}}> Vui lòng thử lại với từ khóa khác hoặc thêm kỳ mới. </Typography> </TableCell></TableRow>
               ) : (
                 rows.map((row) => { prepareRow(row); return (
                   <TableRow

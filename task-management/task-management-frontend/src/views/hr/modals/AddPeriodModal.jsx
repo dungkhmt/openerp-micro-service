@@ -77,7 +77,7 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues, titleProps }) 
           (res) => {
             const { data } = res.data;
             if (!data) {
-              toast.error("Không tìm thấy chi tiết kỳ checkpoint.");
+              toast.error("Không tìm thấy chi tiết kỳ đánh giá.");
               setFormValues(defaultFormValues);
               return;
             }
@@ -98,7 +98,7 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues, titleProps }) 
           {
             onError: (err) => {
               console.error("Error fetching period details:", err);
-              toast.error("Lỗi khi tải chi tiết kỳ checkpoint.");
+              toast.error("Lỗi khi tải chi tiết kỳ đánh giá.");
               setFormValues(defaultFormValues);
             }
           }
@@ -205,7 +205,7 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues, titleProps }) 
       );
     } catch (error) {
       console.error("Error saving period:", error);
-      toast.error("Lỗi khi lưu kỳ checkpoint.");
+      toast.error("Lỗi khi lưu kỳ đánh giá.");
     } finally {
       setLoadingSubmit(false);
     }
@@ -216,7 +216,7 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues, titleProps }) 
   return (
     <Dialog open={open} onClose={loadingSubmit ? () => {} : onClose} fullWidth maxWidth="md" PaperProps={{sx: {height: 'calc(100% - 64px)'}}}>
       <DialogTitle sx={{...titleProps, display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'primary.main', color: 'primary.contrastText', py:1.5, px:2}}>
-        {initialValues?.id ? "Chỉnh sửa Kỳ Checkpoint" : "Thêm Kỳ Checkpoint Mới"}
+        {initialValues?.id ? "Chỉnh sửa Kỳ đánh giá" : "Thêm Kỳ đánh giá Mới"}
         <IconButton aria-label="đóng" onClick={loadingSubmit ? () => {} : onClose} sx={{color: 'primary.contrastText', p:0.5}} disabled={loadingSubmit}>
           <CloseIcon />
         </IconButton>
@@ -235,7 +235,7 @@ const AddPeriodModal = ({ open, onClose, onSubmit, initialValues, titleProps }) 
                     <TextField
                       autoFocus
                       fullWidth
-                      label="Tên kỳ checkpoint (*)"
+                      label="Tên kỳ đánh giá (*)"
                       value={formValues.name}
                       onChange={(e) => setFormValues((prev) => ({ ...prev, name: e.target.value }))}
                       size="small"

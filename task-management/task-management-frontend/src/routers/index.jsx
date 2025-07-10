@@ -44,6 +44,8 @@ import PayrollListPage from "../views/hr/PayrollListPage.jsx";
 import PayrollDetailPage from "../views/hr/PayrollDetailPage.jsx";
 import ShiftScheduler from "../views/hr/shift-scheduler/ShiftScheduler.jsx";
 import ConfigurableRosterPage from "../views/hr/shift-manager/ConfigurableRosterPage.jsx";
+import HRDashboard from "../views/hr/HRDashboard.jsx";
+import EmployeeDashboard from "../views/hr/EmployeeDashboard.jsx";
 
 
 export const router = createBrowserRouter([
@@ -59,7 +61,11 @@ export const router = createBrowserRouter([
         children: [
           {
             path: "/dashboard",
-            element: <DashBoard />,
+            element: <HRDashboard />,
+          },
+          {
+            path: "/dashboard/employee",
+            element: <EmployeeDashboard />,
           },
           {
             path: "/my-profile",
@@ -125,6 +131,10 @@ export const router = createBrowserRouter([
           {
             path: "/hr",
             children: [
+              {
+                path: "me",
+                element: <EmployeeDetails />
+              },
               {
                 path: "checkin-out",
                 element: <CheckinoutScreen />

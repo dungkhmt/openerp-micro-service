@@ -56,13 +56,13 @@ const Timesheet = () => {
           const data = res.data?.data || [];
           setAllTodayRecords(data); // Lưu trữ tất cả bản ghi
 
-          const checkInsToday = data.filter(d => d.type === "CHECKIN").sort((a, b) => dayjs(a.point_time).valueOf() - dayjs(b.point_time).valueOf());
-          const checkOutsToday = data.filter(d => d.type === "CHECKOUT").sort((a, b) => dayjs(a.point_time).valueOf() - dayjs(b.point_time).valueOf());
+          const checkInsToday = data;
+          const checkOutsToday = data;
 
           const firstCI = checkInsToday.length > 0 ? checkInsToday[0].point_time : null;
           // Lần checkout cuối cùng phải sau lần checkin đầu tiên
-          const lastCO = checkOutsToday.length > 0 && firstCI ?
-            checkOutsToday.filter(co => dayjs(co.point_time).isAfter(dayjs(firstCI))).pop()?.point_time
+          const lastCO = checkOutsToday.length > 1 && firstCI ?
+            checkOutsToday.pop()?.point_time
             : null;
 
           setFirstCheckInTime(firstCI);

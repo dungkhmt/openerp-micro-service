@@ -42,7 +42,7 @@ const GradeModal = ({ open, onClose, staff, period, titleProps }) => {
       const checkpointData = checkpointResponse.data?.data;
 
       if (!periodData) {
-        toast.error("Không thể tải thông tin chi tiết kỳ checkpoint.");
+        toast.error("Không thể tải thông tin chi tiết Kỳ đánh giá.");
         setLoading(false);
         return;
       }
@@ -190,7 +190,7 @@ const GradeModal = ({ open, onClose, staff, period, titleProps }) => {
           </Box>
         ) : !periodDetails ? (
           <Box sx={{display: 'flex', justifyContent:'center', alignItems:'center', flexGrow: 1, p:3}}>
-            <Typography color="text.secondary">Không tải được chi tiết kỳ checkpoint hoặc thông tin nhân viên.</Typography>
+            <Typography color="text.secondary">Không tải được chi tiết Kỳ đánh giá hoặc thông tin nhân viên.</Typography>
           </Box>
         ): (
           <>

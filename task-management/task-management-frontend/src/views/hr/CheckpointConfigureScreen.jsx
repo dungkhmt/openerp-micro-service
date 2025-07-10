@@ -176,13 +176,12 @@ const CheckpointConfigureScreenInternal = () => {
     const configIdToDelete = deleteCheckpoint.id;
     const codeToDelete = deleteCheckpoint.code; // API gốc dùng code trong body
 
-    request("delete", `/checkpoints/configures`, () => {
+    request("delete", `/checkpoints/configures/${codeToDelete}`, () => {
         toast.success("Cấu hình Checkpoint đã được xóa thành công.");
         const newCurrentPage = (data.filter(d => d.id !== configIdToDelete).length % itemsPerPage === 0 && currentPage > 0 && Math.floor((data.length -1) / itemsPerPage) < currentPage) ? currentPage - 1 : currentPage;
         fetchData(newCurrentPage, itemsPerPage, debouncedSearchTerm, newCurrentPage === 0 && data.length - 1 === 0);
         setDeleteModalOpen(false); setDeleteCheckpoint(null);
-      }, { onError: (err) => { console.error("Lỗi khi xóa cấu hình:", err); toast.error(err.response?.data?.message || "Không thể xóa cấu hình checkpoint."); } },
-      { code: codeToDelete }
+      }, { onError: (err) => { console.error("Lỗi khi xóa cấu hình:", err); toast.error(err.response?.data?.message || "Không thể xóa cấu hình checkpoint."); } }
     );
   };
 

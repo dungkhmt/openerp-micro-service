@@ -1,10 +1,6 @@
-// fileExportUtils.js
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-import dayjs from "dayjs";
+import { jsPDF } from 'jspdf';
+import { autoTable } from 'jspdf-autotable';
 
-// BƯỚC QUAN TRỌNG: Đảm bảo bạn đã tạo các file này và chúng export đúng chuỗi base64
-// Ví dụ đường dẫn, sửa lại cho đúng với cấu trúc project của bạn
 import { robotoRegularBase64 } from './fonts/roboto-regular-font.js';
 import { robotoBoldBase64 } from './fonts/roboto-bold-font.js';
 
@@ -14,9 +10,6 @@ const FONT_ROBOTO_BOLD = "RobotoCustomBold";
 // Hàm này sẽ được gọi cho mỗi instance `doc` mới
 const registerPdfFontForThisDoc = (docInstance) => {
   try {
-    // Luôn cố gắng thêm VFS và addFont cho instance `doc` hiện tại.
-    // jsPDF có thể sẽ không thêm lại nếu tên file/font đã tồn tại trong instance đó,
-    // nhưng việc gọi lại đảm bảo font được biết đến cho instance này.
     if (typeof robotoRegularBase64 === 'string' && robotoRegularBase64.length > 1000) {
       docInstance.addFileToVFS('Roboto-Regular.ttf', robotoRegularBase64);
       docInstance.addFont('Roboto-Regular.ttf', FONT_ROBOTO_REGULAR, 'normal');
@@ -67,13 +60,12 @@ export const exportToPDF = ({
     format: "a4"
   });
 
-  // Gọi hàm đăng ký font cho instance `doc` này
+
   registerPdfFontForThisDoc(doc);
 
   let activeFont = FONT_ROBOTO_REGULAR;
   let activeBoldFont = FONT_ROBOTO_BOLD;
 
-  // Cố gắng đặt font, jsPDF sẽ fallback nếu font tùy chỉnh không được đăng ký thành công
   try {
     doc.setFont(FONT_ROBOTO_REGULAR, 'normal');
   } catch (e) {
@@ -87,27 +79,20 @@ export const exportToPDF = ({
   const rowEvenColor = ensureHexColor(themePalette?.grey?.[100], "#f5f5f5");
   const borderColor = ensureHexColor(themePalette?.divider, "#e0e0e0");
   const primaryTextColorPdf = ensureHexColor(themePalette?.text?.primary, "#212121");
-  // const secondaryTextColorPdf = ensureHexColor(themePalette?.text?.secondary, "#757575"); // Không còn dùng cho "Ngày xuất"
+  // const secondaryTextColorPdf = ensureHexColor(themePalette?.text?.secondary, "#757575");
   const disabledTextColorPdf = ensureHexColor(themePalette?.text?.disabled, "#bdbdbd");
 
-  // Tiêu đề chính của tài liệu
   try {
     doc.setFont(activeBoldFont, 'bold');
   } catch (e) {
     console.warn(`Không tìm thấy font ${activeBoldFont} (bold) cho tiêu đề, sử dụng font ${activeFont} với style bold. Lỗi: ${e.message}`);
-    doc.setFont(activeFont, 'bold'); // Yêu cầu style bold cho font hiện tại
+    doc.setFont(activeFont, 'bold');
   }
   doc.setFontSize(18);
   doc.setTextColor(primaryTextColorPdf);
   const pageWidth = doc.internal.pageSize.getWidth();
   const titleWidth = doc.getTextWidth(title);
-  doc.text(title, (pageWidth - titleWidth) / 2, 60); // Tọa độ y=60
-
-  // Bỏ dòng "Ngày xuất"
-  // doc.setFont(activeFont, 'normal');
-  // doc.setFontSize(10);
-  // doc.setTextColor(secondaryTextColorPdf);
-  // doc.text(`Ngày xuất: ${dayjs().format("DD/MM/YYYY HH:mm:ss")}`, 40, 75);
+  doc.text(title, (pageWidth - titleWidth) / 2, 60);
 
   const tableColumns = columns.map(col => col.Header);
   const tableRows = data.map((row, rowIndex) => {
@@ -124,8 +109,8 @@ export const exportToPDF = ({
     });
   });
 
-  doc.autoTable({
-    startY: 75, // Điều chỉnh startY vì đã bỏ dòng ngày xuất
+  autoTable(doc,{
+    startY: 75,
     head: [tableColumns],
     body: tableRows,
     theme: 'grid',
@@ -139,8 +124,8 @@ export const exportToPDF = ({
       overflow: 'linebreak',
     },
     headStyles: {
-      font: activeBoldFont, // Sử dụng biến đã kiểm tra
-      fontStyle: 'bold',    // Thêm thuộc tính này để jsPDF cố gắng làm đậm nếu font bold riêng không có
+      font: activeBoldFont,
+      fontStyle: 'bold',
       fillColor: headerColor,
       textColor: headerTextColor,
       fontSize: 10,
@@ -166,7 +151,7 @@ export const exportToPDF = ({
       try {
         doc.setFont(activeFont, 'normal');
       } catch (e) {
-        doc.setFont(undefined, 'normal'); // Fallback nếu có lỗi
+        doc.setFont(undefined, 'normal');
       }
       doc.setFontSize(8);
       doc.setTextColor(disabledTextColorPdf);

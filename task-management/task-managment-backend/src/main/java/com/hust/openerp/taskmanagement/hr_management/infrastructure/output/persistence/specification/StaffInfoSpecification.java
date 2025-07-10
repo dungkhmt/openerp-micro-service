@@ -32,6 +32,11 @@ public class StaffInfoSpecification implements Specification<StaffEntity> {
             orPredicates.add(codePredicate);
         }
 
+        if(filter.getUserLoginIds() != null && !filter.getUserLoginIds().isEmpty()){
+            Predicate codePredicate = root.get("user").get("id").in(filter.getUserLoginIds());
+            orPredicates.add(codePredicate);
+        }
+
         // Filter by Staff Name
         if (filter.getStaffName() != null) {
             Predicate namePredicate = cb.like(cb.lower(root.get("fullname")),
@@ -41,7 +46,7 @@ public class StaffInfoSpecification implements Specification<StaffEntity> {
 
         // Filter by Staff Email
         if (filter.getStaffEmail() != null) {
-            var userJoin = root.join("user", JoinType.INNER); // Join with User table
+            var userJoin = root.join("user", JoinType.INNER);
             Predicate emailPredicate = cb.like(cb.lower(userJoin.get("email")),
                     "%" + filter.getStaffEmail().toLowerCase() + "%");
             orPredicates.add(emailPredicate);

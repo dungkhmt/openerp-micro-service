@@ -93,9 +93,9 @@ const UpdateAnnounceAbsenceFormInternal = ({ open, onClose, absenceId, onUpdated
         if (!isMounted) return;
         console.error("Lỗi tải dữ liệu khởi tạo cho modal sửa:", error);
         toast.error("Không thể tải dữ liệu cần thiết cho form chỉnh sửa.");
-        onClose(); // Đóng modal nếu không tải được config
+        onClose();
       }
-      // Không tắt isLoadingData ở đây, để useEffect fetch chi tiết đơn xử lý
+
     };
 
     fetchInitialConfigsAndStaffInfo();
@@ -158,7 +158,7 @@ const UpdateAnnounceAbsenceFormInternal = ({ open, onClose, absenceId, onUpdated
           case "morning": updatedEntry.startTime = workTimes.startWork; updatedEntry.endTime = workTimes.lunchStart; break;
           case "afternoon": updatedEntry.startTime = workTimes.lunchEnd; updatedEntry.endTime = workTimes.endWork; break;
           case "custom":
-            updatedEntry.startTime = prev.startTime || workTimes.startWork; // Giữ lại giá trị cũ nếu có khi chuyển sang custom
+            updatedEntry.startTime = prev.startTime || workTimes.startWork;
             updatedEntry.endTime = prev.endTime || workTimes.endWork;
             break;
           default: break;
@@ -168,8 +168,7 @@ const UpdateAnnounceAbsenceFormInternal = ({ open, onClose, absenceId, onUpdated
         updatedEntry[field] = parseTimeStringToFixedDate(format(value, "HH:mm"));
       }
       if (field === "dateObject" && value instanceof Date && isValidDate(value)) {
-        updatedEntry.date = format(value, "yyyy-MM-dd"); // Cập nhật lại date string
-        // dateObject đã là value rồi
+        updatedEntry.date = format(value, "yyyy-MM-dd");
       }
       return updatedEntry;
     });

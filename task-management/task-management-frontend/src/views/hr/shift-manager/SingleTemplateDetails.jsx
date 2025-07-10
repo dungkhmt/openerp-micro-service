@@ -1,4 +1,3 @@
-// src/features/rosterConfiguration/SingleTemplateDetails.jsx
 import React from 'react';
 import {Box, Chip, Grid, List, ListItem, ListItemText, Paper, Typography} from '@mui/material';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
@@ -10,13 +9,18 @@ import WeekendIcon from '@mui/icons-material/Weekend';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+import CalendarViewDayIcon from '@mui/icons-material/CalendarViewDay';
+import CelebrationIcon from '@mui/icons-material/Celebration';
+
 
 export default function SingleTemplateDetails({ template }) {
-  // Provide default fallbacks to prevent errors if properties are missing
   const definedShifts = template?.definedShifts || [];
   const activeHardConstraints = template?.activeHardConstraints || {};
 
   const constraintDisplayInfo = {
+    AVOID_SPECIFIC_DAYS_OF_WEEK: { label: "Không làm việc vào các thứ", icon: <CalendarViewDayIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
+    NO_WORK_ON_HOLIDAYS: { label: "Nghỉ vào ngày Lễ, Tết", icon: <CelebrationIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
+    // ---
     MAX_CONSECUTIVE_WORK_DAYS: { label: "Ngày làm LT tối đa", icon: <TodayIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
     MIN_REST_BETWEEN_SHIFTS_HOURS: { label: "Nghỉ giữa ca (giờ)", icon: <BusinessHoursIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
     MAX_WEEKLY_WORK_HOURS: { label: "Giờ tối đa/tuần", icon: <BusinessHoursIcon sx={{mr:0.5, fontSize: '1.2rem'}}/> },
@@ -33,6 +37,12 @@ export default function SingleTemplateDetails({ template }) {
     const value = activeHardConstraints[key];
     return value === true || (typeof value === 'object' && value !== null);
   });
+
+  const formatDaysOfWeek = (daysArray) => {
+    if (!daysArray || !Array.isArray(daysArray) || daysArray.length === 0) return "Không có";
+    const dayMap = { 1: 'T2', 2: 'T3', 3: 'T4', 4: 'T5', 5: 'T6', 6: 'T7', 7: 'CN' };
+    return daysArray.map(d => dayMap[d] || d).join(', ');
+  }
 
   return (
     <Paper elevation={0} sx={{ p: { xs: 1.5, sm: 2 }, mt: 1.5, backgroundColor: '#fafafa', borderRadius: 1.5, border: '1px solid #e0e0e0' }}>
@@ -67,7 +77,10 @@ export default function SingleTemplateDetails({ template }) {
                 const constraintValue = activeHardConstraints[key];
                 const displayInfo = constraintDisplayInfo[key] || { label: key.replace(/_/g, ' ') };
                 let valueString = "";
-                if (typeof constraintValue === 'boolean' && constraintValue) {
+
+                if (key === 'AVOID_SPECIFIC_DAYS_OF_WEEK' && typeof constraintValue === 'object' && constraintValue.daysOfWeek) {
+                  valueString = formatDaysOfWeek(constraintValue.daysOfWeek);
+                } else if (typeof constraintValue === 'boolean' && constraintValue) {
                   valueString = "Đang áp dụng";
                 }
                 else if (typeof constraintValue === 'object' && constraintValue !== null) {

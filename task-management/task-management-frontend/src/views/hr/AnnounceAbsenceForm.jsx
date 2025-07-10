@@ -244,7 +244,8 @@ const AnnounceAbsenceFormInternal = () => {
           successfullySubmittedDatesIds.push(d.id);
         }, {
           onError: (err) => {
-            toast.error(`Lỗi khi gửi yêu cầu cho ngày ${format(d.dateObject, "dd/MM/yyyy")}: ${err.response?.data?.message || "Lỗi không xác định"}`);
+            console.log(err)
+            toast.error(`Lỗi khi gửi yêu cầu cho ngày ${format(d.dateObject, "dd/MM/yyyy")}: ${err.response?.data?.data || "Lỗi không xác định"}`);
             allSuccessful = false;
           },
         }, payload);
@@ -282,7 +283,7 @@ const AnnounceAbsenceFormInternal = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-      <Box sx={{ p: { xs: 2, md: 3 } }}>
+      <Box sx={{ p: { xs: 1, md: 1 } }}>
         <Paper sx={{ p: { xs: 2, md: 3 }, maxWidth: 900, mx: "auto" }}>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, display: 'flex', alignItems: 'center' }}>
             <EventBusyIcon sx={{mr: 1, color: 'primary.main'}} /> Thông báo Nghỉ phép
@@ -318,8 +319,7 @@ const AnnounceAbsenceFormInternal = () => {
             </Typography>
           )}
 
-          {/* Box cuộn cho danh sách ngày nghỉ */}
-          <Box sx={{ maxHeight: selectedDates.length > 2 ? '40vh' : 'auto', overflowY: selectedDates.length > 2 ? 'auto' : 'visible', pr: selectedDates.length > 2 ? 1 : 0, mb: 2 }}>
+          <Box className={"custom-scrollbar"} sx={{ maxHeight: selectedDates.length > 2 ? '40vh' : 'auto', overflowY: selectedDates.length > 2 ? 'auto' : 'visible', pr: selectedDates.length > 2 ? 1 : 0, mb: 2 }}>
             {selectedDates.map((d, i) => (
               <Paper variant="outlined" key={d.id} sx={{ p: 2, mb: 2, position: "relative" }}>
                 <IconButton

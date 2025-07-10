@@ -1,4 +1,3 @@
-// StaffScreen.jsx
 import React, {useEffect, useMemo, useState, useCallback} from "react";
 import {usePagination, useTable} from "react-table";
 import {useNavigate}from "react-router-dom";
@@ -52,13 +51,18 @@ import {CSVLink}from "react-csv";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
 
-// Import state quản lý quyền scope
-import { useScopePermissionState, fetchPermittedScopes } from "../../state/scopePermissionState"; // Điều chỉnh đường dẫn nếu cần
+import Papa from "papaparse";
 
-const STAFF_ADMIN_SCOPE = "SCOPE_STAFF_ADMIN"; // Định nghĩa scope cho quản lý nhân viên
+import { useScopePermissionState, fetchPermittedScopes } from "../../state/scopePermissionState";
+
+const STAFF_ADMIN_SCOPE = "SCOPE_STAFF_ADMIN";
 
 const StaffScreenInternal = () => {
   const navigate = useNavigate();
+
+  const [importLoading, setImportLoading] = useState(false);
+  const fileInputRef = React.useRef();
+
   const [data, setData] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [jobPositions, setJobPositions] = useState([]);
@@ -82,7 +86,6 @@ const StaffScreenInternal = () => {
   const [currentMenuStaffId, setCurrentMenuStaffId] = useState(null);
   const [viewMode, setViewMode] = useState("table");
 
-  // State quyền scope
   const scopeState = useScopePermissionState();
   const { permittedScopeIds, isFetched: scopesFetched, isFetching: scopesFetching } = scopeState.get();
 
@@ -91,7 +94,6 @@ const StaffScreenInternal = () => {
   }, [permittedScopeIds, scopesFetched]);
 
   useEffect(() => {
-    // Fetch quyền scope khi component mount
     if (!scopesFetched && !scopesFetching) {
       fetchPermittedScopes();
     }
@@ -134,9 +136,7 @@ const StaffScreenInternal = () => {
 
   const fetchFilterData = useCallback(async () => {
     try {
-      // Lấy danh sách phòng ban đang hoạt động
       await request("get", "/departments?status=ACTIVE&pageSize=1000", (res) => setDepartments(res.data.data || []), { onError: (err) => console.error("Lỗi tải phòng ban:", err) }, {});
-      // Lấy danh sách vị trí công việc đang hoạt động
       await request("get", "/jobs?status=ACTIVE&pageSize=1000", (res) => setJobPositions(res.data.data || []), { onError: (err) => console.error("Lỗi tải vị trí công việc:", err) }, {});
     } catch (error) {
       console.error("Lỗi tải dữ liệu filter:", error);
@@ -183,6 +183,88 @@ const StaffScreenInternal = () => {
     handleMenuClose();
   }, [currentMenuStaffId, data, handleMenuClose]);
 
+  const handleImportCSV = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImportLoading(true);
+
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: async (results) => {
+        const rawData = results.data;
+
+        let validRows = [];
+        rawData.forEach((row, idx) => {
+          if (
+            row["Họ và Tên"] &&
+            row["Email"] &&
+            row["Phòng Ban"] &&
+            row["Vị Trí"]
+          ) {
+            validRows.push(row);
+          }
+        });
+
+        try {
+          let importSuccess = 0, importFail = 0;
+          for (const row of validRows) {
+
+            const dep = departments.find(
+              (d) => d.department_name.trim().toLowerCase() === row["Phòng Ban"].trim().toLowerCase()
+            );
+            const job = jobPositions.find(
+              (j) => j.name.trim().toLowerCase() === row["Vị Trí"].trim().toLowerCase()
+            );
+            if (!dep || !job) {
+              importFail++;
+              toast.error(`import department or job position error`)
+              continue;
+            }
+
+            const staffPayload = {
+              fullname: row["Họ và Tên"],
+              email: row["Email"],
+              department_code: dep.department_code,
+              job_position_code: job.code,
+              status: "ACTIVE",
+              salary: row["Lương"] ? row["Lương"] : null,
+              salary_type: row["Loại lương"] && row["Loại lương"] ? row["Loại lương"] : null
+            };
+
+            await request(
+              "post",
+              "/staffs",
+              () => {
+                importSuccess++;
+                toast.success(row["Họ và Tên"])
+              },
+              {
+                onError: (err) => {
+                  importFail++;
+                  toast.error(row["Họ và Tên"])
+                }
+              },
+              staffPayload
+            );
+          }
+          toast.success(`Import: ${importSuccess}, Error: ${importFail}`);
+          fetchStaffList(0, itemsPerPage, debouncedSearchTerm, selectedDepartmentFilter, selectedJobPositionFilter, true);
+        } catch (err) {
+          toast.error("Có lỗi xảy ra khi import.");
+        } finally {
+          setImportLoading(false);
+          e.target.value = "";
+        }
+      },
+      error: (err) => {
+        toast.error("Lỗi khi đọc file CSV.");
+        setImportLoading(false);
+        e.target.value = "";
+      }
+    });
+  };
+
   const columns = useMemo(
     () => {
       const baseColumns = [
@@ -212,14 +294,14 @@ const StaffScreenInternal = () => {
         { Header: "Email", accessor: "email", minWidth: 200, id: 'email' },
         {
           Header: "Phòng Ban",
-          accessor: "department.department_name", // Truy cập sâu hơn vào object
+          accessor: "department.department_name",
           Cell: ({ row }) => row.original.department?.department_name || "Chưa có",
           minWidth: 150,
           id: 'department'
         },
         {
           Header: "Vị Trí",
-          accessor: "job_position.job_position_name", // Truy cập sâu hơn vào object
+          accessor: "job_position.job_position_name",
           Cell: ({ row }) => row.original.job_position?.job_position_name || "Chưa có",
           minWidth: 150,
           id: 'jobPosition'
@@ -292,8 +374,8 @@ const StaffScreenInternal = () => {
       customColumnWidths: {
         0: { cellWidth: 30 },
         1: { cellWidth: 70 },
-        2: { cellWidth: 120 },
-        3: { cellWidth: 130 },
+        2: { cellWidth: 100 },
+        3: { cellWidth: 110 },
         4: { cellWidth: 100 },
         5: { cellWidth: 100 }
       }
@@ -333,6 +415,7 @@ const StaffScreenInternal = () => {
   const modalTitleStyle = { fontSize: '1.15rem', fontWeight: 600 };
 
 
+
   return (
     <Box sx={{ mr: 2, bgcolor: 'background.default', minHeight: 'calc(100vh - 64px)' }}>
       <Paper sx={{ p: 2, mb: 2 }}>
@@ -348,6 +431,28 @@ const StaffScreenInternal = () => {
               </Tooltip>
               {canAdminStaff && (
                 <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => { setSelectedEmployee(null); setOpenModal(true); }}> Thêm mới </Button>
+
+              )}
+
+              {canAdminStaff && (
+                <>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".csv"
+                    style={{ display: "none" }}
+                    onChange={handleImportCSV}
+                  />
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<AddIcon />}
+                    onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                    disabled={importLoading}
+                  >
+                    Import CSV
+                  </Button>
+                </>
               )}
             </Stack>
           </Grid>
@@ -364,8 +469,8 @@ const StaffScreenInternal = () => {
           }}
           initialData={selectedEmployee}
           isEditMode={!!selectedEmployee}
-          departments={departments} // Truyền danh sách phòng ban
-          jobPositions={jobPositions} // Truyền danh sách vị trí
+          departments={departments}
+          jobPositions={jobPositions}
           titleProps={{sx: modalTitleStyle}}
         />
       )}

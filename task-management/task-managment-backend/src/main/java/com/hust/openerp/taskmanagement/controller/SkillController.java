@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class SkillController {
     private final SkillService skillService;
 
-    @GetMapping
+/*    @GetMapping
     public List<Skill> getAllSkills() {
         return skillService.getAllSkills();
     }
@@ -45,5 +45,5 @@ public class SkillController {
     @PutMapping("{id}")
     public void updateSkill(@PathVariable("id") String id, @RequestBody Skill updatedSkill) {
         skillService.update(id, updatedSkill);
-    }
+    }*/
 }

@@ -1,0 +1,34 @@
+@startuml
+!theme materia
+title Sơ đồ CI/CD với GitHub Actions và Google Cloud
+
+actor "Lập trình viên" as Dev
+
+cloud "GitHub" {
+    [Mã nguồn] as Repo
+    [GitHub Actions] as Actions
+}
+
+frame "Google Cloud" {
+    node "Artifact Registry" as GCR {
+        [Docker Images]
+    }
+
+    node "Cloud Run\n(Serverless)" as Runner {
+        component "[Frontend Service]" as FE
+        component "[Backend Service]" as BE
+    }
+
+    database "Cloud SQL\n(PostgreSQL)" as DB
+}
+
+' Định nghĩa luồng CI/CD
+Dev -> Repo : 1. Push Code
+Repo -> Actions : 2. Kích hoạt Workflow
+Actions -> GCR : 3. Build & Đẩy Image
+Actions -> Runner : 4. Deploy Dịch vụ
+
+' Định nghĩa luồng hoạt động lúc chạy
+Runner --> DB : Kết nối
+
+@enduml

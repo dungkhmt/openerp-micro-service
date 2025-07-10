@@ -6,10 +6,7 @@ import com.hust.openerp.taskmanagement.hr_management.application.port.out.holida
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.payroll.usecase_data.CreatePayroll;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.GetAllStaffInfo;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff_salary.usecase_data.GetAllCurrentStaffSalary;
-import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceStatus;
-import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceType;
-import com.hust.openerp.taskmanagement.hr_management.constant.JobPositionType;
-import com.hust.openerp.taskmanagement.hr_management.constant.PayrollStatus;
+import com.hust.openerp.taskmanagement.hr_management.constant.*;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.*;
 import com.hust.openerp.taskmanagement.util.WorkTimeCalculator;
@@ -81,6 +78,7 @@ public class PayrollCalculator extends BeanAwareUseCasePublisher {
             List<Double> absenceHoursInDays = new ArrayList<>();
 
             LocalDate currentDate = createPayroll.getFromDate();
+            var workTimePerDay = roundToQuarter(companyConfig.getTotalWorkTime());
             while (!currentDate.isAfter(createPayroll.getThruDate())) {
                 boolean isWeekend = currentDate.getDayOfWeek().getValue() == 6 || currentDate.getDayOfWeek().getValue() == 7;
                 boolean isHoliday = holidayDates.contains(currentDate);
@@ -113,15 +111,17 @@ public class PayrollCalculator extends BeanAwareUseCasePublisher {
                         }
                     }
                 } else if (isHoliday && !isWeekend) {
-                    dailyAbsenceHours = roundToQuarter(companyConfig.getTotalWorkTime());
-                    if (staff.getJobPosition().getType() == JobPositionType.FULL_TIME) {
+                    dailyAbsenceHours = workTimePerDay;
+                    if (salary.getSalaryType() != SalaryType.HOURLY) {
                         totalPairLeaveHours += (float) dailyAbsenceHours;
                     }
                     else {
-                        totalUnpairLeaveHours += (float) dailyAbsenceHours;
+                        totalUnpairLeaveHours += Math.max(0f, (float) dailyAbsenceHours - (float) dailyWorkHours);
                     }
                 }
-
+                if(dailyWorkHours + dailyAbsenceHours > workTimePerDay) {
+                    dailyWorkHours = Math.max(0f,  workTimePerDay - dailyAbsenceHours);
+                }
                 workHoursInDays.add(roundToQuarter(dailyWorkHours));
                 absenceHoursInDays.add(roundToQuarter(dailyAbsenceHours));
                 totalWorkHours += (float) dailyWorkHours;
@@ -181,9 +181,8 @@ public class PayrollCalculator extends BeanAwareUseCasePublisher {
         while (!currentDate.isAfter(endDate)) {
             boolean isWeekend = currentDate.getDayOfWeek().getValue() == 6
                 || currentDate.getDayOfWeek().getValue() == 7;
-            boolean isHoliday = holidayDates.contains(currentDate);
 
-            if (!isWeekend && !isHoliday) {
+            if (!isWeekend) {
                 totalWorkDays++;
             }
             currentDate = currentDate.plusDays(1);

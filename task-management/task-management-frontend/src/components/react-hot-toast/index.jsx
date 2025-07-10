@@ -1,6 +1,9 @@
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import {CssBaseline, ThemeProvider} from "@mui/material";
+import {theme} from "../../views/hr/theme.js";
+import React from "react";
 
 const ReactHotToast = styled(Box)(({ theme }) => {
   return {

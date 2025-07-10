@@ -11,7 +11,7 @@ import {
   Typography
 } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
-import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded'; // Or a similar appropriate icon
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 
 const DeleteConfirmationModal = ({
                                    open,
@@ -27,13 +27,13 @@ const DeleteConfirmationModal = ({
       open={open}
       onClose={onClose}
       fullWidth
-      maxWidth="xs" // Keeps the dialog compact
+      maxWidth="xs"
       PaperProps={{
         sx: {
-          borderRadius: 2, // Consistent border radius
-          border: '1px solid', // Border consistent with Paper in ShiftManager
-          borderColor: 'rgba(0,0,0,0.12)', // A common divider/border color
-          boxShadow: '0px 4px 12px rgba(0,0,0,0.05)', // Consistent shadow if used elsewhere
+          borderRadius: 2,
+          border: '1px solid',
+          borderColor: 'rgba(0,0,0,0.12)',
+          boxShadow: '0px 4px 12px rgba(0,0,0,0.05)',
         }
       }}
     >
@@ -48,39 +48,38 @@ const DeleteConfirmationModal = ({
           <IconButton
             aria-label="close"
             onClick={onClose}
-            sx={{ color: 'text.secondary' }} // Standard icon color
+            sx={{ color: 'text.secondary' }}
           >
             <CloseIcon />
           </IconButton>
         </Box>
       </DialogTitle>
 
-      <Divider /> {/* Visual separator */}
+      <Divider />
 
-      <DialogContent sx={{ p: { xs: 2, sm: 2.5 }, textAlign: 'center' }}> {/* Centered content */}
+      <DialogContent sx={{ p: { xs: 2, sm: 2.5 }, textAlign: 'center' }}>
         <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.6 }}>
           {info}
         </Typography>
       </DialogContent>
 
-      {/* <Divider /> Optional: another divider before actions */}
 
       <DialogActions
         sx={{
-          justifyContent: "center", // Center buttons for a balanced look
-          p: 2, // Consistent padding
-          // backgroundColor: 'grey.50', // Optional: light background for action area
-          gap: 1.5, // Space between buttons
+          justifyContent: "center",
+          p: 2,
+
+          gap: 1.5,
         }}
       >
         <Button
           onClick={onClose}
-          variant="outlined" // Subtle cancel button
-          color="inherit" // Neutral color
+          variant="outlined"
+          color="inherit"
           sx={{
-            borderRadius: 1.5, // Consistent button border radius
+            borderRadius: 1.5,
             borderColor: 'grey.400',
-            color: 'text.primary', // Or text.secondary
+            color: 'text.primary',
             minWidth: '100px'
           }}
         >
@@ -89,10 +88,10 @@ const DeleteConfirmationModal = ({
         <Button
           onClick={onSubmit}
           variant="contained"
-          color="error" // Clearly indicates a destructive action
+          color="error"
           disableElevation
           sx={{
-            borderRadius: 1.5, // Consistent button border radius
+            borderRadius: 1.5,
             fontWeight: 500,
             minWidth: '100px'
           }}

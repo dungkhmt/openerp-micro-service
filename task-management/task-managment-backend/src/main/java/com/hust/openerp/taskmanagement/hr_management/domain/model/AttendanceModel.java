@@ -26,6 +26,7 @@ public class AttendanceModel {
     public static class DayAttendance{
         private List<LocalDateTime> pointTimes = new ArrayList<>();
         private float totalTimeByHours;
+        private AttendanceType attendanceType;
 
         public LocalDateTime getStartTime(){
             return pointTimes.get(0);
@@ -40,10 +41,16 @@ public class AttendanceModel {
 
 
         public AttendanceType getAttendanceType() {
+            if(attendanceType == AttendanceType.LATE){
+                return AttendanceType.LATE;
+            }
             return getAttendanceType(totalTimeByHours);
         }
 
         public AttendanceType getAttendanceType(float totalTimeByHours) {
+            if(attendanceType == AttendanceType.LATE){
+                return AttendanceType.LATE;
+            }
             if(pointTimes.size() < 2) {
                 if(pointTimes.isEmpty()) {
                     return AttendanceType.ABSENT;
@@ -51,7 +58,7 @@ public class AttendanceModel {
                 else return AttendanceType.MISSING;
             }
             if(totalTimeByHours < AttendanceConfig.LIMIT_TIME_BY_HOURS) {
-                return AttendanceType.INCOMPLETE;
+                return AttendanceType.PRESENT;
             }
             return AttendanceType.PRESENT;
         }
@@ -63,24 +70,16 @@ public class AttendanceModel {
      * @return attendance
      */
     public static List<AttendanceModel> populateFrom(List<CheckinoutModel> sortedModel, CompanyConfigModel companyConfig){
-        String id = null;
-        int count = -1;
-        var list = new ArrayList<AttendanceModel>();
-        for(CheckinoutModel model: sortedModel){
-            if(!model.getUserId().equals(id)){
-                id = model.getUserId();
-                list.add(new AttendanceModel(id, new HashMap<>()));
-                count++;
-            }
-            var attendances = list.get(count).attendances;
+        Map<String, AttendanceModel> userAttendanceMap = new HashMap<>();
+        for (CheckinoutModel model : sortedModel) {
+            String userId = model.getUserId();
+            AttendanceModel attendance = userAttendanceMap.computeIfAbsent(userId, id -> new AttendanceModel(id, new HashMap<>()));
+            var attendances = attendance.attendances;
             var date = model.getPointTime().toLocalDate();
-            if(!attendances.containsKey(date)){
-                attendances.put(date, new DayAttendance());
-            }
-            attendances.get(date).pointTimes.add(model.getPointTime());
+            attendances.computeIfAbsent(date, d -> new DayAttendance()).pointTimes.add(model.getPointTime());
         }
-        for(var attendance: list){
-            for(var dayAttendance: attendance.attendances.values()){
+        for (var attendance : userAttendanceMap.values()) {
+            for (var dayAttendance : attendance.attendances.values()) {
                 var startTime = dayAttendance.getStartTime() != null ? dayAttendance.getStartTime().toLocalTime() : null;
                 var endTime = dayAttendance.getEndTime() != null ? dayAttendance.getEndTime().toLocalTime() : null;
                 dayAttendance.setTotalTimeByHours(
@@ -89,9 +88,12 @@ public class AttendanceModel {
                         endTime,
                         companyConfig)
                 );
+                if(startTime != null && endTime != null && startTime.isAfter(companyConfig.getStartWorkTime())){
+                    dayAttendance.setAttendanceType(AttendanceType.LATE);
+                }
             }
         }
-        return list;
+        return new ArrayList<>(userAttendanceMap.values());
     }
 
 }

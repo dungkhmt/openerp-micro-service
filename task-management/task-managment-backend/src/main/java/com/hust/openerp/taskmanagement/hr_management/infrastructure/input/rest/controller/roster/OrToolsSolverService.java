@@ -3,9 +3,7 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 import com.google.ortools.Loader;
 import com.google.ortools.sat.*;
 import com.hust.openerp.taskmanagement.hr_management.application.port.in.port.IShiftPort;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.AbsenceModel;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.ShiftModel;
-import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -48,14 +46,14 @@ public class OrToolsSolverService {
         return lastSolveFeasible;
     }
 
-    public RosterSolution solveRoster(RosterRequest request, List<StaffModel> employees, List<AbsenceModel> leaves, List<ShiftModel> existingShiftsDataParam) {
+    public RosterSolution solveRoster(RosterRequest request, List<StaffModel> employees, List<AbsenceModel> leaves, List<ShiftModel> existingShiftsDataParam, HolidayListModel existingHolidaysDataParam) {
         this.lastSolveFeasible = false;
         CpModel model = new CpModel();
 
         List<ShiftDefinition> shiftDefs = request.getDefinedShifts();
         Map<String, Object> hardConstraints = request.getActiveHardConstraints();
 
-        LocalDate rosterPeriodStartDate = request.getStartDate(); // Use request's start and end date for stats
+        LocalDate rosterPeriodStartDate = request.getStartDate();
         LocalDate rosterPeriodEndDate = request.getEndDate();
         List<LocalDate> dateRange = rosterPeriodStartDate.datesUntil(rosterPeriodEndDate.plusDays(1)).collect(Collectors.toList());
         int numDays = dateRange.size();
@@ -70,7 +68,6 @@ public class OrToolsSolverService {
 
 
         if (numEmployees == 0 || numShifts == 0 || numDays == 0) {
-            System.out.println("Không có nhân viên, ca làm việc hoặc ngày để xếp lịch. Trả về lịch rỗng.");
             this.lastSolveFeasible = true;
             statsBuilder.employeeStats(new ArrayList<>())
                 .detailedRosterLog(List.of("Không có nhân viên, ca làm việc hoặc ngày để xếp lịch."))
@@ -91,7 +88,7 @@ public class OrToolsSolverService {
         for (int e = 0; e < numEmployees; e++) {
             for (int s = 0; s < numShifts; s++) {
                 for (int d = 0; d < numDays; d++) {
-                    works[e][s][d] = (BoolVar) model.newBoolVar("works_e" + e + "_s" + s + "_d" + d);
+                    works[e][s][d] = model.newBoolVar("works_e" + e + "_s" + s + "_d" + d);
                 }
             }
         }
@@ -99,7 +96,7 @@ public class OrToolsSolverService {
         BoolVar[][] isWorkingOnDay = new BoolVar[numEmployees][numDays];
         for (int e = 0; e < numEmployees; e++) {
             for (int d = 0; d < numDays; d++) {
-                isWorkingOnDay[e][d] = (BoolVar) model.newBoolVar("is_working_e" + e + "_d" + d);
+                isWorkingOnDay[e][d] = model.newBoolVar("is_working_e" + e + "_d" + d);
                 List<IntVar> shiftsThisDayList = new ArrayList<>();
                 for (int s = 0; s < numShifts; s++) {
                     shiftsThisDayList.add(works[e][s][d]);
@@ -111,8 +108,53 @@ public class OrToolsSolverService {
             }
         }
 
+        Set<LocalDate> nonWorkingDays = new HashSet<>();
+
+
+        if (Boolean.TRUE.equals(hardConstraints.get("NO_WORK_ON_HOLIDAYS")) && existingHolidaysDataParam != null && existingHolidaysDataParam.getHolidays() != null) {
+            nonWorkingDays.addAll(existingHolidaysDataParam.getHolidays().keySet());
+        }
+
+        if (hardConstraints.containsKey("AVOID_SPECIFIC_DAYS_OF_WEEK")) {
+            Object param = hardConstraints.get("AVOID_SPECIFIC_DAYS_OF_WEEK");
+            if (param instanceof Map) {
+                Object daysListObj = ((Map<?, ?>) param).get("daysOfWeek");
+                if (daysListObj instanceof List && !((List<?>) daysListObj).isEmpty()) {
+                    try {
+                        Set<Integer> blockedDows = ((List<?>) daysListObj).stream()
+                            .map(n -> ((Number) n).intValue())
+                            .collect(Collectors.toSet());
+                        if (!blockedDows.isEmpty()) {
+                            for (LocalDate date : dateRange) {
+                                if (blockedDows.contains(date.getDayOfWeek().getValue())) {
+                                    nonWorkingDays.add(date);
+                                }
+                            }
+                        }
+                    } catch (Exception ex) {
+                        System.err.println("AVOID_SPECIFIC_DAYS_OF_WEEK: " + ex.getMessage());
+                    }
+                }
+            }
+        }
+
+        for (int d = 0; d < numDays; d++) {
+            if (nonWorkingDays.contains(dateRange.get(d))) {
+                for (int e = 0; e < numEmployees; e++) {
+                    for (int s = 0; s < numShifts; s++) {
+                        model.addEquality(works[e][s][d], 0);
+                    }
+                }
+            }
+        }
+
+
         // Constraint 1: Min/Max employees per shift
         for (int d = 0; d < numDays; d++) {
+            if (nonWorkingDays.contains(dateRange.get(d))) {
+                continue;
+            }
+
             for (int s = 0; s < numShifts; s++) {
                 ShiftDefinition currentShiftDef = shiftDefs.get(s);
                 List<IntVar> assignedToShiftOnDay = new ArrayList<>();
@@ -125,6 +167,8 @@ public class OrToolsSolverService {
                 }
             }
         }
+
+
         // Constraint 2: MAX_SHIFTS_PER_DAY_FOR_EMPLOYEE
         if (hardConstraints.containsKey("MAX_SHIFTS_PER_DAY_FOR_EMPLOYEE")) {
             Object param = hardConstraints.get("MAX_SHIFTS_PER_DAY_FOR_EMPLOYEE");
@@ -153,7 +197,7 @@ public class OrToolsSolverService {
                 if (empIdx != null) {
                     try {
                         LocalDate leaveDate = leave.getDate();
-                        if (!leaveDate.isBefore(rosterPeriodStartDate) && !leaveDate.isAfter(rosterPeriodEndDate)) { // Use rosterPeriod dates
+                        if (!leaveDate.isBefore(rosterPeriodStartDate) && !leaveDate.isAfter(rosterPeriodEndDate)) {
                             int dayIdx = (int) ChronoUnit.DAYS.between(rosterPeriodStartDate, leaveDate);
                             if (dayIdx >= 0 && dayIdx < numDays) {
                                 for (int s = 0; s < numShifts; s++) {
@@ -208,11 +252,9 @@ public class OrToolsSolverService {
         }
 
 
-        // Constraint 6: AVOID_OVERLAPPING_EXISTING_SHIFTS (Keep as is, using existingShiftsDataParam)
+        // Constraint 6: AVOID_OVERLAPPING_EXISTING_SHIFTS
         if (Boolean.TRUE.equals(hardConstraints.get("AVOID_OVERLAPPING_EXISTING_SHIFTS"))) {
-            // Logic from your previous code for this constraint
             if (existingShiftsDataParam != null && !existingShiftsDataParam.isEmpty()) {
-                // ... (full logic as provided in previous response)
                 Map<String, Map<LocalDate, List<LocalTime[]>>> employeeDailyIntervals = new HashMap<>();
                 for (ShiftModel es : existingShiftsDataParam) {
                     String userId = es.getUserId(); LocalDate esDate = es.getDate();
@@ -272,7 +314,7 @@ public class OrToolsSolverService {
             } else { System.out.println("INFO: AVOID_OVERLAPPING_EXISTING_SHIFTS is active, but no existing shifts data passed to check against.");}
         }
 
-        // Constraint 7: MIN_REST_BETWEEN_SHIFTS_HOURS (Keep as is)
+        // Constraint 7: MIN_REST_BETWEEN_SHIFTS_HOURS
         if (hardConstraints.containsKey("MIN_REST_BETWEEN_SHIFTS_HOURS")) {
             Object param = hardConstraints.get("MIN_REST_BETWEEN_SHIFTS_HOURS");
             if (param instanceof Map) {
@@ -324,7 +366,7 @@ public class OrToolsSolverService {
                 }
             }
         }
-        // Constraint 8: MAX_WEEKLY_WORK_HOURS (Keep as is)
+        // Constraint 8: MAX_WEEKLY_WORK_HOURS
         if (hardConstraints.containsKey("MAX_WEEKLY_WORK_HOURS")) {
             Object param = hardConstraints.get("MAX_WEEKLY_WORK_HOURS");
             if (param instanceof Map) {
@@ -380,15 +422,12 @@ public class OrToolsSolverService {
                                 LocalTime end2 = convertStringToLocalTime(def2.getEndTime());
 
                                 if (start1 == null || end1 == null || start2 == null || end2 == null) continue;
-                                // Simplified overlap: (StartA < EndB) and (EndA > StartB)
-                                // This simple check doesn't fully handle midnight crossing shifts for pairwise on same day.
-                                // For this to be robust with midnight shifts, intervals need to be split or handled carefully.
                                 boolean timeOverlap = start1.isBefore(end2) && end1.isAfter(start2);
                                 if (end1.isBefore(start1)) { // def1 crosses midnight
-                                    timeOverlap = timeOverlap || (start1.isBefore(end2) || end1.isAfter(start2)); // Looser check if one crosses
+                                    timeOverlap = timeOverlap || (start1.isBefore(end2) || end1.isAfter(start2));
                                 }
                                 if (end2.isBefore(start2)) { // def2 crosses midnight
-                                    timeOverlap = timeOverlap || (start2.isBefore(end1) || end2.isAfter(start1)); // Looser check if one crosses
+                                    timeOverlap = timeOverlap || (start2.isBefore(end1) || end2.isAfter(start1));
                                 }
 
 
@@ -403,7 +442,7 @@ public class OrToolsSolverService {
                 System.out.println("INFO: NO_CLASHING_SHIFTS_FOR_EMPLOYEE is active, but MAX_SHIFTS_PER_DAY_FOR_EMPLOYEE is 1 or not set, so it's implicitly handled.");
             }
         }
-        // Constraint 10: MIN_WEEKEND_DAYS_OFF_PER_PERIOD (Keep as is)
+        // Constraint 10: MIN_WEEKEND_DAYS_OFF_PER_PERIOD
         if (hardConstraints.containsKey("MIN_WEEKEND_DAYS_OFF_PER_PERIOD")) {
             Object param = hardConstraints.get("MIN_WEEKEND_DAYS_OFF_PER_PERIOD");
             if (param instanceof Map) {
@@ -456,13 +495,10 @@ public class OrToolsSolverService {
                                     if (st == null || et == null) continue;
 
                                     long durationMillis;
-                                    // Calculate duration of the shift PART that falls on day 'd'
-                                    // This is important for shifts crossing midnight.
-                                    if (et.isAfter(st) || et.equals(st)) { // Shift does not cross midnight
+                                    if (et.isAfter(st) || et.equals(st)) {
                                         durationMillis = Duration.between(st, et).toMillis();
                                     } else { // Shift crosses midnight
-                                        // For day 'd', it's from start time to end of day
-                                        durationMillis = Duration.between(st, LocalTime.MAX).toMillis() + 1; // +1 to include the last ms
+                                        durationMillis = Duration.between(st, LocalTime.MAX).toMillis() + 1;
                                     }
                                     dailyWorkExpressions.add(LinearExpr.term(works[e][s][d], durationMillis));
                                 }
@@ -476,7 +512,8 @@ public class OrToolsSolverService {
             }
         }
 
-        // --- OBJECTIVE: FAIRNESS (Minimize range of total work hours) ---
+        // --- OBJECTIVE: FAIRNESS ---
+        // 1. Fair distribution of total work hours
         IntVar[] employeeTotalWorkMillis = new IntVar[numEmployees];
         long maxPossibleTotalMillisPerDay = 0;
         for(ShiftDefinition sd : shiftDefs){
@@ -484,12 +521,12 @@ public class OrToolsSolverService {
             LocalTime et = convertStringToLocalTime(sd.getEndTime());
             if(st != null && et != null){
                 long dur = Duration.between(st, et).toMillis();
-                if(dur < 0) dur += Duration.ofDays(1).toMillis(); // Add 24h if crosses midnight
-                if(dur > maxPossibleTotalMillisPerDay) maxPossibleTotalMillisPerDay = dur;
+                if(dur < 0) dur += Duration.ofDays(1).toMillis();
+                maxPossibleTotalMillisPerDay += dur;
             }
         }
         long maxPossibleTotalMillisOverall = maxPossibleTotalMillisPerDay * numDays;
-        if (maxPossibleTotalMillisOverall == 0 && numDays > 0 && numShifts > 0) { // Avoid 0 upper bound if shifts exist
+        if (maxPossibleTotalMillisOverall == 0 && numDays > 0 && numShifts > 0) {
             maxPossibleTotalMillisOverall = Duration.ofDays(1).toMillis() * numDays; // Default to 24h * numDays
         }
 
@@ -517,58 +554,113 @@ public class OrToolsSolverService {
 
         IntVar minTotalMillis = model.newIntVar(0, maxPossibleTotalMillisOverall, "min_total_millis");
         IntVar maxTotalMillis = model.newIntVar(0, maxPossibleTotalMillisOverall, "max_total_millis");
+        IntVar rangeMillis = model.newIntVar(0, maxPossibleTotalMillisOverall, "range_millis");
 
         if (numEmployees > 0) {
             model.addMinEquality(minTotalMillis, employeeTotalWorkMillis);
             model.addMaxEquality(maxTotalMillis, employeeTotalWorkMillis);
+            model.addEquality(rangeMillis, LinearExpr.newBuilder().addTerm(maxTotalMillis, 1).addTerm(minTotalMillis, -1).build());
         } else {
             model.addEquality(minTotalMillis, 0);
             model.addEquality(maxTotalMillis, 0);
+            model.addEquality(rangeMillis, 0);
         }
 
-        IntVar rangeMillis = model.newIntVar(0, maxPossibleTotalMillisOverall, "range_millis");
-        model.addEquality(rangeMillis, LinearExpr.newBuilder().addTerm(maxTotalMillis, 1).addTerm(minTotalMillis, -1).build());
-        model.minimize(rangeMillis);
-
-
-        // Additional fairness metrics (counts) - these are for reporting, not direct objectives here
+        // 2. Fair distribution of Night, Sunday, and Saturday shifts
         IntVar[] employeeNightShiftsCount = new IntVar[numEmployees];
-        IntVar[] employeeSundayShiftsCount = new IntVar[numEmployees]; // Can add Saturday similarly if needed
+        IntVar[] employeeSundayShiftsCount = new IntVar[numEmployees];
+        IntVar[] employeeSaturdayShiftsCount = new IntVar[numEmployees];
 
         for (int e = 0; e < numEmployees; e++) {
+            // Night shifts
             List<BoolVar> nightShiftsForEmp = new ArrayList<>();
-            List<BoolVar> sundayShiftsForEmp = new ArrayList<>();
             for (int d = 0; d < numDays; d++) {
                 for (int s = 0; s < numShifts; s++) {
                     if (shiftDefs.get(s).getIsNightShift()) {
                         nightShiftsForEmp.add(works[e][s][d]);
-                    }
-                    if (dateRange.get(d).getDayOfWeek() == DayOfWeek.SUNDAY) {
-                        sundayShiftsForEmp.add(works[e][s][d]);
                     }
                 }
             }
             employeeNightShiftsCount[e] = model.newIntVar(0, numDays * numShifts, "night_shifts_e" + e);
             model.addEquality(employeeNightShiftsCount[e], LinearExpr.sum(nightShiftsForEmp.toArray(new BoolVar[0])));
 
-            employeeSundayShiftsCount[e] = model.newIntVar(0, numDays, "sunday_shifts_e" + e); // Max 1 shift per sunday for count
+            // Sunday shifts (counting days worked on Sunday)
             List<BoolVar> worksOnSundayVars = new ArrayList<>();
-            for (int d=0; d<numDays; d++) {
+            for (int d = 0; d < numDays; d++) {
                 if (dateRange.get(d).getDayOfWeek() == DayOfWeek.SUNDAY) {
                     worksOnSundayVars.add(isWorkingOnDay[e][d]);
                 }
             }
+            employeeSundayShiftsCount[e] = model.newIntVar(0, worksOnSundayVars.size(), "sunday_shifts_e" + e);
             if (!worksOnSundayVars.isEmpty()) {
                 model.addEquality(employeeSundayShiftsCount[e], LinearExpr.sum(worksOnSundayVars.toArray(new BoolVar[0])));
             } else {
                 model.addEquality(employeeSundayShiftsCount[e], 0);
             }
+
+            // Saturday shifts (counting days worked on Saturday)
+            List<BoolVar> worksOnSaturdayVars = new ArrayList<>();
+            for (int d = 0; d < numDays; d++) {
+                if (dateRange.get(d).getDayOfWeek() == DayOfWeek.SATURDAY) {
+                    worksOnSaturdayVars.add(isWorkingOnDay[e][d]);
+                }
+            }
+            employeeSaturdayShiftsCount[e] = model.newIntVar(0, worksOnSaturdayVars.size(), "saturday_shifts_e" + e);
+            if (!worksOnSaturdayVars.isEmpty()) {
+                model.addEquality(employeeSaturdayShiftsCount[e], LinearExpr.sum(worksOnSaturdayVars.toArray(new BoolVar[0])));
+            } else {
+                model.addEquality(employeeSaturdayShiftsCount[e], 0);
+            }
         }
 
+        // Create range variables for fairness counts
+        IntVar rangeNightShifts = model.newIntVar(0, numDays, "range_night_shifts");
+        IntVar rangeSundayShifts = model.newIntVar(0, numDays, "range_sunday_shifts");
+        IntVar rangeSaturdayShifts = model.newIntVar(0, numDays, "range_saturday_shifts");
+
+        if (numEmployees > 0) {
+            IntVar minNightShifts = model.newIntVar(0, numDays, "min_night_shifts");
+            IntVar maxNightShifts = model.newIntVar(0, numDays, "max_night_shifts");
+            model.addMinEquality(minNightShifts, employeeNightShiftsCount);
+            model.addMaxEquality(maxNightShifts, employeeNightShiftsCount);
+            model.addEquality(rangeNightShifts, LinearExpr.newBuilder().addTerm(maxNightShifts, 1).addTerm(minNightShifts, -1).build());
+
+            IntVar minSundayShifts = model.newIntVar(0, numDays, "min_sunday_shifts");
+            IntVar maxSundayShifts = model.newIntVar(0, numDays, "max_sunday_shifts");
+            model.addMinEquality(minSundayShifts, employeeSundayShiftsCount);
+            model.addMaxEquality(maxSundayShifts, employeeSundayShiftsCount);
+            model.addEquality(rangeSundayShifts, LinearExpr.newBuilder().addTerm(maxSundayShifts, 1).addTerm(minSundayShifts, -1).build());
+
+            IntVar minSaturdayShifts = model.newIntVar(0, numDays, "min_saturday_shifts");
+            IntVar maxSaturdayShifts = model.newIntVar(0, numDays, "max_saturday_shifts");
+            model.addMinEquality(minSaturdayShifts, employeeSaturdayShiftsCount);
+            model.addMaxEquality(maxSaturdayShifts, employeeSaturdayShiftsCount);
+            model.addEquality(rangeSaturdayShifts, LinearExpr.newBuilder().addTerm(maxSaturdayShifts, 1).addTerm(minSaturdayShifts, -1).build());
+        } else {
+            model.addEquality(rangeNightShifts, 0);
+            model.addEquality(rangeSundayShifts, 0);
+            model.addEquality(rangeSaturdayShifts, 0);
+        }
+
+        // Minimize a weighted sum of all fairness objectives
+        final long hoursToMillis = 3600000L;
+        final long shiftPenaltyInHours = 8;
+        final long weekendShiftPenalty = shiftPenaltyInHours * hoursToMillis;
+        final long nightShiftPenalty = shiftPenaltyInHours * hoursToMillis;
+
+
+        LinearExpr totalObjective = LinearExpr.newBuilder()
+            .addTerm(rangeMillis, 1)
+            .addTerm(rangeNightShifts, nightShiftPenalty)
+            .addTerm(rangeSundayShifts, weekendShiftPenalty)
+            .addTerm(rangeSaturdayShifts, weekendShiftPenalty)
+            .build();
+
+        model.minimize(totalObjective);
 
         CpSolver solver = new CpSolver();
         solver.getParameters().setLogSearchProgress(true);
-        solver.getParameters().setMaxTimeInSeconds(60.0); // Increased time
+        solver.getParameters().setMaxTimeInSeconds(60.0);
 
         System.out.println("Starting solver...");
         CpSolverStatus status = solver.solve(model);
@@ -581,12 +673,11 @@ public class OrToolsSolverService {
 
         if (status == CpSolverStatus.OPTIMAL || status == CpSolverStatus.FEASIBLE) {
             this.lastSolveFeasible = true;
-            // ... (Detailed roster logging to detailedRosterLogForStats - same as previous version) ...
-            detailedRosterLogForStats.add("🎉 SOLUTION FOUND! DETAILED ROSTER:");
+            detailedRosterLogForStats.add("SOLUTION FOUND! DETAILED ROSTER:");
             detailedRosterLogForStats.add("=========================================================");
             for (int d_print = 0; d_print < numDays; d_print++) {
                 LocalDate currentDate_print = dateRange.get(d_print);
-                String dateLog = String.format("\n📅 DATE: %s (%s)", currentDate_print.format(DateTimeFormatter.ISO_LOCAL_DATE), currentDate_print.getDayOfWeek());
+                String dateLog = String.format("\nDATE: %s (%s)", currentDate_print.format(DateTimeFormatter.ISO_LOCAL_DATE), currentDate_print.getDayOfWeek());
                 detailedRosterLogForStats.add(dateLog); System.out.println(dateLog);
                 boolean dayHasAssignments_print = false;
                 for (int s_print = 0; s_print < numShifts; s_print++) {
@@ -599,9 +690,9 @@ public class OrToolsSolverService {
                         }
                     }
                     if (!employeesOnThisShiftNames.isEmpty()) {
-                        String shiftLogHeader = String.format("  🕒 SHIFT: %s (%s - %s) - NV yêu cầu: %d%s, Thực tế: %d", shiftDef_print.getName(), shiftDef_print.getStartTime(), shiftDef_print.getEndTime(), shiftDef_print.getMinEmployees(), (shiftDef_print.getMaxEmployees()!=null && shiftDef_print.getMaxEmployees()>0 ? ("-"+shiftDef_print.getMaxEmployees()) : "+"), assignedCount);
+                        String shiftLogHeader = String.format("   SHIFT: %s (%s - %s) - NV yêu cầu: %d%s, Thực tế: %d", shiftDef_print.getName(), shiftDef_print.getStartTime(), shiftDef_print.getEndTime(), shiftDef_print.getMinEmployees(), (shiftDef_print.getMaxEmployees()!=null && shiftDef_print.getMaxEmployees()>0 ? ("-"+shiftDef_print.getMaxEmployees()) : "+"), assignedCount);
                         detailedRosterLogForStats.add(shiftLogHeader); System.out.println(shiftLogHeader);
-                        for (String empName : employeesOnThisShiftNames) { String empLog = "    👤 " + empName; detailedRosterLogForStats.add(empLog); System.out.println(empLog); }
+                        for (String empName : employeesOnThisShiftNames) { String empLog = "     " + empName; detailedRosterLogForStats.add(empLog); System.out.println(empLog); }
                         dayHasAssignments_print = true;
                     }
                 }
@@ -619,7 +710,7 @@ public class OrToolsSolverService {
                 long empTotalMillis = solver.value(employeeTotalWorkMillis[e]);
                 int empNightShiftsVal = (int) solver.value(employeeNightShiftsCount[e]);
                 int empSundayShiftsVal = (int) solver.value(employeeSundayShiftsCount[e]);
-                int empSaturdayShiftsVal = 0; // Calculate Saturday shifts
+                int empSaturdayShiftsVal = (int) solver.value(employeeSaturdayShiftsCount[e]); // **MODIFIED**
                 int currentConsecutiveWorkDays = 0;
                 int maxConsecutiveWorkDaysFound = 0;
 
@@ -627,10 +718,7 @@ public class OrToolsSolverService {
                     boolean workedThisDay = solver.booleanValue(isWorkingOnDay[e][d]);
                     if (workedThisDay) {
                         currentConsecutiveWorkDays++;
-                        LocalDate currentDate = dateRange.get(d);
-                        if (currentDate.getDayOfWeek() == DayOfWeek.SATURDAY) {
-                            for (int s = 0; s < numShifts; s++) { if(solver.booleanValue(works[e][s][d])) empSaturdayShiftsVal++;}
-                        }
+                        // Saturday shifts were already calculated using isWorkingOnDay, no need to re-calculate here
                         for (int s = 0; s < numShifts; s++) {
                             if (solver.booleanValue(works[e][s][d])) empTotalShifts++;
                         }
@@ -653,7 +741,7 @@ public class OrToolsSolverService {
                     .totalHours(empTotalMillis / (3600000.0))
                     .nightShifts(empNightShiftsVal)
                     .sundayShiftsWorked(empSundayShiftsVal)
-                    .saturdayShiftsWorked(empSaturdayShiftsVal)
+                    .saturdayShiftsWorked(empSaturdayShiftsVal) // **MODIFIED**
                     .maxConsecutiveWorkDays(maxConsecutiveWorkDaysFound)
                     .build());
                 overallTotalAssignedShifts += empTotalShifts;
@@ -729,7 +817,7 @@ public class OrToolsSolverService {
             }
         } else {
             this.lastSolveFeasible = false;
-            detailedRosterLogForStats.add("\n❌ NO SOLUTION FOUND or an error occurred. Status: " + status);
+            detailedRosterLogForStats.add("\n NO SOLUTION FOUND or an error occurred. Status: " + status);
             if (status == CpSolverStatus.INFEASIBLE) {
                 detailedRosterLogForStats.add("The problem is INFEASIBLE. Consider reviewing constraints, input data, or leave requests.");
             } else if (status == CpSolverStatus.MODEL_INVALID) {

@@ -1,4 +1,3 @@
-// src/features/rosterConfiguration/TemplateConfigForm.jsx
 import React, {useCallback, useState} from 'react';
 import {Alert, Button, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField} from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
@@ -9,13 +8,26 @@ import ConstraintsManager from './ConstraintsManager';
 export default function TemplateConfigForm({ onSave, onCancel, initialTemplateData }) {
   const [templateName, setTemplateName] = useState(initialTemplateData?.templateName || '');
   const [shifts, setShifts] = useState(initialTemplateData?.definedShifts || [
-    { id: 's1', name: 'Sáng Hành Chính 1', startTime: '08:00', endTime: '11:00', isNightShift: false, minEmployees: 2, maxEmployees: 5 },
-    { id: 's2', name: 'Sáng Hành Chính 2', startTime: '13:00', endTime: '15:00', isNightShift: false, minEmployees: 3, maxEmployees: 5 },
-    { id: 's3', name: 'Sáng Hành Chính 3', startTime: '15:00', endTime: '18:00', isNightShift: false, minEmployees: 4, maxEmployees: 5 },
-    { id: 's4', name: 'Đêm Kho', startTime: '22:00', endTime: '02:00', isNightShift: true, minEmployees: 1, maxEmployees: 2 },
+    { id: 's1', name: 'Trực ca sáng', startTime: '08:30', endTime: '11:30', isNightShift: false, minEmployees: 4, maxEmployees: 8 },
+    { id: 's2', name: 'Trực ca chiều', startTime: '13:30', endTime: '16:30', isNightShift: false, minEmployees: 5, maxEmployees: 10 },
+    { id: 's3', name: 'Đêm Kho', startTime: '22:00', endTime: '01:00', isNightShift: true, minEmployees: 2, maxEmployees: 3 },
   ]);
 
   const initialHardConstraintsStructure = useCallback(() => ({
+    AVOID_SPECIFIC_DAYS_OF_WEEK: {
+      description: "Không xếp lịch vào các thứ được chọn trong tuần",
+      enabled: false,
+      params: {
+        daysOfWeek: { label: "Chọn các thứ không làm việc", value: [], type: 'day_of_week_select' }
+      },
+      tooltip: "Hệ thống sẽ không xếp lịch cho bất kỳ nhân viên nào vào các thứ được chọn."
+    },
+    NO_WORK_ON_HOLIDAYS: {
+      description: "Không xếp lịch vào các ngày Lễ, Tết",
+      enabled: true,
+      params: null,
+      tooltip: "Hệ thống sẽ tự động tải danh sách ngày lễ và không xếp lịch vào những ngày này."
+    },
     MAX_CONSECUTIVE_WORK_DAYS: { description: "Số ngày làm liên tiếp tối đa", enabled: true, params: { days: { label: "Số ngày tối đa", value: 5, type: 'number', min: 1 } }, tooltip: "Không làm quá X ngày liên tục." },
     MIN_REST_BETWEEN_SHIFTS_HOURS: { description: "Nghỉ tối thiểu (giờ) giữa 2 ca", enabled: true, params: { hours: { label: "Số giờ nghỉ tối thiểu", value: 10, type: 'number', min: 1 } }, tooltip: "Đảm bảo phục hồi." },
     MAX_WEEKLY_WORK_HOURS: { description: "Tổng giờ làm tối đa/tuần", enabled: true, params: { hours: { label: "Số giờ tối đa/tuần", value: 40, type: 'number', min: 1 } }, tooltip: "Tuân thủ luật." },
@@ -55,21 +67,24 @@ export default function TemplateConfigForm({ onSave, onCancel, initialTemplateDa
     const baseStructure = initialHardConstraintsStructure();
     if (initialTemplateData?.activeHardConstraints) {
       return Object.entries(baseStructure).reduce((acc, [key, structure]) => {
-        // Kiểm tra xem key từ activeHardConstraints có tồn tại trong baseStructure không để tránh lỗi
         if (baseStructure[key]) {
           const isActiveConfig = initialTemplateData.activeHardConstraints[key];
-          // Nếu là boolean (cho các ràng buộc không có params) hoặc là object (cho ràng buộc có params)
           const isActive = (typeof isActiveConfig === 'boolean' && isActiveConfig === true) ||
             (typeof isActiveConfig === 'object' && isActiveConfig !== null);
 
           acc[key] = { ...structure, enabled: isActive };
 
           if (isActive && structure.params && typeof isActiveConfig === 'object') {
-            acc[key].params = { ...structure.params }; // Sao chép cấu trúc params gốc
+            acc[key].params = { ...structure.params };
             for (const pKey in structure.params) {
-              // Chỉ cập nhật nếu giá trị param tồn tại trong activeHardConstraints[key]
               if (isActiveConfig[pKey] !== undefined) {
-                acc[key].params[pKey] = { ...structure.params[pKey], value: isActiveConfig[pKey] };
+                // NEU: Xử lý giá trị là mảng cho AVOID_SPECIFIC_DAYS_OF_WEEK
+                const valueFromTemplate = isActiveConfig[pKey];
+                if (Array.isArray(valueFromTemplate)) {
+                  acc[key].params[pKey] = { ...structure.params[pKey], value: [...valueFromTemplate] };
+                } else {
+                  acc[key].params[pKey] = { ...structure.params[pKey], value: valueFromTemplate };
+                }
               }
             }
           }
@@ -94,15 +109,19 @@ export default function TemplateConfigForm({ onSave, onCancel, initialTemplateDa
         const constraint = hardConstraints[key];
         if (constraint.params) { // Nếu ràng buộc có tham số
           const activeParams = {};
-          let paramsAreValid = true;
           for (const paramKey in constraint.params) {
             const paramDetail = constraint.params[paramKey];
             let valueToSave = paramDetail.value;
 
+            // NEU: Xử lý giá trị là mảng
+            if(Array.isArray(valueToSave)) {
+              activeParams[paramKey] = valueToSave;
+              continue;
+            }
+
             if (paramDetail.type === 'number') {
               if (valueToSave === '' || valueToSave === null || isNaN(Number(valueToSave))) {
                 valueToSave = paramDetail.min === undefined ? 0 : paramDetail.min;
-
               } else {
                 valueToSave = Number(valueToSave);
               }

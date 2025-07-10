@@ -54,6 +54,9 @@ public class SecurityConfig {
                         authorizeRequests -> authorizeRequests
                                 .requestMatchers("/actuator/prometheus/**").permitAll())
                 .authorizeHttpRequests(
+                    authorizeRequests -> authorizeRequests
+                        .requestMatchers("/warm-up").permitAll())
+                .authorizeHttpRequests(
                         authorizeRequests -> authorizeRequests.requestMatchers("/resources/**")
                                 .permitAll())
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/css/**")

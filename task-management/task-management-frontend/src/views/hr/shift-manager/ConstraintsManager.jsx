@@ -1,13 +1,63 @@
-// src/features/rosterConfiguration/ConstraintsManager.jsx
 import React from 'react';
-import {Box, FormControlLabel, Grid, Paper, Switch, Tooltip, Typography} from '@mui/material';
+import {
+  Box,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormGroup, FormLabel,
+  Grid,
+  Paper,
+  Switch,
+  Tooltip,
+  Typography
+} from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import BlockIcon from '@mui/icons-material/Block';
-import TextField from '@mui/material/TextField'; // Thêm nếu TextField chưa được import ở đây
+import TextField from '@mui/material/TextField';
+
+const DayOfWeekSelector = ({ selectedDays, onChange }) => {
+  const days = [
+    { label: 'T2', value: 1 }, { label: 'T3', value: 2 }, { label: 'T4', value: 3 },
+    { label: 'T5', value: 4 }, { label: 'T6', value: 5 }, { label: 'T7', value: 6 }, { label: 'CN', value: 7 }
+  ];
+
+  const handleDayChange = (dayValue, isChecked) => {
+    const newSelectedDays = isChecked
+      ? [...selectedDays, dayValue]
+      : selectedDays.filter(d => d !== dayValue);
+    onChange(newSelectedDays.sort());
+  };
+
+  return (
+    <FormControl component="fieldset" variant="standard" fullWidth>
+      <FormLabel component="legend" sx={{fontSize: '0.8rem', mb: -0.5}}>Chọn các thứ không làm việc</FormLabel>
+      <FormGroup row>
+        {days.map(day => (
+          <FormControlLabel
+            key={day.value}
+            control={
+              <Checkbox
+                checked={selectedDays.includes(day.value)}
+                onChange={(e) => handleDayChange(day.value, e.target.checked)}
+                size="small"
+              />
+            }
+            label={day.label}
+          />
+        ))}
+      </FormGroup>
+    </FormControl>
+  );
+};
+
 
 export default function ConstraintsManager({ constraints, setConstraints }) {
   const toggleConstraint = (key) => setConstraints(prev => ({ ...prev, [key]: { ...prev[key], enabled: !prev[key].enabled } }));
   const handleConstraintValueChange = (key, paramName, value, type) => {
+    if(Array.isArray(value)) {
+      setConstraints(prev => ({ ...prev, [key]: { ...prev[key], params: { ...prev[key].params, [paramName]: { ...prev[key].params[paramName], value: value } } } }));
+      return;
+    }
     let pValue = type === 'number' ? (value === '' ? '' : Number(value)) : value;
     setConstraints(prev => ({ ...prev, [key]: { ...prev[key], params: { ...prev[key].params, [paramName]: { ...prev[key].params[paramName], value: pValue } } } }));
   };
@@ -26,14 +76,26 @@ export default function ConstraintsManager({ constraints, setConstraints }) {
             {constraint.enabled && constraint.params && (
               <Box sx={{ pl: { xs: 0, sm: 1 }, pt: 1, mt: 1, borderTop: '1px solid', borderColor: 'divider' }}>
                 <Grid container spacing={1.5}>
-                  {Object.entries(constraint.params).map(([paramName, paramDetails]) => (
-                    <Grid item xs={12} sm={paramDetails.fullWidth ? 12 : 6} key={paramName}>
-                      <TextField fullWidth type={paramDetails.type === 'number' ? 'number' : 'text'} label={paramDetails.label} value={paramDetails.value}
-                                 inputProps={{ min: paramDetails.type === 'number' ? (paramDetails.min === undefined ? 0 : paramDetails.min) : undefined, step: paramDetails.step || 1 }}
-                                 onChange={(e) => handleConstraintValueChange(key, paramName, e.target.value, paramDetails.type)}
-                      />
-                    </Grid>
-                  ))}
+                  {Object.entries(constraint.params).map(([paramName, paramDetails]) => {
+                    if (paramDetails.type === 'day_of_week_select') {
+                      return (
+                        <Grid item xs={12} key={paramName}>
+                          <DayOfWeekSelector
+                            selectedDays={paramDetails.value || []}
+                            onChange={(newValue) => handleConstraintValueChange(key, paramName, newValue, 'array')}
+                          />
+                        </Grid>
+                      )
+                    }
+                    return (
+                      <Grid item xs={12} sm={paramDetails.fullWidth ? 12 : 6} key={paramName}>
+                        <TextField fullWidth type={paramDetails.type === 'number' ? 'number' : 'text'} label={paramDetails.label} value={paramDetails.value}
+                                   inputProps={{ min: paramDetails.type === 'number' ? (paramDetails.min === undefined ? 0 : paramDetails.min) : undefined, step: paramDetails.step || 1 }}
+                                   onChange={(e) => handleConstraintValueChange(key, paramName, e.target.value, paramDetails.type)}
+                        />
+                      </Grid>
+                    )
+                  })}
                 </Grid>
               </Box>
             )}

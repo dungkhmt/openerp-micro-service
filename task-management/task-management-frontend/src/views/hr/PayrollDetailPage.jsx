@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback} from "react"; // Added useCallback
+import React, {useEffect, useState, useCallback, useMemo} from "react"; // Added useCallback
 import {
   Box,
   Chip, CssBaseline,
@@ -35,6 +35,7 @@ const defaultCellBgColor = theme.palette.background.paper;
 
 
 const InnerPayrollDetailPage = () => {
+  const [loadingUserDetail, setLoadingUserDetail] = useState(false);
   const { payrollId } = useParams();
   const [payroll, setPayroll] = useState(null);
   const [details, setDetails] = useState([]);
@@ -169,9 +170,9 @@ const InnerPayrollDetailPage = () => {
       null,
       { params }
     );
-  }, [payrollId, currentPage, itemsPerPage, userFilter, searchName, department, jobPosition]); // Added searchName, department, jobPosition
+  }, [payrollId, currentPage, itemsPerPage, userFilter, searchName, department, jobPosition]);
 
-  const fetchUsers = useCallback((list) => { // Made fetchUsers a useCallback
+  const fetchUsers = useCallback((list) => {
     if (list.length === 0) {
       setUserMap({});
       return;
@@ -181,6 +182,7 @@ const InnerPayrollDetailPage = () => {
       setUserMap({});
       return;
     }
+    setLoadingUserDetail(true);
     request(
       "get",
       "/staffs/details",
@@ -190,17 +192,27 @@ const InnerPayrollDetailPage = () => {
           map[staff.user_login_id] = staff;
         }
         setUserMap(map);
+        setLoadingUserDetail(false);
       },
-      {}, // onError
-      null, // onFinal
-      { params: { userIds: userIds.join(",") } }
+      {onError: () => setLoadingUserDetail(false)},
+      null,
+      { params: { userIds: userIds.join(","), page: 0, pageSize: 250} }
     );
   }, []);
+
+  const sortedDetails = useMemo(() => {
+    if (!details.length || !Object.keys(userMap).length) return details;
+    return [...details].sort((a, b) => {
+      const staffCodeA = (userMap[a.user_id]?.staff_code || a.user_id || "").toString();
+      const staffCodeB = (userMap[b.user_id]?.staff_code || b.user_id || "").toString();
+      return staffCodeA.localeCompare(staffCodeB, "vi", {numeric: true});
+    });
+  }, [details, userMap]);
 
 
   useEffect(() => {
     fetchPayrollDetails();
-  }, [fetchPayrollDetails]); // Call fetchPayrollDetails when it changes (which includes its dependencies)
+  }, [fetchPayrollDetails]);
 
 
   const applyStaffFilters = useCallback(() => {
@@ -210,31 +222,30 @@ const InnerPayrollDetailPage = () => {
       setSearchName("");
       setDepartment(null);
       setJobPosition(null);
-      setCurrentPage(0); // Reset page when filters are cleared
-      // fetchPayrollDetails will be called by its own useEffect trigger due to userFilter change
+      setCurrentPage(0);
       return;
     }
-    // Fetch staff IDs based on temporary filters first
     request(
       "get",
       "/staffs/details",
       (res) => {
         const staff_ids = (res.data.data || []).map((staff) => staff.user_login_id);
         setUserFilter(staff_ids);
-        // Persist temp filters to actual filters
         setSearchName(tempSearchName);
         setDepartment(tempDepartmentFilter);
         setJobPosition(tempJobPositionFilter);
-        setCurrentPage(0); // Reset page
-        // fetchPayrollDetails will be called by its own useEffect trigger
+        setCurrentPage(0);
       },
-      { onError: () => { setUserFilter([]); setCurrentPage(0); /* Handle error, maybe clear details */ }},
+      { onError: () => { setUserFilter([]); setCurrentPage(0); }},
       null,
       {
         params: {
           fullname: tempSearchName || null,
           departmentCode: tempDepartmentFilter?.code || null,
           jobPositionCode: tempJobPositionFilter?.code || null,
+          status: "ACTIVE",
+          page: 0,
+          pageSize: 250
         },
       }
     );
@@ -246,7 +257,7 @@ const InnerPayrollDetailPage = () => {
     return weekdays[dayIndex];
   };
 
-  const getDateArray = useCallback(() => { // Memoize with useCallback
+  const getDateArray = useCallback(() => {
     if (!payroll?.from_date || !payroll?.thru_date) return [];
     const from = dayjs(payroll.from_date);
     const to = dayjs(payroll.thru_date);
@@ -457,14 +468,14 @@ const InnerPayrollDetailPage = () => {
           </TableHead>
 
           <TableBody>
-            {loadingDetails ? (
+            {(loadingDetails || loadingUserDetail) ? (
               <TableRow>
                 <TableCell colSpan={dateArray.length + 9} align="center" sx={{p:3, ...cellBorderStyle}}>
                   <CircularProgress size={24} /> <Typography variant="body2" sx={{ml:1, display:'inline'}}>Đang tải chi tiết...</Typography>
                 </TableCell>
               </TableRow>
             ) : details.length > 0 ? (
-              details.map((d_row) => {
+              sortedDetails.map((d_row) => {
                 const user = userMap[d_row.user_id] || {};
                 return (
                   <React.Fragment key={d_row.user_id + '_payroll_detail'}> {/* Changed key for stability */}

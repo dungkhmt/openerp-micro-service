@@ -62,7 +62,7 @@ const WeeklyAbsencePageInternal = () => {
   const [loading, setLoading] = useState(false);
   const [searchName, setSearchName] = useState("");
   const debouncedSearchName = useDebounce(searchName, 500);
-  const [viewMode, setViewMode] = useState("byEmployeeTable");
+  const [viewMode, setViewMode] = useState("byDayGrouped");
 
   const [workTimes, setWorkTimes] = useState({
     startWork: null,
@@ -132,7 +132,9 @@ const WeeklyAbsencePageInternal = () => {
       fullname: debouncedSearchName || null,
       departmentCode: selectedDept?.department_code || null,
       jobPositionCode: selectedPos?.code || null,
-      status: "ACTIVE"
+      status: "ACTIVE",
+      page: 0,
+      pageSize: 250
     };
     try {
       const empRes = await new Promise((resolve, reject) => {
@@ -266,14 +268,14 @@ const WeeklyAbsencePageInternal = () => {
             </Grid>
             <Grid item>
               <Stack direction="row" spacing={0.5}>
-                <Tooltip title="Xem theo Nhân Viên (Bảng)">
-                  <IconButton onClick={() => setViewMode("byEmployeeTable")} color={viewMode === 'byEmployeeTable' ? 'primary' : 'default'} size="medium">
-                    <PeopleOutlineIcon />
-                  </IconButton>
-                </Tooltip>
                 <Tooltip title="Xem theo Ngày (Group)">
                   <IconButton onClick={() => setViewMode("byDayGrouped")} color={viewMode === 'byDayGrouped' ? 'primary' : 'default'} size="medium">
                     <CalendarViewDayIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Xem theo Nhân Viên (Bảng)">
+                  <IconButton onClick={() => setViewMode("byEmployeeTable")} color={viewMode === 'byEmployeeTable' ? 'primary' : 'default'} size="medium">
+                    <PeopleOutlineIcon />
                   </IconButton>
                 </Tooltip>
               </Stack>
@@ -298,9 +300,9 @@ const WeeklyAbsencePageInternal = () => {
                 slotProps={{ textField: { size: 'small', fullWidth: true } }}
               />
             </Grid>
-            <Grid item xs={12} sm="auto" md="auto">
-              <Button variant="contained" onClick={handleSearch} disabled={loading} fullWidth sx={{height: '40px'}}> Tìm kiếm </Button> {/* Set height bằng TextField size small */}
-            </Grid>
+{/*            <Grid item xs={12} sm="auto" md="auto">
+              <Button variant="contained" onClick={handleSearch} disabled={loading} fullWidth sx={{height: '40px'}}> Tìm kiếm </Button>  Set height bằng TextField size small
+            </Grid>*/}
           </Grid>
         </Paper>
 

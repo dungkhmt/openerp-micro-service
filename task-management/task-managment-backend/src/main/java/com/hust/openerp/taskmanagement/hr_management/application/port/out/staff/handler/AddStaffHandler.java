@@ -46,7 +46,10 @@ public class AddStaffHandler extends ObservableUseCasePublisher implements VoidU
         var savedModel = staffPort.addStaff(model);
         addStaffDepartment(useCase.getDepartmentCode(), savedModel.getUserLoginId());
         addStaffJobPosition(useCase.getJobPositionCode(), savedModel.getUserLoginId());
-        addStaffSalary(useCase.getSalaryType(), useCase.getSalary(), useCase.getUserLoginId());
+        if(useCase.getSalaryType() != null && useCase.getSalary() != null){
+            addStaffSalary(useCase.getSalaryType(), useCase.getSalary(), savedModel.getUserLoginId());
+
+        }
     }
 
     private void addStaffDepartment(String departmentCode, String userLoginId){

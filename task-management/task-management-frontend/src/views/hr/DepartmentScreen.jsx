@@ -42,8 +42,7 @@ import dayjs from 'dayjs';
 import {CSVLink}from "react-csv";
 import toast from "react-hot-toast";
 
-// Import state quản lý quyền scope
-import { useScopePermissionState, fetchPermittedScopes } from "../../state/scopePermissionState"; // Điều chỉnh đường dẫn nếu cần
+import { useScopePermissionState, fetchPermittedScopes } from "../../state/scopePermissionState";
 
 const DEPARTMENT_ADMIN_SCOPE = "SCOPE_DEPARTMENT_ADMIN";
 

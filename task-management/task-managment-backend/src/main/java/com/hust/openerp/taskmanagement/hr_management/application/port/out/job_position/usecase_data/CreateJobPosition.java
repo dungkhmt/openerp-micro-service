@@ -22,7 +22,7 @@ public class CreateJobPosition implements UseCase {
         return JobPositionModel.builder()
             .name(name)
             .description(description)
-            .type(type)
+            .type(type == null ? JobPositionType.FULL_TIME : type)
             .status(JobPositionStatus.ACTIVE)
             .build();
     }

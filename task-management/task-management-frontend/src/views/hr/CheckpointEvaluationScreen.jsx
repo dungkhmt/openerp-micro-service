@@ -140,8 +140,8 @@ const CheckpointEvaluationScreenInternal = () => {
           }
           return currentSelectedPeriod;
         });
-      }, { onError: (err) => console.error("Lỗi tải kỳ checkpoint:", err) });
-    } catch (error) { console.error("Lỗi tải kỳ checkpoint:", error); }
+      }, { onError: (err) => console.error("Lỗi tải kỳ đánh giá:", err) });
+    } catch (error) { console.error("Lỗi tải kỳ đánh giá:", error); }
   }, [periodFromState]);
 
 
@@ -204,7 +204,7 @@ const CheckpointEvaluationScreenInternal = () => {
 
   const handleGradeClick = useCallback((staff) => {
     if (!selectedPeriod) {
-      toast.error("Vui lòng chọn một kỳ checkpoint trước khi đánh giá.");
+      toast.error("Vui lòng chọn một kỳ đánh giá trước khi đánh giá.");
       return;
     }
     setSelectedStaffForGrading(staff);
@@ -337,8 +337,8 @@ const CheckpointEvaluationScreenInternal = () => {
               onChange={(event, newValue) => {
                 setSelectedPeriod(newValue);
               }}
-              renderInput={(params) => <TextField {...params} label="Chọn Kỳ Checkpoint" variant="outlined" size="small" />}
-              noOptionsText="Không có kỳ checkpoint nào"
+              renderInput={(params) => <TextField {...params} label="Chọn Kỳ đánh giá" variant="outlined" size="small" />}
+              noOptionsText="Không có kỳ đánh giá nào"
             />
           </Grid>
         </Grid>

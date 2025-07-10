@@ -1,4 +1,3 @@
-// src/features/rosterConfiguration/ShiftManager.jsx
 import React, {useState} from 'react';
 import {
   Alert,

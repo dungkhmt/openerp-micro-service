@@ -259,11 +259,11 @@ const SalaryListPageInternal = () => {
             <Grid item xs={12} sm={6} md>
               <SearchSelect label="Chức vụ" fetchUrl="/jobs?status=ACTIVE&pageSize=1000" value={selectedPos} onChange={setSelectedPos} getOptionLabel={(item) => item.name} isClearable size="small"/>
             </Grid>
-            <Grid item xs={12} sm={6} md="auto">
+{/*            <Grid item xs={12} sm={6} md="auto">
               <Button variant="contained" onClick={() => { handleSearchAndFetchAll(0, itemsPerPage, true);}} sx={{ height: '40px', width: {xs: '100%', sm: 'auto'} }} disabled={loading}>
                 Tìm kiếm
               </Button>
-            </Grid>
+            </Grid>*/}
           </Grid>
         </Paper>
 
@@ -370,7 +370,7 @@ const SalaryListPageInternal = () => {
                   <InputLabel id="salary-type-label">Loại lương</InputLabel>
                   <Select labelId="salary-type-label" label="Loại lương" name="salary_type" value={editForm.salary_type} onChange={handleEditFormChange} >
                     <MenuItem value="MONTHLY">Theo Tháng</MenuItem>
-                    <MenuItem value="WEEKLY">Theo Tuần</MenuItem>
+                    {/*<MenuItem value="WEEKLY">Theo Tuần</MenuItem>*/}
                     <MenuItem value="HOURLY">Theo Giờ</MenuItem>
                   </Select>
                 </FormControl>

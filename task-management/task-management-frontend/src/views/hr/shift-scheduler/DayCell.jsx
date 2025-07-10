@@ -16,7 +16,8 @@ export default function DayCell({
                                   selectedShiftIds,
                                   onToggleSelectShift,
                                   isAnyShiftSelected,
-                                  canAdmin
+                                  canAdmin,
+                                  companyConfigs = {}
                                 }) {
   const droppableId = `user-${userId}-day-${format(day, 'yyyy-MM-dd')}`;
 
@@ -62,6 +63,7 @@ export default function DayCell({
                     onToggleSelect={onToggleSelectShift}
                     isAnyShiftSelected={isAnyShiftSelected}
                     canAdmin={canAdmin}
+                    companyConfigs={companyConfigs}
                   />
                 )}
               </Draggable>

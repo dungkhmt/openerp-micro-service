@@ -12,7 +12,8 @@ export default function CalendarHeader({
                           stickyTopOffset = 0,
                           onToggleSelectAll,
                           isAllSelectedInView,
-                          isIndeterminateInView
+                          isIndeterminateInView,
+                          canAdmin
                         }) {
   const startDate = startOfWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON });
   const days = Array.from({ length: 7 }).map((_, i) => addDays(startDate, i));
@@ -24,17 +25,20 @@ export default function CalendarHeader({
       zIndex: 10
     }}>
       <Grid item sx={{ width: 160, p: 0.5, borderRight: 1, borderColor: 'divider', display: 'flex', alignItems: 'center' }}>
-        <Checkbox
-          size="small"
-          checked={isAllSelectedInView}
-          indeterminate={isIndeterminateInView && !isAllSelectedInView}
-          onChange={onToggleSelectAll}
-          icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
-          checkedIcon={<CheckBoxIcon fontSize="small" />}
-          indeterminateIcon={<IndeterminateCheckBoxIcon fontSize="small" />}
-          sx={{mr: 0.5, p:0.25}}
-          title={isAllSelectedInView ? "Bỏ chọn tất cả ca trong tuần" : (isIndeterminateInView ? "Chọn tất cả ca trong tuần" : "Chọn tất cả ca trong tuần")}
-        />
+        {canAdmin &&(
+          <Checkbox
+            size="small"
+            checked={isAllSelectedInView}
+            indeterminate={isIndeterminateInView && !isAllSelectedInView}
+            onChange={onToggleSelectAll}
+            icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+            checkedIcon={<CheckBoxIcon fontSize="small" />}
+            indeterminateIcon={<IndeterminateCheckBoxIcon fontSize="small" />}
+            sx={{mr: 0.5, p:0.25}}
+            title={isAllSelectedInView ? "Bỏ chọn tất cả ca trong tuần" : (isIndeterminateInView ? "Chọn tất cả ca trong tuần" : "Chọn tất cả ca trong tuần")}
+          />)
+        }
+
         <Typography variant="caption" sx={{ fontWeight: 'medium', textTransform: 'uppercase', color: 'text.secondary' }}>Nhân viên</Typography>
       </Grid>
       {days.map(day => (

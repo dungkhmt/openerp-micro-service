@@ -4,5 +4,6 @@ public enum AttendanceType {
     PRESENT,
     ABSENT,
     MISSING,
-    INCOMPLETE
+    INCOMPLETE,
+    LATE
 }

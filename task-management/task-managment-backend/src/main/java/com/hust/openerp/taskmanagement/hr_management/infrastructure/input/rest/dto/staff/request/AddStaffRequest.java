@@ -27,9 +27,7 @@ public class AddStaffRequest {
     private String departmentCode;
     @NotNull
     private String jobPositionCode;
-    @NotNull
     private Integer salary;
-    @NotNull
     private SalaryType salaryType;
 
     public AddStaff toUseCase(){

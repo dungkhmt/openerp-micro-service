@@ -163,6 +163,7 @@ const AttendancePageInternal = () => {
           case "ABSENT": backgroundColor = "#ffebee"; break;
           case "MISSING": backgroundColor = "#fff3e0"; break;
           case "INCOMPLETE": backgroundColor = "#fffde7"; break;
+          case "LATE": backgroundColor = "#fff0eb"; break;
           default: if (!isWeekend) backgroundColor = theme.palette.grey[50]; // Chỉ nếu không phải cuối tuần
         }
       }
@@ -236,7 +237,7 @@ const AttendancePageInternal = () => {
       <Paper sx={{ p: 2, mb: 2 }}>
         <Typography variant="h5" gutterBottom component="h1">Bảng Chấm Công Tháng</Typography>
         <Grid container spacing={2} alignItems="flex-end" wrap="wrap" marginBottom={2}>
-          <Grid item xs={12} sm={6} md="auto">
+          <Grid item xs={12} sm={6} md>
             <TextField label="Tìm theo tên nhân viên" fullWidth value={searchName} onChange={(e) => setSearchName(e.target.value)} />
           </Grid>
           <Grid item xs={12} sm={6} md>
@@ -245,12 +246,12 @@ const AttendancePageInternal = () => {
           <Grid item xs={12} sm={6} md>
             <SearchSelect label="Chức vụ" fetchUrl="/jobs?status=ACTIVE" value={selectedPos} onChange={setSelectedPos} getOptionLabel={(item) => item.name} />
           </Grid>
-          <Grid item xs={12} sm={6} md>
+          <Grid item xs={12} sm={6} md="auto">
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="vi">
               <DatePicker views={["month", "year"]} label="Chọn tháng năm" value={selectedMonth} onChange={(val) => setSelectedMonth(val || dayjs())} renderInput={(params) => <TextField {...params} fullWidth />} />
             </LocalizationProvider>
           </Grid>
-          <Grid item xs={12} md="auto">
+          {/*<Grid item xs={12} md="auto">
             <Button
               variant="contained"
               onClick={handleSearchButtonClick}
@@ -258,7 +259,7 @@ const AttendancePageInternal = () => {
             >
               Tìm kiếm
             </Button>
-          </Grid>
+          </Grid>*/}
         </Grid>
       </Paper>
 
@@ -319,8 +320,7 @@ const AttendancePageInternal = () => {
                       cursor: "pointer", display: "flex", alignItems: "center", gap: 1,
                       py: 0.5, px: 1, whiteSpace: "nowrap", height: 60,
                       borderBottom: `1px solid ${theme.palette.divider}`,
-                      borderRight: `1px solid ${theme.palette.divider}`,
-                      '&:hover': { bgcolor: theme.palette.action.hover }
+                      borderRight: `1px solid ${theme.palette.divider}`
                     }}
                   >
                     <Avatar src={`https://ui-avatars.com/api/?name=${encodeURIComponent(emp.fullname || 'N V')}&background=random&size=100&font-size=0.5`} alt={emp.fullname} sx={{ width: 32, height: 32 }} />

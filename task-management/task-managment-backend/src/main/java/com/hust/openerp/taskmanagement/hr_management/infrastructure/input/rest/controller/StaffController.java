@@ -42,8 +42,7 @@ public class  StaffController extends BeanAwareUseCasePublisher {
 
     @DeleteMapping("/{staffCode}")
     public ResponseEntity<?> deleteStaff(
-        @PathVariable String staffCode,
-            @Valid @RequestBody DeleteStaffRequest request
+        @PathVariable String staffCode
     ){
         publish(EditStaff.delete(staffCode));
         return ResponseEntity.ok().body(

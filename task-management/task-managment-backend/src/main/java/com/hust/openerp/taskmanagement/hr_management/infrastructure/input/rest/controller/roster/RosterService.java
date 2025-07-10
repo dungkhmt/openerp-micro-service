@@ -3,12 +3,14 @@ package com.hust.openerp.taskmanagement.hr_management.infrastructure.input.rest.
 // ... (imports remain the same)
 
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.absence.usecase_data.GetAbsenceList;
+import com.hust.openerp.taskmanagement.hr_management.application.port.out.holiday.usecase_data.GetHolidayList;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.shift.usecase_data.GetShiftList;
 import com.hust.openerp.taskmanagement.hr_management.application.port.out.staff.usecase_data.FindStaff;
 import com.hust.openerp.taskmanagement.hr_management.constant.AbsenceStatus;
 import com.hust.openerp.taskmanagement.hr_management.constant.StaffStatus;
 import com.hust.openerp.taskmanagement.hr_management.domain.common.usecase.BeanAwareUseCasePublisher;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.AbsenceModel;
+import com.hust.openerp.taskmanagement.hr_management.domain.model.HolidayListModel;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.ShiftModel;
 import com.hust.openerp.taskmanagement.hr_management.domain.model.StaffModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +69,14 @@ public class RosterService extends BeanAwareUseCasePublisher {
         return publishCollection(ShiftModel.class, useCase).stream().toList();
     }
 
+    private HolidayListModel fetchExistingHolidays(LocalDate apiStartDate, LocalDate apiEndDate) {
+        var useCase = GetHolidayList.builder()
+            .startDate(apiStartDate)
+            .endDate(apiEndDate)
+            .build();
+        return publish(HolidayListModel.class, useCase);
+    }
+
     // Update return type
     public RosterSolution generateSchedule(RosterRequest requestDto) {
         this.feasibleSolutionFound = false;
@@ -98,8 +108,10 @@ public class RosterService extends BeanAwareUseCasePublisher {
         var existingAssignedShifts = fetchExistingShiftsForUsers(employeeUserLoginIds, requestDto.getStartDate(), requestDto.getEndDate());
         System.out.println("Fetched existing assigned shifts count: " + existingAssignedShifts.size());
 
+        var existHolidays = fetchExistingHolidays(requestDto.getStartDate(), requestDto.getEndDate());
+
         // Call solver service
-        RosterSolution solution = solverService.solveRoster(requestDto, allActiveEmployees, approvedLeaves, existingAssignedShifts);
+        RosterSolution solution = solverService.solveRoster(requestDto, allActiveEmployees, approvedLeaves, existingAssignedShifts, existHolidays);
         this.feasibleSolutionFound = solverService.wasLastSolveFeasible();
 
         return solution;

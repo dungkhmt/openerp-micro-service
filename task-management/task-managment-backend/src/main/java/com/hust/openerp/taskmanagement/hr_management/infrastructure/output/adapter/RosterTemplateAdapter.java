@@ -8,6 +8,7 @@ import com.hust.openerp.taskmanagement.hr_management.infrastructure.output.persi
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,7 +42,9 @@ public class RosterTemplateAdapter implements IRosterTemplatePort {
 
     @Override
     public List<RosterTemplateModel> getRosterTemplates() {
-        return toModels(rosterTemplateRepo.findAll());
+        return toModels(
+            rosterTemplateRepo.findAll(Sort.by(Sort.Direction.ASC, "templateName"))
+        );
     }
 
     @Transactional
