@@ -1,0 +1,102 @@
+#SQL_DB_HOST: erp3.soict.ai
+#SQL_DB_PORT: 6543
+#SQL_DB_USER: postgres
+#SQL_DB_PASS: 
+#POSTGRES_DB: 
+
+
+SQL_DB_HOST: localhost
+SQL_DB_PORT: 5432
+SQL_DB_USER: postgres
+SQL_DB_PASS: "123456"
+POSTGRES_DB: postgres
+logging:
+  level:
+    org:
+      springframework:
+        transaction: DEBUG
+      hibernate:
+        engine:
+          transaction: DEBUG
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE  # This will log SQL parameter values
+
+
+app:
+  cors:
+    allowed-origins: http://localhost:3000
+
+spring:
+  cache:
+    type: redis
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://erp3.soict.ai/iam/realms/OpenERP-Dev/protocol/openid-connect/certs
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${SQL_DB_HOST}:${SQL_DB_PORT}/${POSTGRES_DB}
+    username: ${SQL_DB_USER}
+    password: ${SQL_DB_PASS}
+    hikari: # reference: https://github:com/brettwooldridge/HikariCP#configuration-knobs-baby:
+      maxLifetime: 30000
+      leakDetectionThreshold: 30000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+
+        #       format_sql: true # not recommended for production
+#        show_sql: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    listener:
+      simple:
+        auto-startup: true
+#        order_inserts: true
+#        jdbc:
+#          batch_size: 50
+
+delivery:
+  strategy:
+    default: GAStrategy
+server:
+  port: 8080
+  # Nên thêm:
+  tomcat:
+    threads:
+      max: 200            # Tối đa 200 threads
+      min-spare: 10       # Tối thiểu 10 spare threads
+    max-connections: 8192 # Tối đa 8192 connections
+  servlet:
+    context-path: '/api'
+  compression:
+    enabled: true # Enable response compression
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json # The comma-separated list of mime types that should be compressed
+    min-response-size: 2048 # Compress the response only if the response size is at least 2 KB
+osm-file-path: 'C:\Users\TUAN DUNG\OneDrive - Hanoi University of Science and Technology\Desktop\vietnam-latest.osm.pbf'
+
+keycloak:
+  auth-server-url: https://erp3.soict.ai/iam
+  realm: OpenERP-Dev
+  resource: smart_delivery
+
+
