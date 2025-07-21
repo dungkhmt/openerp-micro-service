@@ -1,0 +1,97 @@
+.conversationList {
+    /*background-color: #F2F2F2;*/
+    /*flex: 1;*/
+    width: 30%;
+    /*border-radius: 12px;*/
+    /*overflow-y: scroll;*/
+    /*overflow-x: hidden;*/
+    .search {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+        width: 100%;
+
+        .searchBar {
+            flex: 1;
+            background-color: rgba(17, 25, 40, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-radius: 10px;
+            padding: 10px;
+
+            input {
+                background-color: transparent;
+                border: none;
+                outline: none;
+                color: white;
+                flex: 1;
+                width: 100%;
+            }
+
+            img {
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        .add {
+            width: 36px;
+            height: 36px;
+            background-color: rgba(17, 25, 40, 0.5);
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+    }
+
+    .item {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+        cursor: pointer;
+        border-bottom: 1px solid #dddddd35;
+        width: 90%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        /*img {*/
+        /*    width: 50px;*/
+        /*    height: 50px;*/
+        /*    border-radius: 50%;*/
+        /*    object-fit: cover;*/
+        /*}*/
+
+        .texts {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-color: white;
+
+            span {
+                font-weight: 500;
+            }
+
+            p {
+                font-size: 14px;
+                font-weight: 300;
+            }
+        }
+    }
+}
+
+.conversation {
+    display: block;
+    width: 100%;
+    /*padding: 10px;*/
+    /*margin: 5px 0 5px 5px;*/
+    /*background-color: #F2F2F2;*/
+    /*border-bottom: 1px solid red;*/
+}
+
+.conversation:hover {
+    background-color: #F2F2F2;
+}

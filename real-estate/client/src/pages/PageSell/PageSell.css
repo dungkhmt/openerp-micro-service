@@ -1,0 +1,52 @@
+.listPage {
+    /*display: flex;*/
+    width: 100%;
+    height: 900px;
+    margin-bottom: 30px;
+    /*background-color: #61dafb;*/
+}
+
+.filter {
+    width: 80%;
+    height: 100px;
+    margin: 0 auto;
+}
+
+.post_map_container {
+    height: 700px;
+    width: 80%;
+    margin: 0 auto;
+}
+
+.postSellContainer {
+    /*display: flex;*/
+    height: 100%;
+    /*width: 90%;*/
+    margin: 0 10px;
+    /*overflow-y: scroll;*/
+    /*flex-direction: column;*/
+
+    /*overflow: auto;*/
+}
+
+.cardContainer {
+    margin-top: 20px;
+    height: 250px;
+    /*border: 2px solid #666666;*/
+}
+.cardContainer:hover {
+    /*border: 2px solid #61dafb;*/
+}
+
+.mapContainer {
+    /*display: block;*/
+    flex: 2;
+    /*background-color: #ff922d;*/
+    /*width: 100%;*/
+    height: 100%;
+}
+
+.mapContainer > div {
+    width: 100%;
+    height: 80%;
+}

@@ -1,0 +1,18 @@
+.contact-box-container {
+    width: 260px;
+    height: 300px;
+    border: 2px solid #F2F2F2;
+    padding: 5px 15px;
+}
+
+.contact-box-container > div {
+    margin: 5px 0;
+}
+
+.contact-box-container > button {
+    margin: 5px 0;
+}
+
+.custom-dialog {
+    padding: 0px !important;
+}
