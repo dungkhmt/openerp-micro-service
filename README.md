@@ -33,3 +33,6 @@
 - Chạy projetc <b>sample/openerp-oauth2-client</b>
 
 Sau lần chạy thành công đầu tiên, ở các lần chạy sau chỉ cần thực hiện bước 3
+
+
+<!-- Security scan triggered at 2025-09-02 04:42:34 -->
