@@ -1,0 +1,30 @@
+.list-post-sell-container {
+    /*background-color: #ffb978;*/
+    width: 100%;
+    margin: 10px auto;
+    display: flex;
+}
+
+.manager-post-sell-container {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    margin-bottom: 15px;
+}
+
+.manager-post-buy-container {
+    position: relative;
+    width: 100%;
+    border-radius: 5px;
+    border: 1px solid #F2F2F2;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.05);
+    margin: 5px 0 15px 0;
+}
+
+.feature-more {
+    align-items: center;
+    align-content: center;
+    position: absolute;
+    top: 20px;
+    right: 0px;
+}

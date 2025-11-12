@@ -1,0 +1,10 @@
+.postBuy-wrapper {
+    width: 60%;
+    box-shadow: 4px 4px 6px 4px rgba(44, 44, 44, 0.4);
+    margin: 10px auto;
+    /*background-color: red;*/
+
+    input {
+        margin-bottom: 10px;
+    }
+}
